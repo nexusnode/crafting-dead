@@ -2,10 +2,10 @@ package com.craftingdead.mod.client;
 
 import org.lwjgl.LWJGLException;
 
+import com.craftingdead.mod.client.gui.GuiMainMenu;
 import com.craftingdead.mod.core.CraftingDead;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;

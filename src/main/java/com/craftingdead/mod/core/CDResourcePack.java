@@ -55,8 +55,8 @@ public class CDResourcePack implements IResourcePack {
 
 	private static InputStream getResourceStream(ResourceLocation resourceLocation) {
 		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		return classloader.getResourceAsStream("assets" + File.separator + resourceLocation.getResourceDomain()
-				+ File.separator + resourceLocation.getResourcePath());
+		return classloader.getResourceAsStream("assets" + File.separator + resourceLocation.getNamespace()
+				+ File.separator + resourceLocation.getPath());
 	}
 
 }
