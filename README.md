@@ -1,2 +1,2 @@
 # Mod Rewritten
-##A rewrriten/ported version of Crafting Dead to the latest version of Minecraft, aiming to clean up and optmize a lot of the code at the same time as staying up to date with the latest versions of Minecraft.
+##A rewritten version of Crafting Dead, aiming to clean up and optmize a lot of the code at the same time as staying up to date with the latest versions of Minecraft.
