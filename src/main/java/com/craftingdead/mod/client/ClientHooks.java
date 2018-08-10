@@ -2,7 +2,7 @@ package com.craftingdead.mod.client;
 
 import org.lwjgl.LWJGLException;
 
-import com.craftingdead.mod.client.gui.GuiMainMenu;
+import com.craftingdead.mod.client.gui.main.GuiMainMenu;
 import com.craftingdead.mod.core.CraftingDead;
 
 import net.minecraft.client.Minecraft;
