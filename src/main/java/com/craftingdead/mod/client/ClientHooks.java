@@ -2,8 +2,13 @@ package com.craftingdead.mod.client;
 
 import org.lwjgl.LWJGLException;
 
+<<<<<<< HEAD
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.gui.GuiMainMenu;
+=======
+import com.craftingdead.mod.client.gui.main.GuiMainMenu;
+import com.craftingdead.mod.core.CraftingDead;
+>>>>>>> 548c9a1c4c92ca63c793ac4ca0cae598f5d2ac76
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
