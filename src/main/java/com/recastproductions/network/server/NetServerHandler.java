@@ -15,7 +15,7 @@ import io.netty.channel.Channel;
  * @author Sm0keySa1m0n
  *
  * @param <HS>
- *            - the {@link IHandshakePacket} that this {@link INetServerHandler}
+ *            - the {@link IHandshakePacket} that this {@link NetServerHandler}
  *            listens for
  */
 public abstract class NetServerHandler<HS extends IHandshakePacket, S extends Session<?>> extends NetHandler<HS> {
@@ -31,5 +31,12 @@ public abstract class NetServerHandler<HS extends IHandshakePacket, S extends Se
 	 */
 	@Nullable
 	public abstract S processHandshake(HS packet, Channel ch);
+	
+	/**
+	 * Get the handshake packet assigned to this {@link NetHandler}
+	 * 
+	 * @return the packet {@link Class}
+	 */
+	public abstract Class<HS> getHandshakePacketClass();
 
 }

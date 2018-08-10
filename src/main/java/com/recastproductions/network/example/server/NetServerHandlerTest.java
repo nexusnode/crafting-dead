@@ -14,7 +14,7 @@ public class NetServerHandlerTest extends NetServerHandler<HandshakeTest, Sessio
 	}
 
 	@Override
-	public Class<HandshakeTest> getHandshakePacket() {
+	public Class<HandshakeTest> getHandshakePacketClass() {
 		return HandshakeTest.class;
 	}
 

@@ -17,7 +17,7 @@ public class MinecraftTransformer extends CallbackInjectionTransformer {
 	}
 
 	public static void createDisplay(Minecraft mc) throws LWJGLException {
-		ClientHooks.createDisplay(mc);
+		ClientHooks.instance().createDisplay(mc);
 	}
 
 }

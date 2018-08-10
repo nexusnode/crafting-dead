@@ -32,9 +32,9 @@ public final class CraftingDead implements IFMLCallHook {
 	
 	public static final SocketAddress MANAGEMENT_SERVER_ADDRESS = new InetSocketAddress("localhost", 32888);
 
-	private static CraftingDead instance;
-	
 	public static final SimpleNetworkWrapper NETWORK_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+	
+	private static CraftingDead instance;
 	
 	private ISidedMod<?> sidedMod;
 

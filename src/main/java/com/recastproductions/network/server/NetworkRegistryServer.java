@@ -2,9 +2,11 @@ package com.recastproductions.network.server;
 
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.recastproductions.network.NetHandler;
 import com.recastproductions.network.NetworkRegistry;
 import com.recastproductions.network.packet.IHandshakePacket;
 import com.recastproductions.network.pipeline.HandshakeHandler;
@@ -13,19 +15,31 @@ import io.netty.channel.Channel;
 
 public class NetworkRegistryServer extends NetworkRegistry {
 
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	private BiMap<String, Class<? extends IHandshakePacket>> handshakeMap = HashBiMap.create();
 	private BiMap<String, NetServerHandler<?, ?>> handlerMap = HashBiMap.create();
 
 	public void registerNetHandler(NetServerHandler<?, ?> handler) {
-		this.handlerMap.put(handler.getName(), handler);
-		this.handshakeMap.put(handler.getName(), handler.getHandshakePacket());
+		if (!this.handlerMap.containsKey(handler.getName())) {
+			this.handlerMap.put(handler.getName(), handler);
+			this.handshakeMap.put(handler.getName(), handler.getHandshakePacketClass());
+		} else {
+			LOGGER.warn("A NetHandler with the name {} is already registered under the class {}", handler.getName(),
+					handlerMap.get(handler.getName()).getClass().getCanonicalName());
+		}
+	}
+
+	public void removeNetHandler(String name) {
+		handshakeMap.remove(name);
+		handlerMap.remove(name);
 	}
 
 	public String getName(Class<? extends IHandshakePacket> handshakeMessage) {
 		return handshakeMap.inverse().get(handshakeMessage);
 	}
 
-	public NetHandler<?> getNetHandler(String name) {
+	public NetServerHandler<?, ?> getNetHandler(String name) {
 		return handlerMap.get(name);
 	}
 
@@ -38,7 +52,7 @@ public class NetworkRegistryServer extends NetworkRegistry {
 
 	private <T extends IHandshakePacket, SH extends NetServerHandler<T, ?>> HandshakeHandler<T, SH> wrapHandshakeHandler(
 			SH netHandler) {
-		return new HandshakeHandler<T, SH>(netHandler.getHandshakePacket(), netHandler);
+		return new HandshakeHandler<T, SH>(netHandler.getHandshakePacketClass(), netHandler);
 	}
 
 }

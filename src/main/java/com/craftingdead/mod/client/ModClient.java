@@ -17,8 +17,11 @@ import com.craftingdead.mod.core.CDDummyContainer;
 import com.craftingdead.mod.core.CraftingDead;
 import com.craftingdead.mod.core.ISidedMod;
 import com.craftingdead.mod.network.message.client.CMessageHandshake;
+import com.craftingdead.network.modclient.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
+import com.recastproductions.network.client.NetworkClient;
+import com.recastproductions.network.client.NetworkRegistryClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeModContainer;
@@ -43,10 +46,23 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 	
 	private IntegratedServer integratedServer;
+	
+	private ClientHooks clientHooks;
+	
+	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
+	private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
+	private NetworkClient networkClient = new NetworkClient(registryClient);
+	
+	public ModClient() {
+		netHandler = new NetClientHandlerModClient(this);
+		registryClient = new NetworkRegistryClient(netHandler);
+		networkClient = new NetworkClient(registryClient.getChannelInitializer());
+	}
 
 	@Override
 	public void setup(CraftingDead mod) {
 		integratedServer = new IntegratedServer();
+		clientHooks = new ClientHooks(Minecraft.getMinecraft(), this);
 	}
 
 	@Override
@@ -61,7 +77,8 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 
 	@Subscribe
 	public void preInitializationEvent(FMLPreInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(ClientHooks.class);
+		MinecraftForge.EVENT_BUS.register(clientHooks);
+		networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
 	}
 	
 	void runTick() {
@@ -134,6 +151,10 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 			unauthorizedMods.add(mod.getModId());
 		}
 		return new CMessageHandshake(unauthorizedMods.toArray(new String[0]));
+	}
+	
+	public NetClientHandlerModClient getNetHandler() {
+		return this.netHandler;
 	}
 
 }

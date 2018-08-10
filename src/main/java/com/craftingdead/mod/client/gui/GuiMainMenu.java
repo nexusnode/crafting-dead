@@ -1,7 +1,15 @@
 package com.craftingdead.mod.client.gui;
 
-import net.minecraft.client.gui.GuiScreen;
+import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.core.CraftingDead;
 
-public class GuiMainMenu extends GuiScreen {
+import net.minecraft.util.ResourceLocation;
+
+public class GuiMainMenu extends GuiCDScreen {
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		RenderHelper.drawImage(0, 0, new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_64x64.png"), width, height, 1);
+	}
 
 }

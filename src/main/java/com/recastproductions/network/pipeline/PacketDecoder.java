@@ -32,7 +32,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
 				NetworkRegistry registry = ctx.channel().attr(NetworkRegistry.INSTANCE_ATTR).get();
 				if (registry instanceof NetworkRegistryServer) {
 					String netHandlerName = ByteBufUtils.readUTF8(in);
-					packetClass = ((NetworkRegistryServer) registry).getNetHandler(netHandlerName).getHandshakePacket();
+					packetClass = ((NetworkRegistryServer) registry).getNetHandler(netHandlerName)
+							.getHandshakePacketClass();
 				}
 			} else {
 				NetHandler<?> handler = ctx.channel().attr(NetHandler.NET_HANDLER_ATTR).get();

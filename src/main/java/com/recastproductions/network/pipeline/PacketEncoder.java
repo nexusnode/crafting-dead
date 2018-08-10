@@ -1,5 +1,8 @@
 package com.recastproductions.network.pipeline;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.recastproductions.network.NetHandler;
 import com.recastproductions.network.NetworkRegistry;
 import com.recastproductions.network.client.NetworkRegistryClient;
@@ -14,6 +17,8 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 
 	public static final String PIPELINE_NAME = "packet_endcoder";
+	
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, IPacket msg, ByteBuf out) throws Exception {
@@ -26,8 +31,13 @@ public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 				// Write net handler name
 				ByteBufUtils.writeUTF8(out, netHandlerName);
 				// Write message
-				msg.toBytes(out);
+				try {
+					msg.toBytes(out);
+				} catch(Exception e) {
+					LOGGER.error("An exception was thrown while encoding a packet", e);
+				}
 			} else {
+				LOGGER.warn("Sending handshake packet from wrong side!");
 				return;
 			}
 		} else {
@@ -36,8 +46,13 @@ public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 				// Write discriminator
 				ByteBufUtils.writeVarInt(out, handler.getDiscriminitor(msg.getClass()));
 				// Write message
-				msg.toBytes(out);
+				try {
+					msg.toBytes(out);
+				} catch(Exception e) {
+					LOGGER.error("An exception was thrown while encoding a packet", e);
+				}
 			} else {
+				LOGGER.warn("No NetHandler found!");
 				return;
 			}
 		}

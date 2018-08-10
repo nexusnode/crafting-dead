@@ -14,8 +14,8 @@ public class NetClientHandlerTest extends NetClientHandler<HandshakeTest, Sessio
 	}
 
 	@Override
-	public Class<HandshakeTest> getHandshakePacket() {
-		return HandshakeTest.class;
+	public HandshakeTest getHandshakePacket() {
+		return new HandshakeTest();
 	}
 
 	@Override

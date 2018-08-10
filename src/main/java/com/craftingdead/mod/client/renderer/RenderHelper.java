@@ -10,6 +10,7 @@ import com.craftingdead.mod.core.CraftingDead;
 import com.craftingdead.mod.util.DownloadUtil;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
@@ -144,6 +145,15 @@ public class RenderHelper {
 		itemRender.renderItemAndEffectIntoGUI(stack, x, y);
 		itemRender.renderItemOverlayIntoGUI(font, stack, x, y, null);
 		itemRender.zLevel = 0.0F;
+	}
+
+	public static void drawCenteredString(FontRenderer fontRenderer, String text, int x, int y, int color) {
+		fontRenderer.drawStringWithShadow(text, (float) (x - fontRenderer.getStringWidth(text) / 2), (float) y, color);
+	}
+
+	public static void renderTextRight(FontRenderer fontRenderer, String text, int x, int y, boolean dropShadow,
+			int color) {
+		fontRenderer.drawString(text, x - fontRenderer.getStringWidth(text), y, color, dropShadow);
 	}
 
 	public static boolean isInBox(int x, int y, int width, int height, int checkX, int checkY) {

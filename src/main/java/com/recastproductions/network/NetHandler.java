@@ -29,13 +29,6 @@ public abstract class NetHandler<HS extends IHandshakePacket> {
 	 * @return the name
 	 */
 	public abstract String getName();
-
-	/**
-	 * Get the handshake packet assigned to this {@link INetHandler}
-	 * 
-	 * @return the packet {@link Class}
-	 */
-	public abstract Class<HS> getHandshakePacket();
 	
 	/**
 	 * Called to register packets

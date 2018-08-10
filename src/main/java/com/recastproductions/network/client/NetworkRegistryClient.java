@@ -24,7 +24,7 @@ public class NetworkRegistryClient extends NetworkRegistry {
 		LOGGER.info("Sending handshake packet");
 		try {
 			ctx.channel().attr(NetHandler.NET_HANDLER_ATTR).set(netHandler);
-			ctx.channel().writeAndFlush(this.netHandler.getHandshakePacket().newInstance()).channel().pipeline()
+			ctx.channel().writeAndFlush(this.netHandler.getHandshakePacket()).channel().pipeline()
 					.addLast(Session.PIPELINE_NAME, this.netHandler.newSession(ctx.channel()));
 		} catch (Exception e) {
 			throw new RuntimeException("Could not send handshake packet", e);
