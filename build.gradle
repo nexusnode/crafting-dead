@@ -50,6 +50,6 @@ processResources {
 
 jar {
 	manifest {
-		attributes 'FMLCorePlugin': 'com.craftingdead.mod.core.CDLoadingPlugin'
+		attributes 'FMLCorePlugin': 'com.craftingdead.mod.common.core.CDLoadingPlugin'
 	}
 }
