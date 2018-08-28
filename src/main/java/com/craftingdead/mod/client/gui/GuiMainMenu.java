@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.gui;
 
 import com.craftingdead.mod.client.renderer.RenderHelper;
-import com.craftingdead.mod.core.CraftingDead;
+import com.craftingdead.mod.common.core.CraftingDead;
 
 import net.minecraft.util.ResourceLocation;
 

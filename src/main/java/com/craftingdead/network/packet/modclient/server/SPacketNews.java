@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.craftingdead.mod.core.CraftingDead;
+import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.network.modclient.SessionModClient;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;

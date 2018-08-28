@@ -5,9 +5,6 @@ import org.lwjgl.LWJGLException;
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.gui.GuiMainMenu;
 
-import com.craftingdead.mod.client.gui.main.GuiMainMenu;
-import com.craftingdead.mod.core.CraftingDead;
-
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;

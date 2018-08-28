@@ -11,7 +11,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.craftingdead.mod.core.CraftingDead;
+import com.craftingdead.mod.common.core.CraftingDead;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 

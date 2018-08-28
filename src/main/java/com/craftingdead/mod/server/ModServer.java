@@ -1,7 +1,7 @@
 package com.craftingdead.mod.server;
 
-import com.craftingdead.mod.core.CraftingDead;
-import com.craftingdead.mod.core.ISidedMod;
+import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.core.ISidedMod;
 
 public class ModServer implements ISidedMod<DedicatedServer> {
 

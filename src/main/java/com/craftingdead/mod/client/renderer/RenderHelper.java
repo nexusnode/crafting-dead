@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
-import com.craftingdead.mod.core.CraftingDead;
+import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.util.DownloadUtil;
 
 import net.minecraft.client.Minecraft;

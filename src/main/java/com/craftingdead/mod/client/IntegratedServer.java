@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client;
 
-import com.craftingdead.mod.LogicalServer;
-import com.craftingdead.mod.network.message.client.CMessageHandshake;
-import com.craftingdead.mod.player.Player;
+import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
+import com.craftingdead.mod.common.server.LogicalServer;
+import com.craftingdead.mod.common.server.Player;
 
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
@@ -15,7 +15,7 @@ public class IntegratedServer extends LogicalServer {
 	}
 
 	@Override
-	protected boolean verifyHandshake(CMessageHandshake handshakeMessage) {
+	protected boolean verifyHandshake(CPacketHandshake handshakeMessage) {
 		return true;
 	}
 

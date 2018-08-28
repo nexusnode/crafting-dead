@@ -13,15 +13,15 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.PixelFormat;
 
-import com.craftingdead.mod.core.CDDummyContainer;
-import com.craftingdead.mod.core.CraftingDead;
-import com.craftingdead.mod.core.ISidedMod;
-import com.craftingdead.mod.network.message.client.CMessageHandshake;
+import com.craftingdead.mod.common.core.CDDummyContainer;
+import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.core.ISidedMod;
+import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.craftingdead.network.modclient.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
-import com.recastproductions.network.client.NetworkClient;
-import com.recastproductions.network.client.NetworkRegistryClient;
+import com.recastproductions.network.NetworkClient;
+import com.recastproductions.network.impl.client.NetworkRegistryClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeModContainer;
@@ -137,7 +137,7 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 		return bytebuffer;
 	}
 
-	public CMessageHandshake getHandshakePacket() {
+	public CPacketHandshake getHandshakePacket() {
 		List<String> unauthorizedMods = new ArrayList<String>();
 		for (ModContainer mod : Loader.instance().getModList()) {
 			if (mod instanceof InjectedModContainer) {
@@ -150,7 +150,7 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 			CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
 			unauthorizedMods.add(mod.getModId());
 		}
-		return new CMessageHandshake(unauthorizedMods.toArray(new String[0]));
+		return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
 	}
 	
 	public NetClientHandlerModClient getNetHandler() {
