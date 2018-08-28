@@ -1,13 +1,11 @@
 package com.craftingdead.mod.client.renderer;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
 import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.util.DownloadUtil;
+import com.craftingdead.mod.util.PlayerResource;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -15,6 +13,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
@@ -22,12 +21,10 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderHelper {
 
-	public static void drawRectangleWithShadow(int x, int y, int width, int height, int color, float alpha) {
-		drawRectangle(x - 1, y - 1, width + 2, height + 2, color, alpha * 0.3F);
-		drawRectangle(x, y, width, height, color, alpha);
-	}
-
-	public static void drawRectangle(double x, double y, double width, double height, int color, float alpha) {
+	public static void drawRectangle(double x, double y, double width, double height, int color, float alpha,
+			boolean shadow) {
+		if (shadow)
+			drawRectangle(x - 1, y - 1, width + 2, height + 2, color, alpha * 0.3F, false);
 		float f = (float) (color >> 16 & 255) / 255.0F;
 		float f1 = (float) (color >> 8 & 255) / 255.0F;
 		float f2 = (float) (color & 255) / 255.0F;
@@ -103,36 +100,17 @@ public class RenderHelper {
 		GL11.glPopMatrix();
 	}
 
-	public static ResourceLocation getPlayerAvatar(UUID playerUUID) throws MalformedURLException {
+	public static ResourceLocation getPlayerAvatar(UUID playerUUID) {
 		ResourceLocation resourceLocation = new ResourceLocation(CraftingDead.MOD_ID,
 				"textures/avatars/" + playerUUID + ".png");
 		ITextureObject object = Minecraft.getMinecraft().getTextureManager().getTexture(resourceLocation);
 		if (object == null) {
-			DownloadUtil.loadImageAsync(new URL("https://crafatar.com/avatars/" + playerUUID + ".png"),
-					resourceLocation);
-			resourceLocation = new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/avatar.png");
+			ThreadDownloadImageData imageData = new ThreadDownloadImageData(null,
+					PlayerResource.AVATAR_URL.getUrl(playerUUID),
+					new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/avatar.png"), null);
+			Minecraft.getMinecraft().getTextureManager().loadTexture(resourceLocation, imageData);
 		}
 		return resourceLocation;
-	}
-
-	public static void drawPlayerAvatar(UUID playerUUID, int x, int y, int width, int height, boolean shadow,
-			float alpha) {
-		if (shadow)
-			RenderHelper.drawRectangle(x - 1, y - 1, width + 2, height + 2, 0, alpha * 0.3F);
-		try {
-			RenderHelper.drawImage(x, y, RenderHelper.getPlayerAvatar(playerUUID), width, height, alpha);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void drawImageCenteredScaled(double x, double y, ResourceLocation image, double width, double height,
-			float alpha, double scale) {
-		GL11.glPushMatrix();
-		GL11.glTranslated(-width / 2.0 * scale * scale, -height / 2.0 * scale * scale, 0.0);
-		GL11.glScaled(scale, scale, scale);
-		drawImage(x, y, image, width, height, alpha);
-		GL11.glPopMatrix();
 	}
 
 	public static void drawItemStack(ItemStack stack, int x, int y) {
@@ -147,11 +125,12 @@ public class RenderHelper {
 		itemRender.zLevel = 0.0F;
 	}
 
-	public static void drawCenteredString(FontRenderer fontRenderer, String text, int x, int y, int color) {
-		fontRenderer.drawStringWithShadow(text, (float) (x - fontRenderer.getStringWidth(text) / 2), (float) y, color);
+	public static void drawCenteredString(FontRenderer fontRenderer, String string, int x, int y, int color) {
+		fontRenderer.drawStringWithShadow(string, (float) (x - fontRenderer.getStringWidth(string) / 2), (float) y,
+				color);
 	}
 
-	public static void renderTextRight(FontRenderer fontRenderer, String text, int x, int y, boolean dropShadow,
+	public static void drawRightAlignedString(FontRenderer fontRenderer, String text, int x, int y, boolean dropShadow,
 			int color) {
 		fontRenderer.drawString(text, x - fontRenderer.getStringWidth(text), y, color, dropShadow);
 	}
