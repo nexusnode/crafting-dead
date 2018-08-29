@@ -16,29 +16,29 @@ import io.netty.util.AttributeKey;
 @ChannelInboundHandlerAdapter.Sharable
 public abstract class NetworkRegistry extends ChannelInboundHandlerAdapter {
 
-	public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
-	public static final AttributeKey<NetworkRegistry> INSTANCE_ATTR = AttributeKey.valueOf("network_registry");
+    public static final AttributeKey<NetworkRegistry> INSTANCE_ATTR = AttributeKey.valueOf("network_registry");
 
-	protected abstract void initChannel(Channel ch) throws Exception;
+    protected abstract void initChannel(Channel ch) throws Exception;
 
-	public Initializer getChannelInitializer() {
-		return new Initializer();
-	}
+    public Initializer getChannelInitializer() {
+        return new Initializer();
+    }
 
-	public class Initializer extends ChannelInitializer<Channel> {
+    public class Initializer extends ChannelInitializer<Channel> {
 
-		@Override
-		protected void initChannel(Channel ch) throws Exception {
-			ch.attr(INSTANCE_ATTR).set(NetworkRegistry.this);
+        @Override
+        protected void initChannel(Channel ch) throws Exception {
+            ch.attr(INSTANCE_ATTR).set(NetworkRegistry.this);
 
-			ch.pipeline().addLast(new Varint21FrameDecoder()).addLast(PacketDecoder.PIPELINE_NAME, new PacketDecoder());
+            ch.pipeline().addLast(new Varint21FrameDecoder()).addLast(PacketDecoder.PIPELINE_NAME, new PacketDecoder());
 
-			ch.pipeline().addLast(new Varint21FrameEncoder()).addLast(PacketEncoder.PIPELINE_NAME, new PacketEncoder())
-					.addLast(NetworkRegistry.this);
-			NetworkRegistry.this.initChannel(ch);
-		}
+            ch.pipeline().addLast(new Varint21FrameEncoder()).addLast(PacketEncoder.PIPELINE_NAME, new PacketEncoder())
+                    .addLast(NetworkRegistry.this);
+            NetworkRegistry.this.initChannel(ch);
+        }
 
-	}
+    }
 
 }

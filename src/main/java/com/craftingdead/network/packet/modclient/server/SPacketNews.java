@@ -14,35 +14,35 @@ import io.netty.buffer.ByteBuf;
 
 public class SPacketNews implements IPacket {
 
-	private List<String> news;
+    private List<String> news;
 
-	public SPacketNews() {
-		;
-	}
+    public SPacketNews() {
+        ;
+    }
 
-	public SPacketNews(List<String> news) {
-		this.news = new ArrayList<String>(news);
-	}
+    public SPacketNews(List<String> news) {
+        this.news = new ArrayList<String>(news);
+    }
 
-	@Override
-	public void toBytes(ByteBuf out) throws Exception {
-		ByteBufUtils.writeStringArray(out, news.toArray(new String[0]));
-	}
+    @Override
+    public void toBytes(ByteBuf out) throws Exception {
+        ByteBufUtils.writeStringArray(out, news.toArray(new String[0]));
+    }
 
-	@Override
-	public void fromBytes(ByteBuf in) throws Exception {
-		news = Arrays.asList(ByteBufUtils.readStringArray(in));
-	}
-	
-	public static class PacketHandlerSPacketNews implements IPacketHandler<SPacketNews, IPacket, SessionModClient> {
+    @Override
+    public void fromBytes(ByteBuf in) throws Exception {
+        news = Arrays.asList(ByteBufUtils.readStringArray(in));
+    }
 
-		@Override
-		public IPacket processPacket(SPacketNews packet, SessionModClient session) {
-			session.setNews(packet.news);
-			CraftingDead.LOGGER.info("News successfully updated");
-			return null;
-		}
-		
-	}
+    public static class PacketHandlerSPacketNews implements IPacketHandler<SPacketNews, IPacket, SessionModClient> {
+
+        @Override
+        public IPacket processPacket(SPacketNews packet, SessionModClient session) {
+            session.setNews(packet.news);
+            CraftingDead.LOGGER.info("News successfully updated");
+            return null;
+        }
+
+    }
 
 }

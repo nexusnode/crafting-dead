@@ -16,47 +16,47 @@ import net.minecraftforge.fml.common.ModContainer;
 
 public class CDResourcePack implements IResourcePack {
 
-	protected ModContainer ownerContainer;
+    protected ModContainer ownerContainer;
 
-	public CDResourcePack(ModContainer container) {
-		this.ownerContainer = container;
-	}
+    public CDResourcePack(ModContainer container) {
+        this.ownerContainer = container;
+    }
 
-	@Override
-	public InputStream getInputStream(ResourceLocation location) throws IOException {
-		return getResourceStream(location);
-	}
+    @Override
+    public InputStream getInputStream(ResourceLocation location) throws IOException {
+        return getResourceStream(location);
+    }
 
-	@Override
-	public boolean resourceExists(ResourceLocation location) {
-		return getResourceStream(location) != null;
-	}
+    @Override
+    public boolean resourceExists(ResourceLocation location) {
+        return getResourceStream(location) != null;
+    }
 
-	@Override
-	public Set<String> getResourceDomains() {
-		return ImmutableSet.of(ownerContainer.getModId());
-	}
+    @Override
+    public Set<String> getResourceDomains() {
+        return ImmutableSet.of(ownerContainer.getModId());
+    }
 
-	@Override
-	public <T extends IMetadataSection> T getPackMetadata(MetadataSerializer metadataSerializer,
-			String metadataSectionName) throws IOException {
-		return null;
-	}
+    @Override
+    public <T extends IMetadataSection> T getPackMetadata(MetadataSerializer metadataSerializer,
+                                                          String metadataSectionName) throws IOException {
+        return null;
+    }
 
-	@Override
-	public BufferedImage getPackImage() throws IOException {
-		return null;
-	}
+    @Override
+    public BufferedImage getPackImage() throws IOException {
+        return null;
+    }
 
-	@Override
-	public String getPackName() {
-		return ownerContainer.getName();
-	}
+    @Override
+    public String getPackName() {
+        return ownerContainer.getName();
+    }
 
-	private static InputStream getResourceStream(ResourceLocation resourceLocation) {
-		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		return classloader.getResourceAsStream("assets" + File.separator + resourceLocation.getNamespace()
-				+ File.separator + resourceLocation.getPath());
-	}
+    private static InputStream getResourceStream(ResourceLocation resourceLocation) {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        return classloader.getResourceAsStream("assets" + File.separator + resourceLocation.getNamespace()
+                + File.separator + resourceLocation.getPath());
+    }
 
 }

@@ -12,31 +12,31 @@ import net.minecraftforge.fml.common.ModMetadata;
 
 public class CDDummyContainer extends DummyModContainer {
 
-	public CDDummyContainer() {
-		super(new ModMetadata());
-		this.getMetadata().modId = CraftingDead.MOD_ID;
-		this.getMetadata().name = CraftingDead.MOD_NAME;
-		this.getMetadata().version = CraftingDead.MOD_VERSION;
-	}
+    public CDDummyContainer() {
+        super(new ModMetadata());
+        this.getMetadata().modId = CraftingDead.MOD_ID;
+        this.getMetadata().name = CraftingDead.MOD_NAME;
+        this.getMetadata().version = CraftingDead.MOD_VERSION;
+    }
 
-	@Override
-	public boolean registerBus(EventBus bus, LoadController controller) {
-		return CraftingDead.instance().registerBus(bus, controller);
-	}
+    @Override
+    public boolean registerBus(EventBus bus, LoadController controller) {
+        return CraftingDead.instance().registerBus(bus, controller);
+    }
 
-	@Override
-	public Class<?> getCustomResourcePackClass() {
-		return CDResourcePack.class;
-	}
+    @Override
+    public Class<?> getCustomResourcePackClass() {
+        return CDResourcePack.class;
+    }
 
-	@Override
-	public List<String> getOwnedPackages() {
-		return ImmutableList.of();
-	}
+    @Override
+    public List<String> getOwnedPackages() {
+        return ImmutableList.of();
+    }
 
-	@Override
-	public File getSource() {
-		return CraftingDead.instance().getModLocation();
-	}
+    @Override
+    public File getSource() {
+        return CraftingDead.instance().getModLocation();
+    }
 
 }

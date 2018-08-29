@@ -7,9 +7,9 @@ import com.recastproductions.network.packet.IHandshakePacket;
 import io.netty.channel.Channel;
 
 public abstract class NetClientHandler<HS extends IHandshakePacket, S extends Session<?>> extends NetHandler<HS> {
-	
-	protected abstract S newSession(Channel ch);
-	
-	protected abstract HS getHandshakePacket();
-		
+
+    protected abstract S newSession(Channel ch);
+
+    protected abstract HS getHandshakePacket();
+
 }

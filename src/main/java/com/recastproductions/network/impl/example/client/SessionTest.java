@@ -8,13 +8,13 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class SessionTest extends Session<NetClientHandlerTest> {
 
-	public SessionTest(Channel ch, NetClientHandlerTest handler) {
-		super(ch, handler);
-	}
+    public SessionTest(Channel ch, NetClientHandlerTest handler) {
+        super(ch, handler);
+    }
 
-	@Override
-	public void handlerAdded(ChannelHandlerContext ctx) {
-		ctx.channel().writeAndFlush(new PacketTest("Hello server"));
-	}
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) {
+        ctx.channel().writeAndFlush(new PacketTest("Hello server"));
+    }
 
 }

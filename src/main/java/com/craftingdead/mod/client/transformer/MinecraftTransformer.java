@@ -10,14 +10,14 @@ import net.minecraft.client.Minecraft;
 
 public class MinecraftTransformer extends CallbackInjectionTransformer {
 
-	@Override
-	protected void addCallbacks() {
-		addCallback("net.minecraft.client.Minecraft", "createDisplay", "()V",
-				new Callback(Callback.CallbackType.REDIRECT, "createDisplay", this.getClass().getCanonicalName()));
-	}
+    @Override
+    protected void addCallbacks() {
+        addCallback("net.minecraft.client.Minecraft", "createDisplay", "()V",
+                new Callback(Callback.CallbackType.REDIRECT, "createDisplay", this.getClass().getCanonicalName()));
+    }
 
-	public static void createDisplay(Minecraft mc) throws LWJGLException {
-		ClientHooks.instance().createDisplay(mc);
-	}
+    public static void createDisplay(Minecraft mc) throws LWJGLException {
+        ClientHooks.instance().createDisplay(mc);
+    }
 
 }

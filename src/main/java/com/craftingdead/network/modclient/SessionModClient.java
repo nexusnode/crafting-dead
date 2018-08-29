@@ -11,26 +11,26 @@ import io.netty.channel.Channel;
 
 public class SessionModClient extends Session<NetClientHandlerModClient> {
 
-	private final ModClient modClient;
+    private final ModClient modClient;
 
-	private List<String> news = new ArrayList<String>();
+    private List<String> news = new ArrayList<String>();
 
-	public SessionModClient(Channel ch, NetClientHandlerModClient handler, ModClient modClient) {
-		super(ch, handler);
-		this.modClient = modClient;
-		CraftingDead.LOGGER.info("Connected to the Crafting Dead Network!");
-	}
+    public SessionModClient(Channel ch, NetClientHandlerModClient handler, ModClient modClient) {
+        super(ch, handler);
+        this.modClient = modClient;
+        CraftingDead.LOGGER.info("Connected to the Crafting Dead Network!");
+    }
 
-	public void setNews(List<String> news) {
-		news = new ArrayList<String>(news);
-	}
+    public void setNews(List<String> news) {
+        news = new ArrayList<String>(news);
+    }
 
-	public List<String> getNews() {
-		return this.news;
-	}
+    public List<String> getNews() {
+        return this.news;
+    }
 
-	public ModClient getModClient() {
-		return this.modClient;
-	}
+    public ModClient getModClient() {
+        return this.modClient;
+    }
 
 }

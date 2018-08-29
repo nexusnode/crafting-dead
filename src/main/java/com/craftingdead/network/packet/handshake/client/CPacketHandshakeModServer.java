@@ -6,14 +6,14 @@ import io.netty.buffer.ByteBuf;
 
 public class CPacketHandshakeModServer implements IHandshakePacket {
 
-	@Override
-	public void toBytes(ByteBuf out) throws Exception {
-		
-	}
+    @Override
+    public void toBytes(ByteBuf out) throws Exception {
 
-	@Override
-	public void fromBytes(ByteBuf in) throws Exception {
-		
-	}
+    }
+
+    @Override
+    public void fromBytes(ByteBuf in) throws Exception {
+
+    }
 
 }

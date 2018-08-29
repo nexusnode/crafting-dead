@@ -9,24 +9,24 @@ import io.netty.buffer.ByteBuf;
 
 public class SPacketRequestHandshake implements IPacket {
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		;
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        ;
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		;
-	}
+    @Override
+    public void toBytes(ByteBuf buf) {
+        ;
+    }
 
-	public static class SPacketHandlerRequestHandshake
-			implements IPacketHandler<SPacketRequestHandshake, CPacketHandshake, CraftingDeadContext> {
+    public static class SPacketHandlerRequestHandshake
+            implements IPacketHandler<SPacketRequestHandshake, CPacketHandshake, CraftingDeadContext> {
 
-		@Override
-		public CPacketHandshake processPacket(SPacketRequestHandshake packet, CraftingDeadContext ctx) {
-			return ctx.getModClient().getHandshakePacket();
-		}
+        @Override
+        public CPacketHandshake processPacket(SPacketRequestHandshake packet, CraftingDeadContext ctx) {
+            return ctx.getModClient().getHandshakePacket();
+        }
 
-	}
+    }
 
 }

@@ -8,19 +8,19 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 public class DedicatedServer extends LogicalServer {
 
-	@Override
-	protected void onServerStart(FMLServerStartingEvent event) {
-		
-	}
+    @Override
+    protected void onServerStart(FMLServerStartingEvent event) {
 
-	@Override
-	protected boolean verifyHandshake(CPacketHandshake handshakeMessage) {
-		return false;
-	}
+    }
 
-	@Override
-	protected void playerAccepted(Player client) {
-		
-	}
+    @Override
+    protected boolean verifyHandshake(CPacketHandshake handshakeMessage) {
+        return false;
+    }
+
+    @Override
+    protected void playerAccepted(Player client) {
+
+    }
 
 }

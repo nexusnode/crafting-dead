@@ -8,30 +8,30 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class Player {
 
-	private final EntityPlayerMP entity;
-	private String[] mods;
-	private LogicalServer server;
+    private final EntityPlayerMP entity;
+    private String[] mods;
+    private LogicalServer server;
 
-	public Player(LogicalServer server, EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
-		this.server = server;
-		this.entity = entity;
-		this.mods = handshakeMessage.getMods();
-	}
+    public Player(LogicalServer server, EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
+        this.server = server;
+        this.entity = entity;
+        this.mods = handshakeMessage.getMods();
+    }
 
-	public EntityPlayerMP getVanillaEntity() {
-		return entity;
-	}
+    public EntityPlayerMP getVanillaEntity() {
+        return entity;
+    }
 
-	public String[] getMods() {
-		return this.mods;
-	}
+    public String[] getMods() {
+        return this.mods;
+    }
 
-	public void sendPacket(IPacket packet) {
-		CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
-	}
+    public void sendPacket(IPacket packet) {
+        CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
+    }
 
-	public LogicalServer getLogicalServer() {
-		return this.server;
-	}
+    public LogicalServer getLogicalServer() {
+        return this.server;
+    }
 
 }

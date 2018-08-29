@@ -9,6 +9,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.craftingdead.discord.DiscordEventHandlers;
+import com.craftingdead.discord.DiscordRPC;
+import com.craftingdead.discord.DiscordRichPresence;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.PixelFormat;
@@ -36,125 +39,134 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public final class ModClient implements ISidedMod<IntegratedServer> {
 
-	private static final String[] ICON_LOCATIONS = new String[] {
-			"assets/craftingdead/textures/gui/icons/icon_16x16.png",
-			"assets/craftingdead/textures/gui/icons/icon_32x32.png",
-			"assets/craftingdead/textures/gui/icons/icon_64x64.png" };
+    private static final String[] ICON_LOCATIONS = new String[]{
+            "assets/craftingdead/textures/gui/icons/icon_16x16.png",
+            "assets/craftingdead/textures/gui/icons/icon_32x32.png",
+            "assets/craftingdead/textures/gui/icons/icon_64x64.png"};
 
-	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
-			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
-			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
-	
-	private IntegratedServer integratedServer;
-	
-	private ClientHooks clientHooks;
-	
-	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
-	private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
-	private NetworkClient networkClient = new NetworkClient(registryClient);
-	
-	public ModClient() {
-		netHandler = new NetClientHandlerModClient(this);
-		registryClient = new NetworkRegistryClient(netHandler);
-		networkClient = new NetworkClient(registryClient.getChannelInitializer());
-	}
+    private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
+            .add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
+            .add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
-	@Override
-	public void setup(CraftingDead mod) {
-		integratedServer = new IntegratedServer();
-		clientHooks = new ClientHooks(Minecraft.getMinecraft(), this);
-	}
+    private IntegratedServer integratedServer;
 
-	@Override
-	public IntegratedServer getLogicalServer() {
-		return integratedServer;
-	}
+    private ClientHooks clientHooks;
 
-	@Override
-	public void onShutdown() {
-		;
-	}
+    private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
+    private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
+    private NetworkClient networkClient = new NetworkClient(registryClient);
 
-	@Subscribe
-	public void preInitializationEvent(FMLPreInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(clientHooks);
-		networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
-	}
-	
-	void runTick() {
+    public ModClient() {
+        netHandler = new NetClientHandlerModClient(this);
+        registryClient = new NetworkRegistryClient(netHandler);
+        networkClient = new NetworkClient(registryClient.getChannelInitializer());
+    }
 
-	}
+    @Override
+    public void setup(CraftingDead mod) {
+        integratedServer = new IntegratedServer();
+        clientHooks = new ClientHooks(Minecraft.getMinecraft(), this);
 
-	void createDisplay(Minecraft mc) throws LWJGLException {
-		mc.gameSettings.guiScale = 2;
-		Display.setTitle(CraftingDead.MOD_NAME);
-		Display.setResizable(false);
+        DiscordRPC discordRPC = DiscordRPC.INSTANCE;
 
-		List<ByteBuffer> icons = new ArrayList<ByteBuffer>();
-		for (String location : ICON_LOCATIONS) {
-			try {
-				ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-				InputStream inputstream = classloader.getResourceAsStream(location);
-				icons.add(readImageToBuffer(inputstream));
-				inputstream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        DiscordEventHandlers handlers = new DiscordEventHandlers();
+        discordRPC.Discord_Initialize("484121003589500929", handlers, true, null);
+        DiscordRichPresence discordRichPresence = new DiscordRichPresence();
+        discordRichPresence.details = "Main Menu";
+        discordRichPresence.largeImageKey = "logo-512";
+        discordRPC.Discord_UpdatePresence(discordRichPresence);
+    }
 
-		Display.setIcon(icons.toArray(new ByteBuffer[0]));
+    @Override
+    public IntegratedServer getLogicalServer() {
+        return integratedServer;
+    }
 
-		try {
-			Display.create((new PixelFormat()).withDepthBits(24));
-		} catch (LWJGLException lwjglexception) {
-			CraftingDead.LOGGER.error("Couldn't set pixel format", (Throwable) lwjglexception);
+    @Override
+    public void onShutdown() {
+        DiscordRPC.INSTANCE.Discord_Shutdown();
+    }
 
-			try {
-				Thread.sleep(1000L);
-			} catch (InterruptedException var3) {
-				;
-			}
+    @Subscribe
+    public void preInitializationEvent(FMLPreInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(clientHooks);
+        networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
+    }
 
-			if (mc.isFullScreen()) {
-				mc.updateDisplayMode();
-			}
+    void runTick() {
 
-			Display.create();
-		}
-	}
+    }
 
-	public static ByteBuffer readImageToBuffer(InputStream imageStream) throws IOException {
-		BufferedImage bufferedimage = ImageIO.read(imageStream);
-		int[] aint = bufferedimage.getRGB(0, 0, bufferedimage.getWidth(), bufferedimage.getHeight(), (int[]) null, 0,
-				bufferedimage.getWidth());
-		ByteBuffer bytebuffer = ByteBuffer.allocate(4 * aint.length);
+    void createDisplay(Minecraft mc) throws LWJGLException {
+        mc.gameSettings.guiScale = 2;
+        Display.setTitle(CraftingDead.MOD_NAME);
+        Display.setResizable(false);
 
-		for (int i : aint) {
-			bytebuffer.putInt(i << 8 | i >> 24 & 255);
-		}
+        List<ByteBuffer> icons = new ArrayList<ByteBuffer>();
+        for (String location : ICON_LOCATIONS) {
+            try {
+                ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+                InputStream inputstream = classloader.getResourceAsStream(location);
+                icons.add(readImageToBuffer(inputstream));
+                inputstream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-		bytebuffer.flip();
-		return bytebuffer;
-	}
+        Display.setIcon(icons.toArray(new ByteBuffer[0]));
 
-	public CPacketHandshake getHandshakePacket() {
-		List<String> unauthorizedMods = new ArrayList<String>();
-		for (ModContainer mod : Loader.instance().getModList()) {
-			if (mod instanceof InjectedModContainer) {
-				InjectedModContainer injectedMod = (InjectedModContainer) mod;
-				mod = injectedMod.wrappedContainer;
-			}
-			if (AUTHORIZED_MOD_CONTAINERS.contains(mod.getClass())) {
-				continue;
-			}
-			CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
-			unauthorizedMods.add(mod.getModId());
-		}
-		return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
-	}
-	
-	public NetClientHandlerModClient getNetHandler() {
-		return this.netHandler;
-	}
+        try {
+            Display.create((new PixelFormat()).withDepthBits(24));
+        } catch (LWJGLException lwjglexception) {
+            CraftingDead.LOGGER.error("Couldn't set pixel format", (Throwable) lwjglexception);
+
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException var3) {
+                ;
+            }
+
+            if (mc.isFullScreen()) {
+                mc.updateDisplayMode();
+            }
+
+            Display.create();
+        }
+    }
+
+    public static ByteBuffer readImageToBuffer(InputStream imageStream) throws IOException {
+        BufferedImage bufferedimage = ImageIO.read(imageStream);
+        int[] aint = bufferedimage.getRGB(0, 0, bufferedimage.getWidth(), bufferedimage.getHeight(), (int[]) null, 0,
+                bufferedimage.getWidth());
+        ByteBuffer bytebuffer = ByteBuffer.allocate(4 * aint.length);
+
+        for (int i : aint) {
+            bytebuffer.putInt(i << 8 | i >> 24 & 255);
+        }
+
+        bytebuffer.flip();
+        return bytebuffer;
+    }
+
+    public CPacketHandshake getHandshakePacket() {
+        List<String> unauthorizedMods = new ArrayList<String>();
+        for (ModContainer mod : Loader.instance().getModList()) {
+            if (mod instanceof InjectedModContainer) {
+                InjectedModContainer injectedMod = (InjectedModContainer) mod;
+                mod = injectedMod.wrappedContainer;
+            }
+            if (AUTHORIZED_MOD_CONTAINERS.contains(mod.getClass())) {
+                continue;
+            }
+            CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
+            unauthorizedMods.add(mod.getModId());
+        }
+        return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
+    }
+
+    public NetClientHandlerModClient getNetHandler() {
+        return this.netHandler;
+    }
 
 }

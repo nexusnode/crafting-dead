@@ -1,47 +1,47 @@
 package com.craftingdead.asm;
 
 public class Callback {
-	
-	private final CallbackType callbackType;
-	private final String callbackClass;
-	private final String callbackMethod;
 
-	public static enum CallbackType {
-		REDIRECT, EVENT;
-	}
+    private final CallbackType callbackType;
+    private final String callbackClass;
+    private final String callbackMethod;
 
-	public Callback(CallbackType callbackType, String callbackMethod, String callbackClass) {
-		this.callbackType = callbackType;
-		this.callbackClass = callbackClass.replace('.', '/');
-		this.callbackMethod = callbackMethod;
-	}
+    public static enum CallbackType {
+        REDIRECT, EVENT;
+    }
 
-	public CallbackType getType() {
-		return this.callbackType;
-	}
+    public Callback(CallbackType callbackType, String callbackMethod, String callbackClass) {
+        this.callbackType = callbackType;
+        this.callbackClass = callbackClass.replace('.', '/');
+        this.callbackMethod = callbackMethod;
+    }
 
-	public String getCallbackClass() {
-		return this.callbackClass;
-	}
+    public CallbackType getType() {
+        return this.callbackType;
+    }
 
-	public String getCallbackMethod() {
-		return this.callbackMethod;
-	}
-	
-	@Override
-	public String toString() {
-		return this.callbackMethod;
-	}
+    public String getCallbackClass() {
+        return this.callbackClass;
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		if ((other == null) || (!(other instanceof Callback))) {
-			return false;
-		}
-		Callback callback = (Callback) other;
-		return (callback.callbackClass.equals(this.callbackClass))
-				&& (callback.callbackMethod.equals(this.callbackMethod))
-				&& (callback.callbackType == this.callbackType);
-	}
-	
+    public String getCallbackMethod() {
+        return this.callbackMethod;
+    }
+
+    @Override
+    public String toString() {
+        return this.callbackMethod;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if ((other == null) || (!(other instanceof Callback))) {
+            return false;
+        }
+        Callback callback = (Callback) other;
+        return (callback.callbackClass.equals(this.callbackClass))
+                && (callback.callbackMethod.equals(this.callbackMethod))
+                && (callback.callbackType == this.callbackType);
+    }
+
 }

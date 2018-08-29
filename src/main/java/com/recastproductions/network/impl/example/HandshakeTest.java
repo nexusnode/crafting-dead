@@ -6,14 +6,14 @@ import io.netty.buffer.ByteBuf;
 
 public class HandshakeTest implements IHandshakePacket {
 
-	@Override
-	public void toBytes(ByteBuf out) {
-		
-	}
+    @Override
+    public void toBytes(ByteBuf out) {
 
-	@Override
-	public void fromBytes(ByteBuf in) {
-		
-	}
+    }
+
+    @Override
+    public void fromBytes(ByteBuf in) {
+
+    }
 
 }

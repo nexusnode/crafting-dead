@@ -6,8 +6,8 @@ import net.minecraftforge.fml.common.asm.transformers.AccessTransformer;
 
 public class CDAccessTransformer extends AccessTransformer {
 
-	public CDAccessTransformer() throws IOException {
-		super("craftingdead_at.cfg");
-	}
+    public CDAccessTransformer() throws IOException {
+        super("craftingdead_at.cfg");
+    }
 
 }

@@ -12,39 +12,39 @@ import io.netty.handler.codec.CorruptedFrameException;
 
 public class Varint21FrameDecoder extends ByteToMessageDecoder {
 
-	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-		in.markReaderIndex();
-		byte[] abyte = new byte[3];
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        in.markReaderIndex();
+        byte[] abyte = new byte[3];
 
-		for (int i = 0; i < abyte.length; ++i) {
-			if (!in.isReadable()) {
-				in.resetReaderIndex();
-				return;
-			}
+        for (int i = 0; i < abyte.length; ++i) {
+            if (!in.isReadable()) {
+                in.resetReaderIndex();
+                return;
+            }
 
-			abyte[i] = in.readByte();
+            abyte[i] = in.readByte();
 
-			if (abyte[i] >= 0) {
-				ByteBuf packetBytes = Unpooled.wrappedBuffer(abyte);
+            if (abyte[i] >= 0) {
+                ByteBuf packetBytes = Unpooled.wrappedBuffer(abyte);
 
-				try {
-					int j = ByteBufUtils.readVarInt(packetBytes);
+                try {
+                    int j = ByteBufUtils.readVarInt(packetBytes);
 
-					if (in.readableBytes() >= j) {
-						out.add(in.readBytes(j));
-						return;
-					}
+                    if (in.readableBytes() >= j) {
+                        out.add(in.readBytes(j));
+                        return;
+                    }
 
-					in.resetReaderIndex();
-				} finally {
-					packetBytes.release();
-				}
+                    in.resetReaderIndex();
+                } finally {
+                    packetBytes.release();
+                }
 
-				return;
-			}
-		}
+                return;
+            }
+        }
 
-		throw new CorruptedFrameException("Length wider than 21-bit");
-	}
+        throw new CorruptedFrameException("Length wider than 21-bit");
+    }
 }
