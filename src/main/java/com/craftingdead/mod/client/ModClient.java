@@ -1,180 +1,166 @@
 package com.craftingdead.mod.client;
 
-import com.craftingdead.discord.DiscordEventHandlers;
-import com.craftingdead.discord.DiscordRPC;
-import com.craftingdead.discord.DiscordRichPresence;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.craftingdead.discordrpc.DiscordEventHandlers;
+import com.craftingdead.discordrpc.DiscordRPC;
+import com.craftingdead.discordrpc.DiscordRichPresence;
+import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
-import com.craftingdead.network.modclient.NetClientHandlerModClient;
+import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 import com.recastproductions.network.NetworkClient;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
+
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeModContainer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.*;
+import net.minecraftforge.fml.common.FMLContainer;
+import net.minecraftforge.fml.common.InjectedModContainer;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.MCPDummyContainer;
+import net.minecraftforge.fml.common.MinecraftDummyContainer;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.PixelFormat;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Physical client version of the mod
+ * 
+ * @author Sm0keySa1m0n
+ *
+ */
+@EventBusSubscriber(value = Side.CLIENT, modid = CraftingDead.MOD_ID)
 public final class ModClient implements ISidedMod<IntegratedServer> {
 
-    private static final String[] ICON_LOCATIONS = new String[]{
-            "assets/craftingdead/textures/gui/icons/icon_16x16.png",
-            "assets/craftingdead/textures/gui/icons/icon_32x32.png",
-            "assets/craftingdead/textures/gui/icons/icon_64x64.png"};
+	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
+			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
+			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
-    private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
-            .add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
-            .add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
+	private Minecraft mc;
 
-    private IntegratedServer integratedServer;
+	private IntegratedServer integratedServer;
 
-    private ClientHooks clientHooks;
+	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
+	private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
+	private NetworkClient networkClient = new NetworkClient(registryClient);
 
-    private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
-    private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
-    private NetworkClient networkClient = new NetworkClient(registryClient);
+	// ================================================================================
+	// Constructor
+	// ================================================================================
 
-    public ModClient() {
-        netHandler = new NetClientHandlerModClient(this);
-        registryClient = new NetworkRegistryClient(netHandler);
-        networkClient = new NetworkClient(registryClient.getChannelInitializer());
-    }
+	public ModClient() {
+		netHandler = new NetClientHandlerModClient(this);
+		registryClient = new NetworkRegistryClient(netHandler);
+		networkClient = new NetworkClient(registryClient.getChannelInitializer());
+	}
 
-    @Override
-    public void setup(CraftingDead mod) {
-        integratedServer = new IntegratedServer();
-        clientHooks = new ClientHooks(Minecraft.getMinecraft(), this);
+	// ================================================================================
+	// Overridden Methods
+	// ================================================================================
 
-        DiscordRPC discordRPC = DiscordRPC.INSTANCE;
+	@Override
+	public void setup(CraftingDead mod) {
+		mc = Minecraft.getMinecraft();
+		integratedServer = new IntegratedServer();
 
-        DiscordEventHandlers handlers = new DiscordEventHandlers();
-        discordRPC.Discord_Initialize("484121003589500929", handlers, true, null);
+		DiscordRPC discordRPC = DiscordRPC.INSTANCE;
 
-        DiscordRichPresence discordRichPresence = new DiscordRichPresence();
-        discordRichPresence.details = "Main Menu";
-        discordRichPresence.largeImageKey = "logo-512";
-        discordRPC.Discord_UpdatePresence(discordRichPresence);
+		DiscordEventHandlers handlers = new DiscordEventHandlers();
+		discordRPC.discordInitialize("484121003589500929", handlers, true, null);
 
-        setServerRichPresence();
-    }
+		// DiscordRPC Test
+		DiscordRichPresence discordRichPresence = new DiscordRichPresence();
+		discordRichPresence.details = "Playing Mod Server";
+		discordRichPresence.state = "Atlanta US";
+		discordRichPresence.largeImageKey = "logo-512";
+		discordRichPresence.partyMax = 200;
+		discordRichPresence.partySize = 13;
+		discordRPC.discordUpdatePresence(discordRichPresence);
+	}
 
-    // Do not use, just for testing
-    private void setServerRichPresence() {
-        DiscordRPC discordRPC = DiscordRPC.INSTANCE;
+	@Override
+	public IntegratedServer getLogicalServer() {
+		return integratedServer;
+	}
 
-        DiscordRichPresence discordRichPresence = new DiscordRichPresence();
-        discordRichPresence.details = "Playing Mod Server";
-        discordRichPresence.state = "Atlanta US";
-        discordRichPresence.largeImageKey = "logo-512";
-        discordRichPresence.partyMax = 200;
-        discordRichPresence.partySize = 13;
-        discordRPC.Discord_UpdatePresence(discordRichPresence);
-    }
+	@Override
+	public void shutdown() {
+		DiscordRPC.INSTANCE.discordShutdown();
+	}
 
-    @Override
-    public IntegratedServer getLogicalServer() {
-        return integratedServer;
-    }
+	// ================================================================================
+	// Mod Events
+	// ================================================================================
 
-    @Override
-    public void onShutdown() {
-        DiscordRPC.INSTANCE.Discord_Shutdown();
-    }
+	@Subscribe
+	public void preInitializationEvent(FMLPreInitializationEvent event) {
+		networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
+	}
 
-    @Subscribe
-    public void preInitializationEvent(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(clientHooks);
-        networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
-    }
+	// ================================================================================
+	// Forge Events
+	// ================================================================================
 
-    void runTick() {
+	@SubscribeEvent
+	public void onGuiOpen(GuiOpenEvent event) {
+		if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
+			// event.setGui(new GuiMainMenu());
+		}
+		if (event.getGui() instanceof GuiCDScreen) {
+			((GuiCDScreen) event.getGui()).modClient = this;
+		}
+	}
 
-    }
+	// Fixes rendering crash - rendering entities when not inside a world
+	@SubscribeEvent
+	public void onPreRenderEntitySpecials(RenderLivingEvent.Specials.Pre<?> event) {
+		if (mc.player == null)
+			event.setCanceled(true);
+	}
 
-    void createDisplay(Minecraft mc) throws LWJGLException {
-        mc.gameSettings.guiScale = 2;
-        Display.setTitle(CraftingDead.MOD_NAME);
-        Display.setResizable(false);
+	@SubscribeEvent
+	public void onPreTooltipRender(RenderTooltipEvent.Color event) {
+		event.setBackground(0xFF101010);
+		event.setBorderEnd(0);
+		event.setBorderStart(0);
+	}
 
-        List<ByteBuffer> icons = new ArrayList<ByteBuffer>();
-        for (String location : ICON_LOCATIONS) {
-            try {
-                ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-                InputStream inputstream = classloader.getResourceAsStream(location);
-                icons.add(readImageToBuffer(inputstream));
-                inputstream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+	// ================================================================================
+	// Normal Methods
+	// ================================================================================
 
-        Display.setIcon(icons.toArray(new ByteBuffer[0]));
+	public CPacketHandshake buildHandshakePacket() {
+		List<String> unauthorizedMods = new ArrayList<String>();
+		for (ModContainer mod : Loader.instance().getModList()) {
+			if (mod instanceof InjectedModContainer) {
+				InjectedModContainer injectedMod = (InjectedModContainer) mod;
+				mod = injectedMod.wrappedContainer;
+			}
+			if (AUTHORIZED_MOD_CONTAINERS.contains(mod.getClass())) {
+				continue;
+			}
+			CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
+			unauthorizedMods.add(mod.getModId());
+		}
+		return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
+	}
 
-        try {
-            Display.create((new PixelFormat()).withDepthBits(24));
-        } catch (LWJGLException lwjglexception) {
-            CraftingDead.LOGGER.error("Couldn't set pixel format", (Throwable) lwjglexception);
+	// ================================================================================
+	// Getters
+	// ================================================================================
 
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException var3) {
-                ;
-            }
-
-            if (mc.isFullScreen()) {
-                mc.updateDisplayMode();
-            }
-
-            Display.create();
-        }
-    }
-
-    public static ByteBuffer readImageToBuffer(InputStream imageStream) throws IOException {
-        BufferedImage bufferedimage = ImageIO.read(imageStream);
-        int[] aint = bufferedimage.getRGB(0, 0, bufferedimage.getWidth(), bufferedimage.getHeight(), (int[]) null, 0,
-                bufferedimage.getWidth());
-        ByteBuffer bytebuffer = ByteBuffer.allocate(4 * aint.length);
-
-        for (int i : aint) {
-            bytebuffer.putInt(i << 8 | i >> 24 & 255);
-        }
-
-        bytebuffer.flip();
-        return bytebuffer;
-    }
-
-    public CPacketHandshake getHandshakePacket() {
-        List<String> unauthorizedMods = new ArrayList<String>();
-        for (ModContainer mod : Loader.instance().getModList()) {
-            if (mod instanceof InjectedModContainer) {
-                InjectedModContainer injectedMod = (InjectedModContainer) mod;
-                mod = injectedMod.wrappedContainer;
-            }
-            if (AUTHORIZED_MOD_CONTAINERS.contains(mod.getClass())) {
-                continue;
-            }
-            CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
-            unauthorizedMods.add(mod.getModId());
-        }
-        return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
-    }
-
-    public NetClientHandlerModClient getNetHandler() {
-        return this.netHandler;
-    }
+	public NetClientHandlerModClient getNetHandler() {
+		return this.netHandler;
+	}
 
 }

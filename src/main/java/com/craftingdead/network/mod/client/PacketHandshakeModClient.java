@@ -1,4 +1,4 @@
-package com.craftingdead.network.packet.handshake.client;
+package com.craftingdead.network.mod.client;
 
 import com.recastproductions.network.packet.IHandshakePacket;
 import com.recastproductions.network.util.ByteBufUtils;
@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.UUID;
 
-public class CPacketHandshakeModClient implements IHandshakePacket {
+public class PacketHandshakeModClient implements IHandshakePacket {
 
     private String accessToken;
     private String clientToken;
@@ -14,11 +14,11 @@ public class CPacketHandshakeModClient implements IHandshakePacket {
     private UUID playerUUID = UUID.randomUUID();
     private String modVersion;
 
-    public CPacketHandshakeModClient() {
+    public PacketHandshakeModClient() {
         ;
     }
 
-    public CPacketHandshakeModClient(String accessToken, String clientToken, String username, UUID playerUUID,
+    public PacketHandshakeModClient(String accessToken, String clientToken, String username, UUID playerUUID,
                                      String modVersion) {
         this.accessToken = accessToken;
         this.clientToken = clientToken;

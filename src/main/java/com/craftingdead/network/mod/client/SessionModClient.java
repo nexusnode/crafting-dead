@@ -1,4 +1,4 @@
-package com.craftingdead.network.modclient;
+package com.craftingdead.network.mod.client;
 
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.core.CraftingDead;

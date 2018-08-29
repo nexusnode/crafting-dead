@@ -1,9 +1,8 @@
-package com.craftingdead.network.modclient;
+package com.craftingdead.network.mod.client;
 
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.network.packet.handshake.client.CPacketHandshakeModClient;
-import com.craftingdead.network.packet.modclient.server.SPacketNews;
+import com.craftingdead.network.mod.client.packet.PacketNews;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.recastproductions.network.impl.client.NetClientHandler;
@@ -12,7 +11,7 @@ import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
 
-public class NetClientHandlerModClient extends NetClientHandler<CPacketHandshakeModClient, SessionModClient> {
+public class NetClientHandlerModClient extends NetClientHandler<PacketHandshakeModClient, SessionModClient> {
 
     private final ModClient modClient;
 
@@ -33,7 +32,7 @@ public class NetClientHandlerModClient extends NetClientHandler<CPacketHandshake
     }
 
     @Override
-    public CPacketHandshakeModClient getHandshakePacket() {
+    public PacketHandshakeModClient getHandshakePacket() {
         Minecraft mc = Minecraft.getMinecraft();
         String accessToken = mc.getSession().getToken();
         String clientToken = ((YggdrasilAuthenticationService) ((YggdrasilMinecraftSessionService) mc
@@ -46,12 +45,12 @@ public class NetClientHandlerModClient extends NetClientHandler<CPacketHandshake
             e.printStackTrace();
         }
         String version = CraftingDead.MOD_VERSION;
-        return new CPacketHandshakeModClient(accessToken, clientToken, username, uuid, version);
+        return new PacketHandshakeModClient(accessToken, clientToken, username, uuid, version);
     }
 
     @Override
     protected void registerPackets() {
-        this.registerPacket(0, SPacketNews.class, new SPacketNews.PacketHandlerSPacketNews());
+        this.registerPacket(0, PacketNews.class, new PacketNews.PacketHandlerPacketNews());
     }
 
     public SessionModClient getSession() {

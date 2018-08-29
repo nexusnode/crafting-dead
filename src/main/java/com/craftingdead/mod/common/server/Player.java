@@ -5,32 +5,48 @@ import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.recastproductions.network.packet.IPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
 
+/**
+ * Wraps around the vanilla {@link EntityPlayerMP} so we can associate our own
+ * data
+ * 
+ * @author Sm0keySa1m0n
+ *
+ */
 public class Player {
 
-    private final EntityPlayerMP entity;
-    private String[] mods;
-    private LogicalServer server;
+	/**
+	 * The vanilla entity
+	 */
+	private final EntityPlayerMP entity;
+	/**
+	 * The mods the player has installed on their client
+	 */
+	private String[] mods;
+	/**
+	 * The server instance used by this session
+	 */
+	private LogicalServer server;
 
-    public Player(LogicalServer server, EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
-        this.server = server;
-        this.entity = entity;
-        this.mods = handshakeMessage.getMods();
-    }
+	public Player(LogicalServer server, EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
+		this.server = server;
+		this.entity = entity;
+		this.mods = handshakeMessage.getMods();
+	}
 
-    public EntityPlayerMP getVanillaEntity() {
-        return entity;
-    }
+	public EntityPlayerMP getVanillaEntity() {
+		return entity;
+	}
 
-    public String[] getMods() {
-        return this.mods;
-    }
+	public String[] getMods() {
+		return this.mods;
+	}
 
-    public void sendPacket(IPacket packet) {
-        CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
-    }
+	public void sendPacket(IPacket packet) {
+		CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
+	}
 
-    public LogicalServer getLogicalServer() {
-        return this.server;
-    }
+	public LogicalServer getLogicalServer() {
+		return this.server;
+	}
 
 }

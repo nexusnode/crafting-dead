@@ -5,19 +5,21 @@ import com.craftingdead.mod.common.core.ISidedMod;
 
 public class ModServer implements ISidedMod<DedicatedServer> {
 
-    @Override
-    public void setup(CraftingDead mod) {
+	private DedicatedServer dedicatedServer;
 
-    }
+	@Override
+	public void setup(CraftingDead mod) {
+		dedicatedServer = new DedicatedServer();
+	}
 
-    @Override
-    public DedicatedServer getLogicalServer() {
-        return null;
-    }
+	@Override
+	public DedicatedServer getLogicalServer() {
+		return dedicatedServer;
+	}
 
-    @Override
-    public void onShutdown() {
-
-    }
+	@Override
+	public void shutdown() {
+		;
+	}
 
 }
