@@ -13,9 +13,6 @@ import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
-import com.google.common.eventbus.Subscribe;
-import com.recastproductions.network.NetworkClient;
-import com.recastproductions.network.impl.client.NetworkRegistryClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -29,7 +26,6 @@ import net.minecraftforge.fml.common.MCPDummyContainer;
 import net.minecraftforge.fml.common.MinecraftDummyContainer;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -40,7 +36,7 @@ import net.minecraftforge.fml.relauncher.Side;
  *
  */
 @EventBusSubscriber(value = Side.CLIENT, modid = CraftingDead.MOD_ID)
-public final class ModClient implements ISidedMod<IntegratedServer> {
+public final class ModClient implements ISidedMod<IntegratedServer, NetClientHandlerModClient> {
 
 	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
 			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
@@ -51,18 +47,6 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 	private IntegratedServer integratedServer;
 
 	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
-	private NetworkRegistryClient registryClient = new NetworkRegistryClient(netHandler);
-	private NetworkClient networkClient = new NetworkClient(registryClient);
-
-	// ================================================================================
-	// Constructor
-	// ================================================================================
-
-	public ModClient() {
-		netHandler = new NetClientHandlerModClient(this);
-		registryClient = new NetworkRegistryClient(netHandler);
-		networkClient = new NetworkClient(registryClient.getChannelInitializer());
-	}
 
 	// ================================================================================
 	// Overridden Methods
@@ -98,13 +82,9 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 		DiscordRPC.INSTANCE.discordShutdown();
 	}
 
-	// ================================================================================
-	// Mod Events
-	// ================================================================================
-
-	@Subscribe
-	public void preInitializationEvent(FMLPreInitializationEvent event) {
-		networkClient.connect(CraftingDead.MANAGEMENT_SERVER_ADDRESS);
+	@Override
+	public NetClientHandlerModClient getNetHandler() {
+		return this.netHandler;
 	}
 
 	// ================================================================================
@@ -153,14 +133,6 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 			unauthorizedMods.add(mod.getModId());
 		}
 		return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
-	}
-
-	// ================================================================================
-	// Getters
-	// ================================================================================
-
-	public NetClientHandlerModClient getNetHandler() {
-		return this.netHandler;
 	}
 
 }

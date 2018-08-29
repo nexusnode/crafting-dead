@@ -2,8 +2,11 @@ package com.craftingdead.mod.server;
 
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
+import com.craftingdead.network.mod.server.NetClientHandlerModServer;
 
-public class ModServer implements ISidedMod<DedicatedServer> {
+public class ModServer implements ISidedMod<DedicatedServer, NetClientHandlerModServer> {
+
+	private NetClientHandlerModServer netHandler = new NetClientHandlerModServer();
 
 	private DedicatedServer dedicatedServer;
 
@@ -20,6 +23,11 @@ public class ModServer implements ISidedMod<DedicatedServer> {
 	@Override
 	public void shutdown() {
 		;
+	}
+
+	@Override
+	public NetClientHandlerModServer getNetHandler() {
+		return netHandler;
 	}
 
 }

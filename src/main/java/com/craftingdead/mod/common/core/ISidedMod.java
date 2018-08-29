@@ -1,6 +1,7 @@
 package com.craftingdead.mod.common.core;
 
 import com.craftingdead.mod.common.server.LogicalServer;
+import com.recastproductions.network.impl.client.NetClientHandler;
 
 /**
  * Implemented by each side of the game, one for the
@@ -11,7 +12,7 @@ import com.craftingdead.mod.common.server.LogicalServer;
  *
  * @param <L> - the {@link LogicalServer} associated with this side
  */
-public interface ISidedMod<L extends LogicalServer> {
+public interface ISidedMod<L extends LogicalServer, H extends NetClientHandler<?, ?>> {
 
 	/**
 	 * Called before minecraft is loaded, do any pre loading here
@@ -32,5 +33,7 @@ public interface ISidedMod<L extends LogicalServer> {
 	 * separate shutdown thread<b>
 	 */
 	void shutdown();
+	
+	H getNetHandler();
 
 }

@@ -26,10 +26,10 @@ public class PacketChannelHandler<REQ extends IPacket, REPLY extends IPacket> ex
 
 	private final IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler;
 	private final Side side;
-	private final ISidedMod<?> mod;
+	private final ISidedMod<?, ?> mod;
 
 	public PacketChannelHandler(IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> handler, Side side,
-			Class<REQ> requestType, ISidedMod<?> mod) {
+			Class<REQ> requestType, ISidedMod<?, ?> mod) {
 		super(requestType);
 		packetHandler = Preconditions.checkNotNull(handler, "Packet handler must not be null");
 		this.side = side;

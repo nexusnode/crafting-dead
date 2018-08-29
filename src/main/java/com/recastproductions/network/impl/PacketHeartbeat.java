@@ -1,9 +1,10 @@
-package com.craftingdead.network.mod.server;
+package com.recastproductions.network.impl;
 
-import com.recastproductions.network.packet.IHandshakePacket;
+import com.recastproductions.network.packet.IPacket;
+
 import io.netty.buffer.ByteBuf;
 
-public class PacketHandshakeModServer implements IHandshakePacket {
+public class PacketHeartbeat implements IPacket {
 
 	@Override
 	public void toBytes(ByteBuf out) throws Exception {

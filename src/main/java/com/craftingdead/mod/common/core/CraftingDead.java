@@ -1,22 +1,27 @@
 package com.craftingdead.mod.common.core;
 
+import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.network.NetworkWrapper;
 import com.craftingdead.mod.server.ModServer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.recastproductions.network.NetworkClient;
+import com.recastproductions.network.impl.Session;
+import com.recastproductions.network.impl.client.NetworkRegistryClient;
+
 import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.Side;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.Map;
 
 /**
  * The main class for Crafting Dead
@@ -30,43 +35,85 @@ public final class CraftingDead implements IFMLCallHook {
 
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public static final Class<? extends ISidedMod<?>> CLIENT_MOD_CLASS = ModClient.class,
+	public static final Class<? extends ISidedMod<?, ?>> CLIENT_MOD_CLASS = ModClient.class,
 			SERVER_MOD_CLASS = ModServer.class;
 
 	public static final SocketAddress MANAGEMENT_SERVER_ADDRESS = new InetSocketAddress("localhost", 32888);
 
+	/**
+	 * Singleton
+	 */
 	private static CraftingDead instance;
 
-	private ISidedMod<?> sidedMod;
+	/**
+	 * Current {@link ISidedMod} instance
+	 */
+	private ISidedMod<?, ?> sidedMod;
 
+	/**
+	 * Handles all impl network logic
+	 */
+	private NetworkRegistryClient networkRegistryClient;
+
+	/**
+	 * Used to connect to the master server
+	 */
+	private NetworkClient networkClient;
+
+	/**
+	 * The location of the mod - can be a jar or directory
+	 */
 	private File modLocation;
 
+	/**
+	 * The data folder
+	 */
 	private File folder;
 
+	/**
+	 * Internal event bus
+	 */
 	private EventBus bus;
 
+	/**
+	 * Used for internal networking
+	 */
 	private NetworkWrapper networkWrapper;
 
 	public CraftingDead() {
 		instance = this;
 	}
 
+	/**
+	 * Called by FML at early startup
+	 */
 	@Override
 	public Void call() throws Exception {
 		sidedMod = FMLLaunchHandler.side() == Side.CLIENT ? CLIENT_MOD_CLASS.newInstance()
 				: SERVER_MOD_CLASS.newInstance();
+
 		sidedMod.setup(this);
+
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				LOGGER.info("Shutting down " + MOD_NAME);
+				Session<?> session = networkRegistryClient.getNetHandler().getCurrentSession();
+				if (session != null) {
+					LOGGER.info("Disconnecting from the master server");
+					session.getChannel().close();
+				}
 				sidedMod.shutdown();
 			}
 		});
+
 		networkWrapper = new NetworkWrapper(MOD_ID, sidedMod);
 		return null;
 	}
 
+	/**
+	 * Injects data provided by FML
+	 */
 	@Override
 	public void injectData(Map<String, Object> data) {
 		modLocation = (File) data.get("coremodLocation");
@@ -74,16 +121,26 @@ public final class CraftingDead implements IFMLCallHook {
 		folder.mkdir();
 	}
 
+	@Subscribe
+	public void loadComplete(FMLLoadCompleteEvent event) {
+		networkRegistryClient = new NetworkRegistryClient(sidedMod.getNetHandler());
+		networkClient = new NetworkClient(networkRegistryClient.getChannelInitializer());
+		networkClient.connect(MANAGEMENT_SERVER_ADDRESS);
+	}
+
+	/**
+	 * Forwarded to this class by the mod container
+	 * 
+	 * @param bus        - the {@link EventBus} instance
+	 * @param controller - the {@link LoadController} instance
+	 * @return
+	 */
 	boolean registerBus(EventBus bus, LoadController controller) {
+		this.bus = bus;
 		bus.register(this);
 		bus.register(sidedMod);
 		bus.register(sidedMod.getLogicalServer());
 		return true;
-	}
-
-	@Subscribe
-	public void onFMLPreInitialization(FMLPreInitializationEvent event) {
-		// MessageRegister.registerPackets(NETWORK_WRAPPER);
 	}
 
 	public File getModLocation() {

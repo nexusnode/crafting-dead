@@ -28,9 +28,9 @@ public class PacketContextMod implements IPacketContext {
 	 */
 	private final Side side;
 
-	private final ISidedMod<?> mod;
+	private final ISidedMod<?, ?> mod;
 
-	public PacketContextMod(INetHandler netHandler, Side side, ISidedMod<?> mod) {
+	public PacketContextMod(INetHandler netHandler, Side side, ISidedMod<?, ?> mod) {
 		this.netHandler = netHandler;
 		this.side = side;
 		this.mod = mod;

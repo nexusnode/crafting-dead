@@ -1,11 +1,15 @@
 package com.craftingdead.mod.common.network;
 
+import java.lang.reflect.Method;
+import java.util.EnumMap;
+
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.network.packet.PacketContextMod;
 import com.craftingdead.mod.common.network.pipeline.PacketChannelHandler;
 import com.craftingdead.mod.common.network.pipeline.PacketCodec;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
+
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
@@ -22,9 +26,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleIndexedCodec;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.lang.reflect.Method;
-import java.util.EnumMap;
-
 /**
  * Used to wrap around all networking classes such as the {@link PacketCodec},
  * making life simple when it comes to networking. Register and send your
@@ -37,12 +38,12 @@ public class NetworkWrapper {
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private PacketCodec packetCodec;
-	private ISidedMod<?> mod;
+	private ISidedMod<?, ?> mod;
 
 	private static Class<?> defaultChannelPipeline;
 	private static Method generateName;
 
-	public NetworkWrapper(String channelName, ISidedMod<?> mod) {
+	public NetworkWrapper(String channelName, ISidedMod<?, ?> mod) {
 		packetCodec = new PacketCodec();
 		channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec);
 		this.mod = mod;

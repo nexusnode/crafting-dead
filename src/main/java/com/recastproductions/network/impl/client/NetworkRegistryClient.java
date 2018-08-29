@@ -8,31 +8,31 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class NetworkRegistryClient extends NetworkRegistry {
 
-    private NetClientHandler<?, ?> netHandler;
+	private NetClientHandler<?, ?> netHandler;
 
-    public NetworkRegistryClient(NetClientHandler<?, ?> handler) {
-        this.netHandler = handler;
-    }
+	public NetworkRegistryClient(NetClientHandler<?, ?> handler) {
+		this.netHandler = handler;
+	}
 
-    public NetClientHandler<?, ?> getNetHandler() {
-        return this.netHandler;
-    }
+	public NetClientHandler<?, ?> getNetHandler() {
+		return this.netHandler;
+	}
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        LOGGER.info("Sending handshake packet");
-        try {
-            ctx.channel().attr(NetHandler.NET_HANDLER_ATTR).set(netHandler);
-            ctx.channel().writeAndFlush(this.netHandler.getHandshakePacket()).channel().pipeline()
-                    .addLast(Session.PIPELINE_NAME, this.netHandler.newSession(ctx.channel()));
-        } catch (Exception e) {
-            throw new RuntimeException("Could not send handshake packet", e);
-        }
-    }
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) {
+		LOGGER.info("Sending handshake packet");
+		try {
+			ctx.channel().attr(NetHandler.NET_HANDLER_ATTR).set(netHandler);
+			ctx.channel().writeAndFlush(this.netHandler.getHandshakePacket()).channel().pipeline()
+					.addLast(Session.PIPELINE_NAME, this.netHandler.onConnected(ctx.channel()));
+		} catch (Exception e) {
+			throw new RuntimeException("Could not send handshake packet", e);
+		}
+	}
 
-    @Override
-    protected void initChannel(Channel ch) throws Exception {
-        ;
-    }
+	@Override
+	protected void initChannel(Channel ch) throws Exception {
+		;
+	}
 
 }
