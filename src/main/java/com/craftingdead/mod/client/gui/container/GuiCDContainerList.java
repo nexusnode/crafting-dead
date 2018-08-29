@@ -1,15 +1,13 @@
 package com.craftingdead.mod.client.gui.container;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-
-import org.lwjgl.input.Mouse;
-
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import com.craftingdead.mod.common.core.CraftingDead;
-
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Mouse;
+
+import java.awt.*;
+import java.util.ArrayList;
 
 public class GuiCDContainerList extends GuiCDContainer {
 

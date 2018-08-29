@@ -14,13 +14,22 @@ public interface DiscordRPC extends Library {
     int DISCORD_REPLY_IGNORE = 2;
 
     void Discord_Initialize(@Nonnull String applicationId, @Nullable DiscordEventHandlers handlers, boolean autoRegister, @Nullable String steamId);
+
     void Discord_Shutdown();
+
     void Discord_RunCallbacks();
+
     void Discord_UpdateConnection();
+
     void Discord_UpdatePresence(@Nullable DiscordRichPresence struct);
+
     void Discord_ClearPresence();
+
     void Discord_Respond(@Nonnull String userid, int reply);
+
     void Discord_UpdateHandlers(@Nullable DiscordEventHandlers handlers);
+
     void Discord_Register(String applicationId, String command);
+
     void Discord_RegisterSteamGame(String applicationId, String steamId);
 }

@@ -1,7 +1,6 @@
 package com.recastproductions.network.impl.example;
 
 import com.recastproductions.network.packet.IHandshakePacket;
-
 import io.netty.buffer.ByteBuf;
 
 public class HandshakeTest implements IHandshakePacket {

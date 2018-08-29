@@ -1,23 +1,17 @@
 package com.craftingdead.mod.client.renderer;
 
-import java.util.UUID;
-
-import org.lwjgl.opengl.GL11;
-
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.UUID;
 
 public class RenderHelper {
 

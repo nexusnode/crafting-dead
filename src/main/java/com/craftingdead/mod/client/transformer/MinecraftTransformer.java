@@ -1,12 +1,10 @@
 package com.craftingdead.mod.client.transformer;
 
-import org.lwjgl.LWJGLException;
-
 import com.craftingdead.asm.Callback;
 import com.craftingdead.asm.CallbackInjectionTransformer;
 import com.craftingdead.mod.client.ClientHooks;
-
 import net.minecraft.client.Minecraft;
+import org.lwjgl.LWJGLException;
 
 public class MinecraftTransformer extends CallbackInjectionTransformer {
 

@@ -1,15 +1,14 @@
 package com.recastproductions.network.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.recastproductions.network.packet.IHandshakePacket;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
-
 import io.netty.util.AttributeKey;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class NetHandler<HS extends IHandshakePacket> {
 

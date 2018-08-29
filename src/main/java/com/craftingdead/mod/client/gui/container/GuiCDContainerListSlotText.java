@@ -1,10 +1,9 @@
 package com.craftingdead.mod.client.gui.container;
 
-import java.util.ArrayList;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.Minecraft;
+
+import java.util.ArrayList;
 
 public class GuiCDContainerListSlotText extends GuiCDContainerListSlot {
 

@@ -1,13 +1,12 @@
 package com.craftingdead.mod.common.network.packet.client;
 
-import java.io.IOException;
-
 import com.craftingdead.mod.common.network.CraftingDeadContext;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
+
+import java.io.IOException;
 
 public class CPacketHandshake implements IPacket {
 

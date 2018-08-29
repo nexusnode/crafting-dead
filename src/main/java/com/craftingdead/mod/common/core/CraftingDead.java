@@ -1,24 +1,22 @@
 package com.craftingdead.mod.common.core;
 
-import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.network.NetworkWrapper;
 import com.craftingdead.mod.server.ModServer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Map;
 
 public final class CraftingDead implements IFMLCallHook {
 

@@ -3,7 +3,6 @@ package com.craftingdead.mod.server;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.craftingdead.mod.common.server.LogicalServer;
 import com.craftingdead.mod.common.server.Player;
-
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 public class DedicatedServer extends LogicalServer {

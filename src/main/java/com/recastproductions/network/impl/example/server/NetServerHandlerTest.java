@@ -3,7 +3,6 @@ package com.recastproductions.network.impl.example.server;
 import com.recastproductions.network.impl.example.HandshakeTest;
 import com.recastproductions.network.impl.example.PacketTest;
 import com.recastproductions.network.impl.server.NetServerHandler;
-
 import io.netty.channel.Channel;
 
 public class NetServerHandlerTest extends NetServerHandler<HandshakeTest, SessionTest> {

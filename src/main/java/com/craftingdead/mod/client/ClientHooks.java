@@ -1,16 +1,14 @@
 package com.craftingdead.mod.client;
 
-import org.lwjgl.LWJGLException;
-
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.gui.GuiMainMenu;
-
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.LWJGLException;
 
 public class ClientHooks {
 

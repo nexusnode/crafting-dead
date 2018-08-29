@@ -2,7 +2,6 @@ package com.recastproductions.network.impl.example.server;
 
 import com.recastproductions.network.impl.Session;
 import com.recastproductions.network.impl.example.PacketTest;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 

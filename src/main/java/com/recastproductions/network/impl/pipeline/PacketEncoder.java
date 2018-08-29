@@ -1,18 +1,16 @@
 package com.recastproductions.network.impl.pipeline;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.recastproductions.network.impl.NetHandler;
 import com.recastproductions.network.impl.NetworkRegistry;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
 import com.recastproductions.network.packet.IHandshakePacket;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 

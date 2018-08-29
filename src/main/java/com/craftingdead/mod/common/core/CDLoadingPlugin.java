@@ -1,10 +1,9 @@
 package com.craftingdead.mod.common.core;
 
-import java.util.Map;
-
 import com.craftingdead.mod.client.transformer.MinecraftTransformer;
-
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+
+import java.util.Map;
 
 public class CDLoadingPlugin implements IFMLLoadingPlugin {
 

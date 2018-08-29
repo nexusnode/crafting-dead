@@ -2,7 +2,6 @@ package com.craftingdead.mod.common.network;
 
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.recastproductions.network.packet.IPacket;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraftforge.fml.common.network.FMLIndexedMessageToMessageCodec;

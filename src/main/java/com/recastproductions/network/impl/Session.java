@@ -3,7 +3,6 @@ package com.recastproductions.network.impl;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketContext;
 import com.recastproductions.network.packet.IPacketHandler;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

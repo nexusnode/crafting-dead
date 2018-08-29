@@ -1,12 +1,11 @@
 package com.craftingdead.mod.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringListHelper {
 

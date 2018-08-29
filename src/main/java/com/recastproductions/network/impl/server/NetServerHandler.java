@@ -1,12 +1,11 @@
 package com.recastproductions.network.impl.server;
 
-import javax.annotation.Nullable;
-
 import com.recastproductions.network.impl.NetHandler;
 import com.recastproductions.network.impl.Session;
 import com.recastproductions.network.packet.IHandshakePacket;
-
 import io.netty.channel.Channel;
+
+import javax.annotation.Nullable;
 
 /**
  * An interface used to handle server side logic for authenticated clients or

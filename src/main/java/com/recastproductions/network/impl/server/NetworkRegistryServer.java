@@ -1,17 +1,15 @@
 package com.recastproductions.network.impl.server;
 
-import java.util.Map.Entry;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.recastproductions.network.impl.NetworkRegistry;
 import com.recastproductions.network.impl.pipeline.HandshakeHandler;
 import com.recastproductions.network.packet.IHandshakePacket;
-
 import io.netty.channel.Channel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Map.Entry;
 
 public class NetworkRegistryServer extends NetworkRegistry {
 

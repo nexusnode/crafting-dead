@@ -3,7 +3,6 @@ package com.craftingdead.mod.common.server;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.recastproductions.network.packet.IPacket;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class Player {

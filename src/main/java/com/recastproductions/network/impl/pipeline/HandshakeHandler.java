@@ -1,15 +1,13 @@
 package com.recastproductions.network.impl.pipeline;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.recastproductions.network.impl.NetHandler;
 import com.recastproductions.network.impl.Session;
 import com.recastproductions.network.impl.server.NetServerHandler;
 import com.recastproductions.network.packet.IHandshakePacket;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class HandshakeHandler<REQ extends IHandshakePacket, H extends NetServerHandler<REQ, ?>>
         extends SimpleChannelInboundHandler<REQ> {

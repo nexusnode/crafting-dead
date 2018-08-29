@@ -53,8 +53,7 @@ public class DiscordRichPresence extends Structure {
     public byte instance;
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof DiscordRichPresence))
@@ -78,15 +77,13 @@ public class DiscordRichPresence extends Structure {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(state, details, startTimestamp, endTimestamp, largeImageKey, largeImageText, smallImageKey,
                 smallImageText, partyId, partySize, partyMax, matchSecret, joinSecret, spectateSecret, instance);
     }
 
     @Override
-    protected List<String> getFieldOrder()
-    {
+    protected List<String> getFieldOrder() {
         return FIELD_ORDER;
     }
 }

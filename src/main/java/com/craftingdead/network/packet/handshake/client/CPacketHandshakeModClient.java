@@ -1,11 +1,10 @@
 package com.craftingdead.network.packet.handshake.client;
 
-import java.util.UUID;
-
 import com.recastproductions.network.packet.IHandshakePacket;
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
+
+import java.util.UUID;
 
 public class CPacketHandshakeModClient implements IHandshakePacket {
 

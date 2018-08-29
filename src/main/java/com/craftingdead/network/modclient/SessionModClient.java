@@ -1,13 +1,12 @@
 package com.craftingdead.network.modclient;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.recastproductions.network.impl.Session;
-
 import io.netty.channel.Channel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SessionModClient extends Session<NetClientHandlerModClient> {
 

@@ -1,7 +1,5 @@
 package com.craftingdead.network.modclient;
 
-import java.util.UUID;
-
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.network.packet.handshake.client.CPacketHandshakeModClient;
@@ -9,9 +7,10 @@ import com.craftingdead.network.packet.modclient.server.SPacketNews;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.recastproductions.network.impl.client.NetClientHandler;
-
 import io.netty.channel.Channel;
 import net.minecraft.client.Minecraft;
+
+import java.util.UUID;
 
 public class NetClientHandlerModClient extends NetClientHandler<CPacketHandshakeModClient, SessionModClient> {
 

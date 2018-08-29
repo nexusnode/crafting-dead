@@ -9,22 +9,19 @@ import java.util.List;
 import java.util.Objects;
 
 public class DiscordEventHandlers extends Structure {
-    public interface OnReady extends Callback
-    {
+    public interface OnReady extends Callback {
         void accept(DiscordUser user);
     }
 
-    public interface OnStatus extends Callback
-    {
+    public interface OnStatus extends Callback {
         void accept(int errorCode, String message);
     }
 
-    public interface OnGameUpdate extends Callback
-    {
+    public interface OnGameUpdate extends Callback {
         void accept(String secret);
     }
-    public interface OnJoinRequest extends Callback
-    {
+
+    public interface OnJoinRequest extends Callback {
         void accept(DiscordUser request);
     }
 
@@ -45,8 +42,7 @@ public class DiscordEventHandlers extends Structure {
     public OnJoinRequest joinRequest;
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof DiscordEventHandlers))
@@ -61,14 +57,12 @@ public class DiscordEventHandlers extends Structure {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(ready, disconnected, errored, joinGame, spectateGame, joinRequest);
     }
 
     @Override
-    protected List<String> getFieldOrder()
-    {
+    protected List<String> getFieldOrder() {
         return FIELD_ORDER;
     }
 }

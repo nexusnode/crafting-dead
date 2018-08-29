@@ -4,7 +4,6 @@ import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.server.ModServer;
 import com.recastproductions.network.packet.IPacketContext;
-
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;

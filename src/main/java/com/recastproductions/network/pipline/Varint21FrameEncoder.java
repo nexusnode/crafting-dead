@@ -1,7 +1,6 @@
 package com.recastproductions.network.pipline;
 
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,13 +1,13 @@
 package com.recastproductions.network.impl.example;
 
-import java.net.InetSocketAddress;
-
 import com.recastproductions.network.NetworkClient;
 import com.recastproductions.network.NetworkServer;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
 import com.recastproductions.network.impl.example.client.NetClientHandlerTest;
 import com.recastproductions.network.impl.example.server.NetServerHandlerTest;
 import com.recastproductions.network.impl.server.NetworkRegistryServer;
+
+import java.net.InetSocketAddress;
 
 public class Network {
 

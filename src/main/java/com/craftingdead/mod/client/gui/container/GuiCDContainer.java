@@ -2,7 +2,6 @@ package com.craftingdead.mod.client.gui.container;
 
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
-
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 

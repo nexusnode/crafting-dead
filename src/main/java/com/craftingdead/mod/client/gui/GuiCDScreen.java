@@ -1,15 +1,13 @@
 package com.craftingdead.mod.client.gui;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.annotation.Nullable;
-
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.client.gui.container.GuiCDContainer;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class GuiCDScreen extends GuiScreen {
 

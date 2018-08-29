@@ -1,13 +1,12 @@
 package com.recastproductions.network.impl.example;
 
-import java.io.IOException;
-
 import com.recastproductions.network.impl.Session;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
+
+import java.io.IOException;
 
 public class PacketTest implements IPacket {
 

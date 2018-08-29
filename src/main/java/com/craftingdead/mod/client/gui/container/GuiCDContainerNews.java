@@ -1,10 +1,10 @@
 package com.craftingdead.mod.client.gui.container;
 
-import java.util.ArrayList;
-
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.util.StringListHelper;
 import com.craftingdead.network.modclient.SessionModClient;
+
+import java.util.ArrayList;
 
 public class GuiCDContainerNews extends GuiCDContainerList {
 

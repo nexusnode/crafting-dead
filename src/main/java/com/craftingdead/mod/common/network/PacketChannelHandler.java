@@ -4,7 +4,6 @@ import com.craftingdead.mod.common.core.ISidedMod;
 import com.google.common.base.Preconditions;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
-
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

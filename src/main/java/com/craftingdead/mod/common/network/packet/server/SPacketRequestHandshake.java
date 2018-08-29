@@ -4,7 +4,6 @@ import com.craftingdead.mod.common.network.CraftingDeadContext;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
-
 import io.netty.buffer.ByteBuf;
 
 public class SPacketRequestHandshake implements IPacket {

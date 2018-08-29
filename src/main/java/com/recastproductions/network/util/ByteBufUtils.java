@@ -23,12 +23,12 @@
  */
 package com.recastproductions.network.util;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-
-import io.netty.buffer.ByteBuf;
 
 /**
  * A class containing various utility methods that act on byte buffers.

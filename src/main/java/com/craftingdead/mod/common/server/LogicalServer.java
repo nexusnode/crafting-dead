@@ -1,20 +1,19 @@
 package com.craftingdead.mod.common.server;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
 import com.craftingdead.mod.common.network.packet.server.SPacketRequestHandshake;
 import com.google.common.eventbus.Subscribe;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public abstract class LogicalServer {
 

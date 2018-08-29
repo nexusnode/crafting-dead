@@ -3,7 +3,6 @@ package com.recastproductions.network.impl.example.client;
 import com.recastproductions.network.impl.client.NetClientHandler;
 import com.recastproductions.network.impl.example.HandshakeTest;
 import com.recastproductions.network.impl.example.PacketTest;
-
 import io.netty.channel.Channel;
 
 public class NetClientHandlerTest extends NetClientHandler<HandshakeTest, SessionTest> {

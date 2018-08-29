@@ -1,21 +1,8 @@
 package com.craftingdead.mod.client;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import com.craftingdead.discord.DiscordEventHandlers;
 import com.craftingdead.discord.DiscordRPC;
 import com.craftingdead.discord.DiscordRichPresence;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.PixelFormat;
-
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
@@ -25,17 +12,22 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 import com.recastproductions.network.NetworkClient;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
-
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLContainer;
-import net.minecraftforge.fml.common.InjectedModContainer;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.MCPDummyContainer;
-import net.minecraftforge.fml.common.MinecraftDummyContainer;
-import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.PixelFormat;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ModClient implements ISidedMod<IntegratedServer> {
 

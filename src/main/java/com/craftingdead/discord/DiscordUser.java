@@ -30,8 +30,7 @@ public class DiscordUser extends Structure {
     public String avatar;
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof DiscordUser))
@@ -44,14 +43,12 @@ public class DiscordUser extends Structure {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(userId, username, discriminator, avatar);
     }
 
     @Override
-    protected List<String> getFieldOrder()
-    {
+    protected List<String> getFieldOrder() {
         return FIELD_ORDER;
     }
 }

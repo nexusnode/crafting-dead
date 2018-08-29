@@ -1,20 +1,18 @@
 package com.recastproductions.network.impl.pipeline;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.recastproductions.network.impl.NetHandler;
 import com.recastproductions.network.impl.NetworkRegistry;
 import com.recastproductions.network.impl.server.NetworkRegistryServer;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.util.ByteBufUtils;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.util.List;
 
 public class PacketDecoder extends ByteToMessageDecoder {
 

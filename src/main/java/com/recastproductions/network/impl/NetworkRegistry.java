@@ -1,17 +1,15 @@
 package com.recastproductions.network.impl;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.recastproductions.network.impl.pipeline.PacketDecoder;
 import com.recastproductions.network.impl.pipeline.PacketEncoder;
 import com.recastproductions.network.pipline.Varint21FrameDecoder;
 import com.recastproductions.network.pipline.Varint21FrameEncoder;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.util.AttributeKey;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @ChannelInboundHandlerAdapter.Sharable
 public abstract class NetworkRegistry extends ChannelInboundHandlerAdapter {

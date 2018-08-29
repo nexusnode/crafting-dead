@@ -1,12 +1,8 @@
 package com.craftingdead.mod.common.network;
 
-import java.lang.reflect.Method;
-import java.util.EnumMap;
-
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
-
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
@@ -22,6 +18,9 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleIndexedCodec;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.lang.reflect.Method;
+import java.util.EnumMap;
 
 public class NetworkWrapper {
 

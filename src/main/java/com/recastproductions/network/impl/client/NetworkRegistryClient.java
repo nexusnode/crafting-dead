@@ -3,7 +3,6 @@ package com.recastproductions.network.impl.client;
 import com.recastproductions.network.impl.NetHandler;
 import com.recastproductions.network.impl.NetworkRegistry;
 import com.recastproductions.network.impl.Session;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
