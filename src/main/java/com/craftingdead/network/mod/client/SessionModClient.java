@@ -19,12 +19,17 @@ public class SessionModClient extends Session<NetClientHandlerModClient> {
 	public SessionModClient(Channel ch, NetClientHandlerModClient handler, ModClient modClient) {
 		super(ch, handler);
 		this.modClient = modClient;
-		CraftingDead.LOGGER.info("Connected to the Crafting Dead Network!");
+		CraftingDead.LOGGER.info("Connected to the Crafting Dead network");
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
-		System.out.println("====================disconnect");
+		CraftingDead.LOGGER.info("Disconnected from the Crafting Dead network");
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
+		CraftingDead.LOGGER.warn("Exception in session", t);
 	}
 
 	public void setNews(List<String> news) {
@@ -37,11 +42,6 @@ public class SessionModClient extends Session<NetClientHandlerModClient> {
 
 	public ModClient getModClient() {
 		return this.modClient;
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
-		CraftingDead.LOGGER.warn("Exception in session", t);
 	}
 
 }
