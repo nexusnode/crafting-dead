@@ -63,9 +63,25 @@ public final class ModClient implements ISidedMod<IntegratedServer> {
 
         DiscordEventHandlers handlers = new DiscordEventHandlers();
         discordRPC.Discord_Initialize("484121003589500929", handlers, true, null);
+
         DiscordRichPresence discordRichPresence = new DiscordRichPresence();
         discordRichPresence.details = "Main Menu";
         discordRichPresence.largeImageKey = "logo-512";
+        discordRPC.Discord_UpdatePresence(discordRichPresence);
+
+        setServerRichPresence();
+    }
+
+    // Do not use, just for testing
+    private void setServerRichPresence() {
+        DiscordRPC discordRPC = DiscordRPC.INSTANCE;
+
+        DiscordRichPresence discordRichPresence = new DiscordRichPresence();
+        discordRichPresence.details = "Playing Mod Server";
+        discordRichPresence.state = "Atlanta US";
+        discordRichPresence.largeImageKey = "logo-512";
+        discordRichPresence.partyMax = 200;
+        discordRichPresence.partySize = 13;
         discordRPC.Discord_UpdatePresence(discordRichPresence);
     }
 
