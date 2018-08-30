@@ -3,50 +3,62 @@ package com.craftingdead.mod.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.craftingdead.discordrpc.DiscordEventHandlers;
 import com.craftingdead.discordrpc.DiscordRPC;
 import com.craftingdead.discordrpc.DiscordRichPresence;
 import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
+import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLContainer;
 import net.minecraftforge.fml.common.InjectedModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.MCPDummyContainer;
 import net.minecraftforge.fml.common.MinecraftDummyContainer;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 /**
- * Physical client version of the mod
+ * Physical client version of the mod, handles all client logic
  * 
  * @author Sm0keySa1m0n
  *
  */
-@EventBusSubscriber(value = Side.CLIENT, modid = CraftingDead.MOD_ID)
 public final class ModClient implements ISidedMod<IntegratedServer, NetClientHandlerModClient> {
 
 	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
 			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
 			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
-	private Minecraft mc = Minecraft.getMinecraft();
+	private Minecraft mc;
 
 	private IntegratedServer integratedServer;
 
 	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
+
+	private GuiIngame guiIngame;
+
+	private PlayerSP player;
 
 	// ================================================================================
 	// Overridden Methods
@@ -86,6 +98,13 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		return this.netHandler;
 	}
 
+	@Subscribe
+	public void preInitialization(FMLPreInitializationEvent event) {
+		mc = FMLClientHandler.instance().getClient();
+		MinecraftForge.EVENT_BUS.register(this);
+		guiIngame = new GuiIngame(this);
+	}
+
 	// ================================================================================
 	// Forge Events
 	// ================================================================================
@@ -100,7 +119,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		}
 	}
 
-	// Fixes rendering crash - rendering entities when not inside a world
+	// Fixes rendering crash with rendering entities when not inside a world
 	@SubscribeEvent
 	public void onPreRenderEntitySpecials(RenderLivingEvent.Specials.Pre<?> event) {
 		if (mc.player == null)
@@ -112,6 +131,29 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		event.setBackground(0xFF101010);
 		event.setBorderEnd(0);
 		event.setBorderStart(0);
+	}
+
+	@SubscribeEvent
+	public void onClientConnectedToServer(ClientConnectedToServerEvent event) {
+		// If the player doesn't exist (first time connecting to server) set the player
+		// instance
+		if (player == null) {
+			player = new PlayerSP(mc.player);
+		}
+	}
+
+	@SubscribeEvent
+	public void onClientDisconnectionFromServer(ClientDisconnectionFromServerEvent event) {
+		// Destroy the player instance as it's no longer needed
+		player = null;
+	}
+
+	@SubscribeEvent
+	public void onRenderTick(TickEvent.RenderTickEvent event) {
+		if (event.phase == Phase.END) {
+			if (mc.world != null)
+				guiIngame.renderGameOverlay(event.renderTickTime);
+		}
 	}
 
 	// ================================================================================
@@ -132,6 +174,15 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 			unauthorizedMods.add(mod.getModId());
 		}
 		return new PacketHandshake(unauthorizedMods.toArray(new String[0]));
+	}
+
+	public Minecraft getMinecraft() {
+		return this.mc;
+	}
+
+	@Nullable
+	public PlayerSP getPlayer() {
+		return this.player;
 	}
 
 }

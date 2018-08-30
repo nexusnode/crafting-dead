@@ -11,15 +11,17 @@ import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 /**
- * Contains common logic for CraftingDead, implemented by the physical client
- * and physical server as integrated and dedicated servers
+ * Contains common logic for the mod, implemented by the physical client and
+ * physical server as integrated and dedicated servers allowing each side to
+ * adjust the {@link LogicalServer} for side specific requirements
  * 
  * @author Sm0keySa1m0n
  *
@@ -40,7 +42,7 @@ public abstract class LogicalServer {
 	/**
 	 * A map of all the players currently on the server
 	 */
-	protected Map<EntityPlayerMP, Player> playerMap = new HashMap<EntityPlayerMP, Player>();
+	protected Map<EntityPlayerMP, PlayerMP> playerMap = new HashMap<EntityPlayerMP, PlayerMP>();
 
 	// ================================================================================
 	// Mod Events
@@ -64,11 +66,13 @@ public abstract class LogicalServer {
 	// ================================================================================
 
 	@SubscribeEvent
-	public void onServerTick(ServerTickEvent event) {
+	public void onServerTick(TickEvent.ServerTickEvent event) {
 		Iterator<Map.Entry<EntityPlayerMP, Integer>> iter = handshakeTimeoutMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<EntityPlayerMP, Integer> entry = iter.next();
+			// Reduce the timer value
 			entry.setValue(entry.getValue() - 1);
+			// Kick the player if they have run out of time to send a valid handshake packet
 			if (entry.getValue() <= 0) {
 				EntityPlayerMP player = entry.getKey();
 				CraftingDead.LOGGER.warn(
@@ -81,13 +85,40 @@ public abstract class LogicalServer {
 	}
 
 	@SubscribeEvent
+	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+		if (event.player instanceof EntityPlayerMP) {
+			EntityPlayerMP entity = (EntityPlayerMP) event.player;
+			PlayerMP player = this.playerMap.get(entity);
+			if (player != null) {
+				player.update();
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onLivingDeath(LivingDeathEvent event) {
+		if (event.getEntityLiving() instanceof EntityPlayerMP) {
+			EntityPlayerMP entity = (EntityPlayerMP) event.getEntityLiving();
+			PlayerMP player = this.playerMap.get(entity);
+			if (player != null) {
+				player.onDeath(event.getSource());
+			}
+		}
+	}
+
+	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
+		// Ask the client to send their handshake packet
 		CraftingDead.instance().getNetworkWrapper().sendTo(new PacketRequestHandshake(), (EntityPlayerMP) event.player);
+		// Begin the timeout timer
 		handshakeTimeoutMap.put((EntityPlayerMP) event.player, HANDSHAKE_TIMEOUT);
 	}
 
 	@SubscribeEvent
 	public void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+		PlayerMP player = this.getPlayer((EntityPlayerMP) event.player);
+		// Save their data
+		player.getVanillaEntity().getEntityData().setTag(CraftingDead.MOD_ID, player.serializeNBT());
 		this.playerMap.remove((EntityPlayerMP) event.player);
 	}
 
@@ -95,11 +126,21 @@ public abstract class LogicalServer {
 	// Normal Methods
 	// ================================================================================
 
+	/**
+	 * Called by the handshake packet handler to initiate a handshake
+	 * 
+	 * @param entity           - the player trying to login
+	 * @param handshakeMessage - the {@link PacketHandshake} instance
+	 */
 	public void onHandshake(EntityPlayerMP entity, PacketHandshake handshakeMessage) {
 		CraftingDead.LOGGER.info("Verifying handshake for {}", entity.getName());
 		if (this.verifyHandshake(handshakeMessage)) {
+			// Remove them from the handshake map or else they will be kicked
 			this.handshakeTimeoutMap.remove(entity);
-			Player player = new Player(this, entity, handshakeMessage);
+			// Create our custom Player object that wraps around the vanilla one
+			PlayerMP player = new PlayerMP(this, entity, handshakeMessage);
+			// Load their data (if any) from the world save
+			player.deserializeNBT(entity.getEntityData().getCompoundTag(CraftingDead.MOD_ID));
 			this.playerMap.put(entity, player);
 			this.playerAccepted(player);
 			CraftingDead.LOGGER.info("{} has successfully passed the handshake verification", entity.getName());
@@ -118,15 +159,15 @@ public abstract class LogicalServer {
 	/**
 	 * Called when the player has been accepted into the game
 	 * 
-	 * @param player - the {@link Player} instance
+	 * @param player - the {@link PlayerMP} instance
 	 */
-	protected abstract void playerAccepted(Player player);
+	protected abstract void playerAccepted(PlayerMP player);
 
 	// ================================================================================
 	// Getters
 	// ================================================================================
 
-	public Player getPlayer(EntityPlayerMP player) {
+	public PlayerMP getPlayer(EntityPlayerMP player) {
 		return this.playerMap.get(player);
 	}
 

@@ -2,7 +2,7 @@ package com.craftingdead.mod.server;
 
 import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.server.LogicalServer;
-import com.craftingdead.mod.common.server.Player;
+import com.craftingdead.mod.common.server.PlayerMP;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 public class DedicatedServer extends LogicalServer {
@@ -18,7 +18,7 @@ public class DedicatedServer extends LogicalServer {
 	}
 
 	@Override
-	protected void playerAccepted(Player client) {
+	protected void playerAccepted(PlayerMP client) {
 		;
 	}
 

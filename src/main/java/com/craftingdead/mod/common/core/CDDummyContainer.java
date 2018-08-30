@@ -38,7 +38,8 @@ public class CDDummyContainer extends DummyModContainer {
 
 	@Override
 	public List<String> getOwnedPackages() {
-		return ImmutableList.of();
+		return ImmutableList.of("com.craftingdead.mod.client", "com.craftingdead.mod.server",
+				"com.craftingdead.mod.common.server");
 	}
 
 	@Override

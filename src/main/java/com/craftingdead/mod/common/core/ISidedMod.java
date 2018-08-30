@@ -4,9 +4,8 @@ import com.craftingdead.mod.common.server.LogicalServer;
 import com.recastproductions.network.impl.client.NetClientHandler;
 
 /**
- * Implemented by each side of the game, one for the
- * {@link net.minecraftforge.fml.relauncher.Side#CLIENT} and one for the
- * {@link net.minecraftforge.fml.relauncher.Side#SERVER}
+ * Implemented by each side of the game, one for the client and one for the
+ * server
  * 
  * @author Sm0keySa1m0n
  *
@@ -33,7 +32,7 @@ public interface ISidedMod<L extends LogicalServer, H extends NetClientHandler<?
 	 * separate shutdown thread<b>
 	 */
 	void shutdown();
-	
+
 	H getNetHandler();
 
 }
