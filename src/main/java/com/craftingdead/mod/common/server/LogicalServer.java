@@ -5,19 +5,17 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
-import com.craftingdead.mod.common.network.packet.server.SPacketRequestHandshake;
+import com.craftingdead.mod.common.network.packet.PacketHandshake;
+import com.craftingdead.mod.common.network.packet.PacketRequestHandshake;
 import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Contains common logic for CraftingDead, implemented by the physical client
@@ -26,7 +24,6 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author Sm0keySa1m0n
  *
  */
-@EventBusSubscriber(value = Side.SERVER, modid = CraftingDead.MOD_ID)
 public abstract class LogicalServer {
 
 	/**
@@ -85,8 +82,7 @@ public abstract class LogicalServer {
 
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-		CraftingDead.instance().getNetworkWrapper().sendTo(new SPacketRequestHandshake(),
-				(EntityPlayerMP) event.player);
+		CraftingDead.instance().getNetworkWrapper().sendTo(new PacketRequestHandshake(), (EntityPlayerMP) event.player);
 		handshakeTimeoutMap.put((EntityPlayerMP) event.player, HANDSHAKE_TIMEOUT);
 	}
 
@@ -99,7 +95,7 @@ public abstract class LogicalServer {
 	// Normal Methods
 	// ================================================================================
 
-	public void onHandshake(EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
+	public void onHandshake(EntityPlayerMP entity, PacketHandshake handshakeMessage) {
 		CraftingDead.LOGGER.info("Verifying handshake for {}", entity.getName());
 		if (this.verifyHandshake(handshakeMessage)) {
 			this.handshakeTimeoutMap.remove(entity);
@@ -111,13 +107,13 @@ public abstract class LogicalServer {
 	}
 
 	/**
-	 * Called to verify if the supplied {@link CPacketHandshake} should be accepted
+	 * Called to verify if the supplied {@link PacketHandshake} should be accepted
 	 * thus allowing the player to join
 	 * 
-	 * @param handshakeMessage - the {@link CPacketHandshake} instance
+	 * @param handshakePacket - the {@link PacketHandshake} instance
 	 * @return if its accepted
 	 */
-	protected abstract boolean verifyHandshake(CPacketHandshake handshakeMessage);
+	protected abstract boolean verifyHandshake(PacketHandshake handshakePacket);
 
 	/**
 	 * Called when the player has been accepted into the game

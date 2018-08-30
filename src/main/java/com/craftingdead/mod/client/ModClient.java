@@ -10,7 +10,7 @@ import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
-import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
+import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
 
@@ -42,7 +42,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
 			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
-	private Minecraft mc;
+	private Minecraft mc = Minecraft.getMinecraft();
 
 	private IntegratedServer integratedServer;
 
@@ -54,7 +54,6 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 
 	@Override
 	public void setup(CraftingDead mod) {
-		mc = Minecraft.getMinecraft();
 		integratedServer = new IntegratedServer();
 
 		DiscordRPC discordRPC = DiscordRPC.INSTANCE;
@@ -119,7 +118,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	// Normal Methods
 	// ================================================================================
 
-	public CPacketHandshake buildHandshakePacket() {
+	public PacketHandshake buildHandshakePacket() {
 		List<String> unauthorizedMods = new ArrayList<String>();
 		for (ModContainer mod : Loader.instance().getModList()) {
 			if (mod instanceof InjectedModContainer) {
@@ -132,7 +131,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 			CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
 			unauthorizedMods.add(mod.getModId());
 		}
-		return new CPacketHandshake(unauthorizedMods.toArray(new String[0]));
+		return new PacketHandshake(unauthorizedMods.toArray(new String[0]));
 	}
 
 }

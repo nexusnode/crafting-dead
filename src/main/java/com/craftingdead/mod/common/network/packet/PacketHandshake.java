@@ -1,6 +1,5 @@
-package com.craftingdead.mod.common.network.packet.client;
+package com.craftingdead.mod.common.network.packet;
 
-import com.craftingdead.mod.common.network.packet.PacketContextMod;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
 import com.recastproductions.network.util.ByteBufUtils;
@@ -8,15 +7,15 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 
-public class CPacketHandshake implements IPacket {
+public class PacketHandshake implements IPacket {
 
 	private String[] mods;
 
-	public CPacketHandshake() {
+	public PacketHandshake() {
 		;
 	}
 
-	public CPacketHandshake(String[] mods) {
+	public PacketHandshake(String[] mods) {
 		this.mods = mods;
 	}
 
@@ -42,10 +41,10 @@ public class CPacketHandshake implements IPacket {
 		return this.mods;
 	}
 
-	public static class SPacketHandlerHandshake implements IPacketHandler<CPacketHandshake, IPacket, PacketContextMod> {
+	public static class PacketHandlerHandshake implements IPacketHandler<PacketHandshake, IPacket, PacketContextMod> {
 
 		@Override
-		public IPacket processPacket(CPacketHandshake packet, PacketContextMod ctx) {
+		public IPacket processPacket(PacketHandshake packet, PacketContextMod ctx) {
 			ctx.getModClient().getLogicalServer().onHandshake(ctx.getServerHandler().player, packet);
 			return null;
 		}

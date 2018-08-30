@@ -23,7 +23,6 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleIndexedCodec;
 import net.minecraftforge.fml.relauncher.Side;
 
 /**
@@ -99,7 +98,7 @@ public class NetworkWrapper {
 			int discriminator, Side side) {
 		packetCodec.addDiscriminator(discriminator, requestPacketType);
 		FMLEmbeddedChannel channel = channels.get(side);
-		String type = channel.findChannelHandlerNameForType(SimpleIndexedCodec.class);
+		String type = channel.findChannelHandlerNameForType(PacketCodec.class);
 		if (side == Side.SERVER) {
 			addServerHandlerAfter(channel, type, packetHandler, requestPacketType);
 		} else {

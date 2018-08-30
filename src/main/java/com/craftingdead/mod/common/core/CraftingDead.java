@@ -10,14 +10,17 @@ import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.network.NetworkWrapper;
+import com.craftingdead.mod.common.network.PacketRegistry;
 import com.craftingdead.mod.server.ModServer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.recastproductions.network.NetworkClient;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.Side;
@@ -103,6 +106,8 @@ public final class CraftingDead implements IFMLCallHook {
 		});
 
 		networkWrapper = new NetworkWrapper(MOD_ID, sidedMod);
+		PacketRegistry.registerPackets(networkWrapper);
+
 		return null;
 	}
 
@@ -114,6 +119,11 @@ public final class CraftingDead implements IFMLCallHook {
 		modLocation = (File) data.get("coremodLocation");
 		folder = new File(data.get("mcLocation") + File.separator + CraftingDead.MOD_ID);
 		folder.mkdir();
+	}
+
+	@Subscribe
+	public void preInitialization(FMLPreInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(this.sidedMod.getLogicalServer());
 	}
 
 	@Subscribe

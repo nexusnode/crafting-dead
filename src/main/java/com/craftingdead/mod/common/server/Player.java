@@ -1,7 +1,7 @@
 package com.craftingdead.mod.common.server;
 
 import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.common.network.packet.client.CPacketHandshake;
+import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.recastproductions.network.packet.IPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -27,7 +27,7 @@ public class Player {
 	 */
 	private LogicalServer server;
 
-	public Player(LogicalServer server, EntityPlayerMP entity, CPacketHandshake handshakeMessage) {
+	public Player(LogicalServer server, EntityPlayerMP entity, PacketHandshake handshakeMessage) {
 		this.server = server;
 		this.entity = entity;
 		this.mods = handshakeMessage.getMods();
