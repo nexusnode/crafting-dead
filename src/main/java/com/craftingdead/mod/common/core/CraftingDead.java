@@ -14,7 +14,6 @@ import com.craftingdead.mod.server.ModServer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.recastproductions.network.NetworkClient;
-import com.recastproductions.network.impl.Session;
 import com.recastproductions.network.impl.client.NetworkRegistryClient;
 
 import net.minecraftforge.fml.common.LoadController;
@@ -98,11 +97,7 @@ public final class CraftingDead implements IFMLCallHook {
 			@Override
 			public void run() {
 				LOGGER.info("Shutting down " + MOD_NAME);
-				Session<?> session = networkRegistryClient.getNetHandler().getCurrentSession();
-				if (session != null) {
-					LOGGER.info("Disconnecting from the master server");
-					session.getChannel().close();
-				}
+				networkClient.shutdown();
 				sidedMod.shutdown();
 			}
 		});
