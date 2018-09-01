@@ -45,7 +45,7 @@ public class PacketHandshake implements IPacket {
 
 		@Override
 		public IPacket processPacket(PacketHandshake packet, PacketContextMod ctx) {
-			ctx.getModClient().getLogicalServer().onHandshake(ctx.getServerHandler().player, packet);
+			ctx.getMod().getLogicalServer().onHandshake(ctx.getServerHandler().player, packet);
 			return null;
 		}
 

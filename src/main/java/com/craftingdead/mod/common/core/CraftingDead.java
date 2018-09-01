@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.common.entity.EntityRegistry;
 import com.craftingdead.mod.common.network.NetworkWrapper;
 import com.craftingdead.mod.common.network.PacketRegistry;
 import com.craftingdead.mod.server.ModServer;
@@ -123,6 +124,7 @@ public final class CraftingDead implements IFMLCallHook {
 
 	@Subscribe
 	public void preInitialization(FMLPreInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(EntityRegistry.class);
 		MinecraftForge.EVENT_BUS.register(this.sidedMod.getLogicalServer());
 	}
 

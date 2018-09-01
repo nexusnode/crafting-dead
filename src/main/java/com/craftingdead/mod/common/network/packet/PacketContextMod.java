@@ -48,6 +48,10 @@ public class PacketContextMod implements IPacketContext {
 		return this.side;
 	}
 
+	public ISidedMod<?, ?> getMod() {
+		return this.mod;
+	}
+
 	public ModClient getModClient() {
 		if (mod instanceof ModClient)
 			return (ModClient) mod;

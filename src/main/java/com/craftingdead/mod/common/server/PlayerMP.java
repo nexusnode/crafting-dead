@@ -34,13 +34,9 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private LogicalServer server;
 	/**
-	 * Used to along with {@link #lastWorldTime} to calculate {@link #timeAlive}
+	 * Used to calculate if a day has passed by
 	 */
-	private long worldTime;
-	/**
-	 * Used along with {@link #worldTime} to calculate {@link #timeAlive}
-	 */
-	private long lastWorldTime;
+	private boolean lastDay;
 	/**
 	 * Used to calculate {@link #daysSurvived}
 	 */
@@ -50,16 +46,33 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private int daysSurvived;
 	/**
-	 * Used to detect if {@link #daysSurvived} has changed and needs to be sent to
+	 * Used to detect if {@link #daysSurvived} has changed since it was last sent to
 	 * the client
 	 */
-	private int lastDaysSurvived = -1;
+	private int lastDaysSurvived = Integer.MIN_VALUE;
+	/**
+	 * Zombie kills
+	 */
+	private int zombieKills;
+	/**
+	 * Used to detect if {@link #zombieKills} has changed since it was last sent to
+	 * the client
+	 */
+	private int lastZombieKills = Integer.MIN_VALUE;
+	/**
+	 * Player kills
+	 */
+	private int playerKills;
+	/**
+	 * Used to detect if {@link #playerKills} has changed since it was last sent to
+	 * the client
+	 */
+	private int lastPlayerKills = Integer.MIN_VALUE;
 
 	public PlayerMP(LogicalServer server, EntityPlayerMP entity, PacketHandshake handshakeMessage) {
 		this.server = server;
 		this.entity = entity;
 		this.mods = handshakeMessage.getMods();
-		this.worldTime = entity.getEntityWorld().getWorldTime();
 	}
 
 	public EntityPlayerMP getVanillaEntity() {
@@ -92,17 +105,21 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setInteger("timeAlive", timeAlive);
 		nbt.setInteger("daysSurvived", daysSurvived);
+		nbt.setInteger("zombieKills", zombieKills);
+		nbt.setInteger("playerKills", playerKills);
 		return nbt;
 	}
 
 	/**
-	 * Deserialise the class from an {@link NBTTagCompound} which is usually read
+	 * Deserialises the class from an {@link NBTTagCompound} which is usually read
 	 * from {@link EntityPlayerMP#getEntityData()}
 	 */
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt) {
 		this.timeAlive = nbt.getInteger("timeAlive");
 		this.daysSurvived = nbt.getInteger("daysSurvived");
+		this.zombieKills = nbt.getInteger("zombieKills");
+		this.playerKills = nbt.getInteger("playerKills");
 	}
 
 	/**
@@ -110,17 +127,25 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	@Override
 	public void update() {
-		lastWorldTime = worldTime;
-		worldTime = entity.getEntityWorld().getWorldTime();
-		if (worldTime != lastWorldTime) {
-			System.out.println("test" + timeAlive);
-			timeAlive += worldTime - lastWorldTime;
+		boolean isDay = entity.getEntityWorld().isDaytime();
+		// If it was night time and is now day time then increment their days survived
+		// by 1
+		if (!lastDay && isDay) {
+			daysSurvived++;
 		}
-		daysSurvived = timeAlive / 24000;
-		if (this.daysSurvived != this.lastDaysSurvived) {
-			this.sendPacket(new PacketUpdateStatistics(this.daysSurvived));
+		lastDay = isDay;
+
+		if (this.daysSurvived != this.lastDaysSurvived || this.zombieKills != this.lastZombieKills
+				|| this.playerKills != this.lastPlayerKills) {
+			this.sendPacket(new PacketUpdateStatistics(this.daysSurvived, this.zombieKills, this.playerKills));
 			this.lastDaysSurvived = this.daysSurvived;
+			this.lastZombieKills = this.zombieKills;
+			this.lastPlayerKills = this.playerKills;
 		}
+	}
+
+	public void incrementPlayerKills() {
+		this.playerKills++;
 	}
 
 	/**
@@ -131,6 +156,8 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	public void onDeath(DamageSource cause) {
 		this.timeAlive = 0;
 		this.daysSurvived = 0;
+		this.zombieKills = 0;
+		this.playerKills = 0;
 	}
 
 }

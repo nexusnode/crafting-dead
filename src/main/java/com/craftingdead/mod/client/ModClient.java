@@ -10,31 +10,39 @@ import com.craftingdead.discordrpc.DiscordRPC;
 import com.craftingdead.discordrpc.DiscordRichPresence;
 import com.craftingdead.mod.client.gui.GuiCDScreen;
 import com.craftingdead.mod.client.gui.GuiIngame;
+import com.craftingdead.mod.client.renderer.RenderCDZombie;
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
+import com.craftingdead.mod.common.entity.EntityCDZombie;
 import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLContainer;
 import net.minecraftforge.fml.common.InjectedModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.MCPDummyContainer;
 import net.minecraftforge.fml.common.MinecraftDummyContainer;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
@@ -103,6 +111,19 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		mc = FMLClientHandler.instance().getClient();
 		MinecraftForge.EVENT_BUS.register(this);
 		guiIngame = new GuiIngame(this);
+		RenderingRegistry.registerEntityRenderingHandler(EntityCDZombie.class, new IRenderFactory<EntityCDZombie>() {
+
+			@Override
+			public Render<? super EntityCDZombie> createRenderFor(RenderManager manager) {
+				return new RenderCDZombie(manager, new ModelBiped(), 0.4F);
+			}
+
+		});
+	}
+
+	@Subscribe
+	public void posInitialization(FMLPostInitializationEvent event) {
+
 	}
 
 	// ================================================================================
@@ -149,10 +170,9 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	}
 
 	@SubscribeEvent
-	public void onRenderTick(TickEvent.RenderTickEvent event) {
-		if (event.phase == Phase.END) {
-			if (mc.world != null)
-				guiIngame.renderGameOverlay(event.renderTickTime);
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
+		if (event.getType() == ElementType.ALL) {
+			guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
 		}
 	}
 

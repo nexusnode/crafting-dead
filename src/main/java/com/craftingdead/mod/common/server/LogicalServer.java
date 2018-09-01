@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 /**
  * Contains common logic for the mod, implemented by the physical client and
@@ -86,11 +87,13 @@ public abstract class LogicalServer {
 
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-		if (event.player instanceof EntityPlayerMP) {
-			EntityPlayerMP entity = (EntityPlayerMP) event.player;
-			PlayerMP player = this.playerMap.get(entity);
-			if (player != null) {
-				player.update();
+		if (event.phase == Phase.START) {
+			if (event.player instanceof EntityPlayerMP) {
+				EntityPlayerMP entity = (EntityPlayerMP) event.player;
+				PlayerMP player = this.playerMap.get(entity);
+				if (player != null) {
+					player.update();
+				}
 			}
 		}
 	}
@@ -100,14 +103,32 @@ public abstract class LogicalServer {
 		if (event.getEntityLiving() instanceof EntityPlayerMP) {
 			EntityPlayerMP entity = (EntityPlayerMP) event.getEntityLiving();
 			PlayerMP player = this.playerMap.get(entity);
+			// If the player being killed hasn't completed their handshake it will be null
 			if (player != null) {
 				player.onDeath(event.getSource());
+				if (event.getSource().getTrueSource() instanceof EntityPlayerMP) {
+					EntityPlayerMP causeEntity = (EntityPlayerMP) event.getSource().getTrueSource();
+					PlayerMP causePlayer = this.playerMap.get(causeEntity);
+					// If the cause player hasn't completed their handshake it will be null
+					if (causePlayer != null) {
+						causePlayer.incrementPlayerKills();
+					} else {
+						// Cancel the event because the cause player hasn't completed their handshake
+						event.setCanceled(true);
+					}
+				}
+			} else {
+				// Cancel the event because the player being killed hasn't completed their
+				// handshake
+				event.setCanceled(true);
 			}
 		}
 	}
 
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
+		// Set them to invisible as they haven't 'truly' joined yet
+		event.player.setInvisible(true);
 		// Ask the client to send their handshake packet
 		CraftingDead.instance().getNetworkWrapper().sendTo(new PacketRequestHandshake(), (EntityPlayerMP) event.player);
 		// Begin the timeout timer
@@ -116,10 +137,13 @@ public abstract class LogicalServer {
 
 	@SubscribeEvent
 	public void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
-		PlayerMP player = this.getPlayer((EntityPlayerMP) event.player);
-		// Save their data
-		player.getVanillaEntity().getEntityData().setTag(CraftingDead.MOD_ID, player.serializeNBT());
-		this.playerMap.remove((EntityPlayerMP) event.player);
+		PlayerMP player = this.playerMap.get((EntityPlayerMP) event.player);
+		// Player may not of completed their handshake so could be null
+		if (player != null) {
+			// Save their data
+			player.getVanillaEntity().getEntityData().setTag(CraftingDead.MOD_ID, player.serializeNBT());
+			this.playerMap.remove((EntityPlayerMP) event.player);
+		}
 	}
 
 	// ================================================================================
@@ -142,6 +166,8 @@ public abstract class LogicalServer {
 			// Load their data (if any) from the world save
 			player.deserializeNBT(entity.getEntityData().getCompoundTag(CraftingDead.MOD_ID));
 			this.playerMap.put(entity, player);
+			// Set them to visible as they have now 'truly' joined
+			entity.setInvisible(false);
 			this.playerAccepted(player);
 			CraftingDead.LOGGER.info("{} has successfully passed the handshake verification", entity.getName());
 		}

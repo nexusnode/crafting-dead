@@ -21,17 +21,41 @@ public class PlayerSP {
 	 * Days survived
 	 */
 	private int daysSurvived;
+	/**
+	 * Zombie kills
+	 */
+	private int zombieKills;
+	/**
+	 * Player kills
+	 */
+	private int playerKills;
 
 	public PlayerSP(EntityPlayerSP vanillaEntity) {
 		this.entity = vanillaEntity;
+	}
+
+	public int getDaysSurvived() {
+		return this.daysSurvived;
 	}
 
 	public void setDaysSurvived(int daysSurvived) {
 		this.daysSurvived = daysSurvived;
 	}
 
-	public int getDaysSurvived() {
-		return this.daysSurvived;
+	public int getZombieKills() {
+		return zombieKills;
+	}
+
+	public void setZombieKills(int zombieKills) {
+		this.zombieKills = zombieKills;
+	}
+
+	public int getPlayerKills() {
+		return playerKills;
+	}
+
+	public void setPlayerKills(int playerKills) {
+		this.playerKills = playerKills;
 	}
 
 	public EntityPlayerSP getVanillaEntity() {
