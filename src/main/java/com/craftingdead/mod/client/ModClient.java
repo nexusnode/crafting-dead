@@ -14,7 +14,7 @@ import com.craftingdead.mod.client.renderer.RenderCDZombie;
 import com.craftingdead.mod.common.core.CDDummyContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
-import com.craftingdead.mod.common.entity.EntityCDZombie;
+import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
 import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.network.mod.client.NetClientHandlerModClient;
 import com.google.common.collect.ImmutableList;
@@ -111,6 +111,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		mc = FMLClientHandler.instance().getClient();
 		MinecraftForge.EVENT_BUS.register(this);
 		guiIngame = new GuiIngame(this);
+
 		RenderingRegistry.registerEntityRenderingHandler(EntityCDZombie.class, new IRenderFactory<EntityCDZombie>() {
 
 			@Override

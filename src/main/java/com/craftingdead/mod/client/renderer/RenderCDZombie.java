@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.renderer;
 
 import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.common.entity.EntityCDZombie;
+import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderBiped;
@@ -17,7 +17,7 @@ public class RenderCDZombie extends RenderBiped<EntityCDZombie> {
 	@Override
 	protected ResourceLocation getEntityTexture(EntityCDZombie entity) {
 		ResourceLocation texture = new ResourceLocation(CraftingDead.MOD_ID,
-				"textures/mobs/zombies/zombie" + entity.getTextureNumber() + ".png");
+				"textures/entity/zombie/zombie" + entity.getTextureNumber() + ".png");
 		return texture;
 	}
 }

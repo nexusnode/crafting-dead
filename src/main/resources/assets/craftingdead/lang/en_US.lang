@@ -1,1 +1,3 @@
+entity.zombie.name=Zombie
+entity.zombieFast.name=Fast Zombie
 multiplayer.disconnect.handshakeFail=Client failed handshake
