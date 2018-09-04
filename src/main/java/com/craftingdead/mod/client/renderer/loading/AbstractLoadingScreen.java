@@ -1,4 +1,4 @@
-package com.craftingdead.mod.client.renderer;
+package com.craftingdead.mod.client.renderer.loading;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -35,7 +35,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.asm.FMLSanityChecker;
 
-public abstract class LoadingGuiScreen {
+public abstract class AbstractLoadingScreen {
 
 	private static final IResourcePack mcPack = Minecraft.getMinecraft().defaultResourcePack;
 	private static final IResourcePack fmlPack = createResourcePack(FMLSanityChecker.fmlLocation);
@@ -52,7 +52,7 @@ public abstract class LoadingGuiScreen {
 
 	private List<Texture> textures = new ArrayList<Texture>();
 
-	public LoadingGuiScreen() {
+	public AbstractLoadingScreen() {
 		File miscPackFile = new File(Minecraft.getMinecraft().gameDir, "resources");
 		miscPack = createResourcePack(miscPackFile);
 

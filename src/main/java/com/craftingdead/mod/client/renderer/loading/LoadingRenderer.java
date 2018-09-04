@@ -1,4 +1,4 @@
-package com.craftingdead.mod.client.renderer;
+package com.craftingdead.mod.client.renderer.loading;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.Semaphore;
@@ -34,7 +34,7 @@ public class LoadingRenderer {
 	private static Thread renderThread;
 	private static volatile Throwable threadError;
 
-	public static void start(Minecraft mc, LoadingGuiScreen gui) {
+	public static void start(Minecraft mc, AbstractLoadingScreen gui) {
 		if (running) {
 			return;
 		}
@@ -63,7 +63,7 @@ public class LoadingRenderer {
 					if (gui != null) {
 						gui.handleInput();
 
-						CustomScaledResolution res = new CustomScaledResolution(2);
+						RawScaledResolution res = new RawScaledResolution(2);
 
 						GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 						GL11.glLoadIdentity();

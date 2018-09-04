@@ -8,12 +8,12 @@ import javax.annotation.Nullable;
 import com.craftingdead.discordrpc.DiscordEventHandlers;
 import com.craftingdead.discordrpc.DiscordRPC;
 import com.craftingdead.discordrpc.DiscordRichPresence;
-import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
 import com.craftingdead.mod.client.renderer.transition.ScreenTransitionFade;
 import com.craftingdead.mod.client.renderer.transition.TransitionManager;
-import com.craftingdead.mod.common.core.CDDummyContainer;
+import com.craftingdead.mod.common.core.CDModContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
@@ -57,7 +57,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 public final class ModClient implements ISidedMod<IntegratedServer, NetClientHandlerModClient> {
 
 	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
-			.add(CDDummyContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
+			.add(CDModContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
 			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
 	private Minecraft mc;
@@ -142,8 +142,8 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
 			// event.setGui(new GuiMainMenu());
 		}
-		if (event.getGui() instanceof GuiCDScreen) {
-			((GuiCDScreen) event.getGui()).modClient = this;
+		if (event.getGui() instanceof GuiScreen) {
+			((GuiScreen) event.getGui()).modClient = this;
 		}
 	}
 

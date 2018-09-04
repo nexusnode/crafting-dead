@@ -1,4 +1,4 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
 import net.minecraft.client.gui.Gui;
 
@@ -8,7 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class GuiCDContainerListSlot extends Gui {
+public class GuiWidgetListSlot extends Gui {
 
     public int posX;
     public int posY;

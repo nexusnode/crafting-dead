@@ -1,4 +1,4 @@
-package com.craftingdead.mod.client.transformer;
+package com.craftingdead.mod.common.asm.transformers;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

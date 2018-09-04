@@ -1,17 +1,18 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import com.craftingdead.mod.common.core.CraftingDead;
+
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class GuiCDContainerList extends GuiCDContainer {
+public class GuiWidgetList extends GuiWidget {
 
-    private ArrayList<GuiCDContainerListSlot> slots = new ArrayList<GuiCDContainerListSlot>();
+    private ArrayList<GuiWidgetListSlot> slots = new ArrayList<GuiWidgetListSlot>();
 
     private int mouseX;
     private int mouseY;
@@ -25,21 +26,21 @@ public class GuiCDContainerList extends GuiCDContainer {
     private int slotHeight = 11;
     private int selectedSlot = -1;
 
-    public GuiCDContainerList(int par1, int par2, int par3, int par4, int par5, GuiCDScreen par6) {
+    public GuiWidgetList(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
         super(par1, par2, par3, par4, par5, par6);
     }
 
-    public GuiCDContainerList setContent(ArrayList<GuiCDContainerListSlot> par1) {
+    public GuiWidgetList setContent(ArrayList<GuiWidgetListSlot> par1) {
         this.updateDisplayedSlots(par1);
         return this;
     }
 
-    public GuiCDContainerList setContentText(ArrayList<String> par1) {
-        this.updateDisplayedSlots(GuiCDContainerListSlotText.getListFromStrings(par1));
+    public GuiWidgetList setContentText(ArrayList<String> par1) {
+        this.updateDisplayedSlots(GuiWidgetListSlotText.getListFromStrings(par1));
         return this;
     }
 
-    public GuiCDContainerList setSlotHeight(int par1) {
+    public GuiWidgetList setSlotHeight(int par1) {
         this.slotHeight = par1;
         return this;
     }
@@ -56,7 +57,7 @@ public class GuiCDContainerList extends GuiCDContainer {
         this.updateScollerStatus();
 
         for (int i = 0; i < slots.size(); i++) {
-            GuiCDContainerListSlot slot = slots.get(i);
+            GuiWidgetListSlot slot = slots.get(i);
             slot.onUpdate();
         }
 
@@ -80,7 +81,7 @@ public class GuiCDContainerList extends GuiCDContainer {
 
         for (int i = 0; i < slots.size(); i++) {
 
-            GuiCDContainerListSlot slot = slots.get(i);
+            GuiWidgetListSlot slot = slots.get(i);
             Rectangle rect = new Rectangle(slot.posX, slot.posY, this.width - 20, this.slotHeight);
 
             if (rect.contains(par1, par2) && slot.canSelect()) {
@@ -210,14 +211,14 @@ public class GuiCDContainerList extends GuiCDContainer {
         }
     }
 
-    public GuiCDContainerListSlot getSlectedSlot() {
+    public GuiWidgetListSlot getSlectedSlot() {
         if (this.selectedSlot == -1) {
             return null;
         }
         return this.slots.get(this.selectedSlot);
     }
 
-    public void updateDisplayedSlots(ArrayList<GuiCDContainerListSlot> par1) {
+    public void updateDisplayedSlots(ArrayList<GuiWidgetListSlot> par1) {
         this.slots.clear();
         this.slots.addAll(par1);
     }

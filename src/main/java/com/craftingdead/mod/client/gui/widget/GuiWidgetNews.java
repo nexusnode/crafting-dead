@@ -1,19 +1,19 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.util.ListUtil;
 import com.craftingdead.network.mod.client.SessionModClient;
 
 import java.util.ArrayList;
 
-public class GuiCDContainerNews extends GuiCDContainerList {
+public class GuiWidgetNews extends GuiWidgetList {
 
     private static int delay = 0;
     private static ArrayList<String> text = new ArrayList<String>();
 
-    public GuiCDContainerNews(int par1, int par2, int par3, int par4, int par5, GuiCDScreen par6) {
+    public GuiWidgetNews(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
         super(par1, par2, par3, par4, par5, par6);
-        this.updateDisplayedSlots(GuiCDContainerListSlotText.getListFromStrings(text));
+        this.updateDisplayedSlots(GuiWidgetListSlotText.getListFromStrings(text));
     }
 
     public void updateScreen() {
@@ -37,7 +37,7 @@ public class GuiCDContainerNews extends GuiCDContainerList {
                 text.add(ListUtil.colorizeString("&7&m---------------------------------------"));
             }
 
-            this.updateDisplayedSlots(GuiCDContainerListSlotText.getListFromStrings(text));
+            this.updateDisplayedSlots(GuiWidgetListSlotText.getListFromStrings(text));
             delay = 0;
         }
     }

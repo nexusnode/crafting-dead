@@ -1,11 +1,11 @@
-package com.craftingdead.mod.client.transformer;
+package com.craftingdead.mod.common.asm.transformers;
 
 import org.lwjgl.LWJGLException;
 
 import com.craftingdead.asm.Callback;
 import com.craftingdead.asm.CallbackInjectionTransformer;
-import com.craftingdead.mod.client.gui.GuiLoadingScreen;
-import com.craftingdead.mod.client.renderer.LoadingRenderer;
+import com.craftingdead.mod.client.renderer.loading.LoadingScreen;
+import com.craftingdead.mod.client.renderer.loading.LoadingRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -28,7 +28,7 @@ public class SplashProgressTransformer extends CallbackInjectionTransformer {
 	}
 
 	public static void start() throws LWJGLException {
-		LoadingRenderer.start(Minecraft.getMinecraft(), new GuiLoadingScreen());
+		LoadingRenderer.start(Minecraft.getMinecraft(), new LoadingScreen());
 	}
 
 	public static void finish() {

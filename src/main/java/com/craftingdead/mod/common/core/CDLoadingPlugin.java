@@ -1,8 +1,9 @@
 package com.craftingdead.mod.common.core;
 
-import com.craftingdead.mod.client.transformer.MinecraftTransformer;
-import com.craftingdead.mod.client.transformer.SplashProgressTransformer;
+import com.craftingdead.mod.common.asm.transformers.MinecraftTransformer;
+import com.craftingdead.mod.common.asm.transformers.SplashProgressTransformer;
 
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
@@ -15,18 +16,20 @@ import java.util.Map;
  */
 public class CDLoadingPlugin implements IFMLLoadingPlugin {
 
-	private static final String[] ASM_TRANSFORMER_CLASSES = new String[] {
-			MinecraftTransformer.class.getCanonicalName(), SplashProgressTransformer.class.getCanonicalName() };
+	private static final String[] CLIENT_TRANSFORMERS = new String[] { MinecraftTransformer.class.getCanonicalName(),
+			SplashProgressTransformer.class.getCanonicalName() };
+
+	private static final String[] SERVER_TRANSFORMERS = new String[0];
 
 	private static final String ACCESS_TRANSFORMER_CLASS = CDAccessTransformer.class.getCanonicalName();
 
-	private static final String MOD_CONTAINER_CLASS = CDDummyContainer.class.getCanonicalName();
+	private static final String MOD_CONTAINER_CLASS = CDModContainer.class.getCanonicalName();
 
 	private static final String SETUP_CLASS = CraftingDead.class.getCanonicalName();
 
 	@Override
 	public String[] getASMTransformerClass() {
-		return ASM_TRANSFORMER_CLASSES;
+		return FMLLaunchHandler.side().isClient() ? CLIENT_TRANSFORMERS : SERVER_TRANSFORMERS;
 	}
 
 	@Override

@@ -1,15 +1,15 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 
-public class GuiCDContainerListSlotText extends GuiCDContainerListSlot {
+public class GuiWidgetListSlotText extends GuiWidgetListSlot {
 
     private String displayText;
 
-    public GuiCDContainerListSlotText(String par1) {
+    public GuiWidgetListSlotText(String par1) {
         this.displayText = par1;
     }
 
@@ -49,12 +49,12 @@ public class GuiCDContainerListSlotText extends GuiCDContainerListSlot {
     /**
      * Convert a list of strings to a list of slots
      */
-    public static ArrayList<GuiCDContainerListSlot> getListFromStrings(ArrayList<String> par1) {
+    public static ArrayList<GuiWidgetListSlot> getListFromStrings(ArrayList<String> par1) {
 
-        ArrayList<GuiCDContainerListSlot> list = new ArrayList<GuiCDContainerListSlot>();
+        ArrayList<GuiWidgetListSlot> list = new ArrayList<GuiWidgetListSlot>();
 
         for (String var1 : par1) {
-            GuiCDContainerListSlot slot = new GuiCDContainerListSlotText(var1);
+            GuiWidgetListSlot slot = new GuiWidgetListSlotText(var1);
             list.add(slot);
         }
 

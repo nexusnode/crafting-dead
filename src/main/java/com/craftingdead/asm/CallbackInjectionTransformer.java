@@ -1,11 +1,12 @@
 package com.craftingdead.asm;
 
-import com.craftingdead.mod.common.core.CraftingDead;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import com.craftingdead.mod.common.core.CraftingDead;
 
 import java.util.*;
 

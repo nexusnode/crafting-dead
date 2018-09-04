@@ -1,10 +1,10 @@
-package com.craftingdead.mod.client.renderer;
+package com.craftingdead.mod.client.renderer.loading;
 
 import org.lwjgl.opengl.Display;
 
 import net.minecraft.util.math.MathHelper;
 
-public class CustomScaledResolution {
+public class RawScaledResolution {
 
 	private final double scaledWidthD;
 	private final double scaledHeightD;
@@ -12,7 +12,7 @@ public class CustomScaledResolution {
 	private int scaledHeight;
 	private int scaleFactor;
 
-	public CustomScaledResolution(int scale) {
+	public RawScaledResolution(int scale) {
 		this.scaledWidth = Display.getWidth();
 		this.scaledHeight = Display.getHeight();
 		this.scaleFactor = 1;

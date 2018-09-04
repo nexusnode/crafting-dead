@@ -1,24 +1,24 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import net.minecraft.client.Minecraft;
 
-public class GuiCDContainerText extends GuiCDContainer {
+public class GuiWidgetText extends GuiWidget {
 
     private String[] text;
     private boolean centerText = false;
 
-    public GuiCDContainerText(int par1, int par2, int par3, int par4, int par5, GuiCDScreen par6) {
+    public GuiWidgetText(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
         super(par1, par2, par3, par4, par5, par6);
     }
 
-    public GuiCDContainerText setText(String... par1) {
+    public GuiWidgetText setText(String... par1) {
         this.text = par1;
         return this;
     }
 
-    public GuiCDContainerText setCentered() {
+    public GuiWidgetText setCentered() {
         this.centerText = true;
         return this;
     }

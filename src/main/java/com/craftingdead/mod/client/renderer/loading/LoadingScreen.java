@@ -1,22 +1,21 @@
-package com.craftingdead.mod.client.gui;
+package com.craftingdead.mod.client.renderer.loading;
 
 import java.util.Iterator;
 
 import org.lwjgl.opengl.GL11;
 
-import com.craftingdead.mod.client.renderer.LoadingGuiScreen;
 import com.craftingdead.mod.common.core.CraftingDead;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
-public class GuiLoadingScreen extends LoadingGuiScreen {
+public class LoadingScreen extends AbstractLoadingScreen {
 
 	@Override
 	protected void drawScreen(int mouseX, int mouseY) {
 		this.drawImage(0, 0, this.width, this.height,
-				new Texture(new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/loading.png"), null), 1);
+				new Texture(new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/title/mojang.png"), null), 1);
 
 		ProgressBar first = null, penult = null, last = null;
 		Iterator<ProgressBar> i = ProgressManager.barIterator();

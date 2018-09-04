@@ -1,11 +1,11 @@
-package com.craftingdead.mod.client.gui.container;
+package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiCDScreen;
+import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 
-public class GuiCDContainer extends Gui {
+public class GuiWidget extends Gui {
 
     public int containerID;
 
@@ -15,12 +15,12 @@ public class GuiCDContainer extends Gui {
     protected int width;
     protected int height;
 
-    protected GuiCDScreen parentGUI;
+    protected GuiScreen parentGUI;
 
     protected int color = 0x333333;
     public float colorOpacity = 0.5F;
 
-    public GuiCDContainer(int par1, int par2, int par3, int par4, int par5, GuiCDScreen par6) {
+    public GuiWidget(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
         this.containerID = par1;
         this.posX = par2;
         this.posY = par3;
@@ -29,12 +29,12 @@ public class GuiCDContainer extends Gui {
         this.parentGUI = par6;
     }
 
-    public GuiCDContainer setColor(int color) {
+    public GuiWidget setColor(int color) {
         this.color = color;
         return this;
     }
 
-    public GuiCDContainer setOpacity(float opacity) {
+    public GuiWidget setOpacity(float opacity) {
         this.colorOpacity = opacity;
         return this;
     }
