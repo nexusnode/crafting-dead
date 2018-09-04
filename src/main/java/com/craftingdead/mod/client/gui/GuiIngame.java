@@ -6,6 +6,7 @@ import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import com.craftingdead.mod.common.core.CraftingDead;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
 
@@ -37,26 +38,22 @@ public class GuiIngame {
 	}
 
 	private void renderPlayerStats(int width, int height, int mouseX, int mouseY) {
-		// Bottom of screen
-		int y = height - 20;
-		// Left align
+		int y = height / 2;
 		int x = 4;
-		RenderHelper.drawImage(x, y, DAYS_SURVIVED, 16, 16, 1.0F);
-		RenderHelper.drawTextScaled(String.valueOf(client.getPlayer().getDaysSurvived()), x + 20, y + 4, 0xFFFFFF, true,
-				1F);
+		FontRenderer fontRenderer = client.getMinecraft().fontRenderer;
 
-		RenderHelper.drawImage(x + 40, y, KARMA, 16, 16, 1.0F);
-		RenderHelper.drawTextScaled("0", x + 60, y + 4, 0xFFFFFF, true, 1F);
+		RenderHelper.drawImage(x, y - 20, DAYS_SURVIVED, 16, 16, 1.0F);
+		fontRenderer.drawString(String.valueOf(client.getPlayer().getDaysSurvived()), x + 20, y - 16, 0xFFFFFF, true);
 
-		// Right align
-		int x2 = width - 20;
-		RenderHelper.drawImage(x2, y, ZOMBIE_KILLS, 16, 16, 1.0F);
-		RenderHelper.drawTextScaled(String.valueOf(client.getPlayer().getZombieKills()), x2 - 10, y + 4, 0xFFFFFF, true,
-				1F);
+		RenderHelper.drawImage(x, y, KARMA, 16, 16, 1.0F);
+		fontRenderer.drawString("0", x + 20, y + 4, 0xFFFFFF, true);
 
-		RenderHelper.drawImage(x2 - 40, y, PLAYER_KILLS, 16, 16, 1.0F);
-		RenderHelper.drawTextScaled(String.valueOf(client.getPlayer().getPlayerKills()), x2 - 50, y + 4, 0xFFFFFF, true,
-				1.0D);
+		RenderHelper.drawImage(x, y + 20, ZOMBIE_KILLS, 16, 16, 1.0F);
+		fontRenderer.drawString(String.valueOf(client.getPlayer().getZombieKills()), x + 20, y + 24, 0xFFFFFF, true);
+
+		RenderHelper.drawImage(x, y + 40, PLAYER_KILLS, 16, 16, 1.0F);
+		fontRenderer.drawString(String.valueOf(client.getPlayer().getPlayerKills()), x + 20, y + 44, 0xFFFFFF, true);
+
 	}
 
 }

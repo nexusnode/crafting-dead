@@ -70,6 +70,11 @@ public class EntityCDZombie extends EntityZombie {
 	}
 
 	@Override
+	protected boolean isValidLightLevel() {
+		return true;
+	}
+
+	@Override
 	public int getMaxSpawnedInChunk() {
 		return 12;
 	}

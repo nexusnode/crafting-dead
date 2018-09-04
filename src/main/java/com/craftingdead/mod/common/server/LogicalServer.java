@@ -9,8 +9,10 @@ import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.network.packet.PacketRequestHandshake;
 import com.google.common.eventbus.Subscribe;
 
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.GameType;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -28,12 +30,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
  *
  */
 public abstract class LogicalServer {
-
-	/**
-	 * A timeout value used to decide how many ticks to wait for a handshake
-	 * response until the player is kicked
-	 */
-	private static final int HANDSHAKE_TIMEOUT = 200;
 
 	/**
 	 * Updated every tick with players and their timeout count down
@@ -71,11 +67,11 @@ public abstract class LogicalServer {
 		Iterator<Map.Entry<EntityPlayerMP, Integer>> iter = handshakeTimeoutMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<EntityPlayerMP, Integer> entry = iter.next();
+			EntityPlayerMP player = entry.getKey();
 			// Reduce the timer value
 			entry.setValue(entry.getValue() - 1);
 			// Kick the player if they have run out of time to send a valid handshake packet
 			if (entry.getValue() <= 0) {
-				EntityPlayerMP player = entry.getKey();
 				CraftingDead.LOGGER.warn(
 						"{} failed to complete a successful handshake in a timely manner, disconnecting",
 						player.getName());
@@ -122,17 +118,32 @@ public abstract class LogicalServer {
 				// handshake
 				event.setCanceled(true);
 			}
+		} else if (event.getEntityLiving() instanceof EntityZombie) {
+			if (event.getSource().getTrueSource() instanceof EntityPlayerMP) {
+				EntityPlayerMP causeEntity = (EntityPlayerMP) event.getSource().getTrueSource();
+				PlayerMP causePlayer = this.playerMap.get(causeEntity);
+				// If the cause player hasn't completed their handshake it will be null
+				if (causePlayer != null) {
+					causePlayer.incrementZombieKills();
+				} else {
+					// Cancel the event because the cause player hasn't completed their handshake
+					event.setCanceled(true);
+				}
+			}
 		}
 	}
 
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-		// Set them to invisible as they haven't 'truly' joined yet
-		event.player.setInvisible(true);
+		EntityPlayerMP player = (EntityPlayerMP) event.player;
+		// Cache their game type so we can restore it once they complete the handshake
+		player.getEntityData().setString("gameTypeCache", player.interactionManager.getGameType().name());
+		// Set them to spectator mode as they haven't 'truly' joined yet
+		player.setGameType(GameType.SPECTATOR);
 		// Ask the client to send their handshake packet
 		CraftingDead.instance().getNetworkWrapper().sendTo(new PacketRequestHandshake(), (EntityPlayerMP) event.player);
 		// Begin the timeout timer
-		handshakeTimeoutMap.put((EntityPlayerMP) event.player, HANDSHAKE_TIMEOUT);
+		handshakeTimeoutMap.put((EntityPlayerMP) event.player, this.getHandshakeTimeout());
 	}
 
 	@SubscribeEvent
@@ -166,8 +177,8 @@ public abstract class LogicalServer {
 			// Load their data (if any) from the world save
 			player.deserializeNBT(entity.getEntityData().getCompoundTag(CraftingDead.MOD_ID));
 			this.playerMap.put(entity, player);
-			// Set them to visible as they have now 'truly' joined
-			entity.setInvisible(false);
+			// Set their game type to the cached version
+			entity.setGameType(GameType.valueOf(entity.getEntityData().getString("gameTypeCache")));
 			this.playerAccepted(player);
 			CraftingDead.LOGGER.info("{} has successfully passed the handshake verification", entity.getName());
 		}
@@ -188,6 +199,8 @@ public abstract class LogicalServer {
 	 * @param player - the {@link PlayerMP} instance
 	 */
 	protected abstract void playerAccepted(PlayerMP player);
+
+	protected abstract int getHandshakeTimeout();
 
 	// ================================================================================
 	// Getters

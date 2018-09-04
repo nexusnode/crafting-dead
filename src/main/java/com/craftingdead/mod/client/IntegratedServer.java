@@ -22,4 +22,9 @@ public class IntegratedServer extends LogicalServer {
 
 	}
 
+	@Override
+	protected int getHandshakeTimeout() {
+		return 500;
+	}
+
 }

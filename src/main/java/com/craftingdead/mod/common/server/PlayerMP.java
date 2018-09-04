@@ -144,6 +144,10 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 		}
 	}
 
+	public void incrementZombieKills() {
+		this.zombieKills++;
+	}
+
 	public void incrementPlayerKills() {
 		this.playerKills++;
 	}

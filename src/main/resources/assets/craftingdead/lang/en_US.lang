@@ -1,3 +1,8 @@
+generator.zombie=Zombie
+
 entity.zombie.name=Zombie
-entity.zombieFast.name=Fast Zombie
+entity.zombie.fast.name=Fast Zombie
+entity.zombie.tank.name=Tank Zombie
+entity.zombie.weak.name=Weak Zombie
+
 multiplayer.disconnect.handshakeFail=Client failed handshake

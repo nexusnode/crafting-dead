@@ -40,6 +40,7 @@ public class MinecraftTransformer extends CallbackInjectionTransformer {
 
 	public static void createDisplay(Minecraft mc) throws LWJGLException {
 		mc.gameSettings.guiScale = 2;
+		Display.setResizable(true);
 		Display.setTitle(CraftingDead.MOD_NAME);
 
 		List<ByteBuffer> icons = new ArrayList<ByteBuffer>();

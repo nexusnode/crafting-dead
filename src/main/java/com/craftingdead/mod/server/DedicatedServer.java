@@ -22,4 +22,9 @@ public class DedicatedServer extends LogicalServer {
 		;
 	}
 
+	@Override
+	protected int getHandshakeTimeout() {
+		return 200;
+	}
+
 }
