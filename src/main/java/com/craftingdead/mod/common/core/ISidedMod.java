@@ -33,6 +33,11 @@ public interface ISidedMod<L extends LogicalServer, H extends NetClientHandler<?
 	 */
 	void shutdown();
 
+	/**
+	 * Get the {@link NetClientHandler} associated with this side
+	 * 
+	 * @return
+	 */
 	H getNetHandler();
 
 }

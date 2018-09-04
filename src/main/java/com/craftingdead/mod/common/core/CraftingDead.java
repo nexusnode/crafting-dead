@@ -9,10 +9,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.client.ModClient;
-import com.craftingdead.mod.common.entity.EntityRegistry;
 import com.craftingdead.mod.common.network.NetworkWrapper;
-import com.craftingdead.mod.common.network.PacketRegistry;
-import com.craftingdead.mod.common.world.WorldRegistry;
+import com.craftingdead.mod.common.registry.EntityRegistry;
+import com.craftingdead.mod.common.registry.PacketRegistry;
+import com.craftingdead.mod.common.registry.WorldRegistry;
 import com.craftingdead.mod.server.ModServer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

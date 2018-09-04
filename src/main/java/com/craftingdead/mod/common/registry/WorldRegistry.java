@@ -1,6 +1,7 @@
-package com.craftingdead.mod.common.world;
+package com.craftingdead.mod.common.registry;
 
 import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.world.WorldTypeZombie;
 import com.craftingdead.mod.common.world.biome.BiomeZombieDesert;
 import com.craftingdead.mod.common.world.biome.BiomeZombieForest;
 import com.craftingdead.mod.common.world.biome.BiomeZombiePlains;

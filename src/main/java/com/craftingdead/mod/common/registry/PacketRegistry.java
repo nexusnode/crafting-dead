@@ -1,5 +1,6 @@
-package com.craftingdead.mod.common.network;
+package com.craftingdead.mod.common.registry;
 
+import com.craftingdead.mod.common.network.NetworkWrapper;
 import com.craftingdead.mod.common.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.network.packet.PacketHandshake.PacketHandlerHandshake;
 import com.craftingdead.mod.common.network.packet.PacketRequestHandshake;

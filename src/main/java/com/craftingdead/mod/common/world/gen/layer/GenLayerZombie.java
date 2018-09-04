@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import com.craftingdead.mod.common.world.WorldRegistry;
+import com.craftingdead.mod.common.registry.WorldRegistry;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.init.Biomes;

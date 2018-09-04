@@ -1,6 +1,8 @@
 package com.craftingdead.mod.common.core;
 
 import com.craftingdead.mod.client.transformer.MinecraftTransformer;
+import com.craftingdead.mod.client.transformer.SplashProgressTransformer;
+
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
@@ -14,7 +16,7 @@ import java.util.Map;
 public class CDLoadingPlugin implements IFMLLoadingPlugin {
 
 	private static final String[] ASM_TRANSFORMER_CLASSES = new String[] {
-			MinecraftTransformer.class.getCanonicalName() };
+			MinecraftTransformer.class.getCanonicalName(), SplashProgressTransformer.class.getCanonicalName() };
 
 	private static final String ACCESS_TRANSFORMER_CLASS = CDAccessTransformer.class.getCanonicalName();
 

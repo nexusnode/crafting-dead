@@ -1,4 +1,4 @@
-package com.craftingdead.mod.client.renderer;
+package com.craftingdead.mod.client.renderer.entity;
 
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.entity.monster.EntityCDZombie;

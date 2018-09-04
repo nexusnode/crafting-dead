@@ -1,8 +1,7 @@
-package com.craftingdead.mod.common.entity;
+package com.craftingdead.mod.common.registry;
 
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
-import com.craftingdead.mod.common.world.WorldRegistry;
 
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.ResourceLocation;
