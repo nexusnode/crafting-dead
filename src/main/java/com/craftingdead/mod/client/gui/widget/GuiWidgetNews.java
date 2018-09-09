@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.gui.widget;
 
 import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.network.SessionModClient;
 import com.craftingdead.mod.util.ListUtil;
-import com.craftingdead.network.mod.client.SessionModClient;
 
 import java.util.ArrayList;
 

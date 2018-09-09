@@ -13,8 +13,8 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.PixelFormat;
 
-import com.craftingdead.asm.Callback;
-import com.craftingdead.asm.CallbackInjectionTransformer;
+import com.craftingdead.mod.common.asm.Callback;
+import com.craftingdead.mod.common.asm.CallbackInjectionTransformer;
 import com.craftingdead.mod.common.core.CraftingDead;
 
 import net.minecraft.client.Minecraft;

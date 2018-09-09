@@ -9,7 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.client.ModClient;
-import com.craftingdead.mod.common.network.NetworkWrapper;
+import com.craftingdead.mod.common.multiplayer.LogicalServer;
+import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
 import com.craftingdead.mod.common.registry.EntityRegistry;
 import com.craftingdead.mod.common.registry.PacketRegistry;
 import com.craftingdead.mod.common.registry.WorldRegistry;
@@ -23,6 +24,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,56 +36,54 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author Sm0keySa1m0n
  *
  */
-public final class CraftingDead implements IFMLCallHook {
+public final class CraftingDead<T extends ISidedMod<T, ?>> implements IFMLCallHook {
 
 	public static final String MOD_ID = "craftingdead", MOD_VERSION = "0.0.1", MOD_NAME = "Crafting Dead";
 
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public static final Class<? extends ISidedMod<?, ?>> CLIENT_MOD_CLASS = ModClient.class,
-			SERVER_MOD_CLASS = ModServer.class;
-
-	public static final SocketAddress MANAGEMENT_SERVER_ADDRESS = new InetSocketAddress("localhost", 32888);
+	private static final Class<? extends ISidedMod<?, ?>> CLIENT_SIDE = ModClient.class, SERVER_SIDE = ModServer.class;
 
 	/**
 	 * Singleton
 	 */
-	private static CraftingDead instance;
-
+	private static CraftingDead<?> instance;
 	/**
 	 * Current {@link ISidedMod} instance
 	 */
-	private ISidedMod<?, ?> sidedMod;
-
+	private T sidedMod;
+	/**
+	 * The network address of the management server
+	 */
+	private SocketAddress managementServerAddress = new InetSocketAddress("localhost", 32888);
 	/**
 	 * Handles all impl network logic
 	 */
 	private NetworkRegistryClient networkRegistryClient;
-
 	/**
 	 * Used to connect to the master server
 	 */
 	private NetworkClient networkClient;
-
 	/**
 	 * The location of the mod - can be a jar or directory
 	 */
 	private File modLocation;
-
 	/**
 	 * The data folder
 	 */
 	private File folder;
-
 	/**
 	 * Internal event bus
 	 */
 	private EventBus bus;
-
 	/**
 	 * Used for internal networking
 	 */
 	private NetworkWrapper networkWrapper;
+	/**
+	 * {@link LogicalServer} instance
+	 */
+	private LogicalServer<T> logicalServer;
 
 	public CraftingDead() {
 		instance = this;
@@ -93,8 +94,7 @@ public final class CraftingDead implements IFMLCallHook {
 	 */
 	@Override
 	public Void call() throws Exception {
-		sidedMod = FMLLaunchHandler.side() == Side.CLIENT ? CLIENT_MOD_CLASS.newInstance()
-				: SERVER_MOD_CLASS.newInstance();
+		sidedMod = this.instantiateSide(CLIENT_SIDE, SERVER_SIDE);
 
 		sidedMod.setup(this);
 
@@ -113,6 +113,12 @@ public final class CraftingDead implements IFMLCallHook {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	private T instantiateSide(Class<? extends ISidedMod<?, ?>> clientSide, Class<? extends ISidedMod<?, ?>> serverSide)
+			throws InstantiationException, IllegalAccessException {
+		return FMLLaunchHandler.side() == Side.CLIENT ? (T) clientSide.newInstance() : (T) serverSide.newInstance();
+	}
+
 	/**
 	 * Injects data provided by FML
 	 */
@@ -127,14 +133,35 @@ public final class CraftingDead implements IFMLCallHook {
 	public void preInitialization(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(EntityRegistry.class);
 		MinecraftForge.EVENT_BUS.register(WorldRegistry.class);
-		MinecraftForge.EVENT_BUS.register(this.sidedMod.getLogicalServer());
 	}
 
 	@Subscribe
 	public void loadComplete(FMLLoadCompleteEvent event) {
 		networkRegistryClient = new NetworkRegistryClient(sidedMod.getNetHandler());
 		networkClient = new NetworkClient(networkRegistryClient.getChannelInitializer());
-		networkClient.connect(MANAGEMENT_SERVER_ADDRESS);
+		networkClient.connect(managementServerAddress);
+	}
+
+	@Subscribe
+	public void serverStarting(FMLServerStartingEvent event) {
+		try {
+			logicalServer = sidedMod.getLogicalServer().newInstance();
+			MinecraftForge.EVENT_BUS.register(logicalServer);
+			this.bus.register(logicalServer);
+			logicalServer.start(sidedMod, event.getServer());
+		} catch (InstantiationException | IllegalAccessException e) {
+			LOGGER.error("Could not start logical server", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Subscribe
+	public void serverStopping(FMLServerStoppingEvent event) {
+		if (logicalServer != null) {
+			MinecraftForge.EVENT_BUS.unregister(logicalServer);
+			this.bus.unregister(logicalServer);
+			logicalServer = null;
+		}
 	}
 
 	/**
@@ -168,7 +195,7 @@ public final class CraftingDead implements IFMLCallHook {
 		return this.networkWrapper;
 	}
 
-	public static CraftingDead instance() {
+	public static CraftingDead<?> instance() {
 		return instance;
 	}
 

@@ -14,8 +14,6 @@ public class GuiIngame {
 
 	private static final ResourceLocation DAYS_SURVIVED = new ResourceLocation(CraftingDead.MOD_ID,
 			"textures/gui/hud/daysSurvived.png");
-	private static final ResourceLocation KARMA = new ResourceLocation(CraftingDead.MOD_ID,
-			"textures/gui/hud/karma.png");
 	private static final ResourceLocation ZOMBIE_KILLS = new ResourceLocation(CraftingDead.MOD_ID,
 			"textures/gui/hud/zombieKills.png");
 	private static final ResourceLocation PLAYER_KILLS = new ResourceLocation(CraftingDead.MOD_ID,
@@ -45,14 +43,11 @@ public class GuiIngame {
 		RenderHelper.drawImage(x, y - 20, DAYS_SURVIVED, 16, 16, 1.0F);
 		fontRenderer.drawString(String.valueOf(client.getPlayer().getDaysSurvived()), x + 20, y - 16, 0xFFFFFF, true);
 
-		RenderHelper.drawImage(x, y, KARMA, 16, 16, 1.0F);
-		fontRenderer.drawString("0", x + 20, y + 4, 0xFFFFFF, true);
+		RenderHelper.drawImage(x, y, ZOMBIE_KILLS, 16, 16, 1.0F);
+		fontRenderer.drawString(String.valueOf(client.getPlayer().getZombieKills()), x + 20, y + 4, 0xFFFFFF, true);
 
-		RenderHelper.drawImage(x, y + 20, ZOMBIE_KILLS, 16, 16, 1.0F);
-		fontRenderer.drawString(String.valueOf(client.getPlayer().getZombieKills()), x + 20, y + 24, 0xFFFFFF, true);
-
-		RenderHelper.drawImage(x, y + 40, PLAYER_KILLS, 16, 16, 1.0F);
-		fontRenderer.drawString(String.valueOf(client.getPlayer().getPlayerKills()), x + 20, y + 44, 0xFFFFFF, true);
+		RenderHelper.drawImage(x, y + 20, PLAYER_KILLS, 16, 16, 1.0F);
+		fontRenderer.drawString(String.valueOf(client.getPlayer().getPlayerKills()), x + 20, y + 24, 0xFFFFFF, true);
 
 	}
 

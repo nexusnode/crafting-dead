@@ -1,6 +1,6 @@
 package com.craftingdead.mod.common.core;
 
-import com.craftingdead.mod.common.server.LogicalServer;
+import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.recastproductions.network.impl.client.NetClientHandler;
 
 /**
@@ -11,21 +11,21 @@ import com.recastproductions.network.impl.client.NetClientHandler;
  *
  * @param <L> - the {@link LogicalServer} associated with this side
  */
-public interface ISidedMod<L extends LogicalServer, H extends NetClientHandler<?, ?>> {
+public interface ISidedMod<T extends ISidedMod<T, H>, H extends NetClientHandler<?, ?>> {
 
 	/**
 	 * Called before minecraft is loaded, do any pre loading here
 	 * 
 	 * @param mod - the {@link CraftingDead} instance
 	 */
-	void setup(CraftingDead mod);
+	void setup(CraftingDead<T> mod);
 
 	/**
 	 * Get the {@link LogicalServer} associated with this side
 	 * 
 	 * @return the server instance
 	 */
-	L getLogicalServer();
+	Class<? extends LogicalServer<T>> getLogicalServer();
 
 	/**
 	 * Signals the shutdown of the game, do any shutdown tasks here, <b>runs in

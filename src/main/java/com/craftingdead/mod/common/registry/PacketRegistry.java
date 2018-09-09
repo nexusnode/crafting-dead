@@ -1,12 +1,12 @@
 package com.craftingdead.mod.common.registry;
 
-import com.craftingdead.mod.common.network.NetworkWrapper;
-import com.craftingdead.mod.common.network.packet.PacketHandshake;
-import com.craftingdead.mod.common.network.packet.PacketHandshake.PacketHandlerHandshake;
-import com.craftingdead.mod.common.network.packet.PacketRequestHandshake;
-import com.craftingdead.mod.common.network.packet.PacketRequestHandshake.PacketHandlerRequestHandshake;
-import com.craftingdead.mod.common.network.packet.PacketUpdateStatistics;
-import com.craftingdead.mod.common.network.packet.PacketUpdateStatistics.PacketHandlerUpdateStatistics;
+import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketRequestHandshake;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketUpdateStatistics;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake.PacketHandlerHandshake;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketRequestHandshake.PacketHandlerRequestHandshake;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketUpdateStatistics.PacketHandlerUpdateStatistics;
 
 import net.minecraftforge.fml.relauncher.Side;
 

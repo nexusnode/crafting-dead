@@ -49,6 +49,10 @@ public abstract class Session<NH extends NetHandler<?>> extends SimpleChannelInb
 		}
 	}
 
+	public void sendPacket(IPacket packet) {
+		this.channel.writeAndFlush(packet);
+	}
+
 	public NH getNetHandler() {
 		return this.netHandler;
 	}

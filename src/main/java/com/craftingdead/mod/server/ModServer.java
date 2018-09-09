@@ -2,22 +2,21 @@ package com.craftingdead.mod.server;
 
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
-import com.craftingdead.network.mod.server.NetClientHandlerModServer;
+import com.craftingdead.mod.server.multiplayer.DedicatedServer;
+import com.craftingdead.mod.server.network.NetClientHandlerModServer;
 
-public class ModServer implements ISidedMod<DedicatedServer, NetClientHandlerModServer> {
+public class ModServer implements ISidedMod<ModServer, NetClientHandlerModServer> {
 
 	private NetClientHandlerModServer netHandler = new NetClientHandlerModServer();
 
-	private DedicatedServer dedicatedServer;
-
 	@Override
-	public void setup(CraftingDead mod) {
-		dedicatedServer = new DedicatedServer();
+	public void setup(CraftingDead<ModServer> mod) {
+		;
 	}
 
 	@Override
-	public DedicatedServer getLogicalServer() {
-		return dedicatedServer;
+	public Class<DedicatedServer> getLogicalServer() {
+		return DedicatedServer.class;
 	}
 
 	@Override

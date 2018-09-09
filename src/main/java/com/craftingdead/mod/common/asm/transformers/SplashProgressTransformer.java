@@ -2,9 +2,9 @@ package com.craftingdead.mod.common.asm.transformers;
 
 import org.lwjgl.LWJGLException;
 
-import com.craftingdead.asm.Callback;
-import com.craftingdead.asm.CallbackInjectionTransformer;
 import com.craftingdead.mod.client.renderer.loading.LoadingScreen;
+import com.craftingdead.mod.common.asm.Callback;
+import com.craftingdead.mod.common.asm.CallbackInjectionTransformer;
 import com.craftingdead.mod.client.renderer.loading.LoadingRenderer;
 
 import net.minecraft.client.Minecraft;

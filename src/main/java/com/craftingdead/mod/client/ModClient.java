@@ -8,8 +8,11 @@ import javax.annotation.Nullable;
 import com.craftingdead.discordrpc.DiscordEventHandlers;
 import com.craftingdead.discordrpc.DiscordRPC;
 import com.craftingdead.discordrpc.DiscordRichPresence;
-import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.gui.GuiIngame;
+import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.multiplayer.IntegratedServer;
+import com.craftingdead.mod.client.multiplayer.PlayerSP;
+import com.craftingdead.mod.client.network.NetClientHandlerModClient;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
 import com.craftingdead.mod.client.renderer.transition.ScreenTransitionFade;
 import com.craftingdead.mod.client.renderer.transition.TransitionManager;
@@ -17,8 +20,7 @@ import com.craftingdead.mod.common.core.CDModContainer;
 import com.craftingdead.mod.common.core.CraftingDead;
 import com.craftingdead.mod.common.core.ISidedMod;
 import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
-import com.craftingdead.mod.common.network.packet.PacketHandshake;
-import com.craftingdead.network.mod.client.NetClientHandlerModClient;
+import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 
@@ -29,8 +31,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -42,7 +42,6 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.MCPDummyContainer;
 import net.minecraftforge.fml.common.MinecraftDummyContainer;
 import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
@@ -54,15 +53,13 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
  * @author Sm0keySa1m0n
  *
  */
-public final class ModClient implements ISidedMod<IntegratedServer, NetClientHandlerModClient> {
+public final class ModClient implements ISidedMod<ModClient, NetClientHandlerModClient> {
 
 	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
 			.add(CDModContainer.class).add(MinecraftDummyContainer.class).add(FMLContainer.class)
 			.add(ForgeModContainer.class).add(MCPDummyContainer.class).build();
 
 	private Minecraft mc;
-
-	private IntegratedServer integratedServer;
 
 	private NetClientHandlerModClient netHandler = new NetClientHandlerModClient(this);
 
@@ -77,9 +74,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	// ================================================================================
 
 	@Override
-	public void setup(CraftingDead mod) {
-		integratedServer = new IntegratedServer();
-
+	public void setup(CraftingDead<ModClient> mod) {
 		DiscordRPC discordRPC = DiscordRPC.INSTANCE;
 
 		DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -96,8 +91,8 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	}
 
 	@Override
-	public IntegratedServer getLogicalServer() {
-		return integratedServer;
+	public Class<IntegratedServer> getLogicalServer() {
+		return IntegratedServer.class;
 	}
 
 	@Override
@@ -113,6 +108,7 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	@Subscribe
 	public void preInitialization(FMLPreInitializationEvent event) {
 		mc = FMLClientHandler.instance().getClient();
+		mc.loadingScreen = null;
 		MinecraftForge.EVENT_BUS.register(this);
 		guiIngame = new GuiIngame(this);
 		transitionManager = new TransitionManager(new ScreenTransitionFade());
@@ -128,11 +124,6 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 		});
 	}
 
-	@Subscribe
-	public void posInitialization(FMLPostInitializationEvent event) {
-
-	}
-
 	// ================================================================================
 	// Forge Events
 	// ================================================================================
@@ -140,25 +131,11 @@ public final class ModClient implements ISidedMod<IntegratedServer, NetClientHan
 	@SubscribeEvent
 	public void onGuiOpen(GuiOpenEvent event) {
 		if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
-			// event.setGui(new GuiMainMenu());
+//			event.setGui(new GuiMainMenu());
 		}
 		if (event.getGui() instanceof GuiScreen) {
 			((GuiScreen) event.getGui()).modClient = this;
 		}
-	}
-
-	// Fixes rendering crash with rendering entities when not inside a world
-	@SubscribeEvent
-	public void onPreRenderEntitySpecials(RenderLivingEvent.Specials.Pre<?> event) {
-		if (mc.player == null)
-			event.setCanceled(true);
-	}
-
-	@SubscribeEvent
-	public void onPreTooltipRender(RenderTooltipEvent.Color event) {
-		event.setBackground(0xFF101010);
-		event.setBorderEnd(0);
-		event.setBorderStart(0);
 	}
 
 	@SubscribeEvent
