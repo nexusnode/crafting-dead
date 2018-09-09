@@ -2,7 +2,7 @@ package com.craftingdead;
 
 public enum KarmaRank {
 
-	HERO_1(1000), HERO_2(2500), HERO_3(4000), HERO_4(7000), BANDIT_1(-1000), BANDIT_2(-2500), BANDIT_3(-4000),
+	HERO_1(1000), HERO_2(2500), HERO_3(4000), HERO_4(7000), NONE(0), BANDIT_1(-1000), BANDIT_2(-2500), BANDIT_3(-4000),
 	BANDIT_4(-7000);
 
 	private final int minimumKarma;
@@ -19,7 +19,7 @@ public enum KarmaRank {
 				return rank;
 			}
 		}
-		return null;
+		return KarmaRank.NONE;
 	}
 
 }
