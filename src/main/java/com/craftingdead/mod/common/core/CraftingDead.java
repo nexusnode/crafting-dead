@@ -142,32 +142,35 @@ public final class CraftingDead<T extends ISidedMod<T, ?>> implements IFMLCallHo
         LOGGER.info("################");
 
 
-
+        MinecraftForge.EVENT_BUS.register(new RegistrationHandler());
         MinecraftForge.EVENT_BUS.register(EntityRegistry.class);
 		MinecraftForge.EVENT_BUS.register(WorldRegistry.class);
 	}
 
-	@
+	@Mod.EventBusSubscriber
+    public class RegistrationHandler {
+        @SubscribeEvent
+        public void registerItems(RegistryEvent.Register<Item> event) {
+            LOGGER.info("################");
+            LOGGER.info("################");
+            LOGGER.info("################");
+            LOGGER.info("register items event");
 
-    @Subscribe
-    public void registerItems(RegistryEvent.Register<Item> event) {
-        LOGGER.info("################");
-        LOGGER.info("################");
-        LOGGER.info("################");
-        LOGGER.info("register item event");
 
+            ItemManager.register(event.getRegistry());
+        }
 
-        ItemManager.register(event.getRegistry());
+        @SubscribeEvent
+        public void registerItems(ModelRegistryEvent event) {
+            LOGGER.info("register model event");
+            LOGGER.info("################");
+            LOGGER.info("################");
+            LOGGER.info("################");
+            ItemManager.registerModels();
+        }
     }
 
-    @Subscribe
-    public void registerItems(ModelRegistryEvent event) {
-        LOGGER.info("register model event");
-        LOGGER.info("################");
-        LOGGER.info("################");
-        LOGGER.info("################");
-        ItemManager.registerModels();
-    }
+
 
 	@Subscribe
 	public void loadComplete(FMLLoadCompleteEvent event) {

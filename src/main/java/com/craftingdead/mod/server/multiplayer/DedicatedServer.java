@@ -20,7 +20,7 @@ public class DedicatedServer extends LogicalServer<ModServer> {
 
 	@Override
 	protected int getHandshakeTimeout() {
-		return 200;
+		return 500;
 	}
 
 	@Override
