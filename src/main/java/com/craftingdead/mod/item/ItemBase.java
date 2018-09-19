@@ -23,7 +23,7 @@ public class ItemBase extends Item {
         try {
             this.mainModel = (IBakedModel) ModelLoaderRegistry.getModel(modelResourceLocation);
         } catch (Exception e) {
-            e.printStackTrace();
+            CraftingDead.LOGGER.error(e.getMessage());
         }
     }
 

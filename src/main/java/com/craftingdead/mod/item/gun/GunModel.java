@@ -19,13 +19,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
-class GunModel extends ItemBase implements IBakedModel {
+public class GunModel extends ItemBase implements IBakedModel {
     //TODO setup basic variables and methods that will be used across all guns
 
     protected IBakedModel attachmentModel;
     protected IModel attachment;
 
-    GunModel(String name) {
+    public GunModel(String name) {
         super(name);
 
         try {
