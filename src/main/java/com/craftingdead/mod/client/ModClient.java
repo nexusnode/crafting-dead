@@ -10,6 +10,7 @@ import com.craftingdead.discordrpc.DiscordRPC;
 import com.craftingdead.discordrpc.DiscordRichPresence;
 import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.model.ModelLoader;
 import com.craftingdead.mod.client.multiplayer.IntegratedServer;
 import com.craftingdead.mod.client.multiplayer.PlayerSP;
 import com.craftingdead.mod.client.network.NetClientHandlerModClient;
@@ -31,6 +32,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -68,6 +70,8 @@ public final class ModClient implements ISidedMod<ModClient, NetClientHandlerMod
 	private PlayerSP player;
 
 	private TransitionManager transitionManager;
+	
+	private ModelLoader modelLoader;
 
 	// ================================================================================
 	// Overridden Methods
@@ -113,6 +117,8 @@ public final class ModClient implements ISidedMod<ModClient, NetClientHandlerMod
 		guiIngame = new GuiIngame(this);
 		transitionManager = new TransitionManager(new ScreenTransitionFade());
 		MinecraftForge.EVENT_BUS.register(transitionManager);
+
+		modelLoader = new ModelLoader();
 
 		RenderingRegistry.registerEntityRenderingHandler(EntityCDZombie.class, new IRenderFactory<EntityCDZombie>() {
 

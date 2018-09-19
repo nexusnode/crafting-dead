@@ -1,7 +1,7 @@
 {
 	"__comment": "Designed by Zachrywilsn with Cubik Studio - https://cubik.studio",
 	"textures": {
-		"particle": "craftingdead:items/l85a3"
+		"particle": "items/nubx/l85a3"
 	},
 	"elements": [ 	 
 		{

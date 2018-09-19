@@ -5,12 +5,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
 
-import com.craftingdead.mod.item.ItemManager;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +12,7 @@ import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
 import com.craftingdead.mod.common.registry.EntityRegistry;
+import com.craftingdead.mod.common.registry.ItemRegistry;
 import com.craftingdead.mod.common.registry.PacketRegistry;
 import com.craftingdead.mod.common.registry.WorldRegistry;
 import com.craftingdead.mod.server.ModServer;
@@ -137,40 +132,14 @@ public final class CraftingDead<T extends ISidedMod<T, ?>> implements IFMLCallHo
 
 	@Subscribe
 	public void preInitialization(FMLPreInitializationEvent event) {
-        LOGGER.info("Pre initialization");
-        LOGGER.info("################");
-        LOGGER.info("################");
+		LOGGER.info("Pre initialization");
+		LOGGER.info("################");
+		LOGGER.info("################");
 
-
-        MinecraftForge.EVENT_BUS.register(new RegistrationHandler());
-        MinecraftForge.EVENT_BUS.register(EntityRegistry.class);
+		MinecraftForge.EVENT_BUS.register(ItemRegistry.class);
+		MinecraftForge.EVENT_BUS.register(EntityRegistry.class);
 		MinecraftForge.EVENT_BUS.register(WorldRegistry.class);
 	}
-
-	@Mod.EventBusSubscriber
-    public class RegistrationHandler {
-        @SubscribeEvent
-        public void registerItems(RegistryEvent.Register<Item> event) {
-            LOGGER.info("################");
-            LOGGER.info("################");
-            LOGGER.info("################");
-            LOGGER.info("register items event");
-
-
-            ItemManager.register(event.getRegistry());
-        }
-
-        @SubscribeEvent
-        public void registerItems(ModelRegistryEvent event) {
-            LOGGER.info("register model event");
-            LOGGER.info("################");
-            LOGGER.info("################");
-            LOGGER.info("################");
-            ItemManager.registerModels();
-        }
-    }
-
-
 
 	@Subscribe
 	public void loadComplete(FMLLoadCompleteEvent event) {

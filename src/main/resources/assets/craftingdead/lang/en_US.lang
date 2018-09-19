@@ -1,8 +1,10 @@
 generator.zombie=Zombie
 
-entity.zombie.name=Zombie
-entity.zombie.fast.name=Fast Zombie
-entity.zombie.tank.name=Tank Zombie
-entity.zombie.weak.name=Weak Zombie
+entity.craftingdead.zombie.name=Zombie
+entity.craftingdead.zombie.fast.name=Fast Zombie
+entity.craftingdead.zombie.tank.name=Tank Zombie
+entity.craftingdead.zombie.weak.name=Weak Zombie
+
+item.craftingdead.arc.name=ARC
 
 multiplayer.disconnect.handshakeFail=Client failed handshake
