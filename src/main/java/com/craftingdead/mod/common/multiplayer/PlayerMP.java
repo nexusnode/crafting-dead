@@ -2,7 +2,7 @@ package com.craftingdead.mod.common.multiplayer;
 
 import java.util.UUID;
 
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketUpdateStatistics;
 import com.recastproductions.network.packet.IPacket;

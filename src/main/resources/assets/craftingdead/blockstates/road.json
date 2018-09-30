@@ -1,0 +1,36 @@
+{
+    "forge_marker": 1,
+    "defaults":  { 
+        "textures": {
+            "all": "craftingdead:blocks/road"
+        },
+        "model": "cube_all"
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}],
+        "type": {
+            "normal": {
+
+            },
+            "lined": {
+                "textures": {
+                    "top": "craftingdead:blocks/road_lined",
+                    "front": "craftingdead:blocks/road",
+                    "side": "craftingdead:blocks/road",
+                    "bottom": "craftingdead:blocks/road"
+                },
+                "model": "orientable"
+            },
+            "lined_broken": {
+                "textures": {
+                    "top": "craftingdead:blocks/road_lined",
+                    "front": "craftingdead:blocks/road",
+                    "side": "craftingdead:blocks/road",
+                    "bottom": "craftingdead:blocks/road"
+                },
+                "model": "orientable"
+            }
+        }
+    }
+}

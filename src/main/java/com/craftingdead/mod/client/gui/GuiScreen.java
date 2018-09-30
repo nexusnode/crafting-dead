@@ -5,14 +5,14 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientMod;
 import com.craftingdead.mod.client.gui.widget.GuiWidget;
 
 import net.minecraft.client.gui.GuiButton;
 
 public class GuiScreen extends net.minecraft.client.gui.GuiScreen {
 
-	public ModClient modClient;
+	public ClientMod modClient;
 
 	protected ArrayList<GuiWidget> guiContainers = new ArrayList<GuiWidget>();
 

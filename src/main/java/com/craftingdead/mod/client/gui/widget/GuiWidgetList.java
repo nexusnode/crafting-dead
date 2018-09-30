@@ -2,7 +2,7 @@ package com.craftingdead.mod.client.gui.widget;
 
 import com.craftingdead.mod.client.gui.GuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;

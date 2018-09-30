@@ -3,10 +3,10 @@ package com.craftingdead.mod.server.multiplayer;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
-import com.craftingdead.mod.server.ModServer;
+import com.craftingdead.mod.server.ServerMod;
 import com.craftingdead.mod.server.network.packet.PacketKilledZombie;
 
-public class DedicatedServer extends LogicalServer<ModServer> {
+public class DedicatedServer extends LogicalServer<ServerMod> {
 
 	@Override
 	protected boolean verifyHandshake(PacketHandshake handshakePacket) {

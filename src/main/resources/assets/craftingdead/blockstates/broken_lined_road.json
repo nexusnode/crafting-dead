@@ -1,0 +1,29 @@
+{
+    "forge_marker": 1,
+    "defaults":  { 
+       "textures": {
+            "top": "craftingdead:blocks/broken_lined_road",
+            "front": "craftingdead:blocks/road",
+            "side": "craftingdead:blocks/road",
+            "bottom": "craftingdead:blocks/road"
+        },
+        "model": "orientable"
+    },
+    "variants": {
+        "normal":[{}],
+        "facing": {
+            "north": { 
+               
+            },
+            "east": { 
+                "y": 90 
+            },
+            "south": { 
+                "y": 180
+            },
+            "west": { 
+               "y": 270
+            }
+        }
+    }
+}

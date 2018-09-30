@@ -1,7 +1,9 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { 
+        	url = "http://files.minecraftforge.net/maven" 
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
@@ -19,13 +21,29 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.4.2759"
+    version = "1.12.2-14.23.4.2765"
     runDir = "run"
     mappings = "stable_39"
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = "chickenbones"
+        url = "http://chickenbones.net/maven/"
+    }			
+    maven { 
+    	name = "jitpack"
+    	url = "https://jitpack.io"
+    }
+    
+}
+
 dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
+	compile 'com.github.Vatuu:discord-rpc:1.5.1'
+	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'
 }
 
 processResources {
@@ -41,10 +59,4 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-jar {
-	manifest {
-		attributes 'FMLCorePlugin': 'com.craftingdead.mod.common.core.CDLoadingPlugin'
-	}
 }

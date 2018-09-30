@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.common.core.ISidedMod;
-import com.craftingdead.mod.common.event.server.HandshakeEvent;
+import com.craftingdead.mod.common.CraftingDead;
+import com.craftingdead.mod.common.IMod;
+import com.craftingdead.mod.common.event.HandshakeEvent;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketRequestHandshake;
-import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -31,7 +30,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
  * @author Sm0keySa1m0n
  *
  */
-public abstract class LogicalServer<M extends ISidedMod<M, ?>> {
+public abstract class LogicalServer<M extends IMod<M, ?>> {
 
 	/**
 	 * The mod instance
@@ -57,7 +56,7 @@ public abstract class LogicalServer<M extends ISidedMod<M, ?>> {
 	// Mod Events
 	// ================================================================================
 
-	@Subscribe
+	@SubscribeEvent
 	public void onHandshake(HandshakeEvent event) {
 		EntityPlayerMP entity = event.getPlayer();
 		PacketHandshake handshakePacket = event.getPacketHandshake();
@@ -110,7 +109,7 @@ public abstract class LogicalServer<M extends ISidedMod<M, ?>> {
 				CraftingDead.LOGGER.warn(
 						"{} failed to complete a successful handshake in a timely manner, disconnecting",
 						player.getName());
-				player.connection.disconnect(new TextComponentTranslation("multiplayer.disconnect.handshakeFail"));
+				player.connection.disconnect(new TextComponentTranslation("multiplayer.disconnect.handshake_fail"));
 				iter.remove();
 			}
 		}

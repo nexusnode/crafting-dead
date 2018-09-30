@@ -1,17 +1,40 @@
 package com.craftingdead.mod.client.renderer;
 
-import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.util.PlayerResource;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import java.util.List;
+import java.util.UUID;
+
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.UUID;
+import com.craftingdead.mod.common.CraftingDead;
+import com.craftingdead.mod.util.PlayerResource;
+
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.color.ItemColors;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.pipeline.IVertexConsumer;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.client.model.pipeline.VertexTransformer;
+import net.minecraftforge.common.model.TRSRTransformation;
 
 public class RenderHelper extends net.minecraft.client.renderer.RenderHelper {
 
@@ -131,6 +154,90 @@ public class RenderHelper extends net.minecraft.client.renderer.RenderHelper {
 
 	public static boolean isInBox(int x, int y, int width, int height, int checkX, int checkY) {
 		return (checkX >= x) && (checkY >= y) && (checkX <= x + width) && (checkY <= y + height);
+	}
+
+	public static BakedQuad transform(BakedQuad quad, final TRSRTransformation transform) {
+		UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
+		final IVertexConsumer consumer = new VertexTransformer(builder) {
+			@Override
+			public void put(int element, float... data) {
+				VertexFormatElement formatElement = DefaultVertexFormats.ITEM.getElement(element);
+				switch (formatElement.getUsage()) {
+				case POSITION: {
+					float[] newData = new float[4];
+					Vector4f vec = new Vector4f(data);
+					transform.getMatrix().transform(vec);
+					vec.get(newData);
+					parent.put(element, newData);
+					break;
+				}
+				default: {
+					parent.put(element, data);
+					break;
+				}
+				}
+			}
+		};
+		quad.pipe(consumer);
+		return builder.build();
+	}
+
+	private static void renderQuads(BufferBuilder renderer, List<BakedQuad> quads, int color, ItemStack stack,
+			ItemColors colors) {
+		boolean flag = color == -1 && !stack.isEmpty();
+		int i = 0;
+
+		for (int j = quads.size(); i < j; ++i) {
+			BakedQuad bakedquad = quads.get(i);
+			int k = color;
+
+			if (flag && bakedquad.hasTintIndex()) {
+				k = colors.colorMultiplier(stack, bakedquad.getTintIndex());
+
+				if (EntityRenderer.anaglyphEnable) {
+					k = TextureUtil.anaglyphColor(k);
+				}
+
+				k = k | -16777216;
+			}
+
+			net.minecraftforge.client.model.pipeline.LightUtil.renderQuadColor(renderer, bakedquad, k);
+		}
+	}
+
+	public static void renderModel(IBakedModel model, int color) {
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(7, DefaultVertexFormats.ITEM);
+
+		for (EnumFacing enumfacing : EnumFacing.values()) {
+			renderQuads(bufferbuilder, model.getQuads((IBlockState) null, enumfacing, 0L), color, ItemStack.EMPTY,
+					Minecraft.getMinecraft().getItemColors());
+		}
+
+		renderQuads(bufferbuilder, model.getQuads((IBlockState) null, (EnumFacing) null, 0L), color, ItemStack.EMPTY,
+				Minecraft.getMinecraft().getItemColors());
+		tessellator.draw();
+	}
+
+	public static void renderSuffocationOverlay(TextureAtlasSprite sprite) {
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		GlStateManager.color(0.1F, 0.1F, 0.1F, 0.5F);
+		GlStateManager.pushMatrix();
+		float f6 = sprite.getMinU();
+		float f7 = sprite.getMaxU();
+		float f8 = sprite.getMinV();
+		float f9 = sprite.getMaxV();
+		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+		bufferbuilder.pos(-1.0D, -1.0D, -0.5D).tex((double) f7, (double) f9).endVertex();
+		bufferbuilder.pos(1.0D, -1.0D, -0.5D).tex((double) f6, (double) f9).endVertex();
+		bufferbuilder.pos(1.0D, 1.0D, -0.5D).tex((double) f6, (double) f8).endVertex();
+		bufferbuilder.pos(-1.0D, 1.0D, -0.5D).tex((double) f7, (double) f8).endVertex();
+		tessellator.draw();
+		GlStateManager.popMatrix();
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 
 }

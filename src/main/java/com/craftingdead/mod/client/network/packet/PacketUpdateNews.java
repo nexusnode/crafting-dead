@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.network.packet;
 
 import com.craftingdead.mod.client.network.SessionModClient;
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
 import com.recastproductions.network.util.ByteBufUtils;

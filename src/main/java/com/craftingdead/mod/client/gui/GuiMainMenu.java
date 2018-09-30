@@ -2,7 +2,7 @@ package com.craftingdead.mod.client.gui;
 
 import org.lwjgl.util.glu.Project;
 
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;

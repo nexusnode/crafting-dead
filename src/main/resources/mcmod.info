@@ -1,0 +1,11 @@
+[{
+  "modid": "craftingdead",
+  "name": "Crafting Dead",
+  "description": "The Minecraft zombie survival mod",
+  "version": "0.0.0.1",
+  "mcversion": "1.12.2",
+  "logoFile": "assets/craftingdead/textures/gui/icons/icon_128x128.png",
+  "url": "craftingdead.com",
+  "authorList": ["Sm0keySa1m0n", "ThatAbstractWolf", "woag", "Phoenix"],
+  "credits": "The Crafting Dead Development Team"
+}]

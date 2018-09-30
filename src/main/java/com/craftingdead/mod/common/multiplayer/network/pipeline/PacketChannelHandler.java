@@ -1,6 +1,6 @@
 package com.craftingdead.mod.common.multiplayer.network.pipeline;
 
-import com.craftingdead.mod.common.core.ISidedMod;
+import com.craftingdead.mod.common.IMod;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketContextMod;
 import com.google.common.base.Preconditions;
 import com.recastproductions.network.packet.IPacket;
@@ -26,10 +26,10 @@ public class PacketChannelHandler<REQ extends IPacket, REPLY extends IPacket> ex
 
 	private final IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler;
 	private final Side side;
-	private final ISidedMod<?, ?> mod;
+	private final IMod<?, ?> mod;
 
 	public PacketChannelHandler(IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> handler, Side side,
-			Class<REQ> requestType, ISidedMod<?, ?> mod) {
+			Class<REQ> requestType, IMod<?, ?> mod) {
 		super(requestType);
 		packetHandler = Preconditions.checkNotNull(handler, "Packet handler must not be null");
 		this.side = side;

@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.craftingdead.mod.client.renderer.framebuffer.FrameBufferObject;
 import com.craftingdead.mod.client.renderer.framebuffer.FrameBufferProxy;
+import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -15,13 +16,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class TransitionManager {
 
-	private Minecraft mc;
+	private Minecraft minecraft;
+
+	private boolean enabled;
 
 	private ScreenTransition transition;
 
 	private FrameBufferObject[] transitionFBOs = new FrameBufferObject[2];
 
-	private FrameBufferProxy proxy = new FrameBufferProxy();
+	private FrameBufferProxy framebuffer;
 
 	private long transitionBeginTime = 0L;
 
@@ -35,12 +38,19 @@ public class TransitionManager {
 
 	private int transitionFrames = 2;
 
-	public TransitionManager(ScreenTransition transition) {
+	public TransitionManager(ScreenTransition transition, Minecraft minecraft) {
 		this.transition = transition;
-		this.mc = Minecraft.getMinecraft();
+		this.minecraft = minecraft;
 		if (OpenGlHelper.framebufferSupported) {
+			try {
+				this.framebuffer = new FrameBufferProxy();
+			} catch (NoSuchFieldException | SecurityException e) {
+				CraftingDead.LOGGER.error("Could not load framebuffer", e);
+				return;
+			}
 			this.transitionFBOs[0] = new FrameBufferObject();
 			this.transitionFBOs[1] = new FrameBufferObject();
+			this.enabled = true;
 		}
 	}
 
@@ -50,12 +60,11 @@ public class TransitionManager {
 		int mouseX = event.getMouseX(), mouseY = event.getMouseY();
 		float partialTicks = event.getRenderPartialTicks();
 
-		if (!OpenGlHelper.framebufferSupported
-				|| (mc.currentScreen == null && mc.gameSettings.keyBindPlayerList.isPressed())) {
+		if (!enabled || (minecraft.currentScreen == null && minecraft.gameSettings.keyBindPlayerList.isPressed())) {
 			return;
 		}
 
-		if (mc.world != null) {
+		if (minecraft.world != null) {
 			this.transitionFBOs[0].dispose();
 			this.transitionFBOs[1].dispose();
 			return;
@@ -78,7 +87,11 @@ public class TransitionManager {
 				this.transitionPct = this.transition.getTransitionType().interpolate(pct);
 			}
 		}
-		this.drawTransition(mouseX, mouseY, partialTicks);
+		try {
+			this.drawTransition(mouseX, mouseY, partialTicks);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			CraftingDead.LOGGER.error("A reflection based error occurred while drawing the transition");
+		}
 		event.setCanceled(true);
 	}
 
@@ -89,42 +102,43 @@ public class TransitionManager {
 		return false;
 	}
 
-	private void drawTransition(int mouseX, int mouseY, float partialTicks) {
-		ScaledResolution resolution = new ScaledResolution(this.mc);
+	private void drawTransition(int mouseX, int mouseY, float partialTicks)
+			throws IllegalArgumentException, IllegalAccessException {
+		ScaledResolution resolution = new ScaledResolution(this.minecraft);
 		int width = resolution.getScaledWidth();
 		int height = resolution.getScaledHeight();
 
-		FrameBufferObject activeFBO = this.transitionFBOs[this.currentFBOIndex];
-		if (this.mc.currentScreen != null && activeFBO != null) {
+		FrameBufferObject activeFbo = this.transitionFBOs[this.currentFBOIndex];
+		if (this.minecraft.currentScreen != null && activeFbo != null) {
 			GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 
-			this.mc.getFramebuffer().unbindFramebuffer();
-			this.proxy.attach(this.mc, activeFBO);
-			activeFBO.begin(this.mc.displayWidth, this.mc.displayHeight);
+			this.minecraft.getFramebuffer().unbindFramebuffer();
+			this.framebuffer.attach(this.minecraft, activeFbo);
+			activeFbo.begin(this.minecraft.displayWidth, this.minecraft.displayHeight);
 
-			this.mc.entityRenderer.setupOverlayRendering();
-			this.mc.currentScreen.drawScreen(mouseX, mouseY, partialTicks);
+			this.minecraft.entityRenderer.setupOverlayRendering();
+			this.minecraft.currentScreen.drawScreen(mouseX, mouseY, partialTicks);
 
-			activeFBO.end();
-			this.proxy.release(this.mc);
-			this.mc.getFramebuffer().bindFramebuffer(true);
+			activeFbo.end();
+			this.framebuffer.release(this.minecraft);
+			this.minecraft.getFramebuffer().bindFramebuffer(true);
 
-			if (this.mc.getFramebuffer().useDepth) {
+			if (this.minecraft.getFramebuffer().useDepth) {
 				EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-						this.mc.getFramebuffer().depthBuffer);
+						this.minecraft.getFramebuffer().depthBuffer);
 			}
 
 			GL11.glPopAttrib();
 		}
 
-		this.mc.entityRenderer.setupOverlayRendering();
+		this.minecraft.entityRenderer.setupOverlayRendering();
 
 		if (this.transitionPct < 1.0f && this.transition != null) {
-			FrameBufferObject active = (this.mc.currentScreen != null) ? activeFBO : null;
+			FrameBufferObject active = (this.minecraft.currentScreen != null) ? activeFbo : null;
 			FrameBufferObject last = this.previousWasScreen ? this.transitionFBOs[1 - this.currentFBOIndex] : null;
 			this.transition.render(active, last, width, height, this.transitionPct);
-		} else if (this.mc.currentScreen != null) {
-			ScreenTransition.drawFBO(activeFBO, 0, 0, width, height, 0, 1.0f, false);
+		} else if (this.minecraft.currentScreen != null) {
+			ScreenTransition.draw(activeFbo, 0, 0, width, height, 0, 1.0f, false);
 		}
 	}
 }

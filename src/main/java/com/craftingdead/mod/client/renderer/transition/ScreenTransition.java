@@ -14,10 +14,10 @@ public abstract class ScreenTransition {
 
 	public static final void drawFBO(final FrameBufferObject fbo, final int x, final int y, final int x2, final int y2, final int z,
 			final float alpha) {
-		drawFBO(fbo, x, y, x2, y2, z, alpha, true);
+		draw(fbo, x, y, x2, y2, z, alpha, true);
 	}
 
-	public static final void drawFBO(final FrameBufferObject fbo, final int x, final int y, final int x2, final int y2, final int z,
+	public static final void draw(final FrameBufferObject fbo, final int x, final int y, final int x2, final int y2, final int z,
 			final float alpha, final boolean blend) {
 		drawFBO(fbo, x, y, x2, y2, z, alpha, blend, 0.0, 0.0, 1.0, 1.0);
 	}

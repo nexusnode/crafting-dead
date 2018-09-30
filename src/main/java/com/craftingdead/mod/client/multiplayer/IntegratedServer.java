@@ -1,11 +1,11 @@
 package com.craftingdead.mod.client.multiplayer;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientMod;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
 
-public class IntegratedServer extends LogicalServer<ModClient> {
+public class IntegratedServer extends LogicalServer<ClientMod> {
 
 	@Override
 	protected boolean verifyHandshake(PacketHandshake handshakePacket) {

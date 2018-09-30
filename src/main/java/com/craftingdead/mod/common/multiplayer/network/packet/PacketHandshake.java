@@ -2,13 +2,13 @@ package com.craftingdead.mod.common.multiplayer.network.packet;
 
 import java.io.IOException;
 
-import com.craftingdead.mod.common.core.CraftingDead;
-import com.craftingdead.mod.common.event.server.HandshakeEvent;
+import com.craftingdead.mod.common.event.HandshakeEvent;
 import com.recastproductions.network.packet.IPacket;
 import com.recastproductions.network.packet.IPacketHandler;
 import com.recastproductions.network.util.ByteBufUtils;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraftforge.common.MinecraftForge;
 
 public class PacketHandshake implements IPacket {
 
@@ -48,7 +48,7 @@ public class PacketHandshake implements IPacket {
 
 		@Override
 		public IPacket processPacket(PacketHandshake packet, PacketContextMod ctx) {
-			CraftingDead.instance().getEventBus().post(new HandshakeEvent(ctx.getServerHandler().player, packet));
+			MinecraftForge.EVENT_BUS.post(new HandshakeEvent(ctx.getServerHandler().player, packet));
 			return null;
 		}
 

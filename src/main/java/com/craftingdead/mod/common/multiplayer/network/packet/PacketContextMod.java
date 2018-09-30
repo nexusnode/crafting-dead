@@ -1,8 +1,8 @@
 package com.craftingdead.mod.common.multiplayer.network.packet;
 
-import com.craftingdead.mod.client.ModClient;
-import com.craftingdead.mod.common.core.ISidedMod;
-import com.craftingdead.mod.server.ModServer;
+import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.common.IMod;
+import com.craftingdead.mod.server.ServerMod;
 import com.recastproductions.network.packet.IPacketContext;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.INetHandler;
@@ -28,9 +28,9 @@ public class PacketContextMod implements IPacketContext {
 	 */
 	private final Side side;
 
-	private final ISidedMod<?, ?> mod;
+	private final IMod<?, ?> mod;
 
-	public PacketContextMod(INetHandler netHandler, Side side, ISidedMod<?, ?> mod) {
+	public PacketContextMod(INetHandler netHandler, Side side, IMod<?, ?> mod) {
 		this.netHandler = netHandler;
 		this.side = side;
 		this.mod = mod;
@@ -48,20 +48,20 @@ public class PacketContextMod implements IPacketContext {
 		return this.side;
 	}
 
-	public ISidedMod<?, ?> getMod() {
+	public IMod<?, ?> getMod() {
 		return this.mod;
 	}
 
-	public ModClient getModClient() {
-		if (mod instanceof ModClient)
-			return (ModClient) mod;
+	public ClientMod getModClient() {
+		if (mod instanceof ClientMod)
+			return (ClientMod) mod;
 		else
 			throw new RuntimeException("Accessing physical client on wrong side");
 	}
 
-	public ModServer getModServer() {
-		if (mod instanceof ModServer)
-			return (ModServer) mod;
+	public ServerMod getModServer() {
+		if (mod instanceof ServerMod)
+			return (ServerMod) mod;
 		else
 			throw new RuntimeException("Accessing physical server on wrong side");
 	}

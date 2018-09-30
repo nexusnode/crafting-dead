@@ -2,9 +2,9 @@ package com.craftingdead.mod.client.gui;
 
 import org.lwjgl.input.Mouse;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientMod;
 import com.craftingdead.mod.client.renderer.RenderHelper;
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -13,15 +13,15 @@ import net.minecraft.util.ResourceLocation;
 public class GuiIngame {
 
 	private static final ResourceLocation DAYS_SURVIVED = new ResourceLocation(CraftingDead.MOD_ID,
-			"textures/gui/hud/daysSurvived.png");
+			"textures/gui/hud/days_survived.png");
 	private static final ResourceLocation ZOMBIE_KILLS = new ResourceLocation(CraftingDead.MOD_ID,
-			"textures/gui/hud/zombieKills.png");
+			"textures/gui/hud/zombie_kills.png");
 	private static final ResourceLocation PLAYER_KILLS = new ResourceLocation(CraftingDead.MOD_ID,
-			"textures/gui/hud/playerKills.png");
+			"textures/gui/hud/player_kills.png");
 
-	private final ModClient client;
+	private final ClientMod client;
 
-	public GuiIngame(ModClient client) {
+	public GuiIngame(ClientMod client) {
 		this.client = client;
 	}
 

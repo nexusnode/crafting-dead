@@ -3,7 +3,7 @@ package com.craftingdead.mod.common.multiplayer.network;
 import java.lang.reflect.Method;
 import java.util.EnumMap;
 
-import com.craftingdead.mod.common.core.ISidedMod;
+import com.craftingdead.mod.common.IMod;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketContextMod;
 import com.craftingdead.mod.common.multiplayer.network.pipeline.PacketChannelHandler;
 import com.craftingdead.mod.common.multiplayer.network.pipeline.PacketCodec;
@@ -37,12 +37,12 @@ public class NetworkWrapper {
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private PacketCodec packetCodec;
-	private ISidedMod<?, ?> mod;
+	private IMod<?, ?> mod;
 
 	private static Class<?> defaultChannelPipeline;
 	private static Method generateName;
 
-	public NetworkWrapper(String channelName, ISidedMod<?, ?> mod) {
+	public NetworkWrapper(String channelName, IMod<?, ?> mod) {
 		packetCodec = new PacketCodec();
 		channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec);
 		this.mod = mod;

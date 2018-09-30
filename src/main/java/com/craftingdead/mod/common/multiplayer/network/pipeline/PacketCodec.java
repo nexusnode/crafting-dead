@@ -1,6 +1,6 @@
 package com.craftingdead.mod.common.multiplayer.network.pipeline;
 
-import com.craftingdead.mod.common.core.CraftingDead;
+import com.craftingdead.mod.common.CraftingDead;
 import com.recastproductions.network.packet.IPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

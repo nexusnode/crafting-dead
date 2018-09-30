@@ -1,10 +1,19 @@
 generator.zombie=Zombie
 
 entity.craftingdead.zombie.name=Zombie
-entity.craftingdead.zombie.fast.name=Fast Zombie
-entity.craftingdead.zombie.tank.name=Tank Zombie
-entity.craftingdead.zombie.weak.name=Weak Zombie
+entity.craftingdead.zombie_fast.name=Zombie Fast
+entity.craftingdead.zombie_tank.name=Zombie Tank
+entity.craftingdead.zombie_weak.name=Zombie Weak
+
+itemGroup.craftingdead.decorative=Crafting Dead Decorative
+itemGroup.craftingdead=Crafting Dead
 
 item.craftingdead.arc.name=ARC
 
-multiplayer.disconnect.handshakeFail=Client failed handshake
+tile.craftingdead.road.name=Road
+tile.craftingdead.lined_road.name=Lined Road
+tile.craftingdead.broken_lined_road.name=Broken Lined Road
+tile.craftingdead.barbed_wire.name=Barbed Wire
+tile.craftingdead.residential_loot.name=Residential Loot
+
+multiplayer.disconnect.handshake_fail=Client failed handshake

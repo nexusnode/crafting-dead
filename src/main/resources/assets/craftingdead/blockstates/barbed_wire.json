@@ -1,0 +1,12 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "textures": {
+            "cross": "craftingdead:blocks/barbed_wire"
+        },
+        "model": "cross"
+    },
+    "variants": {
+        "normal":[{}]
+    }
+}

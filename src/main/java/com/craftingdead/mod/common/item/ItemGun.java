@@ -1,9 +1,7 @@
 package com.craftingdead.mod.common.item;
 
-public class ItemGun extends CustomItem {
+import net.minecraft.item.Item;
 
-	public ItemGun(String registryName) {
-		super(registryName);
-	}
+public class ItemGun extends Item {
 
 }
