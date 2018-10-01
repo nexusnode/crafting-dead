@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.animation;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.client.multiplayer.PlayerSP;
 
 import net.minecraft.item.ItemStack;
@@ -10,7 +10,7 @@ public abstract class GunAnimation {
 
 	public int animationTicker;
 
-	public abstract void update(ClientMod client, PlayerSP player, ItemStack itemStack);
+	public abstract void update(ModClient client, PlayerSP player, ItemStack itemStack);
 
 	/** Called to render the animation right before the gun model is rendered */
 	public abstract void doRender(ItemStack itemStack, float partialTicks);

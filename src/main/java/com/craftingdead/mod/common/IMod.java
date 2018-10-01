@@ -1,6 +1,8 @@
 package com.craftingdead.mod.common;
 
+import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
+import com.craftingdead.mod.server.ModServer;
 import com.recastproductions.network.impl.client.NetClientHandler;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -16,7 +18,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
  *
  * @param <L> - the {@link LogicalServer} associated with this side
  */
-public interface IMod<T extends IMod<T, H>, H extends NetClientHandler<?, ?>> {
+public interface IMod<H extends NetClientHandler<?, ?>> {
 
 	/**
 	 * Called before {@link FMLInitializationEvent} during mod startup. This is the
@@ -63,7 +65,7 @@ public interface IMod<T extends IMod<T, H>, H extends NetClientHandler<?, ?>> {
 	 * 
 	 * @return the server instance
 	 */
-	Class<? extends LogicalServer<T>> getLogicalServer();
+	Class<? extends LogicalServer> getLogicalServer();
 
 	/**
 	 * Get the {@link NetClientHandler} associated with this side
@@ -71,5 +73,19 @@ public interface IMod<T extends IMod<T, H>, H extends NetClientHandler<?, ?>> {
 	 * @return
 	 */
 	H getNetHandler();
+
+	default ModClient getModClient() {
+		if (this instanceof ModClient)
+			return (ModClient) this;
+		else
+			throw new RuntimeException("Accessing physical client on wrong side");
+	}
+
+	default ModServer getModServer() {
+		if (this instanceof ModServer)
+			return (ModServer) this;
+		else
+			throw new RuntimeException("Accessing physical server on wrong side");
+	}
 
 }

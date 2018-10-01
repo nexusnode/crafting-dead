@@ -3,9 +3,9 @@ package com.craftingdead.mod.common.multiplayer;
 import java.util.UUID;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
 import com.craftingdead.mod.common.multiplayer.network.packet.PacketUpdateStatistics;
 import com.recastproductions.network.packet.IPacket;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -28,13 +28,9 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private final EntityPlayerMP entity;
 	/**
-	 * The mods the player has installed on their client
-	 */
-	private String[] mods;
-	/**
 	 * The server instance used by this session
 	 */
-	private LogicalServer<?> server;
+	private LogicalServer server;
 	/**
 	 * Used to calculate if a day has passed by
 	 */
@@ -71,18 +67,13 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
 
-	public PlayerMP(LogicalServer<?> server, EntityPlayerMP entity, PacketHandshake handshakeMessage) {
+	public PlayerMP(LogicalServer server, EntityPlayerMP entity) {
 		this.server = server;
 		this.entity = entity;
-		this.mods = handshakeMessage.getMods();
 	}
 
 	public EntityPlayerMP getVanillaEntity() {
 		return entity;
-	}
-
-	public String[] getMods() {
-		return this.mods;
 	}
 
 	/**
@@ -94,7 +85,7 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 		CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
 	}
 
-	public LogicalServer<?> getLogicalServer() {
+	public LogicalServer getLogicalServer() {
 		return this.server;
 	}
 

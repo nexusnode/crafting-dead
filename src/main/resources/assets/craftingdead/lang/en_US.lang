@@ -1,3 +1,10 @@
+discordstate.pre-initialization=Pre Initialization
+discordstate.initialization=Initialization
+discordstate.post-initialization=Post Initialization
+discordstate.idle=Idle
+discordstate.singleplayer=Playing Singleplayer
+discordstate.multiplayer=Playing Multiplayer
+
 generator.zombie=Zombie
 
 entity.craftingdead.zombie.name=Zombie

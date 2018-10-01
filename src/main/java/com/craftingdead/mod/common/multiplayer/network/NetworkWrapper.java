@@ -37,12 +37,12 @@ public class NetworkWrapper {
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private PacketCodec packetCodec;
-	private IMod<?, ?> mod;
+	private IMod<?> mod;
 
 	private static Class<?> defaultChannelPipeline;
 	private static Method generateName;
 
-	public NetworkWrapper(String channelName, IMod<?, ?> mod) {
+	public NetworkWrapper(String channelName, IMod<?> mod) {
 		packetCodec = new PacketCodec();
 		channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec);
 		this.mod = mod;

@@ -1,10 +1,8 @@
 package com.craftingdead.mod.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nullable;
 
+import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.gui.GuiScreen;
@@ -16,31 +14,20 @@ import com.craftingdead.mod.client.registry.generic.ColourRegistry;
 import com.craftingdead.mod.client.renderer.entity.EntityRenderers;
 import com.craftingdead.mod.client.renderer.transition.ScreenTransitionFade;
 import com.craftingdead.mod.client.renderer.transition.TransitionManager;
-import com.craftingdead.mod.common.CraftingDead;
 import com.craftingdead.mod.common.IMod;
-import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
-import com.google.common.collect.ImmutableList;
 
-import net.arikia.dev.drpc.DiscordEventHandlers;
-import net.arikia.dev.drpc.DiscordRPC;
-import net.arikia.dev.drpc.DiscordRichPresence;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLContainer;
-import net.minecraftforge.fml.common.InjectedModContainer;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.MCPDummyContainer;
-import net.minecraftforge.fml.common.MinecraftDummyContainer;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -51,11 +38,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
  * @author Sm0keySa1m0n
  *
  */
-public final class ClientMod implements IMod<ClientMod, NetClientHandlerModClient> {
-
-	private static final ImmutableList<Class<? extends ModContainer>> AUTHORIZED_MOD_CONTAINERS = new ImmutableList.Builder<Class<? extends ModContainer>>()
-			.add(MinecraftDummyContainer.class).add(FMLContainer.class).add(ForgeModContainer.class)
-			.add(MCPDummyContainer.class).build();
+public final class ModClient implements IMod<NetClientHandlerModClient> {
 
 	private Minecraft minecraft;
 
@@ -87,10 +70,10 @@ public final class ClientMod implements IMod<ClientMod, NetClientHandlerModClien
 
 	@Override
 	public void preInitialization(FMLPreInitializationEvent event) {
-		DiscordRPC.discordInitialize("475405055302828034", new DiscordEventHandlers(), true, "");
-		this.setDiscordNotInGame();
-
 		minecraft = FMLClientHandler.instance().getClient();
+
+		DiscordPresence.initialize("475405055302828034");
+		DiscordPresence.updateState(GameState.PRE_INITIALIZATION, this);
 
 		MinecraftForge.EVENT_BUS.register(this);
 
@@ -109,12 +92,23 @@ public final class ClientMod implements IMod<ClientMod, NetClientHandlerModClien
 
 	@Override
 	public void initialization(FMLInitializationEvent event) {
+		DiscordPresence.updateState(GameState.INITIALIZATION, this);
 		ColourRegistry.registerColourHandlers(this.minecraft.getBlockColors(), this.minecraft.getItemColors());
 	}
 
 	@Override
+	public void postInitialization(FMLPostInitializationEvent event) {
+		DiscordPresence.updateState(GameState.POST_INITIALIZATION, this);
+	}
+
+	@Override
+	public void loadComplete(FMLLoadCompleteEvent event) {
+		DiscordPresence.updateState(GameState.IDLE, this);
+	}
+
+	@Override
 	public void shutdown() {
-		DiscordRPC.discordShutdown();
+		DiscordPresence.shutdown();
 	}
 
 	// ================================================================================
@@ -138,34 +132,24 @@ public final class ClientMod implements IMod<ClientMod, NetClientHandlerModClien
 		if (event.getEntity() instanceof EntityPlayerSP) {
 			if (player == null) {
 				player = new PlayerSP((EntityPlayerSP) event.getEntity());
-
-				DiscordRichPresence discordRichPresence = new DiscordRichPresence();
-				if (event.getWorld().isRemote) {
-					discordRichPresence.details = "Playing singleplayer";
-				} else {
-					discordRichPresence.state = minecraft.getCurrentServerData().serverMOTD;
-					String[] playerListSplit = minecraft.getCurrentServerData().playerList.split("/");
-					discordRichPresence.partyMax = Integer.valueOf(playerListSplit[0]);
-					discordRichPresence.partySize = Integer.valueOf(playerListSplit[1]);
-				}
-				discordRichPresence.largeImageKey = "craftingdead";
-				DiscordRPC.discordUpdatePresence(discordRichPresence);
+				DiscordPresence.updateState(
+						minecraft.isIntegratedServerRunning() ? GameState.SINGLEPLAYER : GameState.MULTIPLAYER, this);
 			}
 		}
+
 	}
 
 	@SubscribeEvent
 	public void onClientDisconnectionFromServer(WorldEvent.Unload event) {
 		// Destroy the player instance as it's no longer needed
 		player = null;
-		this.setDiscordNotInGame();
+		DiscordPresence.updateState(GameState.IDLE, this);
 	}
 
 	@SubscribeEvent
 	public void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-		if (event.getType() == ElementType.ALL) {
+		if (event.getType() == ElementType.ALL)
 			guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
-		}
 	}
 
 	@SubscribeEvent
@@ -174,29 +158,8 @@ public final class ClientMod implements IMod<ClientMod, NetClientHandlerModClien
 	}
 
 	// ================================================================================
-	// Normal Methods
+	// Getters
 	// ================================================================================
-
-	public PacketHandshake buildHandshakePacket() {
-		List<String> unauthorizedMods = new ArrayList<String>();
-		for (ModContainer mod : Loader.instance().getModList()) {
-			if (mod instanceof InjectedModContainer) {
-				InjectedModContainer injectedMod = (InjectedModContainer) mod;
-				mod = injectedMod.wrappedContainer;
-			}
-			if (AUTHORIZED_MOD_CONTAINERS.contains(mod.getClass()) || mod.getMod() instanceof CraftingDead) {
-				continue;
-			}
-			CraftingDead.LOGGER.warn("Found unauthorised mod container: " + mod.getName());
-			unauthorizedMods.add(mod.getModId());
-		}
-		return new PacketHandshake(unauthorizedMods.toArray(new String[0]));
-	}
-
-	private void setDiscordNotInGame() {
-		DiscordRPC.discordUpdatePresence(
-				new DiscordRichPresence.Builder("Not in game").setBigImage("craftingdead", "Crafting Dead").build());
-	}
 
 	public Minecraft getMinecraft() {
 		return this.minecraft;

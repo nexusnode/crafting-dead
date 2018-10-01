@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-public class ServerMod implements IMod<ServerMod, NetClientHandlerModServer> {
+public class ModServer implements IMod<NetClientHandlerModServer> {
 
 	private NetClientHandlerModServer netHandler = new NetClientHandlerModServer();
 

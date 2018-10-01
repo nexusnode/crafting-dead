@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.network;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ModClient;
 import com.craftingdead.mod.client.network.packet.PacketUpdateNews;
 import com.craftingdead.mod.common.CraftingDead;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public class NetClientHandlerModClient extends NetClientHandler<PacketHandshakeModClient, SessionModClient> {
 
-	private final ClientMod modClient;
+	private final ModClient modClient;
 
 	private SessionModClient session;
 
-	public NetClientHandlerModClient(ClientMod modClient) {
+	public NetClientHandlerModClient(ModClient modClient) {
 		this.modClient = modClient;
 	}
 
@@ -44,7 +44,7 @@ public class NetClientHandlerModClient extends NetClientHandler<PacketHandshakeM
 		} catch (IllegalArgumentException e) {
 			CraftingDead.LOGGER.warn("Bad UUID, could be in offline mode?");
 		}
-		String version = CraftingDead.MOD_VERSION;
+		String version = CraftingDead.instance().getMetadata().version;
 		return new PacketHandshakeModClient(accessToken, clientToken, username, uuid, version);
 	}
 

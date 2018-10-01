@@ -1,26 +1,21 @@
 package com.craftingdead.mod.server.multiplayer;
 
+import java.util.Map;
+
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
-import com.craftingdead.mod.common.multiplayer.network.packet.PacketHandshake;
-import com.craftingdead.mod.server.ServerMod;
 import com.craftingdead.mod.server.network.packet.PacketKilledZombie;
 
-public class DedicatedServer extends LogicalServer<ServerMod> {
+public class DedicatedServer extends LogicalServer {
 
 	@Override
-	protected boolean verifyHandshake(PacketHandshake handshakePacket) {
+	protected boolean checkModList(Map<String, String> mods) {
 		return true;
 	}
 
 	@Override
-	protected void playerAccepted(PlayerMP client) {
+	protected void onPlayerAccepted(PlayerMP client) {
 		;
-	}
-
-	@Override
-	protected int getHandshakeTimeout() {
-		return 500;
 	}
 
 	@Override

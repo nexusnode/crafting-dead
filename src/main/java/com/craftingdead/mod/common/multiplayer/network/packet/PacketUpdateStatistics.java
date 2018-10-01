@@ -41,7 +41,7 @@ public class PacketUpdateStatistics implements IPacket {
 
 		@Override
 		public IPacket processPacket(PacketUpdateStatistics packet, PacketContextMod ctx) {
-			PlayerSP player = ctx.getModClient().getPlayer();
+			PlayerSP player = ctx.getMod().getModClient().getPlayer();
 			player.setDaysSurvived(packet.daysSurvived);
 			player.setZombieKills(packet.zombieKills);
 			player.setPlayerKills(packet.playerKills);

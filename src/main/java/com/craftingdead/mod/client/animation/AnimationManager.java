@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.animation;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ModClient;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -8,7 +8,7 @@ import net.minecraft.util.ITickable;
 
 public class AnimationManager implements ITickable {
 
-	private final ClientMod client;
+	private final ModClient client;
 
 	private GunAnimation currentAnimation;
 	private GunAnimation nextAnimation;
@@ -16,7 +16,7 @@ public class AnimationManager implements ITickable {
 	private ItemStack lastItemStack = null;
 	private ItemStack itemStack = null;
 
-	public AnimationManager(ClientMod client) {
+	public AnimationManager(ModClient client) {
 		this.client = client;
 	}
 

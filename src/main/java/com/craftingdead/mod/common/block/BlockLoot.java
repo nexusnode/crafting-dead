@@ -13,10 +13,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -39,14 +35,11 @@ public class BlockLoot extends Block {
 
 	private final Map<ResourceLocation, Integer> itemToWeight;
 
-	private final ColourHandler colourHandler;
-
 	public BlockLoot(int colour, Map<ResourceLocation, Integer> itemToWeight) {
 		super(Material.ROCK);
 		this.setCreativeTab(CreativeTabs.CRAFTING_DEAD);
 		this.colour = colour;
 		this.itemToWeight = itemToWeight;
-		this.colourHandler = new ColourHandler();
 	}
 
 	public double getItemChance(ResourceLocation item) {
@@ -71,25 +64,6 @@ public class BlockLoot extends Block {
 	public ResourceLocation getRandomItem() {
 		List<ResourceLocation> weightedItemList = this.getWeightedItemList();
 		return weightedItemList.get(RANDOM.nextInt(weightedItemList.size()));
-	}
-
-	private class ColourHandler implements IBlockColor, IItemColor {
-
-		@Override
-		public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-			return colour;
-		}
-
-		@Override
-		public int colorMultiplier(ItemStack stack, int tintIndex) {
-			return colour;
-		}
-
-	}
-
-	public void registerColourHandler(BlockColors blockColors, ItemColors itemColors) {
-		blockColors.registerBlockColorHandler(this.colourHandler, this);
-		itemColors.registerItemColorHandler(this.colourHandler, this);
 	}
 
 	@Override
@@ -141,6 +115,10 @@ public class BlockLoot extends Block {
 	@Override
 	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
 		return BlockFaceShape.UNDEFINED;
+	}
+
+	public int getColour() {
+		return this.colour;
 	}
 
 }
