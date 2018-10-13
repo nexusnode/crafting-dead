@@ -3,7 +3,7 @@ package com.craftingdead.mod.client.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.client.renderer.item.ArcRenderer;
 import com.craftingdead.mod.common.registry.forge.ItemRegistry;
 
@@ -20,9 +20,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ModelManager {
 
-	private final ModClient client;
+	private final ClientProxy client;
 
-	public ModelManager(ModClient client) {
+	public ModelManager(ClientProxy client) {
 		this.client = client;
 	}
 

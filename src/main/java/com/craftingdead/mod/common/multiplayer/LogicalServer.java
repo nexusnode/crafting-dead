@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.IMod;
+import com.craftingdead.mod.common.Proxy;
 
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -29,20 +29,24 @@ import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 public abstract class LogicalServer {
 
 	/**
-	 * The mod instance
+	 * The {@link Proxy}
 	 */
-	private IMod<?> mod;
-
+	private Proxy proxy;
+	/**
+	 * The {@link MinecraftServer}
+	 */
+	protected MinecraftServer minecraftServer;
 	/**
 	 * A map of all the players currently on the server
 	 */
 	protected Map<EntityPlayerMP, PlayerMP> playerMap = new HashMap<EntityPlayerMP, PlayerMP>();
 
-	public void start(IMod<?> mod, MinecraftServer server) {
-		this.mod = mod;
+	public void start(Proxy proxy, MinecraftServer minecraftServer) {
+		this.proxy = proxy;
+		this.minecraftServer = minecraftServer;
 		CraftingDead.LOGGER.info("Starting logical server");
 	}
-
+	
 	// ================================================================================
 	// Forge Events
 	// ================================================================================
@@ -152,8 +156,8 @@ public abstract class LogicalServer {
 		return this.playerMap.get(player);
 	}
 
-	public IMod<?> getMod() {
-		return this.mod;
+	public Proxy getMod() {
+		return this.proxy;
 	}
 
 }

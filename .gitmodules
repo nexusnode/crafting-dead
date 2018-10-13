@@ -1,0 +1,3 @@
+[submodule "Network"]
+	path = Network
+	url = https://github.com/Sm0keySa1m0n/Network

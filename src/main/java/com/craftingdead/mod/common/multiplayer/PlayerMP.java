@@ -3,20 +3,20 @@ package com.craftingdead.mod.common.multiplayer;
 import java.util.UUID;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.multiplayer.network.packet.PacketUpdateStatistics;
-import com.recastproductions.network.packet.IPacket;
+import com.craftingdead.mod.common.multiplayer.network.message.MessageUpdateStatistics;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.INBTSerializable;
+import sm0keysa1m0n.network.message.Message;
 
 /**
  * Wraps around the vanilla {@link EntityPlayerMP} so we can associate our own
  * data, functions and logic. This class performs most of the logic associated
  * with the player and forwards data to the client's
- * {@link com.craftingdead.mod.client.multiplayer.PlayerSP} via packets
+ * {@link com.craftingdead.mod.client.multiplayer.PlayerSP} via messages
  * 
  * @author Sm0keySa1m0n
  *
@@ -77,12 +77,12 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	}
 
 	/**
-	 * Send a packet to the player's client
+	 * Send a message to the player's client
 	 * 
-	 * @param packet - the {@link IPacket} to send
+	 * @param message - the {@link Message} to send
 	 */
-	public void sendPacket(IPacket packet) {
-		CraftingDead.instance().getNetworkWrapper().sendTo(packet, this.getVanillaEntity());
+	public void sendMessage(Message msg) {
+		CraftingDead.instance().getNetworkWrapper().sendTo(msg, this.getVanillaEntity());
 	}
 
 	public LogicalServer getLogicalServer() {
@@ -130,7 +130,7 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 
 		if (this.daysSurvived != this.lastDaysSurvived || this.zombieKills != this.lastZombieKills
 				|| this.playerKills != this.lastPlayerKills) {
-			this.sendPacket(new PacketUpdateStatistics(this.daysSurvived, this.zombieKills, this.playerKills));
+			this.sendMessage(new MessageUpdateStatistics(this.daysSurvived, this.zombieKills, this.playerKills));
 			this.lastDaysSurvived = this.daysSurvived;
 			this.lastZombieKills = this.zombieKills;
 			this.lastPlayerKills = this.playerKills;

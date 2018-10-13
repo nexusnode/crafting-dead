@@ -9,6 +9,7 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "0.0.1"
@@ -43,6 +44,7 @@ repositories {
 dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
 	compile 'com.github.Vatuu:discord-rpc:1.5.1'
+	compile project('Network')
 	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'
 }
 

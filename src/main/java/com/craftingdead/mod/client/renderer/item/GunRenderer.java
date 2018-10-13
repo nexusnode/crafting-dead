@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.renderer.item;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientProxy;
 
 import codechicken.lib.render.item.IItemRenderer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -12,13 +12,13 @@ import net.minecraftforge.common.model.TRSRTransformation;
 
 public abstract class GunRenderer implements IItemRenderer {
 
-	protected final ModClient client;
+	protected final ClientProxy client;
 
 	protected abstract IBakedModel getModel();
 
 	protected abstract ResourceLocation getTexture();
 
-	public GunRenderer(ModClient client) {
+	public GunRenderer(ClientProxy client) {
 		this.client = client;
 	}
 

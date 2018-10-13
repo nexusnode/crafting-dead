@@ -3,12 +3,10 @@ package com.craftingdead.mod.common.multiplayer.network;
 import java.lang.reflect.Method;
 import java.util.EnumMap;
 
-import com.craftingdead.mod.common.IMod;
-import com.craftingdead.mod.common.multiplayer.network.packet.PacketContextMod;
-import com.craftingdead.mod.common.multiplayer.network.pipeline.PacketChannelHandler;
-import com.craftingdead.mod.common.multiplayer.network.pipeline.PacketCodec;
-import com.recastproductions.network.packet.IPacket;
-import com.recastproductions.network.packet.IPacketHandler;
+import com.craftingdead.mod.common.Proxy;
+import com.craftingdead.mod.common.multiplayer.network.message.MessageHandler;
+import com.craftingdead.mod.common.multiplayer.network.pipeline.NettyMessageChannelHandler;
+import com.craftingdead.mod.common.multiplayer.network.pipeline.NettyMessageCodec;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -24,11 +22,12 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
+import sm0keysa1m0n.network.message.Message;
 
 /**
- * Used to wrap around all networking classes such as the {@link PacketCodec},
+ * Used to wrap around all networking classes such as the {@link NettyMessageCodec},
  * making life simple when it comes to networking. Register and send your
- * packets here
+ * messages here
  * 
  * @author Sm0keySa1m0n
  *
@@ -36,15 +35,15 @@ import net.minecraftforge.fml.relauncher.Side;
 public class NetworkWrapper {
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
-	private PacketCodec packetCodec;
-	private IMod<?> mod;
+	private NettyMessageCodec messageCodec;
+	private Proxy mod;
 
 	private static Class<?> defaultChannelPipeline;
 	private static Method generateName;
 
-	public NetworkWrapper(String channelName, IMod<?> mod) {
-		packetCodec = new PacketCodec();
-		channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec);
+	public NetworkWrapper(String channelName, Proxy mod) {
+		messageCodec = new NettyMessageCodec();
+		channels = NetworkRegistry.INSTANCE.newChannel(channelName, messageCodec);
 		this.mod = mod;
 	}
 
@@ -57,24 +56,24 @@ public class NetworkWrapper {
 	}
 
 	/**
-	 * Register a packet and it's associated handler. The packet will have the
-	 * supplied discriminator byte. The packet handler will be registered on the
-	 * supplied side (this is the side where you want the packet to be processed and
+	 * Register a message and it's associated handler. The message will have the
+	 * supplied discriminator byte. The message handler will be registered on the
+	 * supplied side (this is the side where you want the message to be processed and
 	 * acted upon).
 	 *
-	 * @param packetHandler     the packet handler type
-	 * @param requestPacketType the packet type
-	 * @param discriminator     a discriminator byte
-	 * @param side              the side for the handler
+	 * @param messageHandler     the message handler type
+	 * @param requestMessageType the message type
+	 * @param discriminator      a discriminator byte
+	 * @param side               the side for the handler
 	 */
-	public <REQ extends IPacket, REPLY extends IPacket> void registerPacket(
-			Class<? extends IPacketHandler<REQ, REPLY, PacketContextMod>> packetHandler, Class<REQ> requestPacketType,
+	public <REQ extends Message, REPLY extends Message> void registerMessage(
+			Class<? extends MessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType,
 			int discriminator, Side side) {
-		registerPacket(instantiate(packetHandler), requestPacketType, discriminator, side);
+		registerMessage(instantiate(messageHandler), requestMessageType, discriminator, side);
 	}
 
-	static <REQ extends IPacket, REPLY extends IPacket> IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> instantiate(
-			Class<? extends IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod>> handler) {
+	static <REQ extends Message, REPLY extends Message> MessageHandler<? super REQ, ? extends REPLY> instantiate(
+			Class<? extends MessageHandler<? super REQ, ? extends REPLY>> handler) {
 		try {
 			return handler.newInstance();
 		} catch (ReflectiveOperationException e) {
@@ -83,47 +82,46 @@ public class NetworkWrapper {
 	}
 
 	/**
-	 * Register a packet and it's associated handler. The packet will have the
-	 * supplied discriminator byte. The packet handler will be registered on the
-	 * supplied side (this is the side where you want the packet to be processed and
+	 * Register a message and it's associated handler. The message will have the
+	 * supplied discriminator byte. The message handler will be registered on the
+	 * supplied side (this is the side where you want the message to be processed and
 	 * acted upon).
 	 *
-	 * @param packetHandler     the packet handler instance
-	 * @param requestPacketType the packet type
-	 * @param discriminator     a discriminator byte
-	 * @param side              the side for the handler
+	 * @param messageHandler     the message handler instance
+	 * @param requestMessageType the message type
+	 * @param discriminator      a discriminator byte
+	 * @param side               the side for the handler
 	 */
-	public <REQ extends IPacket, REPLY extends IPacket> void registerPacket(
-			IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler, Class<REQ> requestPacketType,
+	public <REQ extends Message, REPLY extends Message> void registerMessage(
+			MessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestMessageType,
 			int discriminator, Side side) {
-		packetCodec.addDiscriminator(discriminator, requestPacketType);
+		messageCodec.addDiscriminator(discriminator, requestMessageType);
 		FMLEmbeddedChannel channel = channels.get(side);
-		String type = channel.findChannelHandlerNameForType(PacketCodec.class);
+		String type = channel.findChannelHandlerNameForType(NettyMessageCodec.class);
 		if (side == Side.SERVER) {
-			addServerHandlerAfter(channel, type, packetHandler, requestPacketType);
+			addServerHandlerAfter(channel, type, messageHandler, requestMessageType);
 		} else {
-			addClientHandlerAfter(channel, type, packetHandler, requestPacketType);
+			addClientHandlerAfter(channel, type, messageHandler, requestMessageType);
 		}
 	}
 
-	private <REQ extends IPacket, REPLY extends IPacket, NH extends INetHandler> void addServerHandlerAfter(
-			FMLEmbeddedChannel channel, String type,
-			IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler, Class<REQ> requestType) {
-		PacketChannelHandler<REQ, REPLY> handler = getHandlerWrapper(packetHandler, Side.SERVER, requestType);
-		channel.pipeline().addAfter(type, generateName(channel.pipeline(), handler), handler);
-	}
-
-	private <REQ extends IPacket, REPLY extends IPacket, NH extends INetHandler> void addClientHandlerAfter(
-			FMLEmbeddedChannel channel, String type,
-			IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler, Class<REQ> requestType) {
-		PacketChannelHandler<REQ, REPLY> handler = getHandlerWrapper(packetHandler, Side.CLIENT, requestType);
-		channel.pipeline().addAfter(type, generateName(channel.pipeline(), handler), handler);
-	}
-
-	private <REPLY extends IPacket, REQ extends IPacket> PacketChannelHandler<REQ, REPLY> getHandlerWrapper(
-			IPacketHandler<? super REQ, ? extends REPLY, PacketContextMod> packetHandler, Side side,
+	private <REQ extends Message, REPLY extends Message, NH extends INetHandler> void addServerHandlerAfter(
+			FMLEmbeddedChannel channel, String type, MessageHandler<? super REQ, ? extends REPLY> messageHandler,
 			Class<REQ> requestType) {
-		return new PacketChannelHandler<REQ, REPLY>(packetHandler, side, requestType, mod);
+		NettyMessageChannelHandler<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.SERVER, requestType);
+		channel.pipeline().addAfter(type, generateName(channel.pipeline(), handler), handler);
+	}
+
+	private <REQ extends Message, REPLY extends Message, NH extends INetHandler> void addClientHandlerAfter(
+			FMLEmbeddedChannel channel, String type, MessageHandler<? super REQ, ? extends REPLY> messageHandler,
+			Class<REQ> requestType) {
+		NettyMessageChannelHandler<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.CLIENT, requestType);
+		channel.pipeline().addAfter(type, generateName(channel.pipeline(), handler), handler);
+	}
+
+	private <REPLY extends Message, REQ extends Message> NettyMessageChannelHandler<REQ, REPLY> getHandlerWrapper(
+			MessageHandler<? super REQ, ? extends REPLY> messageHandler, Side side, Class<REQ> requestType) {
+		return new NettyMessageChannelHandler<REQ, REPLY>(messageHandler, side, requestType, mod);
 	}
 
 	/**
@@ -131,107 +129,107 @@ public class NetworkWrapper {
 	 * minecraft packets are required, such as
 	 * {@link TileEntity#getDescriptionPacket()}.
 	 *
-	 * @param packet The packet to translate into minecraft packet form
+	 * @param message The message to translate into minecraft packet form
 	 * @return A minecraft {@link Packet} suitable for use in minecraft APIs
 	 */
-	public Packet<?> getPacketFrom(IPacket packet) {
-		return channels.get(Side.SERVER).generatePacketFrom(packet);
+	public Packet<?> getPacketFrom(Message message) {
+		return channels.get(Side.SERVER).generatePacketFrom(message);
 	}
 
 	/**
-	 * Send this packet to everyone. The {@link IPacketHandler} for this packet type
+	 * Send this message to everyone. The {@link MessageHandler} for this message type
 	 * should be on the CLIENT side.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 */
-	public void sendToAll(IPacket packet) {
+	public void sendToAll(Message message) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALL);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Send this packet to the specified player. The {@link IPacketHandler} for this
-	 * packet type should be on the CLIENT side.
+	 * Send this message to the specified player. The {@link MessageHandler} for this
+	 * message type should be on the CLIENT side.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 * @param player The player to send it to
 	 */
-	public void sendTo(IPacket packet, EntityPlayerMP player) {
+	public void sendTo(Message message, EntityPlayerMP player) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.PLAYER);
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Send this packet to everyone within a certain range of a point. The
-	 * {@link IPacketHandler} for this packet type should be on the CLIENT side.
+	 * Send this message to everyone within a certain range of a point. The
+	 * {@link MessageHandler} for this message type should be on the CLIENT side.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 * @param point  The {@link TargetPoint} around which to send
 	 */
-	public void sendToAllAround(IPacket packet, NetworkRegistry.TargetPoint point) {
+	public void sendToAllAround(Message message, NetworkRegistry.TargetPoint point) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Sends this packet to everyone tracking a point. The {@link IPacketHandler}
-	 * for this packet type should be on the CLIENT side. The {@code range} field of
+	 * Sends this message to everyone tracking a point. The {@link MessageHandler}
+	 * for this message type should be on the CLIENT side. The {@code range} field of
 	 * the {@link TargetPoint} is ignored.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 * @param point  The tracked {@link TargetPoint} around which to send
 	 */
-	public void sendToAllTracking(IPacket packet, NetworkRegistry.TargetPoint point) {
+	public void sendToAllTracking(Message message, NetworkRegistry.TargetPoint point) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.TRACKING_POINT);
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Sends this packet to everyone tracking an entity. The {@link IPacketHandler}
-	 * for this packet type should be on the CLIENT side. This is not equivalent to
+	 * Sends this message to everyone tracking an entity. The {@link MessageHandler}
+	 * for this message type should be on the CLIENT side. This is not equivalent to
 	 * {@link #sendToAllTracking(IMessage, TargetPoint)} because entities have
 	 * different tracking distances based on their type.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 * @param entity The tracked entity around which to send
 	 */
-	public void sendToAllTracking(IPacket packet, Entity entity) {
+	public void sendToAllTracking(Message message, Entity entity) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.TRACKING_ENTITY);
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(entity);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Send this packet to everyone within the supplied dimension. The
-	 * {@link IPacketHandler} for this packet type should be on the CLIENT side.
+	 * Send this message to everyone within the supplied dimension. The
+	 * {@link MessageHandler} for this message type should be on the CLIENT side.
 	 *
-	 * @param packet      The packet to send
+	 * @param message      The message to send
 	 * @param dimensionId The dimension id to target
 	 */
-	public void sendToDimension(IPacket packet, int dimensionId) {
+	public void sendToDimension(Message message, int dimensionId) {
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.DIMENSION);
 		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(dimensionId);
-		channels.get(Side.SERVER).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	/**
-	 * Send this packet to the server. The {@link IPacketHandler} for this message
+	 * Send this message to the server. The {@link MessageHandler} for this message
 	 * type should be on the SERVER side.
 	 *
-	 * @param packet The packet to send
+	 * @param message The message to send
 	 */
-	public void sendToServer(IPacket packet) {
+	public void sendToServer(Message message) {
 		channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET)
 				.set(FMLOutboundHandler.OutboundTarget.TOSERVER);
-		channels.get(Side.CLIENT).writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		channels.get(Side.CLIENT).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	static {

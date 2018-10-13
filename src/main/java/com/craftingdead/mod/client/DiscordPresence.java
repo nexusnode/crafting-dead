@@ -15,9 +15,9 @@ public class DiscordPresence {
 		DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers(), true, null);
 	}
 
-	public static void updateState(GameState state, ModClient mod) {
+	public static void updateState(GameState state, ClientProxy client) {
 		DiscordRichPresence presence = new DiscordRichPresence();
-		state.applyState(presence, mod);
+		state.applyState(presence, client);
 		DiscordRPC.discordUpdatePresence(presence);
 	}
 
@@ -31,8 +31,8 @@ public class DiscordPresence {
 		POST_INITIALIZATION("discordstate.post-initialization"), IDLE("discordstate.idle"),
 		SINGLEPLAYER("discordstate.singleplayer"), MULTIPLAYER("discordstate.multiplayer") {
 			@Override
-			public void applyState(DiscordRichPresence presence, ModClient mod) {
-				ServerData serverData = mod.getMinecraft().getCurrentServerData();
+			public void applyState(DiscordRichPresence presence, ClientProxy client) {
+				ServerData serverData = client.getMinecraft().getCurrentServerData();
 				presence.state = serverData.serverIP;
 				String[] playerListSplit = serverData.populationInfo.split("/");
 				try {
@@ -52,7 +52,7 @@ public class DiscordPresence {
 			this.translationKey = translationKey;
 		}
 
-		void applyState(DiscordRichPresence presence, ModClient mod) {
+		void applyState(DiscordRichPresence presence, ClientProxy client) {
 			presence.details = I18n.format(translationKey);
 			presence.startTimestamp = System.currentTimeMillis() / 1000;
 			presence.largeImageKey = "craftingdead";

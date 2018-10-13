@@ -1,21 +1,18 @@
 package com.craftingdead.mod.common;
 
 import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
-import com.craftingdead.mod.common.registry.generic.PacketRegistry;
+import com.craftingdead.mod.common.registry.generic.MessageRegistry;
 import com.craftingdead.mod.common.registry.generic.TileEntityRegistry;
-import com.craftingdead.mod.server.ModServer;
-import com.recastproductions.network.NetworkClient;
-import com.recastproductions.network.impl.client.NetworkRegistryClient;
+import com.craftingdead.mod.network.ConnectionState;
+import com.craftingdead.mod.server.ServerProxy;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -29,6 +26,9 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import sm0keysa1m0n.network.system.NettyClient;
+import sm0keysa1m0n.network.wrapper.NetworkManager;
+import sm0keysa1m0n.network.wrapper.Session;
 
 /**
  * The main class for Crafting Dead
@@ -52,21 +52,13 @@ public class CraftingDead {
 	 */
 	private ModMetadata metadata;
 	/**
-	 * Current {@link IMod} instance
+	 * {@link NettyClient} used for connecting to the master server
 	 */
-	private IMod<?> sidedMod;
+	private NettyClient nettyClient;
 	/**
-	 * The network address of the management server
+	 * Current {@link Proxy} instance
 	 */
-	private SocketAddress managementServerAddress = new InetSocketAddress("localhost", 32888);
-	/**
-	 * Handles all impl network logic
-	 */
-	private NetworkRegistryClient networkRegistryClient;
-	/**
-	 * Used to connect to the master server
-	 */
-	private NetworkClient networkClient;
+	private Proxy proxy;
 	/**
 	 * The data folder
 	 */
@@ -76,6 +68,10 @@ public class CraftingDead {
 	 */
 	private NetworkWrapper networkWrapper;
 	/**
+	 * Used for external networking (with the master server)
+	 */
+	private NetworkManager networkManager;
+	/**
 	 * {@link LogicalServer} instance
 	 */
 	private LogicalServer logicalServer;
@@ -83,24 +79,23 @@ public class CraftingDead {
 	public CraftingDead() {
 		instance = this;
 
-		modFolder = new File((File) FMLInjectionData.data()[6], CraftingDead.MOD_ID);
-		modFolder.mkdir();
+		this.modFolder = new File((File) FMLInjectionData.data()[6], CraftingDead.MOD_ID);
+		this.modFolder.mkdir();
 
-		LOGGER.info("Loading {}", FMLLaunchHandler.side());
-		sidedMod = instantiateSide(ModClient::new, ModServer::new);
+		LOGGER.info("Loading proxy for {}", FMLLaunchHandler.side());
+		this.proxy = this.instantiateSide(ClientProxy::new, ServerProxy::new);
 
 		LOGGER.info("Adding shutdown hook");
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				LOGGER.info("Shutting down");
-				networkClient.shutdown();
-				sidedMod.shutdown();
+				CraftingDead.this.proxy.shutdown();
 			}
 		});
 	}
 
-	private IMod<?> instantiateSide(Supplier<? extends IMod<?>> clientSide, Supplier<? extends IMod<?>> serverSide) {
+	private Proxy instantiateSide(Supplier<? extends Proxy> clientSide, Supplier<? extends Proxy> serverSide) {
 		return FMLLaunchHandler.side() == Side.CLIENT ? clientSide.get() : serverSide.get();
 	}
 
@@ -108,47 +103,54 @@ public class CraftingDead {
 	public void preInitialization(FMLPreInitializationEvent event) {
 		LOGGER.info("Processing FMLPreInitializationEvent");
 
-		metadata = event.getModMetadata();
+		this.metadata = event.getModMetadata();
 
 		LOGGER.info("Loading network wrapper");
-		networkWrapper = new NetworkWrapper(MOD_ID, sidedMod);
+		this.networkWrapper = new NetworkWrapper(MOD_ID, this.proxy);
 
-		LOGGER.info("Registering packets");
-		PacketRegistry.registerPackets(networkWrapper);
+		LOGGER.info("Registering messages");
+		MessageRegistry.registerMessages(this.networkWrapper);
 		LOGGER.info("Registering tile entities");
 		TileEntityRegistry.registerTileEntities();
 
-		sidedMod.preInitialization(event);
+		this.proxy.preInitialization(event);
 	}
 
 	@Mod.EventHandler
 	public void initialization(FMLInitializationEvent event) {
 		LOGGER.info("Processing FMLInitializationEvent ");
-		sidedMod.initialization(event);
+		this.proxy.initialization(event);
 	}
 
 	@Mod.EventHandler
 	public void postInitialization(FMLPostInitializationEvent event) {
 		LOGGER.info("Processing FMLPostInitializationEvent");
-		sidedMod.postInitialization(event);
+		this.proxy.postInitialization(event);
 	}
 
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
 		LOGGER.info("Processing FMLLoadCompleteEvent");
-		networkRegistryClient = new NetworkRegistryClient(sidedMod.getNetHandler());
-		networkClient = new NetworkClient(networkRegistryClient.getChannelInitializer());
-		networkClient.connect(managementServerAddress);
-		sidedMod.loadComplete(event);
+		this.nettyClient = new NettyClient(this.proxy.useEpoll());
+		this.networkManager = this.nettyClient.connect(this.proxy.getMasterServerAddress(), ConnectionState.HANDSHAKE,
+				new Supplier<Session>() {
+
+					@Override
+					public Session get() {
+						return CraftingDead.this.proxy.newSession();
+					}
+
+				});
+		this.proxy.loadComplete(event);
 	}
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		LOGGER.info("Processing FMLServerStartingEvent");
 		try {
-			logicalServer = sidedMod.getLogicalServer().newInstance();
-			MinecraftForge.EVENT_BUS.register(logicalServer);
-			logicalServer.start(sidedMod, event.getServer());
+			this.logicalServer = this.proxy.getLogicalServer().newInstance();
+			MinecraftForge.EVENT_BUS.register(this.logicalServer);
+			this.logicalServer.start(this.proxy, event.getServer());
 		} catch (InstantiationException | IllegalAccessException e) {
 			LOGGER.error("Could not start logical server", e);
 			throw new RuntimeException(e);
@@ -158,9 +160,9 @@ public class CraftingDead {
 	@Mod.EventHandler
 	public void serverStopping(FMLServerStoppingEvent event) {
 		LOGGER.info("Processing FMLServerStoppingEvent");
-		if (logicalServer != null) {
-			MinecraftForge.EVENT_BUS.unregister(logicalServer);
-			logicalServer = null;
+		if (this.logicalServer != null) {
+			MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
+			this.logicalServer = null;
 		}
 	}
 
@@ -170,6 +172,10 @@ public class CraftingDead {
 
 	public NetworkWrapper getNetworkWrapper() {
 		return this.networkWrapper;
+	}
+
+	public NetworkManager getNetworkManager() {
+		return this.networkManager;
 	}
 
 	public ModMetadata getMetadata() {

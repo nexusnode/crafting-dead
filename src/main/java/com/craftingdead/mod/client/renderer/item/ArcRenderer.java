@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.renderer.item;
 
-import com.craftingdead.mod.client.ModClient;
+import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -12,7 +12,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 
 public class ArcRenderer extends GunRenderer {
 
-	public ArcRenderer(ModClient client) {
+	public ArcRenderer(ClientProxy client) {
 		super(client);
 	}
 
