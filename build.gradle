@@ -38,13 +38,23 @@ repositories {
     	name = "jitpack"
     	url = "https://jitpack.io"
     }
-    
+    maven { 
+    	name = "ts1"
+    	url = "http://ts1:8040/artifactory/gradle-dev-local"
+    	credentials {
+            username "$ts1Username"
+            password "$ts1Password"
+        }
+    }
 }
 
 dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
 	compile 'com.github.Vatuu:discord-rpc:1.5.1'
-	compile project('Network')
+	compile (group: 'sm0keysa1m0n', name: 'Network', version: '1.0.0') {
+		exclude group: 'com.google.guava', module: 'guava'
+  	}
+
 	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'
 }
 

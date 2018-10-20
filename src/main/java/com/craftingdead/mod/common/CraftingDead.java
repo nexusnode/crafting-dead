@@ -3,6 +3,8 @@ package com.craftingdead.mod.common;
 import java.io.File;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +30,6 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import sm0keysa1m0n.network.system.NettyClient;
 import sm0keysa1m0n.network.wrapper.NetworkManager;
-import sm0keysa1m0n.network.wrapper.Session;
 
 /**
  * The main class for Crafting Dead
@@ -132,15 +133,13 @@ public class CraftingDead {
 	public void loadComplete(FMLLoadCompleteEvent event) {
 		LOGGER.info("Processing FMLLoadCompleteEvent");
 		this.nettyClient = new NettyClient(this.proxy.useEpoll());
-		this.networkManager = this.nettyClient.connect(this.proxy.getMasterServerAddress(), ConnectionState.HANDSHAKE,
-				new Supplier<Session>() {
+		try {
+			this.networkManager = this.nettyClient.connect(this.proxy.getMasterServerAddress(),
+					ConnectionState.HANDSHAKE, this.proxy::newSession);
+		} catch (Exception e) {
+			LOGGER.warn("Could not connect to the master server", e);
+		}
 
-					@Override
-					public Session get() {
-						return CraftingDead.this.proxy.newSession();
-					}
-
-				});
 		this.proxy.loadComplete(event);
 	}
 
@@ -174,6 +173,7 @@ public class CraftingDead {
 		return this.networkWrapper;
 	}
 
+	@Nullable
 	public NetworkManager getNetworkManager() {
 		return this.networkManager;
 	}

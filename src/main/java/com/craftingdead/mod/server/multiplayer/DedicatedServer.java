@@ -7,6 +7,8 @@ import com.craftingdead.mod.common.multiplayer.LogicalServer;
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
 import com.craftingdead.mod.network.message.server.MessageKilledZombie;
 
+import sm0keysa1m0n.network.wrapper.NetworkManager;
+
 public class DedicatedServer extends LogicalServer {
 
 	@Override
@@ -26,7 +28,9 @@ public class DedicatedServer extends LogicalServer {
 
 	@Override
 	protected boolean onPlayerKillZombie(PlayerMP cause) {
-		CraftingDead.instance().getNetworkManager().sendMessage(new MessageKilledZombie(cause.getUUID()));
+		NetworkManager networkManager = CraftingDead.instance().getNetworkManager();
+		if (networkManager != null)
+			networkManager.sendMessage(new MessageKilledZombie(cause.getUUID()));
 		return false;
 	}
 
