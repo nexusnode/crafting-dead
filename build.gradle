@@ -22,7 +22,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.4.2765"
+    version = "1.12.2-14.23.5.2772"
     runDir = "run"
     mappings = "stable_39"
 }
@@ -40,7 +40,7 @@ repositories {
     }
     maven { 
     	name = "ts1"
-    	url = "http://ts1:8040/artifactory/gradle-dev-local"
+    	url = "http://maven.tarbits.co.uk:8040/artifactory/gradle-dev-local"
     	credentials {
             username "$ts1Username"
             password "$ts1Password"

@@ -46,7 +46,7 @@ public abstract class LogicalServer {
 		this.minecraftServer = minecraftServer;
 		CraftingDead.LOGGER.info("Starting logical server");
 	}
-	
+
 	// ================================================================================
 	// Forge Events
 	// ================================================================================
@@ -61,9 +61,9 @@ public abstract class LogicalServer {
 			player.deserializeNBT(entity.getEntityData().getCompoundTag(CraftingDead.MOD_ID));
 			this.playerMap.put(entity, player);
 			this.onPlayerAccepted(player);
-			CraftingDead.LOGGER.info("{} has successfully passed the mod check", entity.getName());
+			CraftingDead.LOGGER.info("{} has successfully passed the handshake check", entity.getName());
 		} else {
-			CraftingDead.LOGGER.warn("{} failed the mod check, disconnecting", entity.getName());
+			CraftingDead.LOGGER.warn("{} failed the handshake check, disconnecting", entity.getName());
 			entity.connection.disconnect(new TextComponentTranslation("multiplayer.disconnect.handshake_fail"));
 		}
 	}

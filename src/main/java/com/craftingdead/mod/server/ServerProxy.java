@@ -1,6 +1,7 @@
 package com.craftingdead.mod.server;
 
 import java.net.InetSocketAddress;
+import java.util.function.Supplier;
 
 import com.craftingdead.mod.common.Proxy;
 import com.craftingdead.mod.network.session.ServerSession;
@@ -20,8 +21,8 @@ public class ServerProxy implements Proxy {
 	}
 
 	@Override
-	public Class<DedicatedServer> getLogicalServer() {
-		return DedicatedServer.class;
+	public Supplier<DedicatedServer> getLogicalServerSupplier() {
+		return DedicatedServer::new;
 	}
 
 	@Override

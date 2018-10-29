@@ -7,7 +7,7 @@ import com.craftingdead.mod.common.registry.forge.BlockRegistry;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.ItemColors;
 
-public class ColourRegistry {
+public class ColourHandlerRegistry {
 
 	public static void registerColourHandlers(BlockColors blockColors, ItemColors itemColors) {
 		registerLootColourHandler((BlockLoot) BlockRegistry.RESIDENTIAL_LOOT, blockColors, itemColors);

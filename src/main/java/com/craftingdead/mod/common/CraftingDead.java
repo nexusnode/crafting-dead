@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
-import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
 import com.craftingdead.mod.common.registry.generic.MessageRegistry;
 import com.craftingdead.mod.common.registry.generic.TileEntityRegistry;
 import com.craftingdead.mod.network.ConnectionState;
@@ -25,6 +24,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -39,11 +40,18 @@ import sm0keysa1m0n.network.wrapper.NetworkManager;
  */
 @Mod(modid = CraftingDead.MOD_ID)
 public class CraftingDead {
-
+	/**
+	 * Mod ID
+	 */
 	public static final String MOD_ID = "craftingdead";
-
+	/**
+	 * {@link Logger} instance
+	 */
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
+	/**
+	 * Used for internal networking
+	 */
+	public static final SimpleNetworkWrapper NETWORK_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
 	/**
 	 * Singleton
 	 */
@@ -65,10 +73,6 @@ public class CraftingDead {
 	 */
 	private File modFolder;
 	/**
-	 * Used for internal networking
-	 */
-	private NetworkWrapper networkWrapper;
-	/**
 	 * Used for external networking (with the master server)
 	 */
 	private NetworkManager networkManager;
@@ -77,7 +81,7 @@ public class CraftingDead {
 	 */
 	private LogicalServer logicalServer;
 
-	public CraftingDead() {
+	private CraftingDead() {
 		instance = this;
 
 		this.modFolder = new File((File) FMLInjectionData.data()[6], CraftingDead.MOD_ID);
@@ -106,11 +110,9 @@ public class CraftingDead {
 
 		this.metadata = event.getModMetadata();
 
-		LOGGER.info("Loading network wrapper");
-		this.networkWrapper = new NetworkWrapper(MOD_ID, this.proxy);
-
 		LOGGER.info("Registering messages");
-		MessageRegistry.registerMessages(this.networkWrapper);
+		MessageRegistry.registerMessages(NETWORK_WRAPPER);
+
 		LOGGER.info("Registering tile entities");
 		TileEntityRegistry.registerTileEntities();
 
@@ -146,14 +148,9 @@ public class CraftingDead {
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		LOGGER.info("Processing FMLServerStartingEvent");
-		try {
-			this.logicalServer = this.proxy.getLogicalServer().newInstance();
-			MinecraftForge.EVENT_BUS.register(this.logicalServer);
-			this.logicalServer.start(this.proxy, event.getServer());
-		} catch (InstantiationException | IllegalAccessException e) {
-			LOGGER.error("Could not start logical server", e);
-			throw new RuntimeException(e);
-		}
+		this.logicalServer = this.proxy.getLogicalServerSupplier().get();
+		MinecraftForge.EVENT_BUS.register(this.logicalServer);
+		this.logicalServer.start(this.proxy, event.getServer());
 	}
 
 	@Mod.EventHandler
@@ -169,10 +166,6 @@ public class CraftingDead {
 		return this.modFolder;
 	}
 
-	public NetworkWrapper getNetworkWrapper() {
-		return this.networkWrapper;
-	}
-
 	@Nullable
 	public NetworkManager getNetworkManager() {
 		return this.networkManager;
@@ -182,8 +175,18 @@ public class CraftingDead {
 		return this.metadata;
 	}
 
+	public Proxy getProxy() {
+		return this.proxy;
+	}
+
+	@Nullable
+	public LogicalServer getLogicalServer() {
+		return this.logicalServer;
+	}
+
+	@Mod.InstanceFactory
 	public static CraftingDead instance() {
-		return instance;
+		return instance != null ? instance : new CraftingDead();
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.craftingdead.mod.common.registry.forge;
 
 import com.craftingdead.mod.common.CraftingDead;
+import com.craftingdead.mod.common.item.ItemArc;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -23,7 +24,7 @@ public class ItemRegistry {
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(appendRegistryName("arc", new Item()),
+		event.getRegistry().registerAll(appendRegistryName("arc", new ItemArc()),
 				appendRegistryName("road", new ItemBlock(BlockRegistry.ROAD)),
 				appendRegistryName("lined_road", new ItemBlock(BlockRegistry.LINED_ROAD)),
 				appendRegistryName("broken_lined_road", new ItemBlock(BlockRegistry.BROKEN_LINED_ROAD)),

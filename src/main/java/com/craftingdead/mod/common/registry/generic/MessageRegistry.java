@@ -1,9 +1,9 @@
 package com.craftingdead.mod.common.registry.generic;
 
-import com.craftingdead.mod.common.multiplayer.network.NetworkWrapper;
-import com.craftingdead.mod.common.multiplayer.network.message.MessageUpdateStatistics;
-import com.craftingdead.mod.common.multiplayer.network.message.MessageUpdateStatistics.MessageHandlerUpdateStatistics;
+import com.craftingdead.mod.common.multiplayer.message.MessageTriggerItem;
+import com.craftingdead.mod.common.multiplayer.message.MessageUpdateStatistics;
 
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 /**
@@ -16,9 +16,11 @@ public class MessageRegistry {
 
 	private static int currentDiscriminator = -1;
 
-	public static void registerMessages(NetworkWrapper wrapper) {
-		wrapper.registerMessage(MessageHandlerUpdateStatistics.class, MessageUpdateStatistics.class,
-				currentDiscriminator++, Side.CLIENT);
+	public static void registerMessages(SimpleNetworkWrapper networkWrapper) {
+		networkWrapper.registerMessage(MessageUpdateStatistics.MessageHandlerUpdateStatistics.class,
+				MessageUpdateStatistics.class, currentDiscriminator++, Side.CLIENT);
+		networkWrapper.registerMessage(MessageTriggerItem.MessageHandlerItemTrigger.class, MessageTriggerItem.class,
+				currentDiscriminator++, Side.SERVER);
 	}
 
 }

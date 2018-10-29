@@ -2,12 +2,10 @@ package com.craftingdead.mod.common.item;
 
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
 
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public abstract class ItemGun extends Item {
+public interface TriggerableItem {
 
-	public abstract boolean useBowAndArrowStance();
-
+	void handleTrigger(PlayerMP player, ItemStack itemStack, boolean triggerDown);
 
 }

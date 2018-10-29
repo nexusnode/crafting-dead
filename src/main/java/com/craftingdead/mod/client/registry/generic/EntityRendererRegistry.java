@@ -1,5 +1,6 @@
-package com.craftingdead.mod.client.renderer.entity;
+package com.craftingdead.mod.client.registry.generic;
 
+import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
 import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
 
 import net.minecraft.client.model.ModelBiped;
@@ -8,9 +9,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
-public class EntityRenderers {
+public class EntityRendererRegistry {
 
-	public static void registerRenderers() {
+	public static void registerEntityRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(EntityCDZombie.class, new IRenderFactory<EntityCDZombie>() {
 
 			@Override

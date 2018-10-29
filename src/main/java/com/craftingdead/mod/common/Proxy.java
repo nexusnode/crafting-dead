@@ -1,6 +1,7 @@
 package com.craftingdead.mod.common;
 
 import java.net.InetSocketAddress;
+import java.util.function.Supplier;
 
 import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.common.multiplayer.LogicalServer;
@@ -63,11 +64,12 @@ public interface Proxy {
 	}
 
 	/**
-	 * Get the {@link LogicalServer} associated with this side
+	 * Get a {@link Supplier} for the {@link LogicalServer} associated with this
+	 * side
 	 * 
-	 * @return the server instance
+	 * @return the {@link Supplier}
 	 */
-	Class<? extends LogicalServer> getLogicalServer();
+	Supplier<? extends LogicalServer> getLogicalServerSupplier();
 
 	/**
 	 * Get the {@link InetSocketAddress} used to connect to the master server
@@ -80,6 +82,7 @@ public interface Proxy {
 
 	/**
 	 * Create a new {@link S}
+	 * 
 	 * @return the {@link S}
 	 */
 	Session newSession();

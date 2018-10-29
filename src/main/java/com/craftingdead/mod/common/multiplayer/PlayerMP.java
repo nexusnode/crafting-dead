@@ -3,14 +3,15 @@ package com.craftingdead.mod.common.multiplayer;
 import java.util.UUID;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.multiplayer.network.message.MessageUpdateStatistics;
+import com.craftingdead.mod.common.item.TriggerableItem;
+import com.craftingdead.mod.common.multiplayer.message.MessageUpdateStatistics;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.INBTSerializable;
-import sm0keysa1m0n.network.message.Message;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Wraps around the vanilla {@link EntityPlayerMP} so we can associate our own
@@ -67,6 +68,10 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
 
+	private boolean triggerDown;
+	private int triggerDownTicks = 0;
+	private int lastTriggerDownTicks = Integer.MIN_VALUE;
+
 	public PlayerMP(LogicalServer server, EntityPlayerMP entity) {
 		this.server = server;
 		this.entity = entity;
@@ -79,10 +84,10 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	/**
 	 * Send a message to the player's client
 	 * 
-	 * @param message - the {@link Message} to send
+	 * @param message - the {@link IMessage} to send
 	 */
-	public void sendMessage(Message msg) {
-		CraftingDead.instance().getNetworkWrapper().sendTo(msg, this.getVanillaEntity());
+	public void sendMessage(IMessage msg) {
+		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.getVanillaEntity());
 	}
 
 	public LogicalServer getLogicalServer() {
@@ -143,6 +148,13 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 
 	public void incrementPlayerKills() {
 		this.playerKills++;
+	}
+
+	public void handleItemTrigger(boolean cancel) {
+		// Never trust the client, they may not even have a gun
+		if (entity.getHeldItemMainhand().getItem() instanceof TriggerableItem) {
+			System.out.println("SERVER: Fire gun, should cancel? => " + cancel);
+		}
 	}
 
 	/**
