@@ -181,17 +181,4 @@ public class RenderHelper extends net.minecraft.client.renderer.RenderHelper {
 		}
 	}
 
-	public static CameraType getCameraType(TransformType transformType) {
-		switch (transformType) {
-		case FIRST_PERSON_LEFT_HAND:
-		case FIRST_PERSON_RIGHT_HAND:
-			return CameraType.FIRST_PERSON;
-		case THIRD_PERSON_LEFT_HAND:
-		case THIRD_PERSON_RIGHT_HAND:
-			return CameraType.THIRD_PERSON;
-		default:
-			return CameraType.OTHER;
-		}
-	}
-
 }

@@ -22,9 +22,9 @@ import com.craftingdead.mod.client.renderer.transition.ScreenTransitionFade;
 import com.craftingdead.mod.client.renderer.transition.TransitionManager;
 import com.craftingdead.mod.common.CraftingDead;
 import com.craftingdead.mod.common.Proxy;
+import com.craftingdead.mod.common.item.ExtendedItem;
 import com.craftingdead.mod.common.item.ItemGun;
-import com.craftingdead.mod.common.item.TriggerableItem;
-import com.craftingdead.mod.common.multiplayer.message.MessageTriggerItem;
+import com.craftingdead.mod.common.multiplayer.message.MessageUpdateTriggerStatus;
 import com.craftingdead.mod.network.session.PlayerSession;
 
 import net.minecraft.client.Minecraft;
@@ -199,11 +199,14 @@ public final class ClientProxy implements Proxy {
 	public void onMouseEvent(MouseEvent event) {
 		if (this.minecraft.inGameHasFocus) {
 			if (event.getButton() - 100 == this.minecraft.gameSettings.keyBindAttack.getKeyCode()
-					&& this.player.getVanillaEntity().getHeldItemMainhand().getItem() instanceof TriggerableItem) {
-				// Cancel vanilla attack mechanics
-				event.setCanceled(true);
-				// Tell the server that we are attempting to hold down a trigger on an item
-				CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageTriggerItem(!event.isButtonstate()));
+					&& this.player.getVanillaEntity().getHeldItemMainhand().getItem() instanceof ExtendedItem) {
+				ExtendedItem item = (ExtendedItem) this.player.getVanillaEntity().getHeldItemMainhand().getItem();
+				if (item.getTriggerHandlerSupplier() != null) {
+					// Cancel vanilla attack mechanics
+					event.setCanceled(true);
+					// Tell the server that we are attempting to hold down a trigger on an item
+					CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageUpdateTriggerStatus(event.isButtonstate()));
+				}
 			}
 		}
 	}

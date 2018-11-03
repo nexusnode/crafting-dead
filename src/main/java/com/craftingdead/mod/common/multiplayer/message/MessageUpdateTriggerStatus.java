@@ -1,24 +1,22 @@
 package com.craftingdead.mod.common.multiplayer.message;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.item.TriggerableItem;
 import com.craftingdead.mod.common.multiplayer.PlayerMP;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageTriggerItem implements IMessage {
+public class MessageUpdateTriggerStatus implements IMessage {
 
 	private boolean triggerDown;
 
-	public MessageTriggerItem() {
+	public MessageUpdateTriggerStatus() {
 		;
 	}
 
-	public MessageTriggerItem(boolean triggerDown) {
+	public MessageUpdateTriggerStatus(boolean triggerDown) {
 		this.triggerDown = triggerDown;
 	}
 
@@ -32,15 +30,13 @@ public class MessageTriggerItem implements IMessage {
 		this.triggerDown = in.readBoolean();
 	}
 
-	public static class MessageHandlerItemTrigger implements IMessageHandler<MessageTriggerItem, IMessage> {
+	public static class MessageHandlerUpdateTriggerStatus
+			implements IMessageHandler<MessageUpdateTriggerStatus, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageTriggerItem msg, MessageContext ctx) {
+		public IMessage onMessage(MessageUpdateTriggerStatus msg, MessageContext ctx) {
 			PlayerMP player = CraftingDead.instance().getLogicalServer().getPlayer(ctx.getServerHandler().player);
-			ItemStack heldStack = player.getVanillaEntity().getHeldItemMainhand();
-			// Never trust the client, they may not actually be holding a TriggerableItem
-			if (heldStack.getItem() instanceof TriggerableItem)
-				((TriggerableItem) heldStack.getItem()).handleTrigger(player, heldStack, msg.triggerDown);
+			player.handleTriggerStatusUpdate(msg.triggerDown);
 			return null;
 		}
 

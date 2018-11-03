@@ -21,8 +21,25 @@ public class ArcRenderer extends GunRenderer {
 		GlStateManager.translate(1, 0, 0);
 		GlStateManager.scale(0.5, 0.5, 0.5);
 
-		switch (RenderHelper.getCameraType(transformType)) {
-		case FIRST_PERSON:
+		switch (transformType) {
+		case THIRD_PERSON_LEFT_HAND:
+		case THIRD_PERSON_RIGHT_HAND:
+			GlStateManager.translate(-0.3, 0.5, -0.15);
+			switch (handSide) {
+			case RIGHT:
+				// Backward translation
+				GlStateManager.translate(-0.2, 0, 0.5);
+				// Left/Right rotation
+				GlStateManager.rotate(-90, 0, 1, 0);
+				break;
+			case LEFT:
+				// Left/Right rotation
+				GlStateManager.rotate(280, 0, 1, 0);
+				break;
+			}
+			break;
+		case FIRST_PERSON_LEFT_HAND:
+		case FIRST_PERSON_RIGHT_HAND:
 			GlStateManager.scale(2, 2, 2);
 			switch (handSide) {
 			case RIGHT:
@@ -37,20 +54,11 @@ public class ArcRenderer extends GunRenderer {
 				break;
 			}
 			break;
-		case THIRD_PERSON:
-			GlStateManager.translate(-0.3, 0.5, -0.15);
-			switch (handSide) {
-			case RIGHT:
-				// Backward translation
-				GlStateManager.translate(-0.2, 0, 0.5);
-				// Left/Right rotation
-				GlStateManager.rotate(-90, 0, 1, 0);
-				break;
-			case LEFT:
-				// Left/Right rotation
-				GlStateManager.rotate(280, 0, 1, 0);
-				break;
-			}
+		case GUI:
+			GlStateManager.scale(0.9, 0.9, 0.9);
+			GlStateManager.translate(-0.3, 1, 0);
+			GlStateManager.rotate(180, 0, 1, 0);
+			GlStateManager.rotate(-40, 0, 0, 1);
 			break;
 		default:
 			break;

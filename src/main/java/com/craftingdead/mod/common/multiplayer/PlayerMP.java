@@ -1,12 +1,15 @@
 package com.craftingdead.mod.common.multiplayer;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.item.TriggerableItem;
+import com.craftingdead.mod.common.item.ExtendedItem;
+import com.craftingdead.mod.common.item.trigger.TriggerHandler;
 import com.craftingdead.mod.common.multiplayer.message.MessageUpdateStatistics;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ITickable;
@@ -68,30 +71,11 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
 
-	private boolean triggerDown;
-	private int triggerDownTicks = 0;
-	private int lastTriggerDownTicks = Integer.MIN_VALUE;
+	private TriggerHandler triggerHandler;
 
 	public PlayerMP(LogicalServer server, EntityPlayerMP entity) {
 		this.server = server;
 		this.entity = entity;
-	}
-
-	public EntityPlayerMP getVanillaEntity() {
-		return entity;
-	}
-
-	/**
-	 * Send a message to the player's client
-	 * 
-	 * @param message - the {@link IMessage} to send
-	 */
-	public void sendMessage(IMessage msg) {
-		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.getVanillaEntity());
-	}
-
-	public LogicalServer getLogicalServer() {
-		return this.server;
 	}
 
 	/**
@@ -125,14 +109,13 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 	 */
 	@Override
 	public void update() {
-		boolean isDay = entity.getEntityWorld().isDaytime();
-		// If it was night time and is now day time then increment their days survived
-		// by 1
-		if (!lastDay && isDay) {
-			daysSurvived++;
-		}
-		lastDay = isDay;
+		this.updateDaysSurvived();
+		this.updateStatistics();
+		if (this.triggerHandler != null)
+			this.triggerHandler.update();
+	}
 
+	private void updateStatistics() {
 		if (this.daysSurvived != this.lastDaysSurvived || this.zombieKills != this.lastZombieKills
 				|| this.playerKills != this.lastPlayerKills) {
 			this.sendMessage(new MessageUpdateStatistics(this.daysSurvived, this.zombieKills, this.playerKills));
@@ -140,6 +123,15 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 			this.lastZombieKills = this.zombieKills;
 			this.lastPlayerKills = this.playerKills;
 		}
+	}
+
+	private void updateDaysSurvived() {
+		boolean isDay = entity.getEntityWorld().isDaytime();
+		// If it was night time and is now day time then increment their days survived
+		// by 1
+		if (!lastDay && isDay)
+			daysSurvived++;
+		lastDay = isDay;
 	}
 
 	public void incrementZombieKills() {
@@ -150,10 +142,20 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 		this.playerKills++;
 	}
 
-	public void handleItemTrigger(boolean cancel) {
-		// Never trust the client, they may not even have a gun
-		if (entity.getHeldItemMainhand().getItem() instanceof TriggerableItem) {
-			System.out.println("SERVER: Fire gun, should cancel? => " + cancel);
+	public void handleTriggerStatusUpdate(boolean triggerDown) {
+		// Never trust the client, they may not actually be holding a triggerable item
+		ItemStack heldStack = this.entity.getHeldItemMainhand();
+		if (heldStack.getItem() instanceof ExtendedItem) {
+			ExtendedItem item = (ExtendedItem) heldStack.getItem();
+			Supplier<? extends TriggerHandler> triggerHandlerSupplier = item.getTriggerHandlerSupplier();
+			if (triggerHandlerSupplier != null)
+				if (triggerDown) {
+					this.triggerHandler = triggerHandlerSupplier.get();
+					this.triggerHandler.triggerDown(this, heldStack);
+				} else {
+					this.triggerHandler.triggerUp();
+					this.triggerHandler = null;
+				}
 		}
 	}
 
@@ -169,8 +171,25 @@ public class PlayerMP implements INBTSerializable<NBTTagCompound>, ITickable {
 		this.playerKills = 0;
 	}
 
+	/**
+	 * Send a message to the player's client
+	 * 
+	 * @param message - the {@link IMessage} to send
+	 */
+	public void sendMessage(IMessage msg) {
+		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.entity);
+	}
+
 	public UUID getUUID() {
 		return this.entity.getPersistentID();
+	}
+
+	public EntityPlayerMP getVanillaEntity() {
+		return entity;
+	}
+
+	public LogicalServer getLogicalServer() {
+		return this.server;
 	}
 
 }

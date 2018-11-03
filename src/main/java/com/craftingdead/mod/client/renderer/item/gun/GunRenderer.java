@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import com.craftingdead.mod.client.ClientProxy;
-import com.craftingdead.mod.client.renderer.CameraType;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import com.craftingdead.mod.client.renderer.item.ItemRenderer;
 import com.google.common.collect.ImmutableList;
@@ -47,12 +46,17 @@ public abstract class GunRenderer extends ItemRenderer {
 		RenderHelper.renderModel(baseModelBaked, DefaultVertexFormats.ITEM);
 		GlStateManager.popMatrix();
 
-		if (RenderHelper.getCameraType(transformType) == CameraType.FIRST_PERSON) {
+		switch (transformType) {
+		case FIRST_PERSON_LEFT_HAND:
+		case FIRST_PERSON_RIGHT_HAND:
 			EnumHandSide handSide = RenderHelper.getHandSide(transformType);
 			GlStateManager.pushMatrix();
 			this.applyHandTranslations(handSide);
 			this.renderArm(handSide);
 			GlStateManager.popMatrix();
+			break;
+		default:
+			break;
 		}
 	}
 
