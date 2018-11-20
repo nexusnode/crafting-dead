@@ -1,6 +1,7 @@
 package com.craftingdead.mod.client;
 
-import com.craftingdead.mod.common.CraftingDead;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
@@ -11,11 +12,13 @@ import net.minecraft.util.text.TextFormatting;
 
 public class DiscordPresence {
 
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	public static void initialize(String clientId) {
 		DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers(), true, null);
 	}
 
-	public static void updateState(GameState state, ClientProxy client) {
+	public static void updateState(GameState state, ClientMod client) {
 		DiscordRichPresence presence = new DiscordRichPresence();
 		state.applyState(presence, client);
 		DiscordRPC.discordUpdatePresence(presence);
@@ -31,7 +34,7 @@ public class DiscordPresence {
 		POST_INITIALIZATION("discordstate.post-initialization"), IDLE("discordstate.idle"),
 		SINGLEPLAYER("discordstate.singleplayer"), MULTIPLAYER("discordstate.multiplayer") {
 			@Override
-			public void applyState(DiscordRichPresence presence, ClientProxy client) {
+			public void applyState(DiscordRichPresence presence, ClientMod client) {
 				ServerData serverData = client.getMinecraft().getCurrentServerData();
 				presence.state = serverData.serverIP;
 				String[] playerListSplit = serverData.populationInfo.split("/");
@@ -41,7 +44,7 @@ public class DiscordPresence {
 					presence.partyMax = Integer
 							.valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[1]));
 				} catch (NumberFormatException e) {
-					CraftingDead.LOGGER.catching(e);
+					LOGGER.catching(e);
 				}
 			}
 		};
@@ -52,13 +55,11 @@ public class DiscordPresence {
 			this.translationKey = translationKey;
 		}
 
-		void applyState(DiscordRichPresence presence, ClientProxy client) {
+		void applyState(DiscordRichPresence presence, ClientMod client) {
 			presence.details = I18n.format(translationKey);
 			presence.startTimestamp = System.currentTimeMillis() / 1000;
 			presence.largeImageKey = "craftingdead";
 			presence.largeImageText = "Crafting Dead";
 		}
-
 	}
-
 }

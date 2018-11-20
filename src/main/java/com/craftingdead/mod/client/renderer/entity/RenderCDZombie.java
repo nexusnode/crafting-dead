@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.renderer.entity;
 
-import com.craftingdead.mod.common.CraftingDead;
-import com.craftingdead.mod.common.entity.monster.EntityCDZombie;
+import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.entity.monster.EntityCDZombie;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderBiped;

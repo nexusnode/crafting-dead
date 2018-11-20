@@ -2,8 +2,11 @@ package com.craftingdead.mod.client.gui;
 
 import org.lwjgl.util.glu.Project;
 
-import com.craftingdead.mod.common.CraftingDead;
+import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.client.transition.Transition;
 
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -12,7 +15,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class GuiMainMenu extends GuiScreen {
+public class GuiMainMenu extends ExtendedGuiScreen {
 
 	/**
 	 * Timer used to rotate the panorama, increases every tick.
@@ -34,11 +37,21 @@ public class GuiMainMenu extends GuiScreen {
 
 	private ResourceLocation backgroundTexture;
 
+	@Override
 	public void initGui() {
 		this.viewportTexture = new DynamicTexture(256, 256);
 		this.backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background",
 				this.viewportTexture);
 		this.addButton(new GuiButtonStyled(0, this.width / 2 - 50, this.height / 2 - 25, "Play"));
+	}
+
+	@Override
+	public void actionPerformed(GuiButton button) {
+		switch (button.id) {
+		case 0:
+			this.mc.displayGuiScreen(new GuiWorldSelection(this));
+			break;
+		}
 	}
 
 	@Override
@@ -202,6 +215,11 @@ public class GuiMainMenu extends GuiScreen {
 		bufferbuilder.pos(0.0D, 0.0D, (double) this.zLevel).tex((double) (0.5F + f1), (double) (0.5F + f2))
 				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
 		tessellator.draw();
+	}
+
+	@Override
+	public Transition getScreenTransition() {
+		return Transition.GROW;
 	}
 
 }

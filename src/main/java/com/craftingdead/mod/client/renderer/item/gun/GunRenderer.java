@@ -3,16 +3,13 @@ package com.craftingdead.mod.client.renderer.item.gun;
 import java.util.Collection;
 import java.util.function.Function;
 
-import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import com.craftingdead.mod.client.renderer.item.ItemRenderer;
 import com.google.common.collect.ImmutableList;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
@@ -23,13 +20,11 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 
 public abstract class GunRenderer extends ItemRenderer {
 
-	private final ClientProxy client;
 	private final ResourceLocation baseModelLocation;
 
 	private IBakedModel baseModelBaked;
 
-	public GunRenderer(ClientProxy client, ResourceLocation baseModelLocation) {
-		this.client = client;
+	public GunRenderer(ResourceLocation baseModelLocation) {
 		this.baseModelLocation = baseModelLocation;
 	}
 
@@ -46,18 +41,18 @@ public abstract class GunRenderer extends ItemRenderer {
 		RenderHelper.renderModel(baseModelBaked, DefaultVertexFormats.ITEM);
 		GlStateManager.popMatrix();
 
-		switch (transformType) {
-		case FIRST_PERSON_LEFT_HAND:
-		case FIRST_PERSON_RIGHT_HAND:
-			EnumHandSide handSide = RenderHelper.getHandSide(transformType);
-			GlStateManager.pushMatrix();
-			this.applyHandTranslations(handSide);
-			this.renderArm(handSide);
-			GlStateManager.popMatrix();
-			break;
-		default:
-			break;
-		}
+//		switch (transformType) {
+//		case FIRST_PERSON_LEFT_HAND:
+//		case FIRST_PERSON_RIGHT_HAND:
+//			EnumHandSide handSide = RenderHelper.getHandSide(transformType);
+//			GlStateManager.pushMatrix();
+//			this.applyHandTranslations(handSide);
+//			this.renderArm(handSide);
+//			GlStateManager.popMatrix();
+//			break;
+//		default:
+//			break;
+//		}
 	}
 
 	protected void applyHandTranslations(EnumHandSide handSide) {
@@ -81,22 +76,22 @@ public abstract class GunRenderer extends ItemRenderer {
 
 	protected abstract void applyGunTransformations(TransformType transformType);
 
-	private void renderArm(EnumHandSide handSide) {
-		AbstractClientPlayer player = this.client.getPlayer().getVanillaEntity();
-		this.client.getMinecraft().getTextureManager().bindTexture(player.getLocationSkin());
-
-		RenderPlayer renderplayer = (RenderPlayer) this.client.getMinecraft().getRenderManager()
-				.<AbstractClientPlayer>getEntityRenderObject(player);
-
-		switch (handSide) {
-		case RIGHT:
-			renderplayer.renderRightArm(player);
-			break;
-		case LEFT:
-			renderplayer.renderLeftArm(player);
-			break;
-		}
-	}
+//	private void renderArm(EnumHandSide handSide) {
+//		AbstractClientPlayer player = this.client.getPlayer().getEntity();
+//		this.client.getMinecraft().getTextureManager().bindTexture(player.getLocationSkin());
+//
+//		RenderPlayer renderplayer = (RenderPlayer) this.client.getMinecraft().getRenderManager()
+//				.<AbstractClientPlayer>getEntityRenderObject(player);
+//
+//		switch (handSide) {
+//		case RIGHT:
+//			renderplayer.renderRightArm(player);
+//			break;
+//		case LEFT:
+//			renderplayer.renderLeftArm(player);
+//			break;
+//		}
+//	}
 
 	@Override
 	public Collection<ResourceLocation> getDependencies() {

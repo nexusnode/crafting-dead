@@ -1,14 +1,17 @@
 package com.craftingdead.mod.client.renderer.framebuffer;
 
-import java.awt.image.*;
-import org.lwjgl.opengl.*;
+import java.awt.image.BufferedImage;
 
-import net.minecraft.client.renderer.BufferBuilder;
+import org.lwjgl.opengl.ARBFramebufferObject;
+import org.lwjgl.opengl.EXTFramebufferObject;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
+
+import com.craftingdead.mod.client.renderer.RenderHelper;
+
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class FrameBufferObject {
 
@@ -127,27 +130,10 @@ public class FrameBufferObject {
 		}
 	}
 
-	public void draw(final int x, final int y, final int x2, final int y2, final int z, final float alpha) {
-		this.draw(x, y, x2, y2, z, alpha, 0.0, 0.0, 1.0, 1.0);
-	}
-
-	public void draw(final double x, final double y, final double x2, final double y2, final double z,
-			final float alpha, final double u, final double v, final double u2, final double v2) {
-		if (supported && this.created) {
-			GlStateManager.enableTexture2D();
-			GlStateManager.enableBlend();
-			GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
+	public void draw(double x, double y, double width, double height, float alpha) {
+		if (this.supported && this.created) {
 			GlStateManager.bindTexture(this.texture.getGlTextureId());
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferbuilder = tessellator.getBuffer();
-			bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-			bufferbuilder.pos(x, y2, z).tex(u, v).endVertex();
-			bufferbuilder.pos(x2, y2, z).tex(u2, v).endVertex();
-			bufferbuilder.pos(x2, y, z).tex(u2, v2).endVertex();
-			bufferbuilder.pos(x, y, z).tex(u, v2).endVertex();
-			tessellator.draw();
-			GlStateManager.bindTexture(0);
-			GlStateManager.disableBlend();
+			RenderHelper.drawTexture(x, y, width, height, alpha, 0.0D, 0.0D, 1.0D, 1.0D);
 		}
 	}
 

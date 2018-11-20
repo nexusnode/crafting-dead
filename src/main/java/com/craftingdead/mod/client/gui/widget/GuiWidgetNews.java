@@ -2,7 +2,7 @@ package com.craftingdead.mod.client.gui.widget;
 
 import java.util.ArrayList;
 
-import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.util.ListUtil;
 
 public class GuiWidgetNews extends GuiWidgetList {
@@ -10,7 +10,7 @@ public class GuiWidgetNews extends GuiWidgetList {
 	private static int delay = 0;
 	private static ArrayList<String> text = new ArrayList<String>();
 
-	public GuiWidgetNews(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
+	public GuiWidgetNews(int par1, int par2, int par3, int par4, int par5, ExtendedGuiScreen par6) {
 		super(par1, par2, par3, par4, par5, par6);
 	}
 

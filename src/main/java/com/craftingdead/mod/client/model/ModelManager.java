@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.model;
 
-import com.craftingdead.mod.client.ClientProxy;
+import com.craftingdead.mod.client.ClientMod;
 import com.craftingdead.mod.client.renderer.item.gun.ArcRenderer;
-import com.craftingdead.mod.common.registry.forge.ItemRegistry;
+import com.craftingdead.mod.init.ModItems;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -14,10 +14,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ModelManager {
 
-	private final ClientProxy client;
+	private final ClientMod client;
 	private final BuiltinModelLoader builtinModelLoader;
 
-	public ModelManager(ClientProxy client) {
+	public ModelManager(ClientMod client) {
 		this.client = client;
 		this.builtinModelLoader = new BuiltinModelLoader();
 	}
@@ -26,13 +26,13 @@ public class ModelManager {
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoaderRegistry.registerLoader(builtinModelLoader);
 
-		this.registerItemModel(ItemRegistry.ARC, new ArcRenderer(client));
+		this.registerItemModel(ModItems.ACR, new ArcRenderer(client));
 
-		this.registerItemModel(ItemRegistry.ROAD, "normal");
-		this.registerItemModel(ItemRegistry.LINED_ROAD, "normal");
-		this.registerItemModel(ItemRegistry.BROKEN_LINED_ROAD, "normal");
-		this.registerItemModel(ItemRegistry.BARBED_WIRE, "normal");
-		this.registerItemModel(ItemRegistry.RESIDENTIAL_LOOT, "normal");
+		this.registerItemModel(ModItems.ROAD, "normal");
+		this.registerItemModel(ModItems.LINED_ROAD, "normal");
+		this.registerItemModel(ModItems.BROKEN_LINED_ROAD, "normal");
+		this.registerItemModel(ModItems.BARBED_WIRE, "normal");
+		this.registerItemModel(ModItems.RESIDENTIAL_LOOT, "normal");
 	}
 
 	private void registerItemModel(Item item, IModel builtinModel) {

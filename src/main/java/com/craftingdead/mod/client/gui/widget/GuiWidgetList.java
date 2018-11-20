@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
-import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
@@ -26,7 +26,7 @@ public class GuiWidgetList extends GuiWidget {
     private int slotHeight = 11;
     private int selectedSlot = -1;
 
-    public GuiWidgetList(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
+    public GuiWidgetList(int par1, int par2, int par3, int par4, int par5, ExtendedGuiScreen par6) {
         super(par1, par2, par3, par4, par5, par6);
     }
 

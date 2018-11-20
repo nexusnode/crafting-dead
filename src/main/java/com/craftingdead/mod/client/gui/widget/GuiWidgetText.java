@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import net.minecraft.client.Minecraft;
 
@@ -9,7 +9,7 @@ public class GuiWidgetText extends GuiWidget {
     private String[] text;
     private boolean centerText = false;
 
-    public GuiWidgetText(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
+    public GuiWidgetText(int par1, int par2, int par3, int par4, int par5, ExtendedGuiScreen par6) {
         super(par1, par2, par3, par4, par5, par6);
     }
 

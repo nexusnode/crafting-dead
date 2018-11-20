@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.craftingdead.mod.common.CraftingDead;
+import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
 
 import net.minecraft.client.Minecraft;
@@ -54,8 +54,8 @@ public class RenderHelper extends net.minecraft.client.renderer.RenderHelper {
 		GlStateManager.disableBlend();
 	}
 
-	public static void drawGradientRect(double x, double y, double width, double height, int startColor, int endColor,
-			float alpha) {
+	public static void drawGradientRectangle(double x, double y, double width, double height, int startColor,
+			int endColor, float alpha) {
 		float f = (float) (startColor >> 24 & 255) / 255.0F;
 		float f1 = (float) (startColor >> 16 & 255) / 255.0F;
 		float f2 = (float) (startColor >> 8 & 255) / 255.0F;
@@ -86,16 +86,21 @@ public class RenderHelper extends net.minecraft.client.renderer.RenderHelper {
 	}
 
 	public static void drawImage(double x, double y, ResourceLocation image, double width, double height, float alpha) {
+		Minecraft.getMinecraft().getTextureManager().bindTexture(image);
+		drawTexture(x, y, width, height, alpha, 0.0D, 1.0D, 1.0D, 0.0D);
+	}
+
+	public static void drawTexture(double x, double y, double width, double height, float alpha, double u, double v,
+			double u2, double v2) {
 		GlStateManager.enableBlend();
 		GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(image);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-		bufferbuilder.pos(x, y + height, 0.0D).tex(0.0D, 1.0D).endVertex();
-		bufferbuilder.pos(x + width, y + height, 0.0D).tex(1.0D, 1.0D).endVertex();
-		bufferbuilder.pos(x + width, y, 0.0D).tex(1.0D, 0.0D).endVertex();
-		bufferbuilder.pos(x, y, 0.0D).tex(0.0D, 0.0D).endVertex();
+		bufferbuilder.pos(x, y + height, 0.0D).tex(u, v).endVertex();
+		bufferbuilder.pos(x + width, y + height, 0.0D).tex(u2, v).endVertex();
+		bufferbuilder.pos(x + width, y, 0.0D).tex(u2, v2).endVertex();
+		bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
 		tessellator.draw();
 		GlStateManager.disableBlend();
 	}

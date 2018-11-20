@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.gui.widget;
 
-import com.craftingdead.mod.client.gui.GuiScreen;
+import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.client.renderer.RenderHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -15,12 +15,12 @@ public class GuiWidget extends Gui {
     protected int width;
     protected int height;
 
-    protected GuiScreen parentGUI;
+    protected ExtendedGuiScreen parentGUI;
 
     protected int color = 0x333333;
     public float colorOpacity = 0.5F;
 
-    public GuiWidget(int par1, int par2, int par3, int par4, int par5, GuiScreen par6) {
+    public GuiWidget(int par1, int par2, int par3, int par4, int par5, ExtendedGuiScreen par6) {
         this.containerID = par1;
         this.posX = par2;
         this.posY = par3;

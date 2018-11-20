@@ -1,0 +1,10 @@
+{
+  "item.gun.acr_shoot":{
+    "category":"block",
+    "sounds":[
+      {
+        "name":"craftingdead:acrshoot"
+      }
+    ]
+  }
+}

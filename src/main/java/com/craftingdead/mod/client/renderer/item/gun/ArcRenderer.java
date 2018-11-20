@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.renderer.item.gun;
 
-import com.craftingdead.mod.client.ClientProxy;
+import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.client.ClientMod;
 import com.craftingdead.mod.client.renderer.RenderHelper;
-import com.craftingdead.mod.common.CraftingDead;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
@@ -11,8 +11,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ArcRenderer extends GunRenderer {
 
-	public ArcRenderer(ClientProxy client) {
-		super(client, new ResourceLocation(CraftingDead.MOD_ID, "item/gun/base/arc"));
+	public ArcRenderer(ClientMod client) {
+		super(new ResourceLocation(CraftingDead.MOD_ID, "item/gun/base/arc"));
 	}
 
 	@Override
@@ -55,10 +55,12 @@ public class ArcRenderer extends GunRenderer {
 			}
 			break;
 		case GUI:
-			GlStateManager.scale(0.9, 0.9, 0.9);
-			GlStateManager.translate(-0.3, 1, 0);
+
+			GlStateManager.translate(-0.1, 0.95, 0);
+			GlStateManager.scale(0.98, 0.98, 0.98);
+			GlStateManager.rotate(41F, 0, 0, 1);
 			GlStateManager.rotate(180, 0, 1, 0);
-			GlStateManager.rotate(-40, 0, 0, 1);
+
 			break;
 		default:
 			break;
