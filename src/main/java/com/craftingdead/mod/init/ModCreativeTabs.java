@@ -1,11 +1,11 @@
-package com.craftingdead.mod.inventory;
+package com.craftingdead.mod.init;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.init.ModBlocks;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
-public abstract class CreativeTabs extends net.minecraft.creativetab.CreativeTabs {
+public class ModCreativeTabs {
 
 	public static final CreativeTabs CRAFTING_DEAD = (new CreativeTabs(CraftingDead.MOD_ID) {
 
@@ -24,14 +24,6 @@ public abstract class CreativeTabs extends net.minecraft.creativetab.CreativeTab
 		}
 
 	});
-
-	public CreativeTabs(String label) {
-		super(label);
-	}
-
-	public CreativeTabs(int index, String label) {
-		super(index, label);
-	}
 
 	private static String getFormattedName(String name) {
 		return String.format("%s%s%s", CraftingDead.MOD_ID, ".", name);

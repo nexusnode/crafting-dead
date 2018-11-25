@@ -29,7 +29,7 @@ public class ModItems {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		event.getRegistry().registerAll(
-				appendRegistryName("acr", new ItemAcr().setFireRate(80).setUseBowAndArrowPose(true)),
+				appendRegistryName("acr", new ItemAcr().setFireRate(80).setDamage(7).setBowAndArrowPose(true)),
 				appendRegistryName("road", new ItemBlock(ModBlocks.ROAD)),
 				appendRegistryName("lined_road", new ItemBlock(ModBlocks.LINED_ROAD)),
 				appendRegistryName("broken_lined_road", new ItemBlock(ModBlocks.BROKEN_LINED_ROAD)),

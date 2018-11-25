@@ -1,5 +1,6 @@
 package com.craftingdead.mod;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import sm0keysa1m0n.network.wrapper.Session;
 
@@ -21,7 +23,6 @@ import sm0keysa1m0n.network.wrapper.Session;
  * 
  * @author Sm0keySa1m0n
  *
- * @param <L> - the {@link LogicalServer} associated with this side
  */
 public interface SidedMod {
 
@@ -69,8 +70,8 @@ public interface SidedMod {
 	}
 
 	/**
-	 * Signals the shutdown of the game, do any shutdown tasks here, <b>runs in
-	 * separate shutdown thread<b>
+	 * Signals the shutdown of the game, do any shutdown tasks here.<br>
+	 * <b>Runs in a separate shutdown thread.<b>
 	 */
 	default void shutdown() {
 		;
@@ -78,36 +79,62 @@ public interface SidedMod {
 
 	/**
 	 * Get a {@link Supplier} for the {@link LogicalServer} associated with this
-	 * side
+	 * side.
 	 * 
 	 * @return the {@link Supplier}
 	 */
 	Supplier<? extends LogicalServer> getLogicalServerSupplier();
 
 	/**
-	 * Get the {@link InetSocketAddress} used to connect to the master server
+	 * Get the {@link InetSocketAddress} used to connect to the master server.
 	 * 
 	 * @return the {@link InetSocketAddress}
 	 */
 	InetSocketAddress getMasterServerAddress();
 
+	/**
+	 * If supported should the master server connection use Epoll.
+	 * 
+	 * @return the result
+	 */
 	boolean useEpoll();
 
 	/**
-	 * Create a new {@link S}
+	 * Create a new {@link S}.
 	 * 
 	 * @return the {@link S}
 	 */
 	Session newSession();
 
-	default ClientMod getModClient() {
+	/**
+	 * Gets the folder associated with the current side.
+	 * 
+	 * @return the {@link File} instance
+	 */
+	default File getSidedFolder() {
+		return new File(CraftingDead.instance().getModFolder(), FMLLaunchHandler.side().name());
+	}
+
+	/**
+	 * Casts the {@link SidedMod} instance to a {@link ClientMod} instance.<br>
+	 * <b>Throws an exception if called from the incorrect side.
+	 * 
+	 * @return the instance
+	 */
+	default ClientMod getClientMod() {
 		if (this instanceof ClientMod)
 			return (ClientMod) this;
 		else
 			throw new RuntimeException("Accessing physical client on wrong side");
 	}
 
-	default ServerMod getModServer() {
+	/**
+	 * Casts the {@link SidedMod} instance to a {@link ServerMod} instance.<br>
+	 * <b>Throws an exception if called from the incorrect side.
+	 * 
+	 * @return the instance
+	 */
+	default ServerMod getServerMod() {
 		if (this instanceof ServerMod)
 			return (ServerMod) this;
 		else

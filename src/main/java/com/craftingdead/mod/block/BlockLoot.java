@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.craftingdead.mod.inventory.CreativeTabs;
+import com.craftingdead.mod.init.ModCreativeTabs;
 import com.craftingdead.mod.tileentity.TileEntityLoot;
 
 import java.util.Random;
@@ -38,7 +38,7 @@ public class BlockLoot extends Block {
 
 	public BlockLoot(int colour, Map<ResourceLocation, Integer> itemToWeight) {
 		super(Material.ROCK);
-		this.setCreativeTab(CreativeTabs.CRAFTING_DEAD);
+		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
 		this.colour = colour;
 		this.itemToWeight = itemToWeight;
 	}

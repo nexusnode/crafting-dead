@@ -3,7 +3,7 @@ package com.craftingdead.mod.client.gui;
 import org.lwjgl.util.glu.Project;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.transition.Transition;
+import com.craftingdead.mod.client.transition.Transitions;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiWorldSelection;
@@ -218,8 +218,8 @@ public class GuiMainMenu extends ExtendedGuiScreen {
 	}
 
 	@Override
-	public Transition getScreenTransition() {
-		return Transition.GROW;
+	public Transitions getScreenTransition() {
+		return Transitions.FADE_GROW;
 	}
 
 }

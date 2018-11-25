@@ -1,9 +1,9 @@
 {
 	"__comment": "Designed by Zachrywilsn with Cubik Studio - https://cubik.studio",
 	"textures": {
-		"particle": "craftingdead:items/arc"
+		"particle": "craftingdead:items/acr"
 	},
-	"elements": [ 	 
+	"elements": [
 		{
 			"__comment": "Voxels-6B482C",
 			"from": [ -13.75, 10.375, 7.875 ],

@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.model;
 
 import com.craftingdead.mod.client.ClientMod;
-import com.craftingdead.mod.client.renderer.item.gun.ArcRenderer;
+import com.craftingdead.mod.client.renderer.item.gun.AcrRenderer;
 import com.craftingdead.mod.init.ModItems;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -26,7 +26,7 @@ public class ModelManager {
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoaderRegistry.registerLoader(builtinModelLoader);
 
-		this.registerItemModel(ModItems.ACR, new ArcRenderer(client));
+		this.registerItemModel(ModItems.ACR, new AcrRenderer(client));
 
 		this.registerItemModel(ModItems.ROAD, "normal");
 		this.registerItemModel(ModItems.LINED_ROAD, "normal");

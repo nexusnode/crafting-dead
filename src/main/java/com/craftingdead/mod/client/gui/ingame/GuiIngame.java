@@ -1,14 +1,18 @@
-package com.craftingdead.mod.client.gui;
+package com.craftingdead.mod.client.gui.ingame;
 
 import org.lwjgl.input.Mouse;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.ClientMod;
-import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.client.renderer.Graphics;
+import com.craftingdead.mod.item.ExtendedItem;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class GuiIngame {
 
@@ -21,6 +25,8 @@ public class GuiIngame {
 
 	private final ClientMod client;
 
+	private final CrosshairManager crosshairManager = new CrosshairManager();
+
 	public GuiIngame(ClientMod client) {
 		this.client = client;
 	}
@@ -30,6 +36,7 @@ public class GuiIngame {
 		int height = resolution.getScaledHeight();
 		final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
 		final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight - 1;
+
 		// Only draw in survival
 		if (client.getMinecraft().playerController.shouldDrawHUD() && client.getPlayer() != null)
 			this.renderPlayerStats(width, height, mouseX, mouseY);
@@ -40,15 +47,47 @@ public class GuiIngame {
 		int x = 4;
 		FontRenderer fontRenderer = client.getMinecraft().fontRenderer;
 
-		RenderHelper.drawImage(x, y - 20, DAYS_SURVIVED, 16, 16, 1.0F);
+		Graphics.bind(DAYS_SURVIVED);
+		Graphics.drawTexturedRectangle(x, y - 20, 16, 16);
 		fontRenderer.drawString(String.valueOf(client.getPlayer().getDaysSurvived()), x + 20, y - 16, 0xFFFFFF, true);
 
-		RenderHelper.drawImage(x, y, ZOMBIE_KILLS, 16, 16, 1.0F);
+		Graphics.bind(ZOMBIE_KILLS);
+		Graphics.drawTexturedRectangle(x, y, 16, 16);
 		fontRenderer.drawString(String.valueOf(client.getPlayer().getZombieKills()), x + 20, y + 4, 0xFFFFFF, true);
 
-		RenderHelper.drawImage(x, y + 20, PLAYER_KILLS, 16, 16, 1.0F);
+		Graphics.bind(PLAYER_KILLS);
+		Graphics.drawTexturedRectangle(x, y + 20, 16, 16);
 		fontRenderer.drawString(String.valueOf(client.getPlayer().getPlayerKills()), x + 20, y + 24, 0xFFFFFF, true);
+	}
 
+	public CrosshairManager getCrosshairManager() {
+		return this.crosshairManager;
+	}
+
+	@SubscribeEvent
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
+		switch (event.getType()) {
+		case ALL:
+			this.renderGameOverlay(event.getResolution(), event.getPartialTicks());
+			break;
+		case CROSSHAIRS:
+			if (this.useCustomCrosshair()) {
+				event.setCanceled(true);
+				this.crosshairManager.renderCrossHairs(event.getResolution(), event.getPartialTicks());
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	private boolean useCustomCrosshair() {
+		ItemStack heldStack = this.client.getPlayer().getEntity().getHeldItemMainhand();
+		if (heldStack.getItem() instanceof ExtendedItem) {
+			ExtendedItem item = (ExtendedItem) heldStack.getItem();
+			return item.hasCustomCrosshair();
+		}
+		return false;
 	}
 
 }

@@ -47,7 +47,7 @@ import sm0keysa1m0n.network.system.NettyClient;
 import sm0keysa1m0n.network.wrapper.NetworkManager;
 
 /**
- * The main class for Crafting Dead
+ * The main mod class for Crafting Dead.
  * 
  * @author Sm0keySa1m0n
  *

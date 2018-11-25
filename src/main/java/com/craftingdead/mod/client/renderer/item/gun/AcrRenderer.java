@@ -2,22 +2,22 @@ package com.craftingdead.mod.client.renderer.item.gun;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.ClientMod;
-import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.client.renderer.Graphics;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 
-public class ArcRenderer extends GunRenderer {
+public class AcrRenderer extends GunRenderer {
 
-	public ArcRenderer(ClientMod client) {
-		super(new ResourceLocation(CraftingDead.MOD_ID, "item/gun/base/arc"));
+	public AcrRenderer(ClientMod client) {
+		super(client, new ResourceLocation(CraftingDead.MOD_ID, "item/acr"));
 	}
 
 	@Override
 	protected void applyGunTransformations(TransformType transformType) {
-		EnumHandSide handSide = RenderHelper.getHandSide(transformType);
+		EnumHandSide handSide = Graphics.getHandSide(transformType);
 		GlStateManager.translate(1, 0, 0);
 		GlStateManager.scale(0.5, 0.5, 0.5);
 

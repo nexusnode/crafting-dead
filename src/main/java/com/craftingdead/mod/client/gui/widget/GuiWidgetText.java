@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.gui.widget;
 
 import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
-import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.client.renderer.Graphics;
 import net.minecraft.client.Minecraft;
 
 public class GuiWidgetText extends GuiWidget {
@@ -31,7 +31,7 @@ public class GuiWidgetText extends GuiWidget {
             String var1 = text[i];
 
             if (centerText) {
-                RenderHelper.drawCenteredString(Minecraft.getMinecraft().fontRenderer, var1, this.posX + this.width / 2, this.posY + 3 + (10 * i), 0xFFFFFF);
+                Graphics.drawCenteredString(Minecraft.getMinecraft().fontRenderer, var1, this.posX + this.width / 2, this.posY + 3 + (10 * i), 0xFFFFFF);
                 continue;
             }
 

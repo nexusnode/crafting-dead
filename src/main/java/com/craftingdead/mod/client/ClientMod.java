@@ -7,21 +7,24 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.SidedMod;
 import com.craftingdead.mod.block.BlockLoot;
-import com.craftingdead.mod.capability.SimpleCapability;
+import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ClientPlayerLocal;
 import com.craftingdead.mod.capability.player.ClientPlayerOther;
 import com.craftingdead.mod.capability.player.Player;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
-import com.craftingdead.mod.client.gui.GuiIngame;
+import com.craftingdead.mod.client.gui.ingame.GuiIngame;
 import com.craftingdead.mod.client.model.ModelManager;
 import com.craftingdead.mod.client.renderer.color.BasicColourHandler;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
-import com.craftingdead.mod.client.transition.Transition;
 import com.craftingdead.mod.client.transition.TransitionManager;
+import com.craftingdead.mod.client.transition.Transitions;
 import com.craftingdead.mod.entity.monster.EntityCDZombie;
 import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
@@ -42,8 +45,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -65,6 +66,8 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
  *
  */
 public final class ClientMod implements SidedMod {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	private Minecraft minecraft;
 
@@ -95,9 +98,14 @@ public final class ClientMod implements SidedMod {
 		MinecraftForge.EVENT_BUS.register(this);
 
 		this.guiIngame = new GuiIngame(this);
+		MinecraftForge.EVENT_BUS.register(this.guiIngame);
 
-		this.transitionManager = new TransitionManager(Transition.FADE, this.minecraft);
-		MinecraftForge.EVENT_BUS.register(this.transitionManager);
+		try {
+			this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE);
+			MinecraftForge.EVENT_BUS.register(this.transitionManager);
+		} catch (RuntimeException e) {
+			LOGGER.warn("An error occurred while enabling transitions; transitions will be disabled", e);
+		}
 
 		this.modelManager = new ModelManager(this);
 		MinecraftForge.EVENT_BUS.register(this.modelManager);
@@ -165,7 +173,7 @@ public final class ClientMod implements SidedMod {
 				player = new ClientPlayerOther((EntityOtherPlayerMP) event.getObject());
 			}
 			event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
-					new SimpleCapability.Provider<>(player, ModCapabilities.PLAYER));
+					new SerializableProvider<>(player, ModCapabilities.PLAYER));
 		}
 	}
 
@@ -182,12 +190,6 @@ public final class ClientMod implements SidedMod {
 	}
 
 	@SubscribeEvent
-	public void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-		if (event.getType() == ElementType.ALL)
-			this.guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
-	}
-
-	@SubscribeEvent
 	public void onMouseEvent(MouseEvent event) {
 		int bindingCode = event.getButton() - 100;
 		if (this.minecraft.inGameHasFocus) {
@@ -195,7 +197,7 @@ public final class ClientMod implements SidedMod {
 				this.getPlayer().setTriggerPressed(event.isButtonstate());
 				if (this.getPlayer().getEntity().getHeldItemMainhand().getItem() instanceof ExtendedItem
 						&& ((ExtendedItem) this.getPlayer().getEntity().getHeldItemMainhand().getItem())
-								.cancelVanillaAttack())
+								.getCancelVanillaAttack())
 					event.setCanceled(true);
 			}
 		}
@@ -208,7 +210,7 @@ public final class ClientMod implements SidedMod {
 		ItemStack stack = event.getEntity().getHeldItemMainhand();
 		if (stack.getItem() instanceof ExtendedItem) {
 			ExtendedItem item = (ExtendedItem) stack.getItem();
-			if (item.useBowAndArrowPose() && event.getRenderer().getMainModel() instanceof ModelBiped) {
+			if (item.getBowAndArrowPose() && event.getRenderer().getMainModel() instanceof ModelBiped) {
 				ModelBiped model = (ModelBiped) event.getRenderer().getMainModel();
 				switch (event.getEntity().getPrimaryHand()) {
 				case LEFT:

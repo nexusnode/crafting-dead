@@ -1,7 +1,7 @@
 package com.craftingdead.mod.client.gui.widget;
 
 import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
-import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.client.renderer.Graphics;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 
@@ -60,6 +60,6 @@ public class GuiWidget extends Gui {
     }
 
     public void drawBackground() {
-        RenderHelper.drawRectangle(this.posX, this.posY, this.width, this.height, this.color, this.colorOpacity, true);
+        Graphics.drawRectangle(this.posX, this.posY, this.width, this.height, this.color, this.colorOpacity, true);
     }
 }

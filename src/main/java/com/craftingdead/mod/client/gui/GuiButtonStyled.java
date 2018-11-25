@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.gui;
 
-import com.craftingdead.mod.client.renderer.RenderHelper;
+import com.craftingdead.mod.client.renderer.Graphics;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -36,7 +36,7 @@ public class GuiButtonStyled extends GuiButton {
 				break;
 			}
 
-			RenderHelper.drawRectangle(this.x, this.y, this.width, this.height, 0, buttonAlpha, false);
+			Graphics.drawRectangle(this.x, this.y, this.width, this.height, 0, buttonAlpha, false);
 
 			this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2,
 					this.y + (this.height - 8) / 2, buttonColour);

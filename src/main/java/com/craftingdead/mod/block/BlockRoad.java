@@ -2,7 +2,7 @@ package com.craftingdead.mod.block;
 
 import javax.annotation.Nullable;
 
-import com.craftingdead.mod.inventory.CreativeTabs;
+import com.craftingdead.mod.init.ModCreativeTabs;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -15,7 +15,7 @@ public class BlockRoad extends Block {
 
 	public BlockRoad() {
 		super(Material.ROCK);
-		this.setCreativeTab(CreativeTabs.CRAFTING_DEAD_DECORATIVE);
+		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD_DECORATIVE);
 	}
 
 	@Override

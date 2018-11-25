@@ -19,15 +19,6 @@ public class BulletCollisionEvent extends Event {
 	}
 
 	@Cancelable
-	public static class DestoryBlockEvent extends BulletCollisionEvent {
-
-		public DestoryBlockEvent(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
-			super(entity, itemStack, rayTrace);
-		}
-
-	}
-
-	@Cancelable
 	public static class PrimeTNTEvent extends BulletCollisionEvent {
 
 		public PrimeTNTEvent(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {

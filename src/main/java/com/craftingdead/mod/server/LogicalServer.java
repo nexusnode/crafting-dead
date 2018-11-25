@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.capability.SimpleCapability;
+import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.init.ModCapabilities;
 
@@ -55,7 +55,7 @@ public abstract class LogicalServer {
 			ServerPlayer player = new ServerPlayer((EntityPlayerMP) event.getObject(),
 					CraftingDead.instance().getLogicalServer());
 			event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
-					new SimpleCapability.Provider<>(player, ModCapabilities.PLAYER));
+					new SerializableProvider<>(player, ModCapabilities.PLAYER));
 		}
 	}
 

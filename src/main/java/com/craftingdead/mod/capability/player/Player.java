@@ -2,7 +2,6 @@ package com.craftingdead.mod.capability.player;
 
 import java.util.UUID;
 
-import com.craftingdead.mod.capability.SimpleCapability;
 import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.init.ModCapabilities;
 
@@ -11,10 +10,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public abstract class Player<E extends EntityPlayer> implements SimpleCapability, ITickable {
+/**
+ * The abstracted player class - represents a Crafting Dead player.<br>
+ * Subclasses are attached to the appropriate {@link E} via Forge capabilities.
+ * 
+ * @author Sm0keySa1m0n
+ *
+ * @param <E> - the associated {@link EntityPlayer}
+ */
+public abstract class Player<E extends EntityPlayer> implements INBTSerializable<NBTTagCompound>, ITickable {
 
 	/**
 	 * The vanilla entity
@@ -65,7 +72,7 @@ public abstract class Player<E extends EntityPlayer> implements SimpleCapability
 	}
 
 	@Override
-	public NBTTagCompound writeNBT(EnumFacing side) {
+	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setInteger("daysSurvived", this.daysSurvived);
 		nbt.setInteger("zombieKills", this.zombieKills);
@@ -74,7 +81,7 @@ public abstract class Player<E extends EntityPlayer> implements SimpleCapability
 	}
 
 	@Override
-	public void readNBT(EnumFacing side, NBTTagCompound nbt) {
+	public void deserializeNBT(NBTTagCompound nbt) {
 		this.daysSurvived = nbt.getInteger("daysSurvived");
 		this.zombieKills = nbt.getInteger("zombieKills");
 		this.playerKills = nbt.getInteger("playerKills");
