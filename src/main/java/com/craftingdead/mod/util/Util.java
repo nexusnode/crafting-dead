@@ -67,7 +67,8 @@ public class Util {
 				for (Entity currentEntity : entitiesInBB) {
 					AxisAlignedBB entityBoundingBox = currentEntity.getEntityBoundingBox()
 							.grow((double) currentEntity.getCollisionBorderSize());
-					RayTraceResult entityTraceResult = entityBoundingBox.calculateIntercept(eyePosition, selectedVector);
+					RayTraceResult entityTraceResult = entityBoundingBox.calculateIntercept(eyePosition,
+							selectedVector);
 
 					if (entityBoundingBox.contains(eyePosition)) {
 						if (hitEntityDistance >= 0.0D) {

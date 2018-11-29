@@ -1,0 +1,11 @@
+[
+  {
+    "name":"craftingdead:default",
+    "isStatic":false,
+    "top":"craftingdead:textures/crosshairs/default/top.png",
+    "bottom":"craftingdead:textures/crosshairs/default/bottom.png",
+    "left":"craftingdead:textures/crosshairs/default/left.png",
+    "right":"craftingdead:textures/crosshairs/default/right.png",
+    "middle":"craftingdead:textures/crosshairs/default/middle.png"
+  }
+]

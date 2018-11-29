@@ -18,8 +18,10 @@ import com.craftingdead.mod.capability.player.ClientPlayerLocal;
 import com.craftingdead.mod.capability.player.ClientPlayerOther;
 import com.craftingdead.mod.capability.player.Player;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
+import com.craftingdead.mod.client.crosshair.CrosshairManager;
+import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
-import com.craftingdead.mod.client.gui.ingame.GuiIngame;
+import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.model.ModelManager;
 import com.craftingdead.mod.client.renderer.color.BasicColourHandler;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
@@ -40,11 +42,13 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBiped.ArmPose;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -79,6 +83,8 @@ public final class ClientMod implements SidedMod {
 
 	private ModelManager modelManager;
 
+	private CrosshairManager crosshairManager;
+
 	// ================================================================================
 	// Overridden Methods
 	// ================================================================================
@@ -98,7 +104,10 @@ public final class ClientMod implements SidedMod {
 		MinecraftForge.EVENT_BUS.register(this);
 
 		this.guiIngame = new GuiIngame(this);
-		MinecraftForge.EVENT_BUS.register(this.guiIngame);
+
+		this.crosshairManager = new CrosshairManager(this);
+		((IReloadableResourceManager) this.minecraft.getResourceManager())
+				.registerReloadListener(this.crosshairManager);
 
 		try {
 			this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE);
@@ -224,6 +233,25 @@ public final class ClientMod implements SidedMod {
 		}
 	}
 
+	@SubscribeEvent
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
+		switch (event.getType()) {
+		case ALL:
+			this.guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
+			break;
+		case CROSSHAIRS:
+			ItemStack heldStack = this.getPlayer().getEntity().getHeldItemMainhand();
+			if (heldStack.getItem() instanceof CrosshairProvider) {
+				event.setCanceled(true);
+				this.crosshairManager.renderCrossHairs(event.getResolution(), event.getPartialTicks(),
+						(CrosshairProvider) heldStack.getItem());
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
 	// ================================================================================
 	// Bootstrap Methods
 	// ================================================================================
@@ -254,6 +282,10 @@ public final class ClientMod implements SidedMod {
 
 	public Minecraft getMinecraft() {
 		return this.minecraft;
+	}
+
+	public CrosshairManager getCrosshairManager() {
+		return this.crosshairManager;
 	}
 
 	@Nullable

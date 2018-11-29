@@ -3,6 +3,7 @@ package com.craftingdead.mod.item;
 import javax.annotation.Nullable;
 
 import com.craftingdead.mod.capability.triggerable.GunController;
+import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.init.ModCapabilities;
 
 import net.minecraft.item.ItemStack;
@@ -11,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class ItemGun extends ExtendedItem {
+public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	/**
 	 * Time between shots in milliseconds
@@ -109,6 +110,11 @@ public class ItemGun extends ExtendedItem {
 			return null;
 		}
 
+	}
+
+	@Override
+	public float getMovementSpread() {
+		return 2.5F;
 	}
 
 }
