@@ -35,113 +35,108 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private static final ResourceLocation DEFAULT_CROSSHAIR = new ResourceLocation(CraftingDead.MOD_ID, "default");
-	private static final float MINIMUM_SPREAD = 0.1F, MAX_SPREAD = 12.0F;
+	private static final float MINIMUM_SPREAD = 0.5F, MAXIMUM_SPREAD = 60.0F, MOVEMENT_SPREAD = 12.5F;
 
 	private final ClientMod client;
 
-	private final Map<ResourceLocation, Crosshair> crosshairs = Maps.newHashMap();
+	private final Map<ResourceLocation, Crosshair> loadedCrosshairs = Maps.newHashMap();
 
-	private float spread = MINIMUM_SPREAD;
-	private float lastSpread = spread;
+	private float spread = 0.0F;
 
-	private float renderSpread = 0.0F;
-	private float lastRenderSpread = 0.0F;
+	private float averageSpread = 0.0F;
+	private float lastAverageSpread = 0.0F;
 
-	private Crosshair selectedCrosshair;
+	private Crosshair crosshair;
 
 	public CrosshairManager(ClientMod client) {
 		this.client = client;
 	}
 
-	public void setSpread(float spread) {
-		this.lastSpread = this.spread;
-		this.spread = spread;
-		if (this.spread < MINIMUM_SPREAD) {
-			this.spread = MINIMUM_SPREAD;
-		}
-		if (this.spread > MAX_SPREAD) {
-			this.spread = MAX_SPREAD;
-		}
-	}
-
-	public float getAverageSpread() {
-		return (this.spread + this.lastSpread) / 2;
-	}
-
 	public Crosshair getCrosshair() {
-		return this.selectedCrosshair;
+		return this.crosshair;
 	}
 
 	public void setCrosshair(ResourceLocation crosshairName) {
-		this.selectedCrosshair = this.crosshairs.get(crosshairName);
+		this.crosshair = this.loadedCrosshairs.get(crosshairName);
 	}
 
-	public void renderCrossHairs(ScaledResolution resolution, float partialTicks, CrosshairProvider crosshairProvider) {
-		this.updateCrosshairSpread(crosshairProvider);
+	public void updateAndDrawCrosshairs(ScaledResolution resolution, float partialTicks,
+			CrosshairProvider crosshairProvider) {
+		this.updateSpread(crosshairProvider.getDefaultSpread());
+
+		this.lastAverageSpread = this.averageSpread;
+		this.averageSpread = (this.spread + this.lastAverageSpread) / 2.0F;
+
+		final float spread = this.crosshair.isStatic() ? 0.0F
+				: this.lastAverageSpread + (this.averageSpread - this.lastAverageSpread) * partialTicks;
 
 		final double x = resolution.getScaledWidth_double() / 2.0D;
 		final double y = resolution.getScaledHeight_double() / 2.0D;
 
 		final double width = 16.0D, height = 16.0D;
 
-		this.lastRenderSpread = this.renderSpread;
-		this.renderSpread = this.getAverageSpread() * 5.0F;
-
-		final float spread = this.selectedCrosshair.isStatic() ? 0.0F
-				: this.lastRenderSpread + (this.renderSpread - this.lastRenderSpread) * partialTicks;
-
 		GlStateManager.pushMatrix();
 		{
-			GlStateManager.translate(-3.5D, -3.5D, 0.0D);
-			GlStateManager.translate(4.0D, 4.0D, 0.0D);
+			GlStateManager.translate(0.5D, 0.5D, 0.0D);
 
-			Graphics.bind(this.selectedCrosshair.getMiddle());
+			Graphics.bind(this.crosshair.getMiddle());
 			Graphics.drawTexturedRectangle(x - (width / 2.0D), y - (width / 2.0D), width, height);
 
-			Graphics.bind(this.selectedCrosshair.getTop());
+			Graphics.bind(this.crosshair.getTop());
 			Graphics.drawTexturedRectangle(x - (width / 2.0D), y - (14.0D + spread), width, height);
 
-			Graphics.bind(this.selectedCrosshair.getBottom());
+			Graphics.bind(this.crosshair.getBottom());
 			Graphics.drawTexturedRectangle(x - (width / 2.0D), y - (2.0D - spread), width, height);
 
-			Graphics.bind(this.selectedCrosshair.getLeft());
+			Graphics.bind(this.crosshair.getLeft());
 			Graphics.drawTexturedRectangle(x - (14.0D + spread), y - (width / 2.0D), width, height);
 
-			Graphics.bind(this.selectedCrosshair.getRight());
+			Graphics.bind(this.crosshair.getRight());
 			Graphics.drawTexturedRectangle(x - (2.0D - spread), y - (width / 2.0D), width, height);
 		}
 		GlStateManager.popMatrix();
 	}
 
-	private void updateCrosshairSpread(CrosshairProvider crosshairProvider) {
+	private void updateSpread(float defaultSpread) {
 		EntityPlayerSP player = this.client.getPlayer().getEntity();
-		float originalSpread = this.spread;
+		final float originalSpread = this.spread;
 
 		if (player.posX != player.lastTickPosX || player.posY != player.lastTickPosY
 				|| player.posZ != player.lastTickPosZ) {
-			float movementSpread = crosshairProvider.getMovementSpread();
+			float movementSpread = MOVEMENT_SPREAD;
 
 			if (player.isSprinting())
 				movementSpread *= 2F;
 
-			if (player.isSneaking())
+			if (player.isSneaking() && player.onGround)
 				movementSpread /= 2F;
 
-			if (this.spread < movementSpread) {
-				this.setSpread(this.spread + 0.5F);
-			}
+			if (this.spread < movementSpread)
+				this.spread += 2.5F;
 		}
 
 		// If the spread hasn't changed, decrease it
 		if (this.spread == originalSpread) {
-			this.setSpread(this.spread - 0.5F);
+			this.spread -= 2.5F;
+		}
+
+		if (this.spread < defaultSpread) {
+			this.spread = defaultSpread;
+		}
+
+		if (this.spread < MINIMUM_SPREAD) {
+			this.spread = MINIMUM_SPREAD;
+		}
+
+		if (this.spread > MAXIMUM_SPREAD) {
+			this.spread = MAXIMUM_SPREAD;
 		}
 	}
 
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
 		if (resourcePredicate.test(ModResourceType.CROSSHAIRS)) {
-			this.crosshairs.clear();
+			this.loadedCrosshairs.clear();
 			for (String domain : resourceManager.getResourceDomains()) {
 				try {
 					resourceManager.getAllResources(new ResourceLocation(domain, "crosshairs.json"))
@@ -150,7 +145,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 									Crosshair[] crosshairs = JsonUtils.fromJson(GSON,
 											new InputStreamReader(input, StandardCharsets.UTF_8), Crosshair[].class);
 									for (Crosshair crosshair : crosshairs) {
-										this.crosshairs.put(crosshair.getName(), crosshair);
+										this.loadedCrosshairs.put(crosshair.getName(), crosshair);
 									}
 								} catch (IOException e) {
 									LOGGER.catching(e);
@@ -160,8 +155,8 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 					;
 				}
 			}
-			if (this.selectedCrosshair == null || !this.crosshairs.containsKey(this.selectedCrosshair.getName()))
-				this.selectedCrosshair = this.crosshairs.get(DEFAULT_CROSSHAIR);
+			if (this.crosshair == null || !this.loadedCrosshairs.containsKey(this.crosshair.getName()))
+				this.crosshair = this.loadedCrosshairs.get(DEFAULT_CROSSHAIR);
 		}
 	}
 

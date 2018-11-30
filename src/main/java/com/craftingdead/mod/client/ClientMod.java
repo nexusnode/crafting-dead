@@ -243,7 +243,7 @@ public final class ClientMod implements SidedMod {
 			ItemStack heldStack = this.getPlayer().getEntity().getHeldItemMainhand();
 			if (heldStack.getItem() instanceof CrosshairProvider) {
 				event.setCanceled(true);
-				this.crosshairManager.renderCrossHairs(event.getResolution(), event.getPartialTicks(),
+				this.crosshairManager.updateAndDrawCrosshairs(event.getResolution(), event.getPartialTicks(),
 						(CrosshairProvider) heldStack.getItem());
 			}
 			break;

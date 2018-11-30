@@ -113,8 +113,8 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	}
 
 	@Override
-	public float getMovementSpread() {
-		return 2.5F;
+	public float getDefaultSpread() {
+		return 0.1F;
 	}
 
 }
