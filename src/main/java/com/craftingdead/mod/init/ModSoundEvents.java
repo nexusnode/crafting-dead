@@ -14,10 +14,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 public class ModSoundEvents {
 
 	public static final SoundEvent ACR_SHOOT = null;
+	public static final SoundEvent AK47_SHOOT = null;
+	public static final SoundEvent DESERT_EAGLE_SHOOT = null;
 
 	@SubscribeEvent
 	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-		event.getRegistry().registerAll(createSoundEvent("item.gun.acr_shoot", "acr_shoot"));
+		event.getRegistry().registerAll(createSoundEvent("acr_shoot", "acr_shoot"),
+				createSoundEvent("ak47_shoot", "ak47_shoot"),
+				createSoundEvent("desert_eagle_shoot", "desert_eagle_shoot"));
 	}
 
 	private static SoundEvent createSoundEvent(String soundName, String registryName) {

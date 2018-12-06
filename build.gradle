@@ -7,14 +7,15 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.3"
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "0.0.1"
+version = "${minecraft_version}-${mod_version}"
 group = "com.craftingdead.mod"
-archivesBaseName = "craftingdead"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -22,7 +23,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2772"
+    version = "${minecraft_version}-${forge_version}"
     runDir = "run"
     mappings = "stable_39"
 }
@@ -48,14 +49,30 @@ repositories {
     }
 }
 
-dependencies {
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
-	compile 'com.github.Vatuu:discord-rpc:1.5.1'
-	compile (group: 'sm0keysa1m0n', name: 'Network', version: '1.0.0') {
-		exclude group: 'com.google.guava', module: 'guava'
-  	}
+configurations {
+    packaged
+    packagedCompile
+}
 
-	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'
+dependencies {
+  	packagedCompile 'com.github.Vatuu:discord-rpc:1.5.1'
+	packagedCompile (group: 'sm0keysa1m0n', name: 'Network', version: '1.0.0') {
+		exclude group: 'com.google.guava', module: 'guava'
+		exclude group: 'org.slf4j', module: 'slf4j-simple'
+  	}
+  	
+	packaged group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+  	
+	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'		
+    configurations.compile.extendsFrom(configurations.packagedCompile)
+    configurations.packaged.extendsFrom(configurations.packagedCompile)
+}
+
+
+jar {
+    from {
+    	configurations.packaged.collect { it.isDirectory() ? it : zipTree(it) }
+	}
 }
 
 processResources {

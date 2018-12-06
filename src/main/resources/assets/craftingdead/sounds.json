@@ -1,10 +1,20 @@
 {
-  "item.gun.acr_shoot":{
-    "category":"block",
+  "acr_shoot":{
+    "category":"master",
     "sounds":[
-      {
-        "name":"craftingdead:acrshoot"
-      }
+        "craftingdead:acr_shoot"
     ]
+  },
+  "ak47_shoot":{
+  	"category":"master",
+  	"sounds":[
+  		"craftingdead:ak47_shoot"
+  	]
+  },
+  "desert_eagle_shoot":{
+  	"category":"master",
+  	"sounds":[
+  		"craftingdead:desert_eagle_shoot"
+  	]
   }
 }

@@ -1,7 +1,7 @@
 package com.craftingdead.mod.init;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.item.ItemAcr;
+import com.craftingdead.mod.item.ItemGun;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -16,11 +16,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 public class ModItems {
 
 	public static final Item ACR = null;
-
-	public static final Item ROAD = null;
-	public static final Item LINED_ROAD = null;
-	public static final Item BROKEN_LINED_ROAD = null;
-	public static final Item BARBED_WIRE = null;
+	public static final Item AK47 = null;
 
 	public static final Item RESIDENTIAL_LOOT = null;
 
@@ -29,11 +25,9 @@ public class ModItems {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		event.getRegistry().registerAll(
-				appendRegistryName("acr", new ItemAcr().setFireRate(80).setDamage(7).setBowAndArrowPose(true)),
-				appendRegistryName("road", new ItemBlock(ModBlocks.ROAD)),
-				appendRegistryName("lined_road", new ItemBlock(ModBlocks.LINED_ROAD)),
-				appendRegistryName("broken_lined_road", new ItemBlock(ModBlocks.BROKEN_LINED_ROAD)),
-				appendRegistryName("barbed_wire", new ItemBlock(ModBlocks.BARBED_WIRE)),
+				appendRegistryName("desert_eagle", new ItemGun(-1, 0, 8, 0, () -> ModSoundEvents.DESERT_EAGLE_SHOOT)),
+				appendRegistryName("acr", new ItemGun(80, 0, 7, 0, () -> ModSoundEvents.ACR_SHOOT)),
+				appendRegistryName("ak47", new ItemGun(80, 0, 7, 0, () -> ModSoundEvents.AK47_SHOOT)),
 				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
 				appendRegistryName("clip", new Item()));
 	}

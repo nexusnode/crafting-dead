@@ -4,9 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.craftingdead.mod.event.BulletCollisionEvent;
 import com.craftingdead.mod.init.ModDamageSource;
-import com.craftingdead.mod.init.ModSoundEvents;
 import com.craftingdead.mod.item.ItemGun;
-import com.craftingdead.mod.util.Util;
+import com.craftingdead.mod.util.RayTraceUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTNT;
@@ -43,8 +42,8 @@ public class GunController implements Triggerable {
 	}
 
 	private void shoot(ItemStack itemStack, Entity entity) {
-		entity.playSound(ModSoundEvents.ACR_SHOOT, 1.0F, 1.0F);
-		RayTraceResult result = Util.rayTrace(entity, 100, 1.0F);
+		entity.playSound(this.item.getShootSound().get(), 1.0F, 1.0F);
+		RayTraceResult result = RayTraceUtil.rayTrace(entity, 100, 1.0F);
 		if (result != null) {
 			switch (result.typeOfHit) {
 			case MISS:

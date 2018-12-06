@@ -1,11 +1,13 @@
 package com.craftingdead.mod.client.model;
 
+import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.ClientMod;
-import com.craftingdead.mod.client.renderer.item.gun.AcrRenderer;
+import com.craftingdead.mod.client.renderer.item.GunRenderer;
 import com.craftingdead.mod.init.ModItems;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
@@ -24,14 +26,13 @@ public class ModelManager {
 
 	@SubscribeEvent
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoaderRegistry.registerLoader(builtinModelLoader);
+		ModelLoaderRegistry.registerLoader(this.builtinModelLoader);
 
-		this.registerItemModel(ModItems.ACR, new AcrRenderer(client));
+		this.registerItemModel(ModItems.ACR,
+				new GunRenderer(this.client, new ResourceLocation(CraftingDead.MOD_ID, "item/acr")));
+		this.registerItemModel(ModItems.AK47,
+				new GunRenderer(this.client, new ResourceLocation(CraftingDead.MOD_ID, "item/ak47")));
 
-		this.registerItemModel(ModItems.ROAD, "normal");
-		this.registerItemModel(ModItems.LINED_ROAD, "normal");
-		this.registerItemModel(ModItems.BROKEN_LINED_ROAD, "normal");
-		this.registerItemModel(ModItems.BARBED_WIRE, "normal");
 		this.registerItemModel(ModItems.RESIDENTIAL_LOOT, "normal");
 	}
 

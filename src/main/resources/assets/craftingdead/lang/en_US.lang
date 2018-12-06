@@ -12,15 +12,15 @@ entity.craftingdead.zombie_fast.name=Zombie Fast
 entity.craftingdead.zombie_tank.name=Zombie Tank
 entity.craftingdead.zombie_weak.name=Zombie Weak
 
-itemGroup.craftingdead.decorative=Crafting Dead Decorative
 itemGroup.craftingdead=Crafting Dead
 
-item.craftingdead.arc.name=ARC
+item.craftingdead.acr.name=ACR
+item.craftingdead.ak47.name=AK47
 
-tile.craftingdead.road.name=Road
-tile.craftingdead.lined_road.name=Lined Road
-tile.craftingdead.broken_lined_road.name=Broken Lined Road
-tile.craftingdead.barbed_wire.name=Barbed Wire
 tile.craftingdead.residential_loot.name=Residential Loot
 
 multiplayer.disconnect.handshake_fail=Client failed handshake
+
+craftingdead.config.client=Client
+craftingdead.config.client.apply_branding=Apply Branding
+craftingdead.config.client.enable_discord_rpc=Enable Discord RPC

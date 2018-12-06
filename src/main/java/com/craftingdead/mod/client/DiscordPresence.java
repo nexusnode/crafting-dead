@@ -14,17 +14,26 @@ public class DiscordPresence {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	private static boolean initialized;
+
 	public static void initialize(String clientId) {
+		if (initialized)
+			return;
 		DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers(), true, null);
+		initialized = true;
 	}
 
 	public static void updateState(GameState state, ClientMod client) {
+		if (!initialized)
+			return;
 		DiscordRichPresence presence = new DiscordRichPresence();
 		state.applyState(presence, client);
 		DiscordRPC.discordUpdatePresence(presence);
 	}
 
 	public static void shutdown() {
+		if (!initialized)
+			return;
 		DiscordRPC.discordShutdown();
 	}
 

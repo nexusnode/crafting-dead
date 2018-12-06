@@ -4,35 +4,24 @@ import net.minecraft.item.Item;
 
 public class ExtendedItem extends Item {
 
-	private boolean bowAndArrowPose;
-	private boolean customCrosshair;
-	private boolean cancelVanillaAttack;
+	private final boolean bowAndArrowPose;
+	private final boolean customCrosshair;
+
+	public ExtendedItem(boolean bowAndArrowPose, boolean customCrosshair) {
+		this.bowAndArrowPose = bowAndArrowPose;
+		this.customCrosshair = customCrosshair;
+	}
 
 	public boolean getBowAndArrowPose() {
 		return this.bowAndArrowPose;
 	}
 
-	public ExtendedItem setBowAndArrowPose(boolean bowAndArrowPose) {
-		this.bowAndArrowPose = bowAndArrowPose;
-		return this;
-	}
-
 	public boolean hasCustomCrosshair() {
-		return customCrosshair;
-	}
-
-	public ExtendedItem setCustomCrosshair(boolean customCrosshair) {
-		this.customCrosshair = customCrosshair;
-		return this;
+		return this.customCrosshair;
 	}
 
 	public boolean getCancelVanillaAttack() {
-		return this.cancelVanillaAttack;
-	}
-
-	public ExtendedItem setCancelVanillaAttack(boolean cancelVanillaAttack) {
-		this.cancelVanillaAttack = cancelVanillaAttack;
-		return this;
+		return false;
 	}
 
 }

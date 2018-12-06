@@ -1,14 +1,18 @@
 package com.craftingdead.mod.item;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nullable;
 
 import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.init.ModCapabilities;
+import com.craftingdead.mod.init.ModCreativeTabs;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
@@ -17,70 +21,50 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	/**
 	 * Time between shots in milliseconds
 	 */
-	private int fireRate;
+	private final int fireRate;
 
-	private int blockInteractRate;
+	private final int fireDistance = 120;
 
-	private int fireDistance = 120;
+	private final int clipSize;
 
-	private int clipSize;
+	private final int damage;
 
-	private int damage;
+	private final int spread;
 
-	private int spread;
+	private final Supplier<SoundEvent> shootSound;
+
+	public ItemGun(int fireRate, int clipSize, int damage, int spread, Supplier<SoundEvent> shootSound) {
+		super(true, true);
+		this.fireRate = fireRate;
+		this.clipSize = clipSize;
+		this.damage = damage;
+		this.spread = spread;
+		this.shootSound = shootSound;
+		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
+	}
 
 	public int getFireRate() {
 		return fireRate;
-	}
-
-	public ItemGun setFireRate(int fireRate) {
-		this.fireRate = fireRate;
-		return this;
-	}
-
-	public int getBlockInteractRate() {
-		return blockInteractRate;
-	}
-
-	public ItemGun setBlockInteractRate(int blockInteractRate) {
-		this.blockInteractRate = blockInteractRate;
-		return this;
 	}
 
 	public int getFireDistance() {
 		return fireDistance;
 	}
 
-	public ItemGun setFireDistance(int fireDistance) {
-		this.fireDistance = fireDistance;
-		return this;
-	}
-
 	public int getClipSize() {
 		return this.clipSize;
-	}
-
-	public ItemGun setClipSize(int clipSize) {
-		this.clipSize = clipSize;
-		return this;
 	}
 
 	public int getDamage() {
 		return damage;
 	}
 
-	public ItemGun setDamage(int damage) {
-		this.damage = damage;
-		return this;
-	}
-
 	public int getSpread() {
 		return spread;
 	}
 
-	public ItemGun setSpread(int spread) {
-		this.spread = spread;
-		return this;
+	public Supplier<SoundEvent> getShootSound() {
+		return shootSound;
 	}
 
 	@Override

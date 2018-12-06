@@ -41,10 +41,8 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 
 	private final Map<ResourceLocation, Crosshair> loadedCrosshairs = Maps.newHashMap();
 
-	private float spread = 0.0F;
-
-	private float averageSpread = 0.0F;
-	private float lastAverageSpread = 0.0F;
+	private float spread = 0.0F, lastSpread = spread;
+	private float averageSpread = 0.0F, lastAverageSpread = averageSpread;
 
 	private Crosshair crosshair;
 
@@ -65,7 +63,8 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 		this.updateSpread(crosshairProvider.getDefaultSpread());
 
 		this.lastAverageSpread = this.averageSpread;
-		this.averageSpread = (this.spread + this.lastAverageSpread) / 2.0F;
+		this.averageSpread = (this.spread + this.lastSpread) / 2.0F;
+		this.lastSpread = this.spread;
 
 		final float spread = this.crosshair.isStatic() ? 0.0F
 				: this.lastAverageSpread + (this.averageSpread - this.lastAverageSpread) * partialTicks;
@@ -77,6 +76,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 
 		GlStateManager.pushMatrix();
 		{
+			GlStateManager.enableBlend();
 			GlStateManager.translate(0.5D, 0.5D, 0.0D);
 
 			Graphics.bind(this.crosshair.getMiddle());
@@ -93,6 +93,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 
 			Graphics.bind(this.crosshair.getRight());
 			Graphics.drawTexturedRectangle(x - (2.0D - spread), y - (width / 2.0D), width, height);
+			GlStateManager.disableBlend();
 		}
 		GlStateManager.popMatrix();
 	}

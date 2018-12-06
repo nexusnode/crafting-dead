@@ -13,7 +13,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
-public class Util {
+public class RayTraceUtil {
 
 	/**
 	 * Perform a block ray trace from the parsed entity

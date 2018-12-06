@@ -11,22 +11,9 @@ public class ModCreativeTabs {
 
 		@Override
 		public ItemStack createIcon() {
-			return new ItemStack(ModBlocks.LINED_ROAD);
+			return new ItemStack(ModBlocks.RESIDENTIAL_LOOT);
 		}
 
 	});
-
-	public static final CreativeTabs CRAFTING_DEAD_DECORATIVE = (new CreativeTabs(getFormattedName("decorative")) {
-
-		@Override
-		public ItemStack createIcon() {
-			return new ItemStack(ModBlocks.BARBED_WIRE);
-		}
-
-	});
-
-	private static String getFormattedName(String name) {
-		return String.format("%s%s%s", CraftingDead.MOD_ID, ".", name);
-	}
 
 }

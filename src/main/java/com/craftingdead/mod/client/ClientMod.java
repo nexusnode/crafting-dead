@@ -1,6 +1,9 @@
 package com.craftingdead.mod.client;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -9,8 +12,10 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.Display;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.ModConfig;
 import com.craftingdead.mod.SidedMod;
 import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
@@ -33,6 +38,8 @@ import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
 import com.craftingdead.mod.masterserver.session.PlayerSession;
 import com.craftingdead.mod.server.integrated.IntegratedServer;
+import com.craftingdead.mod.util.IOUtil;
+import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -51,10 +58,14 @@ import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Config.Type;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -73,7 +84,13 @@ public final class ClientMod implements SidedMod {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	private static final ResourceLocation[] ICONS = new ResourceLocation[] {
+			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_16x16.png"),
+			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_32x32.png") };
+
 	private Minecraft minecraft;
+
+	private ModMetadata modMetadata;
 
 	private List<String> news = new ArrayList<String>();
 
@@ -97,9 +114,24 @@ public final class ClientMod implements SidedMod {
 	@Override
 	public void preInitialization(FMLPreInitializationEvent event) {
 		this.minecraft = FMLClientHandler.instance().getClient();
+		this.modMetadata = event.getModMetadata();
 
-		DiscordPresence.initialize("475405055302828034");
+		if (ModConfig.client.enableDiscordRpc)
+			DiscordPresence.initialize("475405055302828034");
 		DiscordPresence.updateState(GameState.PRE_INITIALIZATION, this);
+
+		if (ModConfig.client.applyBranding) {
+			Display.setTitle(modMetadata.name + " " + modMetadata.version);
+			List<ByteBuffer> iconBuffers = Lists.newArrayList();
+			for (ResourceLocation icon : ICONS) {
+				try (InputStream input = this.minecraft.getResourceManager().getResource(icon).getInputStream()) {
+					iconBuffers.add(IOUtil.readImageToBuffer(input));
+				} catch (IOException e) {
+					LOGGER.catching(e);
+				}
+			}
+			Display.setIcon(iconBuffers.toArray(new ByteBuffer[0]));
+		}
 
 		MinecraftForge.EVENT_BUS.register(this);
 
@@ -125,6 +157,7 @@ public final class ClientMod implements SidedMod {
 	@Override
 	public void initialization(FMLInitializationEvent event) {
 		DiscordPresence.updateState(GameState.INITIALIZATION, this);
+		ConfigManager.sync(CraftingDead.MOD_ID, Type.INSTANCE);
 		this.registerColourHandlers();
 	}
 
@@ -249,6 +282,13 @@ public final class ClientMod implements SidedMod {
 			break;
 		default:
 			break;
+		}
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(OnConfigChangedEvent event) {
+		if (event.getModID().equals(CraftingDead.MOD_ID)) {
+			ConfigManager.sync(CraftingDead.MOD_ID, Type.INSTANCE);
 		}
 	}
 
