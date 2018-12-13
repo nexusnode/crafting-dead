@@ -16,6 +16,7 @@ itemGroup.craftingdead=Crafting Dead
 
 item.craftingdead.acr.name=ACR
 item.craftingdead.ak47.name=AK47
+item.craftingdead.desert_eagle.name=Desert Eagle
 
 tile.craftingdead.residential_loot.name=Residential Loot
 

@@ -17,6 +17,7 @@ public class ModItems {
 
 	public static final Item ACR = null;
 	public static final Item AK47 = null;
+	public static final Item DESERT_EAGLE = null;
 
 	public static final Item RESIDENTIAL_LOOT = null;
 

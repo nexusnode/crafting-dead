@@ -13,14 +13,14 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 public class ModCapabilities {
 
-	@CapabilityInject(Player.class)
+	@CapabilityInject(DefaultPlayer.class)
 	public static final Capability<Player<?>> PLAYER = null;
 
 	@CapabilityInject(Triggerable.class)
 	public static final Capability<Triggerable> TRIGGERABLE = null;
 
 	public static void registerCapabilities() {
-		CapabilityManager.INSTANCE.register(Player.class, new EmptyStorage<>(), DefaultPlayer::new);
+		CapabilityManager.INSTANCE.register(DefaultPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
 		CapabilityManager.INSTANCE.register(Triggerable.class, new EmptyStorage<>(), DefaultTriggerable::new);
 	}
 

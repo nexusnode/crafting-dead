@@ -19,9 +19,8 @@ import com.craftingdead.mod.ModConfig;
 import com.craftingdead.mod.SidedMod;
 import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
-import com.craftingdead.mod.capability.player.ClientPlayerLocal;
-import com.craftingdead.mod.capability.player.ClientPlayerOther;
-import com.craftingdead.mod.capability.player.Player;
+import com.craftingdead.mod.capability.player.ClientPlayer;
+import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
@@ -37,13 +36,13 @@ import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
 import com.craftingdead.mod.masterserver.session.PlayerSession;
+import com.craftingdead.mod.network.message.MessageSetTriggerPressed;
 import com.craftingdead.mod.server.integrated.IntegratedServer;
 import com.craftingdead.mod.util.IOUtil;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBiped.ArmPose;
@@ -142,7 +141,7 @@ public final class ClientMod implements SidedMod {
 				.registerReloadListener(this.crosshairManager);
 
 		try {
-			this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE);
+			this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE_GROW);
 			MinecraftForge.EVENT_BUS.register(this.transitionManager);
 		} catch (RuntimeException e) {
 			LOGGER.warn("An error occurred while enabling transitions; transitions will be disabled", e);
@@ -208,11 +207,9 @@ public final class ClientMod implements SidedMod {
 	@SubscribeEvent
 	public void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
 		if (event.getObject() instanceof AbstractClientPlayer) {
-			Player<? extends AbstractClientPlayer> player = null;
+			DefaultPlayer<? extends AbstractClientPlayer> player = null;
 			if (event.getObject() instanceof EntityPlayerSP) {
-				player = new ClientPlayerLocal((EntityPlayerSP) event.getObject());
-			} else if (event.getObject() instanceof EntityOtherPlayerMP) {
-				player = new ClientPlayerOther((EntityOtherPlayerMP) event.getObject());
+				player = new ClientPlayer((EntityPlayerSP) event.getObject());
 			}
 			event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
 					new SerializableProvider<>(player, ModCapabilities.PLAYER));
@@ -236,6 +233,7 @@ public final class ClientMod implements SidedMod {
 		int bindingCode = event.getButton() - 100;
 		if (this.minecraft.inGameHasFocus) {
 			if (bindingCode == this.minecraft.gameSettings.keyBindAttack.getKeyCode()) {
+				CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageSetTriggerPressed(event.isButtonstate()));
 				this.getPlayer().setTriggerPressed(event.isButtonstate());
 				if (this.getPlayer().getEntity().getHeldItemMainhand().getItem() instanceof ExtendedItem
 						&& ((ExtendedItem) this.getPlayer().getEntity().getHeldItemMainhand().getItem())
@@ -329,9 +327,9 @@ public final class ClientMod implements SidedMod {
 	}
 
 	@Nullable
-	public ClientPlayerLocal getPlayer() {
+	public ClientPlayer getPlayer() {
 		return this.minecraft.player != null
-				? (ClientPlayerLocal) this.minecraft.player.getCapability(ModCapabilities.PLAYER, null)
+				? (ClientPlayer) this.minecraft.player.getCapability(ModCapabilities.PLAYER, null)
 				: null;
 	}
 

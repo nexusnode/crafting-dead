@@ -12,6 +12,7 @@ import net.minecraft.block.BlockTNT;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class GunController implements Triggerable {
 
-	public static final float HEAD_HEIGHT_FROM_EYES = 0.25F, HEADSHOT_MULTIPLIER = 4;
+	public static final float HEADSHOT_MULTIPLIER = 4;
 
 	private final ItemGun item;
 
@@ -61,7 +62,8 @@ public class GunController implements Triggerable {
 	private void hitEntity(Entity entity, RayTraceResult rayTrace) {
 		Entity entityHit = rayTrace.entityHit;
 		float damage = item.getDamage();
-		if (entityHit instanceof EntityPlayer && rayTrace.hitVec.y >= (entityHit.posY + entityHit.getEyeHeight()))
+		if ((entityHit instanceof EntityPlayer || entityHit instanceof EntityZombie)
+				&& rayTrace.hitVec.y >= (entityHit.posY + entityHit.getEyeHeight()))
 			damage *= HEADSHOT_MULTIPLIER;
 		entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity), damage);
 	}

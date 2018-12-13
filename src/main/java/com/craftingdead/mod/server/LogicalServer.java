@@ -1,8 +1,5 @@
 package com.craftingdead.mod.server;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
@@ -10,7 +7,6 @@ import com.craftingdead.mod.init.ModCapabilities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -26,20 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public abstract class LogicalServer {
 
-	private static final Logger LOGGER = LogManager.getLogger();
-
-	/**
-	 * The {@link MinecraftServer}
-	 */
-	protected MinecraftServer minecraftServer;
-
-	public void start(MinecraftServer minecraftServer) {
-		this.minecraftServer = minecraftServer;
-		LOGGER.info("Starting logical server");
-	}
-
 	// ================================================================================
-	// Forge Events
+	// Server Forge Events
 	// ================================================================================
 
 	@SubscribeEvent

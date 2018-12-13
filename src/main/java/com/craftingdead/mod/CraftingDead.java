@@ -163,7 +163,6 @@ public class CraftingDead {
 		LOGGER.info("Processing {}", event.description());
 		this.logicalServer = this.mod.getLogicalServerSupplier().get();
 		MinecraftForge.EVENT_BUS.register(this.logicalServer);
-		this.logicalServer.start(event.getServer());
 	}
 
 	@Mod.EventHandler
@@ -181,7 +180,7 @@ public class CraftingDead {
 	}
 
 	// ================================================================================
-	// Forge Events
+	// Common Forge Events
 	// ================================================================================
 
 	@SubscribeEvent

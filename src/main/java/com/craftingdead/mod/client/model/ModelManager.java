@@ -32,6 +32,8 @@ public class ModelManager {
 				new GunRenderer(this.client, new ResourceLocation(CraftingDead.MOD_ID, "item/acr")));
 		this.registerItemModel(ModItems.AK47,
 				new GunRenderer(this.client, new ResourceLocation(CraftingDead.MOD_ID, "item/ak47")));
+		this.registerItemModel(ModItems.DESERT_EAGLE,
+				new GunRenderer(this.client, new ResourceLocation(CraftingDead.MOD_ID, "item/desert_eagle")));
 
 		this.registerItemModel(ModItems.RESIDENTIAL_LOOT, "normal");
 	}

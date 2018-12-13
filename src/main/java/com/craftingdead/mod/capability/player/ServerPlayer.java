@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class ServerPlayer extends Player<EntityPlayerMP> {
+public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 
 	private final LogicalServer logicalServer;
 
@@ -33,6 +33,7 @@ public class ServerPlayer extends Player<EntityPlayerMP> {
 	 * the client
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
+
 
 	public ServerPlayer(EntityPlayerMP entity, LogicalServer logicalServer) {
 		super(entity);
@@ -61,7 +62,7 @@ public class ServerPlayer extends Player<EntityPlayerMP> {
 	}
 
 	private void updateDaysSurvived() {
-		boolean isDay = this.getEntity().getEntityWorld().isDaytime();
+		boolean isDay = this.entity.getEntityWorld().isDaytime();
 		// If it was night time and is now day time then increment their days survived
 		// by 1
 		if (!this.lastDay && isDay)
@@ -92,7 +93,7 @@ public class ServerPlayer extends Player<EntityPlayerMP> {
 	 * @param message - the {@link IMessage} to send
 	 */
 	public void sendMessage(IMessage msg) {
-		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.getEntity());
+		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.entity);
 	}
 
 	public LogicalServer getServer() {

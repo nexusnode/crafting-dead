@@ -42,10 +42,6 @@ repositories {
     maven { 
     	name = "ts1"
     	url = "http://maven.tarbits.co.uk:8040/artifactory/gradle-dev-local"
-    	credentials {
-            username "$ts1Username"
-            password "$ts1Password"
-        }
     }
 }
 

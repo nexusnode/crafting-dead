@@ -18,10 +18,10 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.resource.IResourceType;
@@ -99,17 +99,17 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 	}
 
 	private void updateSpread(float defaultSpread) {
-		EntityPlayerSP player = this.client.getPlayer().getEntity();
+		EntityPlayer entity = this.client.getPlayer().getEntity();
 		final float originalSpread = this.spread;
 
-		if (player.posX != player.lastTickPosX || player.posY != player.lastTickPosY
-				|| player.posZ != player.lastTickPosZ) {
+		if (entity.posX != entity.lastTickPosX || entity.posY != entity.lastTickPosY
+				|| entity.posZ != entity.lastTickPosZ) {
 			float movementSpread = MOVEMENT_SPREAD;
 
-			if (player.isSprinting())
+			if (entity.isSprinting())
 				movementSpread *= 2F;
 
-			if (player.isSneaking() && player.onGround)
+			if (entity.isSneaking() && entity.onGround)
 				movementSpread /= 2F;
 
 			if (this.spread < movementSpread)
