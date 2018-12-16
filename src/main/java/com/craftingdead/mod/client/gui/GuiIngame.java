@@ -3,7 +3,7 @@ package com.craftingdead.mod.client.gui;
 import org.lwjgl.input.Mouse;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.renderer.Graphics;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -20,9 +20,9 @@ public class GuiIngame {
 	private static final ResourceLocation PLAYER_KILLS = new ResourceLocation(CraftingDead.MOD_ID,
 			"textures/gui/hud/player_kills.png");
 
-	private final ClientMod client;
+	private final ClientDist client;
 
-	public GuiIngame(ClientMod client) {
+	public GuiIngame(ClientDist client) {
 		this.client = client;
 	}
 

@@ -1,5 +1,7 @@
 package com.craftingdead.mod.item;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -8,6 +10,7 @@ import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.init.ModCreativeTabs;
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -31,14 +34,21 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	private final int spread;
 
+	/**
+	 * A {@link Set} of {@link FireMode}s the gun can cycle through
+	 */
+	private final List<Supplier<FireMode>> fireModes;
+
 	private final Supplier<SoundEvent> shootSound;
 
-	public ItemGun(int fireRate, int clipSize, int damage, int spread, Supplier<SoundEvent> shootSound) {
+	public ItemGun(int fireRate, int clipSize, int damage, int spread, List<Supplier<FireMode>> fireModes,
+			Supplier<SoundEvent> shootSound) {
 		super(true, true);
 		this.fireRate = fireRate;
 		this.clipSize = clipSize;
 		this.damage = damage;
 		this.spread = spread;
+		this.fireModes = ImmutableList.copyOf(fireModes);
 		this.shootSound = shootSound;
 		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
 	}
@@ -61,6 +71,10 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	public int getSpread() {
 		return spread;
+	}
+
+	public List<Supplier<FireMode>> getFireModes() {
+		return this.fireModes;
 	}
 
 	public Supplier<SoundEvent> getShootSound() {

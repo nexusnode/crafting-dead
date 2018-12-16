@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.gui.widget.GuiWidget;
 import com.craftingdead.mod.client.transition.Transition;
 
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.GuiScreen;
 
 public abstract class ExtendedGuiScreen extends GuiScreen {
 
-	public ClientMod client;
+	public ClientDist client;
 
 	protected ArrayList<GuiWidget> guiContainers = new ArrayList<GuiWidget>();
 

@@ -3,7 +3,7 @@ package com.craftingdead.mod.client.renderer.item;
 import java.util.Collection;
 import java.util.function.Function;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.renderer.GlStateManager;
@@ -18,13 +18,13 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 
 public class GunRenderer extends ItemRenderer {
 
-	private ClientMod client;
+	private ClientDist client;
 
 	private final ResourceLocation baseModelLocation;
 
 	private IBakedModel baseModelBaked;
 
-	public GunRenderer(ClientMod client, ResourceLocation baseModelLocation) {
+	public GunRenderer(ClientDist client, ResourceLocation baseModelLocation) {
 		this.client = client;
 		this.baseModelLocation = baseModelLocation;
 	}

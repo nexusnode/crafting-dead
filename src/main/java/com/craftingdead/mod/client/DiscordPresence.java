@@ -23,7 +23,7 @@ public class DiscordPresence {
 		initialized = true;
 	}
 
-	public static void updateState(GameState state, ClientMod client) {
+	public static void updateState(GameState state, ClientDist client) {
 		if (!initialized)
 			return;
 		DiscordRichPresence presence = new DiscordRichPresence();
@@ -43,7 +43,7 @@ public class DiscordPresence {
 		POST_INITIALIZATION("discordstate.post-initialization"), IDLE("discordstate.idle"),
 		SINGLEPLAYER("discordstate.singleplayer"), MULTIPLAYER("discordstate.multiplayer") {
 			@Override
-			public void applyState(DiscordRichPresence presence, ClientMod client) {
+			public void applyState(DiscordRichPresence presence, ClientDist client) {
 				ServerData serverData = client.getMinecraft().getCurrentServerData();
 				presence.state = serverData.serverIP;
 				String[] playerListSplit = serverData.populationInfo.split("/");
@@ -64,7 +64,7 @@ public class DiscordPresence {
 			this.translationKey = translationKey;
 		}
 
-		void applyState(DiscordRichPresence presence, ClientMod client) {
+		void applyState(DiscordRichPresence presence, ClientDist client) {
 			presence.details = I18n.format(translationKey);
 			presence.startTimestamp = System.currentTimeMillis() / 1000;
 			presence.largeImageKey = "craftingdead";

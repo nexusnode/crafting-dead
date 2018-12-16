@@ -44,7 +44,7 @@ public class MessageUpdateStatistics implements IMessage {
 		@Override
 		public IMessage onMessage(MessageUpdateStatistics msg, MessageContext ctx) {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientPlayer player = CraftingDead.instance().getMod().getClientMod().getPlayer();
+				ClientPlayer player = CraftingDead.instance().getMod().getClientDist().getPlayer();
 				player.updateStatistics(msg.daysSurvived, msg.zombieKills, msg.playerKills);
 			});
 

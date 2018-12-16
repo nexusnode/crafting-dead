@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.renderer.Graphics;
 import com.craftingdead.mod.init.ModResourceType;
 import com.google.common.collect.Maps;
@@ -37,7 +37,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 	private static final ResourceLocation DEFAULT_CROSSHAIR = new ResourceLocation(CraftingDead.MOD_ID, "default");
 	private static final float MINIMUM_SPREAD = 0.5F, MAXIMUM_SPREAD = 60.0F, MOVEMENT_SPREAD = 12.5F;
 
-	private final ClientMod client;
+	private final ClientDist client;
 
 	private final Map<ResourceLocation, Crosshair> loadedCrosshairs = Maps.newHashMap();
 
@@ -46,7 +46,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 
 	private Crosshair crosshair;
 
-	public CrosshairManager(ClientMod client) {
+	public CrosshairManager(ClientDist client) {
 		this.client = client;
 	}
 

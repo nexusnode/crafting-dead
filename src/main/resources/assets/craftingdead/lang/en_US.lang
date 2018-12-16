@@ -25,3 +25,5 @@ multiplayer.disconnect.handshake_fail=Client failed handshake
 craftingdead.config.client=Client
 craftingdead.config.client.apply_branding=Apply Branding
 craftingdead.config.client.enable_discord_rpc=Enable Discord RPC
+
+key.toggle_fire_mode=Toggle Fire Mode

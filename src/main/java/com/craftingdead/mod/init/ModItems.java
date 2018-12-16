@@ -1,7 +1,9 @@
 package com.craftingdead.mod.init;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.ItemGun;
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -26,9 +28,15 @@ public class ModItems {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		event.getRegistry().registerAll(
-				appendRegistryName("desert_eagle", new ItemGun(-1, 0, 8, 0, () -> ModSoundEvents.DESERT_EAGLE_SHOOT)),
-				appendRegistryName("acr", new ItemGun(80, 0, 7, 0, () -> ModSoundEvents.ACR_SHOOT)),
-				appendRegistryName("ak47", new ItemGun(80, 0, 7, 0, () -> ModSoundEvents.AK47_SHOOT)),
+				appendRegistryName("desert_eagle",
+						new ItemGun(0, 0, 8, 0, ImmutableList.of(FireMode.Modes.SEMI),
+								() -> ModSoundEvents.DESERT_EAGLE_SHOOT)),
+				appendRegistryName("acr",
+						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
+								() -> ModSoundEvents.ACR_SHOOT)),
+				appendRegistryName("ak47",
+						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
+								() -> ModSoundEvents.AK47_SHOOT)),
 				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
 				appendRegistryName("clip", new Item()));
 	}

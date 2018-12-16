@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.masterserver.ConnectionState;
 import com.craftingdead.mod.masterserver.message.handshake.MessageHandshake;
 import com.craftingdead.mod.masterserver.message.login.MessagePlayerLogin;
@@ -21,9 +21,9 @@ public class PlayerSession implements Session {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private final ClientMod client;
+	private final ClientDist client;
 
-	public PlayerSession(ClientMod client) {
+	public PlayerSession(ClientDist client) {
 		this.client = client;
 	}
 
@@ -55,7 +55,7 @@ public class PlayerSession implements Session {
 		LOGGER.error("Exception in session", t);
 	}
 
-	public ClientMod getClient() {
+	public ClientDist getClient() {
 		return this.client;
 	}
 

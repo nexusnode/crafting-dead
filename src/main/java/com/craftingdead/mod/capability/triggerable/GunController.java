@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.craftingdead.mod.event.BulletCollisionEvent;
 import com.craftingdead.mod.init.ModDamageSource;
+import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.ItemGun;
 import com.craftingdead.mod.util.RayTraceUtil;
 
@@ -27,15 +28,18 @@ public class GunController implements Triggerable {
 
 	private boolean triggerPressed;
 
-	private long lastShot;
+	private long lastShot = Integer.MIN_VALUE;
+
+	private FireMode fireMode;
 
 	public GunController(ItemGun item) {
 		this.item = item;
+		this.fireMode = item.getFireModes().get(0).get();
 	}
 
 	@Override
 	public void update(ItemStack itemStack, Entity entity) {
-		if (this.triggerPressed && System.nanoTime() - this.lastShot > TimeUnit.NANOSECONDS
+		if (this.fireMode.canShoot(this.triggerPressed) && System.nanoTime() - this.lastShot > TimeUnit.NANOSECONDS
 				.convert(this.item.getFireRate(), TimeUnit.MILLISECONDS)) {
 			this.lastShot = System.nanoTime();
 			this.shoot(itemStack, entity);

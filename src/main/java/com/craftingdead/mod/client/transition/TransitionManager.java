@@ -7,8 +7,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class TransitionManager {
 	/**
@@ -47,15 +45,13 @@ public class TransitionManager {
 		this.enabled = true;
 	}
 
-	@SubscribeEvent
-	public void onPreRender(GuiScreenEvent.DrawScreenEvent.Pre event) {
-		GuiScreen screen = event.getGui();
+	public boolean checkDrawTransition(int mouseX, int mouseY, float partialTicks, GuiScreen screen) {
 		Transition transition = screen instanceof ExtendedGuiScreen ? ((ExtendedGuiScreen) screen).getScreenTransition()
 				: this.defaultTransition;
 
 		// Transitions cause issues when in a world
 		if (!this.enabled || this.minecraft.world != null)
-			return;
+			return false;
 
 		if (screen != this.lastScreen) {
 			this.transitionProgress = 0.0F;
@@ -71,11 +67,12 @@ public class TransitionManager {
 		}
 
 		if (this.transitionProgress < 1.0F) {
-			event.setCanceled(true);
-			this.drawTransition(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks(), screen,
-					transition);
+			this.drawTransition(mouseX, mouseY, partialTicks, screen, transition);
+			return true;
+
 		}
 
+		return false;
 	}
 
 	private void drawTransition(int mouseX, int mouseY, float partialTicks, GuiScreen screen, Transition transition) {

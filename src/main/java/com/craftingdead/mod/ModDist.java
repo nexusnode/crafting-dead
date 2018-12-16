@@ -5,9 +5,9 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.craftingdead.mod.client.ClientMod;
+import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.server.LogicalServer;
-import com.craftingdead.mod.server.dedicated.ServerMod;
+import com.craftingdead.mod.server.dedicated.ServerDist;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
@@ -24,7 +24,7 @@ import sm0keysa1m0n.network.wrapper.Session;
  * @author Sm0keySa1m0n
  *
  */
-public interface SidedMod {
+public interface ModDist {
 
 	/**
 	 * Called before {@link FMLInitializationEvent} during mod startup. This is the
@@ -116,27 +116,27 @@ public interface SidedMod {
 	}
 
 	/**
-	 * Casts the {@link SidedMod} instance to a {@link ClientMod} instance.<br>
+	 * Casts the {@link ModDist} instance to a {@link ClientDist} instance.<br>
 	 * <b>Throws an exception if called from the incorrect side.
 	 * 
 	 * @return the instance
 	 */
-	default ClientMod getClientMod() {
-		if (this instanceof ClientMod)
-			return (ClientMod) this;
+	default ClientDist getClientDist() {
+		if (this instanceof ClientDist)
+			return (ClientDist) this;
 		else
 			throw new RuntimeException("Accessing physical client on wrong side");
 	}
 
 	/**
-	 * Casts the {@link SidedMod} instance to a {@link ServerMod} instance.<br>
+	 * Casts the {@link ModDist} instance to a {@link ServerDist} instance.<br>
 	 * <b>Throws an exception if called from the incorrect side.
 	 * 
 	 * @return the instance
 	 */
-	default ServerMod getServerMod() {
-		if (this instanceof ServerMod)
-			return (ServerMod) this;
+	default ServerDist getServerDist() {
+		if (this instanceof ServerDist)
+			return (ServerDist) this;
 		else
 			throw new RuntimeException("Accessing physical server on wrong side");
 	}

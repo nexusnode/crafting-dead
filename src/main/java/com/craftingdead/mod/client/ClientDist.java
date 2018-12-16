@@ -16,7 +16,7 @@ import org.lwjgl.opengl.Display;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.ModConfig;
-import com.craftingdead.mod.SidedMod;
+import com.craftingdead.mod.ModDist;
 import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ClientPlayer;
@@ -26,7 +26,7 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.client.gui.GuiIngame;
-import com.craftingdead.mod.client.model.ModelManager;
+import com.craftingdead.mod.client.model.ModelRegistry;
 import com.craftingdead.mod.client.renderer.color.BasicColourHandler;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
 import com.craftingdead.mod.client.transition.TransitionManager;
@@ -53,17 +53,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
@@ -72,6 +75,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Physical client version of the mod, handles all client logic
@@ -79,7 +83,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
  * @author Sm0keySa1m0n
  *
  */
-public final class ClientMod implements SidedMod {
+public final class ClientDist implements ModDist {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
@@ -96,8 +100,6 @@ public final class ClientMod implements SidedMod {
 	private GuiIngame guiIngame;
 
 	private TransitionManager transitionManager;
-
-	private ModelManager modelManager;
 
 	private CrosshairManager crosshairManager;
 
@@ -132,23 +134,15 @@ public final class ClientMod implements SidedMod {
 			Display.setIcon(iconBuffers.toArray(new ByteBuffer[0]));
 		}
 
-		MinecraftForge.EVENT_BUS.register(this);
-
 		this.guiIngame = new GuiIngame(this);
 
 		this.crosshairManager = new CrosshairManager(this);
 		((IReloadableResourceManager) this.minecraft.getResourceManager())
 				.registerReloadListener(this.crosshairManager);
 
-		try {
-			this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE_GROW);
-			MinecraftForge.EVENT_BUS.register(this.transitionManager);
-		} catch (RuntimeException e) {
-			LOGGER.warn("An error occurred while enabling transitions; transitions will be disabled", e);
-		}
+		this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE_GROW);
 
-		this.modelManager = new ModelManager(this);
-		MinecraftForge.EVENT_BUS.register(this.modelManager);
+		ClientRegistry.registerKeyBinding(ModConfig.Client.KEY_BIND_TOGGLE_FIRE_MODE);
 
 		this.registerEntityRenderers();
 	}
@@ -188,106 +182,6 @@ public final class ClientMod implements SidedMod {
 	@Override
 	public PlayerSession newSession() {
 		return new PlayerSession(this);
-	}
-
-	// ================================================================================
-	// Forge Events
-	// ================================================================================
-
-	@SubscribeEvent
-	public void onGuiOpen(GuiOpenEvent event) {
-//		if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
-//			event.setGui(new GuiMainMenu());
-//		}
-		if (event.getGui() instanceof ExtendedGuiScreen) {
-			((ExtendedGuiScreen) event.getGui()).client = this;
-		}
-	}
-
-	@SubscribeEvent
-	public void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-		if (event.getObject() instanceof AbstractClientPlayer) {
-			DefaultPlayer<? extends AbstractClientPlayer> player = null;
-			if (event.getObject() instanceof EntityPlayerSP) {
-				player = new ClientPlayer((EntityPlayerSP) event.getObject());
-			}
-			event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
-					new SerializableProvider<>(player, ModCapabilities.PLAYER));
-		}
-	}
-
-	@SubscribeEvent
-	public void onClientConnectedToServer(ClientConnectedToServerEvent event) {
-		DiscordPresence.updateState(
-				this.minecraft.isIntegratedServerRunning() ? GameState.SINGLEPLAYER : GameState.MULTIPLAYER, this);
-	}
-
-	@SubscribeEvent
-	public void onClientDisconnectionFromServer(ClientDisconnectionFromServerEvent event) {
-		// Destroy the player instance as it's no longer needed
-		DiscordPresence.updateState(GameState.IDLE, this);
-	}
-
-	@SubscribeEvent
-	public void onMouseEvent(MouseEvent event) {
-		int bindingCode = event.getButton() - 100;
-		if (this.minecraft.inGameHasFocus) {
-			if (bindingCode == this.minecraft.gameSettings.keyBindAttack.getKeyCode()) {
-				CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageSetTriggerPressed(event.isButtonstate()));
-				this.getPlayer().setTriggerPressed(event.isButtonstate());
-				if (this.getPlayer().getEntity().getHeldItemMainhand().getItem() instanceof ExtendedItem
-						&& ((ExtendedItem) this.getPlayer().getEntity().getHeldItemMainhand().getItem())
-								.getCancelVanillaAttack())
-					event.setCanceled(true);
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onRenderLivingPre(RenderLivingEvent.Pre<?> event) {
-		// We don't use RenderPlayerEvent.Pre as it gets called too early resulting in
-		// changes we make to the arm pose being overwritten
-		ItemStack stack = event.getEntity().getHeldItemMainhand();
-		if (stack.getItem() instanceof ExtendedItem) {
-			ExtendedItem item = (ExtendedItem) stack.getItem();
-			if (item.getBowAndArrowPose() && event.getRenderer().getMainModel() instanceof ModelBiped) {
-				ModelBiped model = (ModelBiped) event.getRenderer().getMainModel();
-				switch (event.getEntity().getPrimaryHand()) {
-				case LEFT:
-					model.leftArmPose = ArmPose.BOW_AND_ARROW;
-					break;
-				case RIGHT:
-					model.rightArmPose = ArmPose.BOW_AND_ARROW;
-					break;
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
-		switch (event.getType()) {
-		case ALL:
-			this.guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
-			break;
-		case CROSSHAIRS:
-			ItemStack heldStack = this.getPlayer().getEntity().getHeldItemMainhand();
-			if (heldStack.getItem() instanceof CrosshairProvider) {
-				event.setCanceled(true);
-				this.crosshairManager.updateAndDrawCrosshairs(event.getResolution(), event.getPartialTicks(),
-						(CrosshairProvider) heldStack.getItem());
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	@SubscribeEvent
-	public void onConfigChanged(OnConfigChangedEvent event) {
-		if (event.getModID().equals(CraftingDead.MOD_ID)) {
-			ConfigManager.sync(CraftingDead.MOD_ID, Type.INSTANCE);
-		}
 	}
 
 	// ================================================================================
@@ -335,6 +229,124 @@ public final class ClientMod implements SidedMod {
 
 	public List<String> getNews() {
 		return this.news;
+	}
+
+	// ================================================================================
+	// Forge Events
+	// ================================================================================
+
+	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = CraftingDead.MOD_ID)
+	public static class Events {
+
+		private static final Supplier<ClientDist> CLIENT_DIST = () -> CraftingDead.instance().getMod().getClientDist();
+
+		@SubscribeEvent
+		public static void onEvent(GuiScreenEvent.DrawScreenEvent.Pre event) {
+			event.setCanceled(CLIENT_DIST.get().transitionManager.checkDrawTransition(event.getMouseX(),
+					event.getMouseY(), event.getRenderPartialTicks(), event.getGui()));
+		}
+
+		@SubscribeEvent
+		public static void onEvent(MouseEvent event) {
+			if (CLIENT_DIST.get().minecraft.inGameHasFocus) {
+				if (event.getButton() == CLIENT_DIST.get().minecraft.gameSettings.keyBindAttack.getKeyCode() + 100) {
+					CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageSetTriggerPressed(event.isButtonstate()));
+					CLIENT_DIST.get().getPlayer().setTriggerPressed(event.isButtonstate());
+					if (CLIENT_DIST.get().getPlayer().getEntity().getHeldItemMainhand()
+							.getItem() instanceof ExtendedItem
+							&& ((ExtendedItem) CLIENT_DIST.get().getPlayer().getEntity().getHeldItemMainhand()
+									.getItem()).getCancelVanillaAttack())
+						event.setCanceled(true);
+				}
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(GuiOpenEvent event) {
+//			if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
+//				event.setGui(new GuiMainMenu());
+//			}
+			if (event.getGui() instanceof ExtendedGuiScreen) {
+				((ExtendedGuiScreen) event.getGui()).client = CLIENT_DIST.get();
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(AttachCapabilitiesEvent<Entity> event) {
+			if (event.getObject() instanceof AbstractClientPlayer) {
+				DefaultPlayer<? extends AbstractClientPlayer> player = null;
+				if (event.getObject() instanceof EntityPlayerSP) {
+					player = new ClientPlayer((EntityPlayerSP) event.getObject());
+				}
+				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
+						new SerializableProvider<>(player, ModCapabilities.PLAYER));
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(ClientConnectedToServerEvent event) {
+			DiscordPresence.updateState(CLIENT_DIST.get().minecraft.isIntegratedServerRunning() ? GameState.SINGLEPLAYER
+					: GameState.MULTIPLAYER, CLIENT_DIST.get());
+		}
+
+		@SubscribeEvent
+		public static void onEvent(ClientDisconnectionFromServerEvent event) {
+			// Destroy the player instance as it's no longer needed
+			DiscordPresence.updateState(GameState.IDLE, CLIENT_DIST.get());
+		}
+
+		@SubscribeEvent
+		public static void onEvent(RenderLivingEvent.Pre<?> event) {
+			// We don't use RenderPlayerEvent.Pre as it gets called too early resulting in
+			// changes we make to the arm pose being overwritten
+			ItemStack stack = event.getEntity().getHeldItemMainhand();
+			if (stack.getItem() instanceof ExtendedItem) {
+				ExtendedItem item = (ExtendedItem) stack.getItem();
+				if (item.getBowAndArrowPose() && event.getRenderer().getMainModel() instanceof ModelBiped) {
+					ModelBiped model = (ModelBiped) event.getRenderer().getMainModel();
+					switch (event.getEntity().getPrimaryHand()) {
+					case LEFT:
+						model.leftArmPose = ArmPose.BOW_AND_ARROW;
+						break;
+					case RIGHT:
+						model.rightArmPose = ArmPose.BOW_AND_ARROW;
+						break;
+					}
+				}
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(RenderGameOverlayEvent.Pre event) {
+			switch (event.getType()) {
+			case ALL:
+				CLIENT_DIST.get().guiIngame.renderGameOverlay(event.getResolution(), event.getPartialTicks());
+				break;
+			case CROSSHAIRS:
+				ItemStack heldStack = CLIENT_DIST.get().getPlayer().getEntity().getHeldItemMainhand();
+				if (heldStack.getItem() instanceof CrosshairProvider) {
+					event.setCanceled(true);
+					CLIENT_DIST.get().crosshairManager.updateAndDrawCrosshairs(event.getResolution(),
+							event.getPartialTicks(), (CrosshairProvider) heldStack.getItem());
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
+			if (event.getModID().equals(CraftingDead.MOD_ID)) {
+				ConfigManager.sync(CraftingDead.MOD_ID, Type.INSTANCE);
+			}
+		}
+
+		@SubscribeEvent
+		public static void onEvent(ModelRegistryEvent event) {
+			ModelRegistry.registerModels(CLIENT_DIST.get());
+		}
+
 	}
 
 }
