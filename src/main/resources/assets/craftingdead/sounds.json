@@ -16,5 +16,11 @@
   	"sounds":[
   		"craftingdead:desert_eagle_shoot"
   	]
+  },
+  "m4a1_shoot": {
+    "category":"master",
+    "sounds":[
+      "craftingdead:m4a1_shoot"
+    ]
   }
 }

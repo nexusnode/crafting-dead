@@ -16,17 +16,17 @@ public class ModSoundEvents {
 	public static final SoundEvent ACR_SHOOT = null;
 	public static final SoundEvent AK47_SHOOT = null;
 	public static final SoundEvent DESERT_EAGLE_SHOOT = null;
+	public static final SoundEvent M4A1_SHOOT = null;
 
 	@SubscribeEvent
 	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-		event.getRegistry().registerAll(createSoundEvent("acr_shoot", "acr_shoot"),
-				createSoundEvent("ak47_shoot", "ak47_shoot"),
-				createSoundEvent("desert_eagle_shoot", "desert_eagle_shoot"));
+		event.getRegistry().registerAll(createSoundEvent("acr_shoot"), createSoundEvent("ak47_shoot"),
+				createSoundEvent("desert_eagle_shoot"), createSoundEvent("m4a1_shoot"));
 	}
 
-	private static SoundEvent createSoundEvent(String soundName, String registryName) {
-		return new SoundEvent(new ResourceLocation(CraftingDead.MOD_ID, soundName))
-				.setRegistryName(new ResourceLocation(CraftingDead.MOD_ID, registryName));
+	private static SoundEvent createSoundEvent(String name) {
+		ResourceLocation registryName = new ResourceLocation(CraftingDead.MOD_ID, name);
+		return new SoundEvent(registryName).setRegistryName(registryName);
 	}
 
 }
