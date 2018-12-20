@@ -32,7 +32,7 @@ public class ServerDist implements ModDist {
 
 	@Override
 	public boolean networkCheck(Map<String, String> mods, Side side) {
-		return false;
+		return true;
 	}
 
 	@Override

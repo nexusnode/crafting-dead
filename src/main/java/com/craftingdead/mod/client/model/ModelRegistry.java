@@ -29,6 +29,7 @@ public class ModelRegistry {
 				new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/desert_eagle")));
 		registerItemModel(ModItems.M4A1,
 				new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/m4a1")));
+		registerItemModel(ModItems.M9, new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/m9")));
 
 		registerItemModel(ModItems.RESIDENTIAL_LOOT, "normal");
 	}

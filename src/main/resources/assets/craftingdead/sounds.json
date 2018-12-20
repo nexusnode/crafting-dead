@@ -22,5 +22,11 @@
     "sounds":[
       "craftingdead:m4a1_shoot"
     ]
+  },
+  "m9_shoot":{
+    "category":"master",
+    "sounds":[
+      "craftingdead:m9_shoot"
+    ]
   }
 }

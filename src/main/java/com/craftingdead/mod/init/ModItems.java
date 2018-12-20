@@ -21,6 +21,7 @@ public class ModItems {
 	public static final Item AK47 = null;
 	public static final Item DESERT_EAGLE = null;
 	public static final Item M4A1 = null;
+	public static final Item M9 = null;
 
 	public static final Item RESIDENTIAL_LOOT = null;
 
@@ -41,6 +42,8 @@ public class ModItems {
 				appendRegistryName("m4a1",
 						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
 								() -> ModSoundEvents.M4A1_SHOOT)),
+				appendRegistryName("m9",
+						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT)),
 				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
 				appendRegistryName("clip", new Item()));
 	}

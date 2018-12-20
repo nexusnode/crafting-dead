@@ -65,7 +65,7 @@ public class GunController implements Triggerable {
 
 	private void hitEntity(Entity entity, RayTraceResult rayTrace) {
 		Entity entityHit = rayTrace.entityHit;
-		float damage = item.getDamage();
+		float damage = this.item.getDamage();
 		if ((entityHit instanceof EntityPlayer || entityHit instanceof EntityZombie)
 				&& rayTrace.hitVec.y >= (entityHit.posY + entityHit.getEyeHeight()))
 			damage *= HEADSHOT_MULTIPLIER;
@@ -76,13 +76,18 @@ public class GunController implements Triggerable {
 		BlockPos blockPos = rayTrace.getBlockPos();
 		IBlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
 		Block block = blockState.getBlock();
-		if (block instanceof BlockTNT && !MinecraftForge.EVENT_BUS
-				.post(new BulletCollisionEvent.PrimeTNTEvent(entity, itemStack, rayTrace))) {
+
+		if (MinecraftForge.EVENT_BUS.post(new BulletCollisionEvent.HitBlock.Pre(entity, itemStack, rayTrace)))
+			return;
+
+		if (block instanceof BlockTNT) {
 			((BlockTNT) block).explode(entity.getEntityWorld(), blockPos,
 					blockState.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)),
 					entity instanceof EntityLivingBase ? ((EntityLivingBase) entity) : null);
 			entity.getEntityWorld().setBlockToAir(blockPos);
 		}
+
+		MinecraftForge.EVENT_BUS.post(new BulletCollisionEvent.HitBlock.Post(entity, itemStack, rayTrace));
 	}
 
 	@Override

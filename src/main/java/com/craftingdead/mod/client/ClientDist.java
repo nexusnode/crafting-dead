@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import com.craftingdead.mod.CraftingDead;
@@ -20,7 +21,6 @@ import com.craftingdead.mod.ModDist;
 import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ClientPlayer;
-import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
@@ -32,6 +32,7 @@ import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
 import com.craftingdead.mod.client.transition.TransitionManager;
 import com.craftingdead.mod.client.transition.Transitions;
 import com.craftingdead.mod.entity.monster.EntityCDZombie;
+import com.craftingdead.mod.event.BulletCollisionEvent;
 import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
@@ -43,12 +44,12 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBiped.ArmPose;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -90,6 +91,9 @@ public final class ClientDist implements ModDist {
 	private static final ResourceLocation[] ICONS = new ResourceLocation[] {
 			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_16x16.png"),
 			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_32x32.png") };
+
+	public static final KeyBinding KEY_BIND_TOGGLE_FIRE_MODE = new KeyBinding("key.toggle_fire_mode", Keyboard.KEY_F,
+			"key.categories.gameplay");
 
 	private Minecraft minecraft;
 
@@ -142,7 +146,7 @@ public final class ClientDist implements ModDist {
 
 		this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE_GROW);
 
-		ClientRegistry.registerKeyBinding(ModConfig.Client.KEY_BIND_TOGGLE_FIRE_MODE);
+		ClientRegistry.registerKeyBinding(KEY_BIND_TOGGLE_FIRE_MODE);
 
 		this.registerEntityRenderers();
 	}
@@ -274,12 +278,8 @@ public final class ClientDist implements ModDist {
 		@SubscribeEvent
 		public static void onEvent(AttachCapabilitiesEvent<Entity> event) {
 			if (event.getObject() instanceof AbstractClientPlayer) {
-				DefaultPlayer<? extends AbstractClientPlayer> player = null;
-				if (event.getObject() instanceof EntityPlayerSP) {
-					player = new ClientPlayer((EntityPlayerSP) event.getObject());
-				}
-				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
-						new SerializableProvider<>(player, ModCapabilities.PLAYER));
+				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"), new SerializableProvider<>(
+						new ClientPlayer((AbstractClientPlayer) event.getObject()), ModCapabilities.PLAYER));
 			}
 		}
 
@@ -345,6 +345,12 @@ public final class ClientDist implements ModDist {
 		@SubscribeEvent
 		public static void onEvent(ModelRegistryEvent event) {
 			ModelRegistry.registerModels(CLIENT_DIST.get());
+		}
+
+		@SubscribeEvent
+		public static void onEvent(BulletCollisionEvent.HitBlock.Post event) {
+			CLIENT_DIST.get().minecraft.effectRenderer.addBlockHitEffects(event.getRayTrace().getBlockPos(),
+					event.getRayTrace());
 		}
 
 	}

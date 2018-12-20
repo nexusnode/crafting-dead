@@ -18,11 +18,25 @@ public class BulletCollisionEvent extends Event {
 		this.rayTrace = rayTrace;
 	}
 
-	@Cancelable
-	public static class PrimeTNTEvent extends BulletCollisionEvent {
+	public static class HitBlock extends BulletCollisionEvent {
 
-		public PrimeTNTEvent(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+		public HitBlock(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
 			super(entity, itemStack, rayTrace);
+		}
+
+		@Cancelable
+		public static class Pre extends HitBlock {
+
+			public Pre(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+				super(entity, itemStack, rayTrace);
+			}
+		}
+
+		public static class Post extends HitBlock {
+
+			public Post(Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+				super(entity, itemStack, rayTrace);
+			}
 		}
 
 	}
