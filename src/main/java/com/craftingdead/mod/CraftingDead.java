@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.init.ModCapabilities;
-import com.craftingdead.mod.masterserver.ConnectionState;
 import com.craftingdead.mod.network.message.MessageSetTriggerPressed;
 import com.craftingdead.mod.network.message.MessageUpdateStatistics;
 import com.craftingdead.mod.server.LogicalServer;
@@ -42,8 +41,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import net.minecraftforge.fml.relauncher.Side;
-import sm0keysa1m0n.network.system.NettyClient;
-import sm0keysa1m0n.network.wrapper.NetworkManager;
 
 /**
  * The main mod class for Crafting Dead.
@@ -74,10 +71,6 @@ public class CraftingDead {
 	 */
 	private ModMetadata metadata;
 	/**
-	 * {@link NettyClient} used for connecting to the master server
-	 */
-	private NettyClient nettyClient;
-	/**
 	 * The {@link ModDist} instance
 	 */
 	private ModDist modDist;
@@ -85,10 +78,6 @@ public class CraftingDead {
 	 * The data folder
 	 */
 	private File modFolder;
-	/**
-	 * Used for external networking (with the master server)
-	 */
-	private NetworkManager networkManager;
 	/**
 	 * {@link LogicalServer} instance
 	 */
@@ -145,13 +134,6 @@ public class CraftingDead {
 	@Mod.EventHandler
 	public void onEvent(FMLLoadCompleteEvent event) {
 		LOGGER.info("Processing {}", event.description());
-		this.nettyClient = new NettyClient(this.modDist.useEpoll());
-		try {
-			this.networkManager = this.nettyClient.connect(this.modDist.getMasterServerAddress(),
-					ConnectionState.HANDSHAKE, this.modDist::newSession);
-		} catch (Exception e) {
-			LOGGER.warn("Could not connect to the master server", e);
-		}
 		this.modDist.loadComplete(event);
 	}
 
@@ -195,11 +177,6 @@ public class CraftingDead {
 	// ================================================================================
 	// Getters
 	// ================================================================================
-
-	@Nullable
-	public NetworkManager getNetworkManager() {
-		return this.networkManager;
-	}
 
 	public ModMetadata getMetadata() {
 		return this.metadata;

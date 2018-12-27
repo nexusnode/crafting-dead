@@ -1,7 +1,6 @@
 package com.craftingdead.mod;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -15,7 +14,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import sm0keysa1m0n.network.wrapper.Session;
 
 /**
  * Implemented by each side of the game, one for the client and one for the
@@ -84,27 +82,6 @@ public interface ModDist {
 	 * @return the {@link Supplier}
 	 */
 	Supplier<? extends LogicalServer> getLogicalServerSupplier();
-
-	/**
-	 * Get the {@link InetSocketAddress} used to connect to the master server.
-	 * 
-	 * @return the {@link InetSocketAddress}
-	 */
-	InetSocketAddress getMasterServerAddress();
-
-	/**
-	 * If supported should the master server connection use Epoll.
-	 * 
-	 * @return the result
-	 */
-	boolean useEpoll();
-
-	/**
-	 * Create a new {@link S}.
-	 * 
-	 * @return the {@link S}
-	 */
-	Session newSession();
 
 	/**
 	 * Gets the folder associated with the current side.

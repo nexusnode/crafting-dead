@@ -2,7 +2,6 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ import com.craftingdead.mod.event.BulletCollisionEvent;
 import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
-import com.craftingdead.mod.masterserver.session.PlayerSession;
 import com.craftingdead.mod.network.message.MessageSetTriggerPressed;
 import com.craftingdead.mod.server.integrated.IntegratedServer;
 import com.craftingdead.mod.util.IOUtil;
@@ -171,21 +169,6 @@ public final class ClientDist implements ModDist {
 	@Override
 	public void shutdown() {
 		DiscordPresence.shutdown();
-	}
-
-	@Override
-	public InetSocketAddress getMasterServerAddress() {
-		return new InetSocketAddress("localhost", 32888);
-	}
-
-	@Override
-	public boolean useEpoll() {
-		return this.minecraft.gameSettings.isUsingNativeTransport();
-	}
-
-	@Override
-	public PlayerSession newSession() {
-		return new PlayerSession(this);
 	}
 
 	// ================================================================================
