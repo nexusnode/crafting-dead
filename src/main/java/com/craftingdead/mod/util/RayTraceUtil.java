@@ -39,70 +39,63 @@ public class RayTraceUtil {
 	 * @param partialTicks - the partialTicks (parse 1 if not available)
 	 * @return the result or null
 	 */
-	@Nullable
 	public static RayTraceResult rayTrace(final Entity entity, final double distance, final float partialTicks) {
-		if (entity != null) {
-			if (entity.world != null) {
-				RayTraceResult result = rayTraceBlocks(entity, distance, partialTicks);
-				Vec3d eyePosition = entity.getPositionEyes(partialTicks);
+		RayTraceResult result = rayTraceBlocks(entity, distance, partialTicks);
+		Vec3d eyePosition = entity.getPositionEyes(partialTicks);
 
-				double currentHitDistance = distance;
-				if (result != null)
-					currentHitDistance = result.hitVec.distanceTo(eyePosition);
+		double currentHitDistance = distance;
+		if (result != null)
+			currentHitDistance = result.hitVec.distanceTo(eyePosition);
 
-				Vec3d look = entity.getLook(1.0F);
-				Vec3d selectedVector = eyePosition.add(look.x * distance, look.y * distance, look.z * distance);
-				Entity hitEntity = null;
-				Vec3d hitEntityVector = null;
-				List<Entity> entitiesInBB = entity.world.getEntitiesInAABBexcluding(entity,
-						entity.getEntityBoundingBox().expand(look.x * distance, look.y * distance, look.z * distance)
-								.grow(1.0D, 1.0D, 1.0D),
-						Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
-							public boolean apply(@Nullable Entity entity) {
-								return entity != null && entity.canBeCollidedWith();
-							}
-						}));
+		Vec3d look = entity.getLook(1.0F);
+		Vec3d selectedVector = eyePosition.add(look.x * distance, look.y * distance, look.z * distance);
+		Entity hitEntity = null;
+		Vec3d hitEntityVector = null;
+		List<Entity> entitiesInBB = entity.world.getEntitiesInAABBexcluding(
+				entity, entity.getEntityBoundingBox().expand(look.x * distance, look.y * distance, look.z * distance)
+						.grow(1.0D, 1.0D, 1.0D),
+				Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
+					public boolean apply(@Nullable Entity entity) {
+						return entity != null && entity.canBeCollidedWith();
+					}
+				}));
 
-				double hitEntityDistance = currentHitDistance;
-				for (Entity currentEntity : entitiesInBB) {
-					AxisAlignedBB entityBoundingBox = currentEntity.getEntityBoundingBox()
-							.grow((double) currentEntity.getCollisionBorderSize());
-					RayTraceResult entityTraceResult = entityBoundingBox.calculateIntercept(eyePosition,
-							selectedVector);
+		double hitEntityDistance = currentHitDistance;
+		for (Entity currentEntity : entitiesInBB) {
+			AxisAlignedBB entityBoundingBox = currentEntity.getEntityBoundingBox()
+					.grow((double) currentEntity.getCollisionBorderSize());
+			RayTraceResult entityTraceResult = entityBoundingBox.calculateIntercept(eyePosition, selectedVector);
 
-					if (entityBoundingBox.contains(eyePosition)) {
-						if (hitEntityDistance >= 0.0D) {
+			if (entityBoundingBox.contains(eyePosition)) {
+				if (hitEntityDistance >= 0.0D) {
+					hitEntity = currentEntity;
+					hitEntityVector = entityTraceResult == null ? eyePosition : entityTraceResult.hitVec;
+					hitEntityDistance = 0.0D;
+				}
+			} else if (entityTraceResult != null) {
+				double potentialDistanceToEntity = eyePosition.distanceTo(entityTraceResult.hitVec);
+
+				if (potentialDistanceToEntity < hitEntityDistance || hitEntityDistance == 0.0D) {
+					if (currentEntity.getLowestRidingEntity() == entity.getLowestRidingEntity()
+							&& !currentEntity.canRiderInteract()) {
+						if (hitEntityDistance == 0.0D) {
 							hitEntity = currentEntity;
-							hitEntityVector = entityTraceResult == null ? eyePosition : entityTraceResult.hitVec;
-							hitEntityDistance = 0.0D;
+							hitEntityVector = entityTraceResult.hitVec;
 						}
-					} else if (entityTraceResult != null) {
-						double potentialDistanceToEntity = eyePosition.distanceTo(entityTraceResult.hitVec);
-
-						if (potentialDistanceToEntity < hitEntityDistance || hitEntityDistance == 0.0D) {
-							if (currentEntity.getLowestRidingEntity() == entity.getLowestRidingEntity()
-									&& !currentEntity.canRiderInteract()) {
-								if (hitEntityDistance == 0.0D) {
-									hitEntity = currentEntity;
-									hitEntityVector = entityTraceResult.hitVec;
-								}
-							} else {
-								hitEntity = currentEntity;
-								hitEntityVector = entityTraceResult.hitVec;
-								hitEntityDistance = potentialDistanceToEntity;
-							}
-						}
+					} else {
+						hitEntity = currentEntity;
+						hitEntityVector = entityTraceResult.hitVec;
+						hitEntityDistance = potentialDistanceToEntity;
 					}
 				}
-
-				if (hitEntity != null && (hitEntityDistance < currentHitDistance || result == null)) {
-					result = new RayTraceResult(hitEntity, hitEntityVector);
-				}
-
-				return result;
 			}
 		}
-		return null;
+
+		if (hitEntity != null && (hitEntityDistance < currentHitDistance || result == null)) {
+			result = new RayTraceResult(hitEntity, hitEntityVector);
+		}
+
+		return result;
 	}
 
 }

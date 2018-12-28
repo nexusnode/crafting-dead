@@ -41,7 +41,7 @@ public class DiscordPresence {
 
 		PRE_INITIALIZATION("discordstate.pre-initialization"), INITIALIZATION("discordstate.initialization"),
 		POST_INITIALIZATION("discordstate.post-initialization"), IDLE("discordstate.idle"),
-		SINGLEPLAYER("discordstate.singleplayer"), MULTIPLAYER("discordstate.multiplayer") {
+		SINGLEPLAYER("discordstate.singleplayer"), LAN("discordstate.lan"), MULTIPLAYER("discordstate.multiplayer") {
 			@Override
 			public void applyState(DiscordRichPresence presence, ClientDist client) {
 				ServerData serverData = client.getMinecraft().getCurrentServerData();

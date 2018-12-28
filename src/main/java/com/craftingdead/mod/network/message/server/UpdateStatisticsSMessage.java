@@ -1,4 +1,4 @@
-package com.craftingdead.mod.network.message;
+package com.craftingdead.mod.network.message.server;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.player.ClientPlayer;
@@ -9,17 +9,17 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageUpdateStatistics implements IMessage {
+public class UpdateStatisticsSMessage implements IMessage {
 
 	private int daysSurvived;
 	private int zombieKills;
 	private int playerKills;
 
-	public MessageUpdateStatistics() {
+	public UpdateStatisticsSMessage() {
 		;
 	}
 
-	public MessageUpdateStatistics(int daysSurvived, int zombieKills, int playerKills) {
+	public UpdateStatisticsSMessage(int daysSurvived, int zombieKills, int playerKills) {
 		this.daysSurvived = daysSurvived;
 		this.zombieKills = zombieKills;
 		this.playerKills = playerKills;
@@ -39,12 +39,12 @@ public class MessageUpdateStatistics implements IMessage {
 		this.playerKills = in.readInt();
 	}
 
-	public static class MessageHandlerUpdateStatistics implements IMessageHandler<MessageUpdateStatistics, IMessage> {
+	public static class UpdateStatisticsSHandler implements IMessageHandler<UpdateStatisticsSMessage, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageUpdateStatistics msg, MessageContext ctx) {
+		public IMessage onMessage(UpdateStatisticsSMessage msg, MessageContext ctx) {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientPlayer player = CraftingDead.instance().getMod().getClientDist().getPlayer();
+				ClientPlayer player = CraftingDead.instance().getModDist().getClientDist().getPlayer();
 				player.updateStatistics(msg.daysSurvived, msg.zombieKills, msg.playerKills);
 			});
 

@@ -4,6 +4,7 @@ discordstate.post-initialization=Post Initialization
 discordstate.idle=Idle
 discordstate.singleplayer=Playing Singleplayer
 discordstate.multiplayer=Playing Multiplayer
+discordstate.lan=Playing on LAN
 
 generator.zombie=Zombie
 
@@ -29,3 +30,5 @@ craftingdead.config.client.apply_branding=Apply Branding
 craftingdead.config.client.enable_discord_rpc=Enable Discord RPC
 
 key.toggle_fire_mode=Toggle Fire Mode
+
+death.attack.bullet=%1$s was shot

@@ -1,9 +1,13 @@
 package com.craftingdead.mod.init;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.client.animation.GunAnimation;
+import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
+import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.ItemGun;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -29,21 +33,24 @@ public class ModItems {
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(
-				appendRegistryName("desert_eagle",
-						new ItemGun(0, 0, 8, 0, ImmutableList.of(FireMode.Modes.SEMI),
-								() -> ModSoundEvents.DESERT_EAGLE_SHOOT)),
+		event.getRegistry().registerAll(appendRegistryName("desert_eagle",
+				new ItemGun(0, 0, 8, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.DESERT_EAGLE_SHOOT,
+						ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new), 16F)),
 				appendRegistryName("acr",
 						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.ACR_SHOOT)),
+								() -> ModSoundEvents.ACR_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 6.5F)),
 				appendRegistryName("ak47",
 						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.AK47_SHOOT)),
+								() -> ModSoundEvents.AK47_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 9F)),
 				appendRegistryName("m4a1",
 						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.M4A1_SHOOT)),
+								() -> ModSoundEvents.M4A1_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 5F)),
 				appendRegistryName("m9",
-						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT)),
+						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new), 4F)),
 				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
 				appendRegistryName("clip", new Item()));
 	}

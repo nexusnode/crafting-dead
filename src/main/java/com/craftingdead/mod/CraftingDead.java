@@ -11,8 +11,9 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.init.ModCapabilities;
-import com.craftingdead.mod.network.message.MessageSetTriggerPressed;
-import com.craftingdead.mod.network.message.MessageUpdateStatistics;
+import com.craftingdead.mod.network.message.client.SetTriggerPressedCMessage;
+import com.craftingdead.mod.network.message.server.SetTriggerPressedSMessage;
+import com.craftingdead.mod.network.message.server.UpdateStatisticsSMessage;
 import com.craftingdead.mod.server.LogicalServer;
 import com.craftingdead.mod.server.dedicated.ServerDist;
 import com.craftingdead.mod.tileentity.TileEntityLoot;
@@ -164,10 +165,14 @@ public class CraftingDead {
 
 	private void registerMessages() {
 		int discriminator = -1;
-		NETWORK_WRAPPER.registerMessage(MessageUpdateStatistics.MessageHandlerUpdateStatistics.class,
-				MessageUpdateStatistics.class, discriminator++, Side.CLIENT);
-		NETWORK_WRAPPER.registerMessage(MessageSetTriggerPressed.MessageHandlerUpdateTriggerStatus.class,
-				MessageSetTriggerPressed.class, discriminator++, Side.SERVER);
+		NETWORK_WRAPPER.registerMessage(UpdateStatisticsSMessage.UpdateStatisticsSHandler.class,
+				UpdateStatisticsSMessage.class, discriminator++, Side.CLIENT);
+		NETWORK_WRAPPER.registerMessage(SetTriggerPressedSMessage.SetTriggerPressedSHandler.class,
+				SetTriggerPressedSMessage.class, discriminator++, Side.CLIENT);
+
+		NETWORK_WRAPPER.registerMessage(SetTriggerPressedCMessage.SetTriggerPressedCHandler.class,
+				SetTriggerPressedCMessage.class, discriminator++, Side.SERVER);
+
 	}
 
 	private void registerTileEntities() {
@@ -182,7 +187,7 @@ public class CraftingDead {
 		return this.metadata;
 	}
 
-	public ModDist getMod() {
+	public ModDist getModDist() {
 		return this.modDist;
 	}
 

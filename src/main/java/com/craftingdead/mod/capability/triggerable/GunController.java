@@ -2,7 +2,7 @@ package com.craftingdead.mod.capability.triggerable;
 
 import java.util.concurrent.TimeUnit;
 
-import com.craftingdead.mod.event.BulletCollisionEvent;
+import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.init.ModDamageSource;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.ItemGun;
@@ -48,19 +48,22 @@ public class GunController implements Triggerable {
 
 	private void shoot(ItemStack itemStack, Entity entity) {
 		entity.playSound(this.item.getShootSound().get(), 1.0F, 1.0F);
-		RayTraceResult result = RayTraceUtil.rayTrace(entity, 100, 1.0F);
-		if (result != null) {
-			switch (result.typeOfHit) {
+		RayTraceResult rayTrace = RayTraceUtil.rayTrace(entity, 100, 1.0F);
+		if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(item, entity, itemStack, rayTrace)))
+			return;
+		if (rayTrace != null) {
+			switch (rayTrace.typeOfHit) {
 			case MISS:
 				break;
 			case BLOCK:
-				this.hitBlock(itemStack, entity, result);
+				this.hitBlock(itemStack, entity, rayTrace);
 				break;
 			case ENTITY:
-				this.hitEntity(entity, result);
+				this.hitEntity(entity, rayTrace);
 				break;
 			}
 		}
+		MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(item, entity, itemStack, rayTrace));
 	}
 
 	private void hitEntity(Entity entity, RayTraceResult rayTrace) {
@@ -77,17 +80,12 @@ public class GunController implements Triggerable {
 		IBlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
 		Block block = blockState.getBlock();
 
-		if (MinecraftForge.EVENT_BUS.post(new BulletCollisionEvent.HitBlock.Pre(entity, itemStack, rayTrace)))
-			return;
-
 		if (block instanceof BlockTNT) {
 			((BlockTNT) block).explode(entity.getEntityWorld(), blockPos,
 					blockState.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)),
 					entity instanceof EntityLivingBase ? ((EntityLivingBase) entity) : null);
 			entity.getEntityWorld().setBlockToAir(blockPos);
 		}
-
-		MinecraftForge.EVENT_BUS.post(new BulletCollisionEvent.HitBlock.Post(entity, itemStack, rayTrace));
 	}
 
 	@Override

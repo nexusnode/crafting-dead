@@ -21,29 +21,30 @@ import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ClientPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
+import com.craftingdead.mod.client.animation.AnimationManager;
+import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
-import com.craftingdead.mod.client.gui.ExtendedGuiScreen;
 import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.model.ModelRegistry;
 import com.craftingdead.mod.client.renderer.color.BasicColourHandler;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
-import com.craftingdead.mod.client.transition.TransitionManager;
-import com.craftingdead.mod.client.transition.Transitions;
 import com.craftingdead.mod.entity.monster.EntityCDZombie;
-import com.craftingdead.mod.event.BulletCollisionEvent;
+import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
-import com.craftingdead.mod.network.message.MessageSetTriggerPressed;
+import com.craftingdead.mod.network.message.client.SetTriggerPressedCMessage;
 import com.craftingdead.mod.server.integrated.IntegratedServer;
 import com.craftingdead.mod.util.IOUtil;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBiped.ArmPose;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -51,12 +52,11 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -65,6 +65,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -72,6 +73,7 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -101,9 +103,9 @@ public final class ClientDist implements ModDist {
 
 	private GuiIngame guiIngame;
 
-	private TransitionManager transitionManager;
-
 	private CrosshairManager crosshairManager;
+
+	private AnimationManager animationManager;
 
 	// ================================================================================
 	// Overridden Methods
@@ -142,7 +144,7 @@ public final class ClientDist implements ModDist {
 		((IReloadableResourceManager) this.minecraft.getResourceManager())
 				.registerReloadListener(this.crosshairManager);
 
-		this.transitionManager = new TransitionManager(this.minecraft, Transitions.FADE_GROW);
+		this.animationManager = new AnimationManager();
 
 		ClientRegistry.registerKeyBinding(KEY_BIND_TOGGLE_FIRE_MODE);
 
@@ -207,6 +209,10 @@ public final class ClientDist implements ModDist {
 		return this.crosshairManager;
 	}
 
+	public AnimationManager getAnimationManager() {
+		return this.animationManager;
+	}
+
 	@Nullable
 	public ClientPlayer getPlayer() {
 		return this.minecraft.player != null
@@ -225,19 +231,22 @@ public final class ClientDist implements ModDist {
 	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = CraftingDead.MOD_ID)
 	public static class Events {
 
-		private static final Supplier<ClientDist> CLIENT_DIST = () -> CraftingDead.instance().getMod().getClientDist();
+		private static final Supplier<ClientDist> CLIENT_DIST = () -> CraftingDead.instance().getModDist()
+				.getClientDist();
 
 		@SubscribeEvent
-		public static void onEvent(GuiScreenEvent.DrawScreenEvent.Pre event) {
-			event.setCanceled(CLIENT_DIST.get().transitionManager.checkDrawTransition(event.getMouseX(),
-					event.getMouseY(), event.getRenderPartialTicks(), event.getGui()));
+		public static void onEvent(TickEvent.PlayerTickEvent event) {
+			// Not using instanceof as it is slower
+			if (event.player.getClass() == EntityPlayerSP.class) {
+				CLIENT_DIST.get().animationManager.update();
+			}
 		}
 
 		@SubscribeEvent
 		public static void onEvent(MouseEvent event) {
 			if (CLIENT_DIST.get().minecraft.inGameHasFocus) {
 				if (event.getButton() == CLIENT_DIST.get().minecraft.gameSettings.keyBindAttack.getKeyCode() + 100) {
-					CraftingDead.NETWORK_WRAPPER.sendToServer(new MessageSetTriggerPressed(event.isButtonstate()));
+					CraftingDead.NETWORK_WRAPPER.sendToServer(new SetTriggerPressedCMessage(event.isButtonstate()));
 					CLIENT_DIST.get().getPlayer().setTriggerPressed(event.isButtonstate());
 					if (CLIENT_DIST.get().getPlayer().getEntity().getHeldItemMainhand()
 							.getItem() instanceof ExtendedItem
@@ -245,16 +254,6 @@ public final class ClientDist implements ModDist {
 									.getItem()).getCancelVanillaAttack())
 						event.setCanceled(true);
 				}
-			}
-		}
-
-		@SubscribeEvent
-		public static void onEvent(GuiOpenEvent event) {
-//			if (event.getGui() instanceof net.minecraft.client.gui.GuiMainMenu) {
-//				event.setGui(new GuiMainMenu());
-//			}
-			if (event.getGui() instanceof ExtendedGuiScreen) {
-				((ExtendedGuiScreen) event.getGui()).client = CLIENT_DIST.get();
 			}
 		}
 
@@ -268,8 +267,14 @@ public final class ClientDist implements ModDist {
 
 		@SubscribeEvent
 		public static void onEvent(ClientConnectedToServerEvent event) {
-			DiscordPresence.updateState(CLIENT_DIST.get().minecraft.isIntegratedServerRunning() ? GameState.SINGLEPLAYER
-					: GameState.MULTIPLAYER, CLIENT_DIST.get());
+			if (CLIENT_DIST.get().minecraft.isIntegratedServerRunning()) {
+				DiscordPresence.updateState(GameState.SINGLEPLAYER, CLIENT_DIST.get());
+			} else {
+				ServerData serverData = CLIENT_DIST.get().getMinecraft().getCurrentServerData();
+				DiscordPresence.updateState(serverData.isOnLAN() ? GameState.LAN : GameState.MULTIPLAYER,
+						CLIENT_DIST.get());
+			}
+
 		}
 
 		@SubscribeEvent
@@ -321,7 +326,7 @@ public final class ClientDist implements ModDist {
 		@SubscribeEvent
 		public static void onEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
 			if (event.getModID().equals(CraftingDead.MOD_ID)) {
-				ConfigManager.sync(CraftingDead.MOD_ID, Type.INSTANCE);
+				ConfigManager.sync(CraftingDead.MOD_ID, Config.Type.INSTANCE);
 			}
 		}
 
@@ -331,11 +336,34 @@ public final class ClientDist implements ModDist {
 		}
 
 		@SubscribeEvent
-		public static void onEvent(BulletCollisionEvent.HitBlock.Post event) {
-			CLIENT_DIST.get().minecraft.effectRenderer.addBlockHitEffects(event.getRayTrace().getBlockPos(),
-					event.getRayTrace());
+		public static void onEvent(GunEvent.ShootEvent.Pre event) {
+			// This is event can be called on both the client thread and server thread so
+			// check we are on the client first
+			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+				Supplier<GunAnimation> animation = event.getItem().getAnimations().get(GunAnimation.Type.SHOOT);
+				if (animation != null && animation.get() != null) {
+					AnimationManager animationManager = CLIENT_DIST.get().animationManager;
+					animationManager.clear(event.getItemStack());
+					animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
+				}
+				CLIENT_DIST.get().crosshairManager.addRecoil(event.getItem().getRecoil());
+			}
 		}
 
+		@SubscribeEvent
+		public static void onEvent(GunEvent.ShootEvent.Post event) {
+			// This is event can be called on both the client thread and server thread so
+			// check we are on the client first
+			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+				switch (event.getRayTrace().typeOfHit) {
+				case BLOCK:
+					CLIENT_DIST.get().minecraft.effectRenderer.addBlockHitEffects(event.getRayTrace().getBlockPos(),
+							event.getRayTrace());
+					break;
+				default:
+					break;
+				}
+			}
+		}
 	}
-
 }

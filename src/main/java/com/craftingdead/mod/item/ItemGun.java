@@ -1,16 +1,19 @@
 package com.craftingdead.mod.item;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 import com.craftingdead.mod.capability.triggerable.GunController;
+import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.init.ModCreativeTabs;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -41,8 +44,12 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	private final Supplier<SoundEvent> shootSound;
 
+	private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
+	
+	private final float recoil;
+
 	public ItemGun(int fireRate, int clipSize, int damage, int spread, List<Supplier<FireMode>> fireModes,
-			Supplier<SoundEvent> shootSound) {
+			Supplier<SoundEvent> shootSound, Map<GunAnimation.Type, Supplier<GunAnimation>> animations, float recoil) {
 		super(true, true);
 		this.fireRate = fireRate;
 		this.clipSize = clipSize;
@@ -50,6 +57,8 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 		this.spread = spread;
 		this.fireModes = ImmutableList.copyOf(fireModes);
 		this.shootSound = shootSound;
+		this.animations = ImmutableMap.copyOf(animations);
+		this.recoil = recoil;
 		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
 	}
 
@@ -79,6 +88,14 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	public Supplier<SoundEvent> getShootSound() {
 		return shootSound;
+	}
+
+	public Map<GunAnimation.Type, Supplier<GunAnimation>> getAnimations() {
+		return this.animations;
+	}
+	
+	public float getRecoil() {
+		return this.recoil;
 	}
 
 	@Override

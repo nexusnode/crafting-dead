@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.IResourceManager;
@@ -34,6 +36,8 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	private static final Random RANDOM = new Random();
+
 	private static final ResourceLocation DEFAULT_CROSSHAIR = new ResourceLocation(CraftingDead.MOD_ID, "default");
 	private static final float MINIMUM_SPREAD = 0.5F, MAXIMUM_SPREAD = 60.0F, MOVEMENT_SPREAD = 12.5F;
 
@@ -45,6 +49,8 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 	private float averageSpread = 0.0F, lastAverageSpread = averageSpread;
 
 	private Crosshair crosshair;
+
+	private float recoil;
 
 	public CrosshairManager(ClientDist client) {
 		this.client = client;
@@ -58,6 +64,16 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 		this.crosshair = this.loadedCrosshairs.get(crosshairName);
 	}
 
+	private float getActualSpread(float partialTicks) {
+		return this.crosshair.isStatic() ? 0.0F
+				: this.lastAverageSpread + (this.averageSpread - this.lastAverageSpread) * partialTicks;
+	}
+
+	public void addRecoil(float recoil) {
+		float spread = this.getActualSpread(this.client.getMinecraft().getRenderPartialTicks());
+		this.recoil += (recoil + (spread / 2)) / 7;
+	}
+
 	public void updateAndDrawCrosshairs(ScaledResolution resolution, float partialTicks,
 			CrosshairProvider crosshairProvider) {
 		this.updateSpread(crosshairProvider.getDefaultSpread());
@@ -66,8 +82,7 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 		this.averageSpread = (this.spread + this.lastSpread) / 2.0F;
 		this.lastSpread = this.spread;
 
-		final float spread = this.crosshair.isStatic() ? 0.0F
-				: this.lastAverageSpread + (this.averageSpread - this.lastAverageSpread) * partialTicks;
+		final float spread = this.getActualSpread(partialTicks);
 
 		final double x = resolution.getScaledWidth_double() / 2.0D;
 		final double y = resolution.getScaledHeight_double() / 2.0D;
@@ -96,6 +111,35 @@ public class CrosshairManager implements ISelectiveResourceReloadListener {
 			GlStateManager.disableBlend();
 		}
 		GlStateManager.popMatrix();
+
+		this.updateRecoil();
+	}
+
+	private void updateRecoil() {
+		if (this.recoil > 0) {
+			EntityPlayerSP entity = this.client.getMinecraft().player;
+			float pitch = entity.rotationPitch, yaw = entity.rotationYaw;
+
+			float randomRecoil = this.recoil - RANDOM.nextFloat();
+			switch (RANDOM.nextInt(3)) {
+			case 0:
+				pitch -= randomRecoil;
+				break;
+			case 1:
+				yaw -= randomRecoil;
+				break;
+			case 2:
+				yaw += randomRecoil;
+				break;
+			}
+
+			pitch -= randomRecoil / 2;
+
+			entity.rotationPitch = entity.prevRotationPitch + (pitch - entity.prevRotationPitch);
+			entity.rotationYaw = entity.prevRotationYaw + (yaw - entity.prevRotationYaw);
+
+			this.recoil = 0;
+		}
 	}
 
 	private void updateSpread(float defaultSpread) {

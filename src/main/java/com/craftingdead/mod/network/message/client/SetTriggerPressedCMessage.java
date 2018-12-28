@@ -1,4 +1,4 @@
-package com.craftingdead.mod.network.message;
+package com.craftingdead.mod.network.message.client;
 
 import com.craftingdead.mod.init.ModCapabilities;
 
@@ -7,15 +7,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageSetTriggerPressed implements IMessage {
+public class SetTriggerPressedCMessage implements IMessage {
 
 	private boolean triggerPressed;
 
-	public MessageSetTriggerPressed() {
+	public SetTriggerPressedCMessage() {
 		;
 	}
 
-	public MessageSetTriggerPressed(boolean triggerPressed) {
+	public SetTriggerPressedCMessage(boolean triggerPressed) {
 		this.triggerPressed = triggerPressed;
 	}
 
@@ -29,11 +29,10 @@ public class MessageSetTriggerPressed implements IMessage {
 		this.triggerPressed = in.readBoolean();
 	}
 
-	public static class MessageHandlerUpdateTriggerStatus
-			implements IMessageHandler<MessageSetTriggerPressed, IMessage> {
+	public static class SetTriggerPressedCHandler implements IMessageHandler<SetTriggerPressedCMessage, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageSetTriggerPressed msg, MessageContext ctx) {
+		public IMessage onMessage(SetTriggerPressedCMessage msg, MessageContext ctx) {
 			ctx.getServerHandler().player.getCapability(ModCapabilities.PLAYER, null)
 					.setTriggerPressed(msg.triggerPressed);
 			return null;

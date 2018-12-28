@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import com.craftingdead.mod.client.ClientDist;
+import com.craftingdead.mod.client.animation.GunAnimation;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.renderer.GlStateManager;
@@ -40,6 +41,18 @@ public class GunRenderer extends ItemRenderer {
 		GlStateManager.translate(0.5F, 0.5F, 0.5F);
 		GlStateManager.pushMatrix();
 		{
+			switch (transformType) {
+			case THIRD_PERSON_LEFT_HAND:
+			case THIRD_PERSON_RIGHT_HAND:
+			case FIRST_PERSON_LEFT_HAND:
+			case FIRST_PERSON_RIGHT_HAND:
+				GunAnimation animation = this.client.getAnimationManager().getCurrentAnimation(itemStack);
+				if (animation != null)
+					animation.render(itemStack, this.client.getMinecraft().getRenderPartialTicks());
+				break;
+			default:
+				break;
+			}
 			IBakedModel bakedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(
 					this.baseModelBaked, transformType, transformType == TransformType.FIRST_PERSON_LEFT_HAND
 							|| transformType == TransformType.THIRD_PERSON_LEFT_HAND);

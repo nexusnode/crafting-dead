@@ -1,7 +1,8 @@
 package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.network.message.MessageUpdateStatistics;
+import com.craftingdead.mod.network.message.server.SetTriggerPressedSMessage;
+import com.craftingdead.mod.network.message.server.UpdateStatisticsSMessage;
 import com.craftingdead.mod.server.LogicalServer;
 
 import net.minecraft.entity.Entity;
@@ -34,7 +35,6 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
 
-
 	public ServerPlayer(EntityPlayerMP entity, LogicalServer logicalServer) {
 		super(entity);
 		this.logicalServer = logicalServer;
@@ -54,7 +54,7 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 	private void updateStatistics() {
 		if (this.daysSurvived != this.lastDaysSurvived || this.zombieKills != this.lastZombieKills
 				|| this.playerKills != this.lastPlayerKills) {
-			this.sendMessage(new MessageUpdateStatistics(this.daysSurvived, this.zombieKills, this.playerKills));
+			this.sendMessage(new UpdateStatisticsSMessage(this.daysSurvived, this.zombieKills, this.playerKills));
 			this.lastDaysSurvived = this.daysSurvived;
 			this.lastZombieKills = this.zombieKills;
 			this.lastPlayerKills = this.playerKills;
@@ -77,6 +77,13 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 		} else if (target instanceof EntityPlayerMP) {
 			this.playerKills++;
 		}
+	}
+
+	@Override
+	public void setTriggerPressed(boolean triggerPressed) {
+		super.setTriggerPressed(triggerPressed);
+		CraftingDead.NETWORK_WRAPPER
+				.sendToAllTracking(new SetTriggerPressedSMessage(entity.getEntityId(), triggerPressed), entity);
 	}
 
 	public void copyFrom(ServerPlayer that, boolean wasDeath) {
