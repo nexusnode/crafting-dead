@@ -49,7 +49,7 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author Sm0keySa1m0n
  *
  */
-@Mod(modid = CraftingDead.MOD_ID)
+@Mod(modid = CraftingDead.MOD_ID, useMetadata = true)
 public class CraftingDead {
 	/**
 	 * Mod ID

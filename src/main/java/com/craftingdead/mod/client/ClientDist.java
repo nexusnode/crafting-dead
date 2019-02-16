@@ -19,11 +19,12 @@ import com.craftingdead.mod.ModConfig;
 import com.craftingdead.mod.ModDist;
 import com.craftingdead.mod.block.BlockLoot;
 import com.craftingdead.mod.capability.SerializableProvider;
-import com.craftingdead.mod.capability.player.ClientPlayer;
+import com.craftingdead.mod.capability.player.DefaultPlayer;
+import com.craftingdead.mod.capability.player.UserPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.animation.GunAnimation;
-import com.craftingdead.mod.client.crosshair.CrosshairManager;
+import com.craftingdead.mod.client.crosshair.CrosshairLoader;
 import com.craftingdead.mod.client.crosshair.CrosshairProvider;
 import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.model.ModelRegistry;
@@ -103,9 +104,9 @@ public final class ClientDist implements ModDist {
 
 	private GuiIngame guiIngame;
 
-	private CrosshairManager crosshairManager;
-
 	private AnimationManager animationManager;
+
+	private CrosshairLoader crosshairLoader;
 
 	// ================================================================================
 	// Overridden Methods
@@ -138,11 +139,10 @@ public final class ClientDist implements ModDist {
 			Display.setIcon(iconBuffers.toArray(new ByteBuffer[0]));
 		}
 
-		this.guiIngame = new GuiIngame(this);
+		this.crosshairLoader = new CrosshairLoader();
+		((IReloadableResourceManager) this.minecraft.getResourceManager()).registerReloadListener(this.crosshairLoader);
 
-		this.crosshairManager = new CrosshairManager(this);
-		((IReloadableResourceManager) this.minecraft.getResourceManager())
-				.registerReloadListener(this.crosshairManager);
+		this.guiIngame = new GuiIngame(this, this.crosshairLoader.getCrosshair(null));
 
 		this.animationManager = new AnimationManager();
 
@@ -205,18 +205,14 @@ public final class ClientDist implements ModDist {
 		return this.minecraft;
 	}
 
-	public CrosshairManager getCrosshairManager() {
-		return this.crosshairManager;
-	}
-
 	public AnimationManager getAnimationManager() {
 		return this.animationManager;
 	}
 
 	@Nullable
-	public ClientPlayer getPlayer() {
+	public UserPlayer getPlayer() {
 		return this.minecraft.player != null
-				? (ClientPlayer) this.minecraft.player.getCapability(ModCapabilities.PLAYER, null)
+				? (UserPlayer) this.minecraft.player.getCapability(ModCapabilities.PLAYER, null)
 				: null;
 	}
 
@@ -259,9 +255,12 @@ public final class ClientDist implements ModDist {
 
 		@SubscribeEvent
 		public static void onEvent(AttachCapabilitiesEvent<Entity> event) {
-			if (event.getObject() instanceof AbstractClientPlayer) {
+			if (event.getObject() instanceof EntityPlayerSP) {
 				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"), new SerializableProvider<>(
-						new ClientPlayer((AbstractClientPlayer) event.getObject()), ModCapabilities.PLAYER));
+						new UserPlayer((EntityPlayerSP) event.getObject()), ModCapabilities.PLAYER));
+			} else if (event.getObject() instanceof AbstractClientPlayer) {
+				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"), new SerializableProvider<>(
+						new DefaultPlayer<>((AbstractClientPlayer) event.getObject()), ModCapabilities.PLAYER));
 			}
 		}
 
@@ -314,8 +313,9 @@ public final class ClientDist implements ModDist {
 				ItemStack heldStack = CLIENT_DIST.get().getPlayer().getEntity().getHeldItemMainhand();
 				if (heldStack.getItem() instanceof CrosshairProvider) {
 					event.setCanceled(true);
-					CLIENT_DIST.get().crosshairManager.updateAndDrawCrosshairs(event.getResolution(),
-							event.getPartialTicks(), (CrosshairProvider) heldStack.getItem());
+					CLIENT_DIST.get().getPlayer()
+							.setBaseSpread(((CrosshairProvider) heldStack.getItem()).getDefaultSpread());
+					CLIENT_DIST.get().guiIngame.renderCrosshairs(event.getResolution(), event.getPartialTicks());
 				}
 				break;
 			default:
@@ -346,7 +346,7 @@ public final class ClientDist implements ModDist {
 					animationManager.clear(event.getItemStack());
 					animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
 				}
-				CLIENT_DIST.get().crosshairManager.addRecoil(event.getItem().getRecoil());
+				CLIENT_DIST.get().getPlayer().queueRecoil();
 			}
 		}
 

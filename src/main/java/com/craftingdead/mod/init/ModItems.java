@@ -26,6 +26,7 @@ public class ModItems {
 	public static final Item DESERT_EAGLE = null;
 	public static final Item M4A1 = null;
 	public static final Item M9 = null;
+	public static final Item TASER = null;
 
 	public static final Item RESIDENTIAL_LOOT = null;
 
@@ -34,23 +35,27 @@ public class ModItems {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		event.getRegistry().registerAll(appendRegistryName("desert_eagle",
-				new ItemGun(0, 0, 8, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.DESERT_EAGLE_SHOOT,
-						ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new), 16F)),
+				new ItemGun(0, 0, 8, 2.5F, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.DESERT_EAGLE_SHOOT,
+						ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
 				appendRegistryName("acr",
-						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
+						new ItemGun(80, 0, 7, 2F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
 								() -> ModSoundEvents.ACR_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 6.5F)),
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
 				appendRegistryName("ak47",
-						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
+						new ItemGun(80, 0, 7, 2F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
 								() -> ModSoundEvents.AK47_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 9F)),
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
 				appendRegistryName("m4a1",
-						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
+						new ItemGun(80, 0, 7, 1.5F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
 								() -> ModSoundEvents.M4A1_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new), 5F)),
+								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
 				appendRegistryName("m9",
-						new ItemGun(80, 0, 7, 0, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new), 4F)),
+						new ItemGun(80, 0, 7, 1F, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
+				appendRegistryName("taser",
+						new ItemGun(2000, 0, 7, 1F, ImmutableList.of(FireMode.Modes.SEMI),
+								() -> ModSoundEvents.TASER_SHOOT,
+								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
 				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
 				appendRegistryName("clip", new Item()));
 	}

@@ -1,7 +1,7 @@
 package com.craftingdead.mod.network.message.server;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.capability.player.ClientPlayer;
+import com.craftingdead.mod.capability.player.UserPlayer;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -44,10 +44,9 @@ public class UpdateStatisticsSMessage implements IMessage {
 		@Override
 		public IMessage onMessage(UpdateStatisticsSMessage msg, MessageContext ctx) {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientPlayer player = CraftingDead.instance().getModDist().getClientDist().getPlayer();
+				UserPlayer player = CraftingDead.instance().getModDist().getClientDist().getPlayer();
 				player.updateStatistics(msg.daysSurvived, msg.zombieKills, msg.playerKills);
 			});
-
 			return null;
 		}
 

@@ -2,7 +2,6 @@ package com.craftingdead.mod.item;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -35,21 +34,33 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	private final int damage;
 
-	private final int spread;
+	private final float spread;
 
 	/**
-	 * A {@link Set} of {@link FireMode}s the gun can cycle through
+	 * A {@link List} of {@link FireMode}s the gun can cycle through
 	 */
 	private final List<Supplier<FireMode>> fireModes;
 
 	private final Supplier<SoundEvent> shootSound;
 
 	private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
-	
-	private final float recoil;
 
-	public ItemGun(int fireRate, int clipSize, int damage, int spread, List<Supplier<FireMode>> fireModes,
-			Supplier<SoundEvent> shootSound, Map<GunAnimation.Type, Supplier<GunAnimation>> animations, float recoil) {
+	/**
+	 * Main constructor
+	 * 
+	 * @param fireRate   - the fire rate of the gun in milliseconds
+	 * @param clipSize   - the clip size
+	 * @param damage     - the amount of damage this gun deals when shot
+	 * @param spread     - the default spread
+	 * @param fireModes  - a {@link List} of {@link FireMode}s the gun can cycle
+	 *                   through
+	 * @param shootSound - the sound played when the gun shoots
+	 * @param animations - a {@link Map} that maps animation types to the specified
+	 *                   animation
+	 * @param recoil     - the recoil of
+	 */
+	public ItemGun(int fireRate, int clipSize, int damage, float spread, List<Supplier<FireMode>> fireModes,
+			Supplier<SoundEvent> shootSound, Map<GunAnimation.Type, Supplier<GunAnimation>> animations) {
 		super(true, true);
 		this.fireRate = fireRate;
 		this.clipSize = clipSize;
@@ -58,7 +69,6 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 		this.fireModes = ImmutableList.copyOf(fireModes);
 		this.shootSound = shootSound;
 		this.animations = ImmutableMap.copyOf(animations);
-		this.recoil = recoil;
 		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
 	}
 
@@ -78,10 +88,6 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 		return damage;
 	}
 
-	public int getSpread() {
-		return spread;
-	}
-
 	public List<Supplier<FireMode>> getFireModes() {
 		return this.fireModes;
 	}
@@ -92,10 +98,6 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	public Map<GunAnimation.Type, Supplier<GunAnimation>> getAnimations() {
 		return this.animations;
-	}
-	
-	public float getRecoil() {
-		return this.recoil;
 	}
 
 	@Override
@@ -129,7 +131,7 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	@Override
 	public float getDefaultSpread() {
-		return 0.1F;
+		return this.spread;
 	}
 
 }

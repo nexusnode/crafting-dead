@@ -18,11 +18,13 @@ public class ModSoundEvents {
 	public static final SoundEvent DESERT_EAGLE_SHOOT = null;
 	public static final SoundEvent M4A1_SHOOT = null;
 	public static final SoundEvent M9_SHOOT = null;
+	public static final SoundEvent TASER_SHOOT = null;
 
 	@SubscribeEvent
 	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
 		event.getRegistry().registerAll(createSoundEvent("acr_shoot"), createSoundEvent("ak47_shoot"),
-				createSoundEvent("desert_eagle_shoot"), createSoundEvent("m4a1_shoot"), createSoundEvent("m9_shoot"));
+				createSoundEvent("desert_eagle_shoot"), createSoundEvent("m4a1_shoot"), createSoundEvent("m9_shoot"),
+				createSoundEvent("taser_shoot"));
 	}
 
 	private static SoundEvent createSoundEvent(String name) {

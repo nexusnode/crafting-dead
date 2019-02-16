@@ -2,10 +2,12 @@
   "modid": "craftingdead",
   "name": "Crafting Dead",
   "description": "The Minecraft zombie survival mod",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${mod_version}",
+  "mcversion": "${minecraft_version}",
   "logoFile": "assets/craftingdead/textures/gui/icons/icon_128x128.png",
   "url": "craftingdead.com",
   "authorList": ["Sm0keySa1m0n", "ThatAbstractWolf", "woag", "Phoenix"],
-  "credits": "The Crafting Dead Development Team"
+  "credits": "The Crafting Dead Development Team",
+  "useDependencyInformation": true,
+  "dependencies": ["codechickenlib@[${ccl_version},)"]
 }]

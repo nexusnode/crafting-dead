@@ -28,5 +28,11 @@
     "sounds":[
       "craftingdead:m9_shoot"
     ]
+  },
+  "taser_shoot":{
+    "category":"master",
+    "sounds":[
+      "craftingdead:taser_shoot"
+    ]
   }
 }
