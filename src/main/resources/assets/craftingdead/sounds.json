@@ -2,7 +2,7 @@
   "acr_shoot":{
     "category":"master",
     "sounds":[
-        "craftingdead:acr_shoot"
+      "craftingdead:acr_shoot"
     ]
   },
   "ak47_shoot":{
@@ -33,6 +33,18 @@
     "category":"master",
     "sounds":[
       "craftingdead:taser_shoot"
+    ]
+  },
+  "magnum_shoot":{
+    "category":"master",
+    "sounds":[
+      "craftingdead:magnum_shoot"
+    ]
+  },
+  "fn57_shoot":{
+    "category":"master",
+    "sounds":[
+      "craftingdead:fn57_shoot"
     ]
   }
 }

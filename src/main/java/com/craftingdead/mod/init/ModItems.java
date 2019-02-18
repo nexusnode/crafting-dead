@@ -27,6 +27,8 @@ public class ModItems {
 	public static final Item M4A1 = null;
 	public static final Item M9 = null;
 	public static final Item TASER = null;
+	public static final Item MAGNUM = null;
+	public static final Item FN57 = null;
 
 	public static final Item RESIDENTIAL_LOOT = null;
 
@@ -34,30 +36,81 @@ public class ModItems {
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(appendRegistryName("desert_eagle",
-				new ItemGun(0, 0, 8, 2.5F, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.DESERT_EAGLE_SHOOT,
-						ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
-				appendRegistryName("acr",
-						new ItemGun(80, 0, 7, 2F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.ACR_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
-				appendRegistryName("ak47",
-						new ItemGun(80, 0, 7, 2F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.AK47_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
-				appendRegistryName("m4a1",
-						new ItemGun(80, 0, 7, 1.5F, ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI),
-								() -> ModSoundEvents.M4A1_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))),
-				appendRegistryName("m9",
-						new ItemGun(80, 0, 7, 1F, ImmutableList.of(FireMode.Modes.SEMI), () -> ModSoundEvents.M9_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
-				appendRegistryName("taser",
-						new ItemGun(2000, 0, 7, 1F, ImmutableList.of(FireMode.Modes.SEMI),
-								() -> ModSoundEvents.TASER_SHOOT,
-								ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))),
-				appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT)),
-				appendRegistryName("clip", new Item()));
+		event.getRegistry().registerAll( //
+				appendRegistryName("desert_eagle", new ItemGun.Builder() //
+						.setFireRate(0) //
+						.setClipSize(0) //
+						.setDamage(8) //
+						.setSpread(3F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("acr", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(2F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.ACR_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("ak47", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(2F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.AK47_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("m4a1", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(1.5F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.M4A1_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("m9", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(1F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.M9_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("taser", new ItemGun.Builder() //
+						.setFireRate(2000) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(1F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.TASER_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("magnum", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(1F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("fn57", new ItemGun.Builder() //
+						.setFireRate(80) //
+						.setClipSize(0) //
+						.setDamage(7) //
+						.setSpread(1F) //
+						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
+						.setShootSound(() -> ModSoundEvents.FN57_SHOOT) //
+						.setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new)) //
+						.build() //
+				), appendRegistryName("residential_loot", new ItemBlock(ModBlocks.RESIDENTIAL_LOOT) //
+				), appendRegistryName("clip", new Item()));
 	}
 
 	private static Item appendRegistryName(String registryName, Item item) {

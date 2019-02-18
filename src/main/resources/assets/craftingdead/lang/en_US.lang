@@ -21,6 +21,8 @@ item.craftingdead.desert_eagle.name=Desert Eagle
 item.craftingdead.m4a1.name=M4A1
 item.craftingdead.m9.name=M9
 item.craftingdead.taser.name=Taser
+item.craftingdead.magnum.name=Magnum
+item.craftingdead.fn57.name=Five-seveN
 
 tile.craftingdead.residential_loot.name=Residential Loot
 

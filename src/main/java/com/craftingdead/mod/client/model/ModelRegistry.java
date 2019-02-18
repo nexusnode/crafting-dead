@@ -32,6 +32,10 @@ public class ModelRegistry {
 		registerItemModel(ModItems.M9, new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/m9")));
 		registerItemModel(ModItems.TASER,
 				new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/taser")));
+		registerItemModel(ModItems.MAGNUM,
+				new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/44_magnum")));
+		registerItemModel(ModItems.FN57,
+				new GunRenderer(client, new ResourceLocation(CraftingDead.MOD_ID, "item/fn57")));
 
 		registerItemModel(ModItems.RESIDENTIAL_LOOT, "normal");
 	}

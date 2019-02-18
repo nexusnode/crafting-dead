@@ -28,8 +28,6 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	 */
 	private final int fireRate;
 
-	private final int fireDistance = 120;
-
 	private final int clipSize;
 
 	private final int damage;
@@ -46,8 +44,6 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
 
 	/**
-	 * Main constructor
-	 * 
 	 * @param fireRate   - the fire rate of the gun in milliseconds
 	 * @param clipSize   - the clip size
 	 * @param damage     - the amount of damage this gun deals when shot
@@ -59,25 +55,20 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	 *                   animation
 	 * @param recoil     - the recoil of
 	 */
-	public ItemGun(int fireRate, int clipSize, int damage, float spread, List<Supplier<FireMode>> fireModes,
-			Supplier<SoundEvent> shootSound, Map<GunAnimation.Type, Supplier<GunAnimation>> animations) {
+	private ItemGun(Builder builder) {
 		super(true, true);
-		this.fireRate = fireRate;
-		this.clipSize = clipSize;
-		this.damage = damage;
-		this.spread = spread;
-		this.fireModes = ImmutableList.copyOf(fireModes);
-		this.shootSound = shootSound;
-		this.animations = ImmutableMap.copyOf(animations);
+		this.fireRate = builder.fireRate;
+		this.clipSize = builder.clipSize;
+		this.damage = builder.damage;
+		this.spread = builder.spread;
+		this.fireModes = builder.fireModes;
+		this.shootSound = builder.shootSound;
+		this.animations = builder.animations;
 		this.setCreativeTab(ModCreativeTabs.CRAFTING_DEAD);
 	}
 
 	public int getFireRate() {
 		return fireRate;
-	}
-
-	public int getFireDistance() {
-		return fireDistance;
 	}
 
 	public int getClipSize() {
@@ -132,6 +123,63 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 	@Override
 	public float getDefaultSpread() {
 		return this.spread;
+	}
+
+	public static class Builder {
+
+		private Integer fireRate;
+
+		private Integer clipSize;
+
+		private Integer damage;
+
+		private Float spread;
+
+		private List<Supplier<FireMode>> fireModes;
+
+		private Supplier<SoundEvent> shootSound;
+
+		private Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
+
+		public Builder setFireRate(int fireRate) {
+			this.fireRate = fireRate;
+			return this;
+		}
+
+		public Builder setClipSize(int clipSize) {
+			this.clipSize = clipSize;
+			return this;
+		}
+
+		public Builder setDamage(int damage) {
+			this.damage = damage;
+			return this;
+		}
+
+		public Builder setSpread(float spread) {
+			this.spread = spread;
+			return this;
+		}
+
+		public Builder setFireModes(List<Supplier<FireMode>> fireModes) {
+			this.fireModes = ImmutableList.copyOf(fireModes);
+			return this;
+		}
+
+		public Builder setShootSound(Supplier<SoundEvent> shootSound) {
+			this.shootSound = shootSound;
+			return this;
+		}
+
+		public Builder setAnimations(Map<GunAnimation.Type, Supplier<GunAnimation>> animations) {
+			this.animations = ImmutableMap.copyOf(animations);
+			return this;
+		}
+
+		public ItemGun build() {
+			return new ItemGun(this);
+		}
+
 	}
 
 }
