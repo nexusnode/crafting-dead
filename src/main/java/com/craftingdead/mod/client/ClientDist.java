@@ -30,13 +30,14 @@ import com.craftingdead.mod.client.gui.GuiIngame;
 import com.craftingdead.mod.client.model.ModelRegistry;
 import com.craftingdead.mod.client.renderer.color.BasicColourHandler;
 import com.craftingdead.mod.client.renderer.entity.RenderCDZombie;
+import com.craftingdead.mod.client.renderer.entity.RenderCorpse;
+import com.craftingdead.mod.entity.EntityCorpse;
 import com.craftingdead.mod.entity.monster.EntityCDZombie;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.init.ModBlocks;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.item.ExtendedItem;
 import com.craftingdead.mod.network.message.client.SetTriggerPressedCMessage;
-import com.craftingdead.mod.server.integrated.IntegratedServer;
 import com.craftingdead.mod.util.IOUtil;
 import com.google.common.collect.Lists;
 
@@ -93,8 +94,9 @@ public final class ClientDist implements ModDist {
 			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_16x16.png"),
 			new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/icons/icon_32x32.png") };
 
-	public static final KeyBinding KEY_BIND_TOGGLE_FIRE_MODE = new KeyBinding("key.toggle_fire_mode", Keyboard.KEY_F,
-			"key.categories.gameplay");
+	public static final KeyBinding RELOAD = new KeyBinding("key.reload", Keyboard.KEY_R, "key.categories.gameplay"),
+			KEY_BIND_TOGGLE_FIRE_MODE = new KeyBinding("key.toggle_fire_mode", Keyboard.KEY_F,
+					"key.categories.gameplay");
 
 	private Minecraft minecraft;
 
@@ -111,11 +113,6 @@ public final class ClientDist implements ModDist {
 	// ================================================================================
 	// Overridden Methods
 	// ================================================================================
-
-	@Override
-	public Supplier<IntegratedServer> getLogicalServerSupplier() {
-		return IntegratedServer::new;
-	}
 
 	@Override
 	public void preInitialization(FMLPreInitializationEvent event) {
@@ -147,6 +144,7 @@ public final class ClientDist implements ModDist {
 		this.animationManager = new AnimationManager();
 
 		ClientRegistry.registerKeyBinding(KEY_BIND_TOGGLE_FIRE_MODE);
+		ClientRegistry.registerKeyBinding(RELOAD);
 
 		this.registerEntityRenderers();
 	}
@@ -183,6 +181,14 @@ public final class ClientDist implements ModDist {
 			@Override
 			public Render<? super EntityCDZombie> createRenderFor(RenderManager manager) {
 				return new RenderCDZombie(manager, new ModelBiped(), 0.4F);
+			}
+
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityCorpse.class, new IRenderFactory<EntityCorpse>() {
+
+			@Override
+			public Render<? super EntityCorpse> createRenderFor(RenderManager manager) {
+				return new RenderCorpse(manager);
 			}
 
 		});
@@ -236,6 +242,7 @@ public final class ClientDist implements ModDist {
 			if (event.player.getClass() == EntityPlayerSP.class) {
 				CLIENT_DIST.get().animationManager.update();
 			}
+
 		}
 
 		@SubscribeEvent

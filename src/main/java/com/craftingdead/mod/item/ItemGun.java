@@ -32,6 +32,8 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	private final int damage;
 
+	private final float reloadTime;
+
 	private final float spread;
 
 	/**
@@ -43,23 +45,12 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
 
-	/**
-	 * @param fireRate   - the fire rate of the gun in milliseconds
-	 * @param clipSize   - the clip size
-	 * @param damage     - the amount of damage this gun deals when shot
-	 * @param spread     - the default spread
-	 * @param fireModes  - a {@link List} of {@link FireMode}s the gun can cycle
-	 *                   through
-	 * @param shootSound - the sound played when the gun shoots
-	 * @param animations - a {@link Map} that maps animation types to the specified
-	 *                   animation
-	 * @param recoil     - the recoil of
-	 */
 	private ItemGun(Builder builder) {
 		super(true, true);
 		this.fireRate = builder.fireRate;
 		this.clipSize = builder.clipSize;
 		this.damage = builder.damage;
+		this.reloadTime = builder.reloadTime;
 		this.spread = builder.spread;
 		this.fireModes = builder.fireModes;
 		this.shootSound = builder.shootSound;
@@ -77,6 +68,10 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 	public int getDamage() {
 		return damage;
+	}
+
+	public float getReloadTime() {
+		return this.reloadTime;
 	}
 
 	public List<Supplier<FireMode>> getFireModes() {
@@ -133,6 +128,8 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 		private Integer damage;
 
+		private Float reloadTime;
+
 		private Float spread;
 
 		private List<Supplier<FireMode>> fireModes;
@@ -153,6 +150,11 @@ public class ItemGun extends ExtendedItem implements CrosshairProvider {
 
 		public Builder setDamage(int damage) {
 			this.damage = damage;
+			return this;
+		}
+
+		public Builder setReloadTime(float reloadTime) {
+			this.reloadTime = reloadTime;
 			return this;
 		}
 

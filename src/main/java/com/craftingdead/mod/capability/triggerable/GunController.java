@@ -32,6 +32,8 @@ public class GunController implements Triggerable {
 
 	private FireMode fireMode;
 
+	private float reloadCounter;
+
 	public GunController(ItemGun item) {
 		this.item = item;
 		this.fireMode = item.getFireModes().get(0).get();
@@ -39,6 +41,10 @@ public class GunController implements Triggerable {
 
 	@Override
 	public void update(ItemStack itemStack, Entity entity) {
+		// On finished reloading
+		if (this.reloadCounter-- == 0) {
+
+		}
 		if (this.fireMode.canShoot(this.triggerPressed) && System.nanoTime() - this.lastShot > TimeUnit.NANOSECONDS
 				.convert(this.item.getFireRate(), TimeUnit.MILLISECONDS)) {
 			this.lastShot = System.nanoTime();
@@ -49,7 +55,7 @@ public class GunController implements Triggerable {
 	private void shoot(ItemStack itemStack, Entity entity) {
 		entity.playSound(this.item.getShootSound().get(), 1.0F, 1.0F);
 		RayTraceResult rayTrace = RayTraceUtil.rayTrace(entity, 100, 1.0F);
-		if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(item, entity, itemStack, rayTrace)))
+		if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(this.item, entity, itemStack, rayTrace)))
 			return;
 		if (rayTrace != null) {
 			switch (rayTrace.typeOfHit) {
@@ -63,7 +69,7 @@ public class GunController implements Triggerable {
 				break;
 			}
 		}
-		MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(item, entity, itemStack, rayTrace));
+		MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(this.item, entity, itemStack, rayTrace));
 	}
 
 	private void hitEntity(Entity entity, RayTraceResult rayTrace) {
@@ -85,6 +91,14 @@ public class GunController implements Triggerable {
 					blockState.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)),
 					entity instanceof EntityLivingBase ? ((EntityLivingBase) entity) : null);
 			entity.getEntityWorld().setBlockToAir(blockPos);
+		}
+	}
+
+	public void reload() {
+		// If not already reloading
+		if (this.reloadCounter == 0) {
+			// Set reload time
+			this.reloadCounter = this.item.getReloadTime();
 		}
 	}
 

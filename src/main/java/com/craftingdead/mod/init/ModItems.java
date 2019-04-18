@@ -41,6 +41,7 @@ public class ModItems {
 						.setFireRate(0) //
 						.setClipSize(0) //
 						.setDamage(8) //
+						.setReloadTime(2.2F) //
 						.setSpread(3F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT) //
@@ -50,6 +51,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(2F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.ACR_SHOOT) //
@@ -59,6 +61,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(2F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.AK47_SHOOT) //
@@ -68,6 +71,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(1.5F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.AUTO, FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.M4A1_SHOOT) //
@@ -77,6 +81,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(1F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.M9_SHOOT) //
@@ -86,6 +91,7 @@ public class ModItems {
 						.setFireRate(2000) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(1F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.TASER_SHOOT) //
@@ -95,6 +101,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(1F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT) //
@@ -104,6 +111,7 @@ public class ModItems {
 						.setFireRate(80) //
 						.setClipSize(0) //
 						.setDamage(7) //
+						.setReloadTime(2.2F) //
 						.setSpread(1F) //
 						.setFireModes(ImmutableList.of(FireMode.Modes.SEMI)) //
 						.setShootSound(() -> ModSoundEvents.FN57_SHOOT) //

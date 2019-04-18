@@ -24,6 +24,8 @@ item.craftingdead.taser.name=Taser
 item.craftingdead.magnum.name=Magnum
 item.craftingdead.fn57.name=Five-seveN
 
+craftingdead.broken_leg=Broken Leg
+
 tile.craftingdead.residential_loot.name=Residential Loot
 
 multiplayer.disconnect.handshake_fail=Client failed handshake
@@ -31,7 +33,10 @@ multiplayer.disconnect.handshake_fail=Client failed handshake
 craftingdead.config.client=Client
 craftingdead.config.client.apply_branding=Apply Branding
 craftingdead.config.client.enable_discord_rpc=Enable Discord RPC
+craftingdead.config.client.display_blood=Display Blood
 
 key.toggle_fire_mode=Toggle Fire Mode
 
 death.attack.bullet=%1$s was shot
+
+message.broken_leg=Ouch! You broke your leg.

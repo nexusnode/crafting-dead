@@ -48,7 +48,7 @@ configurations {
 
 dependencies {
   	packagedCompile 'com.github.Vatuu:discord-rpc:1.5.1'
-	deobfCompile 'codechicken:CodeChickenLib:1.12.2-3.2.2.353:universal'		
+	deobfCompile "codechicken:CodeChickenLib:${minecraft_version}-${ccl_version}:universal"
     configurations.compile.extendsFrom(configurations.packagedCompile)
     configurations.packaged.extendsFrom(configurations.packagedCompile)
 }
@@ -67,7 +67,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
                 
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'mod_version':mod_version, 'minecraft_version':minecraft_version, 'ccl_version':ccl_version
     }
         
     from(sourceSets.main.resources.srcDirs) {

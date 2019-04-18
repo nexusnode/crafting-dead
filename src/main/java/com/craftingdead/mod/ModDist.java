@@ -2,11 +2,9 @@ package com.craftingdead.mod;
 
 import java.io.File;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.server.LogicalServer;
-import com.craftingdead.mod.server.dedicated.ServerDist;
+import com.craftingdead.mod.server.ServerDist;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
@@ -74,14 +72,6 @@ public interface ModDist {
 	default void shutdown() {
 		;
 	}
-
-	/**
-	 * Get a {@link Supplier} for the {@link LogicalServer} associated with this
-	 * side.
-	 * 
-	 * @return the {@link Supplier}
-	 */
-	Supplier<? extends LogicalServer> getLogicalServerSupplier();
 
 	/**
 	 * Gets the folder associated with the current side.

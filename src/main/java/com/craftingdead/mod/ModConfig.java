@@ -17,6 +17,9 @@ public class ModConfig {
 		@Config.LangKey("craftingdead.config.client.enable_discord_rpc")
 		@Config.RequiresMcRestart
 		public boolean enableDiscordRpc = true;
+		
+		@Config.LangKey("craftingdead.config.client.display_blood")
+		public boolean displayBlood = true;
 
 	}
 

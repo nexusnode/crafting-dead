@@ -15,17 +15,25 @@ public interface Player<E extends EntityPlayer> extends INBTSerializable<NBTTagC
 	 * When the player kills another entity
 	 * 
 	 * @param target - the {@link Entity} killed
-	 * @param cause  - the {@link DamageSource}
+	 * @return if the event should be cancelled
 	 */
-	void onKill(Entity target, DamageSource cause);
+	boolean onKill(Entity target);
+
+	/**
+	 * When the player's health reaches 0
+	 * 
+	 * @param cause - the source of the damage
+	 * @return if the event should be cancelled
+	 */
+	boolean onDeath(DamageSource cause);
 
 	void setTriggerPressed(boolean triggerPressed);
 
 	int getDaysSurvived();
 
-	int getZombieKills();
+	int getZombiesKilled();
 
-	int getPlayerKills();
+	int getPlayersKilled();
 
 	E getEntity();
 

@@ -3,28 +3,30 @@ package com.craftingdead.mod;
 import java.io.File;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.init.ModCapabilities;
 import com.craftingdead.mod.network.message.client.SetTriggerPressedCMessage;
 import com.craftingdead.mod.network.message.server.SetTriggerPressedSMessage;
 import com.craftingdead.mod.network.message.server.UpdateStatisticsSMessage;
-import com.craftingdead.mod.server.LogicalServer;
-import com.craftingdead.mod.server.dedicated.ServerDist;
+import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.tileentity.TileEntityLoot;
 import com.craftingdead.mod.util.DistExecutor;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -79,10 +81,6 @@ public class CraftingDead {
 	 * The data folder
 	 */
 	private File modFolder;
-	/**
-	 * {@link LogicalServer} instance
-	 */
-	private LogicalServer logicalServer;
 
 	private CraftingDead() {
 		instance = this;
@@ -141,17 +139,11 @@ public class CraftingDead {
 	@Mod.EventHandler
 	public void onEvent(FMLServerStartingEvent event) {
 		LOGGER.info("Processing {}", event.description());
-		this.logicalServer = this.modDist.getLogicalServerSupplier().get();
-		MinecraftForge.EVENT_BUS.register(this.logicalServer);
 	}
 
 	@Mod.EventHandler
 	public void onEvent(FMLServerStoppingEvent event) {
 		LOGGER.info("Processing {}", event.description());
-		if (this.logicalServer != null) {
-			MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
-			this.logicalServer = null;
-		}
 	}
 
 	@NetworkCheckHandler
@@ -191,11 +183,6 @@ public class CraftingDead {
 		return this.modDist;
 	}
 
-	@Nullable
-	public LogicalServer getLogicalServer() {
-		return this.logicalServer;
-	}
-
 	public File getModFolder() {
 		return this.modFolder;
 	}
@@ -224,9 +211,14 @@ public class CraftingDead {
 
 		@SubscribeEvent
 		public static void onEvent(LivingDeathEvent event) {
-			if (event.getSource().getTrueSource() instanceof EntityPlayer)
-				event.getSource().getTrueSource().getCapability(ModCapabilities.PLAYER, null).onKill(event.getEntity(),
-						event.getSource());
+			if (!event.isCanceled() && event.getEntity() instanceof EntityPlayer) {
+				event.setCanceled(
+						event.getEntity().getCapability(ModCapabilities.PLAYER, null).onDeath(event.getSource()));
+			}
+			if (!event.isCanceled() && event.getSource().getTrueSource() instanceof EntityPlayer) {
+				event.setCanceled(event.getSource().getTrueSource().getCapability(ModCapabilities.PLAYER, null)
+						.onKill(event.getEntity()));
+			}
 		}
 
 		@SubscribeEvent
@@ -235,6 +227,22 @@ public class CraftingDead {
 			Triggerable triggerable = itemStack.getCapability(ModCapabilities.TRIGGERABLE, null);
 			if (triggerable != null)
 				triggerable.update(itemStack, event.getEntity());
+		}
+
+		@SubscribeEvent
+		public static void onEvent(PlayerEvent.Clone event) {
+			ServerPlayer that = (ServerPlayer) event.getOriginal().getCapability(ModCapabilities.PLAYER, null);
+			ServerPlayer player = (ServerPlayer) event.getEntityPlayer().getCapability(ModCapabilities.PLAYER, null);
+			player.copyFrom(that, event.isWasDeath());
+		}
+
+		@SubscribeEvent
+		public static void onEvent(AttachCapabilitiesEvent<Entity> event) {
+			if (event.getObject() instanceof EntityPlayerMP) {
+				ServerPlayer player = new ServerPlayer((EntityPlayerMP) event.getObject());
+				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
+						new SerializableProvider<>(player, ModCapabilities.PLAYER));
+			}
 		}
 
 	}

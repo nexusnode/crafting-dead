@@ -22,8 +22,8 @@ public class UserPlayer extends DefaultPlayer<EntityPlayerSP> {
 
 	public void updateStatistics(int daysSurvived, int zombieKills, int playerKills) {
 		this.daysSurvived = daysSurvived;
-		this.zombieKills = zombieKills;
-		this.playerKills = playerKills;
+		this.zombiesKilled = zombieKills;
+		this.playersKilled = playerKills;
 	}
 
 	@Override

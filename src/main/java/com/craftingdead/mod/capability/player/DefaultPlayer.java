@@ -1,15 +1,22 @@
 package com.craftingdead.mod.capability.player;
 
+import java.util.Random;
 import java.util.UUID;
 
 import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.init.ModCapabilities;
+import com.craftingdead.mod.init.ModPotions;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -20,7 +27,10 @@ import net.minecraft.util.DamageSource;
  * @param <E> - the associated {@link EntityPlayer}
  */
 public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
-
+	/**
+	 * Random
+	 */
+	private static final Random RANDOM = new Random();
 	/**
 	 * The vanilla entity
 	 */
@@ -30,13 +40,13 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	 */
 	protected int daysSurvived;
 	/**
-	 * Zombie kills
+	 * Zombies killed
 	 */
-	protected int zombieKills;
+	protected int zombiesKilled;
 	/**
-	 * Player kills
+	 * Players killed
 	 */
-	protected int playerKills;
+	protected int playersKilled;
 	/**
 	 * If the trigger on the current held item is pressed
 	 */
@@ -58,6 +68,19 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	@Override
 	public void update() {
 		this.updateHeldStack();
+		if (!this.entity.capabilities.isCreativeMode && !this.entity.isPotionActive(ModPotions.BROKEN_LEG)
+				&& this.entity.onGround && !this.entity.isInWater()
+				&& ((this.entity.fallDistance > 4F && RANDOM.nextInt(3) == 0) || this.entity.fallDistance > 10F)) {
+			this.entity.sendStatusMessage(new TextComponentTranslation("message.broken_leg")
+					.setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+			this.entity.addPotionEffect(new PotionEffect(ModPotions.BROKEN_LEG, 9999999, 4));
+			this.entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 1));
+		}
+		if (this.entity.capabilities.isCreativeMode) {
+			if (this.entity.isPotionActive(ModPotions.BROKEN_LEG)) {
+				this.entity.removePotionEffect(ModPotions.BROKEN_LEG);
+			}
+		}
 	}
 
 	private void updateHeldStack() {
@@ -72,15 +95,14 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 		}
 	}
 
-	/**
-	 * When the player kills another entity
-	 * 
-	 * @param target - the {@link Entity} killed
-	 * @param cause  - the {@link DamageSource}
-	 */
 	@Override
-	public void onKill(Entity target, DamageSource cause) {
-		;
+	public boolean onKill(Entity target) {
+		return false;
+	}
+
+	@Override
+	public boolean onDeath(DamageSource cause) {
+		return false;
 	}
 
 	@Override
@@ -96,16 +118,16 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setInteger("daysSurvived", this.daysSurvived);
-		nbt.setInteger("zombieKills", this.zombieKills);
-		nbt.setInteger("playerKills", this.playerKills);
+		nbt.setInteger("zombieKills", this.zombiesKilled);
+		nbt.setInteger("playerKills", this.playersKilled);
 		return nbt;
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt) {
 		this.daysSurvived = nbt.getInteger("daysSurvived");
-		this.zombieKills = nbt.getInteger("zombieKills");
-		this.playerKills = nbt.getInteger("playerKills");
+		this.zombiesKilled = nbt.getInteger("zombieKills");
+		this.playersKilled = nbt.getInteger("playerKills");
 	}
 
 	@Override
@@ -114,13 +136,13 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	}
 
 	@Override
-	public int getZombieKills() {
-		return this.zombieKills;
+	public int getZombiesKilled() {
+		return this.zombiesKilled;
 	}
 
 	@Override
-	public int getPlayerKills() {
-		return this.playerKills;
+	public int getPlayersKilled() {
+		return this.playersKilled;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.craftingdead.mod.init;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.entity.EntityCorpse;
 import com.craftingdead.mod.entity.monster.EntityCDZombie;
 import com.craftingdead.mod.entity.monster.EntityCDZombieFast;
 import com.craftingdead.mod.entity.monster.EntityCDZombieTank;
@@ -22,22 +23,41 @@ public class ModEntities {
 
 	@SubscribeEvent
 	public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-		EntityEntry zombie = buildZombie("zombie", id++, EntityCDZombie.class, 40, 3, 8);
-		EntityEntry zombieFast = buildZombie("zombie_fast", id++, EntityCDZombieFast.class, 15, 2, 4);
-		EntityEntry zombieTank = buildZombie("zombie_tank", id++, EntityCDZombieTank.class, 5, 2, 4);
-		EntityEntry zombieWeak = buildZombie("zombie_weak", id++, EntityCDZombieWeak.class, 30, 4, 12);
-		event.getRegistry().registerAll(zombie, zombieFast, zombieTank, zombieWeak);
+		event.getRegistry().registerAll( //
+				startBuilding("zombie") //
+						.entity(EntityCDZombie.class) //
+						.tracker(64, 3, false) //
+						.egg(0x000000, 0xFFFFFF) //
+						.spawn(EnumCreatureType.MONSTER, 40, 3, 8, ModBiomes.getZombieBiomes()) //
+						.build(), //
+				startBuilding("zombie_fast") //
+						.entity(EntityCDZombieFast.class) //
+						.tracker(64, 3, false) //
+						.egg(0x000000, 0xFFFFFF) //
+						.spawn(EnumCreatureType.MONSTER, 15, 2, 4, ModBiomes.getZombieBiomes()) //
+						.build(),
+				startBuilding("zombie_tank") //
+						.entity(EntityCDZombieTank.class) //
+						.tracker(64, 3, false) //
+						.egg(0x000000, 0xFFFFFF) //
+						.spawn(EnumCreatureType.MONSTER, 5, 2, 4, ModBiomes.getZombieBiomes()) //
+						.build(),
+				startBuilding("zombie_weak") //
+						.entity(EntityCDZombieWeak.class) //
+						.tracker(64, 3, false) //
+						.egg(0x000000, 0xFFFFFF) //
+						.spawn(EnumCreatureType.MONSTER, 30, 4, 12, ModBiomes.getZombieBiomes()) //
+						.build(),
+				startBuilding("corpse") //
+						.entity(EntityCorpse.class) //
+						.tracker(64, 10, false) //
+						.egg(0x000000, 0xFFFFFF) //
+						.build() //
+		);
 	}
 
-	private static EntityEntry buildZombie(String registryName, int id, Class<? extends EntityCDZombie> zombieType,
-			int spawnWeight, int spawnMin, int spawnMax) {
-		return startBuilding(registryName, id).entity(zombieType).tracker(64, 3, false).egg(0x000000, 0xFFFFFF)
-				.spawn(EnumCreatureType.MONSTER, spawnWeight, spawnMin, spawnMax, ModBiomes.getZombieBiomes())
-				.build();
-	}
-
-	private static EntityEntryBuilder<Entity> startBuilding(String registryName, int id) {
-		return EntityEntryBuilder.create().id(new ResourceLocation(CraftingDead.MOD_ID, registryName), id)
+	private static EntityEntryBuilder<Entity> startBuilding(String registryName) {
+		return EntityEntryBuilder.create().id(new ResourceLocation(CraftingDead.MOD_ID, registryName), id++)
 				.name(String.format("%s%s%s", CraftingDead.MOD_ID, ".", registryName));
 	}
 
