@@ -1,22 +1,27 @@
 package com.craftingdead.mod.client.renderer.item;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 
+@SuppressWarnings("deprecation")
 public class GunRenderer extends ItemRenderer {
 
 	private ClientDist client;
@@ -31,14 +36,14 @@ public class GunRenderer extends ItemRenderer {
 	}
 
 	@Override
-	public void bakeModels(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-		IModel model = ModelLoaderRegistry.getModelOrMissing(this.baseModelLocation);
-		this.baseModelBaked = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, bakedTextureGetter);
+	public void bakeModels(ModelBakery bakery, Function<ResourceLocation, TextureAtlasSprite> spriteGetter) {
+		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(this.baseModelLocation);
+		this.baseModelBaked = model.bake(bakery, spriteGetter, ModelRotation.X0_Y0, DefaultVertexFormats.ITEM);
 	}
 
 	@Override
-	public void renderItem(ItemStack itemStack, TransformType transformType) {
-		GlStateManager.translate(0.5F, 0.5F, 0.5F);
+	public void renderItem(ItemStack itemStack, ItemCameraTransforms.TransformType transformType) {
+		GlStateManager.translatef(0.5F, 0.5F, 0.5F);
 		GlStateManager.pushMatrix();
 		{
 			switch (transformType) {
@@ -48,15 +53,16 @@ public class GunRenderer extends ItemRenderer {
 			case FIRST_PERSON_RIGHT_HAND:
 				GunAnimation animation = this.client.getAnimationManager().getCurrentAnimation(itemStack);
 				if (animation != null)
-					animation.render(itemStack, this.client.getMinecraft().getRenderPartialTicks());
+					animation.render(itemStack, Minecraft.getInstance().getRenderPartialTicks());
 				break;
 			default:
 				break;
 			}
 			IBakedModel bakedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(
-					this.baseModelBaked, transformType, transformType == TransformType.FIRST_PERSON_LEFT_HAND
-							|| transformType == TransformType.THIRD_PERSON_LEFT_HAND);
-			this.client.getMinecraft().getRenderItem().renderItem(itemStack, bakedModel);
+					this.baseModelBaked, transformType,
+					transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
+							|| transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND);
+			Minecraft.getInstance().getItemRenderer().renderItem(itemStack, bakedModel);
 		}
 		GlStateManager.popMatrix();
 	}
@@ -102,4 +108,9 @@ public class GunRenderer extends ItemRenderer {
 		return ImmutableList.of(this.baseModelLocation);
 	}
 
+	@Override
+	public Collection<ResourceLocation> getTextures(Function<ResourceLocation, IUnbakedModel> modelGetter,
+			Set<String> missingTextureErrors) {
+		return ImmutableList.of();
+	}
 }

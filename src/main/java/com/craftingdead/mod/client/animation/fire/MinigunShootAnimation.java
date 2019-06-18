@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 public class MinigunShootAnimation implements GunAnimation {
 
 	@Override
-	public void update() {
+	public void tick() {
 		;
 	}
 

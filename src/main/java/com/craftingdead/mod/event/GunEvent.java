@@ -1,20 +1,20 @@
 package com.craftingdead.mod.event;
 
-import com.craftingdead.mod.item.ItemGun;
+import com.craftingdead.mod.item.GunItem;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 public class GunEvent extends Event {
 
-	private final ItemGun item;
+	private final GunItem item;
 	private final Entity entity;
 	private final ItemStack itemStack;
 
-	public GunEvent(ItemGun item, Entity entity, ItemStack itemStack) {
+	public GunEvent(GunItem item, Entity entity, ItemStack itemStack) {
 		this.item = item;
 		this.entity = entity;
 		this.itemStack = itemStack;
@@ -24,7 +24,7 @@ public class GunEvent extends Event {
 
 		private final RayTraceResult rayTrace;
 
-		public ShootEvent(ItemGun item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+		public ShootEvent(GunItem item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
 			super(item, entity, itemStack);
 			this.rayTrace = rayTrace;
 
@@ -33,14 +33,14 @@ public class GunEvent extends Event {
 		@Cancelable
 		public static class Pre extends ShootEvent {
 
-			public Pre(ItemGun item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+			public Pre(GunItem item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
 				super(item, entity, itemStack, rayTrace);
 			}
 		}
 
 		public static class Post extends ShootEvent {
 
-			public Post(ItemGun item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
+			public Post(GunItem item, Entity entity, ItemStack itemStack, RayTraceResult rayTrace) {
 				super(item, entity, itemStack, rayTrace);
 			}
 		}
@@ -51,7 +51,7 @@ public class GunEvent extends Event {
 
 	}
 
-	public ItemGun getItem() {
+	public GunItem getItem() {
 		return this.item;
 	}
 

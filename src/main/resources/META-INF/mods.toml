@@ -1,0 +1,10 @@
+modLoader="javafml"
+loaderVersion="[25,)"
+
+[[mods]]
+modId="craftingdead" 
+version="${file.jarVersion}"
+displayName="Crafting Dead"
+description='''
+The Minecraft zombie survival mod.
+'''

@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.animation.fire;
 
 import com.craftingdead.mod.client.animation.GunAnimation;
+import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
 public class PistolShootAnimation implements GunAnimation {
@@ -20,10 +20,10 @@ public class PistolShootAnimation implements GunAnimation {
 	private boolean up = true;
 
 	@Override
-	public void update() {
-		aliveTicks++;
-		lastRotation = rotation;
-		lastTranslation = translation;
+	public void tick() {
+		this.aliveTicks++;
+		this.lastRotation = this.rotation;
+		this.lastTranslation = this.translation;
 
 		float roationSpeed = 60F;
 		float translationSpeed = 0.3F;
@@ -32,38 +32,38 @@ public class PistolShootAnimation implements GunAnimation {
 			this.up = false;
 		}
 
-		if (up) {
-			rotation += roationSpeed;
-			translation += translationSpeed;
+		if (this.up) {
+			this.rotation += roationSpeed;
+			this.translation += translationSpeed;
 		} else {
-			rotation -= roationSpeed;
-			translation -= translationSpeed;
+			this.rotation -= roationSpeed;
+			this.translation -= translationSpeed;
 		}
 
-		if (translation > maxTranslation) {
-			translation = maxTranslation;
+		if (this.translation > this.maxTranslation) {
+			this.translation = this.maxTranslation;
 		}
 
-		if (translation < 0) {
-			translation = 0;
+		if (this.translation < 0) {
+			this.translation = 0;
 		}
 
-		if (rotation > maxRotation) {
-			rotation = maxRotation;
+		if (this.rotation > this.maxRotation) {
+			this.rotation = this.maxRotation;
 		}
 
-		if (rotation < 0) {
-			rotation = 0;
+		if (this.rotation < 0) {
+			this.rotation = 0;
 		}
 	}
 
 	@Override
 	public void render(ItemStack itemStack, float partialTicks) {
-		float transprogress = lastTranslation + (translation - lastTranslation) * partialTicks;
-		GlStateManager.translate(0, 0, transprogress);
+		float transprogress = this.lastTranslation + (this.translation - this.lastTranslation) * partialTicks;
+		GlStateManager.translatef(0, 0, transprogress);
 
-		float rotprogress = lastRotation + (rotation - lastRotation) * partialTicks;
-		GlStateManager.rotate(rotprogress, 1.0F, 0.0F, 0.0F);
+		float rotprogress = this.lastRotation + (this.rotation - this.lastRotation) * partialTicks;
+		GlStateManager.rotatef(rotprogress, 1.0F, 0.0F, 0.0F);
 	}
 
 	@Override
@@ -73,6 +73,6 @@ public class PistolShootAnimation implements GunAnimation {
 
 	@Override
 	public boolean isFinished() {
-		return aliveTicks >= 10;
+		return this.aliveTicks >= 10;
 	}
 }

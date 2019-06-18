@@ -3,20 +3,19 @@ package com.craftingdead.mod.capability.player;
 import java.util.Random;
 import java.util.UUID;
 
-import com.craftingdead.mod.capability.triggerable.Triggerable;
-import com.craftingdead.mod.init.ModCapabilities;
-import com.craftingdead.mod.init.ModPotions;
+import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.potion.ModEffects;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -24,9 +23,9 @@ import net.minecraft.util.text.TextFormatting;
  * 
  * @author Sm0keySa1m0n
  *
- * @param <E> - the associated {@link EntityPlayer}
+ * @param <E> - the associated {@link PlayerEntity}
  */
-public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
+public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
 	/**
 	 * Random
 	 */
@@ -68,17 +67,17 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	@Override
 	public void update() {
 		this.updateHeldStack();
-		if (!this.entity.capabilities.isCreativeMode && !this.entity.isPotionActive(ModPotions.BROKEN_LEG)
-				&& this.entity.onGround && !this.entity.isInWater()
+		if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG) && this.entity.onGround
+				&& !this.entity.isInWater()
 				&& ((this.entity.fallDistance > 4F && RANDOM.nextInt(3) == 0) || this.entity.fallDistance > 10F)) {
-			this.entity.sendStatusMessage(new TextComponentTranslation("message.broken_leg")
+			this.entity.sendStatusMessage(new TranslationTextComponent("message.broken_leg")
 					.setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-			this.entity.addPotionEffect(new PotionEffect(ModPotions.BROKEN_LEG, 9999999, 4));
-			this.entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 1));
+			this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG, 9999999, 4));
+			this.entity.addPotionEffect(new EffectInstance(Effects.field_76440_q, 100, 1));
 		}
-		if (this.entity.capabilities.isCreativeMode) {
-			if (this.entity.isPotionActive(ModPotions.BROKEN_LEG)) {
-				this.entity.removePotionEffect(ModPotions.BROKEN_LEG);
+		if (this.entity.isCreative()) {
+			if (this.entity.isPotionActive(ModEffects.BROKEN_LEG)) {
+				this.entity.removePotionEffect(ModEffects.BROKEN_LEG);
 			}
 		}
 	}
@@ -87,9 +86,8 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 		ItemStack heldStack = this.entity.getHeldItemMainhand();
 		if (heldStack != this.lastHeldStack) {
 			if (this.lastHeldStack != null) {
-				Triggerable triggerable = this.lastHeldStack.getCapability(ModCapabilities.TRIGGERABLE, null);
-				if (triggerable != null)
-					triggerable.setTriggerPressed(false, this.lastHeldStack, this.entity);
+				this.lastHeldStack.getCapability(ModCapabilities.TRIGGERABLE).ifPresent(
+						(triggerable) -> triggerable.setTriggerPressed(false, this.lastHeldStack, this.entity));
 			}
 			this.lastHeldStack = heldStack;
 		}
@@ -109,25 +107,24 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 	public void setTriggerPressed(boolean triggerPressed) {
 		this.triggerPressed = triggerPressed;
 		ItemStack heldStack = this.getEntity().getHeldItemMainhand();
-		Triggerable triggerable = heldStack.getCapability(ModCapabilities.TRIGGERABLE, null);
-		if (triggerable != null)
-			triggerable.setTriggerPressed(triggerPressed, heldStack, this.getEntity());
+		heldStack.getCapability(ModCapabilities.TRIGGERABLE, null)
+				.ifPresent((triggerable) -> triggerable.setTriggerPressed(triggerPressed, heldStack, this.getEntity()));
 	}
 
 	@Override
-	public NBTTagCompound serializeNBT() {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setInteger("daysSurvived", this.daysSurvived);
-		nbt.setInteger("zombieKills", this.zombiesKilled);
-		nbt.setInteger("playerKills", this.playersKilled);
+	public CompoundNBT serializeNBT() {
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putInt("daysSurvived", this.daysSurvived);
+		nbt.putInt("zombiesKilled", this.zombiesKilled);
+		nbt.putInt("playersKilled", this.playersKilled);
 		return nbt;
 	}
 
 	@Override
-	public void deserializeNBT(NBTTagCompound nbt) {
-		this.daysSurvived = nbt.getInteger("daysSurvived");
-		this.zombiesKilled = nbt.getInteger("zombieKills");
-		this.playersKilled = nbt.getInteger("playerKills");
+	public void deserializeNBT(CompoundNBT nbt) {
+		this.daysSurvived = nbt.getInt("daysSurvived");
+		this.zombiesKilled = nbt.getInt("zombiesKilled");
+		this.playersKilled = nbt.getInt("playersKilled");
 	}
 
 	@Override
@@ -152,7 +149,6 @@ public class DefaultPlayer<E extends EntityPlayer> implements Player<E> {
 
 	@Override
 	public UUID getUUID() {
-		return this.entity != null ? this.entity.getPersistentID() : null;
+		return this.entity != null ? this.entity.getUniqueID() : null;
 	}
-
 }

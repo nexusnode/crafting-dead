@@ -1,17 +1,17 @@
 package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.entity.EntityCorpse;
-import com.craftingdead.mod.network.message.server.SetTriggerPressedSMessage;
-import com.craftingdead.mod.network.message.server.UpdateStatisticsSMessage;
+import com.craftingdead.mod.entity.CorpseEntity;
+import com.craftingdead.mod.message.server.SUpdateStatisticsMessage;
+import com.craftingdead.mod.message.server.ServerTriggerPressedMessage;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.PacketDistributor;
 
-public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
+public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
 	/**
 	 * Used to calculate if a day has passed by
 	 */
@@ -32,7 +32,7 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 	 */
 	private int lastPlayerKills = Integer.MIN_VALUE;
 
-	public ServerPlayer(EntityPlayerMP entity) {
+	public ServerPlayer(ServerPlayerEntity entity) {
 		super(entity);
 		this.lastDay = entity.getEntityWorld().isDaytime();
 	}
@@ -50,7 +50,8 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 	private void updateStatistics() {
 		if (this.daysSurvived != this.lastDaysSurvived || this.zombiesKilled != this.lastZombieKills
 				|| this.playersKilled != this.lastPlayerKills) {
-			this.sendMessage(new UpdateStatisticsSMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled));
+			CraftingDead.NETWORK_CHANNEL.send(PacketDistributor.PLAYER.with(this::getEntity),
+					new SUpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled));
 			this.lastDaysSurvived = this.daysSurvived;
 			this.lastZombieKills = this.zombiesKilled;
 			this.lastPlayerKills = this.playersKilled;
@@ -68,9 +69,9 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 
 	@Override
 	public boolean onKill(Entity target) {
-		if (target instanceof EntityZombie) {
+		if (target instanceof ZombieEntity) {
 			this.zombiesKilled++;
-		} else if (target instanceof EntityPlayerMP) {
+		} else if (target instanceof ServerPlayerEntity) {
 			this.playersKilled++;
 		}
 		return false;
@@ -78,16 +79,16 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 
 	@Override
 	public boolean onDeath(DamageSource cause) {
-		EntityCorpse corpse = new EntityCorpse(this.entity);
-		this.entity.world.spawnEntity(corpse);
+		CorpseEntity corpse = new CorpseEntity(this.entity);
+		this.entity.world.func_217376_c(corpse);
 		return false;
 	}
 
 	@Override
 	public void setTriggerPressed(boolean triggerPressed) {
 		super.setTriggerPressed(triggerPressed);
-		CraftingDead.NETWORK_WRAPPER
-				.sendToAllTracking(new SetTriggerPressedSMessage(entity.getEntityId(), triggerPressed), entity);
+		CraftingDead.NETWORK_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(this::getEntity),
+				new ServerTriggerPressedMessage(this.entity.getEntityId(), triggerPressed));
 	}
 
 	public void copyFrom(ServerPlayer that, boolean wasDeath) {
@@ -97,14 +98,4 @@ public class ServerPlayer extends DefaultPlayer<EntityPlayerMP> {
 			this.playersKilled = that.playersKilled;
 		}
 	}
-
-	/**
-	 * Send a message to the player's client
-	 * 
-	 * @param message - the {@link IMessage} to send
-	 */
-	public void sendMessage(IMessage msg) {
-		CraftingDead.NETWORK_WRAPPER.sendTo(msg, this.entity);
-	}
-
 }

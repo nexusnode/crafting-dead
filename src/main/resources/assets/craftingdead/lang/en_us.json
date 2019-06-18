@@ -1,0 +1,27 @@
+{
+    "presence.loading": "Loading",
+    "presence.idle": "Idle",
+    "presence.singleplayer": "Playing Singleplayer",
+    "presence.multiplayer": "Playing Multiplayer",
+    "presence.lan": "Playing on LAN",
+
+    "options.craftingdead.client": "Client",
+    "options.craftingdead.client.apply_branding": "Apply Branding",
+    "options.craftingdead.client.enable_discord_rpc": "Enable Discord RPC",
+    "options.craftingdead.client.display_blood": "Display Blood",
+
+    "effect.craftingdead.broken_leg": "Broken Leg",
+
+    "message.broken_leg": "Ouch! You broke your leg.",
+
+    "itemGroup.craftingdead": "Crafting Dead",
+
+    "item.craftingdead.acr": "ACR",
+    "item.craftingdead.ak47": "AK47",
+    "item.craftingdead.desert_eagle": "Desert Eagle",
+    "item.craftingdead.m4a1": "M4A1",
+    "item.craftingdead.m9": "M9",
+    "item.craftingdead.taser": "Taser",
+    "item.craftingdead.magnum": "Magnum",
+    "item.craftingdead.fn57": "Five-seveN"
+}

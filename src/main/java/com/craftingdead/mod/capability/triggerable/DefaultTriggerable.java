@@ -19,5 +19,4 @@ public class DefaultTriggerable implements Triggerable {
 	public void setTriggerPressed(boolean triggerPressed, ItemStack itemStack, Entity entity) {
 		LOGGER.info("Trigger pressed: {}", triggerPressed);
 	}
-
 }

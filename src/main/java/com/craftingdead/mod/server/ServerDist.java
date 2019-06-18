@@ -1,8 +1,7 @@
 package com.craftingdead.mod.server;
 
-import com.craftingdead.mod.ModDist;
+import com.craftingdead.mod.IModDist;
 
-public class ServerDist implements ModDist {
-
+public class ServerDist implements IModDist {
 
 }

@@ -1,13 +1,13 @@
 package com.craftingdead.mod.capability;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
-public class SerializableProvider<C extends INBTSerializable<S>, S extends NBTBase>
-		implements ICapabilitySerializable<S> {
+public class SerializableProvider<C extends INBTSerializable<S>, S extends INBT> implements ICapabilitySerializable<S> {
 
 	private final C capability;
 	private final Capability<C> capabilityHolder;
@@ -23,13 +23,8 @@ public class SerializableProvider<C extends INBTSerializable<S>, S extends NBTBa
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		return capability == this.capabilityHolder;
-	}
-
-	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		return this.hasCapability(capability, facing) ? this.capabilityHolder.cast(this.capability) : null;
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+		return cap == this.capabilityHolder ? LazyOptional.of(() -> this.capability).cast() : LazyOptional.empty();
 	}
 
 	@Override
@@ -41,5 +36,4 @@ public class SerializableProvider<C extends INBTSerializable<S>, S extends NBTBa
 	public void deserializeNBT(S nbt) {
 		this.capability.deserializeNBT(nbt);
 	}
-
 }

@@ -1,19 +1,61 @@
 package com.craftingdead.mod.util;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 public class RayTraceUtil {
+
+	public static EntityRayTraceResult rayTraceEntities(Entity fromEntity, Vec3d p_221273_1_, Vec3d p_221273_2_,
+			AxisAlignedBB boundingBox, Predicate<Entity> filter, double distance) {
+		World world = fromEntity.world;
+		Entity resultEntity = null;
+		Vec3d vec3d = null;
+
+		for (Entity potentialEntity : world.getEntitiesInAABBexcluding(fromEntity, boundingBox, filter)) {
+			AxisAlignedBB axisalignedbb = potentialEntity.getBoundingBox()
+					.grow((double) potentialEntity.getCollisionBorderSize());
+			Optional<Vec3d> optional = axisalignedbb.func_216365_b(p_221273_1_, p_221273_2_);
+			if (axisalignedbb.contains(p_221273_1_)) {
+				if (distance >= 0.0D) {
+					resultEntity = potentialEntity;
+					vec3d = optional.orElse(p_221273_1_);
+					distance = 0.0D;
+				}
+			} else if (optional.isPresent()) {
+				Vec3d vec3d1 = optional.get();
+				double d1 = p_221273_1_.squareDistanceTo(vec3d1);
+				if (d1 < distance || distance == 0.0D) {
+					if (potentialEntity.getLowestRidingEntity() == fromEntity.getLowestRidingEntity()) {
+						if (distance == 0.0D) {
+							resultEntity = potentialEntity;
+							vec3d = vec3d1;
+						}
+					} else {
+						resultEntity = potentialEntity;
+						vec3d = vec3d1;
+						distance = d1;
+					}
+				}
+			}
+		}
+
+		if (resultEntity == null) {
+			return null;
+		} else {
+			return new EntityRayTraceResult(resultEntity, vec3d);
+		}
+	}
 
 	/**
 	 * Perform a block ray trace from the parsed entity
@@ -25,10 +67,11 @@ public class RayTraceUtil {
 	 */
 	@Nullable
 	public static RayTraceResult rayTraceBlocks(Entity entity, double distance, float partialTicks) {
-		Vec3d vec3d = entity.getPositionEyes(partialTicks);
+		Vec3d vec3d = entity.getEyePosition(partialTicks);
 		Vec3d vec3d1 = entity.getLook(partialTicks);
 		Vec3d vec3d2 = vec3d.add(vec3d1.x * distance, vec3d1.y * distance, vec3d1.z * distance);
-		return entity.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
+		return entity.world.func_217299_a(new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.OUTLINE,
+				RayTraceContext.FluidMode.NONE, entity));
 	}
 
 	/**
@@ -39,63 +82,25 @@ public class RayTraceUtil {
 	 * @param partialTicks - the partialTicks (parse 1 if not available)
 	 * @return the result or null
 	 */
-	public static RayTraceResult rayTrace(final Entity entity, final double distance, final float partialTicks) {
+	public static RayTraceResult rayTrace(final Entity entity, double distance, final float partialTicks) {
 		RayTraceResult result = rayTraceBlocks(entity, distance, partialTicks);
-		Vec3d eyePosition = entity.getPositionEyes(partialTicks);
+		Vec3d eyePosition = entity.getEyePosition(partialTicks);
 
-		double currentHitDistance = distance;
-		if (result != null)
-			currentHitDistance = result.hitVec.distanceTo(eyePosition);
+		double squareDistance = result != null ? result.getHitVec().squareDistanceTo(eyePosition) : distance * distance;
 
-		Vec3d look = entity.getLook(1.0F);
-		Vec3d selectedVector = eyePosition.add(look.x * distance, look.y * distance, look.z * distance);
-		Entity hitEntity = null;
-		Vec3d hitEntityVector = null;
-		List<Entity> entitiesInBB = entity.world.getEntitiesInAABBexcluding(
-				entity, entity.getEntityBoundingBox().expand(look.x * distance, look.y * distance, look.z * distance)
-						.grow(1.0D, 1.0D, 1.0D),
-				Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
-					public boolean apply(@Nullable Entity entity) {
-						return entity != null && entity.canBeCollidedWith();
-					}
-				}));
+		Vec3d look = entity.getLook(partialTicks);
+		Vec3d scaledLook = look.scale(distance);
+		Vec3d eyeScaledLook = eyePosition.add(scaledLook);
 
-		double hitEntityDistance = currentHitDistance;
-		for (Entity currentEntity : entitiesInBB) {
-			AxisAlignedBB entityBoundingBox = currentEntity.getEntityBoundingBox()
-					.grow((double) currentEntity.getCollisionBorderSize());
-			RayTraceResult entityTraceResult = entityBoundingBox.calculateIntercept(eyePosition, selectedVector);
+		AxisAlignedBB boundingBox = entity.getBoundingBox().func_216361_a(scaledLook).grow(1.0D, 1.0D, 1.0D);
 
-			if (entityBoundingBox.contains(eyePosition)) {
-				if (hitEntityDistance >= 0.0D) {
-					hitEntity = currentEntity;
-					hitEntityVector = entityTraceResult == null ? eyePosition : entityTraceResult.hitVec;
-					hitEntityDistance = 0.0D;
-				}
-			} else if (entityTraceResult != null) {
-				double potentialDistanceToEntity = eyePosition.distanceTo(entityTraceResult.hitVec);
-
-				if (potentialDistanceToEntity < hitEntityDistance || hitEntityDistance == 0.0D) {
-					if (currentEntity.getLowestRidingEntity() == entity.getLowestRidingEntity()
-							&& !currentEntity.canRiderInteract()) {
-						if (hitEntityDistance == 0.0D) {
-							hitEntity = currentEntity;
-							hitEntityVector = entityTraceResult.hitVec;
-						}
-					} else {
-						hitEntity = currentEntity;
-						hitEntityVector = entityTraceResult.hitVec;
-						hitEntityDistance = potentialDistanceToEntity;
-					}
-				}
-			}
-		}
-
-		if (hitEntity != null && (hitEntityDistance < currentHitDistance || result == null)) {
-			result = new RayTraceResult(hitEntity, hitEntityVector);
-		}
+		EntityRayTraceResult entityRayTrace = ProjectileHelper.func_221269_a(entity.world, entity, eyePosition,
+				eyeScaledLook, boundingBox, (entityTest) -> {
+					return !entityTest.isSpectator() && entityTest.canBeCollidedWith();
+				}, squareDistance);
+		if (entityRayTrace != null)
+			result = entityRayTrace;
 
 		return result;
 	}
-
 }

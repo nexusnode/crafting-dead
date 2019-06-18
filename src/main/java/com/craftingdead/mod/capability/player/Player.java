@@ -3,13 +3,14 @@ package com.craftingdead.mod.capability.player;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface Player<E extends EntityPlayer> extends INBTSerializable<NBTTagCompound>, ITickable {
+public interface Player<E extends PlayerEntity> extends INBTSerializable<CompoundNBT> {
+
+	void update();
 
 	/**
 	 * When the player kills another entity

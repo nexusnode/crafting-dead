@@ -1,199 +1,148 @@
 package com.craftingdead.mod;
 
-import java.io.File;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
-import com.craftingdead.mod.capability.triggerable.Triggerable;
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.init.ModCapabilities;
-import com.craftingdead.mod.network.message.client.SetTriggerPressedCMessage;
-import com.craftingdead.mod.network.message.server.SetTriggerPressedSMessage;
-import com.craftingdead.mod.network.message.server.UpdateStatisticsSMessage;
+import com.craftingdead.mod.message.client.ClientTriggerPressedMessage;
+import com.craftingdead.mod.message.server.SUpdateStatisticsMessage;
+import com.craftingdead.mod.message.server.ServerTriggerPressedMessage;
 import com.craftingdead.mod.server.ServerDist;
-import com.craftingdead.mod.tileentity.TileEntityLoot;
-import com.craftingdead.mod.util.DistExecutor;
 
+import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModMetadata;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.network.NetworkCheckHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.FMLInjectionData;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.forgespi.language.IModInfo;
 
-/**
- * The main mod class for Crafting Dead.
- * 
- * @author Sm0keySa1m0n
- *
- */
-@Mod(modid = CraftingDead.MOD_ID, useMetadata = true)
+@Mod(CraftingDead.MOD_ID)
 public class CraftingDead {
 	/**
 	 * Mod ID
 	 */
-	public static final String MOD_ID = "craftingdead";
+	public static final String MOD_ID = "craftingdead", NETWORK_VERSION = "0.0.1";
 	/**
-	 * Used for internal networking
+	 * Main network channel
 	 */
-	public static final SimpleNetworkWrapper NETWORK_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+	public static final SimpleChannel NETWORK_CHANNEL = NetworkRegistry.ChannelBuilder //
+			.named(new ResourceLocation(CraftingDead.MOD_ID, "main")) //
+			.clientAcceptedVersions(NETWORK_VERSION::equals) //
+			.serverAcceptedVersions(NETWORK_VERSION::equals) //
+			.networkProtocolVersion(() -> NETWORK_VERSION) //
+			.simpleChannel();
 	/**
-	 * {@link Logger} instance
+	 * Logger
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
 	/**
 	 * Singleton
 	 */
+	@Getter
 	private static CraftingDead instance;
 	/**
-	 * Mod metadata
+	 * Mod info
 	 */
-	private ModMetadata metadata;
+	@Getter
+	private final IModInfo modInfo;
 	/**
-	 * The {@link ModDist} instance
+	 * Event bus
 	 */
-	private ModDist modDist;
+	@Getter
+	private final IEventBus eventBus;
 	/**
-	 * The data folder
+	 * Mod distribution
 	 */
-	private File modFolder;
+	@Getter
+	private final IModDist modDist;
 
-	private CraftingDead() {
+	public CraftingDead() {
 		instance = this;
-
-		this.modFolder = new File((File) FMLInjectionData.data()[6], CraftingDead.MOD_ID);
-		this.modFolder.mkdir();
-
+		this.modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
+		this.eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 		this.modDist = DistExecutor.runForDist(() -> ClientDist::new, () -> ServerDist::new);
-
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			LOGGER.info("Shutting down");
-			CraftingDead.this.modDist.shutdown();
-		}));
+		this.eventBus.addListener(this::setup);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CommonConfig.CLIENT_SPEC);
 	}
 
-	// ================================================================================
-	// FML Events
-	// ================================================================================
-
-	@Mod.EventHandler
-	public void onEvent(FMLPreInitializationEvent event) {
-		LOGGER.info("Processing {}", event.description());
-
-		this.metadata = event.getModMetadata();
-
+	private void setup(FMLCommonSetupEvent event) {
 		LOGGER.info("Registering messages");
 		this.registerMessages();
 
-		LOGGER.info("Registering tile entities");
-		this.registerTileEntities();
-
 		LOGGER.info("Registering capabilities");
 		ModCapabilities.registerCapabilities();
-
-		this.modDist.preInitialization(event);
 	}
-
-	@Mod.EventHandler
-	public void onEvent(FMLInitializationEvent event) {
-		LOGGER.info("Processing {}", event.description());
-		this.modDist.initialization(event);
-	}
-
-	@Mod.EventHandler
-	public void onEvent(FMLPostInitializationEvent event) {
-		LOGGER.info("Processing {}", event.description());
-		this.modDist.postInitialization(event);
-	}
-
-	@Mod.EventHandler
-	public void onEvent(FMLLoadCompleteEvent event) {
-		LOGGER.info("Processing {}", event.description());
-		this.modDist.loadComplete(event);
-	}
-
-	@Mod.EventHandler
-	public void onEvent(FMLServerStartingEvent event) {
-		LOGGER.info("Processing {}", event.description());
-	}
-
-	@Mod.EventHandler
-	public void onEvent(FMLServerStoppingEvent event) {
-		LOGGER.info("Processing {}", event.description());
-	}
-
-	@NetworkCheckHandler
-	public boolean networkCheck(Map<String, String> mods, Side side) {
-		return this.modDist.networkCheck(mods, side);
-	}
-
-	// ================================================================================
-	// Bootstrap Methods
-	// ================================================================================
 
 	private void registerMessages() {
 		int discriminator = -1;
-		NETWORK_WRAPPER.registerMessage(UpdateStatisticsSMessage.UpdateStatisticsSHandler.class,
-				UpdateStatisticsSMessage.class, discriminator++, Side.CLIENT);
-		NETWORK_WRAPPER.registerMessage(SetTriggerPressedSMessage.SetTriggerPressedSHandler.class,
-				SetTriggerPressedSMessage.class, discriminator++, Side.CLIENT);
-
-		NETWORK_WRAPPER.registerMessage(SetTriggerPressedCMessage.SetTriggerPressedCHandler.class,
-				SetTriggerPressedCMessage.class, discriminator++, Side.SERVER);
-
-	}
-
-	private void registerTileEntities() {
-		GameRegistry.registerTileEntity(TileEntityLoot.class, new ResourceLocation(CraftingDead.MOD_ID, "loot"));
-	}
-
-	// ================================================================================
-	// Getters
-	// ================================================================================
-
-	public ModMetadata getMetadata() {
-		return this.metadata;
-	}
-
-	public ModDist getModDist() {
-		return this.modDist;
-	}
-
-	public File getModFolder() {
-		return this.modFolder;
-	}
-
-	// ================================================================================
-	// Static Methods
-	// ================================================================================
-
-	@Mod.InstanceFactory
-	public static CraftingDead instance() {
-		return instance != null ? instance : new CraftingDead();
+		NETWORK_CHANNEL.messageBuilder(SUpdateStatisticsMessage.class, discriminator++) //
+				.encoder((msg, buffer) -> {
+					buffer.writeInt(msg.getDaysSurvived());
+					buffer.writeInt(msg.getZombiesKilled());
+					buffer.writeInt(msg.getPlayersKilled());
+				}) //
+				.decoder((buffer) -> {
+					int daysSurvived = buffer.readInt(), zombiesKilled = buffer.readInt(),
+							playersKilled = buffer.readInt();
+					return new SUpdateStatisticsMessage(daysSurvived, zombiesKilled, playersKilled);
+				}) //
+				.consumer((msg, ctx) -> {
+					((ClientDist) CraftingDead.getInstance().getModDist()).getPlayer().ifPresent((player) -> player
+							.updateStatistics(msg.getDaysSurvived(), msg.getZombiesKilled(), msg.getPlayersKilled()));
+				}) //
+				.add();
+		NETWORK_CHANNEL.messageBuilder(ServerTriggerPressedMessage.class, discriminator++) //
+				.encoder((msg, buffer) -> {
+					buffer.writeInt(msg.getEntityId());
+					buffer.writeBoolean(msg.isTriggerPressed());
+				}) //
+				.decoder((buffer) -> {
+					int entityId = buffer.readInt();
+					boolean triggerPressed = buffer.readBoolean();
+					return new ServerTriggerPressedMessage(entityId, triggerPressed);
+				}) //
+				.consumer((msg, ctx) -> {
+					Entity entity = Minecraft.getInstance().world.getEntityByID(msg.getEntityId());
+					if (entity != null && entity instanceof AbstractClientPlayerEntity)
+						entity.getCapability(ModCapabilities.PLAYER, null)
+								.ifPresent((player) -> player.setTriggerPressed(msg.isTriggerPressed()));
+				}) //
+				.add();
+		NETWORK_CHANNEL.messageBuilder(ClientTriggerPressedMessage.class, discriminator++) //
+				.encoder((msg, buffer) -> {
+					buffer.writeBoolean(msg.isTriggerPressed());
+				}) //
+				.decoder((buffer) -> {
+					boolean triggerPressed = buffer.readBoolean();
+					return new ClientTriggerPressedMessage(triggerPressed);
+				}) //
+				.consumer((msg, ctx) -> {
+					ctx.get().getSender().getCapability(ModCapabilities.PLAYER, null)
+							.ifPresent((player) -> player.setTriggerPressed(msg.isTriggerPressed()));
+				}) //
+				.add();
 	}
 
 	// ================================================================================
@@ -206,45 +155,46 @@ public class CraftingDead {
 		@SubscribeEvent
 		public static void onEvent(TickEvent.PlayerTickEvent event) {
 			if (event.phase == Phase.END)
-				event.player.getCapability(ModCapabilities.PLAYER, null).update();
+				event.player.getCapability(ModCapabilities.PLAYER, null).ifPresent((player) -> player.update());
 		}
 
 		@SubscribeEvent
 		public static void onEvent(LivingDeathEvent event) {
-			if (!event.isCanceled() && event.getEntity() instanceof EntityPlayer) {
-				event.setCanceled(
-						event.getEntity().getCapability(ModCapabilities.PLAYER, null).onDeath(event.getSource()));
+			if (!event.isCanceled() && event.getEntity() instanceof PlayerEntity) {
+				event.getEntity().getCapability(ModCapabilities.PLAYER, null)
+						.ifPresent((player) -> event.setCanceled(player.onDeath(event.getSource())));
 			}
-			if (!event.isCanceled() && event.getSource().getTrueSource() instanceof EntityPlayer) {
-				event.setCanceled(event.getSource().getTrueSource().getCapability(ModCapabilities.PLAYER, null)
-						.onKill(event.getEntity()));
+			if (!event.isCanceled() && event.getSource().getTrueSource() instanceof PlayerEntity) {
+				event.getSource().getTrueSource().getCapability(ModCapabilities.PLAYER, null)
+						.ifPresent((player) -> event.setCanceled(player.onKill(event.getEntity())));
 			}
 		}
 
 		@SubscribeEvent
 		public static void onEvent(LivingEvent.LivingUpdateEvent event) {
 			ItemStack itemStack = event.getEntityLiving().getHeldItemMainhand();
-			Triggerable triggerable = itemStack.getCapability(ModCapabilities.TRIGGERABLE, null);
-			if (triggerable != null)
-				triggerable.update(itemStack, event.getEntity());
+			itemStack.getCapability(ModCapabilities.TRIGGERABLE, null)
+					.ifPresent((triggerable) -> triggerable.update(itemStack, event.getEntity()));
 		}
 
 		@SubscribeEvent
 		public static void onEvent(PlayerEvent.Clone event) {
-			ServerPlayer that = (ServerPlayer) event.getOriginal().getCapability(ModCapabilities.PLAYER, null);
-			ServerPlayer player = (ServerPlayer) event.getEntityPlayer().getCapability(ModCapabilities.PLAYER, null);
-			player.copyFrom(that, event.isWasDeath());
+			event.getEntityPlayer().getCapability(ModCapabilities.PLAYER, null).<ServerPlayer>cast()
+					.ifPresent((player) -> {
+						event.getOriginal().getCapability(ModCapabilities.PLAYER, null).<ServerPlayer>cast()
+								.ifPresent((that) -> {
+									player.copyFrom(that, event.isWasDeath());
+								});
+					});
 		}
 
 		@SubscribeEvent
 		public static void onEvent(AttachCapabilitiesEvent<Entity> event) {
-			if (event.getObject() instanceof EntityPlayerMP) {
-				ServerPlayer player = new ServerPlayer((EntityPlayerMP) event.getObject());
+			if (event.getObject() instanceof ServerPlayerEntity) {
+				ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
 				event.addCapability(new ResourceLocation(CraftingDead.MOD_ID, "player"),
 						new SerializableProvider<>(player, ModCapabilities.PLAYER));
 			}
 		}
-
 	}
-
 }
