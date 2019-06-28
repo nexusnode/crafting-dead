@@ -13,6 +13,7 @@ buildscript {
 
 plugins {
     id 'java-library'
+    id 'eclipse'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -34,24 +35,20 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            property 'forge.logging.console.level', 'debug'
-
             mods {
-                examplemod {
+                craftingdead {
                     source sourceSets.main
                 }
             }
         }
 
         server {
-            workingDirectory project.file('run')
+            workingDirectory project.file('server')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            property 'forge.logging.console.level', 'debug'
-
             mods {
-                examplemod {
+                craftingdead {
                     source sourceSets.main
                 }
             }
