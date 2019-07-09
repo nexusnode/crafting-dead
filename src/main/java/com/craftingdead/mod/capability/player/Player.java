@@ -1,7 +1,6 @@
 package com.craftingdead.mod.capability.player;
 
 import java.util.UUID;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -10,34 +9,33 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public interface Player<E extends PlayerEntity> extends INBTSerializable<CompoundNBT> {
 
-	void update();
+  void tick();
 
-	/**
-	 * When the player kills another entity
-	 * 
-	 * @param target - the {@link Entity} killed
-	 * @return if the event should be cancelled
-	 */
-	boolean onKill(Entity target);
+  /**
+   * When the player kills another entity.
+   * 
+   * @param target - the {@link Entity} killed
+   * @return if the event should be cancelled
+   */
+  boolean onKill(Entity target);
 
-	/**
-	 * When the player's health reaches 0
-	 * 
-	 * @param cause - the source of the damage
-	 * @return if the event should be cancelled
-	 */
-	boolean onDeath(DamageSource cause);
+  /**
+   * When the player's health reaches 0.
+   * 
+   * @param cause - the source of the damage
+   * @return if the event should be cancelled
+   */
+  boolean onDeath(DamageSource cause);
 
-	void setTriggerPressed(boolean triggerPressed);
+  void setTriggerPressed(boolean triggerPressed);
 
-	int getDaysSurvived();
+  int getDaysSurvived();
 
-	int getZombiesKilled();
+  int getZombiesKilled();
 
-	int getPlayersKilled();
+  int getPlayersKilled();
 
-	E getEntity();
+  E getEntity();
 
-	UUID getUUID();
-
+  UUID getId();
 }

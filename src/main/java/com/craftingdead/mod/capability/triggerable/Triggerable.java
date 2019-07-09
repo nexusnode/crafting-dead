@@ -5,8 +5,7 @@ import net.minecraft.item.ItemStack;
 
 public interface Triggerable {
 
-	void update(ItemStack itemStack, Entity entity);
+  void tick(ItemStack itemStack, Entity entity);
 
-	void setTriggerPressed(boolean triggerPressed, ItemStack itemStack, Entity entity);
-
+  void setTriggerPressed(boolean triggerPressed, ItemStack itemStack, Entity entity);
 }

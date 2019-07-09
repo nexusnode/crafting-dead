@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[25,)"
+loaderVersion="[27,)"
 
 [[mods]]
 modId="craftingdead" 

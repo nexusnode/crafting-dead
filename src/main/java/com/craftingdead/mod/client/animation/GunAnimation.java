@@ -4,15 +4,15 @@ import net.minecraft.item.ItemStack;
 
 public interface GunAnimation {
 
-	public static enum Type {
-		SHOOT;
-	}
+  public static enum Type {
+    SHOOT;
+  }
 
-	void tick();
+  void tick();
 
-	void render(ItemStack itemStack, float partialTicks);
+  void render(ItemStack itemStack, float partialTicks);
 
-	void onAnimationStopped(ItemStack par1);
+  void onAnimationStopped(ItemStack par1);
 
-	boolean isFinished();
+  boolean isFinished();
 }

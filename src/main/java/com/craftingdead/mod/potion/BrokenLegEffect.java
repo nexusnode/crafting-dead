@@ -7,9 +7,10 @@ import net.minecraft.potion.EffectType;
 
 public class BrokenLegEffect extends Effect {
 
-	public BrokenLegEffect() {
-		super(EffectType.HARMFUL, 5926017);
-		this.func_220304_a(SharedMonsterAttributes.MOVEMENT_SPEED, "7107DE5E-7CE8-4030-940E-514C1F160890",
-				(double) -0.15F, AttributeModifier.Operation.MULTIPLY_TOTAL);
-	}
+  public BrokenLegEffect() {
+    super(EffectType.HARMFUL, 5926017);
+    this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
+        "021BEAA1-498F-4D7B-933E-F0FA0B88B9D1", (double) -0.15F,
+        AttributeModifier.Operation.MULTIPLY_TOTAL);
+  }
 }

@@ -2,7 +2,6 @@ package com.craftingdead.mod.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import lombok.RequiredArgsConstructor;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
@@ -14,62 +13,66 @@ import net.minecraft.util.text.TextFormatting;
 
 public class DiscordPresence {
 
-	private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger logger = LogManager.getLogger();
 
-	private static boolean initialized;
+  private static boolean initialized;
 
-	public static void initialize(String clientId) {
-		if (initialized)
-			return;
-		DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers(), true, null);
-		initialized = true;
-	}
+  public static void initialize(String clientId) {
+    if (initialized) {
+      return;
+    }
+    DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers(), true, null);
+    initialized = true;
+  }
 
-	public static void updateState(GameState state, ClientDist client) {
-		if (!initialized)
-			return;
-		DiscordRichPresence presence = new DiscordRichPresence();
-		state.applyState(presence, client);
-		DiscordRPC.discordUpdatePresence(presence);
-	}
+  public static void updateState(GameState state, ClientDist client) {
+    if (!initialized) {
+      return;
+    }
+    DiscordRichPresence presence = new DiscordRichPresence();
+    state.applyState(presence, client);
+    DiscordRPC.discordUpdatePresence(presence);
+  }
 
-	public static void shutdown() {
-		if (!initialized)
-			return;
-		DiscordRPC.discordShutdown();
-	}
+  public static void shutdown() {
+    if (!initialized) {
+      return;
+    }
+    DiscordRPC.discordShutdown();
+  }
 
-	@RequiredArgsConstructor
-	public static enum GameState {
+  @RequiredArgsConstructor
+  public static enum GameState {
 
-		LOADING("presence.loading"), IDLE("presence.idle"), SINGLEPLAYER("presence.singleplayer"), LAN("presence.lan"),
-		MULTIPLAYER("presence.multiplayer") {
+    LOADING("presence.loading"), IDLE("presence.idle"), SINGLEPLAYER("presence.singleplayer"), LAN(
+        "presence.lan"), MULTIPLAYER("presence.multiplayer") {
 
-			@Override
-			public void applyState(DiscordRichPresence presence, ClientDist client) {
-				ServerData serverData = Minecraft.getInstance().getCurrentServerData();
-				if (serverData != null) {
-					presence.state = serverData.serverIP;
-					String[] playerListSplit = serverData.populationInfo.split("/");
-					try {
-						presence.partySize = Integer
-								.valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[0]));
-						presence.partyMax = Integer
-								.valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[1]));
-					} catch (NumberFormatException e) {
-						LOGGER.catching(e);
-					}
-				}
-			}
-		};
+          @Override
+          public void applyState(DiscordRichPresence presence, ClientDist client) {
+            ServerData serverData = Minecraft.getInstance().getCurrentServerData();
+            if (serverData != null) {
+              presence.state = serverData.serverIP;
+              System.out.println(serverData.populationInfo);
+              String[] playerListSplit = serverData.populationInfo.split("/");
+              try {
+                presence.partySize = Integer
+                    .valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[0]));
+                presence.partyMax = Integer
+                    .valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[1]));
+              } catch (NumberFormatException e) {
+                logger.catching(e);
+              }
+            }
+          }
+        };
 
-		private final String translationKey;
+    private final String translationKey;
 
-		void applyState(DiscordRichPresence presence, ClientDist client) {
-			presence.details = I18n.format(this.translationKey);
-			presence.startTimestamp = System.currentTimeMillis() / 1000;
-			presence.largeImageKey = "craftingdead";
-			presence.largeImageText = "Crafting Dead";
-		}
-	}
+    void applyState(DiscordRichPresence presence, ClientDist client) {
+      presence.details = I18n.format(this.translationKey);
+      presence.startTimestamp = System.currentTimeMillis() / 1000;
+      presence.largeImageKey = "craftingdead";
+      presence.largeImageText = "Crafting Dead";
+    }
+  }
 }

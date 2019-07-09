@@ -2,7 +2,6 @@ package com.craftingdead.mod.entity;
 
 import java.util.Optional;
 import java.util.UUID;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MoverType;
@@ -18,110 +17,137 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.FMLPlayMessages;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class CorpseEntity extends Entity {
 
-	private static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.createKey(CorpseEntity.class,
-			DataSerializers.field_187203_m);
-	private static final DataParameter<Integer> LIMB_COUNT = EntityDataManager.createKey(CorpseEntity.class,
-			DataSerializers.field_187192_b);
+  private static final DataParameter<Optional<UUID>> DECEASED_ID =
+      EntityDataManager.createKey(CorpseEntity.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
-	private Inventory inventory = new Inventory();
+  private static final DataParameter<Optional<ITextComponent>> DECEASED_NAME =
+      EntityDataManager.createKey(CorpseEntity.class, DataSerializers.OPTIONAL_TEXT_COMPONENT);
 
-	public CorpseEntity(EntityType<?> type, World world) {
-		super(type, world);
-	}
+  private static final DataParameter<Integer> LIMB_COUNT =
+      EntityDataManager.createKey(CorpseEntity.class, DataSerializers.VARINT);
 
-	public CorpseEntity(ServerPlayerEntity player) {
-		this(EntityTypes.CORPSE, player.world);
-		this.dataManager.set(PLAYER_UUID, Optional.of(player.getUniqueID()));
-		this.setCustomName(player.getName());
-		this.inventory = new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0]));
-		player.inventory.clear();
-		this.setPosition(player.posX, player.posY, player.posZ);
-	}
+  private Inventory inventory = new Inventory(27);
 
-	@Override
-	public void baseTick() {
-		super.baseTick();
-		// Every 5 seconds
-		if (!this.world.isRemote && this.ticksExisted % (20 * 10) == 0)
-			this.decrementLimbCount();
-		if (!this.onGround)
-			this.setMotion(this.getMotion().subtract(0, 0.02D, 0));
-		this.move(MoverType.SELF, this.getMotion());
-	}
+  public CorpseEntity(EntityType<?> type, World world, UUID deceasedId,
+      ITextComponent deceasedName) {
+    super(type, world);
+    this.dataManager.set(DECEASED_ID, Optional.ofNullable(deceasedId));
+    this.dataManager.set(DECEASED_NAME, Optional.ofNullable(deceasedName));
+  }
 
-	@Override
-	public boolean hitByEntity(Entity entity) {
-		this.decrementLimbCount();
-		return false;
-	}
+  public CorpseEntity(EntityType<?> type, World world) {
+    this(EntityTypes.CORPSE, world, null, null);
+  }
 
-	@Override
-	public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
-		player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> {
-			return ChestContainer.func_216992_a(id, playerInventory, this.inventory);
-		}, new StringTextComponent(this.getDisplayName().getFormattedText() + "'s Corpse")));
-		return ActionResultType.PASS;
-	}
+  public CorpseEntity(FMLPlayMessages.SpawnEntity packet, World world) {
+    this(EntityTypes.CORPSE, world);
+  }
 
-	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		return false;
-	}
+  public CorpseEntity(ServerPlayerEntity player) {
+    this(EntityTypes.CORPSE, player.world, player.getUniqueID(), player.getName());
+    this.inventory = new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0]));
+    player.inventory.clear();
+    this.setPosition(player.posX, player.posY, player.posZ);
+  }
 
-	@Override
-	public boolean canBeCollidedWith() {
-		return true;
-	}
+  @Override
+  public void baseTick() {
+    super.baseTick();
+    // Every 5 seconds
+    if (!this.world.isRemote && this.ticksExisted % (20 * 10) == 0) {
+      this.decrementLimbCount();
+    }
+    if (!this.onGround) {
+      this.setMotion(this.getMotion().subtract(0, 0.02D, 0));
+    }
+    this.move(MoverType.SELF, this.getMotion());
+  }
 
-	private void decrementLimbCount() {
-		if (this.getLimbCount() > 0) {
-			this.dataManager.set(LIMB_COUNT, this.getLimbCount() - 1);
-		} else {
-			this.remove();
-			InventoryHelper.dropInventoryItems(this.world, this, this.inventory);
-		}
-	}
+  @Override
+  public boolean hitByEntity(Entity entity) {
+    this.decrementLimbCount();
+    return false;
+  }
 
-	public Optional<UUID> getPlayerUUID() {
-		return this.dataManager.get(PLAYER_UUID);
-	}
+  @Override
+  public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
+    player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> {
+      return ChestContainer.createGeneric9X3(id, playerInventory, this.inventory);
+    }, new StringTextComponent(this.getDeceasedName()
+        .orElse(
+            new StringTextComponent((this.getUniqueID().hashCode() & 1) == 1 ? "Alex" : "Steve"))
+        .getFormattedText() + "'s Corpse")));
+    return ActionResultType.PASS;
+  }
 
-	public int getLimbCount() {
-		return this.dataManager.get(LIMB_COUNT);
-	}
+  @Override
+  public boolean attackEntityFrom(DamageSource source, float amount) {
+    return false;
+  }
 
-	@Override
-	protected void registerData() {
-		this.dataManager.register(PLAYER_UUID, Optional.empty());
-		this.dataManager.register(LIMB_COUNT, 4);
-	}
+  @Override
+  public boolean canBeCollidedWith() {
+    return true;
+  }
 
-	@Override
-	protected void readAdditional(CompoundNBT compound) {
-		if (compound.contains("playerUUID"))
-			this.dataManager.set(PLAYER_UUID, Optional.of(compound.getUniqueId("playerUUID")));
-		if (compound.contains("limbCount"))
-			this.dataManager.set(LIMB_COUNT, compound.getInt("limbCount"));
-	}
+  private void decrementLimbCount() {
+    if (this.getLimbCount() > 0) {
+      this.dataManager.set(LIMB_COUNT, this.getLimbCount() - 1);
+    } else {
+      this.remove();
+      InventoryHelper.dropInventoryItems(this.world, this, this.inventory);
+    }
+  }
 
-	@Override
-	protected void writeAdditional(CompoundNBT compound) {
-		compound.putUniqueId("playerUUID", this.getPlayerUUID().get());
-		compound.putInt("limbCount", this.getLimbCount());
-	}
+  public Optional<UUID> getDeceasedId() {
+    return this.dataManager.get(DECEASED_ID);
+  }
 
-	@Override
-	public IPacket<?> createSpawnPacket() {
-		return new SSpawnObjectPacket(this);
-	}
+  public Optional<ITextComponent> getDeceasedName() {
+    return this.dataManager.get(DECEASED_NAME);
+  }
+
+  public int getLimbCount() {
+    return this.dataManager.get(LIMB_COUNT);
+  }
+
+  @Override
+  protected void registerData() {
+    this.dataManager.register(DECEASED_ID, Optional.empty());
+    this.dataManager.register(DECEASED_NAME, Optional.empty());
+    this.dataManager.register(LIMB_COUNT, 4);
+  }
+
+  @Override
+  protected void readAdditional(CompoundNBT compound) {
+    if (compound.contains("playerUUID")) {
+      this.dataManager.set(DECEASED_ID, Optional.of(compound.getUniqueId("playerUUID")));
+    }
+    if (compound.contains("limbCount")) {
+      this.dataManager.set(LIMB_COUNT, compound.getInt("limbCount"));
+    }
+  }
+
+  @Override
+  protected void writeAdditional(CompoundNBT compound) {
+    this.getDeceasedId().ifPresent((uuid) -> compound.putUniqueId("playerUUID", uuid));
+    compound.putInt("limbCount", this.getLimbCount());
+  }
+
+  @Override
+  public IPacket<?> createSpawnPacket() {
+    return NetworkHooks.getEntitySpawningPacket(this);
+  }
 }

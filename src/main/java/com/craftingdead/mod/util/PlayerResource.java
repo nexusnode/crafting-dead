@@ -4,15 +4,15 @@ import java.util.UUID;
 
 public enum PlayerResource {
 
-	AVATAR_URL("https://crafatar.com/avatars/%s.png");
+  AVATAR_URL("https://crafatar.com/avatars/%s.png");
 
-	private String url;
+  private String url;
 
-	PlayerResource(String url) {
-		this.url = url;
-	}
+  PlayerResource(String url) {
+    this.url = url;
+  }
 
-	public String getUrl(UUID playerUUID) {
-		return String.format(url, new Object[] { playerUUID });
-	}
+  public String getUrl(UUID playerId) {
+    return String.format(url, new Object[] {playerId});
+  }
 }

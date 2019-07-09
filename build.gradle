@@ -56,6 +56,14 @@ minecraft {
     }
 }
 
+sourceSets {
+	main {
+		java {
+			srcDir "network/src/main/java"
+		}
+	}
+}
+
 repositories {
 	maven {
 		url = 'https://jitpack.io' 
@@ -67,7 +75,7 @@ dependencies {
     
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
 	
-	compile group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
+	compile group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'	
 }
 
 jar {
