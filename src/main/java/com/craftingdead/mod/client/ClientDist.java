@@ -172,7 +172,7 @@ public class ClientDist implements IModDist {
 
     @SubscribeEvent
     public static void handle(InputEvent.MouseInputEvent event) {
-      if (minecraft.getConnection() != null && !minecraft.isGamePaused()) {
+      if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
         if (event.getButton() == minecraft.gameSettings.keyBindAttack.getKey().getKeyCode()) {
           boolean press = event.getAction() == GLFW.GLFW_PRESS;
           client.getPlayer().ifPresent((player) -> {
