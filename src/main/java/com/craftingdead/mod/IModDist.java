@@ -1,8 +1,8 @@
 package com.craftingdead.mod;
 
-import com.craftingdead.network.protocol.IMessage;
+import com.craftingdead.mod.masterserver.net.MasterServerConnector;
 
 public interface IModDist {
 
-  IMessage getLoginMessage();
+  MasterServerConnector.MasterServerConnectorBuilder<?, ?> getConnectorBuilder();
 }

@@ -2,7 +2,7 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
+import java.net.InetSocketAddress;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,9 +24,11 @@ import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.masterserver.net.protocol.login.message.PlayerLoginMessage;
-import com.craftingdead.network.protocol.IMessage;
-import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
+import com.craftingdead.mod.masterserver.net.MasterServerConnector;
+import com.craftingdead.mod.masterserver.net.MasterServerConnector.MasterServerConnectorBuilder;
+import com.craftingdead.mod.masterserver.net.protocol.login.LoginProtocol;
+import com.craftingdead.mod.masterserver.net.protocol.login.LoginSession;
+import com.craftingdead.mod.masterserver.net.protocol.player.PlayerProtocol;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -39,7 +41,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Session;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
@@ -69,6 +70,12 @@ public class ClientDist implements IModDist {
   private static final Logger logger = LogManager.getLogger();
 
   private static final Minecraft minecraft = Minecraft.getInstance();
+
+  @Getter
+  private final LoginProtocol loginProtocol = new LoginProtocol();
+
+  @Getter
+  private final PlayerProtocol playerProtocol = new PlayerProtocol();
 
   @Getter
   private CrosshairManager crosshairManager = new CrosshairManager();
@@ -132,6 +139,19 @@ public class ClientDist implements IModDist {
     return minecraft.player != null
         ? minecraft.player.getCapability(ModCapabilities.PLAYER, null).cast()
         : LazyOptional.empty();
+  }
+
+
+  @Override
+  public MasterServerConnectorBuilder<?, ?> getConnectorBuilder() {
+    return MasterServerConnector.<LoginSession, LoginProtocol>builder() //
+        .nativeTransport(minecraft.gameSettings.isUsingNativeTransport()) //
+        .pollIntervalSeconds(30L) //
+        .address(
+            InetSocketAddress.createUnresolved(CommonConfig.commonConfig.masterServerHost.get(),
+                CommonConfig.commonConfig.masterServerPort.get())) //
+        .sessionFactory((networkManager) -> new LoginSession(networkManager, this)) //
+        .protocol(this.loginProtocol);
   }
 
   // ================================================================================
@@ -255,16 +275,5 @@ public class ClientDist implements IModDist {
         }
       }
     }
-  }
-
-  @Override
-  public IMessage getLoginMessage() {
-    Session session = minecraft.getSession();
-    UUID id = session.getProfile().getId();
-    String username = session.getUsername();
-    String clientToken = ((YggdrasilMinecraftSessionService) minecraft.getSessionService())
-        .getAuthenticationService().getClientToken();
-    String accessToken = session.getToken();
-    return new PlayerLoginMessage(id, username, clientToken, accessToken, CraftingDead.MOD_VERSION);
   }
 }

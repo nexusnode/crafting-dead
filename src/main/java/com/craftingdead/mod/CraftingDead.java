@@ -1,17 +1,14 @@
 package com.craftingdead.mod;
 
-import java.net.InetSocketAddress;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.masterserver.net.MasterServerClient;
+import com.craftingdead.mod.masterserver.net.MasterServerConnector;
 import com.craftingdead.mod.net.NetworkChannel;
 import com.craftingdead.mod.server.ServerDist;
-import com.craftingdead.network.pipeline.Session;
 import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -76,9 +73,9 @@ public class CraftingDead {
   private final ThreadTaskExecutor<?> mainThreadExecutor;
 
   /**
-   * Master server client.
+   * Master server connector.
    */
-  private MasterServerClient masterServerClient;
+  private MasterServerConnector<?, ?> masterServerConnector;
 
   static {
     MOD_VERSION =
@@ -102,18 +99,11 @@ public class CraftingDead {
   }
 
   private void setup(FMLCommonSetupEvent event) {
-    this.masterServerClient = new MasterServerClient(
-        InetSocketAddress.createUnresolved(CommonConfig.commonConfig.masterServerHost.get(),
-            CommonConfig.commonConfig.masterServerPort.get()),
-        this.modDist::getLoginMessage);
-
+    this.masterServerConnector = this.modDist.getConnectorBuilder().build();
+    this.masterServerConnector.start();
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-  }
-
-  public Optional<Session> getActiveSession() {
-    return this.masterServerClient.getSession();
   }
 
   // ================================================================================
