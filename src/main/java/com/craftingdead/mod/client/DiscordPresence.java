@@ -1,7 +1,5 @@
 package com.craftingdead.mod.client;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import lombok.RequiredArgsConstructor;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
@@ -9,11 +7,8 @@ import net.arikia.dev.drpc.DiscordRichPresence;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextFormatting;
 
 public class DiscordPresence {
-
-  private static final Logger logger = LogManager.getLogger();
 
   private static boolean initialized;
 
@@ -52,16 +47,6 @@ public class DiscordPresence {
             ServerData serverData = Minecraft.getInstance().getCurrentServerData();
             if (serverData != null) {
               presence.state = serverData.serverIP;
-              System.out.println(serverData.populationInfo);
-              String[] playerListSplit = serverData.populationInfo.split("/");
-              try {
-                presence.partySize = Integer
-                    .valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[0]));
-                presence.partyMax = Integer
-                    .valueOf(TextFormatting.getTextWithoutFormattingCodes(playerListSplit[1]));
-              } catch (NumberFormatException e) {
-                logger.catching(e);
-              }
             }
           }
         };

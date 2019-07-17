@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.MOD_ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(CraftingDead.ID)
+@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModTileEntityTypes {
 
   public static final TileEntityType<?> LOOT = null;
@@ -20,7 +20,7 @@ public class ModTileEntityTypes {
     event.getRegistry().registerAll(TileEntityType.Builder //
         .create(TileEntityLoot::new, ModBlocks.RESIDENTIAL_LOOT) //
         .build(null) //
-        .setRegistryName(new ResourceLocation(CraftingDead.MOD_ID, "loot")) //
+        .setRegistryName(new ResourceLocation(CraftingDead.ID, "loot")) //
     );
   }
 }

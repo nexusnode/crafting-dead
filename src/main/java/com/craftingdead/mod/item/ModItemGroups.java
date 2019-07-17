@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
 
-  public static final ItemGroup CRAFTING_DEAD = (new ItemGroup(CraftingDead.MOD_ID) {
+  public static final ItemGroup CRAFTING_DEAD = (new ItemGroup(CraftingDead.ID) {
 
     @Override
     public ItemStack createIcon() {

@@ -1,8 +1,10 @@
 package com.craftingdead.mod;
 
-import com.craftingdead.mod.masterserver.net.MasterServerConnector;
+import com.craftingdead.network.pipeline.NetworkManager;
 
 public interface IModDist {
 
-  MasterServerConnector.MasterServerConnectorBuilder<?, ?> getConnectorBuilder();
+  boolean isUsingNativeTransport();
+
+  void handleConnect(NetworkManager networkManager);
 }

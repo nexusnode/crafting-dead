@@ -16,16 +16,16 @@ import net.minecraft.util.math.MathHelper;
 public class GuiIngame {
 
   private static final ResourceLocation DAYS_SURVIVED =
-      new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/hud/days_survived.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/days_survived.png");
   private static final ResourceLocation ZOMBIES_KILLED =
-      new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/hud/zombies_killed.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/zombies_killed.png");
   private static final ResourceLocation PLAYERS_KILLED =
-      new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/hud/players_killed.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/players_killed.png");
 
   private static final ResourceLocation BLOOD =
-      new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/blood.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
   private static final ResourceLocation BLOOD_2 =
-      new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/blood_2.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
 
   private final Minecraft minecraft;
 

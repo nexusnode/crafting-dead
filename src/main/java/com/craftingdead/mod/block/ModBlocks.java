@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.MOD_ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(CraftingDead.ID)
+@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBlocks {
 
   public static final Block RESIDENTIAL_LOOT = null;
@@ -22,6 +22,6 @@ public class ModBlocks {
   }
 
   private static Block appendRegistryName(String registryName, Block block) {
-    return block.setRegistryName(new ResourceLocation(CraftingDead.MOD_ID, registryName));
+    return block.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName));
   }
 }

@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.MOD_ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(CraftingDead.ID)
+@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EntityTypes {
 
   public static final EntityType<CorpseEntity> CORPSE = null;
@@ -23,7 +23,7 @@ public class EntityTypes {
             .setUpdateInterval(10) //
             .setShouldReceiveVelocityUpdates(false) //
             .setCustomClientFactory(CorpseEntity::new) //
-            .build(new ResourceLocation(CraftingDead.MOD_ID, "corpse").toString()) //
-            .setRegistryName(new ResourceLocation(CraftingDead.MOD_ID, "corpse")));
+            .build(new ResourceLocation(CraftingDead.ID, "corpse").toString()) //
+            .setRegistryName(new ResourceLocation(CraftingDead.ID, "corpse")));
   }
 }

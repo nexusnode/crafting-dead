@@ -112,12 +112,12 @@ public class Graphics {
 
   public static ResourceLocation getPlayerAvatar(UUID playerId) {
     ResourceLocation resourceLocation =
-        new ResourceLocation(CraftingDead.MOD_ID, "textures/avatars/" + playerId + ".png");
+        new ResourceLocation(CraftingDead.ID, "textures/avatars/" + playerId + ".png");
     ITextureObject object = minecraft.getTextureManager().getTexture(resourceLocation);
     if (object == null) {
       DownloadingTexture imageData =
           new DownloadingTexture(null, PlayerResource.AVATAR_URL.getUrl(playerId),
-              new ResourceLocation(CraftingDead.MOD_ID, "textures/gui/avatar.png"), null);
+              new ResourceLocation(CraftingDead.ID, "textures/gui/avatar.png"), null);
       minecraft.getTextureManager().loadTexture(resourceLocation, imageData);
     }
     return resourceLocation;

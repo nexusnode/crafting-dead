@@ -14,7 +14,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 
-  MAIN(new ResourceLocation(CraftingDead.MOD_ID, "main")) {
+  MAIN(new ResourceLocation(CraftingDead.ID, "main")) {
     @Override
     public void registerMessages(SimpleChannel simpleChannel) {
       int id = -1;

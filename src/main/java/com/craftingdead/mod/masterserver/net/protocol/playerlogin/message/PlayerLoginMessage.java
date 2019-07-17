@@ -1,4 +1,4 @@
-package com.craftingdead.mod.masterserver.net.protocol.login.message;
+package com.craftingdead.mod.masterserver.net.protocol.playerlogin.message;
 
 import java.util.UUID;
 import com.craftingdead.network.protocol.IMessage;

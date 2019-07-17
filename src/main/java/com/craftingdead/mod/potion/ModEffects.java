@@ -8,8 +8,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.MOD_ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(CraftingDead.ID)
+@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEffects {
 
   public static final Effect BROKEN_LEG = null;
@@ -17,7 +17,7 @@ public class ModEffects {
   @SubscribeEvent
   public static void handle(RegistryEvent.Register<Effect> event) {
     event.getRegistry().registerAll(new BrokenLegEffect() //
-        .setRegistryName(new ResourceLocation(CraftingDead.MOD_ID, "broken_leg")) //
+        .setRegistryName(new ResourceLocation(CraftingDead.ID, "broken_leg")) //
     );
   }
 }

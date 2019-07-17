@@ -20,7 +20,7 @@ import net.minecraft.util.ResourceLocation;
 public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Crosshair>> {
 
   public static final ResourceLocation DEFAULT_CROSSHAIR =
-      new ResourceLocation(CraftingDead.MOD_ID, "standard");
+      new ResourceLocation(CraftingDead.ID, "standard");
 
   private static final Gson GSON = new GsonBuilder()
       .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer()).create();

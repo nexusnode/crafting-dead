@@ -8,8 +8,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.MOD_ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(CraftingDead.ID)
+@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModSoundEvents {
 
   public static final SoundEvent ACR_SHOOT = null;
@@ -30,7 +30,7 @@ public class ModSoundEvents {
   }
 
   private static SoundEvent createSoundEvent(String name) {
-    ResourceLocation registryName = new ResourceLocation(CraftingDead.MOD_ID, name);
+    ResourceLocation registryName = new ResourceLocation(CraftingDead.ID, name);
     return new SoundEvent(registryName).setRegistryName(registryName);
   }
 }
