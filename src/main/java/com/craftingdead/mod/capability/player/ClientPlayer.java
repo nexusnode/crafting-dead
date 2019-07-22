@@ -10,10 +10,13 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
     super(entity);
   }
 
-  public void updateStatistics(int daysSurvived, int zombiesKilled, int playersKilled) {
+  public void updateMetadata(int daysSurvived, int zombiesKilled, int playersKilled, int water,
+      int maxWater) {
     this.daysSurvived = daysSurvived;
     this.zombiesKilled = zombiesKilled;
     this.playersKilled = playersKilled;
+    this.water = water;
+    this.maxWater = maxWater;
   }
 
   @Override

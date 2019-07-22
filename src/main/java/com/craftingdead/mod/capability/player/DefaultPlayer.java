@@ -56,6 +56,16 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
   protected boolean triggerPressed;
 
   /**
+   * Water.
+   */
+  protected int water;
+
+  /**
+   * Maximum water.
+   */
+  protected int maxWater = 20;
+
+  /**
    * The last held {@link ItemStack} - used to check if the player has switched item.
    */
   private ItemStack lastHeldStack = null;
@@ -124,6 +134,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
     nbt.putInt("daysSurvived", this.daysSurvived);
     nbt.putInt("zombiesKilled", this.zombiesKilled);
     nbt.putInt("playersKilled", this.playersKilled);
+    nbt.putInt("water", this.water);
+    nbt.putInt("maxWater", this.maxWater);
     return nbt;
   }
 
@@ -132,6 +144,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
     this.daysSurvived = nbt.getInt("daysSurvived");
     this.zombiesKilled = nbt.getInt("zombiesKilled");
     this.playersKilled = nbt.getInt("playersKilled");
+    this.water = nbt.getInt("water");
+    this.maxWater = nbt.getInt("maxWater");
   }
 
   @Override
@@ -140,13 +154,49 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
   }
 
   @Override
+  public void setDaysSurvived(int daysSurvived) {
+    this.daysSurvived = daysSurvived;
+  }
+
+  @Override
   public int getZombiesKilled() {
     return this.zombiesKilled;
   }
 
   @Override
+  public void setZombiesKilled(int zombiesKilled) {
+    this.zombiesKilled = zombiesKilled;
+  }
+
+
+  @Override
   public int getPlayersKilled() {
     return this.playersKilled;
+  }
+
+  @Override
+  public void setPlayersKilled(int playersKilled) {
+    this.playersKilled = playersKilled;
+  }
+
+  @Override
+  public int getWater() {
+    return this.water;
+  }
+
+  @Override
+  public void setWater(int water) {
+    this.water = water;
+  }
+
+  @Override
+  public int getMaxWater() {
+    return this.maxWater;
+  }
+
+  @Override
+  public void setMaxWater(int maxWater) {
+    this.maxWater = maxWater;
   }
 
   @Override

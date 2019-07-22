@@ -6,14 +6,14 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.Graphics;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class GuiIngame {
+public class IngameGui {
 
   private static final ResourceLocation DAYS_SURVIVED =
       new ResourceLocation(CraftingDead.ID, "textures/gui/hud/days_survived.png");
@@ -35,47 +35,55 @@ public class GuiIngame {
 
   private float lastSpread;
 
-  public GuiIngame(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
+  public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
     this.crosshairLocation = crosshairLocation;
   }
 
-  public void renderGameOverlay(float partialTicks) {
-    MainWindow window = this.minecraft.mainWindow;
-    final int width = window.getScaledWidth();
-    final int height = window.getScaledHeight();
+  public void renderGameOverlay(float partialTicks, int width, int height) {
     // final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
     // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
     // - 1;
 
     this.client.getPlayer().ifPresent((player) -> {
       ClientPlayerEntity entity = player.getEntity();
-      float healthPercentage = entity.getHealth() / entity.getMaxHealth();
-      if (!entity.isCreative() && healthPercentage < 1.0F
-          && CommonConfig.clientConfig.displayBlood.get()) {
-        ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
-
-        GlStateManager.enableBlend();
-
-        Graphics.bind(res);
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
-        Graphics.drawTexturedRectangle(0, 0, width, height);
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GlStateManager.disableBlend();
-      }
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
-        this.renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
+        if (CommonConfig.clientConfig.displayBlood.get()) {
+          renderBlood(width, height, entity.getHealth(), entity.getMaxHealth());
+        }
+
+        // Only render when air level is not being rendered
+        if (!entity.areEyesInFluid(FluidTags.WATER) && entity.getAir() == entity.getMaxAir()) {
+          renderWaterLevel(width, height, player.getWater(), player.getMaxWater());
+        }
+
+        renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
             player.getZombiesKilled(), player.getPlayersKilled());
       }
     });
   }
 
-  private void renderPlayerStats(FontRenderer fontRenderer, int width, int height, int daysSurvived,
-      int zombiesKilled, int playersKilled) {
+  private static void renderBlood(int width, int height, float health, float maxHealth) {
+    float healthPercentage = health / maxHealth;
+    if (healthPercentage < 1.0F) {
+      ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
+
+      GlStateManager.enableBlend();
+
+      Graphics.bind(res);
+      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
+      Graphics.drawTexturedRectangle(0, 0, width, height);
+      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+      GlStateManager.disableBlend();
+    }
+  }
+
+  private static void renderPlayerStats(FontRenderer fontRenderer, int width, int height,
+      int daysSurvived, int zombiesKilled, int playersKilled) {
     int y = height / 2;
     int x = 4;
 
@@ -96,12 +104,37 @@ public class GuiIngame {
     GlStateManager.disableBlend();
   }
 
-  public void renderCrosshairs(float accuracy, float partialTicks) {
+  private static void renderWaterLevel(int width, int height, int water, int maxWater) {
+    final int y = height - 49;
+    final int x = width / 2 + 91;
+    GlStateManager.enableBlend();
+    Graphics.bind(Graphics.ICONS);
+
+    for (int i = 0; i < 10; i++) {
+      // Draw droplet outline
+      Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 0, 32);
+
+      float scale = 10F / maxWater;
+      float scaledWater = water * scale;
+
+      if (i + 1 <= scaledWater) {
+        // Draw full droplet
+        Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 9, 32);
+      } else if (scaledWater >= i + 0.5F) {
+        // Draw half droplet
+        Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
+      }
+    }
+
+    GlStateManager.disableBlend();
+  }
+
+  public void renderCrosshairs(float accuracy, float partialTicks, int width, int height) {
     final double imageWidth = 16.0D;
     final double imageHeight = 16.0D;
 
-    final double x = (this.minecraft.mainWindow.getScaledWidth() / 2.0D) - (imageWidth / 2.0D);
-    final double y = (this.minecraft.mainWindow.getScaledHeight() / 2.0D) - (imageHeight / 2.0D);
+    final double x = (width / 2.0D) - (imageWidth / 2.0D);
+    final double y = (height / 2.0D) - (imageHeight / 2.0D);
 
     final float newSpread = (1.0F - accuracy) * 60.0F;
     final float lerpSpread = MathHelper.lerp(0.5F, this.lastSpread, newSpread);

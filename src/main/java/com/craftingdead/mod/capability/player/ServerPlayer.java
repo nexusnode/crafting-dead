@@ -17,19 +17,9 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   private boolean lastDay;
 
   /**
-   * Used to detect if {@link #daysSurvived} has changed since it was last sent to the client.
+   * Used to determine whether a data sync packet should be sent to the client.
    */
-  private int lastDaysSurvived = Integer.MIN_VALUE;
-
-  /**
-   * Used to detect if {@link #zombiesKilled} has changed since it was last sent to the client.
-   */
-  private int lastZombieKills = Integer.MIN_VALUE;
-
-  /**
-   * Used to detect if {@link #playersKilled} has changed since it was last sent to the client.
-   */
-  private int lastPlayerKills = Integer.MIN_VALUE;
+  private boolean dirty;
 
   public ServerPlayer(ServerPlayerEntity entity) {
     super(entity);
@@ -43,17 +33,11 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   public void tick() {
     super.tick();
     this.updateDaysSurvived();
-    this.updateStatistics();
-  }
-
-  private void updateStatistics() {
-    if (this.daysSurvived != this.lastDaysSurvived || this.zombiesKilled != this.lastZombieKills
-        || this.playersKilled != this.lastPlayerKills) {
+    if (this.dirty) {
       NetworkChannel.MAIN.getSimpleChannel().send(PacketDistributor.PLAYER.with(this::getEntity),
-          new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled));
-      this.lastDaysSurvived = this.daysSurvived;
-      this.lastZombieKills = this.zombiesKilled;
-      this.lastPlayerKills = this.playersKilled;
+          new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
+              this.water, this.maxWater));
+      this.dirty = false;
     }
   }
 
@@ -62,7 +46,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     // If it was night time and is now day time then increment their days survived
     // by 1
     if (!this.lastDay && isDay) {
-      this.daysSurvived++;
+      this.setDaysSurvived(this.getDaysSurvived() + 1);
     }
     this.lastDay = isDay;
   }
@@ -70,9 +54,9 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   @Override
   public boolean onKill(Entity target) {
     if (target instanceof ZombieEntity) {
-      this.zombiesKilled++;
+      this.setZombiesKilled(this.getZombiesKilled() + 1);
     } else if (target instanceof ServerPlayerEntity) {
-      this.playersKilled++;
+      this.setPlayersKilled(this.getPlayersKilled() + 1);
     }
     return false;
   }
@@ -90,6 +74,36 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     NetworkChannel.MAIN.getSimpleChannel().send(
         PacketDistributor.TRACKING_ENTITY.with(this::getEntity),
         new TriggerPressedMessage(this.entity.getEntityId(), triggerPressed));
+  }
+
+  @Override
+  public void setDaysSurvived(int daysSurvived) {
+    super.setDaysSurvived(daysSurvived);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setZombiesKilled(int zombiesKilled) {
+    super.setZombiesKilled(zombiesKilled);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setPlayersKilled(int playersKilled) {
+    super.setPlayersKilled(playersKilled);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setWater(int water) {
+    super.setWater(water);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setMaxWater(int maxWater) {
+    super.setMaxWater(maxWater);
+    this.dirty = true;
   }
 
   public void copyFrom(ServerPlayer that, boolean wasDeath) {

@@ -25,17 +25,22 @@ public enum NetworkChannel {
             buffer.writeInt(msg.getDaysSurvived());
             buffer.writeInt(msg.getZombiesKilled());
             buffer.writeInt(msg.getPlayersKilled());
+            buffer.writeInt(msg.getWater());
+            buffer.writeInt(msg.getMaxWater());
           }) //
           .decoder((buffer) -> {
             int daysSurvived = buffer.readInt();
             int zombiesKilled = buffer.readInt();
             int playersKilled = buffer.readInt();
-            return new UpdateStatisticsMessage(daysSurvived, zombiesKilled, playersKilled);
+            int water = buffer.readInt();
+            int maxWater = buffer.readInt();
+            return new UpdateStatisticsMessage(daysSurvived, zombiesKilled, playersKilled, water,
+                maxWater);
           }) //
           .consumer((msg, ctx) -> {
-            ((ClientDist) CraftingDead.getInstance().getModDist()).getPlayer()
-                .ifPresent((player) -> player.updateStatistics(msg.getDaysSurvived(),
-                    msg.getZombiesKilled(), msg.getPlayersKilled()));
+            ((ClientDist) CraftingDead.getInstance().getModDist()).getPlayer().ifPresent(
+                (player) -> player.updateMetadata(msg.getDaysSurvived(), msg.getZombiesKilled(),
+                    msg.getPlayersKilled(), msg.getWater(), msg.getMaxWater()));
             ctx.get().setPacketHandled(true);
           }) //
           .add();

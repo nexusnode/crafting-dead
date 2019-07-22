@@ -20,92 +20,75 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class Graphics {
 
+  public static final ResourceLocation ICONS =
+      new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
+
   private static final Minecraft minecraft = Minecraft.getInstance();
 
-  public static void drawRectangle(double x, double y, double width, double height, int color,
-      float alpha, boolean shadow) {
-    if (shadow) {
-      drawRectangle(x - 1, y - 1, width + 2, height + 2, color, alpha * 0.3F, false);
-    }
-
-    Tessellator tessellator = Tessellator.getInstance();
-
-    GlStateManager.enableBlend();
-    GlStateManager.disableTexture();
-
-    GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-        GlStateManager.DestFactor.ZERO);
-
-    float f = (float) (color >> 16 & 255) / 255.0F;
-    float f1 = (float) (color >> 8 & 255) / 255.0F;
-    float f2 = (float) (color & 255) / 255.0F;
-    GlStateManager.color4f(f, f1, f2, alpha);
-
-    BufferBuilder bufferbuilder = tessellator.getBuffer();
-    bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-    bufferbuilder.pos((double) x, (double) y + height, 0.0D).endVertex();
-    bufferbuilder.pos((double) x + width, (double) y + height, 0.0D).endVertex();
-    bufferbuilder.pos((double) x + width, (double) y, 0.0D).endVertex();
-    bufferbuilder.pos((double) x, (double) y, 0.0D).endVertex();
-    tessellator.draw();
-
-    GlStateManager.enableTexture();
-    GlStateManager.disableBlend();
-  }
-
-  public static void drawGradientRectangle(double x, double y, double width, double height,
-      int startColor, int endColor, float alpha) {
+  public static void drawGradientRectangle(double x, double y, double x2, double y2, int startColor,
+      int endColor) {
     GlStateManager.disableTexture();
     GlStateManager.enableBlend();
     GlStateManager.disableAlphaTest();
     GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
         GlStateManager.DestFactor.ZERO);
-    GlStateManager.shadeModel(7425);
+    GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
     Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder bufferbuilder = tessellator.getBuffer();
-    bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+    BufferBuilder buffer = tessellator.getBuffer();
+    buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
 
-    float f = (float) (startColor >> 24 & 255) / 255.0F;
-    float f1 = (float) (startColor >> 16 & 255) / 255.0F;
-    float f2 = (float) (startColor >> 8 & 255) / 255.0F;
-    float f3 = (float) (startColor & 255) / 255.0F;
-    float f4 = (float) (endColor >> 24 & 255) / 255.0F;
-    float f5 = (float) (endColor >> 16 & 255) / 255.0F;
-    float f6 = (float) (endColor >> 8 & 255) / 255.0F;
-    float f7 = (float) (endColor & 255) / 255.0F;
+    float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
+    float startRed = (float) (startColor >> 16 & 255) / 255.0F;
+    float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
+    float startBlue = (float) (startColor & 255) / 255.0F;
 
-    bufferbuilder.pos((double) x, (double) y + height, 0.0D).color(f1, f2, f3, f).endVertex();
-    bufferbuilder.pos((double) x + width, (double) y + height, 0.0D).color(f5, f6, f7, f4)
-        .endVertex();
-    bufferbuilder.pos((double) x + width, (double) y, 0.0D).color(f5, f6, f7, f4).endVertex();
-    bufferbuilder.pos((double) x, (double) y, 0.0D).color(f1, f2, f3, f).endVertex();
+    float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
+    float endRed = (float) (endColor >> 16 & 255) / 255.0F;
+    float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
+    float endBlue = (float) (endColor & 255) / 255.0F;
+
+    buffer.pos(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.pos(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
     tessellator.draw();
-    GlStateManager.shadeModel(7424);
-    GlStateManager.disableBlend();
+
+    GlStateManager.shadeModel(GL11.GL_FLAT);
     GlStateManager.enableAlphaTest();
+    GlStateManager.disableBlend();
     GlStateManager.enableTexture();
   }
 
-  public static void drawTexturedRectangle(double x, double y, double width, double height) {
-    drawTexturedRectangle(x, y, width, height, 0.0D, 1.0D, 1.0D, 0.0D);
-  }
-
-  public static void drawTexturedRectangle(double x, double y, double textureX, double textureY,
-      double width, double height) {
-    drawTexturedRectangle(width / 2, height / 2, width, height, textureX, textureY + height,
-        textureX + width, textureY);
-  }
-
   public static void drawTexturedRectangle(double x, double y, double width, double height,
-      double u, double v, double u2, double v2) {
+      double textureX, double textureY) {
+    drawTexturedRectangle(x, y, x + width, y + height, textureX, textureY, textureX + width,
+        textureY + height, 256, 256);
+  }
+
+  public static void drawTexturedRectangle(double x, double y, double x2, double y2,
+      double textureX, double textureY, double textureX2, double textureY2, double width,
+      double height) {
+    double u = textureX / width;
+    double u2 = textureX2 / width;
+    double v = textureY / height;
+    double v2 = textureY2 / height;
+    drawTexturedRectangle(x, y, x2, y2, u, v, u2, v2);
+  }
+
+  public static void drawTexturedRectangle(double x, double y, double width, double height) {
+    drawTexturedRectangle(x, y, x + width, y + height, 0.0D, 1.0D, 1.0D, 0.0D);
+  }
+
+  public static void drawTexturedRectangle(double x, double y, double x2, double y2, double u,
+      double v, double u2, double v2) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuffer();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.pos(x, y + height, 0.0D).tex(u, v).endVertex();
-    bufferbuilder.pos(x + width, y + height, 0.0D).tex(u2, v).endVertex();
-    bufferbuilder.pos(x + width, y, 0.0D).tex(u2, v2).endVertex();
+    bufferbuilder.pos(x, y2, 0.0D).tex(u, v).endVertex();
+    bufferbuilder.pos(x2, y2, 0.0D).tex(u2, v).endVertex();
+    bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
     bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
     tessellator.draw();
   }

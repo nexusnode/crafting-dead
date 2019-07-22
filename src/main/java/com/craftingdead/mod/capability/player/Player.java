@@ -31,9 +31,23 @@ public interface Player<E extends PlayerEntity> extends INBTSerializable<Compoun
 
   int getDaysSurvived();
 
+  void setDaysSurvived(int daysSurvived);
+
   int getZombiesKilled();
 
+  void setZombiesKilled(int zombiesKilled);
+
   int getPlayersKilled();
+
+  void setPlayersKilled(int playersKilled);
+
+  int getWater();
+
+  void setWater(int water);
+
+  int getMaxWater();
+
+  void setMaxWater(int maxWater);
 
   E getEntity();
 

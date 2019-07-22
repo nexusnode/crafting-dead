@@ -19,7 +19,7 @@ import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
-import com.craftingdead.mod.client.gui.GuiIngame;
+import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.entity.CorpseEntity;
@@ -82,7 +82,7 @@ public class ClientDist implements IModDist {
 
   private RecoilHelper recoilHelper = new RecoilHelper();
 
-  private GuiIngame guiIngame;
+  private IngameGui guiIngame;
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -91,7 +91,7 @@ public class ClientDist implements IModDist {
     ((IReloadableResourceManager) minecraft.getResourceManager())
         .addReloadListener(this.crosshairManager);
 
-    this.guiIngame = new GuiIngame(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+    this.guiIngame = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
   }
 
   @Override
@@ -262,14 +262,16 @@ public class ClientDist implements IModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
-        this.guiIngame.renderGameOverlay(event.getPartialTicks());
+        this.guiIngame.renderGameOverlay(event.getPartialTicks(),
+            event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
         break;
       case CROSSHAIRS:
         this.getPlayer().ifPresent((player) -> {
           player.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.AIMABLE)
               .ifPresent((aimable) -> {
                 event.setCanceled(true);
-                this.guiIngame.renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks());
+                this.guiIngame.renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
+                    event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
               });
         });
         break;
