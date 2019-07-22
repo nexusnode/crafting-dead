@@ -4,13 +4,18 @@ import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.net.NetworkChannel;
 import com.craftingdead.mod.net.message.main.TriggerPressedMessage;
 import com.craftingdead.mod.net.message.main.UpdateStatisticsMessage;
+import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
+
+  private static final int WATER_DAMAGE_DELAY_TICKS = 20 * 6;
+
   /**
    * Used to calculate if a day has passed by.
    */
@@ -19,7 +24,9 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   /**
    * Used to determine whether a data sync packet should be sent to the client.
    */
-  private boolean dirty;
+  private boolean dirty = true;
+
+  private int waterDamageTicks;
 
   public ServerPlayer(ServerPlayerEntity entity) {
     super(entity);
@@ -33,6 +40,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   public void tick() {
     super.tick();
     this.updateDaysSurvived();
+    this.updateWater();
     if (this.dirty) {
       NetworkChannel.MAIN.getSimpleChannel().send(PacketDistributor.PLAYER.with(this::getEntity),
           new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
@@ -49,6 +57,24 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
       this.setDaysSurvived(this.getDaysSurvived() + 1);
     }
     this.lastDay = isDay;
+  }
+
+  private void updateWater() {
+    if (this.entity.world.getDifficulty() != Difficulty.PEACEFUL) {
+      if (this.water > 0) {
+        this.setWater(this.getWater() - 1);
+        if (this.entity.isSprinting()) {
+          this.setWater(this.getWater() - 1);
+        }
+      }
+
+      if (this.water == 0) {
+        if (this.waterDamageTicks++ >= WATER_DAMAGE_DELAY_TICKS) {
+          this.entity.attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
+          this.waterDamageTicks = 0;
+        }
+      }
+    }
   }
 
   @Override

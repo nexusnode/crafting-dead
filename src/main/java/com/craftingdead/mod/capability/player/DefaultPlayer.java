@@ -58,12 +58,12 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
   /**
    * Water.
    */
-  protected int water;
+  protected int water = 30 * 60 * 20;
 
   /**
    * Maximum water.
    */
-  protected int maxWater = 20;
+  protected int maxWater = 30 * 60 * 20;
 
   /**
    * The last held {@link ItemStack} - used to check if the player has switched item.
@@ -141,11 +141,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
-    this.daysSurvived = nbt.getInt("daysSurvived");
-    this.zombiesKilled = nbt.getInt("zombiesKilled");
-    this.playersKilled = nbt.getInt("playersKilled");
-    this.water = nbt.getInt("water");
-    this.maxWater = nbt.getInt("maxWater");
+    this.setDaysSurvived(nbt.getInt("daysSurvived"));
+    this.setZombiesKilled(nbt.getInt("zombiesKilled"));
+    this.setPlayersKilled(nbt.getInt("playersKilled"));
+    this.setWater(nbt.getInt("water"));
+    this.setMaxWater(nbt.getInt("maxWater"));
   }
 
   @Override

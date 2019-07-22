@@ -52,12 +52,12 @@ public class IngameGui {
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
         if (CommonConfig.clientConfig.displayBlood.get()) {
-          renderBlood(width, height, entity.getHealth(), entity.getMaxHealth());
+          renderBlood(width, height, entity.getHealth() / entity.getMaxHealth());
         }
 
         // Only render when air level is not being rendered
         if (!entity.areEyesInFluid(FluidTags.WATER) && entity.getAir() == entity.getMaxAir()) {
-          renderWaterLevel(width, height, player.getWater(), player.getMaxWater());
+          renderWaterLevel(width, height, (float) player.getWater() / (float) player.getMaxWater());
         }
 
         renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
@@ -66,8 +66,7 @@ public class IngameGui {
     });
   }
 
-  private static void renderBlood(int width, int height, float health, float maxHealth) {
-    float healthPercentage = health / maxHealth;
+  private static void renderBlood(int width, int height, float healthPercentage) {
     if (healthPercentage < 1.0F) {
       ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
 
@@ -104,7 +103,7 @@ public class IngameGui {
     GlStateManager.disableBlend();
   }
 
-  private static void renderWaterLevel(int width, int height, int water, int maxWater) {
+  private static void renderWaterLevel(int width, int height, float waterPercentage) {
     final int y = height - 49;
     final int x = width / 2 + 91;
     GlStateManager.enableBlend();
@@ -114,9 +113,7 @@ public class IngameGui {
       // Draw droplet outline
       Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 0, 32);
 
-      float scale = 10F / maxWater;
-      float scaledWater = water * scale;
-
+      float scaledWater = 10.0F * waterPercentage;
       if (i + 1 <= scaledWater) {
         // Draw full droplet
         Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 9, 32);
