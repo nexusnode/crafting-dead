@@ -20,8 +20,10 @@ import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.GuiIngame;
+import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.entity.CorpseEntity;
+import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.message.HandshakeMessage;
@@ -129,6 +131,8 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(RELOAD);
 
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(AdvancedZombieEntity.class,
+        AdvancedZombieRenderer::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
