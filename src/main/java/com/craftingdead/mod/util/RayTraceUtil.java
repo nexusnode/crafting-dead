@@ -1,6 +1,7 @@
 package com.craftingdead.mod.util;
 
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -9,6 +10,7 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
+@UtilityClass
 public class RayTraceUtil {
 
   /**

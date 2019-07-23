@@ -8,6 +8,7 @@ import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -16,21 +17,17 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
 
   private static final int WATER_DAMAGE_DELAY_TICKS = 20 * 6;
 
-  /**
-   * Used to calculate if a day has passed by.
-   */
-  private boolean lastDay;
+  private static final int WATER_DELAY_TICKS = 20 * 40;
 
   /**
    * Used to determine whether a data sync packet should be sent to the client.
    */
   private boolean dirty = true;
 
-  private int waterDamageTicks;
+  private int waterTimer;
 
   public ServerPlayer(ServerPlayerEntity entity) {
     super(entity);
-    this.lastDay = entity.getEntityWorld().isDaytime();
   }
 
   /**
@@ -39,8 +36,14 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   @Override
   public void tick() {
     super.tick();
-    this.updateDaysSurvived();
     this.updateWater();
+
+    int aliveTicks = this.entity.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
+    int aliveDays = aliveTicks / 20 / 60 / 20;
+    if (this.daysSurvived != aliveDays) {
+      this.setDaysSurvived(aliveDays);
+    }
+
     if (this.dirty) {
       NetworkChannel.MAIN.getSimpleChannel().send(PacketDistributor.PLAYER.with(this::getEntity),
           new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
@@ -49,30 +52,20 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     }
   }
 
-  private void updateDaysSurvived() {
-    boolean isDay = this.entity.getEntityWorld().isDaytime();
-    // If it was night time and is now day time then increment their days survived
-    // by 1
-    if (!this.lastDay && isDay) {
-      this.setDaysSurvived(this.getDaysSurvived() + 1);
-    }
-    this.lastDay = isDay;
-  }
-
   private void updateWater() {
     if (this.entity.world.getDifficulty() != Difficulty.PEACEFUL) {
-      if (this.water > 0) {
+      this.waterTimer++;
+      if (this.water <= 0) {
+        if (this.waterTimer >= WATER_DAMAGE_DELAY_TICKS && this.water == 0) {
+          this.entity.attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
+          this.waterTimer = 0;
+        }
+      } else if (this.waterTimer >= WATER_DELAY_TICKS) {
         this.setWater(this.getWater() - 1);
         if (this.entity.isSprinting()) {
           this.setWater(this.getWater() - 1);
         }
-      }
-
-      if (this.water == 0) {
-        if (this.waterDamageTicks++ >= WATER_DAMAGE_DELAY_TICKS) {
-          this.entity.attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
-          this.waterDamageTicks = 0;
-        }
+        this.waterTimer = 0;
       }
     }
   }
@@ -134,7 +127,6 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
 
   public void copyFrom(ServerPlayer that, boolean wasDeath) {
     if (!wasDeath) {
-      this.daysSurvived = that.daysSurvived;
       this.zombiesKilled = that.zombiesKilled;
       this.playersKilled = that.playersKilled;
     }

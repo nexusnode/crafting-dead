@@ -5,6 +5,7 @@ import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
+import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -12,6 +13,8 @@ import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.UseAction;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,6 +37,9 @@ public class ModItems {
   public static final Item RESIDENTIAL_LOOT = null;
 
   public static final Item CLIP = null;
+
+  public static final Item EMPTY_WATER_BOTTLE = null;
+  public static final Item WATER_BOTTLE = null;
 
   @SubscribeEvent
   public static void handle(RegistryEvent.Register<Item> event) {
@@ -111,8 +117,13 @@ public class ModItems {
             .setShootSound(() -> ModSoundEvents.FN57_SHOOT) //
             .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
         ), appendRegistryName("residential_loot",
-            createBlockItem(ModBlocks.RESIDENTIAL_LOOT, ModItemGroups.CRAFTING_DEAD)) //
-        );
+            createBlockItem(ModBlocks.RESIDENTIAL_LOOT, ModItemGroups.CRAFTING_DEAD) //
+        ), appendRegistryName("empty_water_bottle", new Item(new Item.Properties()) //
+        ), appendRegistryName("water_bottle", new UsableItem(new UsableItem.Properties() //
+            .addEffect(() -> new EffectInstance(ModEffects.HYDRATE, 0, 8)) //
+            .setReturnItem(() -> EMPTY_WATER_BOTTLE) //
+            .setUseAction(UseAction.DRINK)) //
+        ));
   }
 
   private static Item appendRegistryName(String registryName, Item item) {

@@ -90,7 +90,7 @@ public class GunItem extends Item {
       modifiers.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(
           ATTACK_SPEED_MODIFIER, "Weapon modifier", 20, AttributeModifier.Operation.ADDITION));
       modifiers.put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(
-          REACH_DISTANCE_MODIFIER, "Weapon modofier", 100, AttributeModifier.Operation.ADDITION));
+          REACH_DISTANCE_MODIFIER, "Weapon modifier", 100, AttributeModifier.Operation.ADDITION));
     }
     return modifiers;
   }

@@ -3,8 +3,8 @@ package com.craftingdead.mod.client.gui;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.client.Graphics;
 import com.craftingdead.mod.client.crosshair.Crosshair;
+import com.craftingdead.mod.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -60,6 +60,7 @@ public class IngameGui {
           renderWaterLevel(width, height, (float) player.getWater() / (float) player.getMaxWater());
         }
 
+
         renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
             player.getZombiesKilled(), player.getPlayersKilled());
       }
@@ -72,9 +73,9 @@ public class IngameGui {
 
       GlStateManager.enableBlend();
 
-      Graphics.bind(res);
+      RenderUtil.bind(res);
       GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
-      Graphics.drawTexturedRectangle(0, 0, width, height);
+      RenderUtil.drawTexturedRectangle(0, 0, width, height);
       GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
       GlStateManager.disableBlend();
@@ -88,16 +89,16 @@ public class IngameGui {
 
     GlStateManager.enableBlend();
 
-    Graphics.bind(DAYS_SURVIVED);
-    Graphics.drawTexturedRectangle(x, y - 20, 16, 16);
+    RenderUtil.bind(DAYS_SURVIVED);
+    RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
     fontRenderer.drawStringWithShadow(String.valueOf(daysSurvived), x + 20, y - 16, 0xFFFFFF);
 
-    Graphics.bind(ZOMBIES_KILLED);
-    Graphics.drawTexturedRectangle(x, y, 16, 16);
+    RenderUtil.bind(ZOMBIES_KILLED);
+    RenderUtil.drawTexturedRectangle(x, y, 16, 16);
     fontRenderer.drawStringWithShadow(String.valueOf(zombiesKilled), x + 20, y + 4, 0xFFFFFF);
 
-    Graphics.bind(PLAYERS_KILLED);
-    Graphics.drawTexturedRectangle(x, y + 20, 16, 16);
+    RenderUtil.bind(PLAYERS_KILLED);
+    RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
     fontRenderer.drawStringWithShadow(String.valueOf(playersKilled), x + 20, y + 24, 0xFFFFFF);
 
     GlStateManager.disableBlend();
@@ -107,19 +108,19 @@ public class IngameGui {
     final int y = height - 49;
     final int x = width / 2 + 91;
     GlStateManager.enableBlend();
-    Graphics.bind(Graphics.ICONS);
+    RenderUtil.bind(RenderUtil.ICONS);
 
     for (int i = 0; i < 10; i++) {
       // Draw droplet outline
-      Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 0, 32);
+      RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 0, 32);
 
       float scaledWater = 10.0F * waterPercentage;
       if (i + 1 <= scaledWater) {
         // Draw full droplet
-        Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 9, 32);
+        RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 9, 32);
       } else if (scaledWater >= i + 0.5F) {
         // Draw half droplet
-        Graphics.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
+        RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
       }
     }
 
@@ -142,20 +143,20 @@ public class IngameGui {
     {
       GlStateManager.enableBlend();
 
-      Graphics.bind(crosshair.getMiddle());
-      Graphics.drawTexturedRectangle(x, y, imageWidth, imageHeight);
+      RenderUtil.bind(crosshair.getMiddle());
+      RenderUtil.drawTexturedRectangle(x, y, imageWidth, imageHeight);
 
-      Graphics.bind(crosshair.getTop());
-      Graphics.drawTexturedRectangle(x, y - lerpSpread, imageWidth, imageHeight);
+      RenderUtil.bind(crosshair.getTop());
+      RenderUtil.drawTexturedRectangle(x, y - lerpSpread, imageWidth, imageHeight);
 
-      Graphics.bind(crosshair.getBottom());
-      Graphics.drawTexturedRectangle(x, y + lerpSpread, imageWidth, imageHeight);
+      RenderUtil.bind(crosshair.getBottom());
+      RenderUtil.drawTexturedRectangle(x, y + lerpSpread, imageWidth, imageHeight);
 
-      Graphics.bind(crosshair.getLeft());
-      Graphics.drawTexturedRectangle(x - lerpSpread, y, imageWidth, imageHeight);
+      RenderUtil.bind(crosshair.getLeft());
+      RenderUtil.drawTexturedRectangle(x - lerpSpread, y, imageWidth, imageHeight);
 
-      Graphics.bind(crosshair.getRight());
-      Graphics.drawTexturedRectangle(x + lerpSpread, y, imageWidth, imageHeight);
+      RenderUtil.bind(crosshair.getRight());
+      RenderUtil.drawTexturedRectangle(x + lerpSpread, y, imageWidth, imageHeight);
       GlStateManager.disableBlend();
     }
     GlStateManager.popMatrix();
