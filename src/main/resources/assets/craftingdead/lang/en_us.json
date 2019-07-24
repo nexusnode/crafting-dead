@@ -25,7 +25,7 @@
 
     "message.broken_leg": "Ouch! You broke your leg.",
 
-    "itemGroup.craftingdead": "Crafting Dead",
+    "itemGroup.craftingdead_consumable": "Crafting Dead Consumable",
 
     "item.craftingdead.acr": "ACR",
     "item.craftingdead.ak47": "AK47",
@@ -38,5 +38,6 @@
     "item.craftingdead.empty_water_bottle":"Empty Water Bottle",
     "item.craftingdead.water_bottle":"Water Bottle",
     "item.craftingdead.power_bar":"Power Bar",
-    "item.craftingdead.candy_bar":"Candy Bar"
+    "item.craftingdead.candy_bar":"Candy Bar",
+    "item.craftingdead.cereal":"Cereal"
 }

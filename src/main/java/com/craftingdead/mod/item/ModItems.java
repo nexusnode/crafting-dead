@@ -41,6 +41,7 @@ public class ModItems {
 
   public static final Item POWER_BAR = null;
   public static final Item CANDY_BAR = null;
+  public static final Item CEREAL = null;
 
   @SubscribeEvent
   public static void handle(RegistryEvent.Register<Item> event) {
@@ -131,6 +132,9 @@ public class ModItems {
             .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
         ), appendRegistryName("candy_bar", new Item(new Item.Properties() //
             .food(ModFoods.CANDY_BAR) //
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
+        ), appendRegistryName("cereal", new Item(new Item.Properties() //
+            .food(ModFoods.CEREAL) //
             .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
         ));
   }
