@@ -25,7 +25,7 @@ archivesBaseName = 'craftingdead'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: "${mappings_channel}", version: "${mappings_version}-${minecraft_version}"
+    mappings channel: "${mappings_channel}", version: "${mappings_version}"
     
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
 
