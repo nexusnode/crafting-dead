@@ -36,5 +36,7 @@
     "item.craftingdead.magnum": "Magnum",
     "item.craftingdead.fn57": "Five-seveN",
     "item.craftingdead.empty_water_bottle":"Empty Water Bottle",
-    "item.craftingdead.water_bottle":"Water Bottle"
+    "item.craftingdead.water_bottle":"Water Bottle",
+    "item.craftingdead.power_bar":"Power Bar",
+    "item.craftingdead.candy_bar":"Candy Bar"
 }

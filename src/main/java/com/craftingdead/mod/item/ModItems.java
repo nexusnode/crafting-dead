@@ -9,10 +9,8 @@ import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
@@ -40,6 +38,9 @@ public class ModItems {
 
   public static final Item EMPTY_WATER_BOTTLE = null;
   public static final Item WATER_BOTTLE = null;
+
+  public static final Item POWER_BAR = null;
+  public static final Item CANDY_BAR = null;
 
   @SubscribeEvent
   public static void handle(RegistryEvent.Register<Item> event) {
@@ -117,20 +118,24 @@ public class ModItems {
             .setShootSound(() -> ModSoundEvents.FN57_SHOOT) //
             .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
         ), appendRegistryName("residential_loot",
-            createBlockItem(ModBlocks.RESIDENTIAL_LOOT, ModItemGroups.CRAFTING_DEAD) //
-        ), appendRegistryName("empty_water_bottle", new Item(new Item.Properties()) //
-        ), appendRegistryName("water_bottle", new UsableItem(new UsableItem.Properties() //
-            .addEffect(() -> new EffectInstance(ModEffects.HYDRATE, 0, 8)) //
-            .setReturnItem(() -> EMPTY_WATER_BOTTLE) //
-            .setUseAction(UseAction.DRINK)) //
+            new BlockItem(ModBlocks.RESIDENTIAL_LOOT, (new Item.Properties())) //
+        ), appendRegistryName("empty_water_bottle", new Item(new Item.Properties() //
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
+        ), appendRegistryName("water_bottle",
+            new UsableItem((UsableItem.Properties) new UsableItem.Properties() //
+                .addEffect(() -> new EffectInstance(ModEffects.HYDRATE, 0, 8)) //
+                .setReturnItem(() -> EMPTY_WATER_BOTTLE) //
+                .setUseAction(UseAction.DRINK).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
+        ), appendRegistryName("power_bar", new Item(new Item.Properties() //
+            .food(ModFoods.POWER_BAR) //
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
+        ), appendRegistryName("candy_bar", new Item(new Item.Properties() //
+            .food(ModFoods.CANDY_BAR) //
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
         ));
   }
 
   private static Item appendRegistryName(String registryName, Item item) {
     return item.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName));
-  }
-
-  private static Item createBlockItem(Block block, ItemGroup itemGroup) {
-    return new BlockItem(block, (new Item.Properties()).group(itemGroup));
   }
 }
