@@ -195,9 +195,10 @@ public class ModItems {
         .maxDamage(4)) //
     ));
 
-    registry.register(appendRegistryName("multi_tool", new ToolItem(new Item.Properties() //
-        .maxDamage(8)) //
-    ));
+    registry.register(
+        appendRegistryName("multi_tool", new MeleeWeaponItem(8, -2.4F, new Item.Properties() //
+            .maxDamage(20)) //
+        ));
 
     registry.register(appendRegistryName("canned_corn", new Item(new Item.Properties() //
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
