@@ -2,7 +2,7 @@ package com.craftingdead.mod.capability.triggerable;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import com.craftingdead.mod.capability.crosshair.Aimable;
+import com.craftingdead.mod.capability.aimable.IAimable;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.IFireMode;
@@ -23,7 +23,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.MinecraftForge;
 
-public class GunController implements Triggerable, Aimable {
+public class GunController implements ITriggerable, IAimable {
 
   private static final float HEADSHOT_MULTIPLIER = 4;
 

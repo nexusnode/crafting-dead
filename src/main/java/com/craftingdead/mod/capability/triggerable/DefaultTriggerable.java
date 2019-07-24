@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
-public class DefaultTriggerable implements Triggerable {
+public class DefaultTriggerable implements ITriggerable {
 
   private static final Logger logger = LogManager.getLogger();
 

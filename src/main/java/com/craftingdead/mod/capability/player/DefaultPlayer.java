@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.potion.ModEffects;
+import com.google.common.primitives.Ints;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -23,7 +24,7 @@ import net.minecraft.util.text.TranslationTextComponent;
  *
  * @param <E> - the associated {@link PlayerEntity}
  */
-public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
+public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   /**
    * Random.
@@ -184,7 +185,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements Player<E> {
 
   @Override
   public void setWater(int water) {
-    this.water = Math.min(water, this.getMaxWater());
+    this.water = Ints.constrainToRange(water, 0, this.getMaxWater());
   }
 
   @Override

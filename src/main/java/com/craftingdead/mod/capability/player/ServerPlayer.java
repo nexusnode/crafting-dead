@@ -53,7 +53,8 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   private void updateWater() {
-    if (this.entity.world.getDifficulty() != Difficulty.PEACEFUL) {
+    if (this.entity.world.getDifficulty() != Difficulty.PEACEFUL
+        && !this.entity.abilities.disableDamage) {
       this.waterTimer++;
       if (this.water <= 0) {
         if (this.waterTimer >= WATER_DAMAGE_DELAY_TICKS && this.water == 0) {

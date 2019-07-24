@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface Player<E extends PlayerEntity> extends INBTSerializable<CompoundNBT> {
+public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<CompoundNBT> {
 
   void tick();
 

@@ -1,11 +1,11 @@
 package com.craftingdead.mod.capability;
 
 import java.util.concurrent.Callable;
-import com.craftingdead.mod.capability.crosshair.Aimable;
+import com.craftingdead.mod.capability.aimable.IAimable;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
-import com.craftingdead.mod.capability.player.Player;
+import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.capability.triggerable.DefaultTriggerable;
-import com.craftingdead.mod.capability.triggerable.Triggerable;
+import com.craftingdead.mod.capability.triggerable.ITriggerable;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -14,21 +14,21 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 public class ModCapabilities {
 
-  @CapabilityInject(Player.class)
-  public static final Capability<Player<?>> PLAYER = null;
+  @CapabilityInject(IPlayer.class)
+  public static final Capability<IPlayer<?>> PLAYER = null;
 
-  @CapabilityInject(Triggerable.class)
-  public static final Capability<Triggerable> TRIGGERABLE = null;
+  @CapabilityInject(ITriggerable.class)
+  public static final Capability<ITriggerable> TRIGGERABLE = null;
 
-  @CapabilityInject(Aimable.class)
-  public static final Capability<Aimable> AIMABLE = null;
+  @CapabilityInject(IAimable.class)
+  public static final Capability<IAimable> AIMABLE = null;
 
   public static void registerCapabilities() {
-    CapabilityManager.INSTANCE.register(Player.class, new EmptyStorage<>(), DefaultPlayer::new);
-    CapabilityManager.INSTANCE.register(Triggerable.class, new EmptyStorage<>(),
+    CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
+    CapabilityManager.INSTANCE.register(ITriggerable.class, new EmptyStorage<>(),
         DefaultTriggerable::new);
-    CapabilityManager.INSTANCE.register(Aimable.class, new EmptyStorage<>(),
-        (Callable<Aimable>) () -> () -> 1.0F);
+    CapabilityManager.INSTANCE.register(IAimable.class, new EmptyStorage<>(),
+        (Callable<IAimable>) () -> () -> 1.0F);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {
