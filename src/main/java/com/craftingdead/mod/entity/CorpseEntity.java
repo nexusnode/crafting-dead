@@ -40,23 +40,22 @@ public class CorpseEntity extends Entity {
 
   private Inventory inventory = new Inventory(27);
 
-  public CorpseEntity(EntityType<?> type, World world, UUID deceasedId,
-      ITextComponent deceasedName) {
-    super(type, world);
+  public CorpseEntity(World world, UUID deceasedId, ITextComponent deceasedName) {
+    super(ModEntityTypes.corpse, world);
     this.dataManager.set(DECEASED_ID, Optional.ofNullable(deceasedId));
     this.dataManager.set(DECEASED_NAME, Optional.ofNullable(deceasedName));
   }
 
   public CorpseEntity(EntityType<?> type, World world) {
-    this(ModEntityTypes.CORPSE, world, null, null);
+    this(world, null, null);
   }
 
   public CorpseEntity(FMLPlayMessages.SpawnEntity packet, World world) {
-    this(ModEntityTypes.CORPSE, world);
+    this(world, null, null);
   }
 
   public CorpseEntity(ServerPlayerEntity player) {
-    this(ModEntityTypes.CORPSE, player.world, player.getUniqueID(), player.getName());
+    this(player.world, player.getUniqueID(), player.getName());
     this.inventory = new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0]));
     player.inventory.clear();
     this.setPosition(player.posX, player.posY, player.posZ);

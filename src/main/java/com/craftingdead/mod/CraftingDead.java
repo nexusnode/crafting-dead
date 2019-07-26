@@ -7,29 +7,38 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
+import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeProtocol;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeSession;
 import com.craftingdead.mod.net.NetworkChannel;
 import com.craftingdead.mod.server.ServerDist;
+import com.craftingdead.mod.tileentity.ModTileEntityTypes;
 import com.craftingdead.network.TcpClient;
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.util.TransportType;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
 import lombok.Getter;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -112,7 +121,22 @@ public class CraftingDead {
 
     this.modDist = DistExecutor.runForDist(() -> ClientDist::new, () -> ServerDist::new);
 
-    FMLJavaModLoadingContext.get().getModEventBus().register(this);
+    IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    modEventBus.register(this);
+
+    // These need to stay in this order as certain Items require access to EntityTypes etc.
+    ModEntityTypes.initialize();
+    modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
+
+    ModBlocks.initialize();
+    modEventBus.addGenericListener(Block.class, ModBlocks::register);
+
+    ModTileEntityTypes.initialize();
+    modEventBus.addGenericListener(TileEntityType.class, ModTileEntityTypes::register);
+
+    ModItems.initialize();
+    modEventBus.addGenericListener(Item.class, ModItems::register);
+
     MinecraftForge.EVENT_BUS.register(this);
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CommonConfig.clientConfigSpec);

@@ -5,14 +5,14 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityLoot extends TileEntity implements ITickableTileEntity {
 
-  public TileEntityLoot() {
-    super(ModTileEntityTypes.LOOT);
-  }
-
   private static final int DESPAWN_TIME = 2400;
   private static final int DESPAWN_DISTANCE = 50;
 
   private int removalTick = 0;
+
+  public TileEntityLoot() {
+    super(ModTileEntityTypes.loot);
+  }
 
   @Override
   public void tick() {

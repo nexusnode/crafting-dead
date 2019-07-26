@@ -1,300 +1,299 @@
 package com.craftingdead.mod.item;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
+import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModItems {
 
-  public static final Item ACR = null;
-  public static final Item AK47 = null;
-  public static final Item DESERT_EAGLE = null;
-  public static final Item M4A1 = null;
-  public static final Item M9 = null;
-  public static final Item TASER = null;
-  public static final Item MAGNUM = null;
-  public static final Item FN57 = null;
+  private static final List<Item> toRegister = new ArrayList<>();
 
-  public static final Item RESIDENTIAL_LOOT = null;
+  public static Item acr;
+  public static Item ak47;
+  public static Item desertEagle;
+  public static Item m4a1;
+  public static Item m9;
+  public static Item taser;
+  public static Item magnum;
+  public static Item fn57;
 
-  public static final Item CLIP = null;
+  public static Item canOpener;
+  public static Item screwdriver;
+  public static Item multiTool;
 
-  public static final Item EMPTY_WATER_BOTTLE = null;
-  public static final Item WATER_BOTTLE = null;
+  public static Item emptyWaterBottle;
+  public static Item waterBottle;
+  public static Item powerBar;
+  public static Item candyBar;
+  public static Item cereal;
+  public static Item cannedCorn;
+  public static Item openCannedCorn;
+  public static Item cannedBeans;
+  public static Item openCannedBeans;
+  public static Item cannedTuna;
+  public static Item openCannedTuna;
+  public static Item cannedPeach;
+  public static Item openCannedPeach;
+  public static Item cannedPasta;
+  public static Item openCannedPasta;
+  public static Item cannedBacon;
+  public static Item openCannedBacon;
+  public static Item cannedCustard;
+  public static Item openCannedCustard;
+  public static Item cannedPickles;
+  public static Item openCannedPickles;
+  public static Item cannedDogFood;
+  public static Item openCannedDogFood;
+  public static Item cannedTomatoSoup;
+  public static Item openCannedTomatoSoup;
 
-  public static final Item POWER_BAR = null;
-  public static final Item CANDY_BAR = null;
-  public static final Item CEREAL = null;
+  public static Item advancedZombieSpawnEgg;
+  public static Item fastZombieSpawnEgg;
+  public static Item tankZombieSpawnEgg;
+  public static Item weakZombieSpawnEgg;
 
-  public static final Item CAN_OPENER = null;
-  public static final Item SCREWDRIVER = null;
-  public static final Item MULTI_TOOL = null;
+  public static Item grenadeSpawnEgg;
 
-  public static final Item CANNED_CORN = null;
-  public static final Item OPEN_CANNED_CORN = null;
-  public static final Item CANNED_BEANS = null;
-  public static final Item OPEN_CANNED_BEANS = null;
-  public static final Item CANNED_TUNA = null;
-  public static final Item OPEN_CANNED_TUNA = null;
-  public static final Item CANNED_PEACH = null;
-  public static final Item OPEN_CANNED_PEACH = null;
-  public static final Item CANNED_PASTA = null;
-  public static final Item OPEN_CANNED_PASTA = null;
-  public static final Item CANNED_BACON = null;
-  public static final Item OPEN_CANNED_BACON = null;
-  public static final Item CANNED_CUSTARD = null;
-  public static final Item OPEN_CANNED_CUSTARD = null;
-  public static final Item CANNED_PICKLES = null;
-  public static final Item OPEN_CANNED_PICKLES = null;
-  public static final Item CANNED_DOG_FOOD = null;
-  public static final Item OPEN_CANNED_DOG_FOOD = null;
-  public static final Item CANNED_TOMATO_SOUP = null;
-  public static final Item OPEN_CANNED_TOMATO_SOUP = null;
+  public static void initialize() {
 
-  @SubscribeEvent
-  public static void handle(RegistryEvent.Register<Item> event) {
-    IForgeRegistry<Item> registry = event.getRegistry();
+    // ================================================================================
+    // Guns
+    // ================================================================================
 
-    registry.register(appendRegistryName("desert_eagle", new GunItem(new GunItem.Properties() //
-        .setFireRate(0) //
-        .setClipSize(0) //
-        .setDamage(8) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.7F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
-    ));
+    acr = add("acr", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.8F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.ACR_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
-    registry.register(appendRegistryName("acr", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.8F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.ACR_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))) //
-    ));
+    ak47 = add("ak47", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.8F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.AK47_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
+    desertEagle = add("desert_eagle", new GunItem(new GunItem.Properties()
+        .setFireRate(0)
+        .setClipSize(0)
+        .setDamage(8)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.7F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    registry.register(appendRegistryName("ak47", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.8F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.AK47_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))) //
-    ));
+    m4a1 = add("m4a1", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.9F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.M4A1_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
-    registry.register(appendRegistryName("m4a1", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.9F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.M4A1_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))) //
-    ));
+    m9 = add("m9", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.9F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.M9_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    registry.register(appendRegistryName("m9", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.9F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.M9_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
-    ));
+    taser = add("taser", new GunItem(new GunItem.Properties()
+        .setFireRate(2000)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.9F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.TASER_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    registry.register(appendRegistryName("taser", new GunItem(new GunItem.Properties() //
-        .setFireRate(2000) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.9F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.TASER_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
-    ));
+    magnum = add("magnum", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.9F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    registry.register(appendRegistryName("magnum", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.9F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
-    ));
+    fn57 = add("fn57", new GunItem(new GunItem.Properties()
+        .setFireRate(80)
+        .setClipSize(0)
+        .setDamage(7)
+        .setReloadTime(2.2F)
+        .setAccuracy(0.9F)
+        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+        .setShootSound(() -> ModSoundEvents.FN57_SHOOT)
+        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    registry.register(appendRegistryName("fn57", new GunItem(new GunItem.Properties() //
-        .setFireRate(80) //
-        .setClipSize(0) //
-        .setDamage(7) //
-        .setReloadTime(2.2F) //
-        .setAccuracy(0.9F) //
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI)) //
-        .setShootSound(() -> ModSoundEvents.FN57_SHOOT) //
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))) //
-    ));
+    // ================================================================================
+    // Tools
+    // ================================================================================
 
-    registry.register(appendRegistryName("residential_loot",
-        new BlockItem(ModBlocks.RESIDENTIAL_LOOT, (new Item.Properties())) //
-    ));
+    canOpener = add("can_opener", new ToolItem(new Item.Properties()
+        .maxDamage(8)
+        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    registry.register(appendRegistryName("empty_water_bottle", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    screwdriver = add("screwdriver", new ToolItem(new Item.Properties()
+        .maxDamage(4)
+        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    registry.register(appendRegistryName("water_bottle",
-        new DrinkItem(8, () -> EMPTY_WATER_BOTTLE, new Item.Properties() //
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    multiTool = add("multi_tool", new MeleeWeaponItem(8, -2.4F, new Item.Properties()
+        .maxDamage(20)
+        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    registry.register(appendRegistryName("power_bar", new Item(new Item.Properties() //
-        .food(ModFoods.POWER_BAR) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    // ================================================================================
+    // Consumable
+    // ================================================================================
 
-    registry.register(appendRegistryName("candy_bar", new Item(new Item.Properties() //
-        .food(ModFoods.CANDY_BAR) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    emptyWaterBottle = add("empty_water_bottle", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("cereal", new Item(new Item.Properties() //
-        .food(ModFoods.CEREAL) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    waterBottle = add("water_bottle",
+        new DrinkItem(8, () -> emptyWaterBottle, new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("can_opener", new ToolItem(new Item.Properties() //
-        .maxDamage(8)) //
-    ));
+    powerBar = add("power_bar", new Item(new Item.Properties()
+        .food(ModFoods.POWER_BAR)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("screwdriver", new ToolItem(new Item.Properties() //
-        .maxDamage(4)) //
-    ));
+    candyBar = add("candy_bar", new Item(new Item.Properties()
+        .food(ModFoods.CANDY_BAR)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(
-        appendRegistryName("multi_tool", new MeleeWeaponItem(8, -2.4F, new Item.Properties() //
-            .maxDamage(20)) //
-        ));
+    cereal = add("cereal", new Item(new Item.Properties()
+        .food(ModFoods.CEREAL)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_corn", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedCorn = add("canned_corn", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_corn", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_CORN) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedCorn = add("open_canned_corn", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_CORN)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_beans", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedBeans = add("canned_beans", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_beans", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_BEANS) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedBeans = add("open_canned_beans", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_BEANS)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_tuna", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedTuna = add("canned_tuna", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_tuna", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_TUNA) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedTuna = add("open_canned_tuna", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_TUNA)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_peach", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedPeach = add("canned_peach", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_peach",
-        new DrinkItem(2, null, new Item.Properties() //
-            .food(ModFoods.CANNED_PEACH) //
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedPeach = add("open_canned_peach",
+        new DrinkItem(2, null, new Item.Properties()
+            .food(ModFoods.CANNED_PEACH)
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_pasta", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedPasta = add("canned_pasta", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_pasta", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_PASTA) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedPasta = add("open_canned_pasta", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_PASTA)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_bacon", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedBacon = add("canned_bacon", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_bacon", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_BACON) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedBacon = add("open_canned_bacon", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_BACON)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_custard", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedCustard = add("canned_custard", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_custard",
-        new DrinkItem(4, null, new Item.Properties() //
-            .food(ModFoods.CANNED_CUSTARD) //
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedCustard = add("open_canned_custard",
+        new DrinkItem(4, null, new Item.Properties()
+            .food(ModFoods.CANNED_CUSTARD)
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_pickles", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedPickles = add("canned_pickles", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_pickles", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_PICKLES) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedPickles = add("open_canned_pickles", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_PICKLES)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_dog_food", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedDogFood = add("canned_dog_food", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_dog_food", new Item(new Item.Properties() //
-        .food(ModFoods.CANNED_DOG_FOOD) //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedDogFood = add("open_canned_dog_food", new Item(new Item.Properties()
+        .food(ModFoods.CANNED_DOG_FOOD)
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("canned_tomato_soup", new Item(new Item.Properties() //
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    cannedTomatoSoup = add("canned_tomato_soup", new Item(new Item.Properties()
+        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    registry.register(appendRegistryName("open_canned_tomato_soup",
-        new DrinkItem(3, null, new Item.Properties() //
-            .food(ModFoods.CANNED_TOMATO_SOUP) //
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLE)) //
-    ));
+    openCannedTomatoSoup = add("open_canned_tomato_soup",
+        new DrinkItem(3, null, new Item.Properties()
+            .food(ModFoods.CANNED_TOMATO_SOUP)
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    // ================================================================================
+    // Spawn Eggs
+    // ================================================================================
+
+    advancedZombieSpawnEgg = add("advanced_zombie_spawn_egg",
+        new SpawnEggItem(ModEntityTypes.advancedZombie, 0x000000, 0xFFFFFF,
+            new Item.Properties()
+                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+    fastZombieSpawnEgg = add("fast_zombie_spawn_egg",
+        new SpawnEggItem(ModEntityTypes.fastZombie, 0x000000, 0xFFFFFF,
+            new Item.Properties()
+                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+    tankZombieSpawnEgg = add("tank_zombie_spawn_egg",
+        new SpawnEggItem(ModEntityTypes.tankZombie, 0x000000, 0xFFFFFF,
+            new Item.Properties()
+                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+    weakZombieSpawnEgg = add("weak_zombie_spawn_egg",
+        new SpawnEggItem(ModEntityTypes.weakZombie, 0x000000, 0xFFFFFF,
+            new Item.Properties()
+                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
   }
 
-  private static Item appendRegistryName(String registryName, Item item) {
-    return item.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName));
+  public static void register(RegistryEvent.Register<Item> event) {
+    toRegister.forEach(event.getRegistry()::register);
+  }
+
+  private static Item add(String registryName, Item item) {
+    toRegister.add(item.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName)));
+    return item;
   }
 }

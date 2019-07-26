@@ -5,12 +5,21 @@ import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
 
-  public static final ItemGroup CRAFTING_DEAD_CONSUMABLE =
-      (new ItemGroup("craftingdead_consumable") {
+  public static final ItemGroup CRAFTING_DEAD_CONSUMABLES =
+      (new ItemGroup("craftingdead_consumables") {
 
         @Override
         public ItemStack createIcon() {
-          return new ItemStack(ModItems.POWER_BAR);
+          return new ItemStack(ModItems.powerBar);
+        }
+      });
+
+  public static final ItemGroup CRAFTING_DEAD_MISC =
+      (new ItemGroup("craftingdead_misc") {
+
+        @Override
+        public ItemStack createIcon() {
+          return new ItemStack(ModItems.canOpener);
         }
       });
 }

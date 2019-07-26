@@ -1,26 +1,33 @@
 package com.craftingdead.mod.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.block.ModBlocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(CraftingDead.ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModTileEntityTypes {
 
-  public static final TileEntityType<?> LOOT = null;
+  private static final List<TileEntityType<?>> toRegister = new ArrayList<>();
 
-  @SubscribeEvent
-  public static void handle(RegistryEvent.Register<TileEntityType<?>> event) {
-    event.getRegistry().registerAll(TileEntityType.Builder //
-        .create(TileEntityLoot::new, ModBlocks.RESIDENTIAL_LOOT) //
-        .build(null) //
-        .setRegistryName(new ResourceLocation(CraftingDead.ID, "loot")) //
-    );
+  public static TileEntityType<?> loot = null;
+
+  public static void initialize() {
+    loot = add("loot",
+        TileEntityType.Builder.create(TileEntityLoot::new, ModBlocks.residentialLoot).build(null));
+  }
+
+  public static void register(RegistryEvent.Register<TileEntityType<?>> event) {
+    toRegister.forEach(event.getRegistry()::register);
+  }
+
+  private static <T extends TileEntity> TileEntityType<T> add(String registryName,
+      TileEntityType<T> tileEntityType) {
+    toRegister
+        .add(tileEntityType.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName)));
+    return tileEntityType;
   }
 }
