@@ -53,17 +53,17 @@ public class PlayerLoginSession implements ISession {
   }
 
   public void handleLoginResponse(LoginResponseMessage msg) {
-    switch (msg.getResponse()) {
-      case SUCCESS:
+    switch (msg.getResponseCode()) {
+      case LoginResponseMessage.SUCCESS:
         logger.info("Successfully logged in to master server");
         this.networkManager.setProtocol(new PlayerSession(), PlayerProtocol.INSTANCE);
         break;
-      case BAD_LOGIN:
+      case LoginResponseMessage.BAD_LOGIN:
         logger.warn("Bad login");
         CraftingDead.getInstance().setRetryConnect(false);
         this.networkManager.closeChannel();
         break;
-      case AUTHENTICATION_UNAVAILABLE:
+      case LoginResponseMessage.AUTHENTICATION_UNAVAILABLE:
         logger.info("Authentication unavailable");
         this.networkManager.closeChannel();
         break;

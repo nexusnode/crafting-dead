@@ -9,10 +9,10 @@ public class HandshakeProtocol extends IndexedProtocol<HandshakeSession> {
 
   private HandshakeProtocol() {
     this.registerMessage(HandshakeMessage.class,
-        MessageEntry.<HandshakeSession, HandshakeMessage>builder() //
-            .id(0x00) //
-            .encoder((msg, out) -> out.writeByte(msg.getOpcode())) //
-            .decoder((in) -> new HandshakeMessage(in.readByte())) //
+        MessageEntry.<HandshakeSession, HandshakeMessage>builder()
+            .id(0x00)
+            .encoder(HandshakeMessage::encode)
+            .decoder(HandshakeMessage::new)
             .build());
   }
 }

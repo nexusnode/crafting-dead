@@ -1,6 +1,5 @@
 package com.craftingdead.mod.masterserver.net.protocol.playerlogin.message;
 
-import java.io.IOException;
 import com.craftingdead.network.protocol.IMessage;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
@@ -10,30 +9,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LoginResponseMessage implements IMessage {
 
-  private final Response response;
+  public static final byte SUCCESS = 0x00;
+  public static final byte BAD_LOGIN = 0x01;
+  public static final byte AUTHENTICATION_UNAVAILABLE = 0x02;
 
-  public LoginResponseMessage(ByteBuf in) throws IOException {
-    this.response = Response.fromCode(in.readByte());
+  private final byte responseCode;
+
+  public LoginResponseMessage(ByteBuf in) {
+    this.responseCode = in.readByte();
   }
 
   public void encode(ByteBuf out) {
-    out.writeByte(response.code);
-  }
-
-  @RequiredArgsConstructor
-  public enum Response {
-    SUCCESS((byte) 0x00), BAD_LOGIN((byte) 0x01), AUTHENTICATION_UNAVAILABLE(
-        (byte) 0x02);
-
-    private final byte code;
-
-    public static Response fromCode(byte code) {
-      for (Response response : values()) {
-        if (response.code == code) {
-          return response;
-        }
-      }
-      return null;
-    }
+    out.writeByte(this.responseCode);
   }
 }
