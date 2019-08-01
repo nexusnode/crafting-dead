@@ -29,9 +29,8 @@ import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.message.HandshakeMessage;
 import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginProtocol;
 import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginSession;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginMessage;
+import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginStartMessage;
 import com.craftingdead.network.pipeline.NetworkManager;
-import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -102,17 +101,14 @@ public class ClientDist implements IModDist {
   @Override
   public void handleConnect(NetworkManager networkManager) {
     networkManager.sendMessage(new HandshakeMessage(HandshakeMessage.PLAYER_LOGIN));
-    networkManager.setProtocol(new PlayerLoginSession(networkManager),
+    networkManager.setProtocol(new PlayerLoginSession(minecraft, networkManager),
         PlayerLoginProtocol.INSTANCE);
 
     Session session = minecraft.getSession();
     UUID id = session.getProfile().getId();
     String username = session.getUsername();
-    String clientToken = ((YggdrasilMinecraftSessionService) minecraft.getSessionService())
-        .getAuthenticationService().getClientToken();
-    String accessToken = session.getToken();
     networkManager.sendMessage(
-        new PlayerLoginMessage(id, username, clientToken, accessToken, CraftingDead.VERSION));
+        new PlayerLoginStartMessage(id, username, CraftingDead.VERSION));
   }
 
   public LazyOptional<ClientPlayer> getPlayer() {

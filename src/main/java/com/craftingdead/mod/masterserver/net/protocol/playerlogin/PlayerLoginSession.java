@@ -1,28 +1,74 @@
 package com.craftingdead.mod.masterserver.net.protocol.playerlogin;
 
+import java.math.BigInteger;
+import java.security.PublicKey;
+import javax.crypto.SecretKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.masterserver.net.protocol.player.PlayerProtocol;
 import com.craftingdead.mod.masterserver.net.protocol.player.PlayerSession;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginResultMessage;
+import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.EncryptionRequestMessage;
+import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.EncryptionResponseMessage;
+import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.LoginResponseMessage;
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.protocol.ISession;
+import com.mojang.authlib.exceptions.AuthenticationException;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.CryptManager;
+import net.minecraft.util.HTTPUtil;
 
 @RequiredArgsConstructor
 public class PlayerLoginSession implements ISession {
 
   private static final Logger logger = LogManager.getLogger();
 
+  private final Minecraft minecraft;
+
   private final NetworkManager networkManager;
 
-  public void handleLoginResult(PlayerLoginResultMessage msg) {
-    if (msg.isSuccess()) {
-      logger.info("Successfully logged in to master server");
-      this.networkManager.setProtocol(new PlayerSession(), PlayerProtocol.INSTANCE);
-    } else {
-      logger.info("Failed to log in to master server, disconnecting");
-      this.networkManager.closeChannel();
+  public void handleEncryptionRequest(EncryptionRequestMessage msg) {
+    SecretKey secretkey = CryptManager.createNewSharedKey();
+    PublicKey publickey = msg.getPublicKey();
+    String serverId =
+        new BigInteger(CryptManager.getServerIdHash("", publickey, secretkey)).toString(16);
+
+    EncryptionResponseMessage response =
+        new EncryptionResponseMessage(CryptManager.encryptData(publickey, secretkey.getEncoded()),
+            CryptManager.encryptData(publickey, msg.getVerifyToken()));
+    HTTPUtil.DOWNLOADER_EXECUTOR.submit(() -> {
+      try {
+        this.minecraft.getSessionService().joinServer(this.minecraft.getSession().getProfile(),
+            this.minecraft.getSession().getToken(), serverId);
+      } catch (AuthenticationException e) {
+        this.networkManager.closeChannel();
+        logger.warn(e);
+      }
+
+      this.networkManager.sendMessage(response, (future) -> {
+        this.networkManager.enableEncryption(secretkey);
+      });
+    });
+  }
+
+  public void handleLoginResponse(LoginResponseMessage msg) {
+    switch (msg.getResponse()) {
+      case SUCCESS:
+        logger.info("Successfully logged in to master server");
+        this.networkManager.setProtocol(new PlayerSession(), PlayerProtocol.INSTANCE);
+        break;
+      case BAD_LOGIN:
+        logger.warn("Bad login");
+        CraftingDead.getInstance().setRetryConnect(false);
+        this.networkManager.closeChannel();
+        break;
+      case AUTHENTICATION_UNAVAILABLE:
+        logger.info("Authentication unavailable");
+        this.networkManager.closeChannel();
+        break;
+      default:
+        break;
     }
   }
 }

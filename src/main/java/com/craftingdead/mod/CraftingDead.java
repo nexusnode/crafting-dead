@@ -25,6 +25,7 @@ import com.craftingdead.network.util.TransportType;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -116,6 +117,9 @@ public class CraftingDead {
    */
   private Optional<NetworkManager> networkManager = Optional.empty();
 
+  @Setter
+  private boolean retryConnect = true;
+
   public CraftingDead() {
     instance = this;
 
@@ -144,7 +148,7 @@ public class CraftingDead {
   }
 
   private void pollConnection() {
-    if (!this.isConnected()) {
+    if (!this.isConnected() && this.retryConnect) {
       logger.info("Attempting to connect to master server");
       try {
         final String host = CommonConfig.commonConfig.masterServerHost.get();
