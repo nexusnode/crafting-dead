@@ -58,6 +58,33 @@ public class ModItems {
   public static Item cannedTomatoSoup;
   public static Item openCannedTomatoSoup;
 
+  //TODO Perhaps they need to be renamed to be more convenient.
+  public static Item sodaOrange;
+  public static Item sodaOrangeEmpty;
+  public static Item icetea;
+  public static Item iceteaEmpty;
+  public static Item juicePouch;
+  public static Item juicePouchEmpty;
+  public static Item sodaPepe;
+  public static Item sodaPepeEmpty;
+  public static Item sodaDewEmpty;
+  public static Item sodaDew;
+  public static Item sodaColaEmpty;
+  public static Item sodaCola;
+  public static Item milkCartonEmpty;
+  public static Item milkCarton;
+  public static Item milkRotten;
+  public static Item colaPopEmpty;
+  public static Item colaPop;
+  public static Item ironBrewEmpty;
+  public static Item ironBrew;
+  public static Item spriteEmpty;
+  public static Item sprite;
+  public static Item zombieEnergyEmpty;
+  public static Item zombieEnergy;
+  public static Item lemonFizzEmpty;
+  public static Item lemonFizz;
+
   public static Item advancedZombieSpawnEgg;
   public static Item fastZombieSpawnEgg;
   public static Item tankZombieSpawnEgg;
@@ -177,6 +204,94 @@ public class ModItems {
     waterBottle = add("water_bottle",
         new DrinkItem(8, () -> emptyWaterBottle, new Item.Properties()
             .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaOrangeEmpty = add("empty_soda_orange", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaOrange = add("soda_orange",
+            new DrinkItem(4, () -> sodaOrangeEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    iceteaEmpty = add("empty_ice_tea", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    icetea = add("ice_tea",
+            new DrinkItem(4, () -> iceteaEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    juicePouchEmpty = add("empty_juice_pouch", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    juicePouch = add("juice_pouch",
+            new DrinkItem(2, () -> juicePouchEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaPepeEmpty = add("empty_soda_pepe", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaPepe = add("soda_pepe",
+            new DrinkItem(4, () -> sodaPepeEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaDewEmpty = add("empty_soda_dew", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaDew = add("soda_dew",
+            new DrinkItem(4, () -> sodaDewEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaColaEmpty = add("empty_soda_cola", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sodaCola = add("soda_cola",
+            new DrinkItem(4, () -> sodaColaEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    milkCartonEmpty = add("empty_milk_carton", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    milkCarton = add("milk_carton",
+            new DrinkItem(8, () -> milkCartonEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    milkRotten = add("milk_rotten",
+            new DrinkItem(4, () -> milkCartonEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    colaPopEmpty = add("empty_cola_pop", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    colaPop = add("cola_pop",
+            new DrinkItem(6, () -> colaPopEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    ironBrewEmpty = add("empty_iron_brew", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    ironBrew = add("iron_brew",
+            new DrinkItem(9, () -> ironBrewEmpty, new Item.Properties()
+                            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    spriteEmpty = add("empty_sprite", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    sprite = add("sprite",
+            new DrinkItem(9, () -> spriteEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    zombieEnergyEmpty = add("empty_zombie_energy", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    zombieEnergy = add("zombie_energy",
+            new DrinkItem(9, () -> zombieEnergyEmpty, new Item.Properties()
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    lemonFizzEmpty = add("empty_lemon_fizz", new Item(new Item.Properties()
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    lemonFizz = add("lemon_fizz",
+            new DrinkItem(6, () -> lemonFizzEmpty, new Item.Properties()
+                     .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     powerBar = add("power_bar", new Item(new Item.Properties()
         .food(ModFoods.POWER_BAR)
