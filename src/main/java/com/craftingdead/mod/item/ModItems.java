@@ -85,6 +85,15 @@ public class ModItems {
   public static Item lemonFizzEmpty;
   public static Item lemonFizz;
 
+  public static Item mre;
+  public static Item orange;
+  public static Item rottenOrange;
+  public static Item pear;
+  public static Item rottenPear;
+  public static Item riceBag;
+  public static Item apple;
+
+
   public static Item advancedZombieSpawnEgg;
   public static Item fastZombieSpawnEgg;
   public static Item tankZombieSpawnEgg;
@@ -293,36 +302,74 @@ public class ModItems {
             new DrinkItem(6, () -> lemonFizzEmpty, new Item.Properties()
                      .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    powerBar = add("power_bar", new Item(new Item.Properties()
+    // ================================================================================
+    // edible
+    // ================================================================================
+
+    mre = add("mre",
+            new DrinkItem(8, new Item.Properties()
+                    .food(ModFoods.MRE)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    orange = add("orange",
+            new DrinkItem(2, new Item.Properties()
+                    .food(ModFoods.ORANGE)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    rottenOrange = add("rotten_orange",
+            new DrinkItem(1, new Item.Properties()
+                    .food(ModFoods.ROTTENORANGE)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    pear = add("pear",
+            new DrinkItem(3, new Item.Properties()
+                    .food(ModFoods.PEAR)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    rottenPear  = add("rotten_pear",
+            new DrinkItem(1, new Item.Properties()
+                    .food(ModFoods.ROTTENOPEAR)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    apple = add("apple",
+            new DrinkItem(3, new Item.Properties()
+                    .food(ModFoods.APPLE)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    riceBag = add("rice_bag", new DrinkItem(new Item.Properties()
+            .food(ModFoods.RICEBAG)
+            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    powerBar = add("power_bar", new DrinkItem(new Item.Properties()
         .food(ModFoods.POWER_BAR)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    candyBar = add("candy_bar", new Item(new Item.Properties()
+    candyBar = add("candy_bar", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANDY_BAR)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cereal = add("cereal", new Item(new Item.Properties()
+    cereal = add("cereal", new DrinkItem(new Item.Properties()
         .food(ModFoods.CEREAL)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedCorn = add("canned_corn", new Item(new Item.Properties()
+    cannedCorn = add("canned_corn", new DrinkItem(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedCorn = add("open_canned_corn", new Item(new Item.Properties()
+    openCannedCorn = add("open_canned_corn", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_CORN)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     cannedBeans = add("canned_beans", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBeans = add("open_canned_beans", new Item(new Item.Properties()
+    openCannedBeans = add("open_canned_beans", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_BEANS)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     cannedTuna = add("canned_tuna", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedTuna = add("open_canned_tuna", new Item(new Item.Properties()
+    openCannedTuna = add("open_canned_tuna", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_TUNA)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -337,14 +384,14 @@ public class ModItems {
     cannedPasta = add("canned_pasta", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPasta = add("open_canned_pasta", new Item(new Item.Properties()
+    openCannedPasta = add("open_canned_pasta", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_PASTA)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     cannedBacon = add("canned_bacon", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBacon = add("open_canned_bacon", new Item(new Item.Properties()
+    openCannedBacon = add("open_canned_bacon", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_BACON)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -359,14 +406,14 @@ public class ModItems {
     cannedPickles = add("canned_pickles", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPickles = add("open_canned_pickles", new Item(new Item.Properties()
+    openCannedPickles = add("open_canned_pickles", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_PICKLES)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     cannedDogFood = add("canned_dog_food", new Item(new Item.Properties()
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedDogFood = add("open_canned_dog_food", new Item(new Item.Properties()
+    openCannedDogFood = add("open_canned_dog_food", new DrinkItem(new Item.Properties()
         .food(ModFoods.CANNED_DOG_FOOD)
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 

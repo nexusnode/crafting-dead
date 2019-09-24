@@ -23,15 +23,29 @@ import java.util.List;
 
 public class DrinkItem extends Item {
 
-  private final int water;
+  private int water;
 
-  private final IItemProvider containerItem;
+  private int bloodHeal;
+
+  private IItemProvider containerItem;
 
 
   public DrinkItem(int water, IItemProvider containerItem, Properties properties) {
     super(properties);
     this.water = water;
     this.containerItem = containerItem;
+  }
+
+  public DrinkItem(int water,Properties properties) {
+    super(properties);
+    this.water = water;
+    this.containerItem = null;
+  }
+
+  public DrinkItem(Properties properties) {
+    super(properties);
+    this.water = 0;
+    this.containerItem = null;
   }
 
   @Override
@@ -91,9 +105,12 @@ public class DrinkItem extends Item {
   public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
       super.addInformation(stack, worldIn, tooltip, flagIn);
 
+    if (stack.getItem().isFood()) {
+      tooltip.add(new TranslationTextComponent("Food " + TextFormatting.RED + stack.getItem().getFood().getHealing()));
+    }
+
     if (this.water != 0) {
       tooltip.add(new TranslationTextComponent("Water " + TextFormatting.RED + this.water));
     }
-
   }
 }

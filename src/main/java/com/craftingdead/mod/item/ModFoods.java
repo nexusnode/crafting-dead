@@ -56,4 +56,32 @@ public class ModFoods {
       .hunger(4) //
       .saturation(0.6F) //
       .build();
+  public static final Food MRE = new Food.Builder() //
+          .hunger(16) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ORANGE = new Food.Builder() //
+          .hunger(5) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ROTTENORANGE = new Food.Builder() //
+          .hunger(2) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food PEAR = new Food.Builder() //
+          .hunger(4) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ROTTENOPEAR = new Food.Builder() //
+          .hunger(1) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food RICEBAG = new Food.Builder() //
+          .hunger(8) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food APPLE = new Food.Builder() //
+          .hunger(5) //
+          .saturation(0.6F) //
+          .build();
 }
