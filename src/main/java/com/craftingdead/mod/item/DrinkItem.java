@@ -113,4 +113,5 @@ public class DrinkItem extends Item {
       tooltip.add(new TranslationTextComponent("Water " + TextFormatting.RED + this.water));
     }
   }
+
 }

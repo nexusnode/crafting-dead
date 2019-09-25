@@ -93,6 +93,23 @@ public class ModItems {
   public static Item riceBag;
   public static Item apple;
 
+  // medic
+  public static Item bloodbag;
+  public static Item bloodbagEmpty;
+  public static Item medpack;
+  public static Item needleAdrenaline;
+  public static Item needle;
+  public static Item needleMorphine;
+  public static Item bandage;
+  public static Item needleRBI;
+  public static Item bottleRBI;
+  public static Item ragDirty;
+  public static Item ragClean;
+  public static Item splint;
+  public static Item needleCure;
+  public static Item bottleCure;
+  public static Item antibiotics;
+  public static Item ragBloody;
 
   public static Item advancedZombieSpawnEgg;
   public static Item fastZombieSpawnEgg;
@@ -424,6 +441,105 @@ public class ModItems {
         new DrinkItem(3, null, new Item.Properties()
             .food(ModFoods.CANNED_TOMATO_SOUP)
             .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    // ================================================================================
+    // medic
+    // ================================================================================
+
+    medpack = add("med_pack",
+            new MedItem( new MedItem.Properties()
+            .setBloodHeal(8)
+            .setBrokenLag()
+            .setMaxStackSize(1)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    needleAdrenaline = add("andrenaline_syringe",
+            new MedItem( new MedItem.Properties()
+                    .setAdrenaline()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    needleMorphine = add("morphine_syringe",
+            new MedItem( new MedItem.Properties()
+                    .setBrokenLag()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+
+    bandage = add("bandage",
+            new MedItem( new MedItem.Properties()
+                    .setBloodHeal(2)
+                    .setBleeding()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    bloodbag = add("blood_bag",
+            new MedItem( new MedItem.Properties()
+                    .setBloodHeal(4)
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    bloodbagEmpty = add("empty_blood_bag",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    needle = add("needle",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    needleRBI = add("needle_rbi",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    bottleRBI = add("bottle_rbi",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    ragClean = add("rag_clean",
+            new MedItem( new MedItem.Properties()
+                    .setBleeding()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    //TODO You need to add her ability to clear when she clicks on the water.
+    ragDirty = add("rag_dirty",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    splint = add("splint",
+            new MedItem( new MedItem.Properties()
+                    .setBrokenLag()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    needleCure = add("needle_cure",
+            new MedItem( new MedItem.Properties()
+                    .setInfection()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    bottleCure = add("bottle_cure",
+            new MedItem( new MedItem.Properties()
+                    .setInfection()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    antibiotics  = add("antibiotics",
+            new MedItem( new MedItem.Properties()
+                    .setBloodHeal(4)
+                    .setBrokenLag()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    //TODO You need to add her ability to clear when she clicks on the water.
+    ragBloody = add("rag_bloody",
+            new MedItem( new MedItem.Properties()
+                    .setMaxStackSize(1)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     // ================================================================================
     // Spawn Eggs
