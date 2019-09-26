@@ -84,4 +84,32 @@ public class ModFoods {
           .hunger(5) //
           .saturation(0.6F) //
           .build();
+  public static final Food NOODLECUP = new Food.Builder() //
+          .hunger(6) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food WATERMELON = new Food.Builder() //
+          .hunger(6) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ROTTENWATERMELON = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food BLUEBERRIES = new Food.Builder() //
+          .hunger(4) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ROTTENBLUEBERRIES = new Food.Builder() //
+          .hunger(1) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food RASPBERRIES = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food ROTTENRASPBERRIES = new Food.Builder() //
+          .hunger(1) //
+          .saturation(0.6F) //
+          .build();
 }

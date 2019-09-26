@@ -25,8 +25,6 @@ public class DrinkItem extends Item {
 
   private int water;
 
-  private int bloodHeal;
-
   private IItemProvider containerItem;
 
 

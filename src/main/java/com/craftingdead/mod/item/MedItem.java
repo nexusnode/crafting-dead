@@ -6,16 +6,15 @@ import lombok.Getter;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.item.*;
+import net.minecraft.potion.*;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -34,6 +33,11 @@ public class MedItem extends Item {
     @Getter
     private boolean brokenlag;
 
+    @Getter
+    private boolean bleeding;
+
+    private IItemProvider containerItem;
+
 
 
 
@@ -41,6 +45,8 @@ public class MedItem extends Item {
         super(properties);
         this.bloodHeal = properties.bloodHeal;
         this.brokenlag = properties.brokenlag;
+        this.containerItem = properties.containerItem;
+        this.bleeding = properties.bleeding;
     }
 
     @Override
@@ -51,7 +57,17 @@ public class MedItem extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
                                                     Hand handIn) {
+
+        RayTraceResult raytraceresult = rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
+        BlockPos blockpos = ((BlockRayTraceResult)raytraceresult).getPos();
         ItemStack itemstack = playerIn.getHeldItem(handIn);
+
+        if (worldIn.getFluidState(blockpos).isTagged(FluidTags.WATER) && containerItem != null) {
+            //TODO maybe you need to insert a sound
+            worldIn.playSound(playerIn, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            return new ActionResult<>(ActionResultType.SUCCESS, this.turnDirtyRagIntoItem(itemstack, playerIn, new ItemStack(this.containerItem)));
+        }
+
         if (playerIn.getHealth() > 20F) {
             return new ActionResult<>(ActionResultType.FAIL, itemstack);
         } else {
@@ -62,27 +78,30 @@ public class MedItem extends Item {
 
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-
         if(bloodHeal > 0) {
             entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
                 entityLiving.heal(bloodHeal);
             });
         }
-
         if(isBrokenlag()){
             entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
                 entityLiving.removePotionEffect(ModEffects.BROKEN_LEG);
             });
         }
 
+        if(isBleeding()){
+            entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
+                entityLiving.removePotionEffect(ModEffects.BROKEN_LEG);
+            });
+        }
         if (entityLiving instanceof PlayerEntity && this.hasContainerItem(stack)) {
             ((PlayerEntity) entityLiving).addItemStackToInventory(this.getContainerItem(stack));
         }
+
         stack.shrink(1);
         return stack;
     }
 
-    // TODO
     @Override
     public int getUseDuration(ItemStack stack) {
         if (stack.getItem().isFood()) {
@@ -101,6 +120,22 @@ public class MedItem extends Item {
         }
     }
 
+    /**
+     * Changes one item to another
+     */
+    protected ItemStack turnDirtyRagIntoItem(ItemStack itemStack, PlayerEntity player, ItemStack stack) {
+        itemStack.shrink(1);
+        player.addStat(Stats.ITEM_USED.get(this));
+        if (itemStack.isEmpty()) {
+            return stack;
+        } else {
+            if (!player.inventory.addItemStackToInventory(stack)) {
+                player.dropItem(stack, false);
+            }
+            return itemStack;
+        }
+    }
+
     public static class Properties extends Item.Properties {
 
         public int bloodHeal;
@@ -112,6 +147,8 @@ public class MedItem extends Item {
         public boolean bleeding = false; //stop loss of blood
 
         public boolean infection = false;
+
+        public IItemProvider containerItem;
 
 
         public MedItem.Properties setMaxStackSize(int maxStackSize) {
@@ -146,6 +183,11 @@ public class MedItem extends Item {
 
         public MedItem.Properties setInfection() {
             this.infection = true;
+            return this;
+        }
+
+        public MedItem.Properties setContainer(IItemProvider containerItem) {
+            this.containerItem = containerItem;
             return this;
         }
 

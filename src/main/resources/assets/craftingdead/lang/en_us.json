@@ -73,7 +73,12 @@
     "item.craftingdead.power_bar":"Power Bar",
     "item.craftingdead.candy_bar":"Candy Bar",
     "item.craftingdead.cereal":"Cereal",
-
+    "item.craftingdead.rotten_blue_berry":"Rotten Blue Berry",
+    "item.craftingdead.rotten_raspberry":"Rotten Raspberry",
+    "item.craftingdead.rotten_water_melon":"Rotten Water Melon Slice",
+    "item.craftingdead.blue_berry":"Blue Berry",
+    "item.craftingdead.raspberry":"Raspberry",
+    "item.craftingdead.water_melon":"Water Melon Slice",
     "item.craftingdead.med_pack":"Medpack",
     "item.craftingdead.andrenaline_syringe":"Andrenaline Syringe",
     "item.craftingdead.morphine_syringe":"Morphine Syringe",

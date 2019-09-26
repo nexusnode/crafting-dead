@@ -84,7 +84,6 @@ public class ModItems {
   public static Item zombieEnergy;
   public static Item lemonFizzEmpty;
   public static Item lemonFizz;
-
   public static Item mre;
   public static Item orange;
   public static Item rottenOrange;
@@ -92,6 +91,13 @@ public class ModItems {
   public static Item rottenPear;
   public static Item riceBag;
   public static Item apple;
+  public static Item noodles;
+  public static Item watermelon;
+  public static Item rottenWatermelon;
+  public static Item blueberry;
+  public static Item rottenBlueberry;
+  public static Item raspberry;
+  public static Item rottenRaspberry;
 
   // medic
   public static Item bloodbag;
@@ -441,6 +447,45 @@ public class ModItems {
         new DrinkItem(3, null, new Item.Properties()
             .food(ModFoods.CANNED_TOMATO_SOUP)
             .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    noodles = add("noodles",
+            new DrinkItem(4, new Item.Properties()
+                    .food(ModFoods.NOODLECUP)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    watermelon = add("water_melon",
+            new DrinkItem(6, new Item.Properties()
+                    .food(ModFoods.WATERMELON)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    rottenWatermelon = add("rotten_water_melon",
+            new DrinkItem(2, new Item.Properties()
+                    .food(ModFoods.ROTTENWATERMELON)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    blueberry = add("blue_berry",
+            new DrinkItem(4, new Item.Properties()
+                    .food(ModFoods.BLUEBERRIES)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    //TODO Chance food poisoning could be induced
+    rottenBlueberry = add("rotten_blue_berry",
+            new DrinkItem(2, new Item.Properties()
+                    .food(ModFoods.ROTTENBLUEBERRIES)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    raspberry = add("raspberry",
+            new DrinkItem(4, new Item.Properties()
+                    .food(ModFoods.RASPBERRIES)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    //TODO Chance food poisoning could be induced
+    raspberry = add("rotten_raspberry",
+            new DrinkItem(2, new Item.Properties()
+                    .food(ModFoods.RASPBERRIES)
+                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+
     // ================================================================================
     // medic
     // ================================================================================
@@ -463,7 +508,6 @@ public class ModItems {
                     .setBrokenLag()
                     .setMaxStackSize(1)
                     .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
 
     bandage = add("bandage",
             new MedItem( new MedItem.Properties()
@@ -508,6 +552,7 @@ public class ModItems {
     ragDirty = add("rag_dirty",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
+                    .setContainer(ragClean)
                     .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     splint = add("splint",
@@ -535,10 +580,10 @@ public class ModItems {
                     .setMaxStackSize(1)
                     .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    //TODO You need to add her ability to clear when she clicks on the water.
     ragBloody = add("rag_bloody",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
+                    .setContainer(ragClean)
                     .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     // ================================================================================
