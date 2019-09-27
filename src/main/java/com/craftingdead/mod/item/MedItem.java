@@ -115,8 +115,16 @@ public class MedItem extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
+        if (bloodHeal > 0) {
+            tooltip.add(new TranslationTextComponent("Hearts " + TextFormatting.RED + bloodHeal));
+        }
+
         if (isBrokenlag()) {
             tooltip.add(new TranslationTextComponent("Fixed Broken Legs"));
+        }
+
+        if (isBleeding()) {
+            tooltip.add(new TranslationTextComponent("Stops Bleeding"));
         }
     }
 

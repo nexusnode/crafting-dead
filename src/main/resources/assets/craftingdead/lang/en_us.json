@@ -27,6 +27,7 @@
 
     "itemGroup.craftingdead_consumables": "Crafting Dead Consumables",
     "itemGroup.craftingdead_misc":"Crafting Dead Miscellaneous",
+    "itemGroup.craftingdead_med":"Crafting Dead Medical",
 
     "item.craftingdead.acr": "ACR",
     "item.craftingdead.ak47": "AK47",
@@ -52,6 +53,15 @@
     "item.craftingdead.soda_dew": "Dew Soda",
     "item.craftingdead.empty_soda_cola": "Empty Cola Soda",
     "item.craftingdead.soda_cola": "Cola Soda",
+    "item.craftingdead.noodles": "Noodle Cup",
+    "item.craftingdead.chips": "Potato Chips",
+    "item.craftingdead.ranch_chips": "Ranch Chips",
+    "item.craftingdead.salt_chips": "Salt & Vinegar Chips",
+    "item.craftingdead.cheese_chips": "Sheesy Chips",
+    "item.craftingdead.cereal_emerald": "Drew & Jake's Emerald",
+    "item.craftingdead.cereal_flakes": "Drew & Jake's Flakes",
+    "item.craftingdead.cereal_nutty": "Nutty Cereal",
+    "item.craftingdead.popcorn": "Popcorn",
     "item.craftingdead.empty_milk_carton": "Empty milk Carton",
     "item.craftingdead.milk_carton": "Milk Carton",
     "item.craftingdead.milk_rotten": "Spoiled Milk Carton",

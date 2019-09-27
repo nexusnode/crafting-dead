@@ -98,6 +98,14 @@ public class ModItems {
   public static Item rottenBlueberry;
   public static Item raspberry;
   public static Item rottenRaspberry;
+  public static Item chips;
+  public static Item chipsRanch;
+  public static Item chipsCheese;
+  public static Item chipsSalt;
+  public static Item popcorn;
+  public static Item cerealNutty;
+  public static Item cerealEmerald;
+  public static Item cerealFlakes;
 
   // medic
   public static Item bloodbag;
@@ -234,257 +242,343 @@ public class ModItems {
         .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     waterBottle = add("water_bottle",
-        new DrinkItem(8, () -> emptyWaterBottle, new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        new DrinkItem(new DrinkItem.Properties()
+            .setContainer(() -> emptyWaterBottle)
+            .setWater(8)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaOrangeEmpty = add("empty_soda_orange", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaOrangeEmpty = add("empty_soda_orange", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaOrange = add("soda_orange",
-            new DrinkItem(4, () -> sodaOrangeEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setContainer(() -> sodaOrangeEmpty)
+                    .setWater(4)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    iceteaEmpty = add("empty_ice_tea", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    iceteaEmpty = add("empty_ice_tea", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     icetea = add("ice_tea",
-            new DrinkItem(4, () -> iceteaEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setContainer(() -> iceteaEmpty)
+                    .setWater(4)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    juicePouchEmpty = add("empty_juice_pouch", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    juicePouchEmpty = add("empty_juice_pouch", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     juicePouch = add("juice_pouch",
-            new DrinkItem(2, () -> juicePouchEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> juicePouchEmpty)
+                    .setWater(2)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaPepeEmpty = add("empty_soda_pepe", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaPepeEmpty = add("empty_soda_pepe", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaPepe = add("soda_pepe",
-            new DrinkItem(4, () -> sodaPepeEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setContainer(() -> sodaPepeEmpty)
+                    .setWater(4)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaDewEmpty = add("empty_soda_dew", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaDewEmpty = add("empty_soda_dew", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaDew = add("soda_dew",
-            new DrinkItem(4, () -> sodaDewEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> sodaDewEmpty)
+                    .setWater(4)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaColaEmpty = add("empty_soda_cola", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaColaEmpty = add("empty_soda_cola", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaCola = add("soda_cola",
-            new DrinkItem(4, () -> sodaColaEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> sodaColaEmpty)
+                    .setWater(4)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    milkCartonEmpty = add("empty_milk_carton", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    milkCartonEmpty = add("empty_milk_carton", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     milkCarton = add("milk_carton",
-            new DrinkItem(8, () -> milkCartonEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setContainer(() -> milkCartonEmpty)
+                    .setWater(8)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     milkRotten = add("milk_rotten",
-            new DrinkItem(4, () -> milkCartonEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> milkCartonEmpty)
+                    .setWater(4)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    colaPopEmpty = add("empty_cola_pop", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    colaPopEmpty = add("empty_cola_pop", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     colaPop = add("cola_pop",
-            new DrinkItem(6, () -> colaPopEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> colaPopEmpty)
+                    .setWater(6)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    ironBrewEmpty = add("empty_iron_brew", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    ironBrewEmpty = add("empty_iron_brew", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     ironBrew = add("iron_brew",
-            new DrinkItem(9, () -> ironBrewEmpty, new Item.Properties()
-                            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setContainer(() -> ironBrewEmpty)
+                    .setWater(9)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    spriteEmpty = add("empty_sprite", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    spriteEmpty = add("empty_sprite", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sprite = add("sprite",
-            new DrinkItem(9, () -> spriteEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> spriteEmpty)
+                    .setWater(9)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    zombieEnergyEmpty = add("empty_zombie_energy", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    zombieEnergyEmpty = add("empty_zombie_energy", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     zombieEnergy = add("zombie_energy",
-            new DrinkItem(9, () -> zombieEnergyEmpty, new Item.Properties()
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> zombieEnergyEmpty)
+                    .setWater(9)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    lemonFizzEmpty = add("empty_lemon_fizz", new Item(new Item.Properties()
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    lemonFizzEmpty = add("empty_lemon_fizz", new Item(new DrinkItem.Properties()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     lemonFizz = add("lemon_fizz",
-            new DrinkItem(6, () -> lemonFizzEmpty, new Item.Properties()
-                     .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setContainer(() -> lemonFizzEmpty)
+                    .setWater(6)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     // ================================================================================
-    // edible
+    // eat
     // ================================================================================
 
     mre = add("mre",
-            new DrinkItem(8, new Item.Properties()
-                    .food(ModFoods.MRE)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(8)
+                    .setFood(ModFoods.MRE)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     orange = add("orange",
-            new DrinkItem(2, new Item.Properties()
-                    .food(ModFoods.ORANGE)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(2)
+                    .setFood(ModFoods.ORANGE)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     rottenOrange = add("rotten_orange",
-            new DrinkItem(1, new Item.Properties()
-                    .food(ModFoods.ROTTENORANGE)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(1)
+                    .setFood(ModFoods.ROTTENORANGE)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     pear = add("pear",
-            new DrinkItem(3, new Item.Properties()
-                    .food(ModFoods.PEAR)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(3)
+                    .setFood(ModFoods.PEAR)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     rottenPear  = add("rotten_pear",
-            new DrinkItem(1, new Item.Properties()
-                    .food(ModFoods.ROTTENOPEAR)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(1)
+                    .setFood(ModFoods.ROTTENOPEAR)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     apple = add("apple",
-            new DrinkItem(3, new Item.Properties()
-                    .food(ModFoods.APPLE)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(3)
+                    .setFood(ModFoods.APPLE)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    riceBag = add("rice_bag", new DrinkItem(new Item.Properties()
-            .food(ModFoods.RICEBAG)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    riceBag = add("rice_bag", new DrinkItem(new DrinkItem.Properties()
+            .setFood(ModFoods.RICEBAG)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    powerBar = add("power_bar", new DrinkItem(new Item.Properties()
-        .food(ModFoods.POWER_BAR)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    powerBar = add("power_bar", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.POWER_BAR)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    candyBar = add("candy_bar", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANDY_BAR)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    candyBar = add("candy_bar", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANDY_BAR)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cereal = add("cereal", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CEREAL)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cereal = add("cereal", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CEREAL)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedCorn = add("canned_corn", new DrinkItem(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedCorn = add("canned_corn", new DrinkItem(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedCorn = add("open_canned_corn", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_CORN)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedCorn = add("open_canned_corn", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_CORN)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedBeans = add("canned_beans", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedBeans = add("canned_beans", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBeans = add("open_canned_beans", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_BEANS)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedBeans = add("open_canned_beans", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_BEANS)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedTuna = add("canned_tuna", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedTuna = add("canned_tuna", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedTuna = add("open_canned_tuna", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_TUNA)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedTuna = add("open_canned_tuna", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_TUNA)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPeach = add("canned_peach", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPeach = add("canned_peach", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedPeach = add("open_canned_peach",
-        new DrinkItem(2, null, new Item.Properties()
-            .food(ModFoods.CANNED_PEACH)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        new DrinkItem(new DrinkItem.Properties()
+                .setWater(2)
+                .setFood(ModFoods.CANNED_PEACH)
+                .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPasta = add("canned_pasta", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPasta = add("canned_pasta", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPasta = add("open_canned_pasta", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_PASTA)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedPasta = add("open_canned_pasta", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_PASTA)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedBacon = add("canned_bacon", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedBacon = add("canned_bacon", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBacon = add("open_canned_bacon", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_BACON)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedBacon = add("open_canned_bacon", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_BACON)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedCustard = add("canned_custard", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedCustard = add("canned_custard", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedCustard = add("open_canned_custard",
-        new DrinkItem(4, null, new Item.Properties()
-            .food(ModFoods.CANNED_CUSTARD)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        new DrinkItem(new DrinkItem.Properties()
+                .setWater(4)
+                .setFood(ModFoods.CANNED_CUSTARD)
+                .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPickles = add("canned_pickles", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPickles = add("canned_pickles", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPickles = add("open_canned_pickles", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_PICKLES)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedPickles = add("open_canned_pickles", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_PICKLES)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedDogFood = add("canned_dog_food", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedDogFood = add("canned_dog_food", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedDogFood = add("open_canned_dog_food", new DrinkItem(new Item.Properties()
-        .food(ModFoods.CANNED_DOG_FOOD)
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedDogFood = add("open_canned_dog_food", new DrinkItem(new DrinkItem.Properties()
+        .setFood(ModFoods.CANNED_DOG_FOOD)
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedTomatoSoup = add("canned_tomato_soup", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedTomatoSoup = add("canned_tomato_soup", new Item(new DrinkItem.Properties()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedTomatoSoup = add("open_canned_tomato_soup",
-        new DrinkItem(3, null, new Item.Properties()
-            .food(ModFoods.CANNED_TOMATO_SOUP)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        new DrinkItem(new DrinkItem.Properties()
+                .setWater(3)
+                .setFood(ModFoods.CANNED_TOMATO_SOUP)
+                .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     noodles = add("noodles",
-            new DrinkItem(4, new Item.Properties()
-                    .food(ModFoods.NOODLECUP)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(4)
+                    .setFood(ModFoods.NOODLECUP)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     watermelon = add("water_melon",
-            new DrinkItem(6, new Item.Properties()
-                    .food(ModFoods.WATERMELON)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(6)
+                    .setFood(ModFoods.WATERMELON)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     rottenWatermelon = add("rotten_water_melon",
-            new DrinkItem(2, new Item.Properties()
-                    .food(ModFoods.ROTTENWATERMELON)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(2)
+                    .setFood(ModFoods.ROTTENWATERMELON)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     blueberry = add("blue_berry",
-            new DrinkItem(4, new Item.Properties()
-                    .food(ModFoods.BLUEBERRIES)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(4)
+                    .setFood(ModFoods.BLUEBERRIES)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    //TODO Chance food poisoning could be induced
     rottenBlueberry = add("rotten_blue_berry",
-            new DrinkItem(2, new Item.Properties()
-                    .food(ModFoods.ROTTENBLUEBERRIES)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setWater(2)
+                    .setFood(ModFoods.ROTTENBLUEBERRIES)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     raspberry = add("raspberry",
-            new DrinkItem(4, new Item.Properties()
-                    .food(ModFoods.RASPBERRIES)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            new DrinkItem( new DrinkItem.Properties()
+                    .setFood(ModFoods.RASPBERRIES)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    //TODO Chance food poisoning could be induced
-    raspberry = add("rotten_raspberry",
-            new DrinkItem(2, new Item.Properties()
-                    .food(ModFoods.RASPBERRIES)
-                    .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    rottenRaspberry = add("rotten_raspberry",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setWater(2)
+                    .setFood(ModFoods.ROTTENRASPBERRIES)
+                    .setRotten()
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
+    chips = add("chips",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.CHIPS)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    chipsRanch = add("ranch_chips",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.RANCHCHIPS)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    chipsCheese = add("cheese_chips",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.CHEESECHIPS)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    chipsSalt = add("salt_chips",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.SALTCHIPS)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    popcorn = add("popcorn",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.POPCORN)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    cerealNutty = add("cereal_nutty",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.CEREALNUTTY)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    cerealEmerald = add("cereal_emerald",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.CEREALEMERALD)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+    cerealFlakes = add("cereal_flakes",
+            new DrinkItem(new DrinkItem.Properties()
+                    .setFood(ModFoods.CEREALFLAKES)
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     // ================================================================================
     // medic
@@ -495,96 +589,96 @@ public class ModItems {
             .setBloodHeal(8)
             .setBrokenLag()
             .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleAdrenaline = add("andrenaline_syringe",
             new MedItem( new MedItem.Properties()
                     .setAdrenaline()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleMorphine = add("morphine_syringe",
             new MedItem( new MedItem.Properties()
                     .setBrokenLag()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bandage = add("bandage",
             new MedItem( new MedItem.Properties()
                     .setBloodHeal(2)
                     .setBleeding()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bloodbag = add("blood_bag",
             new MedItem( new MedItem.Properties()
                     .setBloodHeal(4)
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bloodbagEmpty = add("empty_blood_bag",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needle = add("needle",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleRBI = add("needle_rbi",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bottleRBI = add("bottle_rbi",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     ragClean = add("rag_clean",
             new MedItem( new MedItem.Properties()
                     .setBleeding()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     //TODO You need to add her ability to clear when she clicks on the water.
     ragDirty = add("rag_dirty",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
                     .setContainer(ragClean)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     splint = add("splint",
             new MedItem( new MedItem.Properties()
                     .setBrokenLag()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleCure = add("needle_cure",
             new MedItem( new MedItem.Properties()
                     .setInfection()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bottleCure = add("bottle_cure",
             new MedItem( new MedItem.Properties()
                     .setInfection()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     antibiotics  = add("antibiotics",
             new MedItem( new MedItem.Properties()
                     .setBloodHeal(4)
                     .setBrokenLag()
                     .setMaxStackSize(1)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     ragBloody = add("rag_bloody",
             new MedItem( new MedItem.Properties()
                     .setMaxStackSize(1)
                     .setContainer(ragClean)
-                    .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+                    .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     // ================================================================================
     // Spawn Eggs

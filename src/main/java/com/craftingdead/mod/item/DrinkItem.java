@@ -1,12 +1,13 @@
 package com.craftingdead.mod.item;
 
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.potion.ModEffects;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
+import net.minecraft.item.*;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -20,37 +21,39 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 public class DrinkItem extends Item {
 
   private int water;
 
+  public boolean rotten = false;
+
   private IItemProvider containerItem;
 
-
-  public DrinkItem(int water, IItemProvider containerItem, Properties properties) {
+  public DrinkItem(DrinkItem.Properties properties) {
     super(properties);
-    this.water = water;
-    this.containerItem = containerItem;
-  }
-
-  public DrinkItem(int water,Properties properties) {
-    super(properties);
-    this.water = water;
-    this.containerItem = null;
-  }
-
-  public DrinkItem(Properties properties) {
-    super(properties);
-    this.water = 0;
-    this.containerItem = null;
+    this.water = properties.water;
+    this.containerItem = properties.containerItem;
+    this.rotten = properties.rotten;
   }
 
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+
+    if(rotten){
+      Random rand = new Random();
+      if (rand.nextInt(5) == 0) {
+        entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
+          entityLiving.addPotionEffect(new EffectInstance(Effects.HUNGER, 900, 1));
+        });
+      }
+    }
+
     entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
       player.setWater(player.getWater() + this.water);
     });
+
     if (entityLiving instanceof PlayerEntity && this.hasContainerItem(stack)) {
       ((PlayerEntity) entityLiving).addItemStackToInventory(this.getContainerItem(stack));
     }
@@ -110,6 +113,49 @@ public class DrinkItem extends Item {
     if (this.water != 0) {
       tooltip.add(new TranslationTextComponent("Water " + TextFormatting.RED + this.water));
     }
+
+    if(rotten){
+      tooltip.add(new TranslationTextComponent("Chance food poisoning could be induced..."));
+    }
   }
 
+  public static class Properties extends Item.Properties {
+
+    public Food foodIn;
+
+    public int water;
+
+    public boolean rotten = false;
+
+    public IItemProvider containerItem;
+
+    public DrinkItem.Properties setFood(Food foodIn) {
+      this.food(foodIn);
+      return this;
+    }
+
+    public DrinkItem.Properties setGroup(ItemGroup groupIn) {
+      this.group(groupIn);
+      return this;
+    }
+
+    public DrinkItem.Properties setWater(int water) {
+      this.water = water;
+      return this;
+    }
+
+    public DrinkItem.Properties setContainer(IItemProvider containerItem) {
+      this.containerItem = containerItem;
+      return this;
+    }
+
+    public DrinkItem.Properties setRotten() {
+      this.rotten = true;
+      return this;
+    }
+
+
+
+
+  }
 }

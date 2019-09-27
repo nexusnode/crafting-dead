@@ -112,4 +112,39 @@ public class ModFoods {
           .hunger(1) //
           .saturation(0.6F) //
           .build();
+  public static final Food CHIPS = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food RANCHCHIPS = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food CHEESECHIPS = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food SALTCHIPS = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food POPCORN = new Food.Builder() //
+          .hunger(3) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food CEREALNUTTY = new Food.Builder() //
+          .hunger(10) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food CEREALEMERALD = new Food.Builder() //
+          .hunger(10) //
+          .saturation(0.6F) //
+          .build();
+  public static final Food CEREALFLAKES= new Food.Builder() //
+          .hunger(10) //
+          .saturation(0.6F) //
+          .build();
+
+
+
 }
