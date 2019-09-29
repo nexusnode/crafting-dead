@@ -36,10 +36,10 @@ public class MedItem extends Item {
     @Getter
     private boolean bleeding;
 
+    @Getter
+    private boolean adrenaline;
+
     private IItemProvider containerItem;
-
-
-
 
     public MedItem(MedItem.Properties properties) {
         super(properties);
@@ -47,26 +47,19 @@ public class MedItem extends Item {
         this.brokenlag = properties.brokenlag;
         this.containerItem = properties.containerItem;
         this.bleeding = properties.bleeding;
+        this.adrenaline = properties.adrenaline;
     }
 
+    //TODO Fix Animation
     @Override
     public UseAction getUseAction(ItemStack stack) {
-        return UseAction.BLOCK;
+        return UseAction.CROSSBOW;
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
                                                     Hand handIn) {
-
-        RayTraceResult raytraceresult = rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
-        BlockPos blockpos = ((BlockRayTraceResult)raytraceresult).getPos();
         ItemStack itemstack = playerIn.getHeldItem(handIn);
-
-        if (worldIn.getFluidState(blockpos).isTagged(FluidTags.WATER) && containerItem != null) {
-            //TODO maybe you need to insert a sound
-            worldIn.playSound(playerIn, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
-            return new ActionResult<>(ActionResultType.SUCCESS, this.turnDirtyRagIntoItem(itemstack, playerIn, new ItemStack(this.containerItem)));
-        }
 
         if (playerIn.getHealth() > 20F) {
             return new ActionResult<>(ActionResultType.FAIL, itemstack);
@@ -94,12 +87,29 @@ public class MedItem extends Item {
                 entityLiving.removePotionEffect(ModEffects.BROKEN_LEG);
             });
         }
+
+        if(isAdrenaline()){
+            entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
+                entityLiving.addPotionEffect(new EffectInstance(Effects.SPEED, 2000, 1));
+            });
+        }
+
         if (entityLiving instanceof PlayerEntity && this.hasContainerItem(stack)) {
             ((PlayerEntity) entityLiving).addItemStackToInventory(this.getContainerItem(stack));
         }
 
         stack.shrink(1);
         return stack;
+    }
+
+    @Override
+    public ItemStack getContainerItem(ItemStack itemStack) {
+        return new ItemStack(this.containerItem);
+    }
+
+    @Override
+    public boolean hasContainerItem(ItemStack itemStack) {
+        return this.containerItem != null;
     }
 
     @Override
@@ -126,12 +136,16 @@ public class MedItem extends Item {
         if (isBleeding()) {
             tooltip.add(new TranslationTextComponent("Stops Bleeding"));
         }
+
+        if(isAdrenaline()){
+            tooltip.add(new TranslationTextComponent("Induces Adrenaline"));
+        }
     }
 
     /**
      * Changes one item to another
      */
-    protected ItemStack turnDirtyRagIntoItem(ItemStack itemStack, PlayerEntity player, ItemStack stack) {
+    protected ItemStack turnSwapItem(ItemStack itemStack, PlayerEntity player, ItemStack stack) {
         itemStack.shrink(1);
         player.addStat(Stats.ITEM_USED.get(this));
         if (itemStack.isEmpty()) {
@@ -157,7 +171,6 @@ public class MedItem extends Item {
         public boolean infection = false;
 
         public IItemProvider containerItem;
-
 
         public MedItem.Properties setMaxStackSize(int maxStackSize) {
             this.maxStackSize(maxStackSize);
@@ -198,9 +211,6 @@ public class MedItem extends Item {
             this.containerItem = containerItem;
             return this;
         }
-
-
-
     }
 
 }

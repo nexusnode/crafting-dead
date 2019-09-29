@@ -31,4 +31,13 @@ public class ModItemGroups {
                     return new ItemStack(ModItems.medpack);
                 }
             });
+
+    public static final ItemGroup CRAFTING_DEAD_WEAPON =
+            (new ItemGroup("craftingdead_weapon") {
+
+                @Override
+                public ItemStack createIcon() {
+                    return new ItemStack(ModItems.crowbar);
+                }
+            });
 }

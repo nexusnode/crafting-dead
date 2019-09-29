@@ -84,6 +84,10 @@ public class ModFoods {
           .hunger(5) //
           .saturation(0.6F) //
           .build();
+  public static final Food ROTTENAPPLE = new Food.Builder() //
+          .hunger(1) //
+          .saturation(0.6F) //
+          .build();
   public static final Food NOODLECUP = new Food.Builder() //
           .hunger(6) //
           .saturation(0.6F) //
