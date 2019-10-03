@@ -14,10 +14,12 @@ import com.craftingdead.mod.item.RechargebleItem.RagItem;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import org.apache.commons.compress.archivers.dump.DumpArchiveEntry;
 
 public class ModItems {
 
@@ -164,6 +166,7 @@ public class ModItems {
     public static Item steelBat;
     public static Item cleaver;
     public static Item brokenBottle;
+    //public static Item backpack;
 
 
     public static Item advancedZombieSpawnEgg;
@@ -666,6 +669,8 @@ public class ModItems {
                         .setMaxStackSize(1)
                         .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
+        //backpack = add("backpack" , new BackpackItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
         // ================================================================================
         // medic
         // ================================================================================
@@ -1015,6 +1020,7 @@ public class ModItems {
 
     public static void register(RegistryEvent.Register<Item> event) {
         toRegister.forEach(event.getRegistry()::register);
+        event.getRegistry().register(new BackpackItem());
     }
 
     private static Item add(String registryName, Item item) {
