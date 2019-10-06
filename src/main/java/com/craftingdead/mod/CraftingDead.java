@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.craftingdead.mod.client.ClientProxy;
+import com.craftingdead.mod.type.ModContainerType;
+import net.minecraft.inventory.container.ContainerType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.block.ModBlocks;
@@ -70,12 +74,16 @@ public class CraftingDead {
   public static final String DISPLAY_NAME;
 
   static {
+    proxy = (ServerProxy)DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
     assert VERSION != null;
     DISPLAY_NAME =
         JarVersionLookupHandler.getImplementationTitle(CraftingDead.class).orElse("[display_name]");
     assert DISPLAY_NAME != null;
+
+
   }
 
   /**
@@ -117,6 +125,8 @@ public class CraftingDead {
    */
   private Optional<NetworkManager> networkManager = Optional.empty();
 
+  public static ServerProxy proxy;
+
   @Setter
   private boolean retryConnect = true;
 
@@ -137,6 +147,9 @@ public class CraftingDead {
 
     ModTileEntityTypes.initialize();
     modEventBus.addGenericListener(TileEntityType.class, ModTileEntityTypes::register);
+
+    ModContainerType.initialize();
+    modEventBus.addGenericListener(ContainerType.class, ModContainerType::register);
 
     ModItems.initialize();
     modEventBus.addGenericListener(Item.class, ModItems::register);
@@ -178,6 +191,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleCommonSetup(FMLCommonSetupEvent event) {
+    proxy.preInit();
     logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");

@@ -5,6 +5,7 @@ import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 
@@ -14,9 +15,12 @@ public class ModBlocks {
 
   public static Block residentialLoot = null;
 
+  public static Block chestblock;
+
   public static void initialize() {
     residentialLoot = add("residential_loot",
         new LootBlock(0xFFFFFF, ImmutableMap.of(new ResourceLocation("stone"), 1)));
+    chestblock = add("new_block", new ChestBlock(Block.Properties.create(Material.SPONGE)));
   }
 
   public static void register(RegistryEvent.Register<Block> event) {

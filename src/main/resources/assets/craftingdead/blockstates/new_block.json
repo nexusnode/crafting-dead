@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "craftingdead:block/new_block" }
+  }
+}

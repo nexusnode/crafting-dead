@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
@@ -14,6 +15,7 @@ import com.craftingdead.mod.item.RechargebleItem.RagItem;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
@@ -22,6 +24,8 @@ import net.minecraftforge.event.RegistryEvent;
 public class ModItems {
 
     private static final List<Item> toRegister = new ArrayList<>();
+
+    public static Item chestblock;
 
     public static Item acr;
     public static Item ak47;
@@ -174,6 +178,8 @@ public class ModItems {
     public static Item grenadeSpawnEgg;
 
     public static void initialize() {
+
+        chestblock = add("new_block" , new BlockItem(ModBlocks.chestblock, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
         // ================================================================================
         // Guns
