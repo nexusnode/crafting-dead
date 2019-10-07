@@ -1,6 +1,6 @@
-package com.craftingdead.mod.type;
+package com.craftingdead.mod.tileentity;
 
-import com.craftingdead.mod.tileentity.ModTileEntityTypes;
+import com.craftingdead.mod.container.ChestContainer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;

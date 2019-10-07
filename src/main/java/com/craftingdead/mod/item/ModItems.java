@@ -27,6 +27,7 @@ public class ModItems {
     private static final List<Item> toRegister = new ArrayList<>();
 
     public static Item chestblock;
+    public static Item backpack;
 
     public static Item acr;
     public static Item ak47;
@@ -169,7 +170,6 @@ public class ModItems {
     public static Item steelBat;
     public static Item cleaver;
     public static Item brokenBottle;
-    //public static Item backpack;
 
 
     public static Item advancedZombieSpawnEgg;
@@ -674,7 +674,7 @@ public class ModItems {
                         .setMaxStackSize(1)
                         .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-        //backpack = add("backpack" , new BackpackItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        backpack = add("backpack" , new BackpackItem());
 
         // ================================================================================
         // medic
@@ -1025,7 +1025,6 @@ public class ModItems {
 
     public static void register(RegistryEvent.Register<Item> event) {
         toRegister.forEach(event.getRegistry()::register);
-        event.getRegistry().register(new BackpackItem());
     }
 
     private static Item add(String registryName, Item item) {

@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.craftingdead.mod.client.ClientProxy;
-import com.craftingdead.mod.type.ModContainerType;
+import com.craftingdead.mod.container.ModContainerType;
 import net.minecraft.inventory.container.ContainerType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,7 +83,6 @@ public class CraftingDead {
         JarVersionLookupHandler.getImplementationTitle(CraftingDead.class).orElse("[display_name]");
     assert DISPLAY_NAME != null;
   }
-
   /**
    * Logger.
    */

@@ -1,7 +1,6 @@
-package com.craftingdead.mod.type;
+package com.craftingdead.mod.container;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.container.ChestContainer;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.util.ResourceLocation;
@@ -17,9 +16,15 @@ public class ModContainerType {
 
     public static ContainerType<ChestContainer> ironchest;
 
+    public static ContainerType<BackpackContainer> backpack;
+
     public static void initialize() {
         ironchest = add("new_block", IForgeContainerType.create((windowId, inv, data) -> {
             return ChestContainer.createIronContainer(windowId,inv);
+        }));
+
+        backpack = add("backpack", IForgeContainerType.create((windowId, inv, data) -> {
+            return BackpackContainer.createClientContainer(windowId,inv,data);
         }));
     }
 

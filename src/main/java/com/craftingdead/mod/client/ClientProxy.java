@@ -2,20 +2,24 @@ package com.craftingdead.mod.client;
 
 import com.craftingdead.mod.ServerProxy;
 import com.craftingdead.mod.client.renderer.IronChestTileEntityRenderer;
-import com.craftingdead.mod.type.ChestScreen;
+import com.craftingdead.mod.container.BackpackContainer;
+import com.craftingdead.mod.container.ModContainerType;
+import com.craftingdead.mod.gui.BackpackScreen;
+import com.craftingdead.mod.gui.ChestScreen;
 import com.craftingdead.mod.type.ChestType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-import static com.craftingdead.mod.type.ModContainerType.ironchest;
+import static com.craftingdead.mod.container.ModContainerType.ironchest;
 
 public class ClientProxy
         extends ServerProxy {
     @Override
     public void preInit() {
         ScreenManager.registerFactory(ironchest, ChestScreen::new);
+        ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new);
         super.preInit();
         ChestType[] arrchestType = ChestType.values();
         int n = arrchestType.length;

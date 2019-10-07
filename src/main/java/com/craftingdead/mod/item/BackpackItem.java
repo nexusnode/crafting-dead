@@ -1,47 +1,32 @@
 package com.craftingdead.mod.item;
 
-import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.entity.CorpseEntity;
-import com.craftingdead.mod.inventory.InventoryCorpse;
-import com.craftingdead.mod.potion.ModEffects;
-import com.craftingdead.mod.test.Backpack;
-import com.craftingdead.mod.test.BackpackContainer;
-import com.craftingdead.mod.test.BackpackInventory;
 
+import com.craftingdead.mod.container.BackpackContainer;
+import com.craftingdead.mod.inventory.BackpackInventory;
+import com.craftingdead.mod.type.Backpack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.inventory.container.*;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.network.NetworkHooks;
-import org.lwjgl.system.CallbackI;
 
-import javax.annotation.Nullable;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class BackpackItem extends Item  {
-
-
 
     public BackpackItem() {
         super(new Item.Properties()
                 .maxStackSize(1)
-                .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES));
-        setRegistryName("backpack");
+                .group(ModItemGroups.CRAFTING_DEAD_WEAPON));
     }
 
     @Override
@@ -50,21 +35,14 @@ public class BackpackItem extends Item  {
 
         ItemStack itemstack = player.getHeldItem(handIn);
 
-
-        player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> {
-            return BackpackContainer.createGeneric9X1(id, playerInventory);
-        }, new StringTextComponent("test")));
-
         if (!(player instanceof ServerPlayerEntity)){
             return new ActionResult(ActionResultType.SUCCESS, itemstack);
         }
-        /*
         try {
             NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
-                @Nullable
                 @Override
-                public BackpackContainer createMenu(int id, PlayerInventory playerInventory, PlayerEntity player) {
-                    return BackpackContainer.createGeneric9X1(id,playerInventory);
+                public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity player) {
+                    return new BackpackContainer(id,playerInventory,new BackpackInventory(itemstack,Backpack.SMALL.getInventorySize()), Backpack.SMALL);
                 }
                 @Override
                 public ITextComponent getDisplayName() {
@@ -74,7 +52,7 @@ public class BackpackItem extends Item  {
         }catch (Exception e){
             System.out.println("Error");
             e.printStackTrace();
-        }*/
+        }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 

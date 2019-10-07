@@ -1,5 +1,6 @@
-package com.craftingdead.mod.type;
+package com.craftingdead.mod.container;
 
+import com.craftingdead.mod.type.ChestType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -11,6 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ChestContainer
         extends Container {
+
     private final IInventory inventory;
     private final ChestType chestType;
     private PlayerEntity playerEntity;

@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "craftingdead:item/bandage"
+    "layer0": "craftingdead:item/backpack"
   }
 }

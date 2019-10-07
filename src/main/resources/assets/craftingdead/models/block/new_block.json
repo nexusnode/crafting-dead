@@ -2,7 +2,7 @@
   "parent": "block/block",
   "textures": {
     "texture": "craftingdead:model/new_block",
-    "particle": "minecraft:block/obsidian"
+    "particle": "craftingdead:block/new_block"
   },
   "elements": [
     {   "from": [ 1, 0, 1 ],

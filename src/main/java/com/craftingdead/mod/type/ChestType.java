@@ -1,6 +1,8 @@
 package com.craftingdead.mod.type;
 
 import com.craftingdead.mod.block.ModBlocks;
+import com.craftingdead.mod.tileentity.ChestTileEntity;
+import com.craftingdead.mod.tileentity.IronChestTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
@@ -8,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 
 public enum ChestType implements IStringSerializable
 {
-    IRON(54, 9, "new_block.png", ChestTileEntity.class, "craftingdead:new_block", 184, 222, new ResourceLocation("new_block", "textures/gui/new_block.png"), 256, 256),
+    IRON(54, 9, "new_block_container.png", ChestTileEntity.class, "craftingdead:new_block", 184, 222, new ResourceLocation("new_block", "textures/gui/new_block_container.png"), 256, 256),
        WOOD(0, 0, "", null, null, 0, 0, null, 0, 0);
 
     public static final ChestType[] VALUES;

@@ -1,5 +1,7 @@
-package com.craftingdead.mod.type;
+package com.craftingdead.mod.gui;
 
+import com.craftingdead.mod.container.ChestContainer;
+import com.craftingdead.mod.type.ChestType;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -13,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ChestScreen extends ContainerScreen<ChestContainer>
         implements IHasContainer<ChestContainer> {
 
-    private ResourceLocation GUI = new ResourceLocation("craftingdead", "textures/gui/new_block.png");
+    private ResourceLocation GUI = new ResourceLocation("craftingdead", "textures/gui/new_block_container.png");
 
     private ChestType chestType;
     private int textureXSize;
