@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
@@ -24,6 +25,8 @@ import org.apache.commons.compress.archivers.dump.DumpArchiveEntry;
 public class ModItems {
 
     private static final List<Item> toRegister = new ArrayList<>();
+
+    public static Item chestblock;
 
     public static Item acr;
     public static Item ak47;
@@ -177,6 +180,8 @@ public class ModItems {
     public static Item grenadeSpawnEgg;
 
     public static void initialize() {
+
+        chestblock = add("new_block" , new BlockItem(ModBlocks.chestblock, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
         // ================================================================================
         // Guns

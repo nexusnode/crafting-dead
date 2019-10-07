@@ -6,16 +6,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.craftingdead.mod.item.BackpackItem;
-import com.craftingdead.mod.test.BackpackContainer;
-import com.craftingdead.mod.test.ClientProxy;
-import com.craftingdead.mod.test.IProxy;
-import com.craftingdead.mod.test.ServerProxy;
-import net.minecraft.inventory.container.ChestContainer;
+import com.craftingdead.mod.client.ClientProxy;
+import com.craftingdead.mod.type.ModContainerType;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.event.RegistryEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.block.ModBlocks;
@@ -70,7 +63,6 @@ public class CraftingDead {
    */
   public static final String ID = "craftingdead";
 
-  public static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
   /**
    * Mod version.
    */
@@ -82,6 +74,8 @@ public class CraftingDead {
   public static final String DISPLAY_NAME;
 
   static {
+    proxy = (ServerProxy)DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
     assert VERSION != null;
@@ -129,6 +123,8 @@ public class CraftingDead {
    */
   private Optional<NetworkManager> networkManager = Optional.empty();
 
+  public static ServerProxy proxy;
+
   @Setter
   private boolean retryConnect = true;
 
@@ -149,6 +145,9 @@ public class CraftingDead {
 
     ModTileEntityTypes.initialize();
     modEventBus.addGenericListener(TileEntityType.class, ModTileEntityTypes::register);
+
+    ModContainerType.initialize();
+    modEventBus.addGenericListener(ContainerType.class, ModContainerType::register);
 
     ModItems.initialize();
     modEventBus.addGenericListener(Item.class, ModItems::register);
@@ -175,8 +174,6 @@ public class CraftingDead {
     }
   }
 
-
-
   public void tickConnection() {
     this.tcpClient.tick();
   }
@@ -192,13 +189,12 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleCommonSetup(FMLCommonSetupEvent event) {
+    proxy.preInit();
     logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-    proxy.init();
   }
-
 
   @SubscribeEvent
   public void handleLoadComplete(FMLLoadCompleteEvent event) {
@@ -238,7 +234,6 @@ public class CraftingDead {
           .ifPresent((player) -> event.setCanceled(player.onKill(event.getEntity())));
     }
   }
-
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {

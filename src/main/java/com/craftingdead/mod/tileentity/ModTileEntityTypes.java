@@ -15,9 +15,15 @@ public class ModTileEntityTypes {
 
   public static TileEntityType<?> loot = null;
 
+  public static TileEntityType<?> ironchest;
+
   public static void initialize() {
     loot = add("loot",
         TileEntityType.Builder.create(TileEntityLoot::new, ModBlocks.residentialLoot).build(null));
+
+    ironchest = add("new_block",
+            TileEntityType.Builder.create(TileEntityLoot::new, ModBlocks.chestblock).build(null));
+
   }
 
   public static void register(RegistryEvent.Register<TileEntityType<?>> event) {
