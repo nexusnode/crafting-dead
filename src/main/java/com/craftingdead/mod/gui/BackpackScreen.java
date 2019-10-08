@@ -16,12 +16,16 @@ public class BackpackScreen extends ContainerScreen<BackpackContainer>
     protected int backgroundWidth;
     protected int backgroundHeight;
 
-    private ResourceLocation GUI = new ResourceLocation("craftingdead", "textures/gui/backpack_container.png");
+    private ResourceLocation GUI;
 
     public BackpackScreen(BackpackContainer screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
         this.backgroundHeight = 512;
         this.backgroundWidth = 512;
+        GUI = new ResourceLocation("craftingdead", "textures/gui/backpack/"+screenContainer.getBackpack().getName()+".png");
+        xSize = screenContainer.getBackpack().getTextureSizeX();
+        ySize = screenContainer.getBackpack().getTextureSizeY();
+
     }
 
     public void render(int mouseX, int mouseY, float partialTicks) {
@@ -38,5 +42,6 @@ public class BackpackScreen extends ContainerScreen<BackpackContainer>
         int y = (this.height - this.ySize) / 2;
         this.blit(x, y, 0, 0, this.xSize, this.ySize,this.backgroundWidth, this.backgroundHeight);
     }
+
 
 }

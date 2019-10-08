@@ -12,6 +12,7 @@ import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.RechargebleItem.CanteenItem;
 import com.craftingdead.mod.item.RechargebleItem.FlaskItem;
 import com.craftingdead.mod.item.RechargebleItem.RagItem;
+import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +29,8 @@ public class ModItems {
 
     public static Item chestblock;
     public static Item backpack;
+    public static Item backpack2;
+    public static Item backpack3;
 
     public static Item acr;
     public static Item ak47;
@@ -674,8 +677,11 @@ public class ModItems {
                         .setMaxStackSize(1)
                         .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-        backpack = add("backpack" , new BackpackItem());
+        backpack = add("backpack" , new BackpackItem(Backpack.SMALL));
 
+        backpack2 = add("backpack2" , new BackpackItem(Backpack.MEDIUM));
+
+        backpack3 = add("backpack3" , new BackpackItem(Backpack.LARGE));
         // ================================================================================
         // medic
         // ================================================================================

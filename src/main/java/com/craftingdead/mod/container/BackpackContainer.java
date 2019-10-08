@@ -12,6 +12,8 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.IItemHandler;
+import org.lwjgl.system.CallbackI;
 
 
 public class BackpackContainer extends Container {
@@ -19,9 +21,8 @@ public class BackpackContainer extends Container {
     private final IInventory backpackInventory;
     private final Backpack backpack;
 
-
     public static BackpackContainer createClientContainer(int id, PlayerInventory playerInventory, PacketBuffer buffer) {
-        Backpack backpack = Backpack.SMALL;
+        Backpack backpack = buffer.readEnumValue(Backpack.class);
         return new BackpackContainer(id, playerInventory, new Inventory(backpack.getInventorySize()), backpack);
     }
 
@@ -74,11 +75,32 @@ public class BackpackContainer extends Container {
         super.onContainerClosed(playerIn);
         if (!(this.backpackInventory instanceof BackpackInventory)) return;
         ((BackpackInventory)this.backpackInventory).writeItemStack();
-
     }
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
+    }
+
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+        if (slot == null) return itemstack;
+        if (!slot.getHasStack()) return itemstack;
+        ItemStack itemstack1 = slot.getStack();
+        itemstack = itemstack1.copy();
+        if (index < this.backpack.getInventorySize() ? !this.mergeItemStack(itemstack1, this.backpack.getInventorySize(), this.inventorySlots.size(), true) : !this.mergeItemStack(itemstack1, 0, this.backpack.getInventorySize(), false)) {
+            return ItemStack.EMPTY;
+        }
+        if (itemstack1.isEmpty()) {
+            slot.putStack(ItemStack.EMPTY);
+            return itemstack;
+        }
+        slot.onSlotChanged();
+        return itemstack;
+    }
+
+    public Backpack getBackpack() {
+        return backpack;
     }
 }

@@ -33,10 +33,6 @@ public enum Backpack implements IStringSerializable
         this.textureSizeY = textureSizeY;
     }
 
-    public String func_176610_l() {
-        return this.name;
-    }
-
     public Rarity getRarity() {
         return this.rarity;
     }
@@ -79,6 +75,6 @@ public enum Backpack implements IStringSerializable
 
     @Override
     public String getName() {
-        return "test";
+        return this.name;
     }
 }

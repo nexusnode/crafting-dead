@@ -74,7 +74,7 @@ public class CraftingDead {
   public static final String DISPLAY_NAME;
 
   static {
-    proxy = (ServerProxy)DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
