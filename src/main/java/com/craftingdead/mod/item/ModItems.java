@@ -28,9 +28,6 @@ public class ModItems {
     private static final List<Item> toRegister = new ArrayList<>();
 
     public static Item chestblock;
-    public static Item backpack;
-    public static Item backpack2;
-    public static Item backpack3;
 
     public static Item acr;
     public static Item ak47;
@@ -174,6 +171,31 @@ public class ModItems {
     public static Item cleaver;
     public static Item brokenBottle;
 
+    //backpack
+    public static Item backpackSmallRed;
+    public static Item backpackSmallOrange;
+    public static Item backpackSmallYellow;
+    public static Item backpackSmallGreen;
+    public static Item backpackSmallBlue;
+    public static Item backpackSmallPurple;
+    public static Item backpackMediumRed;
+    public static Item backpackMediumOrange;
+    public static Item backpackMediumYellow;
+    public static Item backpackMediumGreen;
+    public static Item backpackMediumBlue;
+    public static Item backpackMediumPurple;
+    public static Item backpackMediumGrey;
+    public static Item backpackMediumBlack;
+    public static Item backpackMediumGhillie;
+    public static Item backpackMediumWhite;
+    public static Item backpackLargeGrey;
+    public static Item backpackLargeGreen;
+    public static Item backpackLargeTan;
+    public static Item backpackLargeBlack;
+    public static Item backpackLargeGhillie;
+    public static Item backpackGunBag;
+    public static Item backpackGunBagGrey;
+    public static Item backpackAmmoBag;
 
     public static Item advancedZombieSpawnEgg;
     public static Item fastZombieSpawnEgg;
@@ -184,7 +206,8 @@ public class ModItems {
 
     public static void initialize() {
 
-        chestblock = add("new_block" , new BlockItem(ModBlocks.chestblock, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+        //TODO Delete me
+        chestblock = add("new_block", new BlockItem(ModBlocks.chestblock, new Item.Properties()));
 
         // ================================================================================
         // Guns
@@ -676,12 +699,6 @@ public class ModItems {
                         .setContainer(flaskEmpty)
                         .setMaxStackSize(1)
                         .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-        backpack = add("backpack" , new BackpackItem(Backpack.SMALL));
-
-        backpack2 = add("backpack2" , new BackpackItem(Backpack.MEDIUM));
-
-        backpack3 = add("backpack3" , new BackpackItem(Backpack.LARGE));
         // ================================================================================
         // medic
         // ================================================================================
@@ -738,8 +755,6 @@ public class ModItems {
                 new MedItem(new MedItem.Properties()
                         .setMaxStackSize(1)
                         .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
-
-        //TODO A clean rag does not turn into a bloody one because the transfer of the object occurs before it is filled
 
         ragBloody = add("rag_bloody",
                 new RagItem(new MedItem.Properties()
@@ -819,7 +834,7 @@ public class ModItems {
                         .setTierItem(WeaponTier.DIAMOND)
                         .setGroup((ModItemGroups.CRAFTING_DEAD_WEAPON))));
 
-        rustypipe  = add("rusty_pipe",
+        rustypipe = add("rusty_pipe",
                 new WeaponItem(new WeaponItem.Properties()
                         .setAttackDamageln(9)
                         .setAttackSpeedln(-2.4F)
@@ -915,7 +930,7 @@ public class ModItems {
                         .setTierItem(WeaponTier.DIAMOND)
                         .setGroup((ModItemGroups.CRAFTING_DEAD_WEAPON))));
 
-        scytheweapon  = add("scythe_weapon",
+        scytheweapon = add("scythe_weapon",
                 new WeaponItem(new WeaponItem.Properties()
                         .setAttackDamageln(15)
                         .setAttackSpeedln(-2.4F)
@@ -971,7 +986,7 @@ public class ModItems {
                         .setTierItem(WeaponTier.DIAMOND)
                         .setGroup((ModItemGroups.CRAFTING_DEAD_WEAPON))));
 
-        combatKnife  = add("combat_knife",
+        combatKnife = add("combat_knife",
                 new WeaponItem(new WeaponItem.Properties()
                         .setAttackDamageln(14)
                         .setAttackSpeedln(-2.4F)
@@ -1003,6 +1018,83 @@ public class ModItems {
                         .setTierItem(WeaponTier.DIAMOND)
                         .setGroup((ModItemGroups.CRAFTING_DEAD_WEAPON))));
 
+
+        // ================================================================================
+        // wearable
+        // ================================================================================
+
+        backpackSmallRed = add("backpack_small_red",
+                new BackpackItem(Backpack.SMALL));
+
+        backpackSmallOrange = add("backpack_small_orange",
+                new BackpackItem(Backpack.SMALL));
+
+        backpackSmallYellow = add("backpack_small_yellow",
+                new BackpackItem(Backpack.SMALL));
+
+        backpackSmallGreen = add("backpack_small_green",
+                new BackpackItem(Backpack.SMALL));
+
+        backpackSmallBlue = add("backpack_small_blue",
+                new BackpackItem(Backpack.SMALL));
+
+        backpackSmallPurple = add("backpack_small_purple",
+                new BackpackItem(Backpack.SMALL));
+
+
+        backpackMediumRed = add("backpack_medium_red",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumOrange = add("backpack_medium_orange",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumYellow = add("backpack_medium_yellow",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumGreen = add("backpack_medium_green",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumBlue = add("backpack_medium_blue",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumPurple = add("backpack_medium_purple",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumGrey = add("backpack_medium_grey",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumBlack = add("backpack_medium_black",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumGhillie = add("backpack_medium_ghillie",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackMediumWhite = add("backpack_medium_white",
+                new BackpackItem(Backpack.MEDIUM));
+
+        backpackLargeGrey = add("backpack_large_grey",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackLargeGreen = add("backpack_large_green",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackLargeTan = add("backpack_large_tan",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackLargeBlack = add("backpack_large_black",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackLargeGhillie = add("backpack_large_ghillie",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackGunBag = add("backpack_gunbag",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackGunBagGrey = add("backpack_gunbag_grey",
+                new BackpackItem(Backpack.LARGE));
+
+        backpackAmmoBag = add("backpack_ammo",
+                new BackpackItem(Backpack.LARGE));
 
         // ================================================================================
         // Spawn Eggs

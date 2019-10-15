@@ -5,9 +5,10 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.craftingdead.mod.client.ClientProxy;
 import com.craftingdead.mod.container.ModContainerType;
+import com.craftingdead.mod.gui.BackpackScreen;
+import com.craftingdead.mod.gui.ChestScreen;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.ContainerType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,6 +56,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 
+import static com.craftingdead.mod.container.ModContainerType.ironchest;
+
 @Mod(CraftingDead.ID)
 public class CraftingDead {
 
@@ -74,8 +77,6 @@ public class CraftingDead {
   public static final String DISPLAY_NAME;
 
   static {
-    proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
-
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
     assert VERSION != null;
@@ -121,8 +122,6 @@ public class CraftingDead {
    * The {@link NetworkManager} for the Master Server connection.
    */
   private Optional<NetworkManager> networkManager = Optional.empty();
-
-  public static ServerProxy proxy;
 
   @Setter
   private boolean retryConnect = true;
@@ -188,11 +187,14 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleCommonSetup(FMLCommonSetupEvent event) {
-    proxy.preInit();
     logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
+    logger.info("Registering ChestScreen");
+    ScreenManager.registerFactory(ironchest, ChestScreen::new);
+    logger.info("Registering BackpackScree");
+    ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new);
   }
 
   @SubscribeEvent

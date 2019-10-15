@@ -29,7 +29,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
-
+//TODO BAG: When you raise your backpack, you’ll be able to create a chest
 public class BackpackItem extends Item  {
 
     private Backpack backpack;
@@ -37,7 +37,7 @@ public class BackpackItem extends Item  {
     public BackpackItem(Backpack backpack) {
         super(new Item.Properties()
                 .maxStackSize(1)
-                .group(ModItemGroups.CRAFTING_DEAD_WEAPON));
+                .group(ModItemGroups.CRAFTING_DEAD_WEARABLE));
         this.backpack = backpack;
     }
 

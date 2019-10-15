@@ -40,4 +40,13 @@ public class ModItemGroups {
                     return new ItemStack(ModItems.crowbar);
                 }
             });
+
+    public static final ItemGroup CRAFTING_DEAD_WEARABLE =
+            (new ItemGroup("craftingdead_wearable") {
+
+                @Override
+                public ItemStack createIcon() {
+                    return new ItemStack(ModItems.backpackSmallRed);
+                }
+            });
 }

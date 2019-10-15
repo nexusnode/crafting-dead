@@ -126,19 +126,19 @@ public class MedItem extends Item {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         if (bloodHeal > 0) {
-            tooltip.add(new TranslationTextComponent("Hearts " + TextFormatting.RED + bloodHeal));
+            tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Hearts " + TextFormatting.RED + bloodHeal));
         }
 
         if (isBrokenlag()) {
-            tooltip.add(new TranslationTextComponent("Fixed Broken Legs"));
+            tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Fixed Broken Legs"));
         }
 
         if (isBleeding()) {
-            tooltip.add(new TranslationTextComponent("Stops Bleeding"));
+            tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Stops Bleeding"));
         }
 
         if(isAdrenaline()){
-            tooltip.add(new TranslationTextComponent("Induces Adrenaline"));
+            tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Induces Adrenaline"));
         }
     }
 

@@ -109,15 +109,15 @@ public class EatItem extends Item {
       super.addInformation(stack, worldIn, tooltip, flagIn);
 
     if (stack.getItem().isFood()) {
-      tooltip.add(new TranslationTextComponent("Food " + TextFormatting.RED + stack.getItem().getFood().getHealing()));
+      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Food " + TextFormatting.RED + stack.getItem().getFood().getHealing()));
     }
 
     if (this.water != 0) {
-      tooltip.add(new TranslationTextComponent("Water " + TextFormatting.RED + this.water));
+      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Water " + TextFormatting.RED + this.water));
     }
 
     if(rotten){
-      tooltip.add(new TranslationTextComponent("Chance food poisoning could be induced..."));
+      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Chance food poisoning could be induced..."));
     }
   }
 

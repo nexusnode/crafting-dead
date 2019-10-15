@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import com.craftingdead.mod.container.ModContainerType;
+import com.craftingdead.mod.gui.BackpackScreen;
+import com.craftingdead.mod.gui.ChestScreen;
+import net.minecraft.client.gui.ScreenManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -61,6 +66,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
+import static com.craftingdead.mod.container.ModContainerType.ironchest;
 
 public class ClientDist implements IModDist {
 
