@@ -24,28 +24,25 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-//TODO BAG: When you raise your backpack, you’ll be able to create a chest
+// TODO BAG: When you raise your backpack, you’ll be able to create a chest
 public class BackpackItem extends Item {
 
   private Backpack backpack;
 
   public BackpackItem(Backpack backpack) {
-    super(new Item.Properties()
-        .maxStackSize(1)
-        .group(ModItemGroups.CRAFTING_DEAD_WEARABLE));
+    super(new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_WEARABLE));
     this.backpack = backpack;
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player,
-      Hand handIn) {
+  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand handIn) {
 
     ItemStack itemstack = player.getHeldItem(handIn);
     if (worldIn.isRemote) {
-      return new ActionResult(ActionResultType.SUCCESS, itemstack);
+      return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
     if (!(player instanceof ServerPlayerEntity)) {
-      return new ActionResult(ActionResultType.SUCCESS, itemstack);
+      return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
     NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
       @Override

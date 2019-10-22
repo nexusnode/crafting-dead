@@ -2,10 +2,9 @@ package com.craftingdead.mod.server;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
-import com.craftingdead.mod.masterserver.net.protocol.handshake.message.HandshakeMessage;
-import com.craftingdead.mod.masterserver.net.protocol.serverlogin.ServerLoginProtocol;
-import com.craftingdead.mod.masterserver.net.protocol.serverlogin.ServerLoginSession;
-import com.craftingdead.mod.masterserver.net.protocol.serverlogin.message.ServerLoginMessage;
+import com.craftingdead.mod.masterserver.net.protocol.handshake.packet.HandshakePacket;
+import com.craftingdead.mod.masterserver.net.protocol.modserverlogin.ModServerLoginSession;
+import com.craftingdead.mod.masterserver.net.protocol.modserverlogin.packet.LoginPacket;
 import com.craftingdead.network.pipeline.NetworkManager;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,11 +29,10 @@ public class ServerDist implements IModDist {
 
   @Override
   public void handleConnect(NetworkManager networkManager) {
-    networkManager.sendMessage(new HandshakeMessage(HandshakeMessage.SERVER_LOGIN));
-    networkManager.setProtocol(new ServerLoginSession(this.dedicatedServer, networkManager),
-        ServerLoginProtocol.INSTANCE);
+    networkManager.sendMessage(new HandshakePacket(HandshakePacket.SERVER_LOGIN));
+    networkManager.setSession(new ModServerLoginSession(networkManager, this.dedicatedServer));
     networkManager.sendMessage(
-        new ServerLoginMessage(this.dedicatedServer.getHostname(), this.dedicatedServer.getPort()));
+        new LoginPacket(this.dedicatedServer.getHostname(), this.dedicatedServer.getPort()));
   }
 
   // ================================================================================

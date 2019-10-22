@@ -36,26 +36,18 @@ public class BackpackInventory extends Inventory {
   }
 
   private void readNBT(CompoundNBT compound) {
-    NonNullList list = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+    NonNullList<ItemStack> list = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
     ItemStackHelper.loadAllItems(compound, list);
-    int i = 0;
-    while (i < list.size()) {
-      this.setInventorySlotContents(i, (ItemStack) list.get(i));
-      ++i;
+    for (int i = 0; i < list.size(); i++) {
+      this.setInventorySlotContents(i, list.get(i));
     }
   }
 
   private void writeNBT(CompoundNBT compound) {
-    NonNullList list = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
-    int i = 0;
-    do {
-      if (i >= list.size()) {
-        ItemStackHelper.saveAllItems(compound, list, false);
-        return;
-      }
-      list.set(i, this.removeStackFromSlot(i));
-      ++i;
-    } while (true);
+    NonNullList<ItemStack> list = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+    for (int i = 0; i < this.getSizeInventory(); i++) {
+      list.add(this.removeStackFromSlot(i));
+    }
+    ItemStackHelper.saveAllItems(compound, list, false);
   }
-
 }

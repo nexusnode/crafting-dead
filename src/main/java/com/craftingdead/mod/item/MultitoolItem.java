@@ -4,9 +4,9 @@ import net.minecraft.item.IItemTier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 
-public class Multitool extends SwordItem {
+public class MultitoolItem extends SwordItem {
 
-  public Multitool(IItemTier tier, int attackDamageIn, float attackSpeedIn, Properties builder) {
+  public MultitoolItem(IItemTier tier, int attackDamageIn, float attackSpeedIn, Properties builder) {
     super(tier, attackDamageIn, attackSpeedIn, builder);
   }
 

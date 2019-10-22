@@ -43,8 +43,6 @@ public class BackpackScreen extends ContainerScreen<BackpackContainer>
     this.minecraft.getTextureManager().bindTexture(GUI);
     int x = (this.width - this.xSize) / 2;
     int y = (this.height - this.ySize) / 2;
-    this.blit(x, y, 0, 0, this.xSize, this.ySize, this.backgroundWidth, this.backgroundHeight);
+    blit(x, y, 0, 0, this.xSize, this.ySize, this.backgroundWidth, this.backgroundHeight);
   }
-
-
 }

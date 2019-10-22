@@ -1,7 +1,5 @@
-package com.craftingdead.mod.item.RechargebleItem;
+package com.craftingdead.mod.item;
 
-import com.craftingdead.mod.item.EatItem;
-import com.craftingdead.mod.item.ModItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
@@ -14,9 +12,9 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
-public class CanteenItem extends EatItem {
+public class FlaskItem extends EatItem {
 
-  public CanteenItem(Properties properties) {
+  public FlaskItem(Properties properties) {
     super(properties);
   }
 
@@ -29,11 +27,11 @@ public class CanteenItem extends EatItem {
     BlockPos blockpos = ((BlockRayTraceResult) raytraceresult).getPos();
     ItemStack itemstack = playerIn.getHeldItem(handIn);
 
+    //TODO find out how else you can fill the bottle ,and craft with Tea Bag
     if (worldIn.getFluidState(blockpos).isTagged(FluidTags.WATER)
-        && itemstack.getItem() == ModItems.watercanteenEmpty) {
-
+        && itemstack.getItem() == ModItems.flaskEmpty) {
       return new ActionResult<>(ActionResultType.SUCCESS,
-          this.turnSwapItem(itemstack, playerIn, new ItemStack(ModItems.watercanteen)));
+          this.turnSwapItem(itemstack, playerIn, new ItemStack(ModItems.flask)));
     }
 
     //TODO change to determine the need for water

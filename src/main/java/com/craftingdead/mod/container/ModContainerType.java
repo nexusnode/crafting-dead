@@ -13,7 +13,6 @@ public class ModContainerType {
 
   private static final List<ContainerType<?>> toRegister = new ArrayList<>();
 
-
   public static ContainerType<BackpackContainer> backpack;
 
   public static void initialize() {

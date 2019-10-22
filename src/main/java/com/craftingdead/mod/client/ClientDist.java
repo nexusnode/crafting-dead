@@ -1,5 +1,12 @@
 package com.craftingdead.mod.client;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+import java.util.function.Supplier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
@@ -15,23 +22,21 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
+import com.craftingdead.mod.container.ModContainerType;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
+import com.craftingdead.mod.gui.BackpackScreen;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.masterserver.net.protocol.handshake.message.HandshakeMessage;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginProtocol;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginSession;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginStartMessage;
+import com.craftingdead.mod.masterserver.net.protocol.handshake.packet.HandshakePacket;
+import com.craftingdead.mod.masterserver.net.protocol.modclientlogin.ModClientLoginSession;
+import com.craftingdead.mod.masterserver.net.protocol.modclientlogin.packet.LoginStartPacket;
 import com.craftingdead.network.pipeline.NetworkManager;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.UUID;
-import java.util.function.Supplier;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
@@ -58,9 +63,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 
 public class ClientDist implements IModDist {
 
@@ -100,15 +102,13 @@ public class ClientDist implements IModDist {
 
   @Override
   public void handleConnect(NetworkManager networkManager) {
-    networkManager.sendMessage(new HandshakeMessage(HandshakeMessage.PLAYER_LOGIN));
-    networkManager.setProtocol(new PlayerLoginSession(minecraft, networkManager),
-        PlayerLoginProtocol.INSTANCE);
+    networkManager.sendMessage(new HandshakePacket(HandshakePacket.PLAYER_LOGIN));
+    networkManager.setSession(new ModClientLoginSession(networkManager));
 
     Session session = minecraft.getSession();
     UUID id = session.getProfile().getId();
     String username = session.getUsername();
-    networkManager.sendMessage(
-        new PlayerLoginStartMessage(id, username, CraftingDead.VERSION));
+    networkManager.sendMessage(new LoginStartPacket(id, username, CraftingDead.VERSION));
   }
 
   public LazyOptional<ClientPlayer> getPlayer() {
@@ -129,6 +129,8 @@ public class ClientDist implements IModDist {
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(AdvancedZombieEntity.class,
         AdvancedZombieRenderer::new);
+
+    ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {

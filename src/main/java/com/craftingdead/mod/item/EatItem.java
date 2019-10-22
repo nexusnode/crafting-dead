@@ -1,10 +1,9 @@
 package com.craftingdead.mod.item;
 
-import com.craftingdead.mod.capability.ModCapabilities;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
-import lombok.Getter;
+import com.craftingdead.mod.capability.ModCapabilities;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,12 +23,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EatItem extends Item {
 
-  @Getter
+  private static final Random random = new Random();
+
   private int water;
 
   public boolean rotten = false;
@@ -45,10 +43,8 @@ public class EatItem extends Item {
 
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-
-    if (rotten) {
-      Random rand = new Random();
-      if (rand.nextInt(5) == 0) {
+    if (this.rotten) {
+      if (random.nextInt(5) == 0) {
         entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
           entityLiving.addPotionEffect(new EffectInstance(Effects.HUNGER, 900, 1));
         });
@@ -106,16 +102,15 @@ public class EatItem extends Item {
     }
   }
 
-  //TODO is using TranslationTextComponent prudent?
-  @OnlyIn(Dist.CLIENT)
+  // TODO is using TranslationTextComponent prudent?
+  @Override
   public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip,
       ITooltipFlag flagIn) {
     super.addInformation(stack, worldIn, tooltip, flagIn);
 
     if (stack.getItem().isFood()) {
-      tooltip.add(new TranslationTextComponent(
-          TextFormatting.GRAY + "Food " + TextFormatting.RED + stack.getItem().getFood()
-              .getHealing()));
+      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Food " + TextFormatting.RED
+          + stack.getItem().getFood().getHealing()));
     }
 
     if (this.water != 0) {
@@ -143,6 +138,10 @@ public class EatItem extends Item {
       }
       return itemStack;
     }
+  }
+
+  public int getWater() {
+    return this.water;
   }
 
   public static class Properties extends Item.Properties {
@@ -184,7 +183,5 @@ public class EatItem extends Item {
       this.rotten = true;
       return this;
     }
-
-
   }
 }
