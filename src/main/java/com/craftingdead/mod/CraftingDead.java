@@ -1,23 +1,13 @@
 package com.craftingdead.mod;
 
-import java.net.InetSocketAddress;
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import com.craftingdead.mod.container.ModContainerType;
-import com.craftingdead.mod.gui.BackpackScreen;
-import com.craftingdead.mod.gui.ChestScreen;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.inventory.container.ContainerType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
+import com.craftingdead.mod.container.ModContainerType;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.gui.BackpackScreen;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeProtocol;
 import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeSession;
@@ -29,17 +19,25 @@ import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.util.TransportType;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
+import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -55,8 +53,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
-
-import static com.craftingdead.mod.container.ModContainerType.ironchest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -84,6 +82,7 @@ public class CraftingDead {
         JarVersionLookupHandler.getImplementationTitle(CraftingDead.class).orElse("[display_name]");
     assert DISPLAY_NAME != null;
   }
+
   /**
    * Logger.
    */
@@ -191,11 +190,11 @@ public class CraftingDead {
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-    logger.info("Registering ChestScreen");
-    ScreenManager.registerFactory(ironchest, ChestScreen::new);
     logger.info("Registering BackpackScree");
-    ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new);
+    DistExecutor.runWhenOn(Dist.CLIENT,
+        () -> () -> ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new));
   }
+
 
   @SubscribeEvent
   public void handleLoadComplete(FMLLoadCompleteEvent event) {

@@ -37,6 +37,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   public void tick() {
     super.tick();
     this.updateWater();
+    this.updateStamina();
 
     int aliveTicks = this.entity.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
     int aliveDays = aliveTicks / 20 / 60 / 20;
@@ -47,7 +48,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     if (this.dirty) {
       NetworkChannel.MAIN.getSimpleChannel().send(PacketDistributor.PLAYER.with(this::getEntity),
           new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
-              this.water, this.maxWater));
+              this.water, this.maxWater, this.stamina, this.maxStamina));
       this.dirty = false;
     }
   }
@@ -68,6 +69,14 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
         }
         this.waterTimer = 0;
       }
+    }
+  }
+
+  private void updateStamina() {
+    if (this.entity.isSprinting()) {
+      this.setStamina(this.getStamina() - 3);
+    } else {
+      this.setStamina(this.getStamina() + 8);
     }
   }
 
@@ -123,6 +132,18 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   @Override
   public void setMaxWater(int maxWater) {
     super.setMaxWater(maxWater);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setStamina(int stamina) {
+    super.setStamina(stamina);
+    this.dirty = true;
+  }
+
+  @Override
+  public void setMaxStamina(int maxStamina) {
+    super.setMaxStamina(maxStamina);
     this.dirty = true;
   }
 

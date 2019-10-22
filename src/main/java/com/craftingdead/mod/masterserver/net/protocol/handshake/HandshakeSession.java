@@ -1,8 +1,8 @@
 package com.craftingdead.mod.masterserver.net.protocol.handshake;
 
-import java.util.function.Consumer;
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.protocol.ISession;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

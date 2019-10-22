@@ -1,13 +1,13 @@
 package com.craftingdead.mod.capability.triggerable;
 
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import com.craftingdead.mod.capability.aimable.IAimable;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.IFireMode;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.RayTraceUtil;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -60,7 +60,7 @@ public class GunController implements ITriggerable, IAimable {
 
   /**
    * Constructs a new {@link GunController}.
-   * 
+   *
    * @param item - the {@link GunItem} of the associated {@link ItemStack}
    */
   public GunController(GunItem item) {

@@ -1,9 +1,9 @@
 package com.craftingdead.mod.masterserver.net.protocol.playerlogin.message;
 
-import java.io.IOException;
 import com.craftingdead.network.protocol.IMessage;
 import com.craftingdead.network.util.ByteBufUtil;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 

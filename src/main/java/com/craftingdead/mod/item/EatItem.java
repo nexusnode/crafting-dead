@@ -1,11 +1,18 @@
 package com.craftingdead.mod.item;
 
 import com.craftingdead.mod.capability.ModCapabilities;
+import java.util.List;
+import java.util.Random;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Food;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.stats.Stats;
@@ -19,10 +26,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Random;
 
 public class EatItem extends Item {
 
@@ -43,7 +46,7 @@ public class EatItem extends Item {
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
 
-    if(rotten){
+    if (rotten) {
       Random rand = new Random();
       if (rand.nextInt(5) == 0) {
         entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
@@ -105,19 +108,24 @@ public class EatItem extends Item {
 
   //TODO is using TranslationTextComponent prudent?
   @OnlyIn(Dist.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-      super.addInformation(stack, worldIn, tooltip, flagIn);
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip,
+      ITooltipFlag flagIn) {
+    super.addInformation(stack, worldIn, tooltip, flagIn);
 
     if (stack.getItem().isFood()) {
-      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Food " + TextFormatting.RED + stack.getItem().getFood().getHealing()));
+      tooltip.add(new TranslationTextComponent(
+          TextFormatting.GRAY + "Food " + TextFormatting.RED + stack.getItem().getFood()
+              .getHealing()));
     }
 
     if (this.water != 0) {
-      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Water " + TextFormatting.RED + this.water));
+      tooltip.add(new TranslationTextComponent(
+          TextFormatting.GRAY + "Water " + TextFormatting.RED + this.water));
     }
 
-    if(rotten){
-      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Chance food poisoning could be induced..."));
+    if (rotten) {
+      tooltip.add(new TranslationTextComponent(
+          TextFormatting.GRAY + "Chance food poisoning could be induced..."));
     }
   }
 
@@ -176,8 +184,6 @@ public class EatItem extends Item {
       this.rotten = true;
       return this;
     }
-
-
 
 
   }

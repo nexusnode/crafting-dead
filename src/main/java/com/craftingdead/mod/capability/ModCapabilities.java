@@ -1,11 +1,11 @@
 package com.craftingdead.mod.capability;
 
-import java.util.concurrent.Callable;
 import com.craftingdead.mod.capability.aimable.IAimable;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.capability.triggerable.DefaultTriggerable;
 import com.craftingdead.mod.capability.triggerable.ITriggerable;
+import java.util.concurrent.Callable;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;

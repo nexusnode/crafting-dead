@@ -19,7 +19,7 @@ public class ModEffects {
   @SubscribeEvent
   public static void handle(RegistryEvent.Register<Effect> event) {
     event.getRegistry().registerAll(new BrokenLegEffect() //
-        .setRegistryName(new ResourceLocation(CraftingDead.ID, "broken_leg")), //
+            .setRegistryName(new ResourceLocation(CraftingDead.ID, "broken_leg")), //
         new HydrateEffect() //
             .setRegistryName(new ResourceLocation(CraftingDead.ID, "hydrate")));
   }

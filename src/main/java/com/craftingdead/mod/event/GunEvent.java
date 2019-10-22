@@ -1,7 +1,7 @@
 package com.craftingdead.mod.event;
 
-import java.util.Optional;
 import com.craftingdead.mod.capability.triggerable.GunController;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.entity.Entity;

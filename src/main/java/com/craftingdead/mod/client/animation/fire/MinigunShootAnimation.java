@@ -6,13 +6,16 @@ import net.minecraft.item.ItemStack;
 public class MinigunShootAnimation implements GunAnimation {
 
   @Override
-  public void tick() {}
+  public void tick() {
+  }
 
   @Override
-  public void render(ItemStack itemStack, float partialTicks) {}
+  public void render(ItemStack itemStack, float partialTicks) {
+  }
 
   @Override
-  public void onAnimationStopped(ItemStack itemStack) {}
+  public void onAnimationStopped(ItemStack itemStack) {
+  }
 
   @Override
   public boolean isFinished() {

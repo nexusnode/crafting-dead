@@ -1,5 +1,7 @@
 {
   "variants": {
-    "": { "model": "craftingdead:block/new_block" }
+    "": {
+      "model": "craftingdead:block/new_block"
+    }
   }
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import javax.vecmath.Matrix4f;
-import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -21,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
+import org.apache.commons.lang3.tuple.Pair;
 
 @SuppressWarnings("deprecation")
 public abstract class ItemRenderer extends ItemStackTileEntityRenderer

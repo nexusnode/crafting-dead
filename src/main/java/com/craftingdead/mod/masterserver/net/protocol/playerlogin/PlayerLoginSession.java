@@ -1,10 +1,5 @@
 package com.craftingdead.mod.masterserver.net.protocol.playerlogin;
 
-import java.math.BigInteger;
-import java.security.PublicKey;
-import javax.crypto.SecretKey;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.masterserver.net.protocol.player.PlayerProtocol;
 import com.craftingdead.mod.masterserver.net.protocol.player.PlayerSession;
@@ -14,10 +9,15 @@ import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.LoginR
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.protocol.ISession;
 import com.mojang.authlib.exceptions.AuthenticationException;
+import java.math.BigInteger;
+import java.security.PublicKey;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.HTTPUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @RequiredArgsConstructor
 public class PlayerLoginSession implements ISession {

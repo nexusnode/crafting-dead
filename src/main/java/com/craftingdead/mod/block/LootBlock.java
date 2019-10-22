@@ -1,11 +1,11 @@
 package com.craftingdead.mod.block;
 
+import com.craftingdead.mod.tileentity.TileEntityLoot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import com.craftingdead.mod.tileentity.TileEntityLoot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

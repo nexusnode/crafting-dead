@@ -13,6 +13,6 @@ public enum PlayerResource {
   }
 
   public String getUrl(UUID playerId) {
-    return String.format(url, new Object[] {playerId});
+    return String.format(url, new Object[]{playerId});
   }
 }

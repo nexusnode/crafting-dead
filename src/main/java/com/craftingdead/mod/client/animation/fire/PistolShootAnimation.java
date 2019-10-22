@@ -67,7 +67,8 @@ public class PistolShootAnimation implements GunAnimation {
   }
 
   @Override
-  public void onAnimationStopped(ItemStack itemStack) {}
+  public void onAnimationStopped(ItemStack itemStack) {
+  }
 
   @Override
   public boolean isFinished() {

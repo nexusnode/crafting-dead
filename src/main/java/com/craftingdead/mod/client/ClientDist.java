@@ -1,17 +1,5 @@
 package com.craftingdead.mod.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import com.craftingdead.mod.container.ModContainerType;
-import com.craftingdead.mod.gui.BackpackScreen;
-import com.craftingdead.mod.gui.ChestScreen;
-import net.minecraft.client.gui.ScreenManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
@@ -36,6 +24,10 @@ import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginPro
 import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginSession;
 import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginStartMessage;
 import com.craftingdead.network.pipeline.NetworkManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -66,8 +58,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-import static com.craftingdead.mod.container.ModContainerType.ironchest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 
 public class ClientDist implements IModDist {
 

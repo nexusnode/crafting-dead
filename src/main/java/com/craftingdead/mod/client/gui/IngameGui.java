@@ -57,9 +57,12 @@ public class IngameGui {
 
         // Only render when air level is not being rendered
         if (!entity.areEyesInFluid(FluidTags.WATER) && entity.getAir() == entity.getMaxAir()) {
-          renderWaterLevel(width, height, (float) player.getWater() / (float) player.getMaxWater());
+          renderModGui(width, height, (float) player.getWater() / (float) player.getMaxWater(),
+              RenderUtil.ICONS);
         }
 
+        renderModGui(width - 202, height,
+            (float) player.getStamina() / (float) player.getMaxStamina(), RenderUtil.SPRINT);
 
         renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
             player.getZombiesKilled(), player.getPlayersKilled());
@@ -104,11 +107,12 @@ public class IngameGui {
     GlStateManager.disableBlend();
   }
 
-  private static void renderWaterLevel(int width, int height, float waterPercentage) {
+  private static void renderModGui(int width, int height, float waterPercentage,
+      ResourceLocation resourceLocation) {
     final int y = height - 49;
     final int x = width / 2 + 91;
     GlStateManager.enableBlend();
-    RenderUtil.bind(RenderUtil.ICONS);
+    RenderUtil.bind(resourceLocation);
 
     for (int i = 0; i < 10; i++) {
       // Draw droplet outline
@@ -123,7 +127,6 @@ public class IngameGui {
         RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
       }
     }
-
     GlStateManager.disableBlend();
   }
 

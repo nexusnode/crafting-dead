@@ -1,11 +1,10 @@
 package com.craftingdead.mod.client.util;
 
-import java.util.Random;
-import java.util.UUID;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
 import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.Random;
+import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -18,11 +17,15 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
+import org.lwjgl.opengl.GL11;
 
 @UtilityClass
 public class RenderUtil {
 
   public static final ResourceLocation ICONS =
+      new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
+
+  public static final ResourceLocation SPRINT =
       new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
 
   private static final Minecraft minecraft = Minecraft.getInstance();

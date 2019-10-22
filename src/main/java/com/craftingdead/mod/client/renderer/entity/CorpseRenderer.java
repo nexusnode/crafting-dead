@@ -1,11 +1,11 @@
 package com.craftingdead.mod.client.renderer.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import com.craftingdead.mod.client.renderer.entity.model.CorpseModel;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.client.renderer.entity.EntityRenderer;

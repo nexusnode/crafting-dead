@@ -41,15 +41,14 @@ public class DiscordPresence {
 
     LOADING("presence.loading"), IDLE("presence.idle"), SINGLEPLAYER("presence.singleplayer"), LAN(
         "presence.lan"), MULTIPLAYER("presence.multiplayer") {
-
-          @Override
-          public void applyState(DiscordRichPresence presence, ClientDist client) {
-            ServerData serverData = Minecraft.getInstance().getCurrentServerData();
-            if (serverData != null) {
-              presence.state = serverData.serverIP;
-            }
-          }
-        };
+      @Override
+      public void applyState(DiscordRichPresence presence, ClientDist client) {
+        ServerData serverData = Minecraft.getInstance().getCurrentServerData();
+        if (serverData != null) {
+          presence.state = serverData.serverIP;
+        }
+      }
+    };
 
     private final String translationKey;
 

@@ -10,4 +10,6 @@ public class UpdateStatisticsMessage {
   private final int playersKilled;
   private final int water;
   private final int maxWater;
+  private final int stamina;
+  private final int maxStamina;
 }
