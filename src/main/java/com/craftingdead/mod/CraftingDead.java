@@ -14,8 +14,7 @@ import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.ModItems;
-import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeProtocol;
-import com.craftingdead.mod.masterserver.net.protocol.handshake.HandshakeSession;
+import com.craftingdead.mod.masterserver.handshake.HandshakeSession;
 import com.craftingdead.mod.net.NetworkChannel;
 import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.tileentity.ModTileEntityTypes;
@@ -37,6 +36,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -44,7 +44,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -54,20 +53,13 @@ import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 @Mod(CraftingDead.ID)
 public class CraftingDead {
 
-  /**
-   * Mod ID.
-   */
   public static final String ID = "craftingdead";
 
-  /**
-   * Mod version.
-   */
   public static final String VERSION;
 
-  /**
-   * Mod display name.
-   */
   public static final String DISPLAY_NAME;
+
+  public static final String MASTER_SERVER_VERSION = "0.0.1";
 
   static {
     VERSION =
@@ -155,8 +147,7 @@ public class CraftingDead {
         final int port = CommonConfig.commonConfig.masterServerPort.get();
         this.networkManager = Optional.of(this.tcpClient.connect(
             InetSocketAddress.createUnresolved(host, port),
-            (networkManager) -> new HandshakeSession(networkManager, this.modDist::handleConnect),
-            HandshakeProtocol.INSTANCE));
+            (networkManager) -> new HandshakeSession(networkManager, this.modDist::handleConnect)));
       } catch (Throwable t) {
         logger.warn("Master server connection failed -> {}", t.getMessage());
       }
@@ -168,8 +159,7 @@ public class CraftingDead {
   }
 
   public boolean isConnected() {
-    return this.networkManager.map((networkManager) -> networkManager.isChannelOpen())
-        .orElse(false);
+    return this.networkManager.map((networkManager) -> networkManager.isOpen()).orElse(false);
   }
 
   // ================================================================================
@@ -225,7 +215,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    event.getEntityPlayer().getCapability(ModCapabilities.PLAYER).<ServerPlayer>cast()
+    event.getPlayer().getCapability(ModCapabilities.PLAYER).<ServerPlayer>cast()
         .ifPresent((player) -> {
           event.getOriginal().getCapability(ModCapabilities.PLAYER).<ServerPlayer>cast()
               .ifPresent((that) -> {

@@ -26,10 +26,9 @@ import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.masterserver.net.protocol.handshake.message.HandshakeMessage;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginProtocol;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.PlayerLoginSession;
-import com.craftingdead.mod.masterserver.net.protocol.playerlogin.message.PlayerLoginStartMessage;
+import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
+import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
+import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
 import com.craftingdead.network.pipeline.NetworkManager;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -52,12 +51,12 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -100,15 +99,14 @@ public class ClientDist implements IModDist {
 
   @Override
   public void handleConnect(NetworkManager networkManager) {
-    networkManager.sendMessage(new HandshakeMessage(HandshakeMessage.PLAYER_LOGIN));
-    networkManager.setProtocol(new PlayerLoginSession(minecraft, networkManager),
-        PlayerLoginProtocol.INSTANCE);
+    networkManager.sendMessage(
+        new HandshakePacket(CraftingDead.MASTER_SERVER_VERSION, HandshakePacket.MOD_CLIENT_LOGIN));
+    networkManager.setSession(new ModClientLoginSession(networkManager));
 
     Session session = minecraft.getSession();
     UUID id = session.getProfile().getId();
     String username = session.getUsername();
-    networkManager.sendMessage(
-        new PlayerLoginStartMessage(id, username, CraftingDead.VERSION));
+    networkManager.sendMessage(new ModClientLoginPacket(id, username, CraftingDead.VERSION));
   }
 
   public LazyOptional<ClientPlayer> getPlayer() {
