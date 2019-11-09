@@ -11,12 +11,14 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   }
 
   public void updateMetadata(int daysSurvived, int zombiesKilled, int playersKilled, int water,
-      int maxWater) {
+      int maxWater, int stamina, int maxStamina) {
     this.daysSurvived = daysSurvived;
     this.zombiesKilled = zombiesKilled;
     this.playersKilled = playersKilled;
     this.water = water;
     this.maxWater = maxWater;
+    this.stamina = stamina;
+    this.maxStamina = maxStamina;
   }
 
   @Override

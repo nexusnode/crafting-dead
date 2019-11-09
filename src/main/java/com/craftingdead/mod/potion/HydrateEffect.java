@@ -1,7 +1,7 @@
 package com.craftingdead.mod.potion;
 
-import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
+import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;

@@ -1,11 +1,11 @@
 [
   {
-    "name":"craftingdead:standard",
-    "isStatic":false,
-    "top":"craftingdead:textures/crosshairs/standard/top.png",
-    "bottom":"craftingdead:textures/crosshairs/standard/bottom.png",
-    "left":"craftingdead:textures/crosshairs/standard/left.png",
-    "right":"craftingdead:textures/crosshairs/standard/right.png",
-    "middle":"craftingdead:textures/crosshairs/standard/middle.png"
+    "name": "craftingdead:standard",
+    "isStatic": false,
+    "top": "craftingdead:textures/crosshairs/standard/top.png",
+    "bottom": "craftingdead:textures/crosshairs/standard/bottom.png",
+    "left": "craftingdead:textures/crosshairs/standard/left.png",
+    "right": "craftingdead:textures/crosshairs/standard/right.png",
+    "middle": "craftingdead:textures/crosshairs/standard/middle.png"
   }
 ]

@@ -1,16 +1,16 @@
 package com.craftingdead.mod.item;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

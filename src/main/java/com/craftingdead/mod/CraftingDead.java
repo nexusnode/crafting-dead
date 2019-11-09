@@ -12,6 +12,7 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
+import com.craftingdead.mod.container.ModContainerType;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.handshake.HandshakeSession;
@@ -30,6 +31,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
@@ -129,6 +131,9 @@ public class CraftingDead {
 
     ModTileEntityTypes.initialize();
     modEventBus.addGenericListener(TileEntityType.class, ModTileEntityTypes::register);
+
+    ModContainerType.initialize();
+    modEventBus.addGenericListener(ContainerType.class, ModContainerType::register);
 
     ModItems.initialize();
     modEventBus.addGenericListener(Item.class, ModItems::register);

@@ -15,7 +15,7 @@ public class RayTraceUtil {
 
   /**
    * Ray trace the specified entities from the parsed entity.
-   * 
+   *
    * @param fromEntity - the entity performing the ray trace
    * @param start - the start {@link Vec3d}
    * @param end - the end {@link Vec3d}
@@ -62,7 +62,7 @@ public class RayTraceUtil {
 
   /**
    * Perform a full ray trace from the parsed entity.
-   * 
+   *
    * @param fromEntity - the entity performing the ray trace
    * @param distance - the distance
    * @return the {@link RayTraceResult} as an {@link Optional}
@@ -74,7 +74,7 @@ public class RayTraceUtil {
 
   /**
    * Perform a full ray trace from the parsed entity.
-   * 
+   *
    * @param fromEntity - the entity performing the ray trace
    * @param distance - the distance
    * @param partialTicks - the partialTicks

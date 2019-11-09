@@ -1,9 +1,9 @@
 package com.craftingdead.mod.tileentity;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.block.ModBlocks;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;

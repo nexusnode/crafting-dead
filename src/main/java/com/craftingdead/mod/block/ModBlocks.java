@@ -1,9 +1,9 @@
 package com.craftingdead.mod.block;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;

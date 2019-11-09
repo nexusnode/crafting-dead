@@ -27,6 +27,8 @@ public enum NetworkChannel {
             buffer.writeInt(msg.getPlayersKilled());
             buffer.writeInt(msg.getWater());
             buffer.writeInt(msg.getMaxWater());
+            buffer.writeInt(msg.getStamina());
+            buffer.writeInt(msg.getMaxStamina());
           }) //
           .decoder((buffer) -> {
             int daysSurvived = buffer.readInt();
@@ -34,13 +36,16 @@ public enum NetworkChannel {
             int playersKilled = buffer.readInt();
             int water = buffer.readInt();
             int maxWater = buffer.readInt();
+            int stamina = buffer.readInt();
+            int maxStamina = buffer.readInt();
             return new UpdateStatisticsMessage(daysSurvived, zombiesKilled, playersKilled, water,
-                maxWater);
+                maxWater, stamina, maxStamina);
           }) //
           .consumer((msg, ctx) -> {
             ((ClientDist) CraftingDead.getInstance().getModDist()).getPlayer().ifPresent(
                 (player) -> player.updateMetadata(msg.getDaysSurvived(), msg.getZombiesKilled(),
-                    msg.getPlayersKilled(), msg.getWater(), msg.getMaxWater()));
+                    msg.getPlayersKilled(), msg.getWater(), msg.getMaxWater(), msg.getStamina(),
+                    msg.getMaxStamina()));
             ctx.get().setPacketHandled(true);
           }) //
           .add();

@@ -119,7 +119,7 @@ public class InventoryCorpse
 
   /**
    * Copy the passed list into this inventory.
-   * 
+   *
    * @param otherItems - the list to copy from <b>(must be the same size)</b>
    */
   public void copy(NonNullList<ItemStack> otherItems) {

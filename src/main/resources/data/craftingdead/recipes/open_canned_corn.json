@@ -1,24 +1,23 @@
 {
-    "type": "minecraft:crafting_shapeless",
-    "group": "open_can",
-    "ingredients": [
-        [
-            {
-                "item": "craftingdead:can_opener"
-            },
-            {
-                "item":"craftingdead:screwdriver"
-            },
-            {
-                "item":"craftingdead:multi_tool"
-            }
-        ],
-        {
-            "item":"craftingdead:canned_corn"
-        }
+  "type": "minecraft:crafting_shapeless",
+  "group": "open_can",
+  "ingredients": [
+    [
+      {
+        "item": "craftingdead:can_opener"
+      },
+      {
+        "item": "craftingdead:screwdriver"
+      },
+      {
+        "item": "craftingdead:multi_tool"
+      }
     ],
-    "result":
     {
-        "item": "craftingdead:open_canned_corn"
+      "item": "craftingdead:canned_corn"
     }
+  ],
+  "result": {
+    "item": "craftingdead:open_canned_corn"
+  }
 }

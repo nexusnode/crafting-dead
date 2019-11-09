@@ -1,12 +1,12 @@
 package com.craftingdead.mod.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.entity.monster.FastZombieEntity;
 import com.craftingdead.mod.entity.monster.TankZombieEntity;
 import com.craftingdead.mod.entity.monster.WeakZombieEntity;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;

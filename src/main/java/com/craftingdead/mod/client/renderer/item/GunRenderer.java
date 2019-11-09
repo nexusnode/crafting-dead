@@ -1,12 +1,12 @@
 package com.craftingdead.mod.client.renderer.item;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.function.Function;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;

@@ -1,10 +1,10 @@
 package com.craftingdead.mod.capability.player;
 
-import java.util.Random;
-import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
+import java.util.Random;
+import java.util.UUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -17,12 +17,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
 /**
- * The abstracted player class - represents a Crafting Dead player.<br>
- * Subclasses are attached to the appropriate {@link E} via Forge capabilities.
- * 
- * @author Sm0keySa1m0n
+ * The abstracted player class - represents a Crafting Dead player.<br> Subclasses are attached to
+ * the appropriate {@link E} via Forge capabilities.
  *
  * @param <E> - the associated {@link PlayerEntity}
+ * @author Sm0keySa1m0n
  */
 public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
@@ -67,6 +66,17 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   protected int maxWater = 20;
 
   /**
+   * Stamina.
+   */
+  protected int stamina = 1500;
+
+  /**
+   * Maximum water.
+   */
+  protected int maxStamina = 1500;
+
+
+  /**
    * The last held {@link ItemStack} - used to check if the player has switched item.
    */
   private ItemStack lastHeldStack = null;
@@ -85,7 +95,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG)
         && this.entity.onGround && !this.entity.isInWater()
         && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
-            || this.entity.fallDistance > 10F)) {
+        || this.entity.fallDistance > 10F)) {
       this.entity.sendStatusMessage(new TranslationTextComponent("message.broken_leg")
           .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
       this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG, 9999999, 4));
@@ -136,6 +146,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     nbt.putInt("playersKilled", this.playersKilled);
     nbt.putInt("water", this.water);
     nbt.putInt("maxWater", this.maxWater);
+    nbt.putInt("stamina", this.stamina);
+    nbt.putInt("maxStamina", this.maxStamina);
     return nbt;
   }
 
@@ -145,6 +157,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     this.setPlayersKilled(nbt.getInt("playersKilled"));
     this.setWater(nbt.getInt("water"));
     this.setMaxWater(nbt.getInt("maxWater"));
+    this.setStamina(nbt.getInt("stamina"));
+    this.setMaxStamina(nbt.getInt("maxStamina"));
   }
 
   @Override
@@ -196,6 +210,26 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public void setMaxWater(int maxWater) {
     this.maxWater = maxWater;
+  }
+
+  @Override
+  public int getStamina() {
+    return stamina;
+  }
+
+  @Override
+  public void setStamina(int stamina) {
+    this.stamina = Ints.constrainToRange(stamina, 0, this.getMaxStamina());
+  }
+
+  @Override
+  public int getMaxStamina() {
+    return maxStamina;
+  }
+
+  @Override
+  public void setMaxStamina(int maxStamina) {
+    this.maxStamina = maxStamina;
   }
 
   @Override

@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.animation.fire;
 
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 public class SubmachineShootAnimation implements GunAnimation {
 
@@ -66,7 +66,8 @@ public class SubmachineShootAnimation implements GunAnimation {
   }
 
   @Override
-  public void onAnimationStopped(ItemStack itemStack) {}
+  public void onAnimationStopped(ItemStack itemStack) {
+  }
 
   @Override
   public boolean isFinished() {
