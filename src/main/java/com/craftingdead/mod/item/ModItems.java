@@ -125,13 +125,13 @@ public class ModItems {
   public static Item bandage;
   public static Item needleRBI;
   public static Item bottleRBI;
-  public static Item ragDirty;
-  public static Item ragClean;
+  public static Item dirtyRag;
+  public static Item cleanRag;
   public static Item splint;
   public static Item needleCure;
   public static Item bottleCure;
   public static Item antibiotics;
-  public static Item ragBloody;
+  public static Item bloodyRag;
 
   //weapon
   public static Item crowbar;
@@ -691,98 +691,98 @@ public class ModItems {
     // medic
     // ================================================================================
     medpack = add("med_pack",
-        new MedItem(new MedItem.Properties()
-            .setBloodHeal(8)
-            .setBrokenLag()
-            .setBleeding()
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealth(8)
+            .setHealBrokenLeg()
+            .setStopBleeding()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleAdrenaline = add("andrenaline_syringe",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setAdrenaline()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleMorphine = add("morphine_syringe",
-        new MedItem(new MedItem.Properties()
-            .setBrokenLag()
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealBrokenLeg()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bandage = add("bandage",
-        new MedItem(new MedItem.Properties()
-            .setBloodHeal(2)
-            .setBleeding()
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealth(2)
+            .setStopBleeding()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bloodbagEmpty = add("empty_blood_bag",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bloodbag = add("blood_bag",
-        new MedItem(new MedItem.Properties()
-            .setBloodHeal(4)
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealth(4)
             .setMaxStackSize(1)
             .setContainer(bloodbagEmpty)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needle = add("needle",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleRBI = add("needle_rbi",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bottleRBI = add("bottle_rbi",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    ragBloody = add("rag_bloody",
-        new RagItem(new MedItem.Properties()
+    bloodyRag = add("rag_bloody",
+        new RagItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    ragDirty = add("rag_dirty",
-        new RagItem(new MedItem.Properties()
+    dirtyRag = add("rag_dirty",
+        new RagItem(new MedicalItem.Properties()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    ragClean = add("rag_clean",
-        new RagItem(new MedItem.Properties()
-            .setBleeding()
+    cleanRag = add("rag_clean",
+        new RagItem(new MedicalItem.Properties()
+            .setStopBleeding()
             .setMaxStackSize(1)
-            .setContainer(ragBloody)
+            .setContainer(bloodyRag)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     splint = add("splint",
-        new MedItem(new MedItem.Properties()
-            .setBrokenLag()
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealBrokenLeg()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     needleCure = add("needle_cure",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setInfection()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bottleCure = add("bottle_cure",
-        new MedItem(new MedItem.Properties()
+        new MedicalItem(new MedicalItem.Properties()
             .setInfection()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     antibiotics = add("antibiotics",
-        new MedItem(new MedItem.Properties()
-            .setBloodHeal(4)
-            .setBrokenLag()
+        new MedicalItem(new MedicalItem.Properties()
+            .setHealth(4)
+            .setHealBrokenLeg()
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 

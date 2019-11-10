@@ -10,23 +10,18 @@ import net.minecraft.util.LazyLoadBase;
 
 public enum WeaponTier implements IItemTier {
 
-  //TODO Find out and add the properties and type of our weapons
-  bad(3, 10000, 20.0F, 10.0F, 10, () -> {
+  // TODO Find out and add the properties and type of our weapons
+  BAD(3, 10000, 20.0F, 10.0F, 10, () -> {
     return Ingredient.fromItems(Items.DIAMOND);
-  }),
-  WOOD(0, 59, 2.0F, 0.0F, 15, () -> {
+  }), WOOD(0, 59, 2.0F, 0.0F, 15, () -> {
     return Ingredient.fromTag(ItemTags.PLANKS);
-  }),
-  STONE(1, 131, 4.0F, 1.0F, 5, () -> {
+  }), STONE(1, 131, 4.0F, 1.0F, 5, () -> {
     return Ingredient.fromItems(Blocks.COBBLESTONE);
-  }),
-  IRON(2, 250, 6.0F, 2.0F, 14, () -> {
+  }), IRON(2, 250, 6.0F, 2.0F, 14, () -> {
     return Ingredient.fromItems(Items.IRON_INGOT);
-  }),
-  DIAMOND(3, 1561, 8.0F, 3.0F, 10, () -> {
+  }), DIAMOND(3, 1561, 8.0F, 3.0F, 10, () -> {
     return Ingredient.fromItems(Items.DIAMOND);
-  }),
-  GOLD(0, 32, 12.0F, 0.0F, 22, () -> {
+  }), GOLD(0, 32, 12.0F, 0.0F, 22, () -> {
     return Ingredient.fromItems(Items.GOLD_INGOT);
   });
 

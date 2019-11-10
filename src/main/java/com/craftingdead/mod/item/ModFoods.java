@@ -148,6 +148,4 @@ public class ModFoods {
       .hunger(10) //
       .saturation(0.6F) //
       .build();
-
-
 }

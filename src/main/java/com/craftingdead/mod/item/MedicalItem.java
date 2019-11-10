@@ -1,10 +1,9 @@
 package com.craftingdead.mod.item;
 
-import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.potion.ModEffects;
 import java.util.List;
 import javax.annotation.Nullable;
-import lombok.Getter;
+import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.potion.ModEffects;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,32 +25,28 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MedItem extends Item {
+public class MedicalItem extends Item {
 
-  @Getter
-  public int bloodHeal;
+  private int health;
 
-  @Getter
-  private boolean brokenlag;
+  private boolean healBrokenLeg;
 
-  @Getter
-  private boolean bleeding;
+  private boolean stopBleeding;
 
-  @Getter
   private boolean adrenaline;
 
   private IItemProvider containerItem;
 
-  public MedItem(MedItem.Properties properties) {
+  public MedicalItem(MedicalItem.Properties properties) {
     super(properties);
-    this.bloodHeal = properties.bloodHeal;
-    this.brokenlag = properties.brokenlag;
+    this.health = properties.health;
+    this.healBrokenLeg = properties.healBrokenLeg;
     this.containerItem = properties.containerItem;
-    this.bleeding = properties.bleeding;
+    this.stopBleeding = properties.stopBleeding;
     this.adrenaline = properties.adrenaline;
   }
 
-  //TODO Fix Animation
+  // TODO Fix Animation
   @Override
   public UseAction getUseAction(ItemStack stack) {
     return UseAction.CROSSBOW;
@@ -60,36 +55,36 @@ public class MedItem extends Item {
   @Override
   public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
-    ItemStack itemstack = playerIn.getHeldItem(handIn);
-
+    ItemStack itemStack = playerIn.getHeldItem(handIn);
     if (playerIn.getHealth() > 20F) {
-      return new ActionResult<>(ActionResultType.FAIL, itemstack);
+      return new ActionResult<>(ActionResultType.FAIL, itemStack);
     } else {
       playerIn.setActiveHand(handIn);
-      return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
+      return new ActionResult<>(ActionResultType.SUCCESS, itemStack);
     }
   }
 
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-    if (bloodHeal > 0) {
+    if (this.health > 0) {
       entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
-        entityLiving.heal(bloodHeal);
+        entityLiving.heal(this.health);
       });
     }
-    if (isBrokenlag()) {
+
+    if (this.healBrokenLeg) {
       entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
         entityLiving.removePotionEffect(ModEffects.BROKEN_LEG);
       });
     }
 
-    if (isBleeding()) {
+    if (this.stopBleeding) {
       entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
         entityLiving.removePotionEffect(ModEffects.BROKEN_LEG);
       });
     }
 
-    if (isAdrenaline()) {
+    if (this.adrenaline) {
       entityLiving.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
         entityLiving.addPotionEffect(new EffectInstance(Effects.SPEED, 2000, 1));
       });
@@ -123,24 +118,25 @@ public class MedItem extends Item {
   }
 
   @OnlyIn(Dist.CLIENT)
+  @Override
   public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip,
       ITooltipFlag flagIn) {
     super.addInformation(stack, worldIn, tooltip, flagIn);
 
-    if (bloodHeal > 0) {
+    if (this.health > 0) {
       tooltip.add(new TranslationTextComponent(
-          TextFormatting.GRAY + "Hearts " + TextFormatting.RED + bloodHeal));
+          TextFormatting.GRAY + "Hearts " + TextFormatting.RED + this.health));
     }
 
-    if (isBrokenlag()) {
-      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Fixed Broken Legs"));
+    if (this.healBrokenLeg) {
+      tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Fixes Broken Legs"));
     }
 
-    if (isBleeding()) {
+    if (this.stopBleeding) {
       tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Stops Bleeding"));
     }
 
-    if (isAdrenaline()) {
+    if (this.adrenaline) {
       tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + "Induces Adrenaline"));
     }
   }
@@ -163,59 +159,56 @@ public class MedItem extends Item {
 
   public static class Properties extends Item.Properties {
 
-    public int bloodHeal;
+    public int health;
 
     public boolean adrenaline = false;
 
-    public boolean brokenlag = false;
+    public boolean healBrokenLeg = false;
 
-    public boolean bleeding = false; //stop loss of blood
+    public boolean stopBleeding = false; // stop loss of blood
 
     public boolean infection = false;
 
     public IItemProvider containerItem;
 
-    public MedItem.Properties setMaxStackSize(int maxStackSize) {
+    public MedicalItem.Properties setMaxStackSize(int maxStackSize) {
       this.maxStackSize(maxStackSize);
       return this;
     }
 
-    public MedItem.Properties setBloodHeal(int bloodHeal) {
-      this.bloodHeal = bloodHeal;
+    public MedicalItem.Properties setHealth(int health) {
+      this.health = health;
       return this;
     }
 
-    public MedItem.Properties setGroup(ItemGroup groupIn) {
+    public MedicalItem.Properties setGroup(ItemGroup groupIn) {
       this.group(groupIn);
       return this;
     }
 
-    public MedItem.Properties setAdrenaline() {
+    public MedicalItem.Properties setAdrenaline() {
       this.adrenaline = true;
       return this;
     }
 
-    public MedItem.Properties setBrokenLag() {
-      this.brokenlag = true;
+    public MedicalItem.Properties setHealBrokenLeg() {
+      this.healBrokenLeg = true;
       return this;
     }
 
-    public MedItem.Properties setBleeding() {
-      this.bleeding = true;
+    public MedicalItem.Properties setStopBleeding() {
+      this.stopBleeding = true;
       return this;
     }
 
-    public MedItem.Properties setInfection() {
+    public MedicalItem.Properties setInfection() {
       this.infection = true;
       return this;
     }
 
-    public MedItem.Properties setContainer(IItemProvider containerItem) {
+    public MedicalItem.Properties setContainer(IItemProvider containerItem) {
       this.containerItem = containerItem;
       return this;
     }
   }
-
 }
-
-
