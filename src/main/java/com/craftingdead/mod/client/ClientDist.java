@@ -22,11 +22,9 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
-import com.craftingdead.mod.container.ModContainerType;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
-import com.craftingdead.mod.gui.BackpackScreen;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
 import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
@@ -36,7 +34,6 @@ import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
@@ -130,8 +127,6 @@ public class ClientDist implements IModDist {
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(AdvancedZombieEntity.class,
         AdvancedZombieRenderer::new);
-
-    ScreenManager.registerFactory(ModContainerType.backpack, BackpackScreen::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
