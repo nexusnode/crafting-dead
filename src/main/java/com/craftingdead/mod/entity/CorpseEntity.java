@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.ChestContainer;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -20,6 +21,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -137,12 +139,23 @@ public class CorpseEntity extends Entity {
     if (compound.contains("limbCount")) {
       this.dataManager.set(LIMB_COUNT, compound.getInt("limbCount"));
     }
+    if (compound.contains("inventory")) {
+      NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
+      ItemStackHelper.loadAllItems(compound.getCompound("inventory"), items);
+      this.inventory = new Inventory(items.toArray(new ItemStack[0]));
+    }
   }
 
   @Override
   protected void writeAdditional(CompoundNBT compound) {
     this.getDeceasedId().ifPresent((uuid) -> compound.putUniqueId("playerUUID", uuid));
     compound.putInt("limbCount", this.getLimbCount());
+    NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
+    for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+      items.set(i, this.inventory.getStackInSlot(i));
+    }
+    compound.put("inventory",
+        ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
   }
 
   @Override
