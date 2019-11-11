@@ -99,8 +99,9 @@ public class ClientDist implements IModDist {
 
   @Override
   public void handleConnect(NetworkManager networkManager) {
-    networkManager.sendMessage(
-        new HandshakePacket(CraftingDead.MASTER_SERVER_VERSION, HandshakePacket.MOD_CLIENT_LOGIN));
+    networkManager
+        .sendMessage(new HandshakePacket(CraftingDead.MASTER_SERVER_VERSION,
+            HandshakePacket.MOD_CLIENT_LOGIN));
     networkManager.setSession(new ModClientLoginSession(networkManager));
 
     Session session = minecraft.getSession();
@@ -125,21 +126,24 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(RELOAD);
 
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(AdvancedZombieEntity.class,
-        AdvancedZombieRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(AdvancedZombieEntity.class, AdvancedZombieRenderer::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
       if (CommonConfig.clientConfig.applyBranding.get()) {
         StartupMessageManager.addModMessage("Applying branding");
-        GLFW.glfwSetWindowTitle(minecraft.mainWindow.getHandle(),
-            String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
+        GLFW
+            .glfwSetWindowTitle(minecraft.mainWindow.getHandle(),
+                String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
         try {
-          InputStream inputstream = minecraft.getResourceManager()
+          InputStream inputstream = minecraft
+              .getResourceManager()
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_16x16.png"))
               .getInputStream();
-          InputStream inputstream1 = minecraft.getResourceManager()
+          InputStream inputstream1 = minecraft
+              .getResourceManager()
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_32x32.png"))
               .getInputStream();
@@ -203,14 +207,16 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof ClientPlayerEntity) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-          new SerializableProvider<>(new ClientPlayer((ClientPlayerEntity) event.getObject()),
-              ModCapabilities.PLAYER));
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
+              new SerializableProvider<>(new ClientPlayer((ClientPlayerEntity) event.getObject()),
+                  ModCapabilities.PLAYER));
     } else if (event.getObject() instanceof AbstractClientPlayerEntity) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-          new SerializableProvider<>(
-              new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
-              ModCapabilities.PLAYER));
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
+              new SerializableProvider<>(
+                  new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
+                  ModCapabilities.PLAYER));
     }
   }
 
@@ -220,8 +226,8 @@ public class ClientDist implements IModDist {
       DiscordPresence.updateState(GameState.SINGLEPLAYER, this);
     } else {
       ServerData serverData = minecraft.getCurrentServerData();
-      DiscordPresence.updateState(serverData.isOnLAN() ? GameState.LAN : GameState.MULTIPLAYER,
-          this);
+      DiscordPresence
+          .updateState(serverData.isOnLAN() ? GameState.LAN : GameState.MULTIPLAYER, this);
     }
 
   }
@@ -256,16 +262,21 @@ public class ClientDist implements IModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
-        this.guiIngame.renderGameOverlay(event.getPartialTicks(),
-            event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
+        this.guiIngame
+            .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                event.getWindow().getScaledHeight());
         break;
       case CROSSHAIRS:
         this.getPlayer().ifPresent((player) -> {
-          player.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.AIMABLE)
+          player
+              .getEntity()
+              .getHeldItemMainhand()
+              .getCapability(ModCapabilities.AIMABLE)
               .ifPresent((aimable) -> {
                 event.setCanceled(true);
-                this.guiIngame.renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
-                    event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
+                this.guiIngame
+                    .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
+                        event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
               });
         });
         break;
@@ -275,9 +286,7 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleModelRegistry(ModelRegistryEvent event) {
-    // ModelRegistry.registerModels(client);
-  }
+  public void handleModelRegistry(ModelRegistryEvent event) {}
 
   @SubscribeEvent
   public void handleGunShootEventPre(GunEvent.ShootEvent.Pre event) {

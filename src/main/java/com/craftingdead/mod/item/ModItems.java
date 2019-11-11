@@ -1,5 +1,7 @@
 package com.craftingdead.mod.item;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
@@ -9,8 +11,6 @@ import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
@@ -59,7 +59,7 @@ public class ModItems {
   public static Item cannedTomatoSoup;
   public static Item openCannedTomatoSoup;
 
-  //TODO Perhaps they need to be renamed to be more convenient.
+  // TODO Perhaps they need to be renamed to be more convenient.
   public static Item sodaOrange;
   public static Item sodaOrangeEmpty;
   public static Item icetea;
@@ -133,7 +133,7 @@ public class ModItems {
   public static Item antibiotics;
   public static Item bloodyRag;
 
-  //weapon
+  // weapon
   public static Item crowbar;
   public static Item bat;
   public static Item katana;
@@ -162,7 +162,7 @@ public class ModItems {
   public static Item cleaver;
   public static Item brokenBottle;
 
-  //backpack
+  // backpack
   public static Item backpackSmallRed;
   public static Item backpackSmallOrange;
   public static Item backpackSmallYellow;
@@ -201,108 +201,113 @@ public class ModItems {
     // Guns
     // ================================================================================
 
-    acr = add("acr", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.8F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.ACR_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+    acr = add("acr",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.8F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.ACR_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
-    ak47 = add("ak47", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.8F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.AK47_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+    ak47 = add("ak47",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.8F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.AK47_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
-    desertEagle = add("desert_eagle", new GunItem(new GunItem.Properties()
-        .setFireRate(0)
-        .setClipSize(0)
-        .setDamage(8)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.7F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+    desertEagle = add("desert_eagle",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(0)
+            .setClipSize(0)
+            .setDamage(8)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.7F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    m4a1 = add("m4a1", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.9F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.M4A1_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+    m4a1 = add("m4a1",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.9F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.M4A1_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
-    m9 = add("m9", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.9F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.M9_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+    m9 = add("m9",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.9F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.M9_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    taser = add("taser", new GunItem(new GunItem.Properties()
-        .setFireRate(2000)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.9F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.TASER_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+    taser = add("taser",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(2000)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.9F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.TASER_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    magnum = add("magnum", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.9F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+    magnum = add("magnum",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.9F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
-    fn57 = add("fn57", new GunItem(new GunItem.Properties()
-        .setFireRate(80)
-        .setClipSize(0)
-        .setDamage(7)
-        .setReloadTime(2.2F)
-        .setAccuracy(0.9F)
-        .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-        .setShootSound(() -> ModSoundEvents.FN57_SHOOT)
-        .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+    fn57 = add("fn57",
+        new GunItem(new GunItem.Properties()
+            .setFireRate(80)
+            .setClipSize(0)
+            .setDamage(7)
+            .setReloadTime(2.2F)
+            .setAccuracy(0.9F)
+            .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+            .setShootSound(() -> ModSoundEvents.FN57_SHOOT)
+            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     // ================================================================================
     // Tools
     // ================================================================================
 
-    canOpener = add("can_opener", new ToolItem(new Item.Properties()
-        .maxDamage(8)
-        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    canOpener = add("can_opener",
+        new ToolItem(new Item.Properties().maxDamage(8).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    screwdriver = add("screwdriver", new ToolItem(new Item.Properties()
-        .maxDamage(4)
-        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    screwdriver = add("screwdriver",
+        new ToolItem(new Item.Properties().maxDamage(4).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    multiTool = add("multi_tool", new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-        .maxDamage(20)
-        .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    multiTool = add("multi_tool", new MeleeWeaponItem(8, -2.4F,
+        new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
     // ================================================================================
     // Consumable
     // ================================================================================
 
-    emptyWaterBottle = add("empty_water_bottle", new Item(new Item.Properties()
-        .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    emptyWaterBottle = add("empty_water_bottle",
+        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     waterBottle = add("water_bottle",
         new EatItem(new EatItem.Properties()
@@ -310,8 +315,8 @@ public class ModItems {
             .setWater(8)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaOrangeEmpty = add("empty_soda_orange", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaOrangeEmpty = add("empty_soda_orange",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaOrange = add("soda_orange",
         new EatItem(new EatItem.Properties()
@@ -319,8 +324,8 @@ public class ModItems {
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    iceteaEmpty = add("empty_ice_tea", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    iceteaEmpty = add("empty_ice_tea",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     icetea = add("ice_tea",
         new EatItem(new EatItem.Properties()
@@ -328,8 +333,8 @@ public class ModItems {
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    juicePouchEmpty = add("empty_juice_pouch", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    juicePouchEmpty = add("empty_juice_pouch",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     juicePouch = add("juice_pouch",
         new EatItem(new EatItem.Properties()
@@ -337,8 +342,8 @@ public class ModItems {
             .setWater(2)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaPepeEmpty = add("empty_soda_pepe", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaPepeEmpty = add("empty_soda_pepe",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaPepe = add("soda_pepe",
         new EatItem(new EatItem.Properties()
@@ -346,8 +351,8 @@ public class ModItems {
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaDewEmpty = add("empty_soda_dew", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaDewEmpty = add("empty_soda_dew",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaDew = add("soda_dew",
         new EatItem(new EatItem.Properties()
@@ -355,8 +360,8 @@ public class ModItems {
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaColaEmpty = add("empty_soda_cola", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    sodaColaEmpty = add("empty_soda_cola",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sodaCola = add("soda_cola",
         new EatItem(new EatItem.Properties()
@@ -364,8 +369,8 @@ public class ModItems {
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    milkCartonEmpty = add("empty_milk_carton", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    milkCartonEmpty = add("empty_milk_carton",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     milkCarton = add("milk_carton",
         new EatItem(new EatItem.Properties()
@@ -380,8 +385,8 @@ public class ModItems {
             .setRotten()
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    colaPopEmpty = add("empty_cola_pop", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    colaPopEmpty = add("empty_cola_pop",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     colaPop = add("cola_pop",
         new EatItem(new EatItem.Properties()
@@ -389,8 +394,8 @@ public class ModItems {
             .setWater(6)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    ironBrewEmpty = add("empty_iron_brew", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    ironBrewEmpty = add("empty_iron_brew",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     ironBrew = add("iron_brew",
         new EatItem(new EatItem.Properties()
@@ -398,8 +403,8 @@ public class ModItems {
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    spriteEmpty = add("empty_sprite", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    spriteEmpty = add("empty_sprite",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sprite = add("sprite",
         new EatItem(new EatItem.Properties()
@@ -407,8 +412,8 @@ public class ModItems {
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    zombieEnergyEmpty = add("empty_zombie_energy", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    zombieEnergyEmpty = add("empty_zombie_energy",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     zombieEnergy = add("zombie_energy",
         new EatItem(new EatItem.Properties()
@@ -416,8 +421,8 @@ public class ModItems {
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    lemonFizzEmpty = add("empty_lemon_fizz", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    lemonFizzEmpty = add("empty_lemon_fizz",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     lemonFizz = add("lemon_fizz",
         new EatItem(new EatItem.Properties()
@@ -474,45 +479,52 @@ public class ModItems {
             .setFood(ModFoods.ROTTENAPPLE)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    riceBag = add("rice_bag", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.RICEBAG)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    riceBag = add("rice_bag",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.RICEBAG)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    powerBar = add("power_bar", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.POWER_BAR)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    powerBar = add("power_bar",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.POWER_BAR)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    candyBar = add("candy_bar", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANDY_BAR)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    candyBar = add("candy_bar",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANDY_BAR)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cereal = add("cereal", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CEREAL)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cereal = add("cereal",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CEREAL)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedCorn = add("canned_corn", new EatItem(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedCorn = add("canned_corn",
+        new EatItem(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedCorn = add("open_canned_corn", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_CORN)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedCorn = add("open_canned_corn",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_CORN)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedBeans = add("canned_beans", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedBeans = add("canned_beans",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBeans = add("open_canned_beans", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_BEANS)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedBeans = add("open_canned_beans",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_BEANS)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedTuna = add("canned_tuna", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedTuna = add("canned_tuna",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedTuna = add("open_canned_tuna", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_TUNA)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedTuna = add("open_canned_tuna",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_TUNA)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPeach = add("canned_peach", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPeach = add("canned_peach",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedPeach = add("open_canned_peach",
         new EatItem(new EatItem.Properties()
@@ -520,22 +532,24 @@ public class ModItems {
             .setFood(ModFoods.CANNED_PEACH)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPasta = add("canned_pasta", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPasta = add("canned_pasta",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPasta = add("open_canned_pasta", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_PASTA)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedPasta = add("open_canned_pasta",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_PASTA)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedBacon = add("canned_bacon", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedBacon = add("canned_bacon",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedBacon = add("open_canned_bacon", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_BACON)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedBacon = add("open_canned_bacon",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_BACON)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedCustard = add("canned_custard", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedCustard = add("canned_custard",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedCustard = add("open_canned_custard",
         new EatItem(new EatItem.Properties()
@@ -543,22 +557,24 @@ public class ModItems {
             .setFood(ModFoods.CANNED_CUSTARD)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedPickles = add("canned_pickles", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedPickles = add("canned_pickles",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedPickles = add("open_canned_pickles", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_PICKLES)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedPickles = add("open_canned_pickles",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_PICKLES)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedDogFood = add("canned_dog_food", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedDogFood = add("canned_dog_food",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    openCannedDogFood = add("open_canned_dog_food", new EatItem(new EatItem.Properties()
-        .setFood(ModFoods.CANNED_DOG_FOOD)
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    openCannedDogFood = add("open_canned_dog_food",
+        new EatItem(new EatItem.Properties()
+            .setFood(ModFoods.CANNED_DOG_FOOD)
+            .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    cannedTomatoSoup = add("canned_tomato_soup", new Item(new EatItem.Properties()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+    cannedTomatoSoup = add("canned_tomato_soup",
+        new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     openCannedTomatoSoup = add("open_canned_tomato_soup",
         new EatItem(new EatItem.Properties()
@@ -717,10 +733,8 @@ public class ModItems {
             .setMaxStackSize(1)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    bloodbagEmpty = add("empty_blood_bag",
-        new MedicalItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    bloodbagEmpty = add("empty_blood_bag", new MedicalItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     bloodbag = add("blood_bag",
         new MedicalItem(new MedicalItem.Properties()
@@ -729,30 +743,20 @@ public class ModItems {
             .setContainer(bloodbagEmpty)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    needle = add("needle",
-        new MedicalItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    needle = add("needle", new MedicalItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    needleRBI = add("needle_rbi",
-        new MedicalItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    needleRBI = add("needle_rbi", new MedicalItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    bottleRBI = add("bottle_rbi",
-        new MedicalItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    bottleRBI = add("bottle_rbi", new MedicalItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    bloodyRag = add("rag_bloody",
-        new RagItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    bloodyRag = add("rag_bloody", new RagItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    dirtyRag = add("rag_dirty",
-        new RagItem(new MedicalItem.Properties()
-            .setMaxStackSize(1)
-            .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
+    dirtyRag = add("rag_dirty", new RagItem(
+        new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     cleanRag = add("rag_clean",
         new RagItem(new MedicalItem.Properties()
@@ -1010,101 +1014,70 @@ public class ModItems {
     // wearable
     // ================================================================================
 
-    backpackSmallRed = add("backpack_small_red",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallRed = add("backpack_small_red", new BackpackItem(Backpack.SMALL));
 
-    backpackSmallOrange = add("backpack_small_orange",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallOrange = add("backpack_small_orange", new BackpackItem(Backpack.SMALL));
 
-    backpackSmallYellow = add("backpack_small_yellow",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallYellow = add("backpack_small_yellow", new BackpackItem(Backpack.SMALL));
 
-    backpackSmallGreen = add("backpack_small_green",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallGreen = add("backpack_small_green", new BackpackItem(Backpack.SMALL));
 
-    backpackSmallBlue = add("backpack_small_blue",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallBlue = add("backpack_small_blue", new BackpackItem(Backpack.SMALL));
 
-    backpackSmallPurple = add("backpack_small_purple",
-        new BackpackItem(Backpack.SMALL));
+    backpackSmallPurple = add("backpack_small_purple", new BackpackItem(Backpack.SMALL));
 
-    backpackMediumRed = add("backpack_medium_red",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumRed = add("backpack_medium_red", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumOrange = add("backpack_medium_orange",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumOrange = add("backpack_medium_orange", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumYellow = add("backpack_medium_yellow",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumYellow = add("backpack_medium_yellow", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumGreen = add("backpack_medium_green",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumGreen = add("backpack_medium_green", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumBlue = add("backpack_medium_blue",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumBlue = add("backpack_medium_blue", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumPurple = add("backpack_medium_purple",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumPurple = add("backpack_medium_purple", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumGrey = add("backpack_medium_grey",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumGrey = add("backpack_medium_grey", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumBlack = add("backpack_medium_black",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumBlack = add("backpack_medium_black", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumGhillie = add("backpack_medium_ghillie",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumGhillie = add("backpack_medium_ghillie", new BackpackItem(Backpack.MEDIUM));
 
-    backpackMediumWhite = add("backpack_medium_white",
-        new BackpackItem(Backpack.MEDIUM));
+    backpackMediumWhite = add("backpack_medium_white", new BackpackItem(Backpack.MEDIUM));
 
-    backpackLargeGrey = add("backpack_large_grey",
-        new BackpackItem(Backpack.LARGE));
+    backpackLargeGrey = add("backpack_large_grey", new BackpackItem(Backpack.LARGE));
 
-    backpackLargeGreen = add("backpack_large_green",
-        new BackpackItem(Backpack.LARGE));
+    backpackLargeGreen = add("backpack_large_green", new BackpackItem(Backpack.LARGE));
 
-    backpackLargeTan = add("backpack_large_tan",
-        new BackpackItem(Backpack.LARGE));
+    backpackLargeTan = add("backpack_large_tan", new BackpackItem(Backpack.LARGE));
 
-    backpackLargeBlack = add("backpack_large_black",
-        new BackpackItem(Backpack.LARGE));
+    backpackLargeBlack = add("backpack_large_black", new BackpackItem(Backpack.LARGE));
 
-    backpackLargeGhillie = add("backpack_large_ghillie",
-        new BackpackItem(Backpack.LARGE));
+    backpackLargeGhillie = add("backpack_large_ghillie", new BackpackItem(Backpack.LARGE));
 
-    backpackGunBag = add("backpack_gunbag",
-        new BackpackItem(Backpack.LARGE));
+    backpackGunBag = add("backpack_gunbag", new BackpackItem(Backpack.LARGE));
 
-    backpackGunBagGrey = add("backpack_gunbag_grey",
-        new BackpackItem(Backpack.LARGE));
+    backpackGunBagGrey = add("backpack_gunbag_grey", new BackpackItem(Backpack.LARGE));
 
-    backpackAmmoBag = add("backpack_ammo",
-        new BackpackItem(Backpack.LARGE));
+    backpackAmmoBag = add("backpack_ammo", new BackpackItem(Backpack.LARGE));
 
     // ================================================================================
     // Spawn Eggs
     // ================================================================================
 
-    advancedZombieSpawnEgg = add("advanced_zombie_spawn_egg",
-        new SpawnEggItem(ModEntityTypes.advancedZombie, 0x000000, 0xFFFFFF,
-            new Item.Properties()
-                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    advancedZombieSpawnEgg =
+        add("advanced_zombie_spawn_egg", new SpawnEggItem(ModEntityTypes.advancedZombie, 0x000000,
+            0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    fastZombieSpawnEgg = add("fast_zombie_spawn_egg",
-        new SpawnEggItem(ModEntityTypes.fastZombie, 0x000000, 0xFFFFFF,
-            new Item.Properties()
-                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    fastZombieSpawnEgg = add("fast_zombie_spawn_egg", new SpawnEggItem(ModEntityTypes.fastZombie,
+        0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    tankZombieSpawnEgg = add("tank_zombie_spawn_egg",
-        new SpawnEggItem(ModEntityTypes.tankZombie, 0x000000, 0xFFFFFF,
-            new Item.Properties()
-                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    tankZombieSpawnEgg = add("tank_zombie_spawn_egg", new SpawnEggItem(ModEntityTypes.tankZombie,
+        0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-    weakZombieSpawnEgg = add("weak_zombie_spawn_egg",
-        new SpawnEggItem(ModEntityTypes.weakZombie, 0x000000, 0xFFFFFF,
-            new Item.Properties()
-                .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+    weakZombieSpawnEgg = add("weak_zombie_spawn_egg", new SpawnEggItem(ModEntityTypes.weakZombie,
+        0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
   }
 
   public static void register(RegistryEvent.Register<Item> event) {
