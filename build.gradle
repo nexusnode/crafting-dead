@@ -72,9 +72,7 @@ repositories {
 
 dependencies {
     minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
-    
-	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-	
+    	
 	compile group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'	
 }
 

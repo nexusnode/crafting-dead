@@ -5,7 +5,6 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.net.message.main.TriggerPressedMessage;
 import com.craftingdead.mod.net.message.main.UpdateStatisticsMessage;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +19,8 @@ public enum NetworkChannel {
       int id = -1;
 
       // UpdateStatisticsMessage
-      simpleChannel.messageBuilder(UpdateStatisticsMessage.class, id++) //
+      simpleChannel
+          .messageBuilder(UpdateStatisticsMessage.class, id++) //
           .encoder((msg, buffer) -> {
             buffer.writeInt(msg.getDaysSurvived());
             buffer.writeInt(msg.getZombiesKilled());
@@ -42,16 +42,19 @@ public enum NetworkChannel {
                 maxWater, stamina, maxStamina);
           }) //
           .consumer((msg, ctx) -> {
-            ((ClientDist) CraftingDead.getInstance().getModDist()).getPlayer().ifPresent(
-                (player) -> player.updateMetadata(msg.getDaysSurvived(), msg.getZombiesKilled(),
-                    msg.getPlayersKilled(), msg.getWater(), msg.getMaxWater(), msg.getStamina(),
-                    msg.getMaxStamina()));
+            ((ClientDist) CraftingDead.getInstance().getModDist())
+                .getPlayer()
+                .ifPresent((player) -> player
+                    .updateMetadata(msg.getDaysSurvived(), msg.getZombiesKilled(),
+                        msg.getPlayersKilled(), msg.getWater(), msg.getMaxWater(), msg.getStamina(),
+                        msg.getMaxStamina()));
             ctx.get().setPacketHandled(true);
           }) //
           .add();
 
       // TriggerPressedMessage
-      simpleChannel.messageBuilder(TriggerPressedMessage.class, id++) //
+      simpleChannel
+          .messageBuilder(TriggerPressedMessage.class, id++) //
           .encoder((msg, buffer) -> {
             buffer.writeInt(msg.getEntityId());
             buffer.writeBoolean(msg.isTriggerPressed());
@@ -74,7 +77,8 @@ public enum NetworkChannel {
                 break;
             }
             if (entity != null) {
-              entity.getCapability(ModCapabilities.PLAYER, null)
+              entity
+                  .getCapability(ModCapabilities.PLAYER, null)
                   .ifPresent((player) -> player.setTriggerPressed(msg.isTriggerPressed()));
               ctx.get().setPacketHandled(true);
             }
@@ -94,7 +98,6 @@ public enum NetworkChannel {
   /**
    * Simple channel.
    */
-  @Getter
   private final SimpleChannel simpleChannel;
 
   private NetworkChannel(ResourceLocation channelName) {
@@ -107,6 +110,10 @@ public enum NetworkChannel {
   }
 
   protected abstract void registerMessages(SimpleChannel simpleChannel);
+
+  public SimpleChannel getSimpleChannel() {
+    return this.simpleChannel;
+  }
 
   public static void loadChannels() {
     if (!loaded) {

@@ -23,8 +23,6 @@ import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.util.TransportType;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -78,21 +76,22 @@ public class CraftingDead {
   /**
    * Singleton.
    */
-  @Getter
   private static CraftingDead instance;
 
   /**
    * Mod distribution.
    */
-  @Getter
   private final IModDist modDist;
 
   /**
    * {@link ScheduledExecutorService} for polling the connection to the Master Server.
    */
-  private final ScheduledExecutorService poller =
-      Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-          .setNameFormat("Master Server Connection Poller #%d").setDaemon(true).build());
+  private final ScheduledExecutorService poller = Executors
+      .newScheduledThreadPool(1,
+          new ThreadFactoryBuilder()
+              .setNameFormat("Master Server Connection Poller #%d")
+              .setDaemon(true)
+              .build());
 
   /**
    * {@link EventLoopGroup} for {@link #tcpClient}.
@@ -109,7 +108,6 @@ public class CraftingDead {
    */
   private Optional<NetworkManager> networkManager = Optional.empty();
 
-  @Setter
   private boolean retryConnect = true;
 
   public CraftingDead() {
@@ -145,9 +143,11 @@ public class CraftingDead {
       try {
         final String host = CommonConfig.commonConfig.masterServerHost.get();
         final int port = CommonConfig.commonConfig.masterServerPort.get();
-        this.networkManager = Optional.of(this.tcpClient.connect(
-            InetSocketAddress.createUnresolved(host, port),
-            (networkManager) -> new HandshakeSession(networkManager, this.modDist::handleConnect)));
+        this.networkManager = Optional
+            .of(this.tcpClient
+                .connect(InetSocketAddress.createUnresolved(host, port),
+                    (networkManager) -> new HandshakeSession(networkManager,
+                        this.modDist::handleConnect)));
       } catch (Throwable t) {
         logger.warn("Master server connection failed -> {}", t.getMessage());
       }
@@ -158,8 +158,20 @@ public class CraftingDead {
     this.tcpClient.tick();
   }
 
+  public void setRetryConnect(boolean retryConnect) {
+    this.retryConnect = retryConnect;
+  }
+
   public boolean isConnected() {
     return this.networkManager.map((networkManager) -> networkManager.isOpen()).orElse(false);
+  }
+
+  public IModDist getModDist() {
+    return this.modDist;
+  }
+
+  public static CraftingDead getInstance() {
+    return instance;
   }
 
   // ================================================================================
@@ -193,7 +205,8 @@ public class CraftingDead {
       case END:
         event.player.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> player.tick());
         ItemStack itemStack = event.player.getHeldItemMainhand();
-        itemStack.getCapability(ModCapabilities.TRIGGERABLE)
+        itemStack
+            .getCapability(ModCapabilities.TRIGGERABLE)
             .ifPresent((triggerable) -> triggerable.tick(itemStack, event.player));
         break;
       default:
@@ -204,20 +217,31 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleLivingDeath(LivingDeathEvent event) {
     if (!event.isCanceled() && event.getEntity() instanceof PlayerEntity) {
-      event.getEntity().getCapability(ModCapabilities.PLAYER)
+      event
+          .getEntity()
+          .getCapability(ModCapabilities.PLAYER)
           .ifPresent((player) -> event.setCanceled(player.onDeath(event.getSource())));
     }
     if (!event.isCanceled() && event.getSource().getTrueSource() instanceof PlayerEntity) {
-      event.getSource().getTrueSource().getCapability(ModCapabilities.PLAYER)
+      event
+          .getSource()
+          .getTrueSource()
+          .getCapability(ModCapabilities.PLAYER)
           .ifPresent((player) -> event.setCanceled(player.onKill(event.getEntity())));
     }
   }
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    event.getPlayer().getCapability(ModCapabilities.PLAYER).<ServerPlayer>cast()
+    event
+        .getPlayer()
+        .getCapability(ModCapabilities.PLAYER)
+        .<ServerPlayer>cast()
         .ifPresent((player) -> {
-          event.getOriginal().getCapability(ModCapabilities.PLAYER).<ServerPlayer>cast()
+          event
+              .getOriginal()
+              .getCapability(ModCapabilities.PLAYER)
+              .<ServerPlayer>cast()
               .ifPresent((that) -> {
                 player.copyFrom(that, event.isWasDeath());
               });
@@ -228,8 +252,9 @@ public class CraftingDead {
   public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof ServerPlayerEntity) {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-          new SerializableProvider<>(player, ModCapabilities.PLAYER));
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
+              new SerializableProvider<>(player, ModCapabilities.PLAYER));
     }
   }
 }

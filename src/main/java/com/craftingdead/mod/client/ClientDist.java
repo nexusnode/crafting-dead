@@ -30,7 +30,6 @@ import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
 import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
 import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
 import com.craftingdead.network.pipeline.NetworkManager;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -46,7 +45,6 @@ import net.minecraft.util.Session;
 import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -73,10 +71,8 @@ public class ClientDist implements IModDist {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
-  @Getter
   private CrosshairManager crosshairManager = new CrosshairManager();
 
-  @Getter
   private AnimationManager animationManager = new AnimationManager();
 
   private RecoilHelper recoilHelper = new RecoilHelper();
@@ -91,6 +87,14 @@ public class ClientDist implements IModDist {
         .addReloadListener(this.crosshairManager);
 
     this.guiIngame = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+  }
+
+  public CrosshairManager getCrosshairManager() {
+    return crosshairManager;
+  }
+
+  public AnimationManager getAnimationManager() {
+    return animationManager;
   }
 
   @Override
@@ -286,9 +290,6 @@ public class ClientDist implements IModDist {
         break;
     }
   }
-
-  @SubscribeEvent
-  public void handleModelRegistry(ModelRegistryEvent event) {}
 
   @SubscribeEvent
   public void handleGunShootEventPre(GunEvent.ShootEvent.Pre event) {

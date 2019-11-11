@@ -1,11 +1,11 @@
 package com.craftingdead.mod.client.util;
 
+import java.util.Random;
+import java.util.UUID;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
 import com.mojang.blaze3d.platform.GlStateManager;
-import java.util.Random;
-import java.util.UUID;
-import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -17,9 +17,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
-import org.lwjgl.opengl.GL11;
 
-@UtilityClass
 public class RenderUtil {
 
   public static final ResourceLocation ICONS =
@@ -35,9 +33,10 @@ public class RenderUtil {
     GlStateManager.disableTexture();
     GlStateManager.enableBlend();
     GlStateManager.disableAlphaTest();
-    GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-        GlStateManager.DestFactor.ZERO);
+    GlStateManager
+        .blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+            GlStateManager.DestFactor.ZERO);
     GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
     Tessellator tessellator = Tessellator.getInstance();
@@ -111,7 +110,7 @@ public class RenderUtil {
     return resourceLocation;
   }
 
-  @SuppressWarnings("deprecation")
+  @Deprecated
   public static void renderModel(IBakedModel model, VertexFormat vertextFormat) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
@@ -122,7 +121,7 @@ public class RenderUtil {
     tessellator.draw();
   }
 
-  @SuppressWarnings("deprecation")
+  @Deprecated
   public static void renderModel(IBakedModel model, VertexFormat vertexFormat, int color) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();

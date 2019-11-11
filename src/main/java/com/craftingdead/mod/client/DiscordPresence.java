@@ -1,6 +1,5 @@
 package com.craftingdead.mod.client;
 
-import lombok.RequiredArgsConstructor;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
@@ -36,21 +35,24 @@ public class DiscordPresence {
     DiscordRPC.discordShutdown();
   }
 
-  @RequiredArgsConstructor
   public static enum GameState {
 
     LOADING("presence.loading"), IDLE("presence.idle"), SINGLEPLAYER("presence.singleplayer"), LAN(
         "presence.lan"), MULTIPLAYER("presence.multiplayer") {
-      @Override
-      public void applyState(DiscordRichPresence presence, ClientDist client) {
-        ServerData serverData = Minecraft.getInstance().getCurrentServerData();
-        if (serverData != null) {
-          presence.state = serverData.serverIP;
-        }
-      }
-    };
+          @Override
+          public void applyState(DiscordRichPresence presence, ClientDist client) {
+            ServerData serverData = Minecraft.getInstance().getCurrentServerData();
+            if (serverData != null) {
+              presence.state = serverData.serverIP;
+            }
+          }
+        };
 
     private final String translationKey;
+
+    private GameState(String translationKey) {
+      this.translationKey = translationKey;
+    }
 
     void applyState(DiscordRichPresence presence, ClientDist client) {
       presence.details = I18n.format(this.translationKey);

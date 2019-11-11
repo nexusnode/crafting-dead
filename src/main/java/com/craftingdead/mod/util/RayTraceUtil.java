@@ -1,7 +1,6 @@
 package com.craftingdead.mod.util;
 
 import java.util.Optional;
-import lombok.experimental.UtilityClass;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -10,7 +9,6 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
-@UtilityClass
 public class RayTraceUtil {
 
   /**
@@ -56,8 +54,9 @@ public class RayTraceUtil {
       }
     }
 
-    return Optional.ofNullable(
-        finalHitEntity != null ? new EntityRayTraceResult(finalHitEntity, finalHitVec) : null);
+    return Optional
+        .ofNullable(
+            finalHitEntity != null ? new EntityRayTraceResult(finalHitEntity, finalHitVec) : null);
   }
 
   /**
@@ -87,9 +86,10 @@ public class RayTraceUtil {
     Vec3d scaledLook = look.scale(distance);
     Vec3d end = start.add(scaledLook);
 
-    Optional<BlockRayTraceResult> blockRayTraceResult =
-        Optional.ofNullable(fromEntity.world.rayTraceBlocks(new RayTraceContext(start, end,
-            RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, fromEntity)));
+    Optional<BlockRayTraceResult> blockRayTraceResult = Optional
+        .ofNullable(fromEntity.world
+            .rayTraceBlocks(new RayTraceContext(start, end, RayTraceContext.BlockMode.OUTLINE,
+                RayTraceContext.FluidMode.NONE, fromEntity)));
 
     AxisAlignedBB boundingBox =
         fromEntity.getBoundingBox().expand(scaledLook).grow(1.0D, 1.0D, 1.0D);
@@ -98,8 +98,10 @@ public class RayTraceUtil {
         : distance * distance;
 
     Optional<EntityRayTraceResult> entityRayTraceResult = rayTraceEntities(fromEntity, start, end,
-        fromEntity.getEntityWorld().getEntitiesInAABBexcluding(fromEntity, boundingBox,
-            (entityTest) -> !entityTest.isSpectator() && entityTest.canBeCollidedWith()),
+        fromEntity
+            .getEntityWorld()
+            .getEntitiesInAABBexcluding(fromEntity, boundingBox,
+                (entityTest) -> !entityTest.isSpectator() && entityTest.canBeCollidedWith()),
         sqrDistance);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : blockRayTraceResult;

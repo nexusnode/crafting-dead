@@ -1,17 +1,16 @@
 package com.craftingdead.mod.item;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -38,34 +37,26 @@ public class GunItem extends Item {
   /**
    * Time between shots in milliseconds.
    */
-  @Getter
   private final int fireRate;
 
-  @Getter
   private final int clipSize;
 
-  @Getter
   private final int damage;
 
-  @Getter
   private final float reloadTime;
 
   /**
    * Accuracy as percentage.
    */
-  @Getter
   private final float accuracy;
 
   /**
    * A {@link List} of {@link IFireMode}s the gun can cycle through.
    */
-  @Getter
   private final List<Supplier<IFireMode>> fireModes;
 
-  @Getter
   private final Supplier<SoundEvent> shootSound;
 
-  @Getter
   private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
 
   public GunItem(Properties properties) {
@@ -80,6 +71,38 @@ public class GunItem extends Item {
     this.animations = properties.animations;
   }
 
+  public int getFireRate() {
+    return fireRate;
+  }
+
+  public int getClipSize() {
+    return clipSize;
+  }
+
+  public int getDamage() {
+    return damage;
+  }
+
+  public float getReloadTime() {
+    return reloadTime;
+  }
+
+  public float getAccuracy() {
+    return accuracy;
+  }
+
+  public List<Supplier<IFireMode>> getFireModes() {
+    return fireModes;
+  }
+
+  public Supplier<SoundEvent> getShootSound() {
+    return shootSound;
+  }
+
+  public Map<GunAnimation.Type, Supplier<GunAnimation>> getAnimations() {
+    return animations;
+  }
+
   @Override
   public Multimap<String, AttributeModifier> getAttributeModifiers(
       EquipmentSlotType equipmentSlot) {
@@ -87,10 +110,12 @@ public class GunItem extends Item {
     Multimap<String, AttributeModifier> modifiers = super.getAttributeModifiers(equipmentSlot);
     if (equipmentSlot == EquipmentSlotType.MAINHAND) {
       // Add 20 attack speed to remove cooldown
-      modifiers.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(
-          ATTACK_SPEED_MODIFIER, "Weapon modifier", 20, AttributeModifier.Operation.ADDITION));
-      modifiers.put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(
-          REACH_DISTANCE_MODIFIER, "Weapon modifier", 100, AttributeModifier.Operation.ADDITION));
+      modifiers
+          .put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(
+              ATTACK_SPEED_MODIFIER, "Weapon modifier", 20, AttributeModifier.Operation.ADDITION));
+      modifiers
+          .put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER,
+              "Weapon modifier", 100, AttributeModifier.Operation.ADDITION));
     }
     return modifiers;
   }
