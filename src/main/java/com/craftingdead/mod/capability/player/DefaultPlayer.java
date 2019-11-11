@@ -214,7 +214,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public int getStamina() {
-    return stamina;
+    return this.stamina;
   }
 
   @Override
@@ -224,7 +224,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public int getMaxStamina() {
-    return maxStamina;
+    return this.maxStamina;
   }
 
   @Override

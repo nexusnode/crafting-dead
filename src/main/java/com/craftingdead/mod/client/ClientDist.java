@@ -43,6 +43,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
+import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -184,7 +185,8 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         if (minecraft.player != null) {
-          this.recoilHelper.update(minecraft.player);
+          Vec2f position = this.recoilHelper.update();
+          minecraft.player.rotateTowards(position.x, position.y);
         }
         break;
       default:

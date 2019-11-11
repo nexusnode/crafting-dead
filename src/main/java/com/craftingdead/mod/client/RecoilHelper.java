@@ -1,7 +1,6 @@
 package com.craftingdead.mod.client;
 
 import java.util.Random;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 
@@ -22,12 +21,12 @@ public class RecoilHelper {
    */
   private Vec2f prevRotationVelocity = this.rotationVelocity;
 
-  public void update(Entity entity) {
+  public Vec2f update() {
     float smoothYaw = MathHelper.lerp(0.5F, this.prevRotationVelocity.x, this.rotationVelocity.x);
     float smoothPitch = MathHelper.lerp(0.5F, this.prevRotationVelocity.y, this.rotationVelocity.y);
-    entity.rotateTowards(smoothYaw, smoothPitch);
     this.rotationVelocity = Vec2f.ZERO;
     this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
+    return this.prevRotationVelocity;
   }
 
   public void jolt(float accuracy) {
