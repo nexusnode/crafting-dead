@@ -33,7 +33,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 /**
-  The class fully emulates PlayerRenderer.
+ * The class fully emulates PlayerRenderer.
  */
 
 public class LivingRendererMod extends
@@ -56,6 +56,7 @@ public class LivingRendererMod extends
     this.addLayer(new SpinAttackEffectLayer<>(this));
   }
 
+  @Override
   public void doRender(AbstractClientPlayerEntity entity, double x, double y, double z,
       float entityYaw, float partialTicks) {
     if (!entity.isUser() || this.renderManager.info.getRenderViewEntity() == entity) {
@@ -111,6 +112,7 @@ public class LivingRendererMod extends
 
   }
 
+
   private BipedModel.ArmPose func_217766_a(AbstractClientPlayerEntity p_217766_1_,
       ItemStack p_217766_2_, ItemStack p_217766_3_, Hand p_217766_4_) {
     BipedModel.ArmPose bipedmodel$armpose = BipedModel.ArmPose.EMPTY;
@@ -146,15 +148,18 @@ public class LivingRendererMod extends
     return bipedmodel$armpose;
   }
 
+  @Override
   public ResourceLocation getEntityTexture(AbstractClientPlayerEntity entity) {
     return entity.getLocationSkin();
   }
 
+  @Override
   protected void preRenderCallback(AbstractClientPlayerEntity entitylivingbaseIn,
       float partialTickTime) {
     GlStateManager.scalef(0.9375F, 0.9375F, 0.9375F);
   }
 
+  @Override
   protected void renderEntityName(AbstractClientPlayerEntity entityIn, double x, double y, double z,
       String name, double distanceSq) {
     if (distanceSq < 100.0D) {
@@ -172,6 +177,7 @@ public class LivingRendererMod extends
     super.renderEntityName(entityIn, x, y, z, name, distanceSq);
   }
 
+  @Override
   protected void applyRotations(AbstractClientPlayerEntity entityLiving, float ageInTicks,
       float rotationYaw, float partialTicks) {
     float f = entityLiving.getSwimAnimation(partialTicks);
