@@ -7,6 +7,10 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -327,7 +331,6 @@ public class ClientDist implements IModDist {
   /**
    * Using Reflection to set the swimming position, which is then redefined to crawl.
    */
-
   @SubscribeEvent
   public void onPlayerTick(TickEvent.PlayerTickEvent event) {
     if (event.phase == TickEvent.Phase.END) {
@@ -340,4 +343,100 @@ public class ClientDist implements IModDist {
       }
     }
   }
+
+  /**
+   * Responsible for climbing walls.
+   */
+  @SubscribeEvent(priority = EventPriority.LOW)
+  public void tickClient(TickEvent.ClientTickEvent event) {
+    if (event.phase == TickEvent.Phase.START) {
+      PlayerEntity player = Minecraft.getInstance().player;
+      Entity camera = Minecraft.getInstance().getRenderViewEntity();
+
+      if (player == null || camera == null) {
+        return;
+      }
+
+      Minecraft mc = Minecraft.getInstance();
+      if (mc.currentScreen == null) {
+        if (Minecraft.getInstance().gameSettings.keyBindSprint.isKeyDown()) {
+
+          float grabDist = 0.75F;
+
+          Vec3d lookVec = player.getLookVec().scale(grabDist);
+
+          Vec3d lookVecBehind = player.getLookVec().scale(-0.25F);
+
+          double height = 0.2D;
+          /**
+           * STANDART Height player = 1.8 , Snake = 1.5 , low 0.6
+           *
+           * lifting height
+           */
+          double yScanRangeAir = player.getHeight() + height;
+
+          double yScanRangeSolid = 0.4D;
+
+          double yScanRes = 0.2D;
+          double yAirSize = 0.25D;
+          double xzSize = 0.3D;
+          double xzSizeBehind = 0.1D;
+
+          /**
+           * Player Box
+           */
+          AxisAlignedBB playerAABB = player.getBoundingBox();
+
+          /**
+           * Player Box
+           */
+          AxisAlignedBB spotForHandsAir = new AxisAlignedBB(player.posX + lookVec.x,
+              playerAABB.minY, player.posZ + lookVec.z,
+              player.posX + lookVec.x, playerAABB.minY, player.posZ + lookVec.z)
+              .grow(xzSize, yAirSize, xzSize);
+
+          /**
+           * Boxing the size of the user who checks whether it is still necessary to go up
+           */
+          AxisAlignedBB behindUnderFeet = new AxisAlignedBB(player.posX + lookVecBehind.x,
+              playerAABB.minY, player.posZ + lookVecBehind.z,
+              player.posX + lookVecBehind.x, playerAABB.minY, player.posZ + lookVecBehind.z)
+              .grow(xzSizeBehind, xzSizeBehind, xzSizeBehind);
+
+          boolean foundGrabbableSpot = false;
+
+          /**
+           * Check for contact between the player and the wall in front of him.
+           * Проверяет, что пользователь не наземле , и колизии
+           */
+          if (!player.onGround && player.world.isCollisionBoxesEmpty(player, behindUnderFeet)) {
+
+            for (double y = yScanRangeAir; y > 0.25D && !foundGrabbableSpot; y -= yScanRes) {
+              /**
+               * Initial check to see if movement can begin at all.
+               * Начальная проверка можно ли начать движение. И есть ли колизия с блоком который выше игрока.
+               */
+              if (player.world.isCollisionBoxesEmpty(player, spotForHandsAir.offset(0, y, 0))) {
+
+                for (double y2 = 0; y2 < yScanRangeSolid; y2 += yScanRes) {
+                  AxisAlignedBB axisAlignedBB = spotForHandsAir.offset(0, y - (yAirSize * 1D) - y2, 0);
+                  if (!player.world.isCollisionBoxesEmpty(player, axisAlignedBB)&& axisAlignedBB.minY + 0.15D > playerAABB.minY) {
+                    foundGrabbableSpot = true;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          if (foundGrabbableSpot) {
+            float climbSpeed = 0.08F;
+            if (player.getMotion().y < climbSpeed) {
+              Vec3d speed = player.getMotion();
+              player.setMotion(speed.x, climbSpeed, speed.z);
+            }
+          }
+        }
+      }
+      }
+    }
 }
