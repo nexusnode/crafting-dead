@@ -1,20 +1,5 @@
 package com.craftingdead.mod.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.UUID;
-import java.util.function.Supplier;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
@@ -30,6 +15,7 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
+import com.craftingdead.mod.client.renderer.player.LivingRendererMod;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
@@ -38,6 +24,12 @@ import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
 import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
 import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
 import com.craftingdead.network.pipeline.NetworkManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -46,11 +38,15 @@ import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Pose;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -60,13 +56,18 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 
 public class ClientDist implements IModDist {
 
@@ -150,6 +151,12 @@ public class ClientDist implements IModDist {
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(AdvancedZombieEntity.class, AdvancedZombieRenderer::new);
+
+    /*
+      Substitution of a class which is responsible for rendering
+     */
+    RenderingRegistry.registerEntityRenderingHandler(AbstractClientPlayerEntity.class,
+        LivingRendererMod::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
@@ -262,6 +269,21 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
+
+    if (event.getEntity() instanceof ClientPlayerEntity && !LivingRendererMod.class
+        .isAssignableFrom(event.getRenderer().getClass())) {
+      if (!event.getEntity().isSneaking()) {
+        event.setCanceled(true);
+
+        LivingRendererMod render = new LivingRendererMod(
+            Minecraft.getInstance().getRenderManager());
+
+        render.doRender((ClientPlayerEntity) event.getEntity(), event.getX(), event.getY(),
+            event.getZ(), ((AbstractClientPlayerEntity) event.getEntity()).rotationYaw,
+            event.getPartialRenderTick());
+      }
+    }
+
     // We don't use RenderPlayerEvent.Pre as it gets called too early resulting in
     // changes we make to the arm pose being overwritten
     ItemStack stack = event.getEntity().getHeldItemMainhand();
@@ -328,7 +350,7 @@ public class ClientDist implements IModDist {
     }
   }
 
-  /**
+  /*
    * Using Reflection to set the swimming position, which is then redefined to crawl.
    */
   @SubscribeEvent
@@ -344,7 +366,7 @@ public class ClientDist implements IModDist {
     }
   }
 
-  /**
+  /*
    * Responsible for climbing walls.
    */
   @SubscribeEvent(priority = EventPriority.LOW)
@@ -368,7 +390,7 @@ public class ClientDist implements IModDist {
           Vec3d lookVecBehind = player.getLookVec().scale(-0.25F);
 
           double height = 0.2D;
-          /**
+          /*
            * STANDART Height player = 1.8 , Snake = 1.5 , low 0.6
            *
            * lifting height
@@ -382,12 +404,12 @@ public class ClientDist implements IModDist {
           double xzSize = 0.3D;
           double xzSizeBehind = 0.1D;
 
-          /**
+          /*
            * Player Box
            */
           AxisAlignedBB playerAABB = player.getBoundingBox();
 
-          /**
+          /*
            * Player Box
            */
           AxisAlignedBB spotForHandsAir = new AxisAlignedBB(player.posX + lookVec.x,
@@ -395,7 +417,7 @@ public class ClientDist implements IModDist {
               player.posX + lookVec.x, playerAABB.minY, player.posZ + lookVec.z)
               .grow(xzSize, yAirSize, xzSize);
 
-          /**
+          /*
            * Boxing the size of the user who checks whether it is still necessary to go up
            */
           AxisAlignedBB behindUnderFeet = new AxisAlignedBB(player.posX + lookVecBehind.x,
@@ -405,22 +427,24 @@ public class ClientDist implements IModDist {
 
           boolean foundGrabbableSpot = false;
 
-          /**
+          /*
            * Check for contact between the player and the wall in front of him.
            * Проверяет, что пользователь не наземле , и колизии
            */
           if (!player.onGround && player.world.isCollisionBoxesEmpty(player, behindUnderFeet)) {
 
             for (double y = yScanRangeAir; y > 0.25D && !foundGrabbableSpot; y -= yScanRes) {
-              /**
+              /*
                * Initial check to see if movement can begin at all.
                * Начальная проверка можно ли начать движение. И есть ли колизия с блоком который выше игрока.
                */
               if (player.world.isCollisionBoxesEmpty(player, spotForHandsAir.offset(0, y, 0))) {
 
                 for (double y2 = 0; y2 < yScanRangeSolid; y2 += yScanRes) {
-                  AxisAlignedBB axisAlignedBB = spotForHandsAir.offset(0, y - (yAirSize * 1D) - y2, 0);
-                  if (!player.world.isCollisionBoxesEmpty(player, axisAlignedBB)&& axisAlignedBB.minY + 0.15D > playerAABB.minY) {
+                  AxisAlignedBB axisAlignedBB = spotForHandsAir
+                      .offset(0, y - (yAirSize * 1D) - y2, 0);
+                  if (!player.world.isCollisionBoxesEmpty(player, axisAlignedBB)
+                      && axisAlignedBB.minY + 0.15D > playerAABB.minY) {
                     foundGrabbableSpot = true;
                     break;
                   }
@@ -437,6 +461,6 @@ public class ClientDist implements IModDist {
           }
         }
       }
-      }
     }
+  }
 }
