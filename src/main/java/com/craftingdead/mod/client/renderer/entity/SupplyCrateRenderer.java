@@ -45,7 +45,7 @@ public class SupplyCrateRenderer extends EntityRenderer<SupplyCrateEntity> {
 
   @Override
   protected ResourceLocation getEntityTexture(SupplyCrateEntity entity) {
-    return new ResourceLocation(CraftingDead.ID, "models/block/yellow.png");
+    return new ResourceLocation(CraftingDead.ID, "models/block/obj/yellow.png");
   }
 
 }

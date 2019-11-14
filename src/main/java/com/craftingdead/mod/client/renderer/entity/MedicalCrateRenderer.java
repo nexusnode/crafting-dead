@@ -45,7 +45,7 @@ public class MedicalCrateRenderer extends EntityRenderer<MedicalCrateEntity> {
 
   @Override
   protected ResourceLocation getEntityTexture(MedicalCrateEntity entity) {
-    return new ResourceLocation(CraftingDead.ID, "models/block/yellow.png");
+    return new ResourceLocation(CraftingDead.ID, "models/block/obj/yellow.png");
   }
 
 }
