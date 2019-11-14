@@ -45,7 +45,7 @@ public class MilitaryCrateRenderer extends EntityRenderer<MilitaryCrateEntity> {
 
   @Override
   protected ResourceLocation getEntityTexture(MilitaryCrateEntity entity) {
-    return new ResourceLocation(CraftingDead.ID, "models/block/yellow.png");
+    return new ResourceLocation(CraftingDead.ID, "textures/block/yellow.png");
   }
 
 }

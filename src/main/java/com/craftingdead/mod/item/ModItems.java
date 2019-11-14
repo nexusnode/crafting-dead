@@ -211,12 +211,12 @@ public class ModItems {
 
     dropmil = add("drop_mil", new AirDropItem(new AirDropItem.Properties()
         .setMaxStackSize(1)
-        .setMedical()
+        .setMilitary()
         .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
 
     dropsupp = add("drop_supp", new AirDropItem(new AirDropItem.Properties()
         .setMaxStackSize(1)
-        .setMedical()
+        .setSupply()
         .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
 
 

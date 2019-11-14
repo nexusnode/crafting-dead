@@ -22,7 +22,7 @@ public class ParachuteModel extends EntityModel {
     try {
 
       ResourceLocation location = new ResourceLocation(CraftingDead.ID,
-          "/models/block/parachute.obj");
+          "/models/block/obj/parachute.obj");
 
       IUnbakedModel model = OBJLoader.INSTANCE.loadModel(location);
 
