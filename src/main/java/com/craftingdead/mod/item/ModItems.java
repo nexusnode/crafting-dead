@@ -193,9 +193,32 @@ public class ModItems {
   public static Item tankZombieSpawnEgg;
   public static Item weakZombieSpawnEgg;
 
-  public static Item grenadeSpawnEgg;
+  //Drop
+  public static Item dropmed;
+  public static Item dropmil;
+  public static Item dropsupp;
 
   public static void initialize() {
+
+    // ================================================================================
+    // Air Drop
+    // ================================================================================
+
+    dropmed = add("drop_med", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setMedical()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
+    dropmil = add("drop_mil", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setMedical()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
+    dropsupp = add("drop_supp", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setMedical()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
 
     // ================================================================================
     // Guns

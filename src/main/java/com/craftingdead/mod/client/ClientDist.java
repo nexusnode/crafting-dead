@@ -15,8 +15,14 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
+import com.craftingdead.mod.client.renderer.entity.MedicalCrateRenderer;
+import com.craftingdead.mod.client.renderer.entity.MilitaryCrateRenderer;
+import com.craftingdead.mod.client.renderer.entity.SupplyCrateRenderer;
 import com.craftingdead.mod.client.renderer.player.LivingRendererMod;
 import com.craftingdead.mod.entity.CorpseEntity;
+import com.craftingdead.mod.entity.MedicalCrateEntity;
+import com.craftingdead.mod.entity.MilitaryCrateEntity;
+import com.craftingdead.mod.entity.SupplyCrateEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
@@ -51,6 +57,8 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -148,6 +156,9 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
 
+    OBJLoader.INSTANCE.addDomain(CraftingDead.ID);
+    OBJLoader.INSTANCE.onResourceManagerReload(Minecraft.getInstance().getResourceManager());
+
     RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(AdvancedZombieEntity.class, AdvancedZombieRenderer::new);
@@ -157,6 +168,15 @@ public class ClientDist implements IModDist {
      */
     RenderingRegistry.registerEntityRenderingHandler(AbstractClientPlayerEntity.class,
         LivingRendererMod::new);
+
+    RenderingRegistry.registerEntityRenderingHandler(MedicalCrateEntity.class,
+        MedicalCrateRenderer::new);
+
+    RenderingRegistry.registerEntityRenderingHandler(MilitaryCrateEntity.class,
+        MilitaryCrateRenderer::new);
+
+    RenderingRegistry.registerEntityRenderingHandler(SupplyCrateEntity.class,
+        SupplyCrateRenderer::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
@@ -462,5 +482,13 @@ public class ClientDist implements IModDist {
         }
       }
     }
+  }
+
+
+  @SubscribeEvent
+  public static void onPreTextureStitch(TextureStitchEvent.Pre event) {
+    event.addSprite(
+        ResourceLocation.tryCreate("craftingdead:textures/block/yellow")
+    );
   }
 }
