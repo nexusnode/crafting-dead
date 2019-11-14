@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/run/
-/bin/
-/build/
-/.gradle/
-/.settings/
-/.classpath
-/.project
-=======
 /.gradle/
 /.classpath
 /.project
@@ -14,6 +5,5 @@
 /.settings/
 /build/
 /run/
->>>>>>> refs/heads/issues_1
-/runClient.launch
-/runServer.launch
+/.idea/
+
