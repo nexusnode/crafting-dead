@@ -2,8 +2,12 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.function.Supplier;
+import net.minecraft.entity.Pose;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -62,10 +66,19 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientDist implements IModDist {
 
+  /**
+   * Using Reflection to set the swimming position, which is then redefined to crawl.
+   */
+  private static final Method setPose = ObfuscationReflectionHelper
+      .findMethod(Entity.class, "func_213301_b", (Class[]) new Class[]{Pose.class});
+
+
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
   public static final KeyBinding TOGGLE_FIRE_MODE =
       new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_F, "key.categories.gameplay");
+  public static final KeyBinding CROUCH =
+      new KeyBinding("key.crouch", GLFW.GLFW_KEY_C, "key.categories.gameplay");
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -307,6 +320,23 @@ public class ClientDist implements IModDist {
         AnimationManager animationManager = this.animationManager;
         animationManager.clear(event.getItemStack());
         animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
+      }
+    }
+  }
+
+  /**
+   * Using Reflection to set the swimming position, which is then redefined to crawl.
+   */
+
+  @SubscribeEvent
+  public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    if (event.phase == TickEvent.Phase.END) {
+      if (ClientDist.CROUCH.isKeyDown()) {
+        try {
+          setPose.invoke(event.player, Pose.SWIMMING);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          System.out.println("Error using reflection to crawl.");
+        }
       }
     }
   }
