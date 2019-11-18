@@ -20,6 +20,8 @@ import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
+import com.craftingdead.mod.client.gui.transition.TransitionManager;
+import com.craftingdead.mod.client.gui.transition.Transitions;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.entity.CorpseEntity;
@@ -33,6 +35,7 @@ import com.craftingdead.network.pipeline.NetworkManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
@@ -44,6 +47,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
 import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -78,6 +82,8 @@ public class ClientDist implements IModDist {
   private RecoilHelper recoilHelper = new RecoilHelper();
 
   private IngameGui guiIngame;
+
+  private TransitionManager transitionManager = new TransitionManager(minecraft, Transitions.GROW);
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -241,6 +247,9 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     DiscordPresence.updateState(GameState.IDLE, this);
+    if (event.getGui() instanceof MainMenuScreen) {
+//      event.setGui(new StartScreen());
+    }
   }
 
   @SubscribeEvent
@@ -309,5 +318,13 @@ public class ClientDist implements IModDist {
         animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
       }
     }
+  }
+
+  @SubscribeEvent
+  public void preRender(DrawScreenEvent.Pre event) {
+    event
+        .setCanceled(this.transitionManager
+            .checkDrawTransition(event.getMouseX(), event.getMouseY(),
+                event.getRenderPartialTicks(), event.getGui()));
   }
 }

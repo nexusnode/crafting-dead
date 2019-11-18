@@ -1,7 +1,9 @@
 package com.craftingdead.mod.client.util;
 
+import java.awt.Color;
 import java.util.Random;
 import java.util.UUID;
+import javax.vecmath.Vector2d;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
@@ -16,6 +18,7 @@ import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class RenderUtil {
@@ -41,14 +44,14 @@ public class RenderUtil {
 
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
-    buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
     float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
     float startRed = (float) (startColor >> 16 & 255) / 255.0F;
     float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
     float startBlue = (float) (startColor & 255) / 255.0F;
 
-    float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
+    float endAlpha = (float) (startColor >> 24 & 255) / 255.0F;
     float endRed = (float) (endColor >> 16 & 255) / 255.0F;
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
@@ -134,5 +137,31 @@ public class RenderUtil {
 
   public static void bind(ResourceLocation resourceLocation) {
     minecraft.getTextureManager().bindTexture(resourceLocation);
+  }
+
+  public static Color lerp(Color color1, Color color2, double pct) {
+    double r = MathHelper.lerp(pct, color1.getRed(), color2.getRed());
+    double g = MathHelper.lerp(pct, color1.getGreen(), color2.getGreen());
+    double b = MathHelper.lerp(pct, color1.getBlue(), color2.getBlue());
+    double a = MathHelper.lerp(pct, color1.getAlpha(), color2.getAlpha());
+    return new Color((int) Math.round(r), (int) Math.round(g), (int) Math.round(b),
+        (int) Math.round(a));
+  }
+
+  public static Vector2d scaleToFit(final double imageWidth, final double imageHeight) {
+    double widthScale = minecraft.mainWindow.getWidth() / imageWidth;
+    double heightScale = minecraft.mainWindow.getHeight() / imageHeight;
+
+    double scaledImageWidth = imageWidth * widthScale;
+    double scaledImageHeight = imageHeight * widthScale;
+
+    if (scaledImageHeight < minecraft.mainWindow.getHeight()) {
+      scaledImageWidth = imageWidth * heightScale;
+      scaledImageHeight = imageHeight * heightScale;
+    }
+
+    Vector2d finalSize = new Vector2d(scaledImageWidth, scaledImageHeight);
+    finalSize.scale(1 / minecraft.mainWindow.getGuiScaleFactor());
+    return finalSize;
   }
 }
