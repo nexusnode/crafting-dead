@@ -5,5 +5,7 @@
 /.settings/
 /build/
 /run/
+/runClient.launch
+/runServer.launch
 /.idea/
 
