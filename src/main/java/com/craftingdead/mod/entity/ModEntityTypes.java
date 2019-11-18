@@ -23,6 +23,10 @@ public class ModEntityTypes {
   public static EntityType<TankZombieEntity> tankZombie;
   public static EntityType<WeakZombieEntity> weakZombie;
 
+  public static EntityType<MedicalCrateEntity> medicalCrateEntity;
+  public static EntityType<MilitaryCrateEntity> militaryCrateEntity;
+  public static EntityType<SupplyCrateEntity> supplyCrateEntity;
+
   public static void initialize() {
     corpse = add("corpse",
         EntityType.Builder.<CorpseEntity>create(CorpseEntity::new, EntityClassification.MISC)
@@ -54,6 +58,18 @@ public class ModEntityTypes {
         .setTrackingRange(64)
         .setUpdateInterval(3)
         .setShouldReceiveVelocityUpdates(false));
+
+    medicalCrateEntity = add("medical_crate", EntityType.Builder
+        .<MedicalCrateEntity>create(MedicalCrateEntity::new, EntityClassification.MISC)
+        .setCustomClientFactory(MedicalCrateEntity::new));
+
+    militaryCrateEntity = add("military_crate", EntityType.Builder
+        .<MilitaryCrateEntity>create(MilitaryCrateEntity::new, EntityClassification.MISC)
+        .setCustomClientFactory(MilitaryCrateEntity::new));
+
+    supplyCrateEntity = add("supply_crate", EntityType.Builder
+        .<SupplyCrateEntity>create(SupplyCrateEntity::new, EntityClassification.MISC)
+        .setCustomClientFactory(SupplyCrateEntity::new));
   }
 
   public static void register(RegistryEvent.Register<EntityType<?>> event) {

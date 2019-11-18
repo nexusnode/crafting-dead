@@ -135,6 +135,21 @@ public class RenderUtil {
     tessellator.draw();
   }
 
+  @SuppressWarnings("deprecation")
+  public static void renderModel(IBakedModel model) {
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder buffer = tessellator.getBuffer();
+    BakedQuad bakedQuad1 = model.getQuads(null, null, new Random()).get(0);
+
+    buffer.begin(GL11.GL_QUADS, bakedQuad1.getFormat());
+
+    for (BakedQuad bakedquad : model.getQuads(null, null, new Random())) {
+      LightUtil.renderQuadColor(buffer, bakedquad, -1);
+    }
+
+    tessellator.draw();
+  }
+
   public static void bind(ResourceLocation resourceLocation) {
     minecraft.getTextureManager().bindTexture(resourceLocation);
   }

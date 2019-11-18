@@ -27,15 +27,14 @@ public class RagItem extends MedicalItem {
     ItemStack itemstack = playerIn.getHeldItem(handIn);
 
     if (worldIn.getFluidState(blockpos).isTagged(FluidTags.WATER)
-        && (itemstack.getItem() == ModItems.bloodyRag
-            || itemstack.getItem() == ModItems.dirtyRag)) {
+        && (itemstack.getItem() == ModItems.ragBloody
+            || itemstack.getItem() == ModItems.ragDirty)) {
       return new ActionResult<>(ActionResultType.SUCCESS,
-          this.turnSwapItem(itemstack, playerIn, new ItemStack(ModItems.cleanRag)));
+          this.turnSwapItem(itemstack, playerIn, new ItemStack(ModItems.ragClean)));
     }
 
-    // TODO Add a check for â€œisbleedingâ€�
-    if (playerIn.getHealth() > 20F || itemstack.getItem() == ModItems.bloodyRag
-        || itemstack.getItem() == ModItems.dirtyRag) {
+    if (playerIn.getHealth() > 20F || itemstack.getItem() == ModItems.ragBloody
+        || itemstack.getItem() == ModItems.ragDirty) {
       return new ActionResult<>(ActionResultType.FAIL, itemstack);
     } else {
       playerIn.setActiveHand(handIn);

@@ -1,16 +1,17 @@
 package com.craftingdead.mod.item;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.animation.GunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.item.ClothingItem.Properties;
 import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
@@ -125,13 +126,13 @@ public class ModItems {
   public static Item bandage;
   public static Item needleRBI;
   public static Item bottleRBI;
-  public static Item dirtyRag;
-  public static Item cleanRag;
+  public static Item ragDirty;
+  public static Item ragClean;
   public static Item splint;
   public static Item needleCure;
   public static Item bottleCure;
   public static Item antibiotics;
-  public static Item bloodyRag;
+  public static Item ragBloody;
 
   // weapon
   public static Item crowbar;
@@ -193,9 +194,199 @@ public class ModItems {
   public static Item tankZombieSpawnEgg;
   public static Item weakZombieSpawnEgg;
 
-  public static Item grenadeSpawnEgg;
+  //Clothing
+
+  public static Item clothingArmy;
+  public static Item clothingSAS;
+  public static Item clothingSpetsnaz;
+  public static Item clothingPolice;
+  public static Item clothingCamo;
+  public static Item clothingCombatBDU;
+  public static Item clothingWinterArmy;
+  public static Item clothingArmyDesert;
+  public static Item clothingPilot;
+  public static Item clothingHazmat;
+  public static Item clothingTacGhillie;
+  public static Item clothingSwat;
+  public static Item clothingSpaceSuit;
+  public static Item clothingSheriff;
+  public static Item clothingJuggernaut;
+  public static Item clothingFireman;
+  public static Item clothingDoctor;
+  public static Item clothingSmart;
+  public static Item clothingCasualGreen;
+  public static Item clothingBuilder;
+  public static Item clothingBusiness;
+  public static Item clothingSecGuard;
+  public static Item clothingMilHazmat;
+  public static Item clothingFullGhillie;
+  public static Item clothingRedDusk;
+  public static Item clothingClone;
+  public static Item clothingCookie;
+  public static Item clothingDeadpool;
+  public static Item clothingNinja;
+  public static Item clothingArmyMedic;
+  public static Item clothingBlueDusk;
+  public static Item clothingPresident;
+  public static Item clothingYellowDusk;
+  public static Item clothingOrangeDusk;
+  public static Item clothingGreenDusk;
+  public static Item clothingWhiteDusk;
+  public static Item clothingPurpleDusk;
+  public static Item clothingScuba;
+  public static Item clothingDDPAT;
+  public static Item clothingContractor;
+
+  //Drop
+  public static Item dropmed;
+  public static Item dropmil;
+  public static Item dropsupp;
 
   public static void initialize() {
+
+    // ================================================================================
+    // Clothing
+    // ================================================================================
+
+    clothingArmy = add("clothing_army", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingSAS = add("clothing_sas", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingSpetsnaz = add("clothing_spetsnaz", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingPolice = add("clothing_police", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingCamo = add("clothing_camo", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingCombatBDU = add("clothing_combat_bdu", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingWinterArmy = add("clothing_winter_army", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingArmyDesert = add("clothing_army_desert", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingPilot = add("clothing_pilot", new ClothingItem(new Properties()
+        .setArmorLevel(1)));
+
+    clothingHazmat = add("clothing_hazmat", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingTacGhillie = add("clothing_tac_ghillie", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingSwat = add("clothing_swat", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingSpaceSuit = add("clothing_space_suit", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingSheriff = add("clothing_sheriff", new ClothingItem(new Properties()
+        .setArmorLevel(1)));
+
+    clothingJuggernaut = add("clothing_juggernaut", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingFireman = add("clothing_fireman", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingDoctor = add("clothing_doctor", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingSmart = add("clothing_smart", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingCasualGreen = add("clothing_casual_green", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingBuilder = add("clothing_builder", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingBusiness = add("clothing_business", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingSecGuard = add("clothing_sec_guard", new ClothingItem(new Properties()
+        .setArmorLevel(1)));
+
+    clothingMilHazmat = add("clothing_mil_hazmat", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingFullGhillie = add("clothing_full_ghillie", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingRedDusk = add("clothing_red_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingClone = add("clothing_clone", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingCookie = add("clothing_cookie", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingDeadpool = add("clothing_deadpool", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingNinja = add("clothing_nunja", new ClothingItem(new Properties()
+        .setArmorLevel(1)));
+
+    clothingArmyMedic = add("clothing_army_medic", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    clothingBlueDusk = add("clothing_blue_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingPresident = add("clothing_president", new ClothingItem(new Properties()
+        .setArmorLevel(0)));
+
+    clothingYellowDusk = add("clothing_yellow_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingOrangeDusk = add("clothing_orange_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingGreenDusk = add("clothing_green_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingWhiteDusk = add("clothing_white_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingPurpleDusk = add("clothing_purple_dusk", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingScuba = add("clothing_scuba", new ClothingItem(new Properties()
+        .setArmorLevel(1)));
+
+    clothingDDPAT = add("clothing_ddpat", new ClothingItem(new Properties()
+        .setArmorLevel(2)));
+
+    clothingContractor = add("clothing_contractor", new ClothingItem(new Properties()
+        .setArmorLevel(3)));
+
+    // ================================================================================
+    // Air Drop
+    // ================================================================================
+
+    dropmed = add("drop_med", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setMedical()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
+    dropmil = add("drop_mil", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setMilitary()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
+    dropsupp = add("drop_supp", new AirDropItem(new AirDropItem.Properties()
+        .setMaxStackSize(1)
+        .setSupply()
+        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+
 
     // ================================================================================
     // Guns
@@ -752,17 +943,17 @@ public class ModItems {
     bottleRBI = add("bottle_rbi", new MedicalItem(
         new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    bloodyRag = add("rag_bloody", new RagItem(
+    ragBloody = add("rag_bloody", new RagItem(
         new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    dirtyRag = add("rag_dirty", new RagItem(
+    ragDirty = add("rag_dirty", new RagItem(
         new MedicalItem.Properties().setMaxStackSize(1).setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
-    cleanRag = add("rag_clean",
+    ragClean = add("rag_clean",
         new RagItem(new MedicalItem.Properties()
             .setStopBleeding()
             .setMaxStackSize(1)
-            .setContainer(bloodyRag)
+            .setContainer(ragBloody)
             .setGroup(ModItemGroups.CRAFTING_DEAD_MED)));
 
     splint = add("splint",
