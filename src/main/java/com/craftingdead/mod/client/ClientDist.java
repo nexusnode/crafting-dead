@@ -89,7 +89,6 @@ public class ClientDist implements IModDist {
   private static final Method setPose = ObfuscationReflectionHelper
       .findMethod(Entity.class, "func_213301_b", (Class[]) new Class[] {Pose.class});
 
-
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
   public static final KeyBinding TOGGLE_FIRE_MODE =

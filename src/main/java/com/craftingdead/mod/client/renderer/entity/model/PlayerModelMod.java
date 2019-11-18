@@ -9,18 +9,18 @@ import net.minecraft.util.math.MathHelper;
  * Intercepts player display.
  */
 
-public class PlayerModelMod extends PlayerModel {
+public class PlayerModelMod<T extends LivingEntity> extends PlayerModel<T> {
 
   public PlayerModelMod(float modelSize, boolean smallArmsIn) {
     super(modelSize, smallArmsIn);
   }
 
   @Override
-  public void setRotationAngles(LivingEntity entityIn, float limbSwing, float limbSwingAmount,
+  public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount,
       float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
 
-    super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-        headPitch, scaleFactor);
+    super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch,
+        scaleFactor);
 
     float f = (float) entityIn.getMotion().lengthSquared();
     f = f / 0.2F;
@@ -38,20 +38,18 @@ public class PlayerModelMod extends PlayerModel {
         this.bipedHead.rotateAngleX = this
             .func_205060_a(this.bipedHead.rotateAngleX, (-(float) Math.PI / 4F),
                 this.swimAnimation);
-        this.bipedLeftArm.rotateAngleZ = this
-            .func_205060_a(this.bipedLeftArm.rotateAngleZ, 2.25F + f7 / 10, this.swimAnimation);
-        this.bipedRightArm.rotateAngleZ = MathHelper
-            .lerp(f8, this.bipedRightArm.rotateAngleZ, 4.25F - f10 / 10);
+        this.bipedLeftArm.rotateAngleZ =
+            this.func_205060_a(this.bipedLeftArm.rotateAngleZ, 2.25F + f7 / 10, this.swimAnimation);
+        this.bipedRightArm.rotateAngleZ =
+            MathHelper.lerp(f8, this.bipedRightArm.rotateAngleZ, 4.25F - f10 / 10);
       } else if (f7 > 10.F && f7 < 20.f) {
-        this.bipedLeftArm.rotateAngleZ = this
-            .func_205060_a(this.bipedLeftArm.rotateAngleZ, 4.25F - f7 / 10, this.swimAnimation);
-        this.bipedRightArm.rotateAngleZ = MathHelper
-            .lerp(f8, this.bipedRightArm.rotateAngleZ, 3.25F + f10 / 10);
+        this.bipedLeftArm.rotateAngleZ =
+            this.func_205060_a(this.bipedLeftArm.rotateAngleZ, 4.25F - f7 / 10, this.swimAnimation);
+        this.bipedRightArm.rotateAngleZ =
+            MathHelper.lerp(f8, this.bipedRightArm.rotateAngleZ, 3.25F + f10 / 10);
       }
 
       this.bipedHeadwear.copyModelAngles(this.bipedHead);
     }
   }
-
-
 }

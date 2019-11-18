@@ -79,7 +79,7 @@ public class ClothingItem extends Item {
     return 32;
   }
 
-  //TODO Fix Animation
+  // TODO Fix Animation
   @Override
   public UseAction getUseAction(ItemStack stack) {
     return UseAction.BLOCK;

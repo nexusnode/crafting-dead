@@ -36,15 +36,15 @@ import net.minecraft.util.math.Vec3d;
  * The class fully emulates PlayerRenderer.
  */
 
-public class LivingRendererMod extends
-    LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
+public class LivingRendererMod
+    extends LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
   public LivingRendererMod(EntityRendererManager renderManager) {
     this(renderManager, false);
   }
 
   public LivingRendererMod(EntityRendererManager renderManager, boolean useSmallArms) {
-    super(renderManager, new PlayerModelMod(0.0F, useSmallArms), 0.5F);
+    super(renderManager, new PlayerModelMod<>(0.0F, useSmallArms), 0.5F);
     this.addLayer(new BipedArmorLayer<>(this, new BipedModelMod(0.5F), new BipedModelMod(1.0F)));
     this.addLayer(new HeldItemLayer<>(this));
     this.addLayer(new ArrowLayer<>(this));
@@ -86,20 +86,20 @@ public class LivingRendererMod extends
 
       playermodel.bipedHeadwear.showModel = clientPlayer.isWearing(PlayerModelPart.HAT);
       playermodel.bipedBodyWear.showModel = clientPlayer.isWearing(PlayerModelPart.JACKET);
-      playermodel.bipedLeftLegwear.showModel = clientPlayer
-          .isWearing(PlayerModelPart.LEFT_PANTS_LEG);
-      playermodel.bipedRightLegwear.showModel = clientPlayer
-          .isWearing(PlayerModelPart.RIGHT_PANTS_LEG);
+      playermodel.bipedLeftLegwear.showModel =
+          clientPlayer.isWearing(PlayerModelPart.LEFT_PANTS_LEG);
+      playermodel.bipedRightLegwear.showModel =
+          clientPlayer.isWearing(PlayerModelPart.RIGHT_PANTS_LEG);
       playermodel.bipedLeftArmwear.showModel = clientPlayer.isWearing(PlayerModelPart.LEFT_SLEEVE);
-      playermodel.bipedRightArmwear.showModel = clientPlayer
-          .isWearing(PlayerModelPart.RIGHT_SLEEVE);
+      playermodel.bipedRightArmwear.showModel =
+          clientPlayer.isWearing(PlayerModelPart.RIGHT_SLEEVE);
 
       playermodel.isSneak = clientPlayer.shouldRenderSneaking();
 
-      BipedModel.ArmPose bipedmodel$armpose = this
-          .func_217766_a(clientPlayer, itemstack, itemstack1, Hand.MAIN_HAND);
-      BipedModel.ArmPose bipedmodel$armpose1 = this
-          .func_217766_a(clientPlayer, itemstack, itemstack1, Hand.OFF_HAND);
+      BipedModel.ArmPose bipedmodel$armpose =
+          this.func_217766_a(clientPlayer, itemstack, itemstack1, Hand.MAIN_HAND);
+      BipedModel.ArmPose bipedmodel$armpose1 =
+          this.func_217766_a(clientPlayer, itemstack, itemstack1, Hand.OFF_HAND);
 
       if (clientPlayer.getPrimaryHand() == HandSide.RIGHT) {
         playermodel.rightArmPose = bipedmodel$armpose;
@@ -167,9 +167,10 @@ public class LivingRendererMod extends
       ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
       if (scoreobjective != null) {
         Score score = scoreboard.getOrCreateScore(entityIn.getScoreboardName(), scoreobjective);
-        this.renderLivingLabel(entityIn,
-            score.getScorePoints() + " " + scoreobjective.getDisplayName().getFormattedText(), x, y,
-            z, 64);
+        this
+            .renderLivingLabel(entityIn,
+                score.getScorePoints() + " " + scoreobjective.getDisplayName().getFormattedText(),
+                x, y, z, 64);
         y += (double) (9.0F * 1.15F * 0.025F);
       }
     }

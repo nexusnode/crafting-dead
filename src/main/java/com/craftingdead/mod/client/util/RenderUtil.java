@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class RenderUtil {
@@ -113,40 +114,23 @@ public class RenderUtil {
     return resourceLocation;
   }
 
-  @Deprecated
   public static void renderModel(IBakedModel model, VertexFormat vertextFormat) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
     buffer.begin(GL11.GL_QUADS, vertextFormat);
-    for (BakedQuad bakedquad : model.getQuads(null, null, new Random())) {
+    for (BakedQuad bakedquad : model.getQuads(null, null, new Random(), EmptyModelData.INSTANCE)) {
       buffer.addVertexData(bakedquad.getVertexData());
     }
     tessellator.draw();
   }
 
-  @Deprecated
   public static void renderModel(IBakedModel model, VertexFormat vertexFormat, int color) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
     buffer.begin(GL11.GL_QUADS, vertexFormat);
-    for (BakedQuad bakedquad : model.getQuads(null, null, new Random())) {
+    for (BakedQuad bakedquad : model.getQuads(null, null, new Random(), EmptyModelData.INSTANCE)) {
       LightUtil.renderQuadColor(buffer, bakedquad, color);
     }
-    tessellator.draw();
-  }
-
-  @SuppressWarnings("deprecation")
-  public static void renderModel(IBakedModel model) {
-    Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder buffer = tessellator.getBuffer();
-    BakedQuad bakedQuad1 = model.getQuads(null, null, new Random()).get(0);
-
-    buffer.begin(GL11.GL_QUADS, bakedQuad1.getFormat());
-
-    for (BakedQuad bakedquad : model.getQuads(null, null, new Random())) {
-      LightUtil.renderQuadColor(buffer, bakedquad, -1);
-    }
-
     tessellator.draw();
   }
 

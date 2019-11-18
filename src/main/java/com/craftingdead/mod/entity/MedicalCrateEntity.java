@@ -7,7 +7,6 @@ import net.minecraftforge.fml.network.FMLPlayMessages;
 
 public class MedicalCrateEntity extends AirDropEntity {
 
-
   public MedicalCrateEntity(EntityType<?> entityEntityType, World world) {
     super(ModEntityTypes.medicalCrateEntity, world);
   }
@@ -16,8 +15,7 @@ public class MedicalCrateEntity extends AirDropEntity {
     this(ModEntityTypes.medicalCrateEntity, world);
   }
 
-  public MedicalCrateEntity(World world, double x, double y,
-      double z) {
+  public MedicalCrateEntity(World world, double x, double y, double z) {
     super(ModEntityTypes.medicalCrateEntity, x, y, z, world);
   }
 
@@ -28,6 +26,4 @@ public class MedicalCrateEntity extends AirDropEntity {
     this.addRandomItemWithChance(ModItems.apple, 45, 2);
     this.addRandomItemWithChance(ModItems.antibiotics, 45, 1);
   }
-
-
 }
