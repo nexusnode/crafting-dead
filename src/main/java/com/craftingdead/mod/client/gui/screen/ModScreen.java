@@ -1,6 +1,7 @@
 package com.craftingdead.mod.client.gui.screen;
 
 import javax.vecmath.Vector2d;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.gui.transition.ITransition;
 import com.craftingdead.mod.client.gui.transition.Transitions;
@@ -8,6 +9,7 @@ import com.craftingdead.mod.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 
@@ -19,8 +21,9 @@ public abstract class ModScreen extends Screen {
   private static final ResourceLocation SMOKE_TEXTURE =
       new ResourceLocation(CraftingDead.ID, "textures/gui/smoke.png");
 
-  private static double smokeX = 0;
-  private static double lastSmokeX;
+  private static long backgroundStartTime = Util.milliTime();
+
+  private static long fogStartTime = Util.milliTime();
 
   protected ModScreen(ITextComponent title) {
     super(title);
@@ -39,23 +42,54 @@ public abstract class ModScreen extends Screen {
       return;
     }
 
-    Vector2d backgroundSize = RenderUtil.scaleToFit(2048, 1152);
-    RenderUtil.bind(BACKGROUND_TEXTURE);
-    RenderUtil.drawTexturedRectangle(0, 0, backgroundSize.getX(), backgroundSize.getY());
-
-    this.renderSmoke();
-  }
-
-  protected void renderSmoke() {
-    if (smokeX < this.width) {
-      lastSmokeX = smokeX;
-      smokeX += 0.0125;
-    } else {
-      lastSmokeX = 0;
-      smokeX = 0;
+    double pct =
+        MathHelper.clamp(((Util.milliTime() - backgroundStartTime) / 1000.0F) / 10, 0.0F, 1.0F);
+    if (pct == 1.0D) {
+      backgroundStartTime = Util.milliTime();
     }
 
-    Vector2d smokeSize = RenderUtil.scaleToFit(1920, 1080);
+    GlStateManager.pushMatrix();
+    {
+      GlStateManager
+          .translated(Math.sin(Math.toRadians(360 * pct)) * 2.5D,
+              Math.cos(Math.toRadians(360 * pct)) * 2.5D, 0);
+      double scale = 1.25D + Math.cos(Math.toRadians(360 * pct)) * 1.5D / 100.0D;
+      GlStateManager.scaled(scale, scale, scale);
+
+      Vector2d backgroundSize = RenderUtil.scaleToFit(2048, 1152);
+      RenderUtil.bind(BACKGROUND_TEXTURE);
+      // Enable bilinear filtering
+      GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+      RenderUtil
+          .drawTexturedRectangle((this.width / 2 - (backgroundSize.getX() * scale) / 2),
+              this.height / 2 - (backgroundSize.getY() * scale) / 2, backgroundSize.getX(),
+              backgroundSize.getY());
+    }
+    GlStateManager.popMatrix();
+
+    this.renderFog();
+    this.renderFooter();
+  }
+
+  private void renderFooter() {
+    final String footer = CraftingDead.DISPLAY_NAME + " " + CraftingDead.VERSION;
+    GlStateManager.pushMatrix();
+    {
+      GlStateManager.translated(this.width / 2.0D, this.height - 5.0D, 0.0D);
+      GlStateManager.scaled(0.5D, 0.5D, 0.5D);
+      this.drawCenteredString(this.font, footer, 0, 0, 0xAAAAAA);
+    }
+    GlStateManager.popMatrix();
+  }
+
+  private void renderFog() {
+    Vector2d fogSize = RenderUtil.scaleToFit(1920, 1080);
+
+    final double pct =
+        MathHelper.clamp((Util.milliTime() - fogStartTime) / (1000.0D * 100.0D * 2.0D), 0.0D, 1.0D);
+    if (pct == 1.0D) {
+      fogStartTime = Util.milliTime();
+    }
 
     GlStateManager.pushMatrix();
     {
@@ -69,12 +103,10 @@ public abstract class ModScreen extends Screen {
 
       RenderUtil.bind(SMOKE_TEXTURE);
 
-      double smoothSmokeX = MathHelper.lerp(this.minecraft.getTickLength(), lastSmokeX, smokeX);
+      final double smokeX = pct * this.width;
 
-      RenderUtil.drawTexturedRectangle(smoothSmokeX, 0, smokeSize.getX(), smokeSize.getY());
-      RenderUtil
-          .drawTexturedRectangle(smoothSmokeX - smokeSize.getX(), 0, smokeSize.getX(),
-              smokeSize.getY());
+      RenderUtil.drawTexturedRectangle(smokeX, 0, fogSize.getX(), fogSize.getY());
+      RenderUtil.drawTexturedRectangle(smokeX - fogSize.getX(), 0, fogSize.getX(), fogSize.getY());
 
       GlStateManager.disableBlend();
     }

@@ -5,16 +5,16 @@ import com.craftingdead.mod.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
 public class ModButton extends Button {
 
-  private static final int HOVER_COLOUR = 0xcb171e;
+  private static final int HOVER_COLOUR = 0xc2151c;
   private static final int COLOUR = 0xE51C23;
   private static final int SHADOW_COLOR = 0xA01318;
 
-  private static final float FADE_LENGTH = 20 * 1F;
-  private float fadeTimer;
+  private long fadeStartTime;
 
   private boolean wasHovered;
 
@@ -24,15 +24,13 @@ public class ModButton extends Button {
 
   @Override
   public void renderButton(int mouseX, int mouseY, float partialTicks) {
-    if (this.wasHovered != this.isHovered) {
-      this.fadeTimer = 0;
+    if (this.fadeStartTime == 0L || (this.wasHovered != this.isHovered)) {
+      this.fadeStartTime = Util.milliTime();
     }
     this.wasHovered = this.isHovered;
-    if (this.fadeTimer < FADE_LENGTH) {
-      this.fadeTimer++;
-    }
 
-    float fadePct = this.fadeTimer / FADE_LENGTH;
+    float fadePct =
+        MathHelper.clamp(((Util.milliTime() - this.fadeStartTime) / 1000.0F) * 3F, 0.0F, 1.0F);
 
     int i = this.isHovered ? COLOUR : HOVER_COLOUR;
     Color colour1 = new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF,

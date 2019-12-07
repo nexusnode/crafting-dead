@@ -1,9 +1,10 @@
 package com.craftingdead.mod.item;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.animation.GunAnimation;
+import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
+import com.craftingdead.mod.client.model.builtin.ItemRendererDispatcher;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.ClothingItem.Properties;
 import com.craftingdead.mod.type.Backpack;
@@ -60,32 +61,31 @@ public class ModItems {
   public static Item cannedTomatoSoup;
   public static Item openCannedTomatoSoup;
 
-  // TODO Perhaps they need to be renamed to be more convenient.
-  public static Item sodaOrange;
-  public static Item sodaOrangeEmpty;
-  public static Item icetea;
-  public static Item iceteaEmpty;
+  public static Item orangeSoda;
+  public static Item emptyOrangeSoda;
+  public static Item icedTea;
+  public static Item emptyIcedTea;
   public static Item juicePouch;
-  public static Item juicePouchEmpty;
-  public static Item sodaPepe;
-  public static Item sodaPepeEmpty;
-  public static Item sodaDewEmpty;
-  public static Item sodaDew;
-  public static Item sodaColaEmpty;
-  public static Item sodaCola;
-  public static Item milkCartonEmpty;
+  public static Item emptyJuicePouch;
+  public static Item pepeSoda;
+  public static Item emptyPepeSoda;
+  public static Item dewSoda;
+  public static Item emptyDewSoda;
+  public static Item colaSoda;
+  public static Item emptyColaSoda;
   public static Item milkCarton;
+  public static Item emptyMilkCarton;
   public static Item milkRotten;
-  public static Item colaPopEmpty;
   public static Item colaPop;
-  public static Item ironBrewEmpty;
+  public static Item emptyColaPop;
   public static Item ironBrew;
-  public static Item spriteEmpty;
+  public static Item emptyIronBrew;
   public static Item sprite;
-  public static Item zombieEnergyEmpty;
+  public static Item emptySprite;
   public static Item zombieEnergy;
-  public static Item lemonFizzEmpty;
+  public static Item emptyZombieEnergy;
   public static Item lemonFizz;
+  public static Item emptyLemonFizz;
   public static Item mre;
   public static Item orange;
   public static Item rottenOrange;
@@ -194,7 +194,7 @@ public class ModItems {
   public static Item tankZombieSpawnEgg;
   public static Item weakZombieSpawnEgg;
 
-  //Clothing
+  // Clothing
 
   public static Item clothingArmy;
   public static Item clothingSAS;
@@ -237,7 +237,7 @@ public class ModItems {
   public static Item clothingDDPAT;
   public static Item clothingContractor;
 
-  //Drop
+  // Drop
   public static Item dropmed;
   public static Item dropmil;
   public static Item dropsupp;
@@ -248,144 +248,129 @@ public class ModItems {
     // Clothing
     // ================================================================================
 
-    clothingArmy = add("clothing_army", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingArmy = add("clothing_army", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingSAS = add("clothing_sas", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingSAS = add("clothing_sas", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingSpetsnaz = add("clothing_spetsnaz", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingSpetsnaz =
+        add("clothing_spetsnaz", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingPolice = add("clothing_police", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingPolice = add("clothing_police", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingCamo = add("clothing_camo", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingCamo = add("clothing_camo", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingCombatBDU = add("clothing_combat_bdu", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingCombatBDU =
+        add("clothing_combat_bdu", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingWinterArmy = add("clothing_winter_army", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingWinterArmy =
+        add("clothing_winter_army", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingArmyDesert = add("clothing_army_desert", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingArmyDesert =
+        add("clothing_army_desert", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingPilot = add("clothing_pilot", new ClothingItem(new Properties()
-        .setArmorLevel(1)));
+    clothingPilot = add("clothing_pilot", new ClothingItem(new Properties().setArmorLevel(1)));
 
-    clothingHazmat = add("clothing_hazmat", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingHazmat = add("clothing_hazmat", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingTacGhillie = add("clothing_tac_ghillie", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingTacGhillie =
+        add("clothing_tac_ghillie", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingSwat = add("clothing_swat", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingSwat = add("clothing_swat", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingSpaceSuit = add("clothing_space_suit", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingSpaceSuit =
+        add("clothing_space_suit", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingSheriff = add("clothing_sheriff", new ClothingItem(new Properties()
-        .setArmorLevel(1)));
+    clothingSheriff = add("clothing_sheriff", new ClothingItem(new Properties().setArmorLevel(1)));
 
-    clothingJuggernaut = add("clothing_juggernaut", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingJuggernaut =
+        add("clothing_juggernaut", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingFireman = add("clothing_fireman", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingFireman = add("clothing_fireman", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingDoctor = add("clothing_doctor", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingDoctor = add("clothing_doctor", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingSmart = add("clothing_smart", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingSmart = add("clothing_smart", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingCasualGreen = add("clothing_casual_green", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingCasualGreen =
+        add("clothing_casual_green", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingBuilder = add("clothing_builder", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingBuilder = add("clothing_builder", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingBusiness = add("clothing_business", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingBusiness =
+        add("clothing_business", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingSecGuard = add("clothing_sec_guard", new ClothingItem(new Properties()
-        .setArmorLevel(1)));
+    clothingSecGuard =
+        add("clothing_sec_guard", new ClothingItem(new Properties().setArmorLevel(1)));
 
-    clothingMilHazmat = add("clothing_mil_hazmat", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingMilHazmat =
+        add("clothing_mil_hazmat", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingFullGhillie = add("clothing_full_ghillie", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingFullGhillie =
+        add("clothing_full_ghillie", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingRedDusk = add("clothing_red_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingRedDusk = add("clothing_red_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingClone = add("clothing_clone", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingClone = add("clothing_clone", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingCookie = add("clothing_cookie", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingCookie = add("clothing_cookie", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingDeadpool = add("clothing_deadpool", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingDeadpool =
+        add("clothing_deadpool", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingNinja = add("clothing_nunja", new ClothingItem(new Properties()
-        .setArmorLevel(1)));
+    clothingNinja = add("clothing_nunja", new ClothingItem(new Properties().setArmorLevel(1)));
 
-    clothingArmyMedic = add("clothing_army_medic", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingArmyMedic =
+        add("clothing_army_medic", new ClothingItem(new Properties().setArmorLevel(3)));
 
-    clothingBlueDusk = add("clothing_blue_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingBlueDusk =
+        add("clothing_blue_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingPresident = add("clothing_president", new ClothingItem(new Properties()
-        .setArmorLevel(0)));
+    clothingPresident =
+        add("clothing_president", new ClothingItem(new Properties().setArmorLevel(0)));
 
-    clothingYellowDusk = add("clothing_yellow_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingYellowDusk =
+        add("clothing_yellow_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingOrangeDusk = add("clothing_orange_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingOrangeDusk =
+        add("clothing_orange_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingGreenDusk = add("clothing_green_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingGreenDusk =
+        add("clothing_green_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingWhiteDusk = add("clothing_white_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingWhiteDusk =
+        add("clothing_white_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingPurpleDusk = add("clothing_purple_dusk", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingPurpleDusk =
+        add("clothing_purple_dusk", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingScuba = add("clothing_scuba", new ClothingItem(new Properties()
-        .setArmorLevel(1)));
+    clothingScuba = add("clothing_scuba", new ClothingItem(new Properties().setArmorLevel(1)));
 
-    clothingDDPAT = add("clothing_ddpat", new ClothingItem(new Properties()
-        .setArmorLevel(2)));
+    clothingDDPAT = add("clothing_ddpat", new ClothingItem(new Properties().setArmorLevel(2)));
 
-    clothingContractor = add("clothing_contractor", new ClothingItem(new Properties()
-        .setArmorLevel(3)));
+    clothingContractor =
+        add("clothing_contractor", new ClothingItem(new Properties().setArmorLevel(3)));
 
     // ================================================================================
     // Air Drop
     // ================================================================================
 
-    dropmed = add("drop_med", new AirDropItem(new AirDropItem.Properties()
-        .setMaxStackSize(1)
-        .setMedical()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+    dropmed = add("drop_med",
+        new AirDropItem(new AirDropItem.Properties()
+            .setMaxStackSize(1)
+            .setMedical()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
 
-    dropmil = add("drop_mil", new AirDropItem(new AirDropItem.Properties()
-        .setMaxStackSize(1)
-        .setMilitary()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+    dropmil = add("drop_mil",
+        new AirDropItem(new AirDropItem.Properties()
+            .setMaxStackSize(1)
+            .setMilitary()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
 
-    dropsupp = add("drop_supp", new AirDropItem(new AirDropItem.Properties()
-        .setMaxStackSize(1)
-        .setSupply()
-        .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+    dropsupp = add("drop_supp",
+        new AirDropItem(new AirDropItem.Properties()
+            .setMaxStackSize(1)
+            .setSupply()
+            .setGroup(ModItemGroups.CRAFTING_DEAD_GENERAL)));
 
 
     // ================================================================================
@@ -393,7 +378,7 @@ public class ModItems {
     // ================================================================================
 
     acr = add("acr",
-        new GunItem(new GunItem.Properties()
+        new GunItem((GunItem.Properties) new GunItem.Properties()
             .setFireRate(80)
             .setClipSize(0)
             .setDamage(7)
@@ -401,7 +386,8 @@ public class ModItems {
             .setAccuracy(0.8F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.ACR_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
+            .setTEISR(() -> () -> ItemRendererDispatcher.instance)));
 
     ak47 = add("ak47",
         new GunItem(new GunItem.Properties()
@@ -412,7 +398,7 @@ public class ModItems {
             .setAccuracy(0.8F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.AK47_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
     desertEagle = add("desert_eagle",
         new GunItem(new GunItem.Properties()
@@ -423,7 +409,7 @@ public class ModItems {
             .setAccuracy(0.7F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     m4a1 = add("m4a1",
         new GunItem(new GunItem.Properties()
@@ -434,7 +420,7 @@ public class ModItems {
             .setAccuracy(0.9F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.M4A1_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
     m9 = add("m9",
         new GunItem(new GunItem.Properties()
@@ -445,7 +431,7 @@ public class ModItems {
             .setAccuracy(0.9F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.M9_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     taser = add("taser",
         new GunItem(new GunItem.Properties()
@@ -456,7 +442,7 @@ public class ModItems {
             .setAccuracy(0.9F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.TASER_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     magnum = add("magnum",
         new GunItem(new GunItem.Properties()
@@ -467,7 +453,7 @@ public class ModItems {
             .setAccuracy(0.9F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     fn57 = add("fn57",
         new GunItem(new GunItem.Properties()
@@ -478,7 +464,7 @@ public class ModItems {
             .setAccuracy(0.9F)
             .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
             .setShootSound(() -> ModSoundEvents.FN57_SHOOT)
-            .setAnimations(ImmutableMap.of(GunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+            .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
     // ================================================================================
     // Tools
@@ -506,118 +492,118 @@ public class ModItems {
             .setWater(8)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaOrangeEmpty = add("empty_soda_orange",
+    emptyOrangeSoda = add("empty_soda_orange",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaOrange = add("soda_orange",
+    orangeSoda = add("soda_orange",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> sodaOrangeEmpty)
+            .setContainer(() -> emptyOrangeSoda)
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    iceteaEmpty = add("empty_ice_tea",
+    emptyIcedTea = add("empty_ice_tea",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    icetea = add("ice_tea",
+    icedTea = add("ice_tea",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> iceteaEmpty)
+            .setContainer(() -> emptyIcedTea)
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    juicePouchEmpty = add("empty_juice_pouch",
+    emptyJuicePouch = add("empty_juice_pouch",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     juicePouch = add("juice_pouch",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> juicePouchEmpty)
+            .setContainer(() -> emptyJuicePouch)
             .setWater(2)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaPepeEmpty = add("empty_soda_pepe",
+    emptyPepeSoda = add("empty_soda_pepe",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaPepe = add("soda_pepe",
+    pepeSoda = add("soda_pepe",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> sodaPepeEmpty)
+            .setContainer(() -> emptyPepeSoda)
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaDewEmpty = add("empty_soda_dew",
+    emptyDewSoda = add("empty_soda_dew",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaDew = add("soda_dew",
+    dewSoda = add("soda_dew",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> sodaDewEmpty)
+            .setContainer(() -> emptyDewSoda)
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaColaEmpty = add("empty_soda_cola",
+    emptyColaSoda = add("empty_soda_cola",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    sodaCola = add("soda_cola",
+    colaSoda = add("soda_cola",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> sodaColaEmpty)
+            .setContainer(() -> emptyColaSoda)
             .setWater(4)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    milkCartonEmpty = add("empty_milk_carton",
+    emptyMilkCarton = add("empty_milk_carton",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     milkCarton = add("milk_carton",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> milkCartonEmpty)
+            .setContainer(() -> emptyMilkCarton)
             .setWater(8)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     milkRotten = add("milk_rotten",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> milkCartonEmpty)
+            .setContainer(() -> emptyMilkCarton)
             .setWater(4)
             .setRotten()
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    colaPopEmpty = add("empty_cola_pop",
+    emptyColaPop = add("empty_cola_pop",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     colaPop = add("cola_pop",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> colaPopEmpty)
+            .setContainer(() -> emptyColaPop)
             .setWater(6)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    ironBrewEmpty = add("empty_iron_brew",
+    emptyIronBrew = add("empty_iron_brew",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     ironBrew = add("iron_brew",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> ironBrewEmpty)
+            .setContainer(() -> emptyIronBrew)
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    spriteEmpty = add("empty_sprite",
+    emptySprite = add("empty_sprite",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     sprite = add("sprite",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> spriteEmpty)
+            .setContainer(() -> emptySprite)
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    zombieEnergyEmpty = add("empty_zombie_energy",
+    emptyZombieEnergy = add("empty_zombie_energy",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     zombieEnergy = add("zombie_energy",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> zombieEnergyEmpty)
+            .setContainer(() -> emptyZombieEnergy)
             .setWater(9)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-    lemonFizzEmpty = add("empty_lemon_fizz",
+    emptyLemonFizz = add("empty_lemon_fizz",
         new Item(new EatItem.Properties().setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
     lemonFizz = add("lemon_fizz",
         new EatItem(new EatItem.Properties()
-            .setContainer(() -> lemonFizzEmpty)
+            .setContainer(() -> emptyLemonFizz)
             .setWater(6)
             .setGroup(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -1202,7 +1188,7 @@ public class ModItems {
             .setGroup((ModItemGroups.CRAFTING_DEAD_WEAPON))));
 
     // ================================================================================
-    // wearable
+    // Wearable
     // ================================================================================
 
     backpackSmallRed = add("backpack_small_red", new BackpackItem(Backpack.SMALL));

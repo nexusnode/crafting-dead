@@ -10,9 +10,9 @@ import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.RayTraceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -74,7 +74,7 @@ public class GunController implements ITriggerable, IAimable {
   public void tick(ItemStack itemStack, Entity entity) {
     this.updateAccuracy(entity);
 
-    // On finished reloading
+    // TODO On finished reloading
     if (this.reloadDuration-- == 0) {
       ;
     }
@@ -107,7 +107,6 @@ public class GunController implements ITriggerable, IAimable {
     }
 
     this.accuracy *= this.item.getAccuracy();
-
   }
 
   private void shoot(ItemStack itemStack, Entity entity) {
@@ -151,8 +150,10 @@ public class GunController implements ITriggerable, IAimable {
     BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
     Block block = blockState.getBlock();
     if (block instanceof TNTBlock) {
-      TNTBlock.explode(entity.getEntityWorld(), blockPos);
-      entity.getEntityWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState(), 11);
+      block
+          .catchFire(blockState, entity.getEntityWorld(), blockPos, null,
+              entity instanceof LivingEntity ? (LivingEntity) entity : null);
+      entity.getEntityWorld().removeBlock(blockPos, false);
     }
   }
 

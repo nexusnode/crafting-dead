@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.animation;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,48 +8,42 @@ import net.minecraft.item.ItemStack;
 
 public class AnimationManager {
 
-  private final Map<ItemStack, GunAnimation> currentAnimations = Maps.newHashMap();
-  private final Map<ItemStack, GunAnimation> nextAnimations = Maps.newHashMap();
+  private final Map<ItemStack, IGunAnimation> currentAnimations = new HashMap<>();
+  private final Map<ItemStack, IGunAnimation> nextAnimations = new HashMap<>();
 
   public void tick() {
-    Iterator<Entry<ItemStack, GunAnimation>> nextIterator = nextAnimations.entrySet().iterator();
+    Iterator<Entry<ItemStack, IGunAnimation>> nextIterator =
+        this.nextAnimations.entrySet().iterator();
     nextIterator.forEachRemaining((entry) -> {
       ItemStack itemStack = entry.getKey();
-      GunAnimation animation = entry.getValue();
-      currentAnimations.put(itemStack, animation);
+      IGunAnimation animation = entry.getValue();
+      this.currentAnimations.put(itemStack, animation);
       nextIterator.remove();
     });
-    Iterator<Entry<ItemStack, GunAnimation>> currentIterator =
-        currentAnimations.entrySet().iterator();
+    Iterator<Entry<ItemStack, IGunAnimation>> currentIterator =
+        this.currentAnimations.entrySet().iterator();
     currentIterator.forEachRemaining((entry) -> {
-      ItemStack itemStack = entry.getKey();
-      GunAnimation animation = entry.getValue();
-      animation.tick();
-      if (animation.isFinished()) {
-        animation.onAnimationStopped(itemStack);
+      IGunAnimation animation = entry.getValue();
+      if (animation.tick()) {
         currentIterator.remove();
       }
     });
   }
 
-  public void setNextGunAnimation(ItemStack itemStack, GunAnimation animation) {
-    nextAnimations.put(itemStack, animation);
+  public void setNextGunAnimation(ItemStack itemStack, IGunAnimation animation) {
+    this.nextAnimations.put(itemStack, animation);
   }
 
   public void cancelCurrentAnimation(ItemStack itemStack) {
-    GunAnimation animation = currentAnimations.get(itemStack);
-    if (animation != null) {
-      animation.onAnimationStopped(itemStack);
-    }
-    currentAnimations.remove(itemStack);
+    this.currentAnimations.remove(itemStack);
   }
 
   public void clear(ItemStack itemStack) {
-    cancelCurrentAnimation(itemStack);
-    nextAnimations.remove(itemStack);
+    this.cancelCurrentAnimation(itemStack);
+    this.nextAnimations.remove(itemStack);
   }
 
-  public GunAnimation getCurrentAnimation(ItemStack itemStack) {
-    return currentAnimations.get(itemStack);
+  public IGunAnimation getCurrentAnimation(ItemStack itemStack) {
+    return this.currentAnimations.get(itemStack);
   }
 }

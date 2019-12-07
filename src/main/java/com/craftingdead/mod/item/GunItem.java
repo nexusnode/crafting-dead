@@ -7,14 +7,10 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.triggerable.GunController;
-import com.craftingdead.mod.client.animation.GunAnimation;
+import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -23,8 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -57,7 +51,7 @@ public class GunItem extends Item {
 
   private final Supplier<SoundEvent> shootSound;
 
-  private final Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
+  private final Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
 
   public GunItem(Properties properties) {
     super(properties);
@@ -99,7 +93,7 @@ public class GunItem extends Item {
     return shootSound;
   }
 
-  public Map<GunAnimation.Type, Supplier<GunAnimation>> getAnimations() {
+  public Map<IGunAnimation.Type, Supplier<IGunAnimation>> getAnimations() {
     return animations;
   }
 
@@ -109,37 +103,11 @@ public class GunItem extends Item {
     @SuppressWarnings("deprecation")
     Multimap<String, AttributeModifier> modifiers = super.getAttributeModifiers(equipmentSlot);
     if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-      // Add 20 attack speed to remove cooldown
-      modifiers
-          .put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(
-              ATTACK_SPEED_MODIFIER, "Weapon modifier", 20, AttributeModifier.Operation.ADDITION));
       modifiers
           .put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER,
               "Weapon modifier", 100, AttributeModifier.Operation.ADDITION));
     }
     return modifiers;
-  }
-
-  @Override
-  public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-    // Return true to stop swing animation on shoot
-    return true;
-  }
-
-  @Override
-  public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, PlayerEntity player) {
-    return true;
-  }
-
-  @Override
-  public boolean canPlayerBreakBlockWhileHolding(BlockState state, World worldIn, BlockPos pos,
-      PlayerEntity player) {
-    return false;
-  }
-
-  @Override
-  public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
-    return true;
   }
 
   @Override
@@ -172,7 +140,7 @@ public class GunItem extends Item {
 
     private Supplier<SoundEvent> shootSound;
 
-    private Map<GunAnimation.Type, Supplier<GunAnimation>> animations;
+    private Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -209,7 +177,7 @@ public class GunItem extends Item {
       return this;
     }
 
-    public Properties setAnimations(Map<GunAnimation.Type, Supplier<GunAnimation>> animations) {
+    public Properties setAnimations(Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations) {
       this.animations = ImmutableMap.copyOf(animations);
       return this;
     }

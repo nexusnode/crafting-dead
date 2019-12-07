@@ -22,8 +22,8 @@ public class RecoilHelper {
   private Vec2f prevRotationVelocity = this.rotationVelocity;
 
   public Vec2f update() {
-    float smoothYaw = MathHelper.lerp(0.5F, this.prevRotationVelocity.x, this.rotationVelocity.x);
-    float smoothPitch = MathHelper.lerp(0.5F, this.prevRotationVelocity.y, this.rotationVelocity.y);
+    float smoothYaw = MathHelper.lerp(0.25F, this.prevRotationVelocity.x, this.rotationVelocity.x);
+    float smoothPitch = MathHelper.lerp(0.25F, this.prevRotationVelocity.y, this.rotationVelocity.y);
     this.rotationVelocity = Vec2f.ZERO;
     this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
     return this.prevRotationVelocity;

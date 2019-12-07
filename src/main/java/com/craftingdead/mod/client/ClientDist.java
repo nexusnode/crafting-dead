@@ -19,11 +19,14 @@ import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.animation.AnimationManager;
-import com.craftingdead.mod.client.animation.GunAnimation;
+import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.transition.TransitionManager;
 import com.craftingdead.mod.client.gui.transition.Transitions;
+import com.craftingdead.mod.client.model.GunRenderer;
+import com.craftingdead.mod.client.model.builtin.BuiltinModel;
+import com.craftingdead.mod.client.model.builtin.BuiltinModelLoader;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.MedicalCrateRenderer;
@@ -37,6 +40,7 @@ import com.craftingdead.mod.entity.SupplyCrateEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
 import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
 import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
@@ -48,30 +52,34 @@ import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.BasicState;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -119,6 +127,8 @@ public class ClientDist implements IModDist {
         .addReloadListener(this.crosshairManager);
 
     this.guiIngame = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+
+    ModelLoaderRegistry.registerLoader(BuiltinModelLoader.INSTANCE);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -161,6 +171,7 @@ public class ClientDist implements IModDist {
   public void handleClientSetup(FMLClientSetupEvent event) {
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
+    ClientRegistry.registerKeyBinding(CROUCH);
 
     OBJLoader.INSTANCE.addDomain(CraftingDead.ID);
     OBJLoader.INSTANCE.onResourceManagerReload(Minecraft.getInstance().getResourceManager());
@@ -228,6 +239,10 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case END:
         CraftingDead.getInstance().tickConnection();
+        if (minecraft.world != null && !minecraft.isGamePaused()) {
+          this.animationManager.tick();
+
+        }
         break;
       default:
         break;
@@ -249,12 +264,18 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleMouseInput(InputEvent.MouseInputEvent event) {
+  public void handleMouseInput(InputEvent.RawMouseEvent event) {
     if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
       if (event.getButton() == minecraft.gameSettings.keyBindAttack.getKey().getKeyCode()) {
         boolean press = event.getAction() == GLFW.GLFW_PRESS;
         this.getPlayer().ifPresent((player) -> {
           player.setTriggerPressed(press);
+          event
+              .setCanceled(player
+                  .getEntity()
+                  .getHeldItemMainhand()
+                  .getCapability(ModCapabilities.TRIGGERABLE)
+                  .isPresent());
         });
       }
     }
@@ -298,22 +319,6 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
-
-    if (event.getEntity() instanceof ClientPlayerEntity
-        && !LivingRendererMod.class.isAssignableFrom(event.getRenderer().getClass())) {
-      if (!event.getEntity().isSneaking()) {
-        event.setCanceled(true);
-
-        LivingRendererMod render =
-            new LivingRendererMod(Minecraft.getInstance().getRenderManager());
-
-        render
-            .doRender((ClientPlayerEntity) event.getEntity(), event.getX(), event.getY(),
-                event.getZ(), ((AbstractClientPlayerEntity) event.getEntity()).rotationYaw,
-                event.getPartialRenderTick());
-      }
-    }
-
     // We don't use RenderPlayerEvent.Pre as it gets called too early resulting in
     // changes we make to the arm pose being overwritten
     ItemStack stack = event.getEntity().getHeldItemMainhand();
@@ -370,142 +375,67 @@ public class ClientDist implements IModDist {
       if (event.getEntity() == minecraft.player) {
         this.recoilHelper.jolt(gunController.getAccuracy());
       }
-      Supplier<GunAnimation> animation =
-          gunController.getItem().getAnimations().get(GunAnimation.Type.SHOOT);
+      Supplier<IGunAnimation> animation =
+          gunController.getItem().getAnimations().get(IGunAnimation.Type.SHOOT);
       if (animation != null && animation.get() != null) {
-        AnimationManager animationManager = this.animationManager;
-        animationManager.clear(event.getItemStack());
-        animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
+        this.animationManager.clear(event.getItemStack());
+        this.animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
       }
     }
   }
 
   @SubscribeEvent
-  public void preRender(DrawScreenEvent.Pre event) {
+  public void handleDrawScreenPre(DrawScreenEvent.Pre event) {
     event
         .setCanceled(this.transitionManager
             .checkDrawTransition(event.getMouseX(), event.getMouseY(),
                 event.getRenderPartialTicks(), event.getGui()));
   }
 
-  /*
-   * Using Reflection to set the swimming position, which is then redefined to crawl.
-   */
   @SubscribeEvent
-  public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-    if (event.phase == TickEvent.Phase.END) {
-      if (ClientDist.CROUCH.isKeyDown()) {
+  public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
+    switch (event.phase) {
+      case END:
+        if (event.player.world.isRemote) {
+          if (ClientDist.CROUCH.isKeyDown()) {
+            // TODO Use access transformer
+            try {
+              setPose.invoke(event.player, Pose.SWIMMING);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+              ;
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  @SubscribeEvent
+  public void handleModelRegistry(ModelRegistryEvent event) {
+    BuiltinModelLoader.INSTANCE
+        .registerModel(new ModelResourceLocation(ModItems.acr.getRegistryName(), "inventory"),
+            new BuiltinModel(new GunRenderer(new ResourceLocation(CraftingDead.ID, "item/acr"))));
+  }
+
+  @SubscribeEvent
+  public void handleModelBakeEvent(ModelBakeEvent event) {
+    for (ResourceLocation modelLocation : event.getModelRegistry().keySet()) {
+      if (BuiltinModelLoader.INSTANCE.accepts(modelLocation)) {
+        IUnbakedModel model;
         try {
-          setPose.invoke(event.player, Pose.SWIMMING);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-          System.out.println("Error using reflection to crawl.");
+          model = BuiltinModelLoader.INSTANCE.loadModel(modelLocation);
+        } catch (Exception e) {
+          logger.error("Couldn't load model", e);
+          continue;
         }
+
+        IBakedModel bakedModel = model
+            .bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+                new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+        event.getModelRegistry().put(modelLocation, bakedModel);
       }
     }
-  }
-
-  /*
-   * Responsible for climbing walls.
-   */
-  @SubscribeEvent(priority = EventPriority.LOW)
-  public void tickClient(TickEvent.ClientTickEvent event) {
-    if (event.phase == TickEvent.Phase.START) {
-      PlayerEntity player = Minecraft.getInstance().player;
-      Entity camera = Minecraft.getInstance().getRenderViewEntity();
-
-      if (player == null || camera == null) {
-        return;
-      }
-
-      Minecraft mc = Minecraft.getInstance();
-      if (mc.currentScreen == null) {
-        if (Minecraft.getInstance().gameSettings.keyBindSprint.isKeyDown()) {
-
-          float grabDist = 0.75F;
-
-          Vec3d lookVec = player.getLookVec().scale(grabDist);
-
-          Vec3d lookVecBehind = player.getLookVec().scale(-0.25F);
-
-          double height = 0.2D;
-          /*
-           * STANDART Height player = 1.8 , Snake = 1.5 , low 0.6
-           *
-           * lifting height
-           */
-          double yScanRangeAir = player.getHeight() + height;
-
-          double yScanRangeSolid = 0.4D;
-
-          double yScanRes = 0.2D;
-          double yAirSize = 0.25D;
-          double xzSize = 0.3D;
-          double xzSizeBehind = 0.1D;
-
-          /*
-           * Player Box
-           */
-          AxisAlignedBB playerAABB = player.getBoundingBox();
-
-          /*
-           * Player Box
-           */
-          AxisAlignedBB spotForHandsAir =
-              new AxisAlignedBB(player.posX + lookVec.x, playerAABB.minY, player.posZ + lookVec.z,
-                  player.posX + lookVec.x, playerAABB.minY, player.posZ + lookVec.z)
-                      .grow(xzSize, yAirSize, xzSize);
-
-          /*
-           * Boxing the size of the user who checks whether it is still necessary to go up
-           */
-          AxisAlignedBB behindUnderFeet =
-              new AxisAlignedBB(player.posX + lookVecBehind.x, playerAABB.minY,
-                  player.posZ + lookVecBehind.z, player.posX + lookVecBehind.x, playerAABB.minY,
-                  player.posZ + lookVecBehind.z).grow(xzSizeBehind, xzSizeBehind, xzSizeBehind);
-
-          boolean foundGrabbableSpot = false;
-
-          /*
-           * Check for contact between the player and the wall in front of him. Провер�?ет,
-           * что пользователь не наземле , и колизии
-           */
-          if (!player.onGround && player.world.isCollisionBoxesEmpty(player, behindUnderFeet)) {
-
-            for (double y = yScanRangeAir; y > 0.25D && !foundGrabbableSpot; y -= yScanRes) {
-              /*
-               * Initial check to see if movement can begin at all. �?ачальна�?
-               * проверка можно ли начать движение. И е�?ть ли
-               * колизи�? �? блоком который выше игрока.
-               */
-              if (player.world.isCollisionBoxesEmpty(player, spotForHandsAir.offset(0, y, 0))) {
-
-                for (double y2 = 0; y2 < yScanRangeSolid; y2 += yScanRes) {
-                  AxisAlignedBB axisAlignedBB =
-                      spotForHandsAir.offset(0, y - (yAirSize * 1D) - y2, 0);
-                  if (!player.world.isCollisionBoxesEmpty(player, axisAlignedBB)
-                      && axisAlignedBB.minY + 0.15D > playerAABB.minY) {
-                    foundGrabbableSpot = true;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          if (foundGrabbableSpot) {
-            float climbSpeed = 0.08F;
-            if (player.getMotion().y < climbSpeed) {
-              Vec3d speed = player.getMotion();
-              player.setMotion(speed.x, climbSpeed, speed.z);
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  @SubscribeEvent
-  public static void onPreTextureStitch(TextureStitchEvent.Pre event) {
-    event.addSprite(ResourceLocation.tryCreate("craftingdead:textures/block/yellow"));
   }
 }
