@@ -6,7 +6,11 @@ import net.minecraft.util.EntityDamageSource;
 
 public class ModDamageSource {
 
-  public static final DamageSource DEHYDRATION = new DamageSource("dehydration");
+  public static final DamageSource DEHYDRATION =
+      new DamageSource("dehydration").setDamageBypassesArmor();
+  public static final DamageSource BLEEDING = new DamageSource("bleeding").setDamageBypassesArmor();
+  public static final DamageSource INFECTION =
+      new DamageSource("infection").setDamageBypassesArmor();
 
   public static DamageSource causeGunDamage(Entity source) {
     return new EntityDamageSource("bullet", source).setDamageBypassesArmor().setProjectile();

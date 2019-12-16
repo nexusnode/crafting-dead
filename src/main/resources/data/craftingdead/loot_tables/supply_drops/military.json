@@ -1,0 +1,50 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 1,
+          "name": "craftingdead:gun_bag_backpack"
+        },
+        {
+            "type": "minecraft:item",
+            "weight": 1,
+            "functions": [
+              {
+                "function": "minecraft:set_count",
+                "count": {
+                  "min": 1.0,
+                  "max": 3.0,
+                  "type": "minecraft:uniform"
+                }
+              }
+            ],
+            "name": "craftingdead:orange"
+          },
+          {
+            "type": "minecraft:item",
+            "weight": 1,
+            "functions": [
+              {
+                "function": "minecraft:set_count",
+                "count": {
+                  "min": 1.0,
+                  "max": 2.0,
+                  "type": "minecraft:uniform"
+                }
+              }
+            ],
+            "name": "craftingdead:apple"
+          },
+          {
+            "type": "minecraft:item",
+            "weight": 1,
+            "name": "craftingdead:antibiotics"
+          }
+      ]
+    }
+  ]
+}

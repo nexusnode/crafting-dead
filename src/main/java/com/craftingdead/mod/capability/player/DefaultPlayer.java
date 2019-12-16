@@ -17,8 +17,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
 /**
- * The abstracted player class - represents a Crafting Dead player.<br> Subclasses are attached to
- * the appropriate {@link E} via Forge capabilities.
+ * The abstracted player class - represents a Crafting Dead player.<br>
+ * Subclasses are attached to the appropriate {@link E} via Forge capabilities.
  *
  * @param <E> - the associated {@link PlayerEntity}
  * @author Sm0keySa1m0n
@@ -92,18 +92,19 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public void tick() {
     this.updateHeldStack();
-    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG)
+    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())
         && this.entity.onGround && !this.entity.isInWater()
         && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
-        || this.entity.fallDistance > 10F)) {
-      this.entity.sendStatusMessage(new TranslationTextComponent("message.broken_leg")
-          .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG, 9999999, 4));
+            || this.entity.fallDistance > 10F)) {
+      this.entity
+          .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
+              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
     if (this.entity.isCreative()) {
-      if (this.entity.isPotionActive(ModEffects.BROKEN_LEG)) {
-        this.entity.removePotionEffect(ModEffects.BROKEN_LEG);
+      if (this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())) {
+        this.entity.removePotionEffect(ModEffects.BROKEN_LEG.get());
       }
     }
   }
@@ -112,8 +113,10 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     if (heldStack != this.lastHeldStack) {
       if (this.lastHeldStack != null) {
-        this.lastHeldStack.getCapability(ModCapabilities.TRIGGERABLE).ifPresent(
-            (triggerable) -> triggerable.setTriggerPressed(false, this.lastHeldStack, this.entity));
+        this.lastHeldStack
+            .getCapability(ModCapabilities.TRIGGERABLE)
+            .ifPresent((triggerable) -> triggerable
+                .setTriggerPressed(false, this.lastHeldStack, this.entity));
       }
       this.lastHeldStack = heldStack;
     }
@@ -134,9 +137,10 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void setTriggerPressed(boolean triggerPressed) {
     this.triggerPressed = triggerPressed;
     ItemStack heldStack = this.getEntity().getHeldItemMainhand();
-    heldStack.getCapability(ModCapabilities.TRIGGERABLE, null)
-        .ifPresent((triggerable) -> triggerable.setTriggerPressed(triggerPressed, heldStack,
-            this.getEntity()));
+    heldStack
+        .getCapability(ModCapabilities.TRIGGERABLE, null)
+        .ifPresent((triggerable) -> triggerable
+            .setTriggerPressed(triggerPressed, heldStack, this.getEntity()));
   }
 
   @Override

@@ -1,28 +1,44 @@
 package com.craftingdead.mod.potion;
 
-import com.craftingdead.mod.capability.ModCapabilities;
 import javax.annotation.Nullable;
+import com.craftingdead.mod.capability.ModCapabilities;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
+import net.minecraft.potion.InstantEffect;
 
-public class HydrateEffect extends Effect {
+public class HydrateEffect extends InstantEffect {
 
   protected HydrateEffect() {
     super(EffectType.BENEFICIAL, 0x0077BE);
   }
 
   @Override
-  public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource,
-      LivingEntity entityLivingBaseIn, int amplifier, double health) {
-    entityLivingBaseIn.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
-      player.setWater(player.getWater() + amplifier);
+  public void performEffect(LivingEntity livingEntity, int amplifier) {
+    livingEntity.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> {
+      player.setWater(player.getWater() + amplifier + 1);
     });
   }
 
   @Override
-  public boolean isInstant() {
-    return true;
+  public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource,
+      LivingEntity entityLivingBaseIn, int amplifier, double health) {
+    this.performEffect(entityLivingBaseIn, amplifier);
+  }
+
+  @Override
+  public boolean shouldRender(EffectInstance effect) {
+    return false;
+  }
+
+  @Override
+  public boolean shouldRenderInvText(EffectInstance effect) {
+    return false;
+  }
+
+  @Override
+  public boolean shouldRenderHUD(EffectInstance effect) {
+    return false;
   }
 }

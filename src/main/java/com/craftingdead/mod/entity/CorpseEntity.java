@@ -34,9 +34,6 @@ public class CorpseEntity extends Entity {
   private static final DataParameter<Optional<UUID>> DECEASED_ID =
       EntityDataManager.createKey(CorpseEntity.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
-  private static final DataParameter<Optional<ITextComponent>> DECEASED_NAME =
-      EntityDataManager.createKey(CorpseEntity.class, DataSerializers.OPTIONAL_TEXT_COMPONENT);
-
   private static final DataParameter<Integer> LIMB_COUNT =
       EntityDataManager.createKey(CorpseEntity.class, DataSerializers.VARINT);
 
@@ -44,8 +41,8 @@ public class CorpseEntity extends Entity {
 
   public CorpseEntity(World world, UUID deceasedId, ITextComponent deceasedName) {
     super(ModEntityTypes.corpse, world);
+    this.setCustomName(deceasedName);
     this.dataManager.set(DECEASED_ID, Optional.ofNullable(deceasedId));
-    this.dataManager.set(DECEASED_NAME, Optional.ofNullable(deceasedName));
   }
 
   public CorpseEntity(EntityType<?> type, World world) {
@@ -86,10 +83,7 @@ public class CorpseEntity extends Entity {
   public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
     player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> {
       return ChestContainer.createGeneric9X3(id, playerInventory, this.inventory);
-    }, new StringTextComponent(this.getDeceasedName()
-        .orElse(
-            new StringTextComponent((this.getUniqueID().hashCode() & 1) == 1 ? "Alex" : "Steve"))
-        .getFormattedText() + "'s Corpse")));
+    }, new StringTextComponent(this.getDisplayName().getFormattedText() + "'s Corpse")));
     return ActionResultType.PASS;
   }
 
@@ -116,10 +110,6 @@ public class CorpseEntity extends Entity {
     return this.dataManager.get(DECEASED_ID);
   }
 
-  public Optional<ITextComponent> getDeceasedName() {
-    return this.dataManager.get(DECEASED_NAME);
-  }
-
   public int getLimbCount() {
     return this.dataManager.get(LIMB_COUNT);
   }
@@ -127,7 +117,6 @@ public class CorpseEntity extends Entity {
   @Override
   protected void registerData() {
     this.dataManager.register(DECEASED_ID, Optional.empty());
-    this.dataManager.register(DECEASED_NAME, Optional.empty());
     this.dataManager.register(LIMB_COUNT, 4);
   }
 
@@ -154,8 +143,8 @@ public class CorpseEntity extends Entity {
     for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
       items.set(i, this.inventory.getStackInSlot(i));
     }
-    compound.put("inventory",
-        ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
+    compound
+        .put("inventory", ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
   }
 
   @Override

@@ -27,9 +27,6 @@ public class RenderUtil {
   public static final ResourceLocation ICONS =
       new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
 
-  public static final ResourceLocation SPRINT =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
-
   private static final Minecraft minecraft = Minecraft.getInstance();
 
   public static void drawGradientRectangle(double x, double y, double x2, double y2, int startColor,

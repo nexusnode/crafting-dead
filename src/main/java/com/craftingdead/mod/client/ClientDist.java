@@ -29,14 +29,9 @@ import com.craftingdead.mod.client.model.builtin.BuiltinModel;
 import com.craftingdead.mod.client.model.builtin.BuiltinModelLoader;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
-import com.craftingdead.mod.client.renderer.entity.MedicalCrateRenderer;
-import com.craftingdead.mod.client.renderer.entity.MilitaryCrateRenderer;
-import com.craftingdead.mod.client.renderer.entity.SupplyCrateRenderer;
-import com.craftingdead.mod.client.renderer.player.LivingRendererMod;
+import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.entity.CorpseEntity;
-import com.craftingdead.mod.entity.MedicalCrateEntity;
-import com.craftingdead.mod.entity.MilitaryCrateEntity;
-import com.craftingdead.mod.entity.SupplyCrateEntity;
+import com.craftingdead.mod.entity.SupplyDropEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
@@ -180,20 +175,8 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(AdvancedZombieEntity.class, AdvancedZombieRenderer::new);
 
-    /*
-     * Substitution of a class which is responsible for rendering
-     */
     RenderingRegistry
-        .registerEntityRenderingHandler(AbstractClientPlayerEntity.class, LivingRendererMod::new);
-
-    RenderingRegistry
-        .registerEntityRenderingHandler(MedicalCrateEntity.class, MedicalCrateRenderer::new);
-
-    RenderingRegistry
-        .registerEntityRenderingHandler(MilitaryCrateEntity.class, MilitaryCrateRenderer::new);
-
-    RenderingRegistry
-        .registerEntityRenderingHandler(SupplyCrateEntity.class, SupplyCrateRenderer::new);
+        .registerEntityRenderingHandler(SupplyDropEntity.class, SupplyDropRenderer::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
@@ -347,18 +330,25 @@ public class ClientDist implements IModDist {
                 event.getWindow().getScaledHeight());
         break;
       case CROSSHAIRS:
-        this.getPlayer().ifPresent((player) -> {
-          player
-              .getEntity()
-              .getHeldItemMainhand()
-              .getCapability(ModCapabilities.AIMABLE)
-              .ifPresent((aimable) -> {
-                event.setCanceled(true);
-                this.guiIngame
-                    .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
-                        event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
-              });
+        minecraft.player.getCapability(ModCapabilities.ACTION).ifPresent((action) -> {
+          if (action.isActive(minecraft.player)) {
+            event.setCanceled(true);
+          }
         });
+        if (!event.isCanceled()) {
+          this.getPlayer().ifPresent((player) -> {
+            player
+                .getEntity()
+                .getHeldItemMainhand()
+                .getCapability(ModCapabilities.AIMABLE)
+                .ifPresent((aimable) -> {
+                  event.setCanceled(true);
+                  this.guiIngame
+                      .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
+                          event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
+                });
+          });
+        }
         break;
       default:
         break;
@@ -415,7 +405,7 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleModelRegistry(ModelRegistryEvent event) {
     BuiltinModelLoader.INSTANCE
-        .registerModel(new ModelResourceLocation(ModItems.acr.getRegistryName(), "inventory"),
+        .registerModel(new ModelResourceLocation(ModItems.ACR.getId(), "inventory"),
             new BuiltinModel(new GunRenderer(new ResourceLocation(CraftingDead.ID, "item/acr"))));
   }
 

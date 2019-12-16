@@ -2,6 +2,7 @@ package com.craftingdead.mod.client.gui;
 
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
@@ -46,6 +47,21 @@ public class IngameGui {
     // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
     // - 1;
 
+    this.minecraft.player.getCapability(ModCapabilities.ACTION).ifPresent((action) -> {
+      if (action.isActive(this.minecraft.player)) {
+        final float barWidth = 100;
+        final float x = width / 2 - barWidth / 2;
+        final float y = height / 2;
+        this.minecraft.fontRenderer
+            .drawStringWithShadow(action.getText(this.minecraft.player).getFormattedText(), x,
+                y - 15, 0xFFFFFF);
+        RenderUtil
+            .drawGradientRectangle(x, y,
+                x + barWidth * action.getPercentComplete(this.minecraft.player), y + 10, 0xC0FFFFFF,
+                0xC0FFFFFF);
+      }
+    });
+
     this.client.getPlayer().ifPresent((player) -> {
       ClientPlayerEntity entity = player.getEntity();
 
@@ -57,12 +73,9 @@ public class IngameGui {
 
         // Only render when air level is not being rendered
         if (!entity.areEyesInFluid(FluidTags.WATER) && entity.getAir() == entity.getMaxAir()) {
-          renderModGui(width, height, (float) player.getWater() / (float) player.getMaxWater(),
+          renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
               RenderUtil.ICONS);
         }
-
-        renderModGui(width - 202, height,
-            (float) player.getStamina() / (float) player.getMaxStamina(), RenderUtil.SPRINT);
 
         renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
             player.getZombiesKilled(), player.getPlayersKilled());
@@ -107,7 +120,7 @@ public class IngameGui {
     GlStateManager.disableBlend();
   }
 
-  private static void renderModGui(int width, int height, float waterPercentage,
+  private static void renderWater(int width, int height, float waterPercentage,
       ResourceLocation resourceLocation) {
     final int y = height - 49;
     final int x = width / 2 + 91;

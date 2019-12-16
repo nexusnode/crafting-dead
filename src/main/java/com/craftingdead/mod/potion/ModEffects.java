@@ -2,25 +2,27 @@ package com.craftingdead.mod.potion;
 
 import com.craftingdead.mod.CraftingDead;
 import net.minecraft.potion.Effect;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
-@ObjectHolder(CraftingDead.ID)
-@Mod.EventBusSubscriber(modid = CraftingDead.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEffects {
 
-  public static final Effect BROKEN_LEG = null;
+  public static final DeferredRegister<Effect> EFFECTS =
+      new DeferredRegister<>(ForgeRegistries.POTIONS, CraftingDead.ID);
+  
+  public static final RegistryObject<Effect> SCUBA =
+      EFFECTS.register("scuba", HydrateEffect::new);
+  
+  public static final RegistryObject<Effect> INFECTION =
+      EFFECTS.register("infection", HydrateEffect::new);
 
-  public static final Effect HYDRATE = null;
+  public static final RegistryObject<Effect> BLEEDING =
+      EFFECTS.register("bleeding", BleedingEffect::new);
 
-  @SubscribeEvent
-  public static void handle(RegistryEvent.Register<Effect> event) {
-    event.getRegistry().registerAll(new BrokenLegEffect() //
-            .setRegistryName(new ResourceLocation(CraftingDead.ID, "broken_leg")), //
-        new HydrateEffect() //
-            .setRegistryName(new ResourceLocation(CraftingDead.ID, "hydrate")));
-  }
+  public static final RegistryObject<Effect> BROKEN_LEG =
+      EFFECTS.register("broken_leg", BrokenLegEffect::new);
+
+  public static final RegistryObject<Effect> HYDRATE =
+      EFFECTS.register("hydrate", HydrateEffect::new);
 }

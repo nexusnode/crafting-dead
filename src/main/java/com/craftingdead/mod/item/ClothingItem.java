@@ -50,9 +50,9 @@ public class ClothingItem extends Item {
 
       for (int i = 0; i < var1; i++) {
         if (rand.nextBoolean()) {
-          entityLiving.entityDropItem(new ItemStack(ModItems.ragClean));
+          entityLiving.entityDropItem(new ItemStack(ModItems.cleanRag));
         } else {
-          entityLiving.entityDropItem(new ItemStack(ModItems.ragDirty));
+          entityLiving.entityDropItem(new ItemStack(ModItems.dirtyRag));
         }
       }
     }

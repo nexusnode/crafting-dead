@@ -10,52 +10,47 @@ public class ModItemGroups {
 
         @Override
         public ItemStack createIcon() {
-          return new ItemStack(ModItems.powerBar);
+          return new ItemStack(ModItems.POWER_BAR::get);
         }
       });
 
-  public static final ItemGroup CRAFTING_DEAD_MISC =
-      (new ItemGroup("craftingdead_misc") {
+  public static final ItemGroup CRAFTING_DEAD_MISC = (new ItemGroup("craftingdead_misc") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.canOpener);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.CAN_OPENER::get);
+    }
+  });
 
-  public static final ItemGroup CRAFTING_DEAD_MED =
-      (new ItemGroup("craftingdead_med") {
+  public static final ItemGroup CRAFTING_DEAD_MED = (new ItemGroup("craftingdead_med") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.medpack);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.firstAidKit);
+    }
+  });
 
-  public static final ItemGroup CRAFTING_DEAD_WEAPON =
-      (new ItemGroup("craftingdead_weapon") {
+  public static final ItemGroup CRAFTING_DEAD_WEAPON = (new ItemGroup("craftingdead_weapon") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.crowbar);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.crowbar);
+    }
+  });
 
-  public static final ItemGroup CRAFTING_DEAD_WEARABLE =
-      (new ItemGroup("craftingdead_wearable") {
+  public static final ItemGroup CRAFTING_DEAD_WEARABLE = (new ItemGroup("craftingdead_wearable") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.backpackSmallRed);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.smallRedBackpack);
+    }
+  });
 
-  public static final ItemGroup CRAFTING_DEAD_GENERAL=
-      (new ItemGroup("craftingdead_wearable") {
+  public static final ItemGroup CRAFTING_DEAD_GENERAL = (new ItemGroup("craftingdead_wearable") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.backpackLargeTan);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.largeTanBackpack);
+    }
+  });
 }

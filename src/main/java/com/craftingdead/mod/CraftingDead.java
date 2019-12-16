@@ -10,12 +10,14 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.handshake.HandshakeSession;
 import com.craftingdead.mod.net.NetworkChannel;
+import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.tileentity.ModTileEntityTypes;
 import com.craftingdead.network.TcpClient;
@@ -31,8 +33,12 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -121,6 +127,10 @@ public class CraftingDead {
     // These need to stay in this order as certain Items require access to EntityTypes etc.
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
+
+    ModItems.ITEMS.register(modEventBus);
+
+    ModEffects.EFFECTS.register(modEventBus);
 
     ModBlocks.initialize();
     modEventBus.addGenericListener(Block.class, ModBlocks::register);
@@ -255,6 +265,18 @@ public class CraftingDead {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
               new SerializableProvider<>(player, ModCapabilities.PLAYER));
+    }
+
+    if (event.getObject() instanceof PlayerEntity) {
+      event.addCapability(new ResourceLocation(CraftingDead.ID), new ICapabilityProvider() {
+        private final IAction action = ModCapabilities.ACTION.getDefaultInstance();
+
+        @Override
+        public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+          return cap == ModCapabilities.ACTION ? LazyOptional.of(() -> this.action).cast()
+              : LazyOptional.empty();
+        }
+      });
     }
   }
 }
