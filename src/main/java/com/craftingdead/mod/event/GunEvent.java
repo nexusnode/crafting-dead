@@ -1,7 +1,7 @@
 package com.craftingdead.mod.event;
 
 import java.util.Optional;
-import com.craftingdead.mod.capability.triggerable.GunController;
+import com.craftingdead.mod.capability.GunController;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;

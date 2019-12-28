@@ -10,9 +10,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
 
 public class IngameGui {
 
@@ -47,32 +49,26 @@ public class IngameGui {
     // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
     // - 1;
 
-    this.minecraft.player.getCapability(ModCapabilities.ACTION).ifPresent((action) -> {
-      if (action.isActive(this.minecraft.player)) {
-        final float barWidth = 100;
-        final float x = width / 2 - barWidth / 2;
-        final float y = height / 2;
-        this.minecraft.fontRenderer
-            .drawStringWithShadow(action.getText(this.minecraft.player).getFormattedText(), x,
-                y - 15, 0xFFFFFF);
-        RenderUtil
-            .drawGradientRectangle(x, y,
-                x + barWidth * action.getPercentComplete(this.minecraft.player), y + 10, 0xC0FFFFFF,
-                0xC0FFFFFF);
-      }
-    });
-
     this.client.getPlayer().ifPresent((player) -> {
-      ClientPlayerEntity entity = player.getEntity();
+      ClientPlayerEntity playerEntity = player.getEntity();
+      ItemStack heldStack = playerEntity.getHeldItemMainhand();
+      heldStack.getCapability(ModCapabilities.ACTION).ifPresent(action -> {
+        if (action.isActive(playerEntity, heldStack)) {
+          renderActionProgress(this.minecraft.fontRenderer, width, height,
+              action.getText(playerEntity, heldStack),
+              action.getPercentComplete(playerEntity, heldStack));
+        }
+      });
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
         if (CommonConfig.clientConfig.displayBlood.get()) {
-          renderBlood(width, height, entity.getHealth() / entity.getMaxHealth());
+          renderBlood(width, height, playerEntity.getHealth() / playerEntity.getMaxHealth());
         }
 
         // Only render when air level is not being rendered
-        if (!entity.areEyesInFluid(FluidTags.WATER) && entity.getAir() == entity.getMaxAir()) {
+        if (!playerEntity.areEyesInFluid(FluidTags.WATER)
+            && playerEntity.getAir() == playerEntity.getMaxAir()) {
           renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
               RenderUtil.ICONS);
         }
@@ -81,6 +77,18 @@ public class IngameGui {
             player.getZombiesKilled(), player.getPlayersKilled());
       }
     });
+  }
+
+  private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,
+      ITextComponent text, float percent) {
+    final int barWidth = 100;
+    final int barHeight = 10;
+    final int barColour = 0xC0FFFFFF;
+    final float x = width / 2 - barWidth / 2;
+    final float y = height / 2;
+    fontRenderer.drawStringWithShadow(text.getFormattedText(), x, y - barHeight - 5, 0xFFFFFF);
+    RenderUtil
+        .drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour, barColour);
   }
 
   private static void renderBlood(int width, int height, float healthPercentage) {

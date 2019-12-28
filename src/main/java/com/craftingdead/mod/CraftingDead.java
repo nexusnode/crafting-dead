@@ -16,10 +16,11 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.handshake.HandshakeSession;
-import com.craftingdead.mod.net.NetworkChannel;
+import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.tileentity.ModTileEntityTypes;
+import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.network.TcpClient;
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.util.TransportType;
@@ -131,6 +132,7 @@ public class CraftingDead {
     ModItems.ITEMS.register(modEventBus);
 
     ModEffects.EFFECTS.register(modEventBus);
+    ModSoundEvents.SOUND_EVENTS.register(modEventBus);
 
     ModBlocks.initialize();
     modEventBus.addGenericListener(Block.class, ModBlocks::register);
@@ -216,7 +218,7 @@ public class CraftingDead {
         event.player.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> player.tick());
         ItemStack itemStack = event.player.getHeldItemMainhand();
         itemStack
-            .getCapability(ModCapabilities.TRIGGERABLE)
+            .getCapability(ModCapabilities.SHOOTABLE)
             .ifPresent((triggerable) -> triggerable.tick(itemStack, event.player));
         break;
       default:
@@ -259,24 +261,29 @@ public class CraftingDead {
   }
 
   @SubscribeEvent
-  public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+  public void handleAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof ServerPlayerEntity) {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
               new SerializableProvider<>(player, ModCapabilities.PLAYER));
     }
+  }
 
-    if (event.getObject() instanceof PlayerEntity) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID), new ICapabilityProvider() {
-        private final IAction action = ModCapabilities.ACTION.getDefaultInstance();
+  @SubscribeEvent
+  public void handleAttachCapabilitiesItem(AttachCapabilitiesEvent<Item> event) {
+    if (event.getObject() instanceof Item) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "action"),
+              new ICapabilityProvider() {
+                private final IAction action = ModCapabilities.ACTION.getDefaultInstance();
 
-        @Override
-        public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-          return cap == ModCapabilities.ACTION ? LazyOptional.of(() -> this.action).cast()
-              : LazyOptional.empty();
-        }
-      });
+                @Override
+                public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+                  return cap == ModCapabilities.ACTION ? LazyOptional.of(() -> this.action).cast()
+                      : LazyOptional.empty();
+                }
+              });
     }
   }
 }

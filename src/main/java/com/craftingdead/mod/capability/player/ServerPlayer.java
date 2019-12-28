@@ -1,9 +1,8 @@
 package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.entity.CorpseEntity;
-import com.craftingdead.mod.net.NetworkChannel;
-import com.craftingdead.mod.net.message.main.TriggerPressedMessage;
-import com.craftingdead.mod.net.message.main.UpdateStatisticsMessage;
+import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -46,9 +45,11 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     }
 
     if (this.dirty) {
-      NetworkChannel.MAIN.getSimpleChannel().send(PacketDistributor.PLAYER.with(this::getEntity),
-          new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
-              this.water, this.maxWater, this.stamina, this.maxStamina));
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.PLAYER.with(this::getEntity),
+              new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
+                  this.water, this.maxWater, this.stamina, this.maxStamina));
       this.dirty = false;
     }
   }
@@ -95,14 +96,6 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     CorpseEntity corpse = new CorpseEntity(this.entity);
     this.entity.world.addEntity(corpse);
     return false;
-  }
-
-  @Override
-  public void setTriggerPressed(boolean triggerPressed) {
-    super.setTriggerPressed(triggerPressed);
-    NetworkChannel.MAIN.getSimpleChannel().send(
-        PacketDistributor.TRACKING_ENTITY.with(this::getEntity),
-        new TriggerPressedMessage(this.entity.getEntityId(), triggerPressed));
   }
 
   @Override

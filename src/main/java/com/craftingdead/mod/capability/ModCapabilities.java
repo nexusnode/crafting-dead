@@ -6,8 +6,8 @@ import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.aimable.IAimable;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
-import com.craftingdead.mod.capability.triggerable.DefaultTriggerable;
-import com.craftingdead.mod.capability.triggerable.ITriggerable;
+import com.craftingdead.mod.capability.shootable.DefaultShootable;
+import com.craftingdead.mod.capability.shootable.IShootable;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,8 +19,8 @@ public class ModCapabilities {
   @CapabilityInject(IPlayer.class)
   public static final Capability<IPlayer<?>> PLAYER = null;
 
-  @CapabilityInject(ITriggerable.class)
-  public static final Capability<ITriggerable> TRIGGERABLE = null;
+  @CapabilityInject(IShootable.class)
+  public static final Capability<IShootable> SHOOTABLE = null;
 
   @CapabilityInject(IAimable.class)
   public static final Capability<IAimable> AIMABLE = null;
@@ -31,7 +31,7 @@ public class ModCapabilities {
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
     CapabilityManager.INSTANCE
-        .register(ITriggerable.class, new EmptyStorage<>(), DefaultTriggerable::new);
+        .register(IShootable.class, new EmptyStorage<>(), DefaultShootable::new);
     CapabilityManager.INSTANCE
         .register(IAimable.class, new EmptyStorage<>(), (Callable<IAimable>) () -> () -> 1.0F);
     CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);

@@ -27,8 +27,6 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
    */
   boolean onDeath(DamageSource cause);
 
-  void setTriggerPressed(boolean triggerPressed);
-
   int getDaysSurvived();
 
   void setDaysSurvived(int daysSurvived);

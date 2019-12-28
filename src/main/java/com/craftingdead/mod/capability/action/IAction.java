@@ -1,13 +1,14 @@
 package com.craftingdead.mod.capability.action;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
 public interface IAction {
 
-  boolean isActive(PlayerEntity playerEntity);
+  boolean isActive(PlayerEntity playerEntity, ItemStack itemStack);
 
-  ITextComponent getText(PlayerEntity playerEntity);
+  ITextComponent getText(PlayerEntity playerEntity, ItemStack itemStack);
 
-  double getPercentComplete(PlayerEntity playerEntity);
+  float getPercentComplete(PlayerEntity playerEntity, ItemStack itemStack);
 }

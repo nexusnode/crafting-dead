@@ -2,28 +2,32 @@ package com.craftingdead.mod.item;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.animation.IGunAnimation;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class GunItem extends Item {
+public class GunItem extends ShootableItem {
 
   private static final UUID REACH_DISTANCE_MODIFIER =
       UUID.fromString("A625D496-9464-4891-9E1F-9345989E5DAE");
@@ -33,11 +37,9 @@ public class GunItem extends Item {
    */
   private final int fireRate;
 
-  private final int clipSize;
-
   private final int damage;
 
-  private final float reloadTime;
+  private final int reloadDurationTicks;
 
   /**
    * Accuracy as percentage.
@@ -45,56 +47,65 @@ public class GunItem extends Item {
   private final float accuracy;
 
   /**
-   * A {@link List} of {@link IFireMode}s the gun can cycle through.
+   * {@link IFireMode}s the gun can cycle through.
    */
   private final List<Supplier<IFireMode>> fireModes;
 
   private final Supplier<SoundEvent> shootSound;
 
+  private final Supplier<SoundEvent> reloadSound;
+
   private final Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
+
+  private final Set<ResourceLocation> acceptedMagazines;
 
   public GunItem(Properties properties) {
     super(properties);
     this.fireRate = properties.fireRate;
-    this.clipSize = properties.clipSize;
     this.damage = properties.damage;
-    this.reloadTime = properties.reloadTime;
+    this.reloadDurationTicks = properties.reloadDurationTicks;
     this.accuracy = properties.accuracy;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
+    this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
+    this.acceptedMagazines = properties.acceptedMagazines;
   }
 
   public int getFireRate() {
-    return fireRate;
-  }
-
-  public int getClipSize() {
-    return clipSize;
+    return this.fireRate;
   }
 
   public int getDamage() {
-    return damage;
+    return this.damage;
   }
 
-  public float getReloadTime() {
-    return reloadTime;
+  public int getReloadDurationTicks() {
+    return this.reloadDurationTicks;
   }
 
   public float getAccuracy() {
-    return accuracy;
+    return this.accuracy;
   }
 
   public List<Supplier<IFireMode>> getFireModes() {
-    return fireModes;
+    return this.fireModes;
   }
 
   public Supplier<SoundEvent> getShootSound() {
-    return shootSound;
+    return this.shootSound;
+  }
+
+  public Supplier<SoundEvent> getReloadSound() {
+    return this.reloadSound;
   }
 
   public Map<IGunAnimation.Type, Supplier<IGunAnimation>> getAnimations() {
-    return animations;
+    return this.animations;
+  }
+
+  public Set<ResourceLocation> getAcceptedMagazines() {
+    return this.acceptedMagazines;
   }
 
   @Override
@@ -111,44 +122,59 @@ public class GunItem extends Item {
   }
 
   @Override
+  public Predicate<ItemStack> getInventoryAmmoPredicate() {
+    return itemStack -> this.acceptedMagazines
+        .stream()
+        .map(ForgeRegistries.ITEMS::getValue)
+        .anyMatch(itemStack.getItem()::equals);
+  }
+
+  @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-    return new ICapabilityProvider() {
+    return new ICapabilitySerializable<CompoundNBT>() {
       private final GunController gunController = new GunController(GunItem.this);
 
       @Override
       public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        return (cap == ModCapabilities.TRIGGERABLE || cap == ModCapabilities.AIMABLE)
-            ? LazyOptional.of(() -> this.gunController).cast()
-            : LazyOptional.empty();
+        return (cap == ModCapabilities.SHOOTABLE || cap == ModCapabilities.AIMABLE
+            || cap == ModCapabilities.ACTION) ? LazyOptional.of(() -> this.gunController).cast()
+                : LazyOptional.empty();
+      }
+
+      @Override
+      public CompoundNBT serializeNBT() {
+        return this.gunController.serializeNBT();
+      }
+
+      @Override
+      public void deserializeNBT(CompoundNBT nbt) {
+        this.gunController.deserializeNBT(nbt);
       }
     };
   }
 
   public static class Properties extends Item.Properties {
 
-    private Integer fireRate;
+    private int fireRate;
 
-    private Integer clipSize;
+    private int damage;
 
-    private Integer damage;
+    private int reloadDurationTicks;
 
-    private Float reloadTime;
-
-    private Float accuracy;
+    private float accuracy;
 
     private List<Supplier<IFireMode>> fireModes;
 
     private Supplier<SoundEvent> shootSound;
 
+    private Supplier<SoundEvent> reloadSound;
+
     private Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
+
+    private Set<ResourceLocation> acceptedMagazines;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
-      return this;
-    }
-
-    public Properties setClipSize(int clipSize) {
-      this.clipSize = clipSize;
       return this;
     }
 
@@ -157,8 +183,8 @@ public class GunItem extends Item {
       return this;
     }
 
-    public Properties setReloadTime(float reloadTime) {
-      this.reloadTime = reloadTime;
+    public Properties setReloadDurationTicks(int reloadDurationTicks) {
+      this.reloadDurationTicks = reloadDurationTicks;
       return this;
     }
 
@@ -168,7 +194,7 @@ public class GunItem extends Item {
     }
 
     public Properties setFireModes(List<Supplier<IFireMode>> fireModes) {
-      this.fireModes = ImmutableList.copyOf(fireModes);
+      this.fireModes = fireModes;
       return this;
     }
 
@@ -177,8 +203,18 @@ public class GunItem extends Item {
       return this;
     }
 
+    public Properties setReloadSound(Supplier<SoundEvent> reloadSound) {
+      this.reloadSound = reloadSound;
+      return this;
+    }
+
     public Properties setAnimations(Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations) {
-      this.animations = ImmutableMap.copyOf(animations);
+      this.animations = animations;
+      return this;
+    }
+
+    public Properties setAcceptedMagazines(Set<ResourceLocation> acceptedMagazines) {
+      this.acceptedMagazines = acceptedMagazines;
       return this;
     }
   }

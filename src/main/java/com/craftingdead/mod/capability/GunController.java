@@ -1,12 +1,20 @@
-package com.craftingdead.mod.capability.triggerable;
+package com.craftingdead.mod.capability;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.aimable.IAimable;
+import com.craftingdead.mod.capability.shootable.IShootable;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.IFireMode;
+import com.craftingdead.mod.item.Magazine;
+import com.craftingdead.mod.item.MagazineItem;
+import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.ReloadMessage;
+import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
 import com.craftingdead.mod.util.ModDamageSource;
+import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.RayTraceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -16,13 +24,19 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class GunController implements ITriggerable, IAimable {
+public class GunController implements IShootable, IAimable, IAction, INBTSerializable<CompoundNBT> {
 
   private static final float HEADSHOT_MULTIPLIER = 4;
 
@@ -47,14 +61,15 @@ public class GunController implements ITriggerable, IAimable {
   private IFireMode fireMode;
 
   /**
-   * Reload ticks remaining.
-   */
-  private float reloadDuration;
-
-  /**
    * The accuracy value (0.0F - 1.0F)
    */
   private float accuracy;
+
+  private int reloadDurationTicks = 0;
+
+  private MagazineItem loadingMagazine;
+
+  private Magazine magazine;
 
   /**
    * Constructs a new {@link GunController}.
@@ -74,16 +89,16 @@ public class GunController implements ITriggerable, IAimable {
   public void tick(ItemStack itemStack, Entity entity) {
     this.updateAccuracy(entity);
 
-    // TODO On finished reloading
-    if (this.reloadDuration-- == 0) {
-      ;
+    if (this.reloadDurationTicks > 0 && --this.reloadDurationTicks == 0) {
+      this.magazine = this.loadingMagazine.getMagazine();
     }
 
     long fireRateNanoseconds =
         TimeUnit.NANOSECONDS.convert(this.item.getFireRate(), TimeUnit.MILLISECONDS);
     long time = System.nanoTime();
     long timeDelta = time - this.lastShotNanos;
-    if (this.fireMode.canShoot(this.triggerPressed) && timeDelta > fireRateNanoseconds) {
+    if (this.reloadDurationTicks == 0 && this.fireMode.canShoot(this.triggerPressed)
+        && timeDelta > fireRateNanoseconds) {
       this.lastShotNanos = time;
       this.shoot(itemStack, entity);
     }
@@ -110,6 +125,11 @@ public class GunController implements ITriggerable, IAimable {
   }
 
   private void shoot(ItemStack itemStack, Entity entity) {
+    if (this.magazine == null || this.magazine.getSizeAndDecrement() <= 0) {
+      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      return;
+    }
+
     entity.playSound(this.item.getShootSound().get(), 1.0F, 1.0F);
 
     Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
@@ -157,21 +177,84 @@ public class GunController implements ITriggerable, IAimable {
     }
   }
 
-  public void reload() {
-    // If not already reloading
-    if (this.reloadDuration == 0) {
-      // Set reload time
-      this.reloadDuration = this.item.getReloadTime();
+  @Override
+  public void reload(ItemStack itemStack, Entity entity) {
+    if (entity instanceof PlayerEntity) {
+      PlayerEntity playerEntity = (PlayerEntity) entity;
+      if (this.reloadDurationTicks == 0) {
+        if (playerEntity.isCreative()) {
+          this.loadingMagazine = (MagazineItem) ForgeRegistries.ITEMS
+              .getValue(this.item.getAcceptedMagazines().iterator().next());
+        } else {
+          ItemStack foundStack = playerEntity.findAmmo(itemStack);
+          if (foundStack != null && foundStack.getItem() instanceof MagazineItem) {
+            this.loadingMagazine = (MagazineItem) foundStack.getItem();
+            foundStack.shrink(1);
+            if (foundStack.isEmpty()) {
+              playerEntity.inventory.deleteStack(foundStack);
+            }
+          } else {
+            return;
+          }
+        }
+        entity.playSound(this.item.getReloadSound().get(), 1.0F, 1.0F);
+        this.reloadDurationTicks = this.item.getReloadDurationTicks();
+      }
+    }
+
+    if (entity.getEntityWorld().isRemote()) {
+      NetworkChannel.MAIN.getSimpleChannel().sendToServer(new ReloadMessage(0));
+    } else {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY.with(() -> entity),
+              new ReloadMessage(entity.getEntityId()));
     }
   }
 
   @Override
-  public void setTriggerPressed(boolean triggerPressed, ItemStack itemStack, Entity entity) {
+  public void setTriggerPressed(ItemStack itemStack, Entity entity, boolean triggerPressed) {
     this.triggerPressed = triggerPressed;
+    if (entity.getEntityWorld().isRemote()) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .sendToServer(new TriggerPressedMessage(0, triggerPressed));
+    } else {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY.with(() -> entity),
+              new TriggerPressedMessage(entity.getEntityId(), triggerPressed));
+    }
   }
 
   @Override
   public float getAccuracy() {
     return this.accuracy;
+  }
+
+  @Override
+  public CompoundNBT serializeNBT() {
+    return new CompoundNBT();
+  }
+
+  @Override
+  public void deserializeNBT(CompoundNBT nbt) {
+
+  }
+
+  @Override
+  public boolean isActive(PlayerEntity playerEntity, ItemStack itemStack) {
+    return this.reloadDurationTicks > 0;
+  }
+
+  @Override
+  public ITextComponent getText(PlayerEntity playerEntity, ItemStack itemStack) {
+    return new TranslationTextComponent("action.reload");
+  }
+
+  @Override
+  public float getPercentComplete(PlayerEntity playerEntity, ItemStack itemStack) {
+    return (float) (this.item.getReloadDurationTicks() - this.reloadDurationTicks)
+        / (float) this.item.getReloadDurationTicks();
   }
 }

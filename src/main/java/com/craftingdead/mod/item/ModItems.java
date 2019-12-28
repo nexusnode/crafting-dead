@@ -8,13 +8,13 @@ import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.client.model.builtin.ItemRendererDispatcher;
 import com.craftingdead.mod.entity.ModEntityTypes;
-import com.craftingdead.mod.item.ClothingItem.Properties;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
@@ -44,93 +44,92 @@ public class ModItems {
       .register("acr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
-              .setClipSize(0)
               .setDamage(7)
-              .setReloadTime(2.2F)
+              .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.8F)
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-              .setShootSound(() -> ModSoundEvents.ACR_SHOOT)
+              .setShootSound(ModSoundEvents.ACR_SHOOT)
               .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
               .setTEISR(() -> () -> ItemRendererDispatcher.instance)));
 
   public static final RegistryObject<Item> AK47 = ITEMS
-      .register("ak47",
-          () -> new GunItem(new GunItem.Properties()
-              .setFireRate(80)
-              .setClipSize(0)
-              .setDamage(7)
-              .setReloadTime(2.2F)
-              .setAccuracy(0.8F)
-              .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-              .setShootSound(() -> ModSoundEvents.AK47_SHOOT)
-              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+      .register("ak47", () -> new GunItem(new GunItem.Properties()
+          .setFireRate(80)
+          .setDamage(7)
+          .setReloadDurationTicks(20 * 4)
+          .setAccuracy(0.8F)
+          .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+          .setShootSound(ModSoundEvents.AK47_SHOOT)
+          .setReloadSound(ModSoundEvents.AK47_RELOAD)
+          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
+          .setAcceptedMagazines(
+              ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "ak47_30_round_magazine")))));
 
   public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
       .register("desert_eagle", () -> new GunItem(new GunItem.Properties()
           .setFireRate(0)
-          .setClipSize(0)
           .setDamage(8)
-          .setReloadTime(2.2F)
+          .setReloadDurationTicks(20 * 2)
           .setAccuracy(0.7F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-          .setShootSound(() -> ModSoundEvents.DESERT_EAGLE_SHOOT)
+          .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> M4A1 = ITEMS
       .register("m4a1",
           () -> new GunItem(new GunItem.Properties()
               .setFireRate(80)
-              .setClipSize(0)
               .setDamage(7)
-              .setReloadTime(2.2F)
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-              .setShootSound(() -> ModSoundEvents.M4A1_SHOOT)
+              .setShootSound(ModSoundEvents.M4A1_SHOOT)
               .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
   public static final RegistryObject<Item> M9 = ITEMS
       .register("m9", () -> new GunItem(new GunItem.Properties()
           .setFireRate(80)
-          .setClipSize(0)
           .setDamage(7)
-          .setReloadTime(2.2F)
+          .setReloadDurationTicks((int) (20 * 1.5F))
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-          .setShootSound(() -> ModSoundEvents.M9_SHOOT)
+          .setShootSound(ModSoundEvents.M9_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> TASER = ITEMS
       .register("taser", () -> new GunItem(new GunItem.Properties()
           .setFireRate(2000)
-          .setClipSize(0)
           .setDamage(7)
-          .setReloadTime(2.2F)
+          .setReloadDurationTicks(20 * 3)
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-          .setShootSound(() -> ModSoundEvents.TASER_SHOOT)
+          .setShootSound(ModSoundEvents.TASER_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> MAGNUM = ITEMS
       .register("magnum", () -> new GunItem(new GunItem.Properties()
           .setFireRate(80)
-          .setClipSize(0)
           .setDamage(7)
-          .setReloadTime(2.2F)
+          .setReloadDurationTicks(20 * 2)
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-          .setShootSound(() -> ModSoundEvents.MAGNUM_SHOOT)
+          .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> FN57 = ITEMS
       .register("fn57", () -> new GunItem(new GunItem.Properties()
           .setFireRate(80)
-          .setClipSize(0)
           .setDamage(7)
-          .setReloadTime(2.2F)
+          .setReloadDurationTicks((int) (20 * 1.5F))
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
-          .setShootSound(() -> ModSoundEvents.FN57_SHOOT)
+          .setShootSound(ModSoundEvents.FN57_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+
+  public static final RegistryObject<Item> AK47_30_ROUND_MAGAZINE = ITEMS
+      .register("ak47_30_round_magazine",
+          () -> new MagazineItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
+              new Magazine(45, 30)));
 
   // ================================================================================
   // Tools
@@ -417,125 +416,285 @@ public class ModItems {
   // Clothing
   // ================================================================================
 
-  public static final RegistryObject<Item> ARMY_CLOTHING =
-      ITEMS.register("army_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+  public static final RegistryObject<Item> ARMY_CLOTHING = ITEMS
+      .register("army_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> SAS_CLOTHING =
-      ITEMS.register("sas_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+  public static final RegistryObject<Item> SAS_CLOTHING = ITEMS
+      .register("sas_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> SPETSNAZ_CLOTHING = ITEMS
-      .register("spetsnaz_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("spetsnaz_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> POLICE_CLOTHING =
-      ITEMS.register("police_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+  public static final RegistryObject<Item> POLICE_CLOTHING = ITEMS
+      .register("police_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> CAMO_CLOTHING =
-      ITEMS.register("camo_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+  public static final RegistryObject<Item> CAMO_CLOTHING = ITEMS
+      .register("camo_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> COMBAT_BDU_CLOTHING = ITEMS
-      .register("combat_bdu_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("combat_bdu_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> WINTER_ARMY_CLOTHING = ITEMS
-      .register("winter_army_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("winter_army_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> ARMY_DESERT_CLOTHING = ITEMS
-      .register("army_desert_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("army_desert_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> PILOT_CLOTHING =
-      ITEMS.register("pilot_clothing", () -> new ClothingItem(new Properties().setArmorLevel(1)));
+  public static final RegistryObject<Item> PILOT_CLOTHING = ITEMS
+      .register("pilot_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(1)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> HAZMAT_CLOTHING =
-      ITEMS.register("hazmat_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+  public static final RegistryObject<Item> HAZMAT_CLOTHING = ITEMS
+      .register("hazmat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> TAC_GHILLIE_CLOTHING = ITEMS
-      .register("tac_ghillie_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("tac_ghillie_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> SWAT_CLOTHING =
-      ITEMS.register("swat_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+  public static final RegistryObject<Item> SWAT_CLOTHING = ITEMS
+      .register("swat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> SPACE_SUIT_CLOTHING = ITEMS
-      .register("space_suit_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("space_suit_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> SHERIFF_CLOTHING =
-      ITEMS.register("sheriff_clothing", () -> new ClothingItem(new Properties().setArmorLevel(1)));
+  public static final RegistryObject<Item> SHERIFF_CLOTHING = ITEMS
+      .register("sheriff_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(1)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> JUGGERNAUT_CLOTHING = ITEMS
-      .register("juggernaut_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("juggernaut_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> FIREMAN_CLOTHING =
-      ITEMS.register("fireman_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+  public static final RegistryObject<Item> FIREMAN_CLOTHING = ITEMS
+      .register("fireman_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> DOCTOR_CLOTHING =
-      ITEMS.register("doctor_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+  public static final RegistryObject<Item> DOCTOR_CLOTHING = ITEMS
+      .register("doctor_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> SMART_CLOTHING =
-      ITEMS.register("smart_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+  public static final RegistryObject<Item> SMART_CLOTHING = ITEMS
+      .register("smart_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> CASUAL_GREEN_CLOTHING = ITEMS
-      .register("casual_green_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+      .register("casual_green_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> BUILDER_CLOTHING =
-      ITEMS.register("builder_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+  public static final RegistryObject<Item> BUILDER_CLOTHING = ITEMS
+      .register("builder_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> BUSINESS_CLOTHING = ITEMS
-      .register("business_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+      .register("business_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> SEC_GUARD_CLOTHING = ITEMS
-      .register("sec_guard_clothing", () -> new ClothingItem(new Properties().setArmorLevel(1)));
+      .register("sec_guard_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(1)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> MIL_HAZMAT_CLOTHING = ITEMS
-      .register("mil_hazmat_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("mil_hazmat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> FULL_GHILLIE_CLOTHING = ITEMS
-      .register("full_ghillie_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("full_ghillie_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> RED_DUSK_CLOTHING = ITEMS
-      .register("red_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("red_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> CLONE_CLOTHING =
-      ITEMS.register("clone_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+  public static final RegistryObject<Item> CLONE_CLOTHING = ITEMS
+      .register("clone_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> COOKIE_CLOTHING =
-      ITEMS.register("cookie_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+  public static final RegistryObject<Item> COOKIE_CLOTHING = ITEMS
+      .register("cookie_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> DEADPOOL_CLOTHING = ITEMS
-      .register("deadpool_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("deadpool_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> NINJA_CLOTHING =
-      ITEMS.register("ninja_clothing", () -> new ClothingItem(new Properties().setArmorLevel(1)));
+  public static final RegistryObject<Item> NINJA_CLOTHING = ITEMS
+      .register("ninja_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(1)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> ARMY_MEDIC_CLOTHING = ITEMS
-      .register("army_medic_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("army_medic_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> BLUE_DUSK_CLOTHING = ITEMS
-      .register("blue_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("blue_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> PRESIDENT_CLOTHING = ITEMS
-      .register("president_clothing", () -> new ClothingItem(new Properties().setArmorLevel(0)));
+      .register("president_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> YELLOW_DUSK_CLOTHING = ITEMS
-      .register("yellow_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("yellow_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> ORANGE_DUSK_CLOTHING = ITEMS
-      .register("orange_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("orange_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> GREEN_DUSK_CLOTHING = ITEMS
-      .register("green_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("green_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> WHITE_DUSK_CLOTHING = ITEMS
-      .register("white_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("white_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> PURPLE_DUSK_CLOTHING = ITEMS
-      .register("purple_dusk_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+      .register("purple_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> SCUBA_CLOTHING =
-      ITEMS.register("scuba_clothing", () -> new ClothingItem(new Properties().setArmorLevel(1)));
+  public static final RegistryObject<Item> SCUBA_CLOTHING = ITEMS
+      .register("scuba_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(1)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
-  public static final RegistryObject<Item> DDPAT_CLOTHING =
-      ITEMS.register("ddpat_clothing", () -> new ClothingItem(new Properties().setArmorLevel(2)));
+  public static final RegistryObject<Item> DDPAT_CLOTHING = ITEMS
+      .register("ddpat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(2)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   public static final RegistryObject<Item> CONTRACTOR_CLOTHING = ITEMS
-      .register("contractor_clothing", () -> new ClothingItem(new Properties().setArmorLevel(3)));
+      .register("contractor_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .setArmorLevel(3)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_WEARABLE)));
 
   // ================================================================================
   // Air Drop Radio

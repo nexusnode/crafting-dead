@@ -3,8 +3,10 @@ package com.craftingdead.mod.potion;
 import java.util.ArrayList;
 import java.util.List;
 import com.craftingdead.mod.item.ModItems;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
@@ -17,6 +19,15 @@ public class BrokenLegEffect extends Effect {
         .addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
             "021BEAA1-498F-4D7B-933E-F0FA0B88B9D1", (double) -0.15F,
             AttributeModifier.Operation.MULTIPLY_TOTAL);
+  }
+
+  @Override
+  public void performEffect(LivingEntity livingEntity, int amplifier) {
+    if (livingEntity instanceof PlayerEntity) {
+      if (((PlayerEntity) livingEntity).isCreative()) {
+        livingEntity.removePotionEffect(ModEffects.BROKEN_LEG.get());
+      }
+    }
   }
 
   @Override

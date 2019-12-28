@@ -2,8 +2,6 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
@@ -12,11 +10,11 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
+import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ClientPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
-import com.craftingdead.mod.capability.triggerable.GunController;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.animation.AnimationManager;
 import com.craftingdead.mod.client.animation.IGunAnimation;
@@ -54,6 +52,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -79,18 +78,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientDist implements IModDist {
-
-  /**
-   * Using Reflection to set the swimming position, which is then redefined to crawl.
-   */
-  private static final Method setPose = ObfuscationReflectionHelper
-      .findMethod(Entity.class, "func_213301_b", (Class[]) new Class[] {Pose.class});
 
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
@@ -109,7 +101,7 @@ public class ClientDist implements IModDist {
 
   private RecoilHelper recoilHelper = new RecoilHelper();
 
-  private IngameGui guiIngame;
+  private IngameGui ingameGui;
 
   private final TransitionManager transitionManager =
       new TransitionManager(minecraft, Transitions.GROW);
@@ -121,7 +113,7 @@ public class ClientDist implements IModDist {
     ((IReloadableResourceManager) minecraft.getResourceManager())
         .addReloadListener(this.crosshairManager);
 
-    this.guiIngame = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+    this.ingameGui = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
 
     ModelLoaderRegistry.registerLoader(BuiltinModelLoader.INSTANCE);
   }
@@ -156,6 +148,10 @@ public class ClientDist implements IModDist {
     return minecraft.player != null
         ? minecraft.player.getCapability(ModCapabilities.PLAYER, null).cast()
         : LazyOptional.empty();
+  }
+
+  public IngameGui getIngameGui() {
+    return this.ingameGui;
   }
 
   // ================================================================================
@@ -247,20 +243,35 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleMouseInput(InputEvent.RawMouseEvent event) {
+  public void handleRawMouse(InputEvent.RawMouseEvent event) {
     if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
       if (event.getButton() == minecraft.gameSettings.keyBindAttack.getKey().getKeyCode()) {
         boolean press = event.getAction() == GLFW.GLFW_PRESS;
         this.getPlayer().ifPresent((player) -> {
-          player.setTriggerPressed(press);
-          event
-              .setCanceled(player
-                  .getEntity()
-                  .getHeldItemMainhand()
-                  .getCapability(ModCapabilities.TRIGGERABLE)
-                  .isPresent());
+          ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+          heldStack.getCapability(ModCapabilities.SHOOTABLE, null).ifPresent(shootable -> {
+            shootable.setTriggerPressed(heldStack, player.getEntity(), press);
+            event.setCanceled(true);
+          });
         });
       }
+    }
+  }
+
+  @SubscribeEvent
+  public void handleKeyInput(InputEvent.KeyInputEvent event) {
+    if (CROUCH.isPressed()) {
+      this.getPlayer().ifPresent(player -> player.getEntity().setPose(Pose.SWIMMING));
+    }
+
+    if (RELOAD.isPressed()) {
+      this.getPlayer().ifPresent(player -> {
+        PlayerEntity playerEntity = player.getEntity();
+        ItemStack heldStack = playerEntity.getHeldItemMainhand();
+        heldStack
+            .getCapability(ModCapabilities.SHOOTABLE)
+            .ifPresent(shootable -> shootable.reload(heldStack, playerEntity));
+      });
     }
   }
 
@@ -325,30 +336,26 @@ public class ClientDist implements IModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
-        this.guiIngame
+        this.ingameGui
             .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
                 event.getWindow().getScaledHeight());
         break;
       case CROSSHAIRS:
-        minecraft.player.getCapability(ModCapabilities.ACTION).ifPresent((action) -> {
-          if (action.isActive(minecraft.player)) {
-            event.setCanceled(true);
+        this.getPlayer().ifPresent((player) -> {
+          PlayerEntity playerEntity = player.getEntity();
+          ItemStack heldStack = playerEntity.getHeldItemMainhand();
+          heldStack
+              .getCapability(ModCapabilities.ACTION)
+              .ifPresent(action -> event.setCanceled(action.isActive(playerEntity, heldStack)));
+          if (!event.isCanceled()) {
+            heldStack.getCapability(ModCapabilities.AIMABLE).ifPresent(aimable -> {
+              event.setCanceled(true);
+              this.ingameGui
+                  .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
+                      event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
+            });
           }
         });
-        if (!event.isCanceled()) {
-          this.getPlayer().ifPresent((player) -> {
-            player
-                .getEntity()
-                .getHeldItemMainhand()
-                .getCapability(ModCapabilities.AIMABLE)
-                .ifPresent((aimable) -> {
-                  event.setCanceled(true);
-                  this.guiIngame
-                      .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
-                          event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
-                });
-          });
-        }
         break;
       default:
         break;
@@ -386,15 +393,8 @@ public class ClientDist implements IModDist {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        if (event.player.world.isRemote) {
-          if (ClientDist.CROUCH.isKeyDown()) {
-            // TODO Use access transformer
-            try {
-              setPose.invoke(event.player, Pose.SWIMMING);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-              ;
-            }
-          }
+        if (ClientDist.CROUCH.isKeyDown()) {
+
         }
         break;
       default:

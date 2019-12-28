@@ -1,7 +1,5 @@
 package com.craftingdead.mod.capability.player;
 
-import com.craftingdead.mod.net.NetworkChannel;
-import com.craftingdead.mod.net.message.main.TriggerPressedMessage;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 
 public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
@@ -19,12 +17,5 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
     this.maxWater = maxWater;
     this.stamina = stamina;
     this.maxStamina = maxStamina;
-  }
-
-  @Override
-  public void setTriggerPressed(boolean triggerPressed) {
-    super.setTriggerPressed(triggerPressed);
-    NetworkChannel.MAIN.getSimpleChannel()
-        .sendToServer(new TriggerPressedMessage(0, triggerPressed));
   }
 }

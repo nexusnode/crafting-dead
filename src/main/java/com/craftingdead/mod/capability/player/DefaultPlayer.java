@@ -1,10 +1,10 @@
 package com.craftingdead.mod.capability.player;
 
+import java.util.Random;
+import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
-import java.util.Random;
-import java.util.UUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -51,11 +51,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   protected int playersKilled;
 
   /**
-   * If the trigger on the current held item is pressed.
-   */
-  protected boolean triggerPressed;
-
-  /**
    * Water.
    */
   protected int water = 20;
@@ -75,7 +70,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
    */
   protected int maxStamina = 1500;
 
-
   /**
    * The last held {@link ItemStack} - used to check if the player has switched item.
    */
@@ -92,6 +86,10 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public void tick() {
     this.updateHeldStack();
+    this.updateBrokenLeg();
+  }
+
+  private void updateBrokenLeg() {
     if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())
         && this.entity.onGround && !this.entity.isInWater()
         && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
@@ -102,11 +100,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
       this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
-    if (this.entity.isCreative()) {
-      if (this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())) {
-        this.entity.removePotionEffect(ModEffects.BROKEN_LEG.get());
-      }
-    }
   }
 
   private void updateHeldStack() {
@@ -114,13 +107,12 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     if (heldStack != this.lastHeldStack) {
       if (this.lastHeldStack != null) {
         this.lastHeldStack
-            .getCapability(ModCapabilities.TRIGGERABLE)
-            .ifPresent((triggerable) -> triggerable
-                .setTriggerPressed(false, this.lastHeldStack, this.entity));
+            .getCapability(ModCapabilities.SHOOTABLE)
+            .ifPresent(
+                shootable -> shootable.setTriggerPressed(this.lastHeldStack, this.entity, false));
       }
       this.lastHeldStack = heldStack;
     }
-
   }
 
   @Override
@@ -131,16 +123,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public boolean onDeath(DamageSource cause) {
     return false;
-  }
-
-  @Override
-  public void setTriggerPressed(boolean triggerPressed) {
-    this.triggerPressed = triggerPressed;
-    ItemStack heldStack = this.getEntity().getHeldItemMainhand();
-    heldStack
-        .getCapability(ModCapabilities.TRIGGERABLE, null)
-        .ifPresent((triggerable) -> triggerable
-            .setTriggerPressed(triggerPressed, heldStack, this.getEntity()));
   }
 
   @Override

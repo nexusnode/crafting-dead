@@ -11,6 +11,12 @@
       "craftingdead:ak47_shoot"
     ]
   },
+  "ak47_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:ak47_reload"
+    ]
+  },
   "desert_eagle_shoot": {
     "category": "master",
     "sounds": [
@@ -45,6 +51,12 @@
     "category": "master",
     "sounds": [
       "craftingdead:fn57_shoot"
+    ]
+  },
+  "dry_fire": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:dry_fire"
     ]
   }
 }
