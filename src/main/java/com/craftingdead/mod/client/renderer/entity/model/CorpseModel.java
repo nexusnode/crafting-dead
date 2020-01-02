@@ -1,7 +1,6 @@
 package com.craftingdead.mod.client.renderer.entity.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.model.Model;
@@ -122,8 +121,6 @@ public class CorpseModel extends Model {
   @Override
   public void func_225598_a_(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int p_225598_3_,
       int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
-    RenderSystem.rotatef(90.0F, 1.0F, 0.0F, 0.0F);
-
     this.bipedHead
         .func_228309_a_(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_,
             p_225598_6_, p_225598_7_, p_225598_8_);
