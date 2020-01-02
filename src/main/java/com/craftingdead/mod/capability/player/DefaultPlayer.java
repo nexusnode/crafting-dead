@@ -90,14 +90,14 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   }
 
   private void updateBrokenLeg() {
-    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())
+    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.brokenLeg)
         && this.entity.onGround && !this.entity.isInWater()
         && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
             || this.entity.fallDistance > 10F)) {
       this.entity
           .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.brokenLeg, 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
   }

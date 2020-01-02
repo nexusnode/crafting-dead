@@ -6,7 +6,7 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
@@ -95,14 +95,14 @@ public class IngameGui {
     if (healthPercentage < 1.0F) {
       ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
 
-      GlStateManager.enableBlend();
+      RenderSystem.enableBlend();
 
       RenderUtil.bind(res);
-      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
       RenderUtil.drawTexturedRectangle(0, 0, width, height);
-      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-      GlStateManager.disableBlend();
+      RenderSystem.disableBlend();
     }
   }
 
@@ -111,7 +111,7 @@ public class IngameGui {
     int y = height / 2;
     int x = 4;
 
-    GlStateManager.enableBlend();
+    RenderSystem.enableBlend();
 
     RenderUtil.bind(DAYS_SURVIVED);
     RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
@@ -125,14 +125,14 @@ public class IngameGui {
     RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
     fontRenderer.drawStringWithShadow(String.valueOf(playersKilled), x + 20, y + 24, 0xFFFFFF);
 
-    GlStateManager.disableBlend();
+    RenderSystem.disableBlend();
   }
 
   private static void renderWater(int width, int height, float waterPercentage,
       ResourceLocation resourceLocation) {
     final int y = height - 49;
     final int x = width / 2 + 91;
-    GlStateManager.enableBlend();
+    RenderSystem.enableBlend();
     RenderUtil.bind(resourceLocation);
 
     for (int i = 0; i < 10; i++) {
@@ -148,7 +148,7 @@ public class IngameGui {
         RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
       }
     }
-    GlStateManager.disableBlend();
+    RenderSystem.disableBlend();
   }
 
   public void renderCrosshairs(float accuracy, float partialTicks, int width, int height) {
@@ -163,9 +163,9 @@ public class IngameGui {
     final Crosshair crosshair =
         this.client.getCrosshairManager().getCrosshair(this.crosshairLocation);
 
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
-      GlStateManager.enableBlend();
+      RenderSystem.enableBlend();
 
       RenderUtil.bind(crosshair.getMiddle());
       RenderUtil.drawTexturedRectangle(x, y, imageWidth, imageHeight);
@@ -181,9 +181,9 @@ public class IngameGui {
 
       RenderUtil.bind(crosshair.getRight());
       RenderUtil.drawTexturedRectangle(x + lerpSpread, y, imageWidth, imageHeight);
-      GlStateManager.disableBlend();
+      RenderSystem.disableBlend();
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
 
     this.lastSpread = lerpSpread;
   }

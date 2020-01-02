@@ -1,6 +1,6 @@
 package com.craftingdead.mod.client.animation;
 
-import javax.vecmath.Matrix4f;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 public interface IGunAnimation {
 
@@ -10,5 +10,5 @@ public interface IGunAnimation {
 
   boolean tick();
 
-  void apply(Matrix4f matrix, float partialTicks);
+  void apply(MatrixStack matrixStack, float partialTicks);
 }

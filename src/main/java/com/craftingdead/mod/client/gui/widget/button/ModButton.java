@@ -2,7 +2,7 @@ package com.craftingdead.mod.client.gui.widget.button;
 
 import java.awt.Color;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.Util;
@@ -50,12 +50,12 @@ public class ModButton extends Button {
             SHADOW_COLOR | MathHelper.ceil(this.alpha * 255.0F) << 24);
 
 
-    GlStateManager.enableBlend();
+    RenderSystem.enableBlend();
 
     this
         .drawCenteredString(Minecraft.getInstance().fontRenderer, this.getMessage(),
             this.x + this.width / 2, this.y + (this.height - 8) / 2,
             0xFFFFFF | MathHelper.ceil(this.alpha * 255.0F) << 24);
-    GlStateManager.disableBlend();
+    RenderSystem.disableBlend();
   }
 }

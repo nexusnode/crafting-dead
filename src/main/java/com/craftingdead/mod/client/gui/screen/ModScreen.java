@@ -1,12 +1,11 @@
 package com.craftingdead.mod.client.gui.screen;
 
-import javax.vecmath.Vector2d;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.gui.transition.ITransition;
 import com.craftingdead.mod.client.gui.transition.Transitions;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -48,24 +47,28 @@ public abstract class ModScreen extends Screen {
       backgroundStartTime = Util.milliTime();
     }
 
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
-      GlStateManager
+      RenderSystem
           .translated(Math.sin(Math.toRadians(360 * pct)) * 2.5D,
               Math.cos(Math.toRadians(360 * pct)) * 2.5D, 0);
       double scale = 1.25D + Math.cos(Math.toRadians(360 * pct)) * 1.5D / 100.0D;
-      GlStateManager.scaled(scale, scale, scale);
+      RenderSystem.scaled(scale, scale, scale);
 
-      Vector2d backgroundSize = RenderUtil.scaleToFit(2048, 1152);
+      double backgroundWidth = 2048;
+      double backgroundHeight = 1152;
+      double backgroundScale = RenderUtil.getScale(2048, 1152);
+      backgroundWidth *= backgroundScale;
+      backgroundHeight *= backgroundScale;
+
       RenderUtil.bind(BACKGROUND_TEXTURE);
       // Enable bilinear filtering
-      GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+      RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
       RenderUtil
-          .drawTexturedRectangle((this.width / 2 - (backgroundSize.getX() * scale) / 2),
-              this.height / 2 - (backgroundSize.getY() * scale) / 2, backgroundSize.getX(),
-              backgroundSize.getY());
+          .drawTexturedRectangle((this.width / 2 - (backgroundWidth * scale) / 2),
+              this.height / 2 - (backgroundHeight * scale) / 2, backgroundWidth, backgroundHeight);
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
 
     this.renderFog();
     this.renderFooter();
@@ -73,17 +76,21 @@ public abstract class ModScreen extends Screen {
 
   private void renderFooter() {
     final String footer = CraftingDead.DISPLAY_NAME + " " + CraftingDead.VERSION;
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
-      GlStateManager.translated(this.width / 2.0D, this.height - 5.0D, 0.0D);
-      GlStateManager.scaled(0.5D, 0.5D, 0.5D);
+      RenderSystem.translated(this.width / 2.0D, this.height - 5.0D, 0.0D);
+      RenderSystem.scaled(0.5D, 0.5D, 0.5D);
       this.drawCenteredString(this.font, footer, 0, 0, 0xAAAAAA);
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
   }
 
   private void renderFog() {
-    Vector2d fogSize = RenderUtil.scaleToFit(1920, 1080);
+    double fogWidth = 1920;
+    double fogHeight = 1080;
+    final double fogScale = RenderUtil.getScale(fogWidth, fogHeight);
+    fogWidth *= fogScale;
+    fogHeight *= fogScale;
 
     final double pct =
         MathHelper.clamp((Util.milliTime() - fogStartTime) / (1000.0D * 100.0D * 2.0D), 0.0D, 1.0D);
@@ -91,26 +98,23 @@ public abstract class ModScreen extends Screen {
       fogStartTime = Util.milliTime();
     }
 
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
-      GlStateManager.scalef(4F, 4F, 4F);
-      GlStateManager.enableBlend();
-      GlStateManager
-          .blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-              GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-              GlStateManager.DestFactor.ZERO);
-      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 0.3F);
+      RenderSystem.scalef(4F, 4F, 4F);
+      RenderSystem.enableBlend();
+      RenderSystem.defaultBlendFunc();
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 0.3F);
 
       RenderUtil.bind(SMOKE_TEXTURE);
 
       final double smokeX = pct * this.width;
 
-      RenderUtil.drawTexturedRectangle(smokeX, 0, fogSize.getX(), fogSize.getY());
-      RenderUtil.drawTexturedRectangle(smokeX - fogSize.getX(), 0, fogSize.getX(), fogSize.getY());
+      RenderUtil.drawTexturedRectangle(smokeX, 0, fogWidth, fogHeight);
+      RenderUtil.drawTexturedRectangle(smokeX - fogWidth, 0, fogWidth, fogHeight);
 
-      GlStateManager.disableBlend();
+      RenderSystem.disableBlend();
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
   }
 
   public ITransition getTransition() {

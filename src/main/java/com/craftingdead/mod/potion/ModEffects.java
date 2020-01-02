@@ -1,28 +1,41 @@
 package com.craftingdead.mod.potion;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import net.minecraft.potion.Effect;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
 
 public class ModEffects {
 
-  public static final DeferredRegister<Effect> EFFECTS =
-      new DeferredRegister<>(ForgeRegistries.POTIONS, CraftingDead.ID);
-  
-  public static final RegistryObject<Effect> SCUBA =
-      EFFECTS.register("scuba", HydrateEffect::new);
-  
-  public static final RegistryObject<Effect> INFECTION =
-      EFFECTS.register("infection", HydrateEffect::new);
+  private static final List<Effect> toRegister = new ArrayList<>();
 
-  public static final RegistryObject<Effect> BLEEDING =
-      EFFECTS.register("bleeding", BleedingEffect::new);
+  public static Effect scuba;
 
-  public static final RegistryObject<Effect> BROKEN_LEG =
-      EFFECTS.register("broken_leg", BrokenLegEffect::new);
+  public static Effect infection;
 
-  public static final RegistryObject<Effect> HYDRATE =
-      EFFECTS.register("hydrate", HydrateEffect::new);
+  public static Effect bleeding;
+
+  public static Effect brokenLeg;
+
+  public static Effect hydrate;
+
+  public static void initialize() {
+    scuba = register("scuba", new HydrateEffect());
+    bleeding = register("bleeding", new BleedingEffect());
+    infection = register("infection", new HydrateEffect());
+    brokenLeg = register("broken_leg", new BrokenLegEffect());
+    hydrate = register("hydrate", new HydrateEffect());
+  }
+
+  private static Effect register(String name, Effect effect) {
+    effect.setRegistryName(new ResourceLocation(CraftingDead.ID, name));
+    toRegister.add(effect);
+    return effect;
+  }
+
+  public static void register(RegistryEvent.Register<Effect> event) {
+    toRegister.forEach(event.getRegistry()::register);
+  }
 }

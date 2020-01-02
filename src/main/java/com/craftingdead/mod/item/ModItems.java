@@ -1,12 +1,9 @@
 package com.craftingdead.mod.item;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
-import com.craftingdead.mod.client.model.builtin.ItemRendererDispatcher;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;
@@ -24,7 +21,6 @@ import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -33,8 +29,6 @@ public class ModItems {
 
   public static final DeferredRegister<Item> ITEMS =
       new DeferredRegister<>(ForgeRegistries.ITEMS, CraftingDead.ID);
-
-  private static final List<Item> toRegister = new ArrayList<>();
 
   // ================================================================================
   // Guns
@@ -49,8 +43,7 @@ public class ModItems {
               .setAccuracy(0.8F)
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
               .setShootSound(ModSoundEvents.ACR_SHOOT)
-              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
-              .setTEISR(() -> () -> ItemRendererDispatcher.instance)));
+              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
   public static final RegistryObject<Item> AK47 = ITEMS
       .register("ak47", () -> new GunItem(new GunItem.Properties()
@@ -163,7 +156,7 @@ public class ModItems {
       .register("bottled_water",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 7), 1.0F)
               .containerItem(EMPTY_WATER_BOTTLE.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -285,132 +278,642 @@ public class ModItems {
               .food(ModFoods.CANNED_TOMATO_SOUP)
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-  public static Item orangeSoda;
-  public static Item emptyOrangeSoda;
-  public static Item icedTea;
-  public static Item emptyIcedTea;
-  public static Item juicePouch;
-  public static Item emptyJuicePouch;
-  public static Item pepeSoda;
-  public static Item emptyPepeSoda;
-  public static Item lemonSoda;
-  public static Item emptyLemonSoda;
-  public static Item colaSoda;
-  public static Item emptyColaSoda;
-  public static Item milkCarton;
-  public static Item emptyMilkCarton;
-  public static Item rottenMilk;
-  public static Item colaPop;
-  public static Item emptyColaPop;
-  public static Item ironBrew;
-  public static Item emptyIronBrew;
-  public static Item sprite;
-  public static Item emptySprite;
-  public static Item zombieEnergy;
-  public static Item emptyZombieEnergy;
-  public static Item mre;
-  public static Item orange;
-  public static Item rottenOrange;
-  public static Item pear;
-  public static Item rottenPear;
-  public static Item riceBag;
-  public static Item apple;
-  public static Item rottenApple;
-  public static Item noodles;
-  public static Item watermelon;
-  public static Item rottenWatermelon;
-  public static Item blueberry;
-  public static Item rottenBlueberry;
-  public static Item raspberry;
-  public static Item rottenRaspberry;
-  public static Item chips;
-  public static Item ranchChips;
-  public static Item cheeseChips;
-  public static Item saltChips;
-  public static Item popcorn;
-  public static Item nuttyCereal;
-  public static Item emeraldCereal;
-  public static Item flakeCereal;
-  public static Item emptyWaterCanteen;
-  public static Item waterCanteen;
-  public static Item flask;
-  public static Item emptyFlask;
-  public static Item teaFlask;
-  public static Item coffeeFlask;
+  public static final RegistryObject<Item> EMPTY_ORANGE_SODA = ITEMS
+      .register("empty_orange_soda",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-  // medic
-  public static Item bloodBag;
-  public static Item emptyBloodBag;
-  public static Item firstAidKit;
-  public static Item adrenalineSyringe;
-  public static Item syringe;
-  public static Item morphineSyringe;
-  public static Item bandage;
-  public static Item rbiSyringe;
-  public static Item bottledRbi;
-  public static Item dirtyRag;
-  public static Item cleanRag;
-  public static Item splint;
-  public static Item cureSyringe;
-  public static Item bottledCure;
-  public static Item antibiotics;
-  public static Item bloodyRag;
+  public static final RegistryObject<Item> ORANGE_SODA = ITEMS
+      .register("orange_soda",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .containerItem(EMPTY_ORANGE_SODA.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-  // weapon
-  public static Item crowbar;
-  public static Item bat;
-  public static Item katana;
-  public static Item pipe;
-  public static Item rustypipe;
-  public static Item fireaxe;
-  public static Item chainsaw;
-  public static Item bowie;
-  public static Item golfclub;
-  public static Item nightstick;
-  public static Item sledgehammer;
-  public static Item nailBat;
-  public static Item shovel;
-  public static Item hatchet;
-  public static Item broadsword;
-  public static Item machete;
-  public static Item scytheweapon;
-  public static Item scythe;
-  public static Item pickaxe;
-  public static Item bostaff;
-  public static Item wrench;
-  public static Item fryingPan;
-  public static Item boltCutters;
-  public static Item combatKnife;
-  public static Item steelBat;
-  public static Item cleaver;
-  public static Item brokenBottle;
+  public static final RegistryObject<Item> EMPTY_ICED_TEA = ITEMS
+      .register("empty_iced_tea",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
-  // backpack
-  public static Item smallRedBackpack;
-  public static Item smallOrangeBackpack;
-  public static Item smallYellowBackpack;
-  public static Item smallGreenBackpack;
-  public static Item smallBlueBackpack;
-  public static Item smallPurpleBackpack;
-  public static Item mediumRedBackpack;
-  public static Item mediumOrangeBackpack;
-  public static Item mediumYellowBackpack;
-  public static Item mediumGreenBackpack;
-  public static Item mediumBlueBackpack;
-  public static Item mediumPurpleBackpack;
-  public static Item mediumGreyBackpack;
-  public static Item mediumBlackBackpack;
-  public static Item mediumGhillieBackpack;
-  public static Item mediumWhiteBackpack;
-  public static Item largeGreyBackpack;
-  public static Item largeGreenBackpack;
-  public static Item largeTanBackpack;
-  public static Item largeBlackBackpack;
-  public static Item largeGhillieBackpack;
-  public static Item gunBagBackpack;
-  public static Item greyGunBagBackpack;
-  public static Item ammoBagBackpack;
+  public static final RegistryObject<Item> ICED_TEA = ITEMS
+      .register("iced_tea",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .containerItem(EMPTY_ICED_TEA.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
+  public static final RegistryObject<Item> EMPTY_JUICE_POUCH = ITEMS
+      .register("empty_juice_pouch",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> JUICE_POUCH = ITEMS
+      .register("juice_pouch",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 1), 1.0F)
+              .containerItem(EMPTY_JUICE_POUCH.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_PEPE_SODA = ITEMS
+      .register("empty_pepe_soda",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> PEPE_SODA = ITEMS
+      .register("pepe_soda",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .containerItem(EMPTY_PEPE_SODA.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_LEMON_SODA = ITEMS
+      .register("empty_lemon_soda",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> LEMON_SODA = ITEMS
+      .register("lemon_soda",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .containerItem(EMPTY_LEMON_SODA.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_COLA_SODA = ITEMS
+      .register("empty_cola_soda",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> COLA_SODA = ITEMS
+      .register("cola_soda",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .containerItem(EMPTY_COLA_SODA.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_MILK_CARTON = ITEMS
+      .register("empty_milk_carton",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> MILK_CARTON = ITEMS
+      .register("milk_carton",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 7), 1.0F)
+              .containerItem(EMPTY_MILK_CARTON.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTON_MILK = ITEMS
+      .register("rotten_milk",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(Effects.HUNGER, 600, 1), 0.2F)
+              .containerItem(EMPTY_MILK_CARTON.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_COLA_POP = ITEMS
+      .register("empty_cola_pop",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> COLA_POP = ITEMS
+      .register("cola_pop",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .containerItem(EMPTY_COLA_POP.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_IRON_BREW = ITEMS
+      .register("empty_iron_brew",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> IRON_BREW = ITEMS
+      .register("iron_brew",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .containerItem(EMPTY_IRON_BREW.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_SPRITE = ITEMS
+      .register("empty_sprite",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> SPRITE = ITEMS
+      .register("sprite",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .containerItem(EMPTY_SPRITE.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_ZOMBIE_ENERGY = ITEMS
+      .register("empty_zombie_energy",
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ZOMBIE_ENERGY = ITEMS
+      .register("zombie_energy",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .containerItem(EMPTY_ZOMBIE_ENERGY.get())
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> MRE = ITEMS
+      .register("mre", () -> new Item(
+          new Item.Properties().food(ModFoods.MRE).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ORANGE = ITEMS
+      .register("orange",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ORANGE)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_ORANGE = ITEMS
+      .register("rotten_orange",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_ORANGE)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> PEAR = ITEMS
+      .register("pear",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.PEAR)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_PEAR = ITEMS
+      .register("rotten_pear",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_PEAR)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> RICE_BAG = ITEMS
+      .register("rice_bag",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.RICE_BAG)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> APPLE = ITEMS
+      .register("apple",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.APPLE)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_APPLE = ITEMS
+      .register("rotten_apple",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_APPLE)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> NOODLES = ITEMS
+      .register("noodles",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.NOODLE_CUP)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> WATERMELON = ITEMS
+      .register("watermelon",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.WATERMELON)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_WATERMELON = ITEMS
+      .register("rotten_watermelon",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_WATERMELON)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> BLUEBERRY = ITEMS
+      .register("blueberry",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.BLUEBERRY)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_BLUEBERRY = ITEMS
+      .register("rotten_blueberry",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_BLUEBERRY)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> RASPBERRY = ITEMS
+      .register("raspberry",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.RASPBERRY)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> ROTTEN_RASPBERRY = ITEMS
+      .register("rotten_raspberry",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.ROTTEN_RASPBERRY)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> CHIPS = ITEMS
+      .register("chips",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.CHIPS)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> RANCH_CHIPS = ITEMS
+      .register("ranch_chips",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.RANCH_CHIPS)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> CHEESE_CHIPS = ITEMS
+      .register("cheese_chips",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.CHEESE_CHIPS)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> SALT_CHIPS = ITEMS
+      .register("salt_chips",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.SALT_CHIPS)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> POPCORN = ITEMS
+      .register("popcorn",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.POPCORN)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> NUTTY_CEREAL = ITEMS
+      .register("nutty_cereal",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.NUTTY_CEREAL)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMERALD_CEREAL = ITEMS
+      .register("emerald_cereal",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.EMERALD_CEREAL)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> FLAKE_CEREAL = ITEMS
+      .register("flake_cereal",
+          () -> new Item(new Item.Properties()
+              .food(ModFoods.FLAKE_CEREAL)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_WATER_CANTEEN = ITEMS
+      .register("empty_water_canteen",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "water_canteen"))
+              .setBlockPredicate(
+                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> WATER_CANTEEN = ITEMS
+      .register("water_canteen",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .containerItem(EMPTY_WATER_CANTEEN.get())
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> EMPTY_FLASK = ITEMS
+      .register("empty_flask",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "flask"))
+              .setBlockPredicate(
+                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> FLASK = ITEMS
+      .register("flask",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .containerItem(EMPTY_FLASK.get())
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> TEA_FLASK = ITEMS
+      .register("tea_flask",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .containerItem(EMPTY_FLASK.get())
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  public static final RegistryObject<Item> COFFEE_FLASK = ITEMS
+      .register("coffee_flask",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .setUseAction(UseAction.DRINK)
+              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .containerItem(EMPTY_FLASK.get())
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
+
+  // ================================================================================
+  // Medical
+  // ================================================================================
+
+  public static final RegistryObject<Item> EMPTY_BLOOD_BAG = ITEMS
+      .register("empty_blood_bag",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "blood_bag"))
+              .setEntityPredicate((entity) -> {
+                if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHealth() > 4) {
+                  entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
+                  return true;
+                }
+                return false;
+              })
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> BLOOD_BAG = ITEMS
+      .register("blood_bag",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
+              .maxStackSize(1)
+              .containerItem(EMPTY_BLOOD_BAG.get())
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS
+      .register("first_aid_kit",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS
+      .register("adrenaline_syringe",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.SPEED, (20 * 20), 1), 1.0F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> SYRINGE = ITEMS
+      .register("syringe",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))
+              .setEntityPredicate((entity) -> entity instanceof ZombieEntity)
+              .setProbability(0.25F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> MORPHINE_SYRINGE = ITEMS
+      .register("morphine_syringe",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> BANDAGE = ITEMS
+      .register("bandage",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> RBI_SYRINGE = ITEMS
+      .register("rbi_syringe", () -> new Item(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> BOTTLED_RBI = ITEMS
+      .register("bottled_rbi", () -> new Item(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> DIRTY_RAG = ITEMS
+      .register("dirty_rag",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
+              .setBlockPredicate(
+                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> BLOODY_RAG = ITEMS
+      .register("bloody_rag",
+          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
+              .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
+              .setBlockPredicate(
+                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> CLEAN_RAG = ITEMS
+      .register("clean_rag",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .containerItem(BLOODY_RAG.get())
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> SPLINT = ITEMS
+      .register("splint",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> CURE_SYRINGE = ITEMS
+      .register("cure_syringe",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> BOTTLED_CURE = ITEMS
+      .register("bottled_cure", () -> new Item(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  public static final RegistryObject<Item> ANTIBIOTICS = ITEMS
+      .register("antibiotics",
+          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+
+  // ================================================================================
+  // Weapon
+  // ================================================================================
+
+  public static final RegistryObject<Item> CROWBAR = ITEMS
+      .register("crowbar", () -> new MeleeWeaponItem(3, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BAT = ITEMS
+      .register("bat", () -> new MeleeWeaponItem(5, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> KATANA = ITEMS
+      .register("katana", () -> new MeleeWeaponItem(18, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> PIPE = ITEMS
+      .register("pipe", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> RUSTY_PIPE = ITEMS
+      .register("rusty_pipe", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> FIRE_AXE = ITEMS
+      .register("fire_axe", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> CHAINSAW = ITEMS
+      .register("chainsaw", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BOWIE = ITEMS
+      .register("bowie", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> GOLF_CLUB = ITEMS
+      .register("golf_club", () -> new MeleeWeaponItem(6, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> NIGHT_STICK = ITEMS
+      .register("night_stick", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> SLEDGEHAMMER = ITEMS
+      .register("sledgehammer", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> NAIL_BAT = ITEMS
+      .register("nail_bat", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> SHOVEL = ITEMS
+      .register("shovel", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> HATCHET = ITEMS
+      .register("hatchet", () -> new MeleeWeaponItem(16, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BROADSWORD = ITEMS
+      .register("broadsword", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> MACHETE = ITEMS
+      .register("machete", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> WEAPONIZED_SCYTHE = ITEMS
+      .register("weaponized_scythe", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> SCYTHE = ITEMS
+      .register("scythe", () -> new MeleeWeaponItem(20, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> PICKAXE = ITEMS
+      .register("pickaxe", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BO_STAFF = ITEMS
+      .register("bo_staff", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> WRENCH = ITEMS
+      .register("wrench", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> FRYING_PAN = ITEMS
+      .register("frying_pan", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BOLT_CUTTERS = ITEMS
+      .register("bolt_cutters", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> COMBAT_KNIFE = ITEMS
+      .register("combat_knife", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> STEEL_BAT = ITEMS
+      .register("steel_bat", () -> new MeleeWeaponItem(7, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> CLEAVER = ITEMS
+      .register("cleaver", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  public static final RegistryObject<Item> BROKEN_BOTTLE = ITEMS
+      .register("broken_bottle", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
+
+  // ================================================================================
+  // Backpack
+  // ================================================================================
+
+  public static final RegistryObject<Item> SMALL_RED_BACKPACK =
+      ITEMS.register("small_red_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> SMALL_ORANGE_BACKPACK =
+      ITEMS.register("small_orange_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> SMALL_YELLOW_BACKPACK =
+      ITEMS.register("small_yellow_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> SMALL_GREEN_BACKPACK =
+      ITEMS.register("small_green_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> SMALL_BLUE_BACKPACK =
+      ITEMS.register("small_blue_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> SMALL_PURPLE_BACKPACK =
+      ITEMS.register("small_purple_backpack", () -> new BackpackItem(Backpack.SMALL));
+
+  public static final RegistryObject<Item> MEDIUM_RED_BACKPACK =
+      ITEMS.register("medium_red_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_ORANGE_BACKPACK =
+      ITEMS.register("medium_orange_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_YELLOW_BACKPACK =
+      ITEMS.register("medium_yellow_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_GREEN_BACKPACK =
+      ITEMS.register("medium_green_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_BLUE_BACKPACK =
+      ITEMS.register("medium_blue_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_PURPLE_BACKPACK =
+      ITEMS.register("medium_purple_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_GREY_BACKPACK =
+      ITEMS.register("medium_grey_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_BLACK_BACKPACK =
+      ITEMS.register("medium_black_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_GHILLIE_BACKPACK =
+      ITEMS.register("medium_ghillie_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> MEDIUM_WHITE_BACKPACK =
+      ITEMS.register("medium_white_backpack", () -> new BackpackItem(Backpack.MEDIUM));
+
+  public static final RegistryObject<Item> LARGE_GREY_BACKPACK =
+      ITEMS.register("large_grey_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> LARGE_GREEN_BACKPACK =
+      ITEMS.register("large_green_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> LARGE_TAN_BACKPACK =
+      ITEMS.register("large_tan_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> LARGE_BLACK_BACKPACK =
+      ITEMS.register("large_black_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> LARGE_GHILLIE_BACKPACK =
+      ITEMS.register("large_ghillie_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> GUN_BAG_BACKPACK =
+      ITEMS.register("gun_bag_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> GREY_GUN_BAG_BACKPACK =
+      ITEMS.register("grey_gun_bag_backpack", () -> new BackpackItem(Backpack.LARGE));
+
+  public static final RegistryObject<Item> AMMO_BACKPACK =
+      ITEMS.register("ammo_backpack", () -> new BackpackItem(Backpack.LARGE));
 
   // ================================================================================
   // Clothing
@@ -733,536 +1236,4 @@ public class ModItems {
   public static final RegistryObject<Item> WEAK_ZOMBIE_SPAWN_EGG = ITEMS
       .register("weak_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.weakZombie, 0x000000,
           0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
-
-  public static void initialize() {
-
-    // ================================================================================
-    // Food
-    // ================================================================================
-
-    mre = add("mre", new Item(
-        new Item.Properties().food(ModFoods.MRE).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    orange = add("orange",
-        new Item(new Item.Properties()
-            .food(ModFoods.ORANGE)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenOrange = add("rotten_orange",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_ORANGE)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    pear = add("pear", new Item(
-        new Item.Properties().food(ModFoods.PEAR).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenPear = add("rotten_pear",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_PEAR)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    apple = add("apple", new Item(
-        new Item.Properties().food(ModFoods.APPLE).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenApple = add("rotten_apple",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_APPLE)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    riceBag = add("rice_bag",
-        new Item(new Item.Properties()
-            .food(ModFoods.RICE_BAG)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    noodles = add("noodles",
-        new Item(new Item.Properties()
-            .food(ModFoods.NOODLE_CUP)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    watermelon = add("watermelon",
-        new Item(new Item.Properties()
-            .food(ModFoods.WATERMELON)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenWatermelon = add("rotten_watermelon",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_WATERMELON)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    blueberry = add("blueberry",
-        new Item(new Item.Properties()
-            .food(ModFoods.BLUEBERRY)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenBlueberry = add("rotten_blueberry",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_BLUEBERRY)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    raspberry = add("raspberry",
-        new Item(new Item.Properties()
-            .food(ModFoods.RASPBERRY)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenRaspberry = add("rotten_raspberry",
-        new Item(new Item.Properties()
-            .food(ModFoods.ROTTEN_RASPBERRY)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    chips = add("chips", new Item(
-        new Item.Properties().food(ModFoods.CHIPS).group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    ranchChips = add("ranch_chips",
-        new Item(new Item.Properties()
-            .food(ModFoods.RANCH_CHIPS)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    cheeseChips = add("cheese_chips",
-        new Item(new Item.Properties()
-            .food(ModFoods.CHEESE_CHIPS)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    saltChips = add("salt_chips",
-        new Item(new Item.Properties()
-            .food(ModFoods.SALT_CHIPS)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    popcorn = add("popcorn",
-        new Item(new Item.Properties()
-            .food(ModFoods.POPCORN)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    nuttyCereal = add("nutty_cereal",
-        new Item(new Item.Properties()
-            .food(ModFoods.NUTTY_CEREAL)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emeraldCereal = add("emerald_cereal",
-        new Item(new Item.Properties()
-            .food(ModFoods.EMERALD_CEREAL)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    flakeCereal = add("flake_cereal",
-        new Item(new Item.Properties()
-            .food(ModFoods.FLAKE_CEREAL)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    // ================================================================================
-    // Drinks
-    // ================================================================================
-
-    emptyWaterCanteen = add("empty_water_canteen",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "water_canteen"))
-            .setBlockPredicate(
-                (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    waterCanteen = add("water_canteen",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-            .containerItem(emptyWaterCanteen)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyFlask = add("empty_flask",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "flask"))
-            .setBlockPredicate(
-                (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    flask = add("flask",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-            .containerItem(emptyFlask)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    teaFlask = add("tea_flask",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-            .containerItem(emptyFlask)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    coffeeFlask = add("coffee_flask",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-            .containerItem(emptyFlask)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyOrangeSoda = add("empty_orange_soda",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    orangeSoda = add("orange_soda",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .containerItem(emptyOrangeSoda)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyIcedTea = add("empty_iced_tea",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    icedTea = add("iced_tea",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .containerItem(emptyIcedTea)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyJuicePouch = add("empty_juice_pouch",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    juicePouch = add("juice_pouch",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 1), 1.0F)
-            .containerItem(emptyJuicePouch)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyPepeSoda = add("empty_pepe_soda",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    pepeSoda = add("pepe_soda",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .containerItem(emptyPepeSoda)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyLemonSoda = add("empty_lemon_soda",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    lemonSoda = add("lemon_soda",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .containerItem(emptyLemonSoda)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyColaSoda = add("empty_cola_soda",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    colaSoda = add("cola_soda",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .containerItem(emptyColaSoda)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyMilkCarton = add("empty_milk_carton",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    milkCarton = add("milk_carton",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
-            .containerItem(emptyMilkCarton)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    rottenMilk = add("rotten_milk",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-            .effect(() -> new EffectInstance(Effects.HUNGER, 600, 1), 0.2F)
-            .containerItem(emptyMilkCarton)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyColaPop = add("empty_cola_pop",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    colaPop = add("cola_pop",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-            .containerItem(emptyColaPop)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyIronBrew = add("empty_iron_brew",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    ironBrew = add("iron_brew",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-            .containerItem(emptyIronBrew)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptySprite = add("empty_sprite",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    sprite = add("sprite",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-            .containerItem(emptySprite)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    emptyZombieEnergy = add("empty_zombie_energy",
-        new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    zombieEnergy = add("zombie_energy",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .setUseAction(UseAction.DRINK)
-            .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-            .containerItem(emptyZombieEnergy)
-            .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
-
-    // ================================================================================
-    // Medical
-    // ================================================================================
-
-    firstAidKit = add("first_aid_kit",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    adrenalineSyringe = add("adrenaline_syringe",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .effect(() -> new EffectInstance(Effects.SPEED, (20 * 20), 1), 1.0F)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    morphineSyringe = add("morphine_syringe",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    bandage = add("bandage",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    emptyBloodBag = add("empty_blood_bag",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "blood_bag"))
-            .setEntityPredicate((entity) -> {
-              if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHealth() > 4) {
-                entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
-                return true;
-              }
-              return false;
-            })
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    bloodBag = add("blood_bag",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-            .maxStackSize(1)
-            .containerItem(emptyBloodBag)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    syringe = add("syringe",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))
-            .setEntityPredicate((entity) -> entity instanceof ZombieEntity)
-            .setProbability(0.25F)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    rbiSyringe = add("rbi_syringe",
-        new Item(new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    bottledRbi = add("bottled_rbi",
-        new Item(new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    bloodyRag = add("bloody_rag",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
-            .setBlockPredicate(
-                (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    dirtyRag = add("dirty_rag",
-        new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-            .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
-            .setBlockPredicate(
-                (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    cleanRag = add("clean_rag",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .containerItem(bloodyRag)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    splint = add("splint",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    cureSyringe = add("cure_syringe",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    bottledCure = add("bottled_cure",
-        new Item(new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    antibiotics = add("antibiotics",
-        new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-            .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-            .maxStackSize(1)
-            .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-    // ================================================================================
-    // Weapon
-    // ================================================================================
-
-    crowbar = add("crowbar", new MeleeWeaponItem(3, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    bat = add("bat", new MeleeWeaponItem(5, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    katana = add("katana", new MeleeWeaponItem(18, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    pipe = add("pipe", new MeleeWeaponItem(9, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    rustypipe = add("rusty_pipe", new MeleeWeaponItem(9, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    fireaxe = add("fire_axe", new MeleeWeaponItem(14, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    chainsaw = add("chainsaw", new MeleeWeaponItem(8, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    bowie = add("bowie", new MeleeWeaponItem(15, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    golfclub = add("golf_club", new MeleeWeaponItem(6, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    nightstick = add("night_stick", new MeleeWeaponItem(4, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    sledgehammer = add("sledge_hammer", new MeleeWeaponItem(10, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    nailBat = add("nail_bat", new MeleeWeaponItem(8, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    shovel = add("shovel", new MeleeWeaponItem(8, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    hatchet = add("hatchet", new MeleeWeaponItem(16, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    broadsword = add("broad_sword", new MeleeWeaponItem(14, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    machete = add("machete", new MeleeWeaponItem(14, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    scytheweapon = add("scythe_weapon", new MeleeWeaponItem(15, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    scythe = add("scythe", new MeleeWeaponItem(20, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    pickaxe = add("pickaxe", new MeleeWeaponItem(10, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    bostaff = add("bo_staff", new MeleeWeaponItem(4, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    wrench = add("wrench", new MeleeWeaponItem(4, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    fryingPan = add("frying_pan", new MeleeWeaponItem(8, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    boltCutters = add("bolt_cutters", new MeleeWeaponItem(9, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    combatKnife = add("combat_knife", new MeleeWeaponItem(14, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    steelBat = add("steel_bat", new MeleeWeaponItem(7, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    cleaver = add("cleaver", new MeleeWeaponItem(10, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    brokenBottle = add("broken_bottle", new MeleeWeaponItem(15, -2.4F,
-        new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_WEAPON))));
-
-    // ================================================================================
-    // Wearable
-    // ================================================================================
-
-    smallRedBackpack = add("small_red_backpack", new BackpackItem(Backpack.SMALL));
-
-    smallOrangeBackpack = add("small_orange_backpack", new BackpackItem(Backpack.SMALL));
-
-    smallYellowBackpack = add("small_yellow_backpack", new BackpackItem(Backpack.SMALL));
-
-    smallGreenBackpack = add("small_green_backpack", new BackpackItem(Backpack.SMALL));
-
-    smallBlueBackpack = add("small_blue_backpack", new BackpackItem(Backpack.SMALL));
-
-    smallPurpleBackpack = add("small_purple_backpack", new BackpackItem(Backpack.SMALL));
-
-    mediumRedBackpack = add("medium_red_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumOrangeBackpack = add("medium_orange_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumYellowBackpack = add("medium_yellow_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumGreenBackpack = add("medium_green_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumBlueBackpack = add("medium_blue_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumPurpleBackpack = add("medium_purple_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumGreyBackpack = add("medium_grey_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumBlackBackpack = add("medium_black_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumGhillieBackpack = add("medium_ghillie_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    mediumWhiteBackpack = add("medium_white_backpack", new BackpackItem(Backpack.MEDIUM));
-
-    largeGreyBackpack = add("large_grey_backpack", new BackpackItem(Backpack.LARGE));
-
-    largeGreenBackpack = add("large_green_backpack", new BackpackItem(Backpack.LARGE));
-
-    largeTanBackpack = add("large_tan_backpack", new BackpackItem(Backpack.LARGE));
-
-    largeBlackBackpack = add("large_black_backpack", new BackpackItem(Backpack.LARGE));
-
-    largeGhillieBackpack = add("large_ghillie_backpack", new BackpackItem(Backpack.LARGE));
-
-    gunBagBackpack = add("gun_bag_backpack", new BackpackItem(Backpack.LARGE));
-
-    greyGunBagBackpack = add("grey_gun_bag_backpack", new BackpackItem(Backpack.LARGE));
-
-    ammoBagBackpack = add("ammo_backpack", new BackpackItem(Backpack.LARGE));
-  }
-
-  public static void register(RegistryEvent.Register<Item> event) {
-    toRegister.forEach(event.getRegistry()::register);
-  }
-
-  private static Item add(String registryName, Item item) {
-    toRegister.add(item.setRegistryName(new ResourceLocation(CraftingDead.ID, registryName)));
-    return item;
-  }
 }

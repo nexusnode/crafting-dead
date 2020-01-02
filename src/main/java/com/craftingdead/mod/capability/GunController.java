@@ -107,8 +107,9 @@ public class GunController implements IShootable, IAimable, IAction, INBTSeriali
   private void updateAccuracy(Entity entity) {
     this.accuracy = 1.0F;
 
-    if (entity.posX != entity.lastTickPosX || entity.posY != entity.lastTickPosY
-        || entity.posZ != entity.lastTickPosZ) {
+    if (entity.func_226277_ct_() != entity.lastTickPosX
+        || entity.func_226278_cu_() != entity.lastTickPosY
+        || entity.func_226281_cx_() != entity.lastTickPosZ) {
 
       this.accuracy = 0.5F;
 
@@ -116,7 +117,7 @@ public class GunController implements IShootable, IAimable, IAction, INBTSeriali
         this.accuracy = 0.25F;
       }
 
-      if (entity.isSneaking() && entity.onGround) {
+      if (entity.func_225608_bj_() && entity.onGround) {
         this.accuracy = 1.0F;
       }
     }
@@ -159,7 +160,7 @@ public class GunController implements IShootable, IAimable, IAction, INBTSeriali
     Entity entityHit = rayTrace.getEntity();
     float damage = this.item.getDamage();
     if ((entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
-        && rayTrace.getHitVec().y >= (entityHit.posY + entityHit.getEyeHeight())) {
+        && rayTrace.getHitVec().y >= (entityHit.func_226277_ct_() + entityHit.getEyeHeight())) {
       damage *= HEADSHOT_MULTIPLIER;
     }
     entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity), damage);

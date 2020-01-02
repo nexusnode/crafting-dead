@@ -2,8 +2,7 @@ package com.craftingdead.mod.client.gui.transition;
 
 import com.craftingdead.mod.client.gui.screen.ModScreen;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GLX;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,10 +18,6 @@ public class TransitionManager {
    * The default {@link Transitions} to use if no others are available
    */
   private final ITransition defaultTransition;
-  /**
-   * If screen transitions are enabled
-   */
-  private boolean enabled;
   /**
    * The {@link Framebuffer} used to draw the transition to
    */
@@ -43,7 +38,6 @@ public class TransitionManager {
   public TransitionManager(Minecraft minecraft, ITransition defaultTransition) {
     this.minecraft = minecraft;
     this.defaultTransition = defaultTransition;
-    this.enabled = GLX.isUsingFBOs();
   }
 
   public boolean checkDrawTransition(int mouseX, int mouseY, float partialTicks, Screen screen) {
@@ -51,14 +45,16 @@ public class TransitionManager {
         screen instanceof ModScreen ? ((ModScreen) screen).getTransition() : this.defaultTransition;
 
     // Blending issues in world
-    if (!this.enabled || this.minecraft.world != null || transition == null)
+    if (this.minecraft.world != null || transition == null)
       return false;
 
     if (screen != this.lastScreen) {
       this.transitionProgress = 0.0F;
       this.transitionBeginTime = Util.milliTime();
-      this.transitionFramebuffer = new Framebuffer(this.minecraft.mainWindow.getFramebufferWidth(),
-          this.minecraft.mainWindow.getFramebufferHeight(), true, Minecraft.IS_RUNNING_ON_MAC);
+      this.transitionFramebuffer =
+          new Framebuffer(this.minecraft.func_228018_at_().getFramebufferWidth(),
+              this.minecraft.func_228018_at_().getFramebufferHeight(), true,
+              Minecraft.IS_RUNNING_ON_MAC);
       this.transitionFramebuffer.setFramebufferColor(0.0F, 0.0F, 0.0F, 0.0F);
       this.lastScreen = screen;
     } else {
@@ -77,37 +73,37 @@ public class TransitionManager {
 
   private void renderTransition(int mouseX, int mouseY, float partialTicks, Screen screen,
       ITransition transition) {
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
       this.minecraft.getFramebuffer().unbindFramebuffer();
 
       this.transitionFramebuffer.framebufferClear(Minecraft.IS_RUNNING_ON_MAC);
       this.transitionFramebuffer.bindFramebuffer(false);
 
-      GlStateManager.pushMatrix();
+      RenderSystem.pushMatrix();
       {
         screen.render(mouseX, mouseY, partialTicks);
       }
-      GlStateManager.popMatrix();
+      RenderSystem.popMatrix();
       this.transitionFramebuffer.unbindFramebuffer();
 
       this.minecraft.getFramebuffer().bindFramebuffer(false);
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
 
-    MainWindow window = this.minecraft.mainWindow;
+    MainWindow window = this.minecraft.func_228018_at_();
     double width = window.getScaledWidth();
     double height = window.getScaledHeight();
 
-    GlStateManager.pushMatrix();
+    RenderSystem.pushMatrix();
     {
       transition.transform(width, height, this.transitionProgress);
-      GlStateManager.disableAlphaTest();
-      GlStateManager.disableBlend();
+      RenderSystem.disableAlphaTest();
+      RenderSystem.disableBlend();
       this.transitionFramebuffer.bindFramebufferTexture();
-      RenderUtil.drawTexturedRectangle(0, 0, width, height, 0.0D, 0.0D, 1.0D, 1.0D);
+      RenderUtil.drawTexturedRectangle(0, 0, width, height, 0.0F, 0.0F, 1.0F, 1.0F);
     }
-    GlStateManager.popMatrix();
+    RenderSystem.popMatrix();
   }
 
   public static enum TransitionType {

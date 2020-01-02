@@ -1,8 +1,8 @@
 package com.craftingdead.mod.client.animation.fire;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import com.craftingdead.mod.client.animation.IGunAnimation;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
@@ -33,12 +33,14 @@ public class SubmachineShootAnimation implements IGunAnimation {
   }
 
   @Override
-  public void apply(Matrix4f matrix, float partialTicks) {
+  public void apply(MatrixStack matrixStack, float partialTicks) {
     float rotationProgress = MathHelper.lerp(partialTicks, this.lastRotation, this.rotation);
-    matrix.rotX((float) Math.toRadians(rotationProgress));
+    matrixStack
+        .func_227863_a_(
+            Vector3f.field_229179_b_.func_229187_a_((float) Math.toRadians(rotationProgress)));
 
     float translationProgress =
         MathHelper.lerp(partialTicks, this.lastTranslation, this.translation);
-    matrix.setTranslation(new Vector3f(0, 0, translationProgress));
+    matrixStack.func_227861_a_(0, 0, translationProgress);
   }
 }

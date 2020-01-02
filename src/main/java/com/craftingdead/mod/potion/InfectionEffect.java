@@ -24,7 +24,7 @@ public class InfectionEffect extends Effect {
       livingEntity.attackEntityFrom(ModDamageSource.INFECTION, 1.0F);
     }
   }
-  
+
   @Override
   public boolean isReady(int duration, int amplifier) {
     return true;
@@ -33,7 +33,7 @@ public class InfectionEffect extends Effect {
   @Override
   public List<ItemStack> getCurativeItems() {
     List<ItemStack> items = new ArrayList<ItemStack>();
-    items.add(new ItemStack(ModItems.cureSyringe));
+    items.add(new ItemStack(ModItems.CURE_SYRINGE::get));
     return items;
   }
 }

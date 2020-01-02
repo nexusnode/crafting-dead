@@ -22,18 +22,13 @@ import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.transition.TransitionManager;
 import com.craftingdead.mod.client.gui.transition.Transitions;
-import com.craftingdead.mod.client.model.GunRenderer;
-import com.craftingdead.mod.client.model.builtin.BuiltinModel;
-import com.craftingdead.mod.client.model.builtin.BuiltinModelLoader;
+import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
-import com.craftingdead.mod.entity.CorpseEntity;
-import com.craftingdead.mod.entity.SupplyDropEntity;
-import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
 import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
 import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
@@ -45,10 +40,6 @@ import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.Pose;
@@ -61,14 +52,11 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -114,8 +102,6 @@ public class ClientDist implements IModDist {
         .addReloadListener(this.crosshairManager);
 
     this.ingameGui = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
-
-    ModelLoaderRegistry.registerLoader(BuiltinModelLoader.INSTANCE);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -164,22 +150,24 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(CROUCH);
 
-    OBJLoader.INSTANCE.addDomain(CraftingDead.ID);
-    OBJLoader.INSTANCE.onResourceManagerReload(Minecraft.getInstance().getResourceManager());
-
-    RenderingRegistry.registerEntityRenderingHandler(CorpseEntity.class, CorpseRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry
-        .registerEntityRenderingHandler(AdvancedZombieEntity.class, AdvancedZombieRenderer::new);
-
+        .registerEntityRenderingHandler(ModEntityTypes.advancedZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
-        .registerEntityRenderingHandler(SupplyDropEntity.class, SupplyDropRenderer::new);
+        .registerEntityRenderingHandler(ModEntityTypes.fastZombie, AdvancedZombieRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.tankZombie, AdvancedZombieRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.weakZombie, AdvancedZombieRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
       if (CommonConfig.clientConfig.applyBranding.get()) {
         StartupMessageManager.addModMessage("Applying branding");
         GLFW
-            .glfwSetWindowTitle(minecraft.mainWindow.getHandle(),
+            .glfwSetWindowTitle(minecraft.func_228018_at_().getHandle(),
                 String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
         try {
           InputStream inputstream = minecraft
@@ -192,7 +180,7 @@ public class ClientDist implements IModDist {
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_32x32.png"))
               .getInputStream();
-          minecraft.mainWindow.setWindowIcon(inputstream, inputstream1);
+          minecraft.func_228018_at_().setWindowIcon(inputstream, inputstream1);
         } catch (IOException e) {
           logger.error("Couldn't set icon", e);
         }
@@ -260,10 +248,6 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleKeyInput(InputEvent.KeyInputEvent event) {
-    if (CROUCH.isPressed()) {
-      this.getPlayer().ifPresent(player -> player.getEntity().setPose(Pose.SWIMMING));
-    }
-
     if (RELOAD.isPressed()) {
       this.getPlayer().ifPresent(player -> {
         PlayerEntity playerEntity = player.getEntity();
@@ -394,7 +378,7 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case END:
         if (ClientDist.CROUCH.isKeyDown()) {
-
+          event.player.setPose(Pose.SWIMMING);
         }
         break;
       default:
@@ -403,29 +387,12 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleModelRegistry(ModelRegistryEvent event) {
-    BuiltinModelLoader.INSTANCE
-        .registerModel(new ModelResourceLocation(ModItems.ACR.getId(), "inventory"),
-            new BuiltinModel(new GunRenderer(new ResourceLocation(CraftingDead.ID, "item/acr"))));
-  }
-
-  @SubscribeEvent
-  public void handleModelBakeEvent(ModelBakeEvent event) {
-    for (ResourceLocation modelLocation : event.getModelRegistry().keySet()) {
-      if (BuiltinModelLoader.INSTANCE.accepts(modelLocation)) {
-        IUnbakedModel model;
-        try {
-          model = BuiltinModelLoader.INSTANCE.loadModel(modelLocation);
-        } catch (Exception e) {
-          logger.error("Couldn't load model", e);
-          continue;
-        }
-
-        IBakedModel bakedModel = model
-            .bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
-                new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-        event.getModelRegistry().put(modelLocation, bakedModel);
-      }
-    }
+  public void modelRegistry(ModelRegistryEvent event) {
+    ModelLoader
+        .addSpecialModel(new ResourceLocation(CraftingDead.ID, "models/block/obj/supplybox.obj"));
+    ModelLoader
+        .addSpecialModel(new ResourceLocation(CraftingDead.ID, "models/block/obj/parachute.obj"));
+    ModelLoaderRegistry
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
   }
 }

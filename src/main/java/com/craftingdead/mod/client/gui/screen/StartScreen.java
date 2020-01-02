@@ -1,11 +1,10 @@
 package com.craftingdead.mod.client.gui.screen;
 
-import javax.vecmath.Vector2d;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.client.gui.transition.ITransition;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -31,20 +30,25 @@ public class StartScreen extends ModScreen {
 
     float fadePct = MathHelper.clamp((Util.milliTime() - this.fadeStartTime) / 1000.0F, 0.0F, 1.0F);
 
-    Vector2d logoSize = RenderUtil.scaleToFit(1920, 1080);
-    GlStateManager.enableBlend();
-    GlStateManager.color4f(1.0F, 1.0F, 1.0F, fadePct);
+    double logoWidth = 1920;
+    double logoHeight = 1080;
+    double logoScale = RenderUtil.getScale(1920, 1080);
+    logoWidth *= logoScale;
+    logoHeight *= logoHeight;
+
+    RenderSystem.enableBlend();
+    RenderSystem.color4f(1.0F, 1.0F, 1.0F, fadePct);
     RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/craftingdead.png"));
     RenderUtil
-        .drawTexturedRectangle(this.width / 2 - logoSize.getX() / 2,
-            this.height / 2 - logoSize.getY() / 2, logoSize.getX(), logoSize.getY());
+        .drawTexturedRectangle(this.width / 2 - logoWidth / 2, this.height / 2 - logoHeight / 2,
+            logoWidth, logoHeight);
 
     this.font
         .drawString(I18n.format("menu.start"),
             this.width / 2 - this.font.getStringWidth(I18n.format("menu.start")) / 2,
             this.height / 2 + this.height / 4, 0xFFFFFF | MathHelper.ceil(fadePct * 255.0F) << 24);
 
-    GlStateManager.disableBlend();
+    RenderSystem.disableBlend();
   }
 
   @Override

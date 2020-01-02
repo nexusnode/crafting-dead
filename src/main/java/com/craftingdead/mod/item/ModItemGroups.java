@@ -26,7 +26,7 @@ public class ModItemGroups {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.firstAidKit);
+      return new ItemStack(ModItems.FIRST_AID_KIT::get);
     }
   });
 
@@ -34,7 +34,7 @@ public class ModItemGroups {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.crowbar);
+      return new ItemStack(ModItems.CROWBAR::get);
     }
   });
 
@@ -42,7 +42,7 @@ public class ModItemGroups {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.smallRedBackpack);
+      return new ItemStack(ModItems.SMALL_RED_BACKPACK::get);
     }
   });
 
@@ -50,7 +50,7 @@ public class ModItemGroups {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.largeTanBackpack);
+      return new ItemStack(ModItems.LARGE_TAN_BACKPACK::get);
     }
   });
 }

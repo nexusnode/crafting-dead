@@ -25,7 +25,7 @@ public class BrokenLegEffect extends Effect {
   public void performEffect(LivingEntity livingEntity, int amplifier) {
     if (livingEntity instanceof PlayerEntity) {
       if (((PlayerEntity) livingEntity).isCreative()) {
-        livingEntity.removePotionEffect(ModEffects.BROKEN_LEG.get());
+        livingEntity.removePotionEffect(ModEffects.brokenLeg);
       }
     }
   }
@@ -38,10 +38,10 @@ public class BrokenLegEffect extends Effect {
   @Override
   public List<ItemStack> getCurativeItems() {
     List<ItemStack> items = new ArrayList<ItemStack>();
-    items.add(new ItemStack(ModItems.firstAidKit));
-    items.add(new ItemStack(ModItems.morphineSyringe));
-    items.add(new ItemStack(ModItems.splint));
-    items.add(new ItemStack(ModItems.antibiotics));
+    items.add(new ItemStack(ModItems.FIRST_AID_KIT::get));
+    items.add(new ItemStack(ModItems.MORPHINE_SYRINGE::get));
+    items.add(new ItemStack(ModItems.SPLINT::get));
+    items.add(new ItemStack(ModItems.ANTIBIOTICS::get));
     return items;
   }
 }

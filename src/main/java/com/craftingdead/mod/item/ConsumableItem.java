@@ -3,7 +3,6 @@ package com.craftingdead.mod.item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.LivingEntity;
@@ -17,7 +16,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
 public class ConsumableItem extends Item {
@@ -26,14 +24,10 @@ public class ConsumableItem extends Item {
 
   private final UseAction useAction;
 
-  @Nullable
-  private final ITextComponent useText;
-
   public ConsumableItem(Properties properties) {
     super(properties);
     this.effects = properties.effects;
     this.useAction = properties.useAction;
-    this.useText = properties.useText;
   }
 
   @Override
@@ -108,18 +102,11 @@ public class ConsumableItem extends Item {
     }
   }
 
-  @Nullable
-  public ITextComponent getUseText() {
-    return this.useText;
-  }
-
   public static class Properties extends Item.Properties {
 
     private final List<Pair<Supplier<EffectInstance>, Float>> effects = new ArrayList<>();
 
     private UseAction useAction = UseAction.NONE;
-
-    private ITextComponent useText;
 
     public Properties effect(Supplier<EffectInstance> effect, float probability) {
       this.effects.add(Pair.of(effect, probability));
@@ -128,11 +115,6 @@ public class ConsumableItem extends Item {
 
     public Properties setUseAction(UseAction useAction) {
       this.useAction = useAction;
-      return this;
-    }
-
-    public Properties setUseText(ITextComponent useText) {
-      this.useText = useText;
       return this;
     }
   }

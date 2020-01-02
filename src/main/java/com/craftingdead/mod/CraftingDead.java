@@ -7,7 +7,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.mod.block.ModBlocks;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.action.IAction;
@@ -19,21 +18,18 @@ import com.craftingdead.mod.masterserver.handshake.HandshakeSession;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
-import com.craftingdead.mod.tileentity.ModTileEntityTypes;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.network.TcpClient;
 import com.craftingdead.network.pipeline.NetworkManager;
 import com.craftingdead.network.util.TransportType;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.potion.Effect;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -125,23 +121,14 @@ public class CraftingDead {
     IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.register(this);
 
-    // These need to stay in this order as certain Items require access to EntityTypes etc.
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
 
+    ModEffects.initialize();
+    modEventBus.addGenericListener(Effect.class, ModEffects::register);
+
     ModItems.ITEMS.register(modEventBus);
-
-    ModEffects.EFFECTS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
-
-    ModBlocks.initialize();
-    modEventBus.addGenericListener(Block.class, ModBlocks::register);
-
-    ModTileEntityTypes.initialize();
-    modEventBus.addGenericListener(TileEntityType.class, ModTileEntityTypes::register);
-
-    ModItems.initialize();
-    modEventBus.addGenericListener(Item.class, ModItems::register);
 
     MinecraftForge.EVENT_BUS.register(this);
 
@@ -271,19 +258,15 @@ public class CraftingDead {
   }
 
   @SubscribeEvent
-  public void handleAttachCapabilitiesItem(AttachCapabilitiesEvent<Item> event) {
-    if (event.getObject() instanceof Item) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "action"),
-              new ICapabilityProvider() {
-                private final IAction action = ModCapabilities.ACTION.getDefaultInstance();
+  public void handleAttachCapabilitiesItem(AttachCapabilitiesEvent<ItemStack> event) {
+    event.addCapability(new ResourceLocation(CraftingDead.ID, "action"), new ICapabilityProvider() {
+      private final IAction action = ModCapabilities.ACTION.getDefaultInstance();
 
-                @Override
-                public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-                  return cap == ModCapabilities.ACTION ? LazyOptional.of(() -> this.action).cast()
-                      : LazyOptional.empty();
-                }
-              });
-    }
+      @Override
+      public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        return cap == ModCapabilities.ACTION ? LazyOptional.of(() -> this.action).cast()
+            : LazyOptional.empty();
+      }
+    });
   }
 }

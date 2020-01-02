@@ -1,26 +1,19 @@
 package com.craftingdead.mod.client.util;
 
 import java.awt.Color;
-import java.util.Random;
 import java.util.UUID;
-import javax.vecmath.Vector2d;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.DownloadingTexture;
-import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class RenderUtil {
 
@@ -31,14 +24,11 @@ public class RenderUtil {
 
   public static void drawGradientRectangle(double x, double y, double x2, double y2, int startColor,
       int endColor) {
-    GlStateManager.disableTexture();
-    GlStateManager.enableBlend();
-    GlStateManager.disableAlphaTest();
-    GlStateManager
-        .blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-            GlStateManager.DestFactor.ZERO);
-    GlStateManager.shadeModel(GL11.GL_SMOOTH);
+    RenderSystem.disableTexture();
+    RenderSystem.enableBlend();
+    RenderSystem.disableAlphaTest();
+    RenderSystem.defaultBlendFunc();
+    RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
@@ -54,81 +44,72 @@ public class RenderUtil {
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
 
-    buffer.pos(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    buffer.pos(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.pos(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.pos(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer
+        .func_225582_a_(x, y2, 0.0D)
+        .func_227885_a_(startRed, startGreen, startBlue, startAlpha)
+        .endVertex();
+    buffer
+        .func_225582_a_(x2, y2, 0.0D)
+        .func_227885_a_(endRed, endGreen, endBlue, endAlpha)
+        .endVertex();
+    buffer
+        .func_225582_a_(x2, y, 0.0D)
+        .func_227885_a_(endRed, endGreen, endBlue, endAlpha)
+        .endVertex();
+    buffer
+        .func_225582_a_(x, y, 0.0D)
+        .func_227885_a_(startRed, startGreen, startBlue, startAlpha)
+        .endVertex();
     tessellator.draw();
 
-    GlStateManager.shadeModel(GL11.GL_FLAT);
-    GlStateManager.enableAlphaTest();
-    GlStateManager.disableBlend();
-    GlStateManager.enableTexture();
+    RenderSystem.shadeModel(GL11.GL_FLAT);
+    RenderSystem.enableAlphaTest();
+    RenderSystem.disableBlend();
+    RenderSystem.enableTexture();
   }
 
-  public static void drawTexturedRectangle(double x, double y, double width, double height,
-      double textureX, double textureY) {
+  public static void drawTexturedRectangle(double x, double y, float width, float height,
+      float textureX, float textureY) {
     drawTexturedRectangle(x, y, x + width, y + height, textureX, textureY, textureX + width,
         textureY + height, 256, 256);
   }
 
-  public static void drawTexturedRectangle(double x, double y, double x2, double y2,
-      double textureX, double textureY, double textureX2, double textureY2, double width,
-      double height) {
-    double u = textureX / width;
-    double u2 = textureX2 / width;
-    double v = textureY / height;
-    double v2 = textureY2 / height;
+  public static void drawTexturedRectangle(double x, double y, double x2, double y2, float textureX,
+      float textureY, float textureX2, float textureY2, float width, float height) {
+    float u = textureX / width;
+    float u2 = textureX2 / width;
+    float v = textureY / height;
+    float v2 = textureY2 / height;
     drawTexturedRectangle(x, y, x2, y2, u, v, u2, v2);
   }
 
   public static void drawTexturedRectangle(double x, double y, double width, double height) {
-    drawTexturedRectangle(x, y, x + width, y + height, 0.0D, 1.0D, 1.0D, 0.0D);
+    drawTexturedRectangle(x, y, x + width, y + height, 0.0F, 1.0F, 1.0F, 0.0F);
   }
 
-  public static void drawTexturedRectangle(double x, double y, double x2, double y2, double u,
-      double v, double u2, double v2) {
+  public static void drawTexturedRectangle(double x, double y, double x2, double y2, float u,
+      float v, float u2, float v2) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuffer();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.pos(x, y2, 0.0D).tex(u, v).endVertex();
-    bufferbuilder.pos(x2, y2, 0.0D).tex(u2, v).endVertex();
-    bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
-    bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
+    bufferbuilder.func_225582_a_(x, y2, 0.0D).func_225583_a_(u, v).endVertex();
+    bufferbuilder.func_225582_a_(x2, y2, 0.0D).func_225583_a_(u2, v).endVertex();
+    bufferbuilder.func_225582_a_(x2, y, 0.0D).func_225583_a_(u2, v2).endVertex();
+    bufferbuilder.func_225582_a_(x, y, 0.0D).func_225583_a_(u, v2).endVertex();
     tessellator.draw();
   }
 
   public static ResourceLocation getPlayerAvatar(UUID playerId) {
     ResourceLocation resourceLocation =
         new ResourceLocation(CraftingDead.ID, "textures/avatars/" + playerId + ".png");
-    ITextureObject object = minecraft.getTextureManager().getTexture(resourceLocation);
+    Texture object = minecraft.getTextureManager().func_229267_b_(resourceLocation);
     if (object == null) {
       DownloadingTexture imageData =
           new DownloadingTexture(null, PlayerResource.AVATAR_URL.getUrl(playerId),
-              new ResourceLocation(CraftingDead.ID, "textures/gui/avatar.png"), null);
-      minecraft.getTextureManager().loadTexture(resourceLocation, imageData);
+              new ResourceLocation(CraftingDead.ID, "textures/gui/avatar.png"), false, null);
+      minecraft.getTextureManager().func_229263_a_(resourceLocation, imageData);
     }
     return resourceLocation;
-  }
-
-  public static void renderModel(IBakedModel model, VertexFormat vertextFormat) {
-    Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder buffer = tessellator.getBuffer();
-    buffer.begin(GL11.GL_QUADS, vertextFormat);
-    for (BakedQuad bakedquad : model.getQuads(null, null, new Random(), EmptyModelData.INSTANCE)) {
-      buffer.addVertexData(bakedquad.getVertexData());
-    }
-    tessellator.draw();
-  }
-
-  public static void renderModel(IBakedModel model, VertexFormat vertexFormat, int color) {
-    Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder buffer = tessellator.getBuffer();
-    buffer.begin(GL11.GL_QUADS, vertexFormat);
-    for (BakedQuad bakedquad : model.getQuads(null, null, new Random(), EmptyModelData.INSTANCE)) {
-      LightUtil.renderQuadColor(buffer, bakedquad, color);
-    }
-    tessellator.draw();
   }
 
   public static void bind(ResourceLocation resourceLocation) {
@@ -144,20 +125,12 @@ public class RenderUtil {
         (int) Math.round(a));
   }
 
-  public static Vector2d scaleToFit(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.mainWindow.getWidth() / imageWidth;
-    double heightScale = minecraft.mainWindow.getHeight() / imageHeight;
-
-    double scaledImageWidth = imageWidth * widthScale;
-    double scaledImageHeight = imageHeight * widthScale;
-
-    if (scaledImageHeight < minecraft.mainWindow.getHeight()) {
-      scaledImageWidth = imageWidth * heightScale;
-      scaledImageHeight = imageHeight * heightScale;
-    }
-
-    Vector2d finalSize = new Vector2d(scaledImageWidth, scaledImageHeight);
-    finalSize.scale(1 / minecraft.mainWindow.getGuiScaleFactor());
-    return finalSize;
+  public static double getScale(final double imageWidth, final double imageHeight) {
+    double widthScale = minecraft.func_228018_at_().getWidth() / imageWidth;
+    double heightScale = minecraft.func_228018_at_().getHeight() / imageHeight;
+    final double scale =
+        imageHeight * widthScale < minecraft.func_228018_at_().getHeight() ? heightScale
+            : widthScale;
+    return scale / minecraft.func_228018_at_().getGuiScaleFactor();
   }
 }
