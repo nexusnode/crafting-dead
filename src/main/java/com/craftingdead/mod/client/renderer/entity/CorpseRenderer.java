@@ -41,8 +41,8 @@ public class CorpseRenderer extends EntityRenderer<CorpseEntity> {
     IVertexBuilder vertexBuilder =
         renderTypeBuffer.getBuffer(model.func_228282_a_(this.getEntityTexture(entity)));
     model
-        .func_225598_a_(matrixStack, vertexBuilder, p_225623_6_,
-            OverlayTexture.func_229201_a_(0, 10), 1.0F, 1.0F, 1.0F, 0.15F);
+        .func_225598_a_(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.field_229196_a_,
+            1.0F, 1.0F, 1.0F, 0.15F);
   }
 
   private String getSkinType(CorpseEntity entity) {

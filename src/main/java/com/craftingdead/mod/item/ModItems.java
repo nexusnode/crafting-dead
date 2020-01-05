@@ -39,11 +39,14 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
               .setShootSound(ModSoundEvents.ACR_SHOOT)
-              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
+              .setAcceptedMagazines(
+                  ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "acr_magazine")))));
 
   public static final RegistryObject<Item> AK47 = ITEMS
       .register("ak47", () -> new GunItem(new GunItem.Properties()
@@ -73,10 +76,11 @@ public class ModItems {
           () -> new GunItem(new GunItem.Properties()
               .setFireRate(80)
               .setDamage(7)
-              .setReloadDurationTicks(20 * 2)
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
               .setShootSound(ModSoundEvents.M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
 
   public static final RegistryObject<Item> M9 = ITEMS
@@ -119,10 +123,15 @@ public class ModItems {
           .setShootSound(ModSoundEvents.FN57_SHOOT)
           .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
 
+  public static final RegistryObject<Item> ACR_MAGAZINE = ITEMS
+      .register("acr_magazine",
+          () -> new MagazineItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
+              new Magazine(20, 50)));
+
   public static final RegistryObject<Item> AK47_30_ROUND_MAGAZINE = ITEMS
       .register("ak47_30_round_magazine",
           () -> new MagazineItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
-              new Magazine(45, 30)));
+              new Magazine(30, 45)));
 
   // ================================================================================
   // Tools

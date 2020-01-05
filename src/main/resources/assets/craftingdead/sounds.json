@@ -29,6 +29,12 @@
       "craftingdead:m4a1_shoot"
     ]
   },
+  "m4a1_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m4a1_reload"
+    ]
+  },
   "m9_shoot": {
     "category": "master",
     "sounds": [

@@ -55,7 +55,6 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
@@ -388,10 +387,6 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void modelRegistry(ModelRegistryEvent event) {
-    ModelLoader
-        .addSpecialModel(new ResourceLocation(CraftingDead.ID, "models/block/obj/supplybox.obj"));
-    ModelLoader
-        .addSpecialModel(new ResourceLocation(CraftingDead.ID, "models/block/obj/parachute.obj"));
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
   }

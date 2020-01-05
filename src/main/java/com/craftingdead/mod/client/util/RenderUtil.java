@@ -1,19 +1,28 @@
 package com.craftingdead.mod.client.util;
 
 import java.awt.Color;
+import java.util.Random;
 import java.util.UUID;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.DownloadingTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.IModelData;
 
 public class RenderUtil {
 
@@ -110,6 +119,37 @@ public class RenderUtil {
       minecraft.getTextureManager().func_229263_a_(resourceLocation, imageData);
     }
     return resourceLocation;
+  }
+
+  public static void renderModel(IBakedModel model, ItemStack itemStack, MatrixStack matrixStack,
+      IVertexBuilder vertexBuilder) {
+    renderModel(model, itemStack, 0xF000F0, OverlayTexture.field_229196_a_, matrixStack,
+        vertexBuilder, EmptyModelData.INSTANCE);
+  }
+
+  public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
+      MatrixStack matrixStack, IVertexBuilder vertexBuilder) {
+    renderModel(model, itemStack, lightmapCoord, OverlayTexture.field_229196_a_, matrixStack,
+        vertexBuilder, EmptyModelData.INSTANCE);
+  }
+
+  public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
+      int overlayColour, MatrixStack matrixStack, IVertexBuilder vertexBuilder,
+      IModelData modelData) {
+    Random random = new Random();
+    for (Direction direction : Direction.values()) {
+      random.setSeed(42L);
+      minecraft
+          .getItemRenderer()
+          .func_229112_a_(matrixStack, vertexBuilder,
+              model.getQuads(null, direction, random, modelData), itemStack, lightmapCoord,
+              overlayColour);
+    }
+    random.setSeed(42L);
+    minecraft
+        .getItemRenderer()
+        .func_229112_a_(matrixStack, vertexBuilder, model.getQuads(null, null, random, modelData),
+            itemStack, lightmapCoord, overlayColour);
   }
 
   public static void bind(ResourceLocation resourceLocation) {

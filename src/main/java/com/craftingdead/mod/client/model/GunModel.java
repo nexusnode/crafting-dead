@@ -19,7 +19,6 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
@@ -30,10 +29,10 @@ import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
-import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
@@ -51,8 +50,8 @@ public class GunModel implements IModelGeometry<GunModel> {
   public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
-
-    return null;
+    return new BakedGunModel(
+        this.base.func_225613_a_(bakery, spriteGetter, modelTransform, modelLocation));
   }
 
   @Override
@@ -113,9 +112,8 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
+      this.base.handlePerspective(cameraTransformType, mat);
       mat.func_227860_a_();
-      mat.func_227861_a_(0.5F, 0.5F, 0.5F);
-
       switch (cameraTransformType) {
         case THIRD_PERSON_LEFT_HAND:
         case THIRD_PERSON_RIGHT_HAND:
@@ -151,10 +149,11 @@ public class GunModel implements IModelGeometry<GunModel> {
     public GunModel read(JsonDeserializationContext deserializationContext,
         JsonObject modelContents) {
       if (!modelContents.has("base")) {
-        throw new RuntimeException("Gun model requires 'base' value.");
+        throw new RuntimeException("Gun model requires 'base' key that points to a model.");
       }
-      BlockModel base = deserializationContext
-          .deserialize(JSONUtils.getJsonObject(modelContents, "base"), BlockModel.class);
+      IUnbakedModel base = ModelLoader
+          .instance()
+          .getModelOrMissing(new ResourceLocation(modelContents.get("base").getAsString()));
       return new GunModel(base);
     }
   }
