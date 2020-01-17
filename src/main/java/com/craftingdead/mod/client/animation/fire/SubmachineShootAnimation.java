@@ -1,12 +1,12 @@
 package com.craftingdead.mod.client.animation.fire;
 
-import com.craftingdead.mod.client.animation.IGunAnimation;
+import com.craftingdead.mod.capability.animation.IAnimation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-public class SubmachineShootAnimation implements IGunAnimation {
+public class SubmachineShootAnimation implements IAnimation {
 
   private long startTime = 0L;
 

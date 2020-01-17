@@ -4,33 +4,34 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import com.craftingdead.mod.capability.animation.IAnimation;
 import net.minecraft.item.ItemStack;
 
 public class AnimationManager {
 
-  private final Map<ItemStack, IGunAnimation> currentAnimations = new HashMap<>();
-  private final Map<ItemStack, IGunAnimation> nextAnimations = new HashMap<>();
+  private final Map<ItemStack, IAnimation> currentAnimations = new HashMap<>();
+  private final Map<ItemStack, IAnimation> nextAnimations = new HashMap<>();
 
   public void tick() {
-    Iterator<Entry<ItemStack, IGunAnimation>> nextIterator =
+    Iterator<Entry<ItemStack, IAnimation>> nextIterator =
         this.nextAnimations.entrySet().iterator();
     nextIterator.forEachRemaining((entry) -> {
       ItemStack itemStack = entry.getKey();
-      IGunAnimation animation = entry.getValue();
+      IAnimation animation = entry.getValue();
       this.currentAnimations.put(itemStack, animation);
       nextIterator.remove();
     });
-    Iterator<Entry<ItemStack, IGunAnimation>> currentIterator =
+    Iterator<Entry<ItemStack, IAnimation>> currentIterator =
         this.currentAnimations.entrySet().iterator();
     currentIterator.forEachRemaining((entry) -> {
-      IGunAnimation animation = entry.getValue();
+      IAnimation animation = entry.getValue();
       if (animation.tick()) {
         currentIterator.remove();
       }
     });
   }
 
-  public void setNextGunAnimation(ItemStack itemStack, IGunAnimation animation) {
+  public void setNextGunAnimation(ItemStack itemStack, IAnimation animation) {
     this.nextAnimations.put(itemStack, animation);
   }
 
@@ -43,7 +44,7 @@ public class AnimationManager {
     this.nextAnimations.remove(itemStack);
   }
 
-  public IGunAnimation getCurrentAnimation(ItemStack itemStack) {
+  public IAnimation getCurrentAnimation(ItemStack itemStack) {
     return this.currentAnimations.get(itemStack);
   }
 }

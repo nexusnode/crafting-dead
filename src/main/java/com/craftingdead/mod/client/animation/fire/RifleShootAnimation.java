@@ -1,12 +1,12 @@
 package com.craftingdead.mod.client.animation.fire;
 
-import com.craftingdead.mod.client.animation.IGunAnimation;
+import com.craftingdead.mod.capability.animation.IAnimation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-public class RifleShootAnimation implements IGunAnimation {
+public class RifleShootAnimation implements IAnimation {
 
   private long startTime = 0L;
 
@@ -35,10 +35,10 @@ public class RifleShootAnimation implements IGunAnimation {
   @Override
   public void apply(MatrixStack matrixStack, float partialTicks) {
     float rotationProgress = MathHelper.lerp(partialTicks, this.lastRotation, this.rotation);
-    matrixStack.func_227863_a_(Vector3f.field_229182_e_.func_229187_a_(rotationProgress));
+    matrixStack.func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(rotationProgress));
 
     float translationProgress =
         MathHelper.lerp(partialTicks, this.lastTranslation, this.translation);
-    matrixStack.func_227861_a_(translationProgress, 0, 0);
+    matrixStack.func_227861_a_(0, 0, translationProgress);
   }
 }

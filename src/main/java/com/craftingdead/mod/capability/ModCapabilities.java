@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 import com.craftingdead.mod.capability.action.DefaultAction;
 import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.aimable.IAimable;
+import com.craftingdead.mod.capability.animation.DefaultAnimationController;
+import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.capability.shootable.DefaultShootable;
@@ -28,6 +30,9 @@ public class ModCapabilities {
   @CapabilityInject(IAction.class)
   public static final Capability<IAction> ACTION = null;
 
+  @CapabilityInject(IAnimationController.class)
+  public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
     CapabilityManager.INSTANCE
@@ -35,6 +40,9 @@ public class ModCapabilities {
     CapabilityManager.INSTANCE
         .register(IAimable.class, new EmptyStorage<>(), (Callable<IAimable>) () -> () -> 1.0F);
     CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);
+    CapabilityManager.INSTANCE
+        .register(IAnimationController.class, new EmptyStorage<>(),
+            DefaultAnimationController::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

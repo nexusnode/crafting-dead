@@ -1,4 +1,4 @@
 {
     "loader":"craftingdead:gun",
-    "base":"craftingdead:item/acr_base"
+    "base":"craftingdead:item/acr/acr_base"
 }

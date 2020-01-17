@@ -1,12 +1,8 @@
-package com.craftingdead.mod.client.animation;
+package com.craftingdead.mod.capability.animation;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-public interface IGunAnimation {
-
-  public static enum Type {
-    SHOOT;
-  }
+public interface IAnimation {
 
   boolean tick();
 

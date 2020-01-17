@@ -13,11 +13,11 @@ import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.animation.IAnimation;
+import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.player.ClientPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
-import com.craftingdead.mod.client.animation.AnimationManager;
-import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.transition.TransitionManager;
@@ -84,8 +84,6 @@ public class ClientDist implements IModDist {
 
   private CrosshairManager crosshairManager = new CrosshairManager();
 
-  private AnimationManager animationManager = new AnimationManager();
-
   private RecoilHelper recoilHelper = new RecoilHelper();
 
   private IngameGui ingameGui;
@@ -105,10 +103,6 @@ public class ClientDist implements IModDist {
 
   public CrosshairManager getCrosshairManager() {
     return crosshairManager;
-  }
-
-  public AnimationManager getAnimationManager() {
-    return animationManager;
   }
 
   @Override
@@ -206,7 +200,7 @@ public class ClientDist implements IModDist {
       case END:
         CraftingDead.getInstance().tickConnection();
         if (minecraft.world != null && !minecraft.isGamePaused()) {
-          this.animationManager.tick();
+
 
         }
         break;
@@ -222,6 +216,10 @@ public class ClientDist implements IModDist {
         if (minecraft.player != null) {
           Vec2f position = this.recoilHelper.update();
           minecraft.player.rotateTowards(position.x, position.y);
+          minecraft.player
+              .getHeldItemMainhand()
+              .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
+              .ifPresent(IAnimationController::tick);
         }
         break;
       default:
@@ -355,12 +353,17 @@ public class ClientDist implements IModDist {
       if (event.getEntity() == minecraft.player) {
         this.recoilHelper.jolt(gunController.getAccuracy());
       }
-      Supplier<IGunAnimation> animation =
-          gunController.getItem().getAnimations().get(IGunAnimation.Type.SHOOT);
-      if (animation != null && animation.get() != null) {
-        this.animationManager.clear(event.getItemStack());
-        this.animationManager.setNextGunAnimation(event.getItemStack(), animation.get());
-      }
+
+      event
+          .getItemStack()
+          .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
+          .ifPresent(animationController -> {
+            Supplier<IAnimation> animation =
+                gunController.getItem().getAnimations().get(GunItem.AnimationType.SHOOT);
+            if (animation != null && animation.get() != null) {
+              animationController.addAnimation(animation.get());
+            }
+          });
     }
   }
 

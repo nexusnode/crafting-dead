@@ -70,6 +70,8 @@ public class GunController implements IShootable, IAimable, IAction, INBTSeriali
   private MagazineItem loadingMagazine;
 
   private Magazine magazine;
+  
+  private ItemStack attachment
 
   /**
    * Constructs a new {@link GunController}.

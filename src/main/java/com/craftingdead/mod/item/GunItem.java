@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.client.animation.IGunAnimation;
+import com.craftingdead.mod.capability.animation.IAnimation;
 import com.google.common.collect.Multimap;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,7 +55,7 @@ public class GunItem extends ShootableItem {
 
   private final Supplier<SoundEvent> reloadSound;
 
-  private final Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
+  private final Map<AnimationType, Supplier<IAnimation>> animations;
 
   private final Set<ResourceLocation> acceptedMagazines;
 
@@ -100,7 +100,7 @@ public class GunItem extends ShootableItem {
     return this.reloadSound;
   }
 
-  public Map<IGunAnimation.Type, Supplier<IGunAnimation>> getAnimations() {
+  public Map<AnimationType, Supplier<IAnimation>> getAnimations() {
     return this.animations;
   }
 
@@ -152,6 +152,10 @@ public class GunItem extends ShootableItem {
       }
     };
   }
+  
+  public static enum AnimationType {
+    SHOOT;
+  }
 
   public static class Properties extends Item.Properties {
 
@@ -169,7 +173,7 @@ public class GunItem extends ShootableItem {
 
     private Supplier<SoundEvent> reloadSound;
 
-    private Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations;
+    private Map<AnimationType, Supplier<IAnimation>> animations;
 
     private Set<ResourceLocation> acceptedMagazines;
 
@@ -208,7 +212,7 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties setAnimations(Map<IGunAnimation.Type, Supplier<IGunAnimation>> animations) {
+    public Properties setAnimations(Map<AnimationType, Supplier<IAnimation>> animations) {
       this.animations = animations;
       return this;
     }

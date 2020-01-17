@@ -1,7 +1,6 @@
 package com.craftingdead.mod.item;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.animation.IGunAnimation;
 import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
@@ -44,7 +43,7 @@ public class ModItems {
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
               .setShootSound(ModSoundEvents.ACR_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
+              .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
               .setAcceptedMagazines(
                   ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "acr_magazine")))));
 
@@ -57,7 +56,7 @@ public class ModItems {
           .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.AK47_SHOOT)
           .setReloadSound(ModSoundEvents.AK47_RELOAD)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
           .setAcceptedMagazines(
               ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "ak47_30_round_magazine")))));
 
@@ -69,7 +68,7 @@ public class ModItems {
           .setAccuracy(0.7F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> M4A1 = ITEMS
       .register("m4a1",
@@ -81,7 +80,7 @@ public class ModItems {
               .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
               .setShootSound(ModSoundEvents.M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, RifleShootAnimation::new))));
+              .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))));
 
   public static final RegistryObject<Item> M9 = ITEMS
       .register("m9", () -> new GunItem(new GunItem.Properties()
@@ -91,7 +90,7 @@ public class ModItems {
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.M9_SHOOT)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> TASER = ITEMS
       .register("taser", () -> new GunItem(new GunItem.Properties()
@@ -101,7 +100,7 @@ public class ModItems {
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.TASER_SHOOT)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> MAGNUM = ITEMS
       .register("magnum", () -> new GunItem(new GunItem.Properties()
@@ -111,7 +110,7 @@ public class ModItems {
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> FN57 = ITEMS
       .register("fn57", () -> new GunItem(new GunItem.Properties()
@@ -121,7 +120,7 @@ public class ModItems {
           .setAccuracy(0.9F)
           .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
           .setShootSound(ModSoundEvents.FN57_SHOOT)
-          .setAnimations(ImmutableMap.of(IGunAnimation.Type.SHOOT, PistolShootAnimation::new))));
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> ACR_MAGAZINE = ITEMS
       .register("acr_magazine",
