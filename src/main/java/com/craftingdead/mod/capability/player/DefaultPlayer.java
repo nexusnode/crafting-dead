@@ -6,7 +6,9 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
@@ -75,6 +77,14 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
    */
   private ItemStack lastHeldStack = null;
 
+  private boolean triggerPressed;
+
+  private boolean aiming;
+
+  protected int reloadDurationTicks = 0;
+
+  protected int totalReloadDurationTicks;
+
   public DefaultPlayer() {
     this(null);
   }
@@ -87,6 +97,12 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void tick() {
     this.updateHeldStack();
     this.updateBrokenLeg();
+    if (this.isReloading() && --this.reloadDurationTicks == 0) {
+      ItemStack itemStack = this.entity.getHeldItemMainhand();
+      itemStack
+          .getCapability(ModCapabilities.SHOOTABLE)
+          .ifPresent(shootable -> shootable.finishReloading(itemStack, this.entity));
+    }
   }
 
   private void updateBrokenLeg() {
@@ -117,12 +133,74 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public boolean onKill(Entity target) {
+    if (target instanceof ZombieEntity) {
+      this.setZombiesKilled(this.getZombiesKilled() + 1);
+    } else if (target instanceof ServerPlayerEntity) {
+      this.setPlayersKilled(this.getPlayersKilled() + 1);
+    }
     return false;
   }
 
   @Override
   public boolean onDeath(DamageSource cause) {
     return false;
+  }
+
+  @Override
+  public void setTriggerPressed(boolean triggerPressed) {
+    this.triggerPressed = triggerPressed;
+    ItemStack itemStack = this.entity.getHeldItemMainhand();
+    itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
+      if (!this.isReloading()) {
+        shootable.setTriggerPressed(itemStack, this.entity, triggerPressed);
+      }
+    });
+  }
+
+  @Override
+  public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
+    this.setTriggerPressed(triggerPressed);
+  }
+
+  @Override
+  public boolean isTriggerPressed() {
+    return this.triggerPressed;
+  }
+
+  @Override
+  public void toggleAiming() {
+    this.aiming = !this.aiming;
+  }
+
+  @Override
+  public void toggleAiming(boolean sendUpdate) {
+    this.toggleAiming();
+  }
+
+  @Override
+  public boolean isAiming() {
+    return this.aiming;
+  }
+
+  @Override
+  public void reload() {
+    ItemStack itemStack = this.entity.getHeldItemMainhand();
+    itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
+      if (!this.isReloading() && shootable.canReload(itemStack, this.entity)) {
+        this.entity.playSound(shootable.getReloadSound(), 1.0F, 1.0F);
+        this.reloadDurationTicks = this.totalReloadDurationTicks = shootable.getReloadDuration();
+      }
+    });
+  }
+
+  @Override
+  public void reload(boolean sendUpdate) {
+    this.reload();
+  }
+
+  @Override
+  public boolean isReloading() {
+    return this.reloadDurationTicks > 0;
   }
 
   @Override

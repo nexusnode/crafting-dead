@@ -20,8 +20,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 // TODO BAG: When you raise your backpack, you’ll be able to create a chest
 public class BackpackItem extends Item {
@@ -36,10 +34,10 @@ public class BackpackItem extends Item {
   @Override
   public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand handIn) {
     ItemStack itemStack = player.getHeldItem(handIn);
-    player.openContainer(new SimpleNamedContainerProvider(
-        this.backpack
+    player
+        .openContainer(new SimpleNamedContainerProvider(this.backpack
             .getContainerProvider(this.readInventory(itemStack, this.backpack.getInventorySize())),
-        this.getDisplayName(itemStack)));
+            this.getDisplayName(itemStack)));
     return new ActionResult<>(ActionResultType.SUCCESS, itemStack);
   }
 
@@ -58,7 +56,7 @@ public class BackpackItem extends Item {
     return true;
   }
 
-  @OnlyIn(Dist.CLIENT)
+  @Override
   public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip,
       ITooltipFlag flagIn) {
     super.addInformation(stack, worldIn, tooltip, flagIn);
@@ -79,7 +77,7 @@ public class BackpackItem extends Item {
     for (int i = 0; i < inventory.getSizeInventory(); i++) {
       items.set(i, inventory.getStackInSlot(i));
     }
-    compound.put("inventory",
-        ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
+    compound
+        .put("inventory", ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
   }
 }

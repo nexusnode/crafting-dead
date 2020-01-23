@@ -1,8 +1,8 @@
 package com.craftingdead.mod.item;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.client.animation.fire.PistolShootAnimation;
-import com.craftingdead.mod.client.animation.fire.RifleShootAnimation;
+import com.craftingdead.mod.capability.animation.fire.PistolShootAnimation;
+import com.craftingdead.mod.capability.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;

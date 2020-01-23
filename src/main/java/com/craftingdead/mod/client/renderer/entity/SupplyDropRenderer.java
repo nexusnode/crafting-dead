@@ -21,19 +21,19 @@ public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
   }
 
   @Override
-  public void func_225623_a_(SupplyDropEntity entity, float entityYaw, float partialTicks,
+  public void render(SupplyDropEntity entity, float entityYaw, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
 
-    matrixStack.func_227861_a_(0, 1.51D, 0);
-    matrixStack.func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(180.0F));
-    
+    matrixStack.translate(0, 1.51D, 0);
+    matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+
     this.model.setRenderParachute(entity.fallDistance > 0 && !entity.onGround);
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(this.model.func_228282_a_(this.getEntityTexture(entity)));
+        renderTypeBuffer.getBuffer(this.model.getLayer(this.getEntityTexture(entity)));
     this.model
-        .func_225598_a_(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.field_229196_a_,
-            1.0F, 1.0F, 1.0F, 0.15F);
+        .render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+            1.0F, 0.15F);
   }
 
   @Override

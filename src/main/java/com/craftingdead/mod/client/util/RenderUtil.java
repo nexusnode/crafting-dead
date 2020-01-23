@@ -53,22 +53,10 @@ public class RenderUtil {
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
 
-    buffer
-        .func_225582_a_(x, y2, 0.0D)
-        .func_227885_a_(startRed, startGreen, startBlue, startAlpha)
-        .endVertex();
-    buffer
-        .func_225582_a_(x2, y2, 0.0D)
-        .func_227885_a_(endRed, endGreen, endBlue, endAlpha)
-        .endVertex();
-    buffer
-        .func_225582_a_(x2, y, 0.0D)
-        .func_227885_a_(endRed, endGreen, endBlue, endAlpha)
-        .endVertex();
-    buffer
-        .func_225582_a_(x, y, 0.0D)
-        .func_227885_a_(startRed, startGreen, startBlue, startAlpha)
-        .endVertex();
+    buffer.vertex(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.vertex(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.vertex(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.vertex(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
     tessellator.draw();
 
     RenderSystem.shadeModel(GL11.GL_FLAT);
@@ -101,35 +89,35 @@ public class RenderUtil {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuffer();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.func_225582_a_(x, y2, 0.0D).func_225583_a_(u, v).endVertex();
-    bufferbuilder.func_225582_a_(x2, y2, 0.0D).func_225583_a_(u2, v).endVertex();
-    bufferbuilder.func_225582_a_(x2, y, 0.0D).func_225583_a_(u2, v2).endVertex();
-    bufferbuilder.func_225582_a_(x, y, 0.0D).func_225583_a_(u, v2).endVertex();
+    bufferbuilder.vertex(x, y2, 0.0D).texture(u, v).endVertex();
+    bufferbuilder.vertex(x2, y2, 0.0D).texture(u2, v).endVertex();
+    bufferbuilder.vertex(x2, y, 0.0D).texture(u2, v2).endVertex();
+    bufferbuilder.vertex(x, y, 0.0D).texture(u, v2).endVertex();
     tessellator.draw();
   }
 
   public static ResourceLocation getPlayerAvatar(UUID playerId) {
     ResourceLocation resourceLocation =
         new ResourceLocation(CraftingDead.ID, "textures/avatars/" + playerId + ".png");
-    Texture object = minecraft.getTextureManager().func_229267_b_(resourceLocation);
+    Texture object = minecraft.getTextureManager().getTexture(resourceLocation);
     if (object == null) {
       DownloadingTexture imageData =
           new DownloadingTexture(null, PlayerResource.AVATAR_URL.getUrl(playerId),
               new ResourceLocation(CraftingDead.ID, "textures/gui/avatar.png"), false, null);
-      minecraft.getTextureManager().func_229263_a_(resourceLocation, imageData);
+      minecraft.getTextureManager().registerTexture(resourceLocation, imageData);
     }
     return resourceLocation;
   }
 
   public static void renderModel(IBakedModel model, ItemStack itemStack, MatrixStack matrixStack,
       IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, 0xF000F0, OverlayTexture.field_229196_a_, matrixStack,
-        vertexBuilder, EmptyModelData.INSTANCE);
+    renderModel(model, itemStack, 0xF000F0, OverlayTexture.DEFAULT_UV, matrixStack, vertexBuilder,
+        EmptyModelData.INSTANCE);
   }
 
   public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
       MatrixStack matrixStack, IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, lightmapCoord, OverlayTexture.field_229196_a_, matrixStack,
+    renderModel(model, itemStack, lightmapCoord, OverlayTexture.DEFAULT_UV, matrixStack,
         vertexBuilder, EmptyModelData.INSTANCE);
   }
 
@@ -141,15 +129,15 @@ public class RenderUtil {
       random.setSeed(42L);
       minecraft
           .getItemRenderer()
-          .func_229112_a_(matrixStack, vertexBuilder,
+          .renderBakedItemQuads(matrixStack, vertexBuilder,
               model.getQuads(null, direction, random, modelData), itemStack, lightmapCoord,
               overlayColour);
     }
     random.setSeed(42L);
     minecraft
         .getItemRenderer()
-        .func_229112_a_(matrixStack, vertexBuilder, model.getQuads(null, null, random, modelData),
-            itemStack, lightmapCoord, overlayColour);
+        .renderBakedItemQuads(matrixStack, vertexBuilder,
+            model.getQuads(null, null, random, modelData), itemStack, lightmapCoord, overlayColour);
   }
 
   public static void bind(ResourceLocation resourceLocation) {
@@ -166,11 +154,10 @@ public class RenderUtil {
   }
 
   public static double getScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.func_228018_at_().getWidth() / imageWidth;
-    double heightScale = minecraft.func_228018_at_().getHeight() / imageHeight;
+    double widthScale = minecraft.getWindow().getWidth() / imageWidth;
+    double heightScale = minecraft.getWindow().getHeight() / imageHeight;
     final double scale =
-        imageHeight * widthScale < minecraft.func_228018_at_().getHeight() ? heightScale
-            : widthScale;
-    return scale / minecraft.func_228018_at_().getGuiScaleFactor();
+        imageHeight * widthScale < minecraft.getWindow().getHeight() ? heightScale : widthScale;
+    return scale / minecraft.getWindow().getGuiScaleFactor();
   }
 }

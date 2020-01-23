@@ -52,7 +52,7 @@ public class UpdateStatisticsMessage {
   public static void handle(UpdateStatisticsMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ((ClientDist) CraftingDead.getInstance().getModDist())
         .getPlayer()
-        .ifPresent((player) -> player
+        .ifPresent(player -> player
             .updateMetadata(msg.daysSurvived, msg.zombiesKilled, msg.playersKilled, msg.water,
                 msg.maxWater, msg.stamina, msg.maxStamina));
     ctx.get().setPacketHandled(true);

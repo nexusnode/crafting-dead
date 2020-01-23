@@ -2,21 +2,17 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
-import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
-import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
-import com.craftingdead.mod.capability.animation.IAnimation;
-import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.player.ClientPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
+import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
@@ -27,12 +23,7 @@ import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.entity.ModEntityTypes;
-import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.masterserver.handshake.packet.HandshakePacket;
-import com.craftingdead.mod.masterserver.modclientlogin.ModClientLoginSession;
-import com.craftingdead.mod.masterserver.modclientlogin.packet.ModClientLoginPacket;
-import com.craftingdead.network.pipeline.NetworkManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -42,12 +33,10 @@ import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.Pose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Session;
 import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
@@ -82,9 +71,9 @@ public class ClientDist implements IModDist {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
-  private CrosshairManager crosshairManager = new CrosshairManager();
+  private final CrosshairManager crosshairManager = new CrosshairManager();
 
-  private RecoilHelper recoilHelper = new RecoilHelper();
+  private final RecoilHelper recoilHelper = new RecoilHelper();
 
   private IngameGui ingameGui;
 
@@ -102,25 +91,7 @@ public class ClientDist implements IModDist {
   }
 
   public CrosshairManager getCrosshairManager() {
-    return crosshairManager;
-  }
-
-  @Override
-  public boolean isUsingNativeTransport() {
-    return minecraft.gameSettings.isUsingNativeTransport();
-  }
-
-  @Override
-  public void handleConnect(NetworkManager networkManager) {
-    networkManager
-        .sendMessage(new HandshakePacket(CraftingDead.MASTER_SERVER_VERSION,
-            HandshakePacket.MOD_CLIENT_LOGIN));
-    networkManager.setSession(new ModClientLoginSession(networkManager));
-
-    Session session = minecraft.getSession();
-    UUID id = session.getProfile().getId();
-    String username = session.getUsername();
-    networkManager.sendMessage(new ModClientLoginPacket(id, username, CraftingDead.VERSION));
+    return this.crosshairManager;
   }
 
   public LazyOptional<ClientPlayer> getPlayer() {
@@ -131,6 +102,10 @@ public class ClientDist implements IModDist {
 
   public IngameGui getIngameGui() {
     return this.ingameGui;
+  }
+
+  public RecoilHelper getRecoilHelper() {
+    return this.recoilHelper;
   }
 
   // ================================================================================
@@ -160,7 +135,7 @@ public class ClientDist implements IModDist {
       if (CommonConfig.clientConfig.applyBranding.get()) {
         StartupMessageManager.addModMessage("Applying branding");
         GLFW
-            .glfwSetWindowTitle(minecraft.func_228018_at_().getHandle(),
+            .glfwSetWindowTitle(minecraft.getWindow().getHandle(),
                 String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
         try {
           InputStream inputstream = minecraft
@@ -173,7 +148,7 @@ public class ClientDist implements IModDist {
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_32x32.png"))
               .getInputStream();
-          minecraft.func_228018_at_().setWindowIcon(inputstream, inputstream1);
+          minecraft.getWindow().setWindowIcon(inputstream, inputstream1);
         } catch (IOException e) {
           logger.error("Couldn't set icon", e);
         }
@@ -195,64 +170,26 @@ public class ClientDist implements IModDist {
   // ================================================================================
 
   @SubscribeEvent
-  public void handleClientTick(TickEvent.ClientTickEvent event) {
-    switch (event.phase) {
-      case END:
-        CraftingDead.getInstance().tickConnection();
-        if (minecraft.world != null && !minecraft.isGamePaused()) {
-
-
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  @SubscribeEvent
-  public void handleRenderTick(TickEvent.RenderTickEvent event) {
-    switch (event.phase) {
-      case START:
-        if (minecraft.player != null) {
-          Vec2f position = this.recoilHelper.update();
-          minecraft.player.rotateTowards(position.x, position.y);
-          minecraft.player
-              .getHeldItemMainhand()
-              .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-              .ifPresent(IAnimationController::tick);
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
     if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
-      if (event.getButton() == minecraft.gameSettings.keyBindAttack.getKey().getKeyCode()) {
-        boolean press = event.getAction() == GLFW.GLFW_PRESS;
-        this.getPlayer().ifPresent((player) -> {
-          ItemStack heldStack = player.getEntity().getHeldItemMainhand();
-          heldStack.getCapability(ModCapabilities.SHOOTABLE, null).ifPresent(shootable -> {
-            shootable.setTriggerPressed(heldStack, player.getEntity(), press);
+      if (minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
+        boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
+        this.getPlayer().ifPresent(player -> {
+          if (player
+              .getEntity()
+              .getHeldItemMainhand()
+              .getCapability(ModCapabilities.SHOOTABLE)
+              .isPresent()) {
             event.setCanceled(true);
-          });
+            player.setTriggerPressed(triggerPressed, true);
+          }
         });
       }
-    }
-  }
 
-  @SubscribeEvent
-  public void handleKeyInput(InputEvent.KeyInputEvent event) {
-    if (RELOAD.isPressed()) {
-      this.getPlayer().ifPresent(player -> {
-        PlayerEntity playerEntity = player.getEntity();
-        ItemStack heldStack = playerEntity.getHeldItemMainhand();
-        heldStack
-            .getCapability(ModCapabilities.SHOOTABLE)
-            .ifPresent(shootable -> shootable.reload(heldStack, playerEntity));
-      });
+      if (minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())
+          && event.getAction() == GLFW.GLFW_PRESS) {
+        this.getPlayer().ifPresent(player -> player.toggleAiming(true));
+      }
     }
   }
 
@@ -281,7 +218,6 @@ public class ClientDist implements IModDist {
       DiscordPresence
           .updateState(serverData.isOnLAN() ? GameState.LAN : GameState.MULTIPLAYER, this);
     }
-
   }
 
   @SubscribeEvent
@@ -294,11 +230,9 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
-    // We don't use RenderPlayerEvent.Pre as it gets called too early resulting in
-    // changes we make to the arm pose being overwritten
-    ItemStack stack = event.getEntity().getHeldItemMainhand();
-    // isAssignableFrom is faster than instanceof
-    if (GunItem.class.isAssignableFrom(stack.getItem().getClass())) {
+    ItemStack itemStack = event.getEntity().getHeldItemMainhand();
+    if (event.getRenderer().getEntityModel() instanceof BipedModel
+        && itemStack.getItem() instanceof GunItem) {
       BipedModel<?> model = event.getRenderer().getEntityModel();
       switch (event.getEntity().getPrimaryHand()) {
         case LEFT:
@@ -322,12 +256,10 @@ public class ClientDist implements IModDist {
                 event.getWindow().getScaledHeight());
         break;
       case CROSSHAIRS:
-        this.getPlayer().ifPresent((player) -> {
+        this.getPlayer().ifPresent(player -> {
           PlayerEntity playerEntity = player.getEntity();
           ItemStack heldStack = playerEntity.getHeldItemMainhand();
-          heldStack
-              .getCapability(ModCapabilities.ACTION)
-              .ifPresent(action -> event.setCanceled(action.isActive(playerEntity, heldStack)));
+          event.setCanceled(this.ingameGui.getAction().isActive());
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.AIMABLE).ifPresent(aimable -> {
               event.setCanceled(true);
@@ -344,30 +276,6 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleGunShootEventPre(GunEvent.ShootEvent.Pre event) {
-    // This is event can be called on both the client thread and server thread so
-    // check we are on the client first
-    if (event.getEntity().world.isRemote()) {
-      GunController gunController = event.getController();
-      // Only jolt camera if the event is for our own player
-      if (event.getEntity() == minecraft.player) {
-        this.recoilHelper.jolt(gunController.getAccuracy());
-      }
-
-      event
-          .getItemStack()
-          .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-          .ifPresent(animationController -> {
-            Supplier<IAnimation> animation =
-                gunController.getItem().getAnimations().get(GunItem.AnimationType.SHOOT);
-            if (animation != null && animation.get() != null) {
-              animationController.addAnimation(animation.get());
-            }
-          });
-    }
-  }
-
-  @SubscribeEvent
   public void handleDrawScreenPre(DrawScreenEvent.Pre event) {
     event
         .setCanceled(this.transitionManager
@@ -376,21 +284,29 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
+  public void handleModelRegistry(ModelRegistryEvent event) {
+    ModelLoaderRegistry
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
+  }
+
+  @SubscribeEvent
+  public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
-      case END:
-        if (ClientDist.CROUCH.isKeyDown()) {
-          event.player.setPose(Pose.SWIMMING);
+      case START:
+        if (minecraft.player != null) {
+          Vec2f cameraVelocity = this.recoilHelper.update();
+          minecraft.player.rotateTowards(cameraVelocity.x, cameraVelocity.y);
+          minecraft.gameRenderer.cameraZoom = 1.0F;
+          if (this.getPlayer().map(IPlayer::isAiming).orElse(false)) {
+            minecraft.player
+                .getHeldItemMainhand()
+                .getCapability(ModCapabilities.AIMABLE)
+                .ifPresent(aimable -> minecraft.gameRenderer.cameraZoom = aimable.getCameraZoom());
+          }
         }
         break;
       default:
         break;
     }
-  }
-
-  @SubscribeEvent
-  public void modelRegistry(ModelRegistryEvent event) {
-    ModelLoaderRegistry
-        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
   }
 }

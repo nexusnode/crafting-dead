@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimation;
+import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.google.common.collect.Multimap;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,6 +60,8 @@ public class GunItem extends ShootableItem {
 
   private final Set<ResourceLocation> acceptedMagazines;
 
+  private final float cameraZoom;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireRate = properties.fireRate;
@@ -70,6 +73,7 @@ public class GunItem extends ShootableItem {
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
     this.acceptedMagazines = properties.acceptedMagazines;
+    this.cameraZoom = properties.cameraZoom;
   }
 
   public int getFireRate() {
@@ -108,11 +112,15 @@ public class GunItem extends ShootableItem {
     return this.acceptedMagazines;
   }
 
+  public float getCameraZoom() {
+    return this.cameraZoom;
+  }
+
   @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(
-      EquipmentSlotType equipmentSlot) {
-    @SuppressWarnings("deprecation")
-    Multimap<String, AttributeModifier> modifiers = super.getAttributeModifiers(equipmentSlot);
+  public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot,
+      ItemStack itemStack) {
+    Multimap<String, AttributeModifier> modifiers =
+        super.getAttributeModifiers(equipmentSlot, itemStack);
     if (equipmentSlot == EquipmentSlotType.MAINHAND) {
       modifiers
           .put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER,
@@ -133,11 +141,15 @@ public class GunItem extends ShootableItem {
   public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
     return new ICapabilitySerializable<CompoundNBT>() {
       private final GunController gunController = new GunController(GunItem.this);
+      private final IAnimationController animationController =
+          ModCapabilities.ANIMATION_CONTROLLER.getDefaultInstance();
 
       @Override
       public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        return (cap == ModCapabilities.SHOOTABLE || cap == ModCapabilities.AIMABLE
-            || cap == ModCapabilities.ACTION) ? LazyOptional.of(() -> this.gunController).cast()
+        return (cap == ModCapabilities.SHOOTABLE || cap == ModCapabilities.AIMABLE)
+            ? LazyOptional.of(() -> this.gunController).cast()
+            : cap == ModCapabilities.ANIMATION_CONTROLLER
+                ? LazyOptional.of(() -> this.animationController).cast()
                 : LazyOptional.empty();
       }
 
@@ -152,7 +164,7 @@ public class GunItem extends ShootableItem {
       }
     };
   }
-  
+
   public static enum AnimationType {
     SHOOT;
   }
@@ -176,6 +188,8 @@ public class GunItem extends ShootableItem {
     private Map<AnimationType, Supplier<IAnimation>> animations;
 
     private Set<ResourceLocation> acceptedMagazines;
+
+    private float cameraZoom = 1.0F;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -219,6 +233,11 @@ public class GunItem extends ShootableItem {
 
     public Properties setAcceptedMagazines(Set<ResourceLocation> acceptedMagazines) {
       this.acceptedMagazines = acceptedMagazines;
+      return this;
+    }
+
+    public Properties setCameraZoom(float cameraZoom) {
+      this.cameraZoom = cameraZoom;
       return this;
     }
   }

@@ -2,7 +2,6 @@ package com.craftingdead.mod.client.gui;
 
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
@@ -10,7 +9,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -38,6 +36,8 @@ public class IngameGui {
 
   private float lastSpread;
 
+  private IAction action = new IAction.Empty();
+
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
@@ -51,14 +51,11 @@ public class IngameGui {
 
     this.client.getPlayer().ifPresent((player) -> {
       ClientPlayerEntity playerEntity = player.getEntity();
-      ItemStack heldStack = playerEntity.getHeldItemMainhand();
-      heldStack.getCapability(ModCapabilities.ACTION).ifPresent(action -> {
-        if (action.isActive(playerEntity, heldStack)) {
-          renderActionProgress(this.minecraft.fontRenderer, width, height,
-              action.getText(playerEntity, heldStack),
-              action.getPercentComplete(playerEntity, heldStack));
-        }
-      });
+
+      if (this.action.isActive()) {
+        renderActionProgress(this.minecraft.fontRenderer, width, height, action.getText(),
+            action.getProgress());
+      }
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
@@ -77,6 +74,14 @@ public class IngameGui {
             player.getZombiesKilled(), player.getPlayersKilled());
       }
     });
+  }
+  
+  public IAction getAction() {
+    return this.action;
+  }
+
+  public void setAction(IAction action) {
+    this.action = action;
   }
 
   private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,

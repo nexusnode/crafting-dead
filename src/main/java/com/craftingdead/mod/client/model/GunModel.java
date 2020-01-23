@@ -2,26 +2,25 @@ package com.craftingdead.mod.client.model;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimationController;
-import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.client.animation.IGunAnimation;
+import com.craftingdead.mod.item.AttachmentItem;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
@@ -32,64 +31,57 @@ import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.DynamicBucketModel;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.QuadTransformer;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
-import net.minecraftforge.fluids.FluidUtil;
 
 @SuppressWarnings("deprecation")
 public class GunModel implements IModelGeometry<GunModel> {
 
   private final IUnbakedModel base;
+  private final Map<ResourceLocation, TransformationMatrix> attachmentTransforms;
 
-  public GunModel(IUnbakedModel base) {
+  public GunModel(IUnbakedModel base,
+      Map<ResourceLocation, TransformationMatrix> attachmentTransforms) {
     this.base = base;
+    this.attachmentTransforms = attachmentTransforms;
   }
 
   @Override
   public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
-    return new BakedGunModel(
-        this.base.func_225613_a_(bakery, spriteGetter, modelTransform, modelLocation), owner,
-        modelTransform);
+    return new BakedGunModel(this.base.bake(bakery, spriteGetter, modelTransform, modelLocation),
+        new AttachmentOverrideHandler(this.attachmentTransforms));
   }
 
   @Override
   public Collection<Material> getTextures(IModelConfiguration owner,
       Function<ResourceLocation, IUnbakedModel> modelGetter,
-      Set<Pair<String, String>> missingTextureErrors) {
-    Set<Material> materials = new HashSet<>();
-    materials.addAll(this.base.func_225614_a_(modelGetter, missingTextureErrors));
-    return materials;
+      Set<com.mojang.datafixers.util.Pair<String, String>> missingTextureErrors) {
+    return this.base.getTextureDependencies(modelGetter, missingTextureErrors);
   }
 
   public static class BakedGunModel implements IBakedModel {
 
     private final IBakedModel base;
-    private final Map<String, IBakedModel> attachments = new HashMap<>();
-    private final IModelConfiguration owner;
-    private final IModelTransform modelTransform;
-    private final IModelGeometry<GunModel> unbakedModel;
+    private final Map<IBakedModel, QuadTransformer> attachments = new HashMap<>();
+    private final ItemOverrideList itemOverrideList;
 
-    private IAnimationController animationController;
+    private Optional<IAnimationController> animationController = Optional.empty();
 
-    public BakedGunModel(IBakedModel base, IModelConfiguration owner,
-        IModelTransform modelTransform, IModelGeometry<GunModel> unbakedModel) {
+    public BakedGunModel(IBakedModel base, ItemOverrideList itemOverrideList) {
       this.base = base;
-      this.owner = owner;
-      this.modelTransform = modelTransform;
-      this.unbakedModel = unbakedModel;
+      this.itemOverrideList = itemOverrideList;
     }
 
     @Override
@@ -102,10 +94,12 @@ public class GunModel implements IModelGeometry<GunModel> {
         @Nonnull Random rand, @Nonnull IModelData extraData) {
       ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
       builder.addAll(this.base.getQuads(state, side, rand, extraData));
-      if(this.magazines != null) {
-        for()
+      for (Map.Entry<IBakedModel, QuadTransformer> entry : this.attachments.entrySet()) {
+        builder
+            .addAll(entry
+                .getValue()
+                .processMany(entry.getKey().getQuads(state, side, rand, extraData)));
       }
-      QuadTransformer transformer = new QuadTransformer(TransformationMatrix.func_227983_a_());
       return builder.build();
     }
 
@@ -137,40 +131,32 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
-      mat.func_227860_a_();
-      switch (cameraTransformType) {
-        case THIRD_PERSON_LEFT_HAND:
-        case THIRD_PERSON_RIGHT_HAND:
-        case FIRST_PERSON_LEFT_HAND:
-        case FIRST_PERSON_RIGHT_HAND:
-          this.animationController
-          IGunAnimation animation = ((ClientDist) CraftingDead.getInstance().getModDist())
-              .getAnimationManager()
-              .getCurrentAnimation(Minecraft.getInstance().player.getHeldItemMainhand());
-          if (animation != null) {
-            animation.apply(mat, Minecraft.getInstance().getRenderPartialTicks());
-          }
-          break;
-        default:
-          break;
+      if (isHeld(cameraTransformType)) {
+        this.animationController.ifPresent(controller -> controller.apply(mat));
       }
-
       return this.base.handlePerspective(cameraTransformType, mat);
     }
 
     @Override
     public ItemOverrideList getOverrides() {
-      return new ItemOverrideList() {
-        @Override
-        public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
-            @Nullable World world, @Nullable LivingEntity entity) {
-          itemStack
-              .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-              .ifPresent(animationController -> BakedGunModel.this.animationController =
-                  animationController);
-          return BakedGunModel.this;
-        }
-      };
+      return this.itemOverrideList;
+    }
+
+    private static boolean isHeld(ItemCameraTransforms.TransformType cameraTransformType) {
+      switch (cameraTransformType) {
+        case THIRD_PERSON_LEFT_HAND:
+        case THIRD_PERSON_RIGHT_HAND:
+        case FIRST_PERSON_LEFT_HAND:
+        case FIRST_PERSON_RIGHT_HAND:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    @Override
+    public boolean isSideLit() {
+      return false;
     }
   }
 
@@ -190,39 +176,51 @@ public class GunModel implements IModelGeometry<GunModel> {
       IUnbakedModel base = ModelLoader
           .instance()
           .getModelOrMissing(new ResourceLocation(modelContents.get("base").getAsString()));
-      return new GunModel(base);
+
+      Map<ResourceLocation, TransformationMatrix> attachmentTransforms = new HashMap<>();
+      if (modelContents.has("attachment_transforms")) {
+        modelContents.getAsJsonObject("attachment_transforms").entrySet().forEach(entry -> {
+          attachmentTransforms
+              .put(new ResourceLocation(entry.getKey()),
+                  deserializationContext.deserialize(entry.getValue(), TransformationMatrix.class));
+        });
+      }
+
+      return new GunModel(base, attachmentTransforms);
     }
   }
 
   private static final class AttachmentOverrideHandler extends ItemOverrideList {
-    private final ModelBakery bakery;
 
-    private AttachmentOverrideHandler(ModelBakery bakery) {
-      this.bakery = bakery;
+    private final Map<ResourceLocation, TransformationMatrix> attachmentTransforms;
+
+    public AttachmentOverrideHandler(
+        Map<ResourceLocation, TransformationMatrix> attachmentTransforms) {
+      this.attachmentTransforms = attachmentTransforms;
     }
 
     @Override
     public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
         @Nullable World world, @Nullable LivingEntity entity) {
-      return FluidUtil.getFluidContained(itemStack).map(attachmentStack -> {
+      itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
+        GunController gunController = (GunController) shootable;
         BakedGunModel model = (BakedGunModel) originalModel;
-
-        Fluid fluid = attachmentStack.getFluid();
-        String name = fluid.getRegistryName().toString();
-
-        if (!model.attachments.containsKey(name)) {
-          DynamicBucketModel parent = model.unbakedModel.withFluid(fluid);
-          IBakedModel bakedModel = parent
-              .bake(model.owner, bakery, ModelLoader.defaultTextureGetter(), model.modelTransform,
-                  model.getOverrides(), new ResourceLocation(CraftingDead.ID, "gun_override"));
-          model.attachments.put(name, bakedModel);
-          return bakedModel;
+        model.attachments.clear();
+        for (AttachmentItem attachment : gunController.getAttachments().values()) {
+          model.attachments
+              .put(
+                  Minecraft
+                      .getInstance()
+                      .getItemRenderer()
+                      .getItemModelWithOverrides(new ItemStack(attachment), world, entity),
+                  new QuadTransformer(this.attachmentTransforms
+                      .getOrDefault(attachment.getRegistryName(),
+                          TransformationMatrix.identity())));
         }
-
-        return model.attachments.get(name);
-      })
-          // not a fluid item apparently
-          .orElse(originalModel); // empty bucket
+        model.animationController = Optional
+            .ofNullable(itemStack.getCapability(ModCapabilities.ANIMATION_CONTROLLER).orElse(null));
+      });
+      return originalModel;
     }
   }
 }

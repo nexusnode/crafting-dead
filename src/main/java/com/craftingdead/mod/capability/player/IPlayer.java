@@ -27,6 +27,29 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
    */
   boolean onDeath(DamageSource cause);
 
+  /**
+   * When the trigger button is pressed.
+   *
+   * @param triggerPressed - if the button is pressed
+   */
+  void setTriggerPressed(boolean triggerPressed);
+
+  void setTriggerPressed(boolean triggerPressed, boolean sendUpdate);
+
+  boolean isTriggerPressed();
+
+  void toggleAiming();
+
+  void toggleAiming(boolean sendUpdate);
+
+  boolean isAiming();
+
+  void reload();
+
+  void reload(boolean sendUpdate);
+
+  boolean isReloading();
+
   int getDaysSurvived();
 
   void setDaysSurvived(int daysSurvived);

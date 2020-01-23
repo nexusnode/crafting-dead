@@ -57,7 +57,7 @@ public class CorpseEntity extends Entity {
     this(player.world, player.getUniqueID(), player.getName());
     this.inventory = new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0]));
     player.inventory.clear();
-    this.setPosition(player.func_226277_ct_(), player.func_226278_cu_(), player.func_226281_cx_());
+    this.setPosition(player.getX(), player.getY(), player.getZ());
   }
 
   @Override

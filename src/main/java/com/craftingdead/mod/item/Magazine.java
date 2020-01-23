@@ -19,8 +19,8 @@ public class Magazine {
     return size;
   }
 
-  public int getSizeAndDecrement() {
-    return this.size--;
+  public void decrementSize() {
+    this.size--;
   }
 
   public int getPenetration() {

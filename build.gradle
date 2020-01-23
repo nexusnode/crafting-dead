@@ -1,7 +1,8 @@
 buildscript {
     repositories {
         maven { 
-        	url = 'https://files.minecraftforge.net/maven'
+        	name 'forge'
+        	url 'https://files.minecraftforge.net/maven'
 		}
         jcenter()
         mavenCentral()
@@ -23,6 +24,17 @@ group = 'com.craftingdead.mod'
 archivesBaseName = 'craftingdead'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+repositories {
+	maven {
+		name 'jitpack'
+		url 'https://jitpack.io' 
+	}
+	maven {
+        name 'tterrag'
+        url 'https://maven.tterrag.com'
+    }
+}
 
 minecraft {
     mappings channel: "${mappings_channel}", version: "${mappings_version}"
@@ -54,20 +66,6 @@ minecraft {
             }
         }
     }
-}
-
-sourceSets {
-	main {
-		java {
-			srcDir "network/src/main/java"
-		}
-	}
-}
-
-repositories {
-	maven {
-		url = 'https://jitpack.io' 
-	}
 }
 
 dependencies {

@@ -2,6 +2,7 @@ package com.craftingdead.mod.capability.shootable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.SoundEvent;
 
 public interface IShootable {
 
@@ -9,5 +10,11 @@ public interface IShootable {
 
   void setTriggerPressed(ItemStack itemStack, Entity entity, boolean triggerPressed);
 
-  void reload(ItemStack itemStack, Entity entity);
+  boolean canReload(ItemStack itemStack, Entity entity);
+
+  void finishReloading(ItemStack itemStack, Entity entity);
+
+  int getReloadDuration();
+
+  SoundEvent getReloadSound();
 }

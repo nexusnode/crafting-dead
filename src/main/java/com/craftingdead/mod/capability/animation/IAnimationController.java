@@ -1,5 +1,7 @@
 package com.craftingdead.mod.capability.animation;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 public interface IAnimationController {
 
   void tick();
@@ -10,5 +12,5 @@ public interface IAnimationController {
 
   void clearAnimations();
 
-  IAnimation getCurrentAnimation();
+  void apply(MatrixStack matrixStack);
 }

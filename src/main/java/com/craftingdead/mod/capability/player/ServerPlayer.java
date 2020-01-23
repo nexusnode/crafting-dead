@@ -2,10 +2,9 @@ package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
@@ -81,21 +80,42 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     }
   }
 
-  @Override
-  public boolean onKill(Entity target) {
-    if (target instanceof ZombieEntity) {
-      this.setZombiesKilled(this.getZombiesKilled() + 1);
-    } else if (target instanceof ServerPlayerEntity) {
-      this.setPlayersKilled(this.getPlayersKilled() + 1);
-    }
-    return false;
-  }
+
 
   @Override
   public boolean onDeath(DamageSource cause) {
     CorpseEntity corpse = new CorpseEntity(this.entity);
     this.entity.world.addEntity(corpse);
     return false;
+  }
+
+  @Override
+  public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
+    super.setTriggerPressed(triggerPressed, sendUpdate);
+    if (sendUpdate) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY.with(this::getEntity),
+              new PlayerActionMessage(this.entity.getEntityId(),
+                  triggerPressed ? PlayerActionMessage.Action.TRIGGER_PRESSED
+                      : PlayerActionMessage.Action.TRIGGER_RELEASED));
+    }
+  }
+  
+  @Override
+  public void toggleAiming(boolean sendUpdate) {
+    super.toggleAiming(sendUpdate);
+  }
+  
+  @Override
+  public void reload(boolean sendUpdate) {
+    super.reload(sendUpdate);
+    if (sendUpdate) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY.with(this::getEntity), new PlayerActionMessage(
+              this.entity.getEntityId(), PlayerActionMessage.Action.RELOAD));
+    }
   }
 
   @Override

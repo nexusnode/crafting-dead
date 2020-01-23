@@ -28,21 +28,21 @@ public class CorpseRenderer extends EntityRenderer<CorpseEntity> {
   }
 
   @Override
-  public void func_225623_a_(CorpseEntity entity, float entityYaw, float partialTicks,
+  public void render(CorpseEntity entity, float entityYaw, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
     CorpseModel model = this.modelByType.get(this.getSkinType(entity));
 
-    matrixStack.func_227861_a_(0, 0.2D, -0.4D);
-    matrixStack.func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(90.0F));
+    matrixStack.translate(0, 0.2D, -0.4D);
+    matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(90.0F));
 
     final int limbCount = entity.getLimbCount();
     model.setLimbCount(limbCount);
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(model.func_228282_a_(this.getEntityTexture(entity)));
+        renderTypeBuffer.getBuffer(model.getLayer(this.getEntityTexture(entity)));
     model
-        .func_225598_a_(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.field_229196_a_,
-            1.0F, 1.0F, 1.0F, 0.15F);
+        .render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+            1.0F, 0.15F);
   }
 
   private String getSkinType(CorpseEntity entity) {

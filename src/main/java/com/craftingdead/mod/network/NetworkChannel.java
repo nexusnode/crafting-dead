@@ -1,8 +1,7 @@
 package com.craftingdead.mod.network;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.network.message.main.ReloadMessage;
-import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
+import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -23,17 +22,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(TriggerPressedMessage.class, ++id)
-          .encoder(TriggerPressedMessage::encode)
-          .decoder(TriggerPressedMessage::decode)
-          .consumer(TriggerPressedMessage::handle)
-          .add();
-
-      simpleChannel
-          .messageBuilder(ReloadMessage.class, ++id)
-          .encoder(ReloadMessage::encode)
-          .decoder(ReloadMessage::decode)
-          .consumer(ReloadMessage::handle)
+          .messageBuilder(PlayerActionMessage.class, ++id)
+          .encoder(PlayerActionMessage::encode)
+          .decoder(PlayerActionMessage::decode)
+          .consumer(PlayerActionMessage::handle)
           .add();
     }
   };
@@ -52,11 +44,11 @@ public enum NetworkChannel {
   private final SimpleChannel simpleChannel;
 
   private NetworkChannel(ResourceLocation channelName) {
-    this.simpleChannel = NetworkRegistry.ChannelBuilder //
-        .named(channelName) //
-        .clientAcceptedVersions(NETWORK_VERSION::equals) //
-        .serverAcceptedVersions(NETWORK_VERSION::equals) //
-        .networkProtocolVersion(() -> NETWORK_VERSION) //
+    this.simpleChannel = NetworkRegistry.ChannelBuilder
+        .named(channelName)
+        .clientAcceptedVersions(NETWORK_VERSION::equals)
+        .serverAcceptedVersions(NETWORK_VERSION::equals)
+        .networkProtocolVersion(() -> NETWORK_VERSION)
         .simpleChannel();
   }
 

@@ -1,3 +1,0 @@
-[submodule "network"]
-	path = network
-	url = https://gitlab.com/crafting-dead/network.git
