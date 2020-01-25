@@ -70,15 +70,10 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   }
 
   @Override
-  public void reload() {
-    super.reload();
-    IngameGui ingameGui = ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui();
-    ingameGui.setAction(new ReloadAction());
-  }
-
-  @Override
   public void reload(boolean sendUpdate) {
     super.reload(sendUpdate);
+    IngameGui ingameGui = ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui();
+    ingameGui.setAction(new ReloadAction());
     if (sendUpdate) {
       NetworkChannel.MAIN
           .getSimpleChannel()

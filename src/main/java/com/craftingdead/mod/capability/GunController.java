@@ -204,7 +204,7 @@ public class GunController implements IShootable, IAimable, INBTSerializable<Com
   }
 
   @Override
-  public void finishReloading(ItemStack itemStack, Entity entity) {
+  public void reload(ItemStack itemStack, Entity entity) {
     boolean survivalPlayer =
         entity instanceof PlayerEntity && !((PlayerEntity) entity).isCreative();
     ItemStack ammoStack;

@@ -12,7 +12,7 @@ public interface IShootable {
 
   boolean canReload(ItemStack itemStack, Entity entity);
 
-  void finishReloading(ItemStack itemStack, Entity entity);
+  void reload(ItemStack itemStack, Entity entity);
 
   int getReloadDuration();
 

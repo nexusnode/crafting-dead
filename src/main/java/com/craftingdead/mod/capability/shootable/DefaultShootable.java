@@ -18,7 +18,7 @@ public class DefaultShootable implements IShootable {
   }
 
   @Override
-  public void finishReloading(ItemStack itemStack, Entity entity) {}
+  public void reload(ItemStack itemStack, Entity entity) {}
 
   @Override
   public int getReloadDuration() {

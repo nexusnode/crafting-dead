@@ -101,7 +101,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
       ItemStack itemStack = this.entity.getHeldItemMainhand();
       itemStack
           .getCapability(ModCapabilities.SHOOTABLE)
-          .ifPresent(shootable -> shootable.finishReloading(itemStack, this.entity));
+          .ifPresent(shootable -> shootable.reload(itemStack, this.entity));
     }
   }
 
@@ -148,6 +148,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public void setTriggerPressed(boolean triggerPressed) {
+    this.setTriggerPressed(triggerPressed, false);
+  }
+
+  @Override
+  public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
     this.triggerPressed = triggerPressed;
     ItemStack itemStack = this.entity.getHeldItemMainhand();
     itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
@@ -158,23 +163,18 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   }
 
   @Override
-  public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
-    this.setTriggerPressed(triggerPressed);
-  }
-
-  @Override
   public boolean isTriggerPressed() {
     return this.triggerPressed;
   }
 
   @Override
   public void toggleAiming() {
-    this.aiming = !this.aiming;
+    this.toggleAiming(false);
   }
 
   @Override
   public void toggleAiming(boolean sendUpdate) {
-    this.toggleAiming();
+    this.aiming = !this.aiming;
   }
 
   @Override
@@ -184,6 +184,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public void reload() {
+    this.reload(false);
+  }
+
+  @Override
+  public void reload(boolean sendUpdate) {
     ItemStack itemStack = this.entity.getHeldItemMainhand();
     itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
       if (!this.isReloading() && shootable.canReload(itemStack, this.entity)) {
@@ -191,11 +196,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
         this.reloadDurationTicks = this.totalReloadDurationTicks = shootable.getReloadDuration();
       }
     });
-  }
-
-  @Override
-  public void reload(boolean sendUpdate) {
-    this.reload();
   }
 
   @Override
