@@ -33,7 +33,6 @@ import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -175,11 +174,7 @@ public class ClientDist implements IModDist {
       if (minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         this.getPlayer().ifPresent(player -> {
-          if (player
-              .getEntity()
-              .getHeldItemMainhand()
-              .getCapability(ModCapabilities.SHOOTABLE)
-              .isPresent()) {
+          if (player.getEntity().getHeldItemMainhand().getItem() instanceof GunItem) {
             event.setCanceled(true);
             player.setTriggerPressed(triggerPressed, true);
           }
@@ -257,16 +252,18 @@ public class ClientDist implements IModDist {
         break;
       case CROSSHAIRS:
         this.getPlayer().ifPresent(player -> {
-          PlayerEntity playerEntity = player.getEntity();
-          ItemStack heldStack = playerEntity.getHeldItemMainhand();
-          event.setCanceled(this.ingameGui.getAction().isActive());
+          ClientPlayerEntity playerEntity = player.getEntity();
+          event.setCanceled(this.ingameGui.getAction().isActive(playerEntity));
           if (!event.isCanceled()) {
-            heldStack.getCapability(ModCapabilities.AIMABLE).ifPresent(aimable -> {
+            ItemStack heldStack = playerEntity.getHeldItemMainhand();
+            if (heldStack.getItem() instanceof GunItem) {
+              GunItem gunItem = (GunItem) heldStack.getItem();
               event.setCanceled(true);
               this.ingameGui
-                  .renderCrosshairs(aimable.getAccuracy(), event.getPartialTicks(),
-                      event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight());
-            });
+                  .renderCrosshairs(gunItem.getAccuracy(heldStack, playerEntity),
+                      event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                      event.getWindow().getScaledHeight());
+            }
           }
         });
         break;
@@ -297,11 +294,12 @@ public class ClientDist implements IModDist {
           Vec2f cameraVelocity = this.recoilHelper.update();
           minecraft.player.rotateTowards(cameraVelocity.x, cameraVelocity.y);
           minecraft.gameRenderer.cameraZoom = 1.0F;
-          if (this.getPlayer().map(IPlayer::isAiming).orElse(false)) {
-            minecraft.player
-                .getHeldItemMainhand()
-                .getCapability(ModCapabilities.AIMABLE)
-                .ifPresent(aimable -> minecraft.gameRenderer.cameraZoom = aimable.getCameraZoom());
+          ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+          if (this.getPlayer().map(IPlayer::isAiming).orElse(false)
+              && heldStack.getItem() instanceof GunItem) {
+            minecraft.gameRenderer.cameraZoom =
+                ((GunItem) minecraft.player.getHeldItemMainhand().getItem())
+                    .getCameraZoom(heldStack);
           }
         }
         break;

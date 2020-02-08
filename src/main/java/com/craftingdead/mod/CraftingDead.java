@@ -16,7 +16,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -121,10 +120,6 @@ public class CraftingDead {
     switch (event.phase) {
       case END:
         event.player.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> player.tick());
-        ItemStack itemStack = event.player.getHeldItemMainhand();
-        itemStack
-            .getCapability(ModCapabilities.SHOOTABLE)
-            .ifPresent((triggerable) -> triggerable.tick(itemStack, event.player));
         break;
       default:
         break;

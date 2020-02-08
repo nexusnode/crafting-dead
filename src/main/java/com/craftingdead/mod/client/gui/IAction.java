@@ -1,30 +1,32 @@
 package com.craftingdead.mod.client.gui;
 
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 
 public interface IAction {
 
-  boolean isActive();
+  boolean isActive(ClientPlayerEntity playerEntity);
 
-  ITextComponent getText();
+  ITextComponent getText(ClientPlayerEntity playerEntity);
 
-  float getProgress();
+  float getProgress(ClientPlayerEntity playerEntity);
 
-  class Empty implements IAction {
+  public static enum DefaultAction implements IAction {
+    NONE {
+      @Override
+      public boolean isActive(ClientPlayerEntity playerEntity) {
+        return false;
+      }
 
-    @Override
-    public boolean isActive() {
-      return false;
-    }
+      @Override
+      public ITextComponent getText(ClientPlayerEntity playerEntity) {
+        return null;
+      }
 
-    @Override
-    public ITextComponent getText() {
-      return null;
-    }
-
-    @Override
-    public float getProgress() {
-      return 0;
-    }
+      @Override
+      public float getProgress(ClientPlayerEntity playerEntity) {
+        return 0;
+      }
+    };
   }
 }

@@ -1,11 +1,14 @@
 package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.entity.CorpseEntity;
+import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
+import com.craftingdead.mod.network.message.main.SyncGunMessage;
 import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.Difficulty;
@@ -99,14 +102,23 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
               new PlayerActionMessage(this.entity.getEntityId(),
                   triggerPressed ? PlayerActionMessage.Action.TRIGGER_PRESSED
                       : PlayerActionMessage.Action.TRIGGER_RELEASED));
+
+      ItemStack heldStack = this.entity.getHeldItemMainhand();
+      if (heldStack.getItem() instanceof GunItem) {
+        GunItem gunItem = (GunItem) heldStack.getItem();
+        NetworkChannel.MAIN
+            .getSimpleChannel()
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+                new SyncGunMessage(this.entity.getEntityId(), gunItem.getAmmoCount(heldStack)));
+      }
     }
   }
-  
+
   @Override
   public void toggleAiming(boolean sendUpdate) {
     super.toggleAiming(sendUpdate);
   }
-  
+
   @Override
   public void reload(boolean sendUpdate) {
     super.reload(sendUpdate);

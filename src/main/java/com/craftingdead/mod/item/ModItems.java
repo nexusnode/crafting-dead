@@ -40,11 +40,11 @@ public class ModItems {
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
-              .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+              .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
               .setShootSound(ModSoundEvents.ACR_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
-              .setAcceptedMagazines(
+              .setAcceptedClips(
                   ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "acr_magazine")))));
 
   public static final RegistryObject<Item> AK47 = ITEMS
@@ -53,11 +53,11 @@ public class ModItems {
           .setDamage(7)
           .setReloadDurationTicks(20 * 4)
           .setAccuracy(0.8F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
           .setShootSound(ModSoundEvents.AK47_SHOOT)
           .setReloadSound(ModSoundEvents.AK47_RELOAD)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
-          .setAcceptedMagazines(
+          .setAcceptedClips(
               ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "ak47_30_round_magazine")))));
 
   public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
@@ -66,21 +66,20 @@ public class ModItems {
           .setDamage(8)
           .setReloadDurationTicks(20 * 2)
           .setAccuracy(0.7F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.SEMI))
           .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> M4A1 = ITEMS
-      .register("m4a1",
-          () -> new GunItem(new GunItem.Properties()
-              .setFireRate(80)
-              .setDamage(7)
-              .setReloadDurationTicks(20 * 4)
-              .setAccuracy(0.9F)
-              .setFireModes(ImmutableList.of(IFireMode.Modes.AUTO, IFireMode.Modes.SEMI))
-              .setShootSound(ModSoundEvents.M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))));
+      .register("m4a1", () -> new GunItem(new GunItem.Properties()
+          .setFireRate(80)
+          .setDamage(7)
+          .setReloadDurationTicks(20 * 4)
+          .setAccuracy(0.9F)
+          .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
+          .setShootSound(ModSoundEvents.M4A1_SHOOT)
+          .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))));
 
   public static final RegistryObject<Item> M9 = ITEMS
       .register("m9", () -> new GunItem(new GunItem.Properties()
@@ -88,7 +87,7 @@ public class ModItems {
           .setDamage(7)
           .setReloadDurationTicks((int) (20 * 1.5F))
           .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.SEMI))
           .setShootSound(ModSoundEvents.M9_SHOOT)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
@@ -98,7 +97,7 @@ public class ModItems {
           .setDamage(7)
           .setReloadDurationTicks(20 * 3)
           .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.SEMI))
           .setShootSound(ModSoundEvents.TASER_SHOOT)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
@@ -108,7 +107,7 @@ public class ModItems {
           .setDamage(7)
           .setReloadDurationTicks(20 * 2)
           .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.SEMI))
           .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
@@ -118,19 +117,19 @@ public class ModItems {
           .setDamage(7)
           .setReloadDurationTicks((int) (20 * 1.5F))
           .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(IFireMode.Modes.SEMI))
+          .setFireModes(ImmutableList.of(FireMode.SEMI))
           .setShootSound(ModSoundEvents.FN57_SHOOT)
           .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
 
   public static final RegistryObject<Item> ACR_MAGAZINE = ITEMS
       .register("acr_magazine",
-          () -> new MagazineItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
-              new Magazine(20, 50)));
+          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
+              20));
 
   public static final RegistryObject<Item> AK47_30_ROUND_MAGAZINE = ITEMS
       .register("ak47_30_round_magazine",
-          () -> new MagazineItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
-              new Magazine(30, 45)));
+          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
+              30));
 
   // ================================================================================
   // Tools

@@ -10,10 +10,10 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.craftingdead.mod.capability.GunController;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.item.AttachmentItem;
+import com.craftingdead.mod.item.GunItem;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -202,11 +202,11 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
         @Nullable World world, @Nullable LivingEntity entity) {
-      itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
-        GunController gunController = (GunController) shootable;
+      if (itemStack.getItem() instanceof GunItem) {
+        GunItem gunItem = (GunItem) itemStack.getItem();
         BakedGunModel model = (BakedGunModel) originalModel;
         model.attachments.clear();
-        for (AttachmentItem attachment : gunController.getAttachments().values()) {
+        for (AttachmentItem attachment : gunItem.getAttachments(itemStack).values()) {
           model.attachments
               .put(
                   Minecraft
@@ -219,7 +219,7 @@ public class GunModel implements IModelGeometry<GunModel> {
         }
         model.animationController = Optional
             .ofNullable(itemStack.getCapability(ModCapabilities.ANIMATION_CONTROLLER).orElse(null));
-      });
+      }
       return originalModel;
     }
   }

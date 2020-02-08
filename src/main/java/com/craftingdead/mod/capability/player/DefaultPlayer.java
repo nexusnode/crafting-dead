@@ -2,9 +2,13 @@ package com.craftingdead.mod.capability.player;
 
 import java.util.Random;
 import java.util.UUID;
-import com.craftingdead.mod.capability.ModCapabilities;
+import java.util.concurrent.TimeUnit;
+import com.craftingdead.mod.item.ClipItem;
+import com.craftingdead.mod.item.FireMode;
+import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,9 +18,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -85,6 +91,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   protected int totalReloadDurationTicks;
 
+  /**
+   * Time of the last shot.
+   */
+  private long lastShotNanos = Integer.MIN_VALUE;
+
   public DefaultPlayer() {
     this(null);
   }
@@ -95,13 +106,58 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public void tick() {
-    this.updateHeldStack();
+    ItemStack heldStack = this.entity.getHeldItemMainhand();
+
+    if (heldStack != this.lastHeldStack) {
+      if (this.isReloading()) {
+        Minecraft.getInstance().getSoundHandler().stop(null, SoundCategory.PLAYERS);
+        this.reloadDurationTicks = 0;
+      }
+      this.lastHeldStack = heldStack;
+    }
+
+    if (heldStack.getItem() instanceof GunItem) {
+      this.tickGun(heldStack, (GunItem) heldStack.getItem());
+    } else if (this.isReloading()) {
+      this.reloadDurationTicks = 0;
+    }
+
     this.updateBrokenLeg();
+  }
+
+  private void tryShoot(ItemStack itemStack, GunItem gunItem) {
+    long fireRateNanoseconds =
+        TimeUnit.NANOSECONDS.convert(gunItem.getFireRate(), TimeUnit.MILLISECONDS);
+    long time = System.nanoTime();
+    long timeDelta = time - this.lastShotNanos;
+    if (timeDelta > fireRateNanoseconds && this.triggerPressed) {
+      this.lastShotNanos = time;
+      gunItem.shoot(itemStack, this.entity);
+    }
+  }
+
+  private void tickGun(ItemStack itemStack, GunItem gunItem) {
+    if (gunItem.getFireMode(itemStack) == FireMode.AUTO) {
+      this.tryShoot(itemStack, gunItem);
+    }
+
     if (this.isReloading() && --this.reloadDurationTicks == 0) {
-      ItemStack itemStack = this.entity.getHeldItemMainhand();
-      itemStack
-          .getCapability(ModCapabilities.SHOOTABLE)
-          .ifPresent(shootable -> shootable.reload(itemStack, this.entity));
+      ItemStack clipStack;
+      if (!this.entity.isCreative()) {
+        clipStack = this.entity.findAmmo(itemStack);
+      } else {
+        clipStack = new ItemStack(
+            ForgeRegistries.ITEMS.getValue(gunItem.getAcceptedClips().iterator().next()));
+      }
+
+      gunItem.setAmmoCount(itemStack, ((ClipItem) clipStack.getItem()).getSize());
+
+      if (!this.entity.isCreative()) {
+        clipStack.shrink(1);
+        if (clipStack.isEmpty()) {
+          this.entity.inventory.deleteStack(clipStack);
+        }
+      }
     }
   }
 
@@ -115,19 +171,6 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
       this.entity.addPotionEffect(new EffectInstance(ModEffects.brokenLeg, 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
-    }
-  }
-
-  private void updateHeldStack() {
-    ItemStack heldStack = this.entity.getHeldItemMainhand();
-    if (heldStack != this.lastHeldStack) {
-      if (this.lastHeldStack != null) {
-        this.lastHeldStack
-            .getCapability(ModCapabilities.SHOOTABLE)
-            .ifPresent(
-                shootable -> shootable.setTriggerPressed(this.lastHeldStack, this.entity, false));
-      }
-      this.lastHeldStack = heldStack;
     }
   }
 
@@ -153,13 +196,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
-    this.triggerPressed = triggerPressed;
-    ItemStack itemStack = this.entity.getHeldItemMainhand();
-    itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
-      if (!this.isReloading()) {
-        shootable.setTriggerPressed(itemStack, this.entity, triggerPressed);
-      }
-    });
+    this.triggerPressed = triggerPressed && !this.isReloading() ? true : false;
+    ItemStack heldStack = this.entity.getHeldItemMainhand();
+    if (heldStack.getItem() instanceof GunItem) {
+      this.tryShoot(heldStack, (GunItem) heldStack.getItem());
+    }
   }
 
   @Override
@@ -190,12 +231,14 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public void reload(boolean sendUpdate) {
     ItemStack itemStack = this.entity.getHeldItemMainhand();
-    itemStack.getCapability(ModCapabilities.SHOOTABLE).ifPresent(shootable -> {
-      if (!this.isReloading() && shootable.canReload(itemStack, this.entity)) {
-        this.entity.playSound(shootable.getReloadSound(), 1.0F, 1.0F);
-        this.reloadDurationTicks = this.totalReloadDurationTicks = shootable.getReloadDuration();
+    if (itemStack.getItem() instanceof GunItem) {
+      GunItem gunItem = (GunItem) itemStack.getItem();
+      if (!this.isReloading()
+          && (this.entity.isCreative() || !this.entity.findAmmo(itemStack).isEmpty())) {
+        this.entity.playSound(gunItem.getReloadSound().get(), 1.0F, 1.0F);
+        this.reloadDurationTicks = this.totalReloadDurationTicks = gunItem.getReloadDurationTicks();
       }
-    });
+    }
   }
 
   @Override

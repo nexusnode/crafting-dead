@@ -2,6 +2,7 @@ package com.craftingdead.mod.network;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
+import com.craftingdead.mod.network.message.main.SyncGunMessage;
 import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -26,6 +27,13 @@ public enum NetworkChannel {
           .encoder(PlayerActionMessage::encode)
           .decoder(PlayerActionMessage::decode)
           .consumer(PlayerActionMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(SyncGunMessage.class, ++id)
+          .encoder(SyncGunMessage::encode)
+          .decoder(SyncGunMessage::decode)
+          .consumer(SyncGunMessage::handle)
           .add();
     }
   };

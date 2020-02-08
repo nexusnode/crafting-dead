@@ -1,8 +1,6 @@
 package com.craftingdead.mod.capability.player;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.gui.IAction;
 import com.craftingdead.mod.client.gui.IngameGui;
@@ -33,10 +31,6 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   @Override
   public void tick() {
     super.tick();
-    this.entity
-        .getHeldItemMainhand()
-        .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-        .ifPresent(IAnimationController::tick);
 
     if (ClientDist.CROUCH.isKeyDown()) {
       this.entity.setPose(Pose.SWIMMING);
@@ -84,17 +78,17 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   private class ReloadAction implements IAction {
 
     @Override
-    public boolean isActive() {
+    public boolean isActive(ClientPlayerEntity playerEntity) {
       return ClientPlayer.this.isReloading();
     }
 
     @Override
-    public ITextComponent getText() {
+    public ITextComponent getText(ClientPlayerEntity playerEntity) {
       return new TranslationTextComponent("action.reload");
     }
 
     @Override
-    public float getProgress() {
+    public float getProgress(ClientPlayerEntity playerEntity) {
       return (float) (ClientPlayer.this.totalReloadDurationTicks
           - ClientPlayer.this.reloadDurationTicks) / ClientPlayer.this.totalReloadDurationTicks;
     }
