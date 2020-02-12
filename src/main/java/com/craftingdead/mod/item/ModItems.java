@@ -4,6 +4,7 @@ import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.capability.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.item.GrenadeItem.Properties;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModDamageSource;
@@ -146,6 +147,17 @@ public class ModItems {
   public static final RegistryObject<Item> MULTI_TOOL = ITEMS
       .register("multi_tool", () -> new MeleeWeaponItem(8, -2.4F,
           new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+  
+  // ================================================================================
+  // Grenades
+  // ================================================================================
+  
+  public static final RegistryObject<Item> FIRE_GRENADE = ITEMS.register("fire_grenade",
+		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+				  .setTyoe(GrenadeType.FIRE)
+				  .setExplosionRadius(1f)
+				  .setTimeUntilExplosion(10)
+				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
 
   // ================================================================================
   // Consumable

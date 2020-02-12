@@ -10,6 +10,7 @@ import com.craftingdead.mod.entity.monster.WeakZombieEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 
@@ -23,10 +24,16 @@ public class ModEntityTypes {
   public static EntityType<FastZombieEntity> fastZombie;
   public static EntityType<TankZombieEntity> tankZombie;
   public static EntityType<WeakZombieEntity> weakZombie;
+  public static EntityType<GrenadeEntity> grenade;
 
   public static EntityType<SupplyDropEntity> supplyDrop;
 
   public static void initialize() {
+	  
+	  grenade = add("fire_grenade", EntityType.Builder
+			  .<GrenadeEntity>create(GrenadeEntity::new, EntityClassification.MISC).size(0.25F, 0.25F));
+	  
+	  
     corpse = add("corpse",
         EntityType.Builder
             .<CorpseEntity>create(CorpseEntity::new, EntityClassification.MISC)
