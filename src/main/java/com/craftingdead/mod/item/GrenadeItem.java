@@ -1,7 +1,14 @@
 package com.craftingdead.mod.item;
 
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
+
 import com.craftingdead.mod.entity.GrenadeEntity;
+
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,7 +18,12 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class GrenadeItem extends Item{
 
@@ -29,14 +41,29 @@ public class GrenadeItem extends Item{
 		this.throwingForce = properties.throwingForce;
 		this.explosionRadius = properties.explosionRadius;
 		this.grenadeRange = properties.grenadeRange;
+		
 	}
+	
+	
+	@OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack p_77624_1_, @Nullable World p_77624_2_, List<ITextComponent> p_77624_3_, ITooltipFlag p_77624_4_) {
+		
+		ITextComponent text = ITextComponent.copyWithoutSiblings(p_77624_3_.get(0));
+		text.getStyle().setBold(true);
+		text.getStyle().setColor(TextFormatting.DARK_RED);
+		text.appendText("[Countdown After Throw : " + timeUntilExplosion + " ticks]" + "\n");
+		text.appendText("[Explosion Radius : " + explosionRadius + "]");
+		p_77624_3_.add(text);
+		
+	}
+	
 	
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
 		      Hand handIn) {
 	      ItemStack itemstack = playerIn.getHeldItem(handIn);
 	      worldIn.playSound((PlayerEntity)null, playerIn.getX(), playerIn.getY(), playerIn.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 	      if (!worldIn.isRemote) {
-	    	  GrenadeEntity grenadeEntity = new GrenadeEntity(worldIn, playerIn, this.explosionRadius, this.timeUntilExplosion);
+	    	  GrenadeEntity grenadeEntity = new GrenadeEntity(worldIn, playerIn, type, this.explosionRadius, this.timeUntilExplosion);
 	    	  grenadeEntity.setItem(itemstack);
 	    	  Vec3d look = new Vec3d(playerIn.getLookVec().x * throwingForce, playerIn.getLookVec().y * throwingForce, playerIn.getLookVec().z * throwingForce);
 	    	  

@@ -158,7 +158,22 @@ public class ModItems {
 				  .setExplosionRadius(1f)
 				  .setTimeUntilExplosion(10)
 				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
+  
+  public static final RegistryObject<Item> GAS_GRENADE = ITEMS.register("gas_grenade",
+		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+				  .setTyoe(GrenadeType.GAS)
+				  .setExplosionRadius(1f)
+				  .setTimeUntilExplosion(10)
+				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
 
+  public static final RegistryObject<Item> SMOKE_GRENADE = ITEMS.register("smoke_grenade",
+		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+				  .setTyoe(GrenadeType.SMOKE)
+				  .setExplosionRadius(1f)
+				  .setTimeUntilExplosion(10)
+				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
+  
+  
   // ================================================================================
   // Consumable
   // ================================================================================

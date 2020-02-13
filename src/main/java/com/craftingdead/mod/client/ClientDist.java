@@ -21,6 +21,7 @@ import com.craftingdead.mod.client.gui.transition.Transitions;
 import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
+import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.GunItem;
@@ -29,10 +30,12 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.renderer.entity.SpriteRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -117,7 +120,8 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(CROUCH);
 
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
+    RenderingRegistry
+    	.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.advancedZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
@@ -128,7 +132,10 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.weakZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
-
+    RenderingRegistry
+    	.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
+   
+    
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
       if (CommonConfig.clientConfig.applyBranding.get()) {
