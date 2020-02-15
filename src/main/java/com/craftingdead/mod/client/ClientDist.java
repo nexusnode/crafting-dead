@@ -39,7 +39,6 @@ import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -133,8 +132,7 @@ public class ClientDist implements IModDist {
     ClientRegistry.registerKeyBinding(CROUCH);
 
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
-    RenderingRegistry
-    	.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.advancedZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
@@ -145,10 +143,9 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.weakZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
-    RenderingRegistry
-    	.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
-   
-    
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
+
+
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
       if (CommonConfig.clientConfig.applyBranding.get()) {
