@@ -13,16 +13,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -96,6 +99,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
    */
   private long lastShotNanos = Integer.MIN_VALUE;
 
+  private final IInventory inventory = new Inventory(11);
+
   public DefaultPlayer() {
     this(null);
   }
@@ -146,8 +151,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
       if (!this.entity.isCreative()) {
         clipStack = this.entity.findAmmo(itemStack);
       } else {
-        clipStack = new ItemStack(
-            ForgeRegistries.ITEMS.getValue(gunItem.getAcceptedClips().iterator().next()));
+        clipStack = new ItemStack(gunItem.getAcceptedClips().iterator().next());
       }
 
       gunItem.setAmmoCount(itemStack, ((ClipItem) clipStack.getItem()).getSize());
@@ -162,14 +166,14 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   }
 
   private void updateBrokenLeg() {
-    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.brokenLeg)
+    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())
         && this.entity.onGround && !this.entity.isInWater()
         && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
             || this.entity.fallDistance > 10F)) {
       this.entity
           .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.brokenLeg, 9999999, 4));
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
   }
@@ -255,6 +259,13 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     nbt.putInt("maxWater", this.maxWater);
     nbt.putInt("stamina", this.stamina);
     nbt.putInt("maxStamina", this.maxStamina);
+
+    NonNullList<ItemStack> items =
+        NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
+    for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+      items.set(i, this.inventory.getStackInSlot(i));
+    }
+    nbt.put("inventory", ItemStackHelper.saveAllItems(nbt.getCompound("inventory"), items));
     return nbt;
   }
 
@@ -266,6 +277,13 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     this.setMaxWater(nbt.getInt("maxWater"));
     this.setStamina(nbt.getInt("stamina"));
     this.setMaxStamina(nbt.getInt("maxStamina"));
+
+    NonNullList<ItemStack> items =
+        NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
+    ItemStackHelper.loadAllItems(nbt.getCompound("inventory"), items);
+    for (int i = 0; i < items.size(); i++) {
+      this.inventory.setInventorySlotContents(i, items.get(i));
+    }
   }
 
   @Override
@@ -337,6 +355,11 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   @Override
   public void setMaxStamina(int maxStamina) {
     this.maxStamina = maxStamina;
+  }
+
+  @Override
+  public IInventory getInventory() {
+    return this.inventory;
   }
 
   @Override

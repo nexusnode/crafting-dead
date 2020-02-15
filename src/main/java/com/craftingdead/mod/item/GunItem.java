@@ -1,6 +1,8 @@
 package com.craftingdead.mod.item;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
+import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.RayTraceUtil;
@@ -35,7 +38,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -43,11 +48,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class GunItem extends ShootableItem {
 
@@ -81,9 +86,11 @@ public class GunItem extends ShootableItem {
 
   private final Map<AnimationType, Supplier<IAnimation>> animations;
 
-  private final Set<ResourceLocation> acceptedClips;
+  private final Set<Supplier<ClipItem>> acceptedClips;
 
-  private final float cameraZoom;
+  private final Set<Supplier<AttachmentItem>> acceptedAttachments;
+
+  private final Set<Supplier<PaintItem>> acceptedPaints;
 
   public GunItem(Properties properties) {
     super(properties);
@@ -96,7 +103,15 @@ public class GunItem extends ShootableItem {
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
     this.acceptedClips = properties.acceptedClips;
-    this.cameraZoom = properties.cameraZoom;
+    this.acceptedAttachments = properties.acceptedAttachments;
+    this.acceptedPaints = properties.acceptedPaints;
+    this
+        .addPropertyOverride(new ResourceLocation("aiming"),
+            (itemStack, world, entity) -> entity != null ? entity
+                .getCapability(ModCapabilities.PLAYER)
+                .map(player -> entity.getHeldItemMainhand() == itemStack && player.isAiming() ? 1.0F
+                    : 0.0F)
+                .orElse(0.0F) : 0.0F);
   }
 
   public int getFireRate() {
@@ -127,17 +142,16 @@ public class GunItem extends ShootableItem {
     return this.animations;
   }
 
-  public Set<ResourceLocation> getAcceptedClips() {
-    return this.acceptedClips;
+  public Set<ClipItem> getAcceptedClips() {
+    return this.acceptedClips.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
-  public float getCameraZoom(ItemStack itemStack) {
-    float cameraZoom = this.cameraZoom;
-    AttachmentItem sight = this.getAttachments(itemStack).get(AttachmentItem.Type.SIGHT);
-    if (sight != null) {
-      cameraZoom *= sight.getCameraZoom();
-    }
-    return cameraZoom;
+  public Set<AttachmentItem> getAcceptedAttachments() {
+    return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Set<PaintItem> getAcceptedPaints() {
+    return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public float getAccuracy(ItemStack itemStack, Entity entity) {
@@ -157,29 +171,28 @@ public class GunItem extends ShootableItem {
       }
     }
 
-    accuracy *= this.accuracy * this
-        .getAttachments(itemStack)
-        .values()
-        .stream()
-        .map(AttachmentItem::getAccuracy)
-        .reduce(1.0F, (a, b) -> a * b);
-    return accuracy;
+    return accuracy * this.accuracy
+        * this.getAttachmentMultiplier(itemStack, MultiplierType.ACCURACY);
   }
 
-  public Map<AttachmentItem.Type, AttachmentItem> getAttachments(ItemStack itemStack) {
-    CompoundNBT compound = itemStack.getOrCreateChildTag("attachments");
-    NonNullList<ItemStack> attachments =
-        NonNullList.withSize(AttachmentItem.Type.values().length, ItemStack.EMPTY);
-    ItemStackHelper.loadAllItems(compound, attachments);
-    Map<AttachmentItem.Type, AttachmentItem> attachmentsMap = attachments
+  public Float getAttachmentMultiplier(ItemStack itemStack,
+      AttachmentItem.MultiplierType multiplierType) {
+    return this
+        .getAttachments(itemStack)
         .stream()
-        .filter(attachment -> attachment.getItem() instanceof AttachmentItem)
-        .collect(Collectors
-            .toMap(attachment -> ((AttachmentItem) attachment.getItem()).getType(),
-                attachment -> (AttachmentItem) attachment.getItem(), (u, v) -> {
-                  throw new IllegalStateException(String.format("Duplicate key %s", u));
-                }, () -> new EnumMap<>(AttachmentItem.Type.class)));
-    return attachmentsMap;
+        .map(attachment -> attachment.getMultiplier(multiplierType))
+        .reduce(1.0F, (x, y) -> x * y);
+  }
+
+  public Set<AttachmentItem> getAttachments(ItemStack itemStack) {
+    CompoundNBT compound = itemStack.getOrCreateChildTag("attachments");
+    NonNullList<ItemStack> attachments = NonNullList.withSize(3, ItemStack.EMPTY);
+    ItemStackHelper.loadAllItems(compound, attachments);
+    return attachments
+        .stream()
+        .filter(attachmentStack -> attachmentStack.getItem() instanceof AttachmentItem)
+        .map(attachmentStack -> (AttachmentItem) attachmentStack.getItem())
+        .collect(Collectors.toSet());
   }
 
   public void shoot(ItemStack itemStack, Entity entity) {
@@ -194,7 +207,7 @@ public class GunItem extends ShootableItem {
       if (entity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist())
             .getRecoilHelper()
-            .jolt(this.accuracy);
+            .jolt(this.getAccuracy(itemStack, entity));
       }
       itemStack
           .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
@@ -269,6 +282,11 @@ public class GunItem extends ShootableItem {
     }
   }
 
+  public boolean isAcceptedPaintOrAttachment(ItemStack itemStack) {
+    return itemStack != null && (this.getAcceptedAttachments().contains((itemStack.getItem()))
+        || this.getAcceptedPaints().contains((itemStack.getItem())));
+  }
+
   @Override
   public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot,
       ItemStack itemStack) {
@@ -286,7 +304,7 @@ public class GunItem extends ShootableItem {
   public Predicate<ItemStack> getInventoryAmmoPredicate() {
     return itemStack -> this.acceptedClips
         .stream()
-        .map(ForgeRegistries.ITEMS::getValue)
+        .map(Supplier::get)
         .anyMatch(itemStack.getItem()::equals);
   }
 
@@ -306,9 +324,25 @@ public class GunItem extends ShootableItem {
   }
 
   @Override
+  public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+    return true;
+  }
+
+  @Override
   public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack,
       boolean slotChanged) {
     return oldStack.getItem() != newStack.getItem();
+  }
+
+  @Override
+  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
+      Hand hand) {
+    if (world.isRemote()) {
+      playerEntity
+          .getCapability(ModCapabilities.PLAYER)
+          .ifPresent(player -> player.toggleAiming(true));
+    }
+    return super.onItemRightClick(world, playerEntity, hand);
   }
 
   public static enum AnimationType {
@@ -325,17 +359,20 @@ public class GunItem extends ShootableItem {
 
     private float accuracy;
 
-    private List<FireMode> fireModes;
+    private final List<FireMode> fireModes = new ArrayList<>();
 
     private Supplier<SoundEvent> shootSound;
 
     private Supplier<SoundEvent> reloadSound;
 
-    private Map<AnimationType, Supplier<IAnimation>> animations;
+    private final Map<AnimationType, Supplier<IAnimation>> animations =
+        new EnumMap<>(AnimationType.class);
 
-    private Set<ResourceLocation> acceptedClips;
+    private final Set<Supplier<ClipItem>> acceptedClips = new HashSet<>();
 
-    private float cameraZoom = 1.0F;
+    private final Set<Supplier<AttachmentItem>> acceptedAttachments = new HashSet<>();
+
+    private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -357,8 +394,8 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties setFireModes(List<FireMode> fireModes) {
-      this.fireModes = fireModes;
+    public Properties addFireMode(FireMode fireMode) {
+      this.fireModes.add(fireMode);
       return this;
     }
 
@@ -372,18 +409,23 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties setAnimations(Map<AnimationType, Supplier<IAnimation>> animations) {
-      this.animations = animations;
+    public Properties addAnimation(AnimationType type, Supplier<IAnimation> animation) {
+      this.animations.put(type, animation);
       return this;
     }
 
-    public Properties setAcceptedClips(Set<ResourceLocation> acceptedClips) {
-      this.acceptedClips = acceptedClips;
+    public Properties addAcceptedClip(Supplier<ClipItem> acceptedClip) {
+      this.acceptedClips.add(acceptedClip);
       return this;
     }
 
-    public Properties setCameraZoom(float cameraZoom) {
-      this.cameraZoom = cameraZoom;
+    public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
+      this.acceptedAttachments.add(acceptedAttachment);
+      return this;
+    }
+
+    public Properties addAcceptedPaint(Supplier<PaintItem> acceptedPaint) {
+      this.acceptedPaints.add(acceptedPaint);
       return this;
     }
   }

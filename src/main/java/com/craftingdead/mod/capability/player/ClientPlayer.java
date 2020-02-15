@@ -39,6 +39,10 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
     if (ClientDist.RELOAD.isKeyDown() && !this.isReloading()) {
       this.reload(true);
     }
+
+    if (ClientDist.TOGGLE_FIRE_MODE.isKeyDown()) {
+
+    }
   }
 
   @Override
@@ -59,7 +63,7 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
     if (sendUpdate) {
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .sendToServer(new PlayerActionMessage(0, PlayerActionMessage.Action.RELOAD));
+          .sendToServer(new PlayerActionMessage(0, PlayerActionMessage.Action.TOGGLE_AIMING));
     }
   }
 

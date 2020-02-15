@@ -16,21 +16,25 @@ import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.client.DiscordPresence.GameState;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
+import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
 import com.craftingdead.mod.client.gui.transition.TransitionManager;
 import com.craftingdead.mod.client.gui.transition.Transitions;
+import com.craftingdead.mod.client.model.ComplexModel;
 import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.inventory.container.ModContainerTypes;
+import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.GunItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.MainMenuScreen;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.renderer.entity.SpriteRenderer;
+import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
@@ -40,10 +44,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec2f;
+import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -116,10 +120,19 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
+    ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
+
+    ModelLoaderRegistry
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
+    ModelLoaderRegistry
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "complex"),
+            ComplexModel.Loader.INSTANCE);
+
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(CROUCH);
 
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry
     	.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry
@@ -187,11 +200,6 @@ public class ClientDist implements IModDist {
           }
         });
       }
-
-      if (minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())
-          && event.getAction() == GLFW.GLFW_PRESS) {
-        this.getPlayer().ifPresent(player -> player.toggleAiming(true));
-      }
     }
   }
 
@@ -213,17 +221,25 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleEntityJoinWorld(EntityJoinWorldEvent event) {
-    if (minecraft.isIntegratedServerRunning()) {
-      DiscordPresence.updateState(GameState.SINGLEPLAYER, this);
-    } else {
-      ServerData serverData = minecraft.getCurrentServerData();
-      DiscordPresence
-          .updateState(serverData.isOnLAN() ? GameState.LAN : GameState.MULTIPLAYER, this);
+    ClientPlayNetHandler connection = minecraft.getConnection();
+    if (connection != null && connection.getNetworkManager().isChannelOpen()) {
+      if (minecraft.getIntegratedServer() != null && !minecraft.getIntegratedServer().getPublic()) {
+        DiscordPresence.updateState(GameState.SINGLEPLAYER, this);
+      } else if (minecraft.isConnectedToRealms()) {
+        DiscordPresence.updateState(GameState.REALMS, this);
+      } else if (minecraft.getIntegratedServer() == null
+          && (minecraft.getCurrentServerData() == null
+              || !minecraft.getCurrentServerData().isOnLAN())) {
+        DiscordPresence.updateState(GameState.MULTIPLAYER, this);
+      } else {
+        DiscordPresence.updateState(GameState.LAN, this);
+      }
     }
   }
 
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
+
     DiscordPresence.updateState(GameState.IDLE, this);
     if (event.getGui() instanceof MainMenuScreen) {
       // event.setGui(new StartScreen());
@@ -288,9 +304,14 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleModelRegistry(ModelRegistryEvent event) {
-    ModelLoaderRegistry
-        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
+  public void handeFOVUpdate(FOVUpdateEvent event) {
+    ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+    if (this.getPlayer().map(IPlayer::isAiming).orElse(false)
+        && heldStack.getItem() instanceof GunItem) {
+      event
+          .setNewfov(event.getFov() * ((GunItem) heldStack.getItem())
+              .getAttachmentMultiplier(heldStack, AttachmentItem.MultiplierType.FOV));
+    }
   }
 
   @SubscribeEvent
@@ -300,14 +321,6 @@ public class ClientDist implements IModDist {
         if (minecraft.player != null) {
           Vec2f cameraVelocity = this.recoilHelper.update();
           minecraft.player.rotateTowards(cameraVelocity.x, cameraVelocity.y);
-          minecraft.gameRenderer.cameraZoom = 1.0F;
-          ItemStack heldStack = minecraft.player.getHeldItemMainhand();
-          if (this.getPlayer().map(IPlayer::isAiming).orElse(false)
-              && heldStack.getItem() instanceof GunItem) {
-            minecraft.gameRenderer.cameraZoom =
-                ((GunItem) minecraft.player.getHeldItemMainhand().getItem())
-                    .getCameraZoom(heldStack);
-          }
         }
         break;
       default:

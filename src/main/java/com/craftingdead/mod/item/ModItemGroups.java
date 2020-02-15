@@ -45,12 +45,4 @@ public class ModItemGroups {
       return new ItemStack(ModItems.SMALL_RED_BACKPACK::get);
     }
   });
-
-  public static final ItemGroup CRAFTING_DEAD_GENERAL = (new ItemGroup("craftingdead_wearable") {
-
-    @Override
-    public ItemStack createIcon() {
-      return new ItemStack(ModItems.LARGE_TAN_BACKPACK::get);
-    }
-  });
 }

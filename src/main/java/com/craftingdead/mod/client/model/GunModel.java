@@ -4,17 +4,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.animation.IAnimationController;
-import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.GunItem;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -22,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
@@ -34,11 +32,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.QuadTransformer;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
@@ -47,12 +45,12 @@ import net.minecraftforge.client.model.geometry.IModelGeometry;
 @SuppressWarnings("deprecation")
 public class GunModel implements IModelGeometry<GunModel> {
 
-  private final IUnbakedModel base;
-  private final Map<ResourceLocation, TransformationMatrix> attachmentTransforms;
+  private final IUnbakedModel model;
+  private final Map<ResourceLocation, QuadTransformer> attachmentTransforms;
 
-  public GunModel(IUnbakedModel base,
-      Map<ResourceLocation, TransformationMatrix> attachmentTransforms) {
-    this.base = base;
+  public GunModel(IUnbakedModel model,
+      Map<ResourceLocation, QuadTransformer> attachmentTransforms) {
+    this.model = model;
     this.attachmentTransforms = attachmentTransforms;
   }
 
@@ -60,7 +58,7 @@ public class GunModel implements IModelGeometry<GunModel> {
   public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
-    return new BakedGunModel(this.base.bake(bakery, spriteGetter, modelTransform, modelLocation),
+    return new BakedGunModel(this.model.bake(bakery, spriteGetter, modelTransform, modelLocation),
         new AttachmentOverrideHandler(this.attachmentTransforms));
   }
 
@@ -68,19 +66,23 @@ public class GunModel implements IModelGeometry<GunModel> {
   public Collection<Material> getTextures(IModelConfiguration owner,
       Function<ResourceLocation, IUnbakedModel> modelGetter,
       Set<com.mojang.datafixers.util.Pair<String, String>> missingTextureErrors) {
-    return this.base.getTextureDependencies(modelGetter, missingTextureErrors);
+    return this.model.getTextureDependencies(modelGetter, missingTextureErrors);
   }
 
   public static class BakedGunModel implements IBakedModel {
 
     private final IBakedModel base;
-    private final Map<IBakedModel, QuadTransformer> attachments = new HashMap<>();
+    private final Map<IBakedModel, QuadTransformer> attachments;
     private final ItemOverrideList itemOverrideList;
 
-    private Optional<IAnimationController> animationController = Optional.empty();
-
     public BakedGunModel(IBakedModel base, ItemOverrideList itemOverrideList) {
+      this(base, ImmutableMap.of(), itemOverrideList);
+    }
+
+    public BakedGunModel(IBakedModel base, ImmutableMap<IBakedModel, QuadTransformer> attachments,
+        ItemOverrideList itemOverrideList) {
       this.base = base;
+      this.attachments = attachments;
       this.itemOverrideList = itemOverrideList;
     }
 
@@ -131,9 +133,6 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
-      if (isHeld(cameraTransformType)) {
-        this.animationController.ifPresent(controller -> controller.apply(mat));
-      }
       return this.base.handlePerspective(cameraTransformType, mat);
     }
 
@@ -142,21 +141,50 @@ public class GunModel implements IModelGeometry<GunModel> {
       return this.itemOverrideList;
     }
 
-    private static boolean isHeld(ItemCameraTransforms.TransformType cameraTransformType) {
-      switch (cameraTransformType) {
-        case THIRD_PERSON_LEFT_HAND:
-        case THIRD_PERSON_RIGHT_HAND:
-        case FIRST_PERSON_LEFT_HAND:
-        case FIRST_PERSON_RIGHT_HAND:
-          return true;
-        default:
-          return false;
-      }
-    }
-
     @Override
     public boolean isSideLit() {
       return false;
+    }
+  }
+
+  private static final class AttachmentOverrideHandler extends ItemOverrideList {
+
+    private final Map<ResourceLocation, QuadTransformer> attachmentTransforms;
+    private final Map<Integer, ImmutableMap<IBakedModel, QuadTransformer>> attachmentCache =
+        new HashMap<>();
+
+    public AttachmentOverrideHandler(Map<ResourceLocation, QuadTransformer> attachmentTransforms) {
+      this.attachmentTransforms = attachmentTransforms;
+    }
+
+    @Override
+    public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
+        @Nullable World world, @Nullable LivingEntity entity) {
+      if (itemStack.getItem() instanceof GunItem) {
+        GunItem gunItem = (GunItem) itemStack.getItem();
+        BakedGunModel model = (BakedGunModel) originalModel;
+        final int attachmentHash = gunItem.getAttachments(itemStack).hashCode();
+        if (!this.attachmentCache.containsKey(attachmentHash)) {
+          this.attachmentCache
+              .put(attachmentHash, gunItem
+                  .getAttachments(itemStack)
+                  .stream()
+                  .collect(ImmutableMap
+                      .toImmutableMap(
+                          attachment -> Minecraft
+                              .getInstance()
+                              .getItemRenderer()
+                              .getItemModelWithOverrides(new ItemStack(attachment), world, entity),
+                          attachment -> this.attachmentTransforms
+                              .getOrDefault(attachment.getRegistryName(),
+                                  new QuadTransformer(TransformationMatrix.identity())))));
+        }
+
+        return new BakedGunModel(
+            model.base.getOverrides().getModelWithOverrides(model.base, itemStack, world, entity),
+            this.attachmentCache.get(attachmentHash), this);
+      }
+      return originalModel;
     }
   }
 
@@ -170,57 +198,19 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public GunModel read(JsonDeserializationContext deserializationContext,
         JsonObject modelContents) {
-      if (!modelContents.has("base")) {
-        throw new RuntimeException("Gun model requires 'base' key that points to a model.");
-      }
-      IUnbakedModel base = ModelLoader
-          .instance()
-          .getModelOrMissing(new ResourceLocation(modelContents.get("base").getAsString()));
-
-      Map<ResourceLocation, TransformationMatrix> attachmentTransforms = new HashMap<>();
+      Map<ResourceLocation, QuadTransformer> attachmentTransforms = new HashMap<>();
       if (modelContents.has("attachment_transforms")) {
         modelContents.getAsJsonObject("attachment_transforms").entrySet().forEach(entry -> {
           attachmentTransforms
-              .put(new ResourceLocation(entry.getKey()),
-                  deserializationContext.deserialize(entry.getValue(), TransformationMatrix.class));
+              .put(new ResourceLocation(entry.getKey()), new QuadTransformer(deserializationContext
+                  .deserialize(entry.getValue(), TransformationMatrix.class)));
         });
       }
 
-      return new GunModel(base, attachmentTransforms);
-    }
-  }
-
-  private static final class AttachmentOverrideHandler extends ItemOverrideList {
-
-    private final Map<ResourceLocation, TransformationMatrix> attachmentTransforms;
-
-    public AttachmentOverrideHandler(
-        Map<ResourceLocation, TransformationMatrix> attachmentTransforms) {
-      this.attachmentTransforms = attachmentTransforms;
-    }
-
-    @Override
-    public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
-        @Nullable World world, @Nullable LivingEntity entity) {
-      if (itemStack.getItem() instanceof GunItem) {
-        GunItem gunItem = (GunItem) itemStack.getItem();
-        BakedGunModel model = (BakedGunModel) originalModel;
-        model.attachments.clear();
-        for (AttachmentItem attachment : gunItem.getAttachments(itemStack).values()) {
-          model.attachments
-              .put(
-                  Minecraft
-                      .getInstance()
-                      .getItemRenderer()
-                      .getItemModelWithOverrides(new ItemStack(attachment), world, entity),
-                  new QuadTransformer(this.attachmentTransforms
-                      .getOrDefault(attachment.getRegistryName(),
-                          TransformationMatrix.identity())));
-        }
-        model.animationController = Optional
-            .ofNullable(itemStack.getCapability(ModCapabilities.ANIMATION_CONTROLLER).orElse(null));
-      }
-      return originalModel;
+      return new GunModel(
+          deserializationContext
+              .deserialize(JSONUtils.getJsonObject(modelContents, "model"), BlockModel.class),
+          attachmentTransforms);
     }
   }
 }

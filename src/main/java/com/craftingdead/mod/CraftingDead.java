@@ -7,6 +7,7 @@ import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.potion.ModEffects;
@@ -16,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.potion.Effect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -73,17 +73,16 @@ public class CraftingDead {
 
     this.modDist = DistExecutor.runForDist(() -> ClientDist::new, () -> ServerDist::new);
 
-    IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.register(this);
 
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
 
-    ModEffects.initialize();
-    modEventBus.addGenericListener(Effect.class, ModEffects::register);
-
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
+    ModContainerTypes.CONTAINERS.register(modEventBus);
+    ModEffects.EFFECTS.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
 

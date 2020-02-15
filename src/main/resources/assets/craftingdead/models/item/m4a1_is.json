@@ -1,0 +1,15 @@
+{
+    "loader":"forge:composite",
+    "parts" : {
+        "m4a1_is1": {
+            "loader":"forge:obj",
+            "model":"craftingdead:models/item/m4a1_is1/m4a1_is1.obj",
+            "flip-v":true
+        },
+        "m4a1_is2" : {
+            "loader":"forge:obj",
+            "model":"craftingdead:models/item/m4a1_is2/m4a1_is2.obj",
+            "flip-v":true
+        }
+    }
+}

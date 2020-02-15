@@ -1,8 +1,8 @@
 {
-    "loader":"forge:obj",
-    "model":"craftingdead:models/item/ak47/ak47.obj",
-    "flip-v":true,
-    "display": {
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/ak47/ak47.obj",
+	"flip-v":true,
+	"display": {
 		"thirdperson_righthand": {
 			"rotation":  [ 0, 90, 0 ],
 			"translation":  [ 1.5, 2.5, -7.5 ],

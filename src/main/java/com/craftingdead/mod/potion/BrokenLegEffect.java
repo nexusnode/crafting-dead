@@ -25,7 +25,7 @@ public class BrokenLegEffect extends Effect {
   public void performEffect(LivingEntity livingEntity, int amplifier) {
     if (livingEntity instanceof PlayerEntity) {
       if (((PlayerEntity) livingEntity).isCreative()) {
-        livingEntity.removePotionEffect(ModEffects.brokenLeg);
+        livingEntity.removePotionEffect(ModEffects.BROKEN_LEG.get());
       }
     }
   }

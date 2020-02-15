@@ -4,14 +4,12 @@ import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.capability.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
-import com.craftingdead.mod.item.GrenadeItem.Properties;
+import com.craftingdead.mod.inventory.CraftingInventorySlotType;
+import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
@@ -34,6 +32,20 @@ public class ModItems {
   // Guns
   // ================================================================================
 
+  public static final RegistryObject<ClipItem> ACR_CLIP = ITEMS
+      .register("acr_clip",
+          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON), 20));
+
+  public static final RegistryObject<ClipItem> AK47_30_ROUND_CLIP = ITEMS
+      .register("ak47_30_round_clip",
+          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON), 30));
+
+  public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
+      .register("m4a1_iron_sight",
+          () -> new AttachmentItem(new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 2.0F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)));
+
   public static final RegistryObject<Item> ACR = ITEMS
       .register("acr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
@@ -41,96 +53,95 @@ public class ModItems {
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
-              .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.ACR_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
-              .setAcceptedClips(
-                  ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "acr_magazine")))));
+              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAcceptedClip(ACR_CLIP)
+              .addAcceptedAttachment(M4A1_IRON_SIGHT)));
 
   public static final RegistryObject<Item> AK47 = ITEMS
-      .register("ak47", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(80)
-          .setDamage(7)
-          .setReloadDurationTicks(20 * 4)
-          .setAccuracy(0.8F)
-          .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
-          .setShootSound(ModSoundEvents.AK47_SHOOT)
-          .setReloadSound(ModSoundEvents.AK47_RELOAD)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))
-          .setAcceptedClips(
-              ImmutableSet.of(new ResourceLocation(CraftingDead.ID, "ak47_30_round_magazine")))));
+      .register("ak47",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(80)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.8F)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.AK47_SHOOT)
+              .setReloadSound(ModSoundEvents.AK47_RELOAD)
+              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAcceptedClip(AK47_30_ROUND_CLIP)));
 
   public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
-      .register("desert_eagle", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(0)
-          .setDamage(8)
-          .setReloadDurationTicks(20 * 2)
-          .setAccuracy(0.7F)
-          .setFireModes(ImmutableList.of(FireMode.SEMI))
-          .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
+      .register("desert_eagle",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(0)
+              .setDamage(8)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.7F)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
+              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)));
 
   public static final RegistryObject<Item> M4A1 = ITEMS
-      .register("m4a1", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(80)
-          .setDamage(7)
-          .setReloadDurationTicks(20 * 4)
-          .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(FireMode.AUTO, FireMode.SEMI))
-          .setShootSound(ModSoundEvents.M4A1_SHOOT)
-          .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, RifleShootAnimation::new))));
+      .register("m4a1",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(80)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.9F)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)));
 
   public static final RegistryObject<Item> M9 = ITEMS
-      .register("m9", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(80)
-          .setDamage(7)
-          .setReloadDurationTicks((int) (20 * 1.5F))
-          .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(FireMode.SEMI))
-          .setShootSound(ModSoundEvents.M9_SHOOT)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
+      .register("m9",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(80)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.9F)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M9_SHOOT)
+              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)));
 
   public static final RegistryObject<Item> TASER = ITEMS
-      .register("taser", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(2000)
-          .setDamage(7)
-          .setReloadDurationTicks(20 * 3)
-          .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(FireMode.SEMI))
-          .setShootSound(ModSoundEvents.TASER_SHOOT)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
+      .register("taser",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(2000)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.9F)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.TASER_SHOOT)
+              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)));
 
   public static final RegistryObject<Item> MAGNUM = ITEMS
-      .register("magnum", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(80)
-          .setDamage(7)
-          .setReloadDurationTicks(20 * 2)
-          .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(FireMode.SEMI))
-          .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
+      .register("magnum",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(80)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.9F)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
+              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)));
 
   public static final RegistryObject<Item> FN57 = ITEMS
-      .register("fn57", () -> new GunItem(new GunItem.Properties()
-          .setFireRate(80)
-          .setDamage(7)
-          .setReloadDurationTicks((int) (20 * 1.5F))
-          .setAccuracy(0.9F)
-          .setFireModes(ImmutableList.of(FireMode.SEMI))
-          .setShootSound(ModSoundEvents.FN57_SHOOT)
-          .setAnimations(ImmutableMap.of(GunItem.AnimationType.SHOOT, PistolShootAnimation::new))));
-
-  public static final RegistryObject<Item> ACR_MAGAZINE = ITEMS
-      .register("acr_magazine",
-          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
-              20));
-
-  public static final RegistryObject<Item> AK47_30_ROUND_MAGAZINE = ITEMS
-      .register("ak47_30_round_magazine",
-          () -> new ClipItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_WEAPON),
-              30));
+      .register("fn57",
+          () -> new GunItem(new GunItem.Properties()
+              .setFireRate(80)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.9F)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.FN57_SHOOT)
+              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)));
 
   // ================================================================================
   // Tools
@@ -147,33 +158,7 @@ public class ModItems {
   public static final RegistryObject<Item> MULTI_TOOL = ITEMS
       .register("multi_tool", () -> new MeleeWeaponItem(8, -2.4F,
           new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
-  
-  // ================================================================================
-  // Grenades
-  // ================================================================================
-  
-  public static final RegistryObject<Item> FIRE_GRENADE = ITEMS.register("fire_grenade",
-		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-				  .setTyoe(GrenadeType.FIRE)
-				  .setExplosionRadius(1f)
-				  .setTimeUntilExplosion(10)
-				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
-  
-  public static final RegistryObject<Item> GAS_GRENADE = ITEMS.register("gas_grenade",
-		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-				  .setTyoe(GrenadeType.GAS)
-				  .setExplosionRadius(1f)
-				  .setTimeUntilExplosion(10)
-				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
 
-  public static final RegistryObject<Item> SMOKE_GRENADE = ITEMS.register("smoke_grenade",
-		  () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-				  .setTyoe(GrenadeType.SMOKE)
-				  .setExplosionRadius(1f)
-				  .setTimeUntilExplosion(10)
-				  .group(ModItemGroups.CRAFTING_DEAD_WEAPON)));
-  
-  
   // ================================================================================
   // Consumable
   // ================================================================================
@@ -190,7 +175,7 @@ public class ModItems {
       .register("bottled_water",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 7), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
               .containerItem(EMPTY_WATER_BOTTLE.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -320,7 +305,7 @@ public class ModItems {
       .register("orange_soda",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .containerItem(EMPTY_ORANGE_SODA.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -332,7 +317,7 @@ public class ModItems {
       .register("iced_tea",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .containerItem(EMPTY_ICED_TEA.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -344,7 +329,7 @@ public class ModItems {
       .register("juice_pouch",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 1), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 1), 1.0F)
               .containerItem(EMPTY_JUICE_POUCH.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -356,7 +341,7 @@ public class ModItems {
       .register("pepe_soda",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .containerItem(EMPTY_PEPE_SODA.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -368,7 +353,7 @@ public class ModItems {
       .register("lemon_soda",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .containerItem(EMPTY_LEMON_SODA.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -380,7 +365,7 @@ public class ModItems {
       .register("cola_soda",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .containerItem(EMPTY_COLA_SODA.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -392,7 +377,7 @@ public class ModItems {
       .register("milk_carton",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 7), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
               .containerItem(EMPTY_MILK_CARTON.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -400,7 +385,7 @@ public class ModItems {
       .register("rotten_milk",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 3), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
               .effect(() -> new EffectInstance(Effects.HUNGER, 600, 1), 0.2F)
               .containerItem(EMPTY_MILK_CARTON.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
@@ -413,7 +398,7 @@ public class ModItems {
       .register("cola_pop",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
               .containerItem(EMPTY_COLA_POP.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -425,7 +410,7 @@ public class ModItems {
       .register("iron_brew",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
               .containerItem(EMPTY_IRON_BREW.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -437,7 +422,7 @@ public class ModItems {
       .register("sprite",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
               .containerItem(EMPTY_SPRITE.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -449,7 +434,7 @@ public class ModItems {
       .register("zombie_energy",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
               .containerItem(EMPTY_ZOMBIE_ENERGY.get())
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
 
@@ -602,7 +587,7 @@ public class ModItems {
       .register("water_canteen",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 8), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
               .containerItem(EMPTY_WATER_CANTEEN.get())
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
@@ -620,7 +605,7 @@ public class ModItems {
       .register("flask",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
               .containerItem(EMPTY_FLASK.get())
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
@@ -629,7 +614,7 @@ public class ModItems {
       .register("tea_flask",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
               .containerItem(EMPTY_FLASK.get())
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
@@ -638,7 +623,7 @@ public class ModItems {
       .register("coffee_flask",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
               .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.hydrate, 1, 5), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
               .containerItem(EMPTY_FLASK.get())
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CONSUMABLES)));
@@ -1242,14 +1227,14 @@ public class ModItems {
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
               .setLootTable(new ResourceLocation(CraftingDead.ID, "supply_drops/medical"))
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MILITARY_DROP_RADIO = ITEMS
       .register("military_drop_radio",
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
               .setLootTable(new ResourceLocation(CraftingDead.ID, "supply_drops/military"))
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_GENERAL)));
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   // ================================================================================
   // Spawn Eggs

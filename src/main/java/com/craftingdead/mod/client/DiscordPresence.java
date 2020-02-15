@@ -3,8 +3,6 @@ package com.craftingdead.mod.client;
 import net.arikia.dev.drpc.DiscordEventHandlers;
 import net.arikia.dev.drpc.DiscordRPC;
 import net.arikia.dev.drpc.DiscordRichPresence;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
 
 public class DiscordPresence {
@@ -37,25 +35,22 @@ public class DiscordPresence {
 
   public static enum GameState {
 
-    LOADING("presence.loading"), IDLE("presence.idle"), SINGLEPLAYER("presence.singleplayer"), LAN(
-        "presence.lan"), MULTIPLAYER("presence.multiplayer") {
-          @Override
-          public void applyState(DiscordRichPresence presence, ClientDist client) {
-            ServerData serverData = Minecraft.getInstance().getCurrentServerData();
-            if (serverData != null) {
-              presence.state = serverData.serverIP;
-            }
-          }
-        };
+    IDLE, SINGLEPLAYER("title.singleplayer"), REALMS(
+        "title.multiplayer.realms"), LAN(
+            "title.multiplayer.lan"), MULTIPLAYER("title.multiplayer.other");
 
-    private final String translationKey;
+    private String translationKey;
+
+    private GameState() {}
 
     private GameState(String translationKey) {
       this.translationKey = translationKey;
     }
 
-    void applyState(DiscordRichPresence presence, ClientDist client) {
-      presence.details = I18n.format(this.translationKey);
+    public void applyState(DiscordRichPresence presence, ClientDist client) {
+      if (this.translationKey != null) {
+        presence.details = I18n.format(this.translationKey);
+      }
       presence.startTimestamp = System.currentTimeMillis() / 1000;
       presence.largeImageKey = "craftingdead";
       presence.largeImageText = "Crafting Dead";

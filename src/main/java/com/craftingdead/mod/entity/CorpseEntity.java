@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.ItemStackHelper;
@@ -37,25 +38,27 @@ public class CorpseEntity extends Entity {
   private static final DataParameter<Integer> LIMB_COUNT =
       EntityDataManager.createKey(CorpseEntity.class, DataSerializers.VARINT);
 
-  private Inventory inventory = new Inventory(27);
+  private final IInventory inventory;
 
-  public CorpseEntity(World world, UUID deceasedId, ITextComponent deceasedName) {
+  public CorpseEntity(World world, UUID deceasedId, ITextComponent deceasedName,
+      IInventory inventory) {
     super(ModEntityTypes.corpse, world);
+    this.inventory = inventory;
     this.setCustomName(deceasedName);
     this.dataManager.set(DECEASED_ID, Optional.ofNullable(deceasedId));
   }
 
   public CorpseEntity(EntityType<?> type, World world) {
-    this(world, null, null);
+    this(world, null, null, new Inventory(27));
   }
 
   public CorpseEntity(FMLPlayMessages.SpawnEntity packet, World world) {
-    this(world, null, null);
+    this(world, null, null, new Inventory(27));
   }
 
   public CorpseEntity(ServerPlayerEntity player) {
-    this(player.world, player.getUniqueID(), player.getName());
-    this.inventory = new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0]));
+    this(player.world, player.getUniqueID(), player.getName(),
+        new Inventory(player.inventory.mainInventory.toArray(new ItemStack[0])));
     player.inventory.clear();
     this.setPosition(player.getX(), player.getY(), player.getZ());
   }
@@ -131,7 +134,9 @@ public class CorpseEntity extends Entity {
     if (compound.contains("inventory")) {
       NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
       ItemStackHelper.loadAllItems(compound.getCompound("inventory"), items);
-      this.inventory = new Inventory(items.toArray(new ItemStack[0]));
+      for (int i = 0; i < items.size(); i++) {
+        this.inventory.setInventorySlotContents(i, items.get(i));
+      }
     }
   }
 

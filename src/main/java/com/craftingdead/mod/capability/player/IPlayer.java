@@ -3,6 +3,7 @@ package com.craftingdead.mod.capability.player;
 import java.util.UUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -77,6 +78,8 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
   int getMaxStamina();
 
   void setMaxStamina(int stamina);
+
+  IInventory getInventory();
 
   E getEntity();
 

@@ -1,4 +1,23 @@
 {
-    "loader":"craftingdead:gun",
-    "base":"craftingdead:item/acr/acr_base"
+    "loader":"craftingdead:complex",
+    "held": {
+        "loader":"craftingdead:gun",
+        "model": {
+            "parent":"craftingdead:item/acr/acr_held",
+            "overrides": [
+                {
+                    "predicate": {
+                        "aiming": 1
+                    },
+                    "model": "craftingdead:item/acr/acr_aiming"
+                }
+            ]
+        }
+    },
+    "simple": {
+        "parent": "item/generated",
+        "textures": {
+            "layer0": "craftingdead:item/acr_simple"
+        }
+    }
 }
