@@ -4,6 +4,9 @@
         "loader":"craftingdead:gun",
         "model": {
             "parent":"craftingdead:item/ak47/ak47_held",
+            "textures" : {
+                "base": "craftingdead:item/ak47"
+            },
             "overrides": [
                 {
                     "predicate": {

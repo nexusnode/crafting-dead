@@ -21,13 +21,12 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
-// TODO BAG: When you raise your backpack, you’ll be able to create a chest
 public class BackpackItem extends Item {
 
   private Backpack backpack;
 
-  public BackpackItem(Backpack backpack) {
-    super(new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_WEARABLE));
+  public BackpackItem(Backpack backpack, Properties properties) {
+    super(properties);
     this.backpack = backpack;
   }
 

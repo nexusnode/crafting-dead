@@ -10,10 +10,13 @@ public class DefaultAnimationController implements IAnimationController {
 
   private final Queue<IAnimation> animations = new LinkedList<>();
 
+  private IAnimation animation;
+
   private long startTime = 0L;
 
   @Override
   public void addAnimation(IAnimation animation) {
+    this.animation = animation;
     this.animations.add(animation);
   }
 
@@ -31,14 +34,14 @@ public class DefaultAnimationController implements IAnimationController {
   @Override
   public void apply(MatrixStack matrixStack) {
     IAnimation animation = this.animations.peek();
-    if (animation != null) {
+    if (this.animation != null) {
       if (this.startTime == 0L) {
         this.startTime = Util.milliTime();
       }
       float progress =
           MathHelper.clamp((Util.milliTime() - this.startTime) / animation.getLength(), 0.0F, 1.0F);
       animation.apply(matrixStack, progress);
-      if (progress >= 1.0D) {
+      if (progress > 1.0D) {
         this.cancelCurrentAnimation();
       }
     }

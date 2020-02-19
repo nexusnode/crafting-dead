@@ -25,7 +25,7 @@ public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
 
     matrixStack.translate(0, 1.51D, 0);
-    matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+    matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
 
     this.model.setRenderParachute(entity.fallDistance > 0 && !entity.onGround);
 

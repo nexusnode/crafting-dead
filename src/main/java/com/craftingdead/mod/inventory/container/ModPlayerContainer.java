@@ -5,16 +5,19 @@ import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 
 public class ModPlayerContainer extends Container {
 
-  private final IInventory inventory;
+  private final PlayerInventory inventory;
   private final IInventory modInventory;
-  private final IInventory craftingInventory = new Inventory(5);
+  private final CraftResultInventory outputInventory = new CraftResultInventory();
+  private final Inventory craftingInventory = new Inventory(4);
 
   public ModPlayerContainer(int windowId, PlayerInventory playerInventory) {
     super(ModContainerTypes.PLAYER.get(), windowId);
@@ -23,6 +26,7 @@ public class ModPlayerContainer extends Container {
         .getCapability(ModCapabilities.PLAYER)
         .orElseThrow(() -> new IllegalStateException("No player capability"))
         .getInventory();
+    this.craftingInventory.addListener(this::onCraftMatrixChanged);
 
     final int deltaY = 20;
 
@@ -46,7 +50,8 @@ public class ModPlayerContainer extends Container {
             new BackpackSlot(this.modInventory, InventorySlotType.BACKPACK.getIndex(), 65, 48));
     this.addSlot(new VestSlot(this.modInventory, InventorySlotType.VEST.getIndex(), 65, 66));
 
-    this.addSlot(new GunSlot(this.craftingInventory, CraftingInventorySlotType.GUN.getIndex(), 125, 48));
+    this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, 48, this.craftingInventory));
+
     this
         .addSlot(new AttachmentSlot(this.craftingInventory,
             CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104, 48));
@@ -57,8 +62,8 @@ public class ModPlayerContainer extends Container {
         .addSlot(new AttachmentSlot(this.craftingInventory,
             CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, 27));
     this
-        .addSlot(
-            new PaintSlot(this.modInventory, CraftingInventorySlotType.PAINT.getIndex(), 146, 48));
+        .addSlot(new PaintSlot(this.craftingInventory, CraftingInventorySlotType.PAINT.getIndex(),
+            146, 48));
   }
 
   @Override
@@ -72,10 +77,27 @@ public class ModPlayerContainer extends Container {
     super.onContainerClosed(playerEntity);
     if (!playerEntity.getEntityWorld().isRemote()) {
       this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.craftingInventory);
+      this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.outputInventory);
     }
   }
 
-  public IInventory getCraftingInventory() {
-    return this.craftingInventory;
+  public ItemStack getGunStack() {
+    return this.outputInventory.getStackInSlot(0);
+  }
+
+  public boolean isCraftingInventoryEmpty() {
+    return this.craftingInventory.isEmpty();
+  }
+
+  public boolean isCraftable() {
+    return this.getGunStack().getCapability(ModCapabilities.GUN_CONTROLLER).map(gunController -> {
+      for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
+        ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
+        if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {
+          return false;
+        }
+      }
+      return true;
+    }).orElse(false);
   }
 }

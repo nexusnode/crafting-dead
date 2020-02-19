@@ -4,6 +4,9 @@
         "loader":"craftingdead:gun",
         "model": {
             "parent":"craftingdead:item/acr/acr_held",
+            "textures": {
+                "base":"craftingdead:item/acr"
+            },
             "overrides": [
                 {
                     "predicate": {

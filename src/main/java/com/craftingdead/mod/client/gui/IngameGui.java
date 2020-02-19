@@ -2,10 +2,10 @@ package com.craftingdead.mod.client.gui;
 
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
-import com.craftingdead.mod.item.GunItem;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -37,8 +37,6 @@ public class IngameGui {
 
   private float lastSpread;
 
-  private IAction action = IAction.DefaultAction.NONE;
-
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
@@ -50,21 +48,15 @@ public class IngameGui {
     // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
     // - 1;
 
-    this.client.getPlayer().ifPresent((player) -> {
+    this.client.getPlayer().ifPresent(player -> {
       ClientPlayerEntity playerEntity = player.getEntity();
 
-      if (playerEntity.getHeldItemMainhand().getItem() instanceof GunItem) {
-        this.minecraft.fontRenderer
-            .drawString(String
-                .valueOf(((GunItem) playerEntity.getHeldItemMainhand().getItem())
-                    .getAmmoCount(playerEntity.getHeldItemMainhand())),
-                0, 0, 0xFFFFFF);
-      }
-
-      if (this.action.isActive(playerEntity)) {
-        renderActionProgress(this.minecraft.fontRenderer, width, height,
-            this.action.getText(playerEntity), this.action.getProgress(playerEntity));
-      }
+      playerEntity.getHeldItemMainhand().getCapability(ModCapabilities.ACTION).ifPresent(action -> {
+        if (action.isActive(playerEntity)) {
+          renderActionProgress(this.minecraft.fontRenderer, width, height,
+              action.getText(playerEntity), action.getProgress(playerEntity));
+        }
+      });
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
@@ -83,14 +75,6 @@ public class IngameGui {
             player.getZombiesKilled(), player.getPlayersKilled());
       }
     });
-  }
-
-  public IAction getAction() {
-    return this.action;
-  }
-
-  public void setAction(IAction action) {
-    this.action = action;
   }
 
   private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,

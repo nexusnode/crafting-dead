@@ -1,19 +1,16 @@
 package com.craftingdead.mod.capability.player;
 
+import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.entity.CorpseEntity;
-import com.craftingdead.mod.inventory.container.ModPlayerContainer;
-import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
 import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -105,13 +102,12 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
                       : PlayerActionMessage.Action.TRIGGER_RELEASED));
 
       ItemStack heldStack = this.entity.getHeldItemMainhand();
-      if (heldStack.getItem() instanceof GunItem) {
-        GunItem gunItem = (GunItem) heldStack.getItem();
+      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
         NetworkChannel.MAIN
             .getSimpleChannel()
             .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-                new SyncGunMessage(this.entity.getEntityId(), gunItem.getAmmoCount(heldStack)));
-      }
+                new SyncGunMessage(this.entity.getEntityId(), gunController.getAmmo()));
+      });
     }
   }
 
@@ -127,12 +123,19 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   @Override
+  public void toggleFireMode(boolean sendUpdate) {
+    super.toggleFireMode(sendUpdate);
+    if (sendUpdate) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY.with(this::getEntity),
+              new PlayerActionMessage(0, PlayerActionMessage.Action.TOGGLE_FIRE_MODE));
+    }
+  }
+
+  @Override
   public void reload(boolean sendUpdate) {
     super.reload(sendUpdate);
-    this.entity
-        .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
-            playerEntity) -> new ModPlayerContainer(windowId, playerInventory),
-            new StringTextComponent("test")));
     if (sendUpdate) {
       NetworkChannel.MAIN
           .getSimpleChannel()

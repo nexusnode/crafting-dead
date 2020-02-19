@@ -1,13 +1,7 @@
 package com.craftingdead.mod.inventory;
 
-import java.util.Set;
-import com.google.common.collect.ImmutableSet;
-
 public enum CraftingInventorySlotType {
-  GUN(0), UNDERBARREL_ATTACHMENT(1), OVERBARREL_ATTACHMENT(2), MUZZLE_ATTACHMENT(3), PAINT(4);
-
-  public static final Set<CraftingInventorySlotType> ADDON_SLOTS =
-      ImmutableSet.of(UNDERBARREL_ATTACHMENT, OVERBARREL_ATTACHMENT, MUZZLE_ATTACHMENT, PAINT);
+  UNDERBARREL_ATTACHMENT(0), OVERBARREL_ATTACHMENT(1), MUZZLE_ATTACHMENT(2), PAINT(3);
 
   private final int index;
 

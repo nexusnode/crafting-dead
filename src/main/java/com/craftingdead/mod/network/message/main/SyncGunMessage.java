@@ -2,7 +2,7 @@ package com.craftingdead.mod.network.message.main;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.capability.ModCapabilities;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -37,9 +37,9 @@ public class SyncGunMessage {
     world.map(w -> w.getEntityByID(msg.entityId)).ifPresent(entity -> {
       if (entity instanceof LivingEntity) {
         ItemStack heldStack = ((LivingEntity) entity).getHeldItemMainhand();
-        if (heldStack.getItem() instanceof GunItem) {
-          ((GunItem) heldStack.getItem()).setAmmoCount(heldStack, msg.ammoCount);
-        }
+        heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+          gunController.setAmmo(msg.ammoCount);
+        });
       }
     });
     ctx.get().setPacketHandled(true);

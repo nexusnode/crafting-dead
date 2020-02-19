@@ -1,9 +1,5 @@
 {
-  "presence.loading": "Loading",
-  "presence.idle": "Idle",
-  "presence.singleplayer": "Playing Singleplayer",
-  "presence.multiplayer": "Playing Multiplayer",
-  "presence.lan": "Playing on LAN",
+  "action.reload": "Reloading",
   "key.reload": "Reload",
   "key.toggle_fire_mode": "Toggle Fire Mode",
   "death.attack.bullet": "%1$s was shot",

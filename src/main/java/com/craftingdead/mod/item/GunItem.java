@@ -5,35 +5,22 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.animation.IAnimationController;
-import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.event.GunEvent;
-import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
-import com.craftingdead.mod.util.ModDamageSource;
-import com.craftingdead.mod.util.ModSoundEvents;
-import com.craftingdead.mod.util.RayTraceUtil;
+import com.craftingdead.mod.capability.gun.IGunController;
+import com.craftingdead.mod.capability.gun.ItemGunController;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.TNTBlock;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
@@ -41,17 +28,12 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class GunItem extends ShootableItem {
@@ -59,7 +41,6 @@ public class GunItem extends ShootableItem {
   private static final UUID REACH_DISTANCE_MODIFIER =
       UUID.fromString("A625D496-9464-4891-9E1F-9345989E5DAE");
 
-  private static final float HEADSHOT_MULTIPLIER = 4;
 
   /**
    * Time between shots in milliseconds.
@@ -126,6 +107,10 @@ public class GunItem extends ShootableItem {
     return this.reloadDurationTicks;
   }
 
+  public float getAccuracy() {
+    return this.accuracy;
+  }
+
   public List<FireMode> getFireModes() {
     return this.fireModes;
   }
@@ -154,139 +139,6 @@ public class GunItem extends ShootableItem {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
-  public float getAccuracy(ItemStack itemStack, Entity entity) {
-    float accuracy = 1.0F;
-
-    if (entity.getX() != entity.lastTickPosX || entity.getY() != entity.lastTickPosY
-        || entity.getZ() != entity.lastTickPosZ) {
-
-      accuracy = 0.5F;
-
-      if (entity.isSprinting()) {
-        accuracy = 0.25F;
-      }
-
-      if (entity.isSneaking() && entity.onGround) {
-        accuracy = 1.0F;
-      }
-    }
-
-    return accuracy * this.accuracy
-        * this.getAttachmentMultiplier(itemStack, MultiplierType.ACCURACY);
-  }
-
-  public Float getAttachmentMultiplier(ItemStack itemStack,
-      AttachmentItem.MultiplierType multiplierType) {
-    return this
-        .getAttachments(itemStack)
-        .stream()
-        .map(attachment -> attachment.getMultiplier(multiplierType))
-        .reduce(1.0F, (x, y) -> x * y);
-  }
-
-  public Set<AttachmentItem> getAttachments(ItemStack itemStack) {
-    CompoundNBT compound = itemStack.getOrCreateChildTag("attachments");
-    NonNullList<ItemStack> attachments = NonNullList.withSize(3, ItemStack.EMPTY);
-    ItemStackHelper.loadAllItems(compound, attachments);
-    return attachments
-        .stream()
-        .filter(attachmentStack -> attachmentStack.getItem() instanceof AttachmentItem)
-        .map(attachmentStack -> (AttachmentItem) attachmentStack.getItem())
-        .collect(Collectors.toSet());
-  }
-
-  public void shoot(ItemStack itemStack, Entity entity) {
-    if (this.getAmmoCount(itemStack) <= 0) {
-      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      return;
-    }
-
-    this.decrementAmmoCount(itemStack);
-
-    if (entity.world.isRemote()) {
-      if (entity instanceof ClientPlayerEntity) {
-        ((ClientDist) CraftingDead.getInstance().getModDist())
-            .getRecoilHelper()
-            .jolt(this.getAccuracy(itemStack, entity));
-      }
-      itemStack
-          .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-          .ifPresent(animationController -> {
-            IAnimation animation = this.animations.get(GunItem.AnimationType.SHOOT).get();
-            if (animation != null) {
-              animationController.cancelCurrentAnimation();
-              animationController.addAnimation(animation);
-            }
-          });
-    }
-
-    entity.playSound(this.shootSound.get(), 1.0F, 1.0F);
-
-    Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
-
-    if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(itemStack, entity, rayTrace))) {
-      return;
-    }
-
-    rayTrace.ifPresent(result -> {
-      switch (result.getType()) {
-        case BLOCK:
-          this.hitBlock(entity, (BlockRayTraceResult) result);
-          break;
-        case ENTITY:
-          this.hitEntity(entity, (EntityRayTraceResult) result);
-          break;
-        default:
-          break;
-      }
-    });
-
-    MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(itemStack, entity, rayTrace));
-  }
-
-  public int getAmmoCount(ItemStack itemStack) {
-    return itemStack.getOrCreateTag().getInt("ammo");
-  }
-
-  public void setAmmoCount(ItemStack itemStack, int count) {
-    itemStack.getOrCreateTag().putInt("ammo", count);
-  }
-
-  public void decrementAmmoCount(ItemStack itemStack) {
-    this.setAmmoCount(itemStack, this.getAmmoCount(itemStack) - 1);
-  }
-
-  public FireMode getFireMode(ItemStack itemStack) {
-    return this.fireModes.get(itemStack.getOrCreateTag().getInt("fireMode"));
-  }
-
-  private void hitEntity(Entity entity, EntityRayTraceResult rayTrace) {
-    Entity entityHit = rayTrace.getEntity();
-    float damage = this.getDamage();
-    if ((entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
-        && rayTrace.getHitVec().y >= (entityHit.getY() + entityHit.getEyeHeight())) {
-      damage *= HEADSHOT_MULTIPLIER;
-    }
-    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity), damage);
-  }
-
-  private void hitBlock(Entity entity, BlockRayTraceResult rayTrace) {
-    BlockPos blockPos = rayTrace.getPos();
-    BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
-    Block block = blockState.getBlock();
-    if (block instanceof TNTBlock) {
-      block
-          .catchFire(blockState, entity.getEntityWorld(), blockPos, null,
-              entity instanceof LivingEntity ? (LivingEntity) entity : null);
-      entity.getEntityWorld().removeBlock(blockPos, false);
-    }
-  }
-
-  public boolean isAcceptedPaintOrAttachment(ItemStack itemStack) {
-    return itemStack != null && (this.getAcceptedAttachments().contains((itemStack.getItem()))
-        || this.getAcceptedPaints().contains((itemStack.getItem())));
-  }
-
   @Override
   public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot,
       ItemStack itemStack) {
@@ -310,15 +162,28 @@ public class GunItem extends ShootableItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new ICapabilityProvider() {
+    return new ICapabilitySerializable<CompoundNBT>() {
       private final IAnimationController animationController =
           ModCapabilities.ANIMATION_CONTROLLER.getDefaultInstance();
+      private final IGunController gunController = new ItemGunController(GunItem.this);
 
       @Override
       public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         return cap == ModCapabilities.ANIMATION_CONTROLLER
             ? LazyOptional.of(() -> this.animationController).cast()
-            : LazyOptional.empty();
+            : cap == ModCapabilities.GUN_CONTROLLER || cap == ModCapabilities.ACTION
+                ? LazyOptional.of(() -> this.gunController).cast()
+                : LazyOptional.empty();
+      }
+
+      @Override
+      public CompoundNBT serializeNBT() {
+        return this.gunController.serializeNBT();
+      }
+
+      @Override
+      public void deserializeNBT(CompoundNBT nbt) {
+        this.gunController.deserializeNBT(nbt);
       }
     };
   }

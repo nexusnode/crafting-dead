@@ -1,15 +1,12 @@
 package com.craftingdead.mod.capability.player;
 
-import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.capability.gun.IGunController;
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.client.gui.IAction;
-import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Pose;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
 public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
 
@@ -36,12 +33,15 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
       this.entity.setPose(Pose.SWIMMING);
     }
 
-    if (ClientDist.RELOAD.isKeyDown() && !this.isReloading()) {
+    if (ClientDist.RELOAD.isKeyDown()) {
       this.reload(true);
     }
 
     if (ClientDist.TOGGLE_FIRE_MODE.isKeyDown()) {
-
+      this.entity
+          .getHeldItemMainhand()
+          .getCapability(ModCapabilities.GUN_CONTROLLER)
+          .ifPresent(IGunController::toggleFireMode);
     }
   }
 
@@ -68,10 +68,18 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   }
 
   @Override
+  public void toggleFireMode(boolean sendUpdate) {
+    super.toggleFireMode(sendUpdate);
+    if (sendUpdate) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .sendToServer(new PlayerActionMessage(0, PlayerActionMessage.Action.TOGGLE_FIRE_MODE));
+    }
+  }
+
+  @Override
   public void reload(boolean sendUpdate) {
     super.reload(sendUpdate);
-    IngameGui ingameGui = ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui();
-    ingameGui.setAction(new ReloadAction());
     if (sendUpdate) {
       NetworkChannel.MAIN
           .getSimpleChannel()
@@ -79,22 +87,11 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
     }
   }
 
-  private class ReloadAction implements IAction {
-
-    @Override
-    public boolean isActive(ClientPlayerEntity playerEntity) {
-      return ClientPlayer.this.isReloading();
-    }
-
-    @Override
-    public ITextComponent getText(ClientPlayerEntity playerEntity) {
-      return new TranslationTextComponent("action.reload");
-    }
-
-    @Override
-    public float getProgress(ClientPlayerEntity playerEntity) {
-      return (float) (ClientPlayer.this.totalReloadDurationTicks
-          - ClientPlayer.this.reloadDurationTicks) / ClientPlayer.this.totalReloadDurationTicks;
-    }
+  @Override
+  public void openPlayerContainer() {
+    super.openPlayerContainer();
+    NetworkChannel.MAIN
+        .getSimpleChannel()
+        .sendToServer(new PlayerActionMessage(0, PlayerActionMessage.Action.OPEN_PLAYER_CONTAINER));
   }
 }

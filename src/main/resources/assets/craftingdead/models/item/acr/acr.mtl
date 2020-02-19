@@ -5,5 +5,5 @@
 newmtl ModelMaterial
 Ka 1 1 1
 Kd 1 1 1
-map_Ka craftingdead:item/acr
-map_Kd craftingdead:item/acr
+map_Ka #base
+map_Kd #base
