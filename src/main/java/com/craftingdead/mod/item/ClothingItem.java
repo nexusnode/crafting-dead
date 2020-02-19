@@ -22,9 +22,9 @@ public class ClothingItem extends Item {
 
     if (!worldIn.isRemote) {
       Random rand = new Random();
-      int var1 = rand.nextInt(3) + 3;
+      int randomRagAmount = rand.nextInt(3) + 3;
 
-      for (int i = 0; i < var1; i++) {
+      for (int i = 0; i < randomRagAmount; i++) {
         if (rand.nextBoolean()) {
           entityLiving.entityDropItem(new ItemStack(ModItems.CLEAN_RAG::get));
         } else {
