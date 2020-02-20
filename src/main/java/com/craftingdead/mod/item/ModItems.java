@@ -1004,6 +1004,307 @@ public class ModItems {
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   // ================================================================================
+  // Hats, Helmets and Masks
+  // ================================================================================
+
+  public static final RegistryObject<Item> ARMY_HELMET = ITEMS
+      .register("army_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BEANIE_HAT = ITEMS
+      .register("beanie_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BLACK_BALLISTIC_HAT = ITEMS
+      .register("black_ballistic_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SHERIFF_HAT = ITEMS
+      .register("sheriff_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BLUE_HARD_HAT = ITEMS
+      .register("blue_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BUNNY_HAT = ITEMS
+      .register("bunny_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> CAMO_HELMET = ITEMS
+      .register("camo_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> CLONE_HAT = ITEMS
+      .register("clone_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> COMBAT_BDU_HELMET = ITEMS
+      .register("combat_bdu_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> COOKIE_MASK = ITEMS
+      .register("cookie_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> COW_MASK = ITEMS
+      .register("cow_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> CREEPER_MASK = ITEMS
+      .register("creeper_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> DEADPOOL_MASK = ITEMS
+      .register("deadpool_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> DOCTOR_MASK = ITEMS
+      .register("doctor_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> FIREMAN_HAT = ITEMS
+      .register("fireman_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GAS_MASK = ITEMS
+      .register("gas_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setImmuneToFlashes(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GHILLIE_HAT = ITEMS
+      .register("ghillie_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREEN_ARMY_HELMET = ITEMS
+      .register("green_army_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREEN_BALLISTIC_HELMET = ITEMS
+      .register("green_ballistic_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREEN_HARD_HAT = ITEMS
+      .register("green_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREY_ARMY_HELMET = ITEMS
+      .register("grey_army_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> HACKER_MASK = ITEMS
+      .register("hacker_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> HAZMAT_HAT = ITEMS
+      .register("hazmat_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setImmuneToFlashes(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> JUGGERNAUT_HELMET = ITEMS
+      .register("juggernaut_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> KNIGHT_HAT = ITEMS
+      .register("knight_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> MILITARY_HAZMAT_HAT = ITEMS
+      .register("military_hazmat_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setImmuneToFlashes(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> NINJA_HAT = ITEMS
+      .register("ninja_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> NV_GOGGLES_HAT = ITEMS
+      .register("nv_goggles_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setAllowsNightVision(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> ORANGE_HARD_HAT = ITEMS
+      .register("orange_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> PAYDAY_MASK = ITEMS
+      .register("payday_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> PAYDAY2_MASK = ITEMS
+      .register("payday2_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> PILOT_HELMET = ITEMS
+      .register("pilot_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> PUMPKIN_MASK = ITEMS
+      .register("pumpkin_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> RADAR_CAP = ITEMS
+      .register("radar_cap",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> RIOT_HAT = ITEMS
+      .register("riot_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SANTA_HAT = ITEMS
+      .register("santa_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SCUBA_HAT = ITEMS
+      .register("scuba_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SHEEP_MASK = ITEMS
+      .register("sheep_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SKI_MASK = ITEMS
+      .register("ski_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setImmuneToFlashes(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> SPETSNAZ_HELMET = ITEMS
+      .register("spetsnaz_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> TOP_HAT = ITEMS
+      .register("top_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> TRAPPER_HAT = ITEMS
+      .register("trapper_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> USHANKA_HAT = ITEMS
+      .register("ushanka_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> WINTER_MILITARY_HELMET = ITEMS
+      .register("winter_military_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> YELLOW_HARD_HAT = ITEMS
+      .register("yellow_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(20.0)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> ZOMBIE_MASK = ITEMS
+      .register("zombie_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  // ================================================================================
   // Clothing
   // ================================================================================
 
