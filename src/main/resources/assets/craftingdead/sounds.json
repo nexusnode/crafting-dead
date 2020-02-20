@@ -64,5 +64,11 @@
     "sounds": [
       "craftingdead:dry_fire"
     ]
+  },
+  "toggle_fire_mode": {
+    "category":"master",
+    "sounds": [
+      "craftingdead:toggle_fire_mode"
+    ]
   }
 }

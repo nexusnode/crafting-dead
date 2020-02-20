@@ -87,5 +87,5 @@ public class DefaultGunController implements IGunController {
   }
 
   @Override
-  public void toggleFireMode() {}
+  public void toggleFireMode(Entity entity) {}
 }

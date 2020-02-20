@@ -2,8 +2,8 @@
     "parent":"craftingdead:item/acr/acr_held",
     "display": {
 		"firstperson_righthand": {
-			"rotation":  [ 5, 90, 0 ],
-			"translation":  [ -4.25, 10, 0 ],
+			"rotation":  [ 0, 90.25, 0 ],
+			"translation":  [ -4.25, 9, 2 ],
 			"scale":  [ 0.5, 0.5, 0.5 ]
 		},
 		"firstperson_lefthand": {

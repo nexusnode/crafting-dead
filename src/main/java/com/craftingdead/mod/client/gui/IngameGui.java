@@ -10,6 +10,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -51,6 +52,11 @@ public class IngameGui {
     this.client.getPlayer().ifPresent(player -> {
       ClientPlayerEntity playerEntity = player.getEntity();
 
+      ItemStack heldStack = playerEntity.getHeldItemMainhand();
+      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+        renderAmmo(this.minecraft.fontRenderer, width, height, gunController.getAmmo());
+      });
+
       playerEntity.getHeldItemMainhand().getCapability(ModCapabilities.ACTION).ifPresent(action -> {
         if (action.isActive(playerEntity)) {
           renderActionProgress(this.minecraft.fontRenderer, width, height,
@@ -75,6 +81,13 @@ public class IngameGui {
             player.getZombiesKilled(), player.getPlayersKilled());
       }
     });
+  }
+
+  private static void renderAmmo(FontRenderer fontRenderer, int width, int height, int ammo) {
+    String text = String.valueOf(ammo);
+    fontRenderer
+        .drawStringWithShadow(text, width - 15 - fontRenderer.getStringWidth(text),
+            height - 10 - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
   }
 
   private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,
@@ -153,7 +166,7 @@ public class IngameGui {
     final double imageWidth = 16.0D;
     final double imageHeight = 16.0D;
 
-    final double x = (width / 2.0D) - (imageWidth / 2.0D);
+    final double x = (width / 2.0D) - (imageWidth / 2.0D) - 0.5F;
     final double y = (height / 2.0D) - (imageHeight / 2.0D);
 
     final float newSpread = (1.0F - accuracy) * 60.0F;

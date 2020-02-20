@@ -39,6 +39,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -293,8 +294,14 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
-  public void toggleFireMode() {
+  public void toggleFireMode(Entity entity) {
     this.fireModeIndex = ~this.fireModeIndex & 1;
+    entity.playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
+    if (entity.getEntityWorld().isRemote()) {
+      Minecraft.getInstance().ingameGUI
+          .setOverlayMessage(new TranslationTextComponent(
+              this.gunItem.getFireModes().get(this.fireModeIndex).getTranslationKey()), false);
+    }
   }
 
   @Override

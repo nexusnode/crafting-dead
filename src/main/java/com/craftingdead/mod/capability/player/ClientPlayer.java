@@ -1,7 +1,5 @@
 package com.craftingdead.mod.capability.player;
 
-import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.gun.IGunController;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
@@ -35,13 +33,6 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
 
     if (ClientDist.RELOAD.isKeyDown()) {
       this.reload(true);
-    }
-
-    if (ClientDist.TOGGLE_FIRE_MODE.isKeyDown()) {
-      this.entity
-          .getHeldItemMainhand()
-          .getCapability(ModCapabilities.GUN_CONTROLLER)
-          .ifPresent(IGunController::toggleFireMode);
     }
   }
 

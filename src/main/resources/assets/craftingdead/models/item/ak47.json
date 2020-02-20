@@ -1,21 +1,15 @@
 {
     "loader":"craftingdead:complex",
     "held": {
-        "loader":"craftingdead:gun",
-        "model": {
-            "parent":"craftingdead:item/ak47/ak47_held",
-            "textures" : {
-                "base": "craftingdead:item/ak47"
-            },
-            "overrides": [
-                {
-                    "predicate": {
-                        "aiming": 1
-                    },
-                    "model": "craftingdead:item/ak47/ak47_aiming"
-                }
-            ]
-        }
+        "parent":"craftingdead:item/ak47/ak47_held",
+        "overrides": [
+            {
+                "predicate": {
+                    "aiming": 1
+                },
+                "model": "craftingdead:item/ak47/ak47_aiming"
+            }
+        ]
     },
     "simple": {
         "parent": "item/generated",

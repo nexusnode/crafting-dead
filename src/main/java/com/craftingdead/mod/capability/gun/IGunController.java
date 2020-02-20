@@ -53,7 +53,7 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 
-  void toggleFireMode();
+  void toggleFireMode(Entity entity);
 
   @Override
   default boolean isActive(ClientPlayerEntity playerEntity) {

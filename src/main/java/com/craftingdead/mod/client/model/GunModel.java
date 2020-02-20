@@ -53,8 +53,6 @@ import net.minecraftforge.client.model.geometry.IModelGeometry;
 @SuppressWarnings("deprecation")
 public class GunModel implements IModelGeometry<GunModel> {
 
-  private ItemOverrideList overrides;
-
   private final BlockModel baseModel;
   private final Map<ResourceLocation, QuadTransformer> attachmentTransforms;
 
@@ -68,16 +66,13 @@ public class GunModel implements IModelGeometry<GunModel> {
   public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
-    if (this.overrides == null) {
-      this.overrides = new AttachmentOverrideHandler(bakery);
-    }
     IBakedModel bakedModel = this.baseModel
         .bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, true);
     final Random random = new Random();
     random.setSeed(42L);
     return new BakedGunModel(bakedModel,
-        bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE), this.overrides,
-        modelTransform);
+        bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE),
+        new AttachmentOverrideHandler(bakery, overrides), owner.getCombinedTransform());
   }
 
   @Override
@@ -146,7 +141,7 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
-      this.baseModel.handlePerspective(cameraTransformType, mat);
+      this.transform.getPartTransformation(cameraTransformType).push(mat);
       return this;
     }
 
@@ -165,15 +160,23 @@ public class GunModel implements IModelGeometry<GunModel> {
 
     private final Map<Integer, BakedGunModel> cachedModels = new HashMap<>();
     private final ModelBakery bakery;
+    private ItemOverrideList overrides;
 
-    public AttachmentOverrideHandler(ModelBakery bakery) {
+    public AttachmentOverrideHandler(ModelBakery bakery, ItemOverrideList overrides) {
       this.bakery = bakery;
+      this.overrides = overrides;
     }
 
     @Override
     public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
         @Nullable World world, @Nullable LivingEntity entity) {
       final BakedGunModel gunModel = (BakedGunModel) originalModel;
+
+      IBakedModel override =
+          this.overrides.getModelWithOverrides(originalModel, itemStack, world, entity);
+      if (override.getOverrides() != this) {
+        return override.getOverrides().getModelWithOverrides(override, itemStack, world, entity);
+      }
 
       return itemStack.getCapability(ModCapabilities.GUN_CONTROLLER).map(gunController -> {
         final Set<AttachmentItem> attachments = gunController.getAttachments();
@@ -195,6 +198,7 @@ public class GunModel implements IModelGeometry<GunModel> {
             QuadTransformer quadTransformer = GunModel.this.attachmentTransforms
                 .getOrDefault(attachment.getRegistryName(),
                     new QuadTransformer(TransformationMatrix.identity()));
+
             builder
                 .addAll(quadTransformer
                     .processMany(
@@ -210,7 +214,7 @@ public class GunModel implements IModelGeometry<GunModel> {
                                 new ResourceLocation(p.getRegistryName().getNamespace(),
                                     "paint/" + p.getRegistryName().getPath())))),
                 false, null, ItemCameraTransforms.DEFAULT, new ArrayList<>());
-            paintedModel.parent = GunModel.this.baseModel.parent;
+            paintedModel.parent = GunModel.this.baseModel;
             return paintedModel
                 .bake(this.bakery, paintedModel, ModelLoader.defaultTextureGetter(),
                     gunModel.transform, new ResourceLocation(CraftingDead.ID, "generated"), true);
@@ -245,7 +249,7 @@ public class GunModel implements IModelGeometry<GunModel> {
 
       return new GunModel(
           deserializationContext
-              .deserialize(JSONUtils.getJsonObject(modelContents, "model"), BlockModel.class),
+              .deserialize(JSONUtils.getJsonObject(modelContents, "base_model"), BlockModel.class),
           attachmentTransforms);
     }
   }

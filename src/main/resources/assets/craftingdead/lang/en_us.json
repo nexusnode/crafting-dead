@@ -1,4 +1,6 @@
 {
+  "fire_mode.auto":"Switched to automatic",
+  "fire_mode.semi":"Switched to semi-automatic",
   "action.reload": "Reloading",
   "key.reload": "Reload",
   "key.toggle_fire_mode": "Toggle Fire Mode",

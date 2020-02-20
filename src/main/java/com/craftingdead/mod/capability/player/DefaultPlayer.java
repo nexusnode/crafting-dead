@@ -3,7 +3,6 @@ package com.craftingdead.mod.capability.player;
 import java.util.Random;
 import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.gun.IGunController;
 import com.craftingdead.mod.inventory.container.ModPlayerContainer;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
@@ -161,7 +160,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
     this.entity
         .getHeldItemMainhand()
         .getCapability(ModCapabilities.GUN_CONTROLLER)
-        .ifPresent(IGunController::toggleFireMode);
+        .ifPresent(gunController -> gunController.toggleFireMode(this.entity));
   }
 
   @Override

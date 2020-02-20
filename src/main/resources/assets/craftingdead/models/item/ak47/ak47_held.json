@@ -1,7 +1,13 @@
 {
-	"loader":"forge:obj",
-	"model":"craftingdead:models/item/ak47/ak47.obj",
-	"flip-v":true,
+	"loader":"craftingdead:gun",
+	"base_model": {
+		"loader":"forge:obj",
+		"model":"craftingdead:models/item/ak47/ak47.obj",
+		"flip-v":true,
+		"textures" : {
+			"base": "craftingdead:item/ak47"
+		}   
+	},
 	"display": {
 		"thirdperson_righthand": {
 			"rotation":  [ 0, 90, 0 ],

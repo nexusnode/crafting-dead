@@ -340,7 +340,7 @@ public class ClientDist implements IModDist {
               .setCanceled(heldStack
                   .getCapability(ModCapabilities.ACTION)
                   .map(action -> action.isActive(playerEntity))
-                  .orElse(false));
+                  .orElse(false) || player.isAiming());
 
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {

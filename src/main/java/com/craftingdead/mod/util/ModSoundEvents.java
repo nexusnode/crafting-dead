@@ -24,6 +24,7 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> MAGNUM_SHOOT = register("magnum_shoot");
   public static final RegistryObject<SoundEvent> FN57_SHOOT = register("fn57_shoot");
   public static final RegistryObject<SoundEvent> DRY_FIRE = register("dry_fire");
+  public static final RegistryObject<SoundEvent> TOGGLE_FIRE_MODE = register("toggle_fire_mode");
 
   private static RegistryObject<SoundEvent> register(String name) {
     ResourceLocation registryName = new ResourceLocation(CraftingDead.ID, name);

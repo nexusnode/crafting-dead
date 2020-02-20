@@ -55,7 +55,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
       .register("m4a1_iron_sight",
           () -> new AttachmentItem(new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.0F)
+              .addMultiplier(MultiplierType.FOV, 0.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)));
 
   // ================================================================================
