@@ -71,7 +71,7 @@ minecraft {
 dependencies {
     minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
     	
-	compile group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'	
+	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
 }
 
 jar {

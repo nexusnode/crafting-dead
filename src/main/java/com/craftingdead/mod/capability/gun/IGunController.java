@@ -30,6 +30,8 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
   void startReloading(Entity entity, ItemStack itemStack);
 
   float getAccuracy(Entity entity, ItemStack itemStack);
+  
+  ItemStack getMagazineStack();
 
   int getAmmo();
 

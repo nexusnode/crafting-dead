@@ -15,14 +15,16 @@ import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.util.ModSoundEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -125,21 +127,35 @@ public class CraftingDead {
     }
   }
 
-  @SubscribeEvent
+  @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
-    if (!event.isCanceled() && event.getEntity() instanceof PlayerEntity) {
-      event
-          .getEntity()
-          .getCapability(ModCapabilities.PLAYER)
-          .ifPresent((player) -> event.setCanceled(player.onDeath(event.getSource())));
-    }
-    if (!event.isCanceled() && event.getSource().getTrueSource() instanceof PlayerEntity) {
+    event
+        .getEntity()
+        .getCapability(ModCapabilities.PLAYER)
+        .ifPresent(player -> event.setCanceled(player.onDeath(event.getSource())));
+    if (event.getSource().getTrueSource() != null) {
       event
           .getSource()
           .getTrueSource()
           .getCapability(ModCapabilities.PLAYER)
-          .ifPresent((player) -> event.setCanceled(player.onKill(event.getEntity())));
+          .ifPresent(player -> event.setCanceled(player.onKill(event.getEntity())));
     }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingAttack(LivingAttackEvent event) {
+    event
+        .getEntity()
+        .getCapability(ModCapabilities.PLAYER)
+        .ifPresent(player -> player.onAttacked(event.getSource(), event.getAmount()));
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingDamage(LivingDamageEvent event) {
+    event
+        .getEntity()
+        .getCapability(ModCapabilities.PLAYER)
+        .ifPresent(player -> player.onDamaged(event.getSource(), event.getAmount()));
   }
 
   @SubscribeEvent

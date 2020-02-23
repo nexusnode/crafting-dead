@@ -50,7 +50,7 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModPlayerContainer>
 
       this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 0, 22, 22);
 
-      if (this.container.isCraftable()
+      if ((!this.container.isCraftingInventoryEmpty() && this.container.isCraftable())
           || gunController.isAcceptedPaintOrAttachment(this.playerInventory.getItemStack())) {
         this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 22, 22, 22);
       } else if (!this.container.isCraftingInventoryEmpty()) {

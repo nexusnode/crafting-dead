@@ -6,10 +6,12 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
+import com.craftingdead.mod.item.MagazineItem;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
@@ -54,7 +56,8 @@ public class IngameGui {
 
       ItemStack heldStack = playerEntity.getHeldItemMainhand();
       heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
-        renderAmmo(this.minecraft.fontRenderer, width, height, gunController.getAmmo());
+        renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer, width, height,
+            gunController.getAmmo(), gunController.getMagazineStack());
       });
 
       playerEntity.getHeldItemMainhand().getCapability(ModCapabilities.ACTION).ifPresent(action -> {
@@ -83,11 +86,21 @@ public class IngameGui {
     });
   }
 
-  private static void renderAmmo(FontRenderer fontRenderer, int width, int height, int ammo) {
-    String text = String.valueOf(ammo);
-    fontRenderer
-        .drawStringWithShadow(text, width - 15 - fontRenderer.getStringWidth(text),
-            height - 10 - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+  private static void renderAmmo(ItemRenderer itemRenderer, FontRenderer fontRenderer, int width,
+      int height, int ammo, ItemStack magazineStack) {
+    if (magazineStack.getItem() instanceof MagazineItem) {
+      MagazineItem magazine = (MagazineItem) magazineStack.getItem();
+      String text = ammo + "/" + magazine.getSize();
+      int x = width - 15 - fontRenderer.getStringWidth(text);
+      int y = height - 10 - fontRenderer.FONT_HEIGHT;
+      fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
+      RenderSystem.pushMatrix();
+      {
+        itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
+        RenderSystem.scalef(0.75F, 0.75F, 0.75F);
+      }
+      RenderSystem.popMatrix();
+    }
   }
 
   private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,

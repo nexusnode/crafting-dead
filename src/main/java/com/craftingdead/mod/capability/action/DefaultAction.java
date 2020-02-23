@@ -7,16 +7,17 @@ public class DefaultAction implements IAction {
 
   @Override
   public boolean isActive(ClientPlayerEntity playerEntity) {
-    return false;
+    return playerEntity.isHandActive();
   }
 
   @Override
   public ITextComponent getText(ClientPlayerEntity playerEntity) {
-    return null;
+    return playerEntity.getActiveItemStack().getDisplayName();
   }
 
   @Override
   public float getProgress(ClientPlayerEntity playerEntity) {
-    return 0;
+    return (float) playerEntity.getItemInUseMaxCount()
+        / playerEntity.getActiveItemStack().getUseDuration();
   }
 }

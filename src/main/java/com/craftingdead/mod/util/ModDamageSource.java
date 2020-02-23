@@ -12,7 +12,9 @@ public class ModDamageSource {
   public static final DamageSource INFECTION =
       new DamageSource("infection").setDamageBypassesArmor();
 
-  public static DamageSource causeGunDamage(Entity source) {
-    return new EntityDamageSource("bullet", source).setDamageBypassesArmor().setProjectile();
+  public static DamageSource causeGunDamage(Entity source, boolean headshot) {
+    return new EntityDamageSource(headshot ? "bullet.headshot" : "bullet", source)
+        .setDamageBypassesArmor()
+        .setProjectile();
   }
 }

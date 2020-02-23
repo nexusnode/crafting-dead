@@ -13,9 +13,9 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
-import com.craftingdead.mod.item.ClipItem;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.MagazineItem;
 import com.craftingdead.mod.item.PaintItem;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
@@ -35,6 +35,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -62,6 +63,8 @@ public class ItemGunController implements IGunController {
 
   private int fireModeIndex = 0;
 
+  private ItemStack magazineStack = ItemStack.EMPTY;
+
   private int ammo;
 
   private Set<AttachmentItem> attachments = new HashSet<>();
@@ -79,26 +82,27 @@ public class ItemGunController implements IGunController {
     }
 
     if (this.isReloading() && --this.reloadDurationTicks == 0) {
-      ItemStack clipStack = null;
+      ItemStack magazineStack = null;
       if (entity instanceof PlayerEntity) {
         PlayerEntity playerEntity = (PlayerEntity) entity;
         if (!playerEntity.isCreative()) {
-          clipStack = playerEntity.findAmmo(itemStack);
+          magazineStack = playerEntity.findAmmo(itemStack);
         }
       }
 
-      if (clipStack == null) {
-        clipStack = new ItemStack(this.gunItem.getAcceptedClips().iterator().next());
+      if (magazineStack == null) {
+        magazineStack = new ItemStack(this.gunItem.getAcceptedMagazines().iterator().next());
       }
 
-      this.ammo = ((ClipItem) clipStack.getItem()).getSize();
+      this.magazineStack = magazineStack;
+      this.ammo = ((MagazineItem) magazineStack.getItem()).getSize();
 
       if (entity instanceof PlayerEntity) {
         PlayerEntity playerEntity = (PlayerEntity) entity;
         if (!playerEntity.isCreative()) {
-          clipStack.shrink(1);
-          if (clipStack.isEmpty()) {
-            playerEntity.inventory.deleteStack(clipStack);
+          magazineStack.shrink(1);
+          if (magazineStack.isEmpty()) {
+            playerEntity.inventory.deleteStack(magazineStack);
           }
         }
       }
@@ -215,11 +219,13 @@ public class ItemGunController implements IGunController {
   private void hitEntity(Entity entity, EntityRayTraceResult rayTrace) {
     Entity entityHit = rayTrace.getEntity();
     float damage = this.gunItem.getDamage();
-    if ((entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
-        && rayTrace.getHitVec().y >= (entityHit.getY() + entityHit.getEyeHeight())) {
+    boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
+        && rayTrace.getHitVec().y >= (entityHit.getY() + entityHit.getEyeHeight());
+    if (headshot) {
+      entity.playSound(SoundEvents.ENTITY_ITEM_BREAK, 2F, 1.5F);
       damage *= HEADSHOT_MULTIPLIER;
     }
-    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity), damage);
+    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
   }
 
   private void hitBlock(Entity entity, BlockRayTraceResult rayTrace) {
@@ -254,6 +260,11 @@ public class ItemGunController implements IGunController {
 
     return accuracy * this.gunItem.getAccuracy()
         * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
+  }
+
+  @Override
+  public ItemStack getMagazineStack() {
+    return this.magazineStack;
   }
 
   @Override
@@ -297,10 +308,10 @@ public class ItemGunController implements IGunController {
   public void toggleFireMode(Entity entity) {
     this.fireModeIndex = ~this.fireModeIndex & 1;
     entity.playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
-    if (entity.getEntityWorld().isRemote()) {
-      Minecraft.getInstance().ingameGUI
-          .setOverlayMessage(new TranslationTextComponent(
-              this.gunItem.getFireModes().get(this.fireModeIndex).getTranslationKey()), false);
+    if (entity instanceof PlayerEntity) {
+      ((PlayerEntity) entity)
+          .sendStatusMessage(new TranslationTextComponent(
+              this.gunItem.getFireModes().get(this.fireModeIndex).getTranslationKey()), true);
     }
   }
 

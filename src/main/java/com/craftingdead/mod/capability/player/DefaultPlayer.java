@@ -34,6 +34,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   /**
+   * The % chance of getting infected by a zombie.
+   */
+  private static final float INFECTION_CHANCE = 0.1F;
+
+  /**
    * Random.
    */
   private static final Random random = new Random();
@@ -124,6 +129,31 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
       this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
       this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
+  }
+
+  @Override
+  public float onDamaged(DamageSource source, float amount) {
+    float bleedChance = 0.1F * amount;
+    if (random.nextFloat() < bleedChance
+        && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
+      this.entity
+          .sendStatusMessage(new TranslationTextComponent("message.bleeding")
+              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+    }
+    return amount;
+  }
+
+  @Override
+  public boolean onAttacked(DamageSource source, float amount) {
+    if (source.getTrueSource() instanceof ZombieEntity && random.nextFloat() < INFECTION_CHANCE
+        && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
+      this.entity
+          .sendStatusMessage(new TranslationTextComponent("message.infected")
+              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+    }
+    return false;
   }
 
   @Override

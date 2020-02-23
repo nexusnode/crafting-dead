@@ -5,14 +5,13 @@ import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
 
-  public static final ItemGroup CRAFTING_DEAD_CONSUMABLES =
-      (new ItemGroup("craftingdead_consumables") {
+  public static final ItemGroup CRAFTING_DEAD_FOOD = (new ItemGroup("craftingdead_foodstuffs") {
 
-        @Override
-        public ItemStack createIcon() {
-          return new ItemStack(ModItems.POWER_BAR::get);
-        }
-      });
+    @Override
+    public ItemStack createIcon() {
+      return new ItemStack(ModItems.POWER_BAR::get);
+    }
+  });
 
   public static final ItemGroup CRAFTING_DEAD_MISC = (new ItemGroup("craftingdead_misc") {
 
@@ -30,11 +29,11 @@ public class ModItemGroups {
     }
   });
 
-  public static final ItemGroup CRAFTING_DEAD_WEAPON = (new ItemGroup("craftingdead_weapon") {
+  public static final ItemGroup CRAFTING_DEAD_COMBAT = (new ItemGroup("craftingdead_combat") {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.CROWBAR::get);
+      return new ItemStack(ModItems.AK47::get);
     }
   });
 }

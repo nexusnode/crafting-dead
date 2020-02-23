@@ -13,6 +13,24 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
   void tick();
 
   /**
+   * When the player is damaged; with potions and armour taken into account.
+   * 
+   * @param source - the source of damage
+   * @param amount - the amount of damage taken
+   * @return the new damage amount
+   */
+  float onDamaged(DamageSource source, float amount);
+
+  /**
+   * When the player is attacked.
+   * 
+   * @param source - the source of damage
+   * @param amount - the amount of damage taken
+   * @return if the event should be cancelled
+   */
+  boolean onAttacked(DamageSource source, float amount);
+
+  /**
    * When the player kills another entity.
    *
    * @param target - the {@link Entity} killed
@@ -23,7 +41,7 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
   /**
    * When the player's health reaches 0.
    *
-   * @param cause - the source of the damage
+   * @param cause - the cause of death
    * @return if the event should be cancelled
    */
   boolean onDeath(DamageSource cause);
@@ -34,7 +52,7 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
    * @param triggerPressed - if the button is pressed
    */
   void setTriggerPressed(boolean triggerPressed, boolean sendUpdate);
-  
+
   boolean isAiming();
 
   void toggleAiming(boolean sendUpdate);
@@ -42,7 +60,7 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
   void toggleFireMode(boolean sendUpdate);
 
   void reload(boolean sendUpdate);
-  
+
   void openPlayerContainer();
 
   int getDaysSurvived();

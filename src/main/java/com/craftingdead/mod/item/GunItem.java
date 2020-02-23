@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.gun.IGunController;
@@ -67,7 +68,7 @@ public class GunItem extends ShootableItem {
 
   private final Map<AnimationType, Supplier<IAnimation>> animations;
 
-  private final Set<Supplier<ClipItem>> acceptedClips;
+  private final Set<Supplier<MagazineItem>> acceptedMagazines;
 
   private final Set<Supplier<AttachmentItem>> acceptedAttachments;
 
@@ -83,7 +84,7 @@ public class GunItem extends ShootableItem {
     this.shootSound = properties.shootSound;
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
-    this.acceptedClips = properties.acceptedClips;
+    this.acceptedMagazines = properties.acceptedMagazines;
     this.acceptedAttachments = properties.acceptedAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this
@@ -127,8 +128,8 @@ public class GunItem extends ShootableItem {
     return this.animations;
   }
 
-  public Set<ClipItem> getAcceptedClips() {
-    return this.acceptedClips.stream().map(Supplier::get).collect(Collectors.toSet());
+  public Set<MagazineItem> getAcceptedMagazines() {
+    return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Set<AttachmentItem> getAcceptedAttachments() {
@@ -154,7 +155,7 @@ public class GunItem extends ShootableItem {
 
   @Override
   public Predicate<ItemStack> getInventoryAmmoPredicate() {
-    return itemStack -> this.acceptedClips
+    return itemStack -> this.acceptedMagazines
         .stream()
         .map(Supplier::get)
         .anyMatch(itemStack.getItem()::equals);
@@ -163,8 +164,7 @@ public class GunItem extends ShootableItem {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new ICapabilitySerializable<CompoundNBT>() {
-      private final IAnimationController animationController =
-          ModCapabilities.ANIMATION_CONTROLLER.getDefaultInstance();
+      private final IAnimationController animationController = new DefaultAnimationController();
       private final IGunController gunController = new ItemGunController(GunItem.this);
 
       @Override
@@ -233,7 +233,7 @@ public class GunItem extends ShootableItem {
     private final Map<AnimationType, Supplier<IAnimation>> animations =
         new EnumMap<>(AnimationType.class);
 
-    private final Set<Supplier<ClipItem>> acceptedClips = new HashSet<>();
+    private final Set<Supplier<MagazineItem>> acceptedMagazines = new HashSet<>();
 
     private final Set<Supplier<AttachmentItem>> acceptedAttachments = new HashSet<>();
 
@@ -279,8 +279,8 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties addAcceptedClip(Supplier<ClipItem> acceptedClip) {
-      this.acceptedClips.add(acceptedClip);
+    public Properties addAcceptedMagazine(Supplier<MagazineItem> acceptedMagazine) {
+      this.acceptedMagazines.add(acceptedMagazine);
       return this;
     }
 

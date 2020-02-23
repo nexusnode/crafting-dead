@@ -2,7 +2,7 @@ package com.craftingdead.mod.item;
 
 public enum FireMode {
 
-  AUTO("fire_mode.auto"), SEMI("fire_mode.semi");
+  AUTO("message.fire_mode.auto"), SEMI("message.fire_mode.semi");
 
   private final String translationKey;
 

@@ -53,6 +53,11 @@ public class DefaultGunController implements IGunController {
   }
 
   @Override
+  public ItemStack getMagazineStack() {
+    return ItemStack.EMPTY;
+  }
+  
+  @Override
   public int getAmmo() {
     return 0;
   }
