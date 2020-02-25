@@ -736,7 +736,6 @@ public class ModItems {
               .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
               .setBlockPredicate(
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS
@@ -745,16 +744,11 @@ public class ModItems {
               .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
               .setBlockPredicate(
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS
       .register("clean_rag",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setShowProgress(true)
-              .containerItem(BLOODY_RAG.get())
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS
       .register("splint",

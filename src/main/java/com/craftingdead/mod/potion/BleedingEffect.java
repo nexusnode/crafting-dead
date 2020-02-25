@@ -30,7 +30,6 @@ public class BleedingEffect extends Effect {
   @Override
   public List<ItemStack> getCurativeItems() {
     List<ItemStack> items = new ArrayList<ItemStack>();
-    items.add(new ItemStack(ModItems.CLEAN_RAG::get));
     items.add(new ItemStack(ModItems.BANDAGE::get));
     items.add(new ItemStack(ModItems.FIRST_AID_KIT::get));
     return items;
