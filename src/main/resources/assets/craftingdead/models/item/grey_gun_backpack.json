@@ -1,0 +1,15 @@
+{
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/gun_backpack",
+		"textures": {
+			"base":"craftingdead:models/backpacks/grey_gun_backpack"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+		"layer0": "craftingdead:item/grey_gun_backpack"
+		}
+    }
+}

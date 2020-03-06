@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/backpacks/fuel_tank.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 0, 0, 180 ],
+		"translation":  [ -1.6, -0.005, 0.55 ],
+		"scale":  [ 1.1, 1.1, 1.2 ]
+	}
+}

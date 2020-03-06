@@ -1,0 +1,5 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/hats/gas_mask.obj",
+	"flip-v":true
+}

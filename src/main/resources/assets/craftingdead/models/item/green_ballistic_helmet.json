@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/green_ballistic_helmet"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/hats/ballistic_helmet",
+		"textures": {
+			"base":"craftingdead:models/hats/green_ballistic_helmet"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/green_ballistic_helmet"
+		}
+    }
 }

@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/backpacks/small_backpack.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 180, 0, 0 ],
+		"translation":  [ 0.475, 0.2, -1.2 ],
+		"scale":  [ 1, 1, 1 ]
+	}
+}

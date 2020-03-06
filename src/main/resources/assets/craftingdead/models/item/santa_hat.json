@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/santa_hat"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
+		"textures": {
+			"base":"craftingdead:models/hats/santa_hat"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/santa_hat"
+		}
+    }
 }

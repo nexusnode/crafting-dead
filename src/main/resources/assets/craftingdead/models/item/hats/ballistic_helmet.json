@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/hats/ballistic_helmet.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 0, 0, 0 ],
+		"translation":  [ 0.07, -0.16, 0.07 ],
+		"scale":  [ 0.57, 0.57, 0.57 ]
+	}
+}

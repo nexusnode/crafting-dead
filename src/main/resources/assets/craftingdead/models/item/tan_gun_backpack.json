@@ -1,0 +1,15 @@
+{
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/gun_backpack",
+		"textures": {
+			"base":"craftingdead:models/backpacks/tan_gun_backpack"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+		"layer0": "craftingdead:item/tan_gun_backpack"
+		}
+    }
+}

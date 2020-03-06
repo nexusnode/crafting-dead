@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/hats/textured_helmet_multiple_of_9.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 0, 0, 0 ],
+		"translation":  [ 0.32, -0.2, -0.265 ],
+		"scale":  [ 0.525, 0.525, 0.525 ]
+	}
+}

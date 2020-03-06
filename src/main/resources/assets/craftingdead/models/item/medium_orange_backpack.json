@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/medium_orange_backpack"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/medium_backpack",
+		"textures": {
+			"base":"craftingdead:models/backpacks/medium_orange_backpack"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/medium_orange_backpack"
+		}
+    }
 }

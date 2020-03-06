@@ -1,0 +1,5 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/hats/nv_goggles_hat.obj",
+	"flip-v":true
+}

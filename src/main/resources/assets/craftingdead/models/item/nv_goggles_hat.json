@@ -1,6 +1,20 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/nv_goggles_hat"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/hats/nv_goggles_hat",
+		"textures": {
+			"base":"craftingdead:models/hats/nv_goggles_hat"
+		},
+		"transform": {
+			"rotation":  [ 0, 180, 0 ],
+			"translation":  [ -1.55, -0.485, -1.55 ],
+			"scale":  [ 1.05, 1.05, 1.05]
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/nv_goggles_hat"
+		}
+    }
 }

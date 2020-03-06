@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/backpacks/quiver.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 0, 0, 145 ],
+		"translation":  [ -1.3, 0.6, 0.5 ],
+		"scale":  [ 1.0, 1.1, 1.0 ]
+	}
+}

@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/small_red_backpack"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/small_backpack",
+		"textures": {
+			"base":"craftingdead:models/backpacks/small_red_backpack"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/small_red_backpack"
+		}
+    }
 }

@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/orange_hard_hat"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/hats/hard_hat",
+		"textures": {
+			"base":"craftingdead:models/hats/orange_hard_hat"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/orange_hard_hat"
+		}
+    }
 }

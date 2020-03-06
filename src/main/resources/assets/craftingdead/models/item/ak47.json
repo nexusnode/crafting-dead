@@ -1,20 +1,31 @@
 {
-    "loader":"craftingdead:complex",
-    "held": {
-        "parent":"craftingdead:item/ak47/ak47_held",
-        "overrides": [
-            {
-                "predicate": {
-                    "aiming": 1
-                },
-                "model": "craftingdead:item/ak47/ak47_aiming"
-            }
-        ]
-    },
-    "simple": {
-        "parent": "item/generated",
-        "textures": {
-            "layer0": "craftingdead:item/ak47_simple"
-        }
-    }
+    "loader":"craftingdead:equipable",
+	"equipped": {
+		"parent":"craftingdead:item/guns/ak47/ak47",
+		"transform": {
+			"rotation":  [ 0, 90, -90 ],
+			"translation":  [ -0.6, -0.65, -0.475 ],
+			"scale":  [ 0.15, 0.15, 0.15 ]
+		}
+	},
+	"default": {
+		"loader":"craftingdead:perspective",
+		"held": {
+			"parent":"craftingdead:item/guns/ak47/ak47",
+			"overrides": [
+				{
+					"predicate": {
+						"aiming": 1
+					},
+					"model": "craftingdead:item/guns/ak47/ak47_aiming"
+				}
+			]
+		},
+		"simple": {
+			"parent": "item/generated",
+			"textures": {
+				"layer0": "craftingdead:item/ak47_simple"
+			}
+		}
+	}
 }

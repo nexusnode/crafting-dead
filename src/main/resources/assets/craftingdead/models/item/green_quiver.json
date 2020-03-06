@@ -1,0 +1,15 @@
+{
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/quiver",
+		"textures": {
+			"base":"craftingdead:models/backpacks/green_quiver"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/green_quiver"
+		}
+    }
+}

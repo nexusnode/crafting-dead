@@ -8,6 +8,7 @@ import com.craftingdead.mod.capability.gun.DefaultGunController;
 import com.craftingdead.mod.capability.gun.IGunController;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -17,7 +18,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 public class ModCapabilities {
 
   @CapabilityInject(IPlayer.class)
-  public static final Capability<IPlayer<?>> PLAYER = null;
+  public static final Capability<IPlayer<? extends PlayerEntity>> PLAYER = null;
 
   @CapabilityInject(IAnimationController.class)
   public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;

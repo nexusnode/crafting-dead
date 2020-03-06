@@ -1,0 +1,15 @@
+{
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/vests/tactical_vest",
+		"textures": {
+			"base":"craftingdead:models/vests/grey_tactical_vest"
+		}
+    },
+    "default": {
+        "parent": "item/generated",
+        "textures": {
+            "layer0": "craftingdead:item/grey_tactical_vest"
+        }
+    }
+}

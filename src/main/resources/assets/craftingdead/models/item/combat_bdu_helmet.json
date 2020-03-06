@@ -1,6 +1,15 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "craftingdead:item/combat_bdu_helmet"
-  }
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
+		"textures": {
+			"base":"craftingdead:models/hats/combat_bdu_helmet"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/combat_bdu_helmet"
+		}
+    }
 }

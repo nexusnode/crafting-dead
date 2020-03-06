@@ -889,7 +889,7 @@ public class ModItems {
           new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   // ================================================================================
-  // Backpack
+  // Backpacks
   // ================================================================================
 
   public static final RegistryObject<Item> SMALL_RED_BACKPACK = ITEMS
@@ -988,6 +988,61 @@ public class ModItems {
       .register("ammo_backpack", () -> new BackpackItem(Backpack.LARGE,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
+  // TODO Make it hold only fuel
+  public static final RegistryObject<Item> FUEL_TANK = ITEMS
+      .register("fuel_tank", () -> new BackpackItem(Backpack.SMALL,
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  /* TODO Make quivers work exactly like in 1.6.4 */
+
+  public static final RegistryObject<Item> TAN_QUIVER = ITEMS
+      .register("tan_quiver", () -> new BackpackItem(Backpack.SMALL,
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREEN_QUIVER = ITEMS
+      .register("green_quiver", () -> new BackpackItem(Backpack.SMALL,
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BLACK_QUIVER = ITEMS
+      .register("black_quiver", () -> new BackpackItem(Backpack.SMALL,
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  // ================================================================================
+  // Vests
+  // ================================================================================
+
+  // TODO Allow vests hold items
+  // TODO Allow ammo vests hold ammo
+  // TODO Set vest inventory size
+
+  public static final RegistryObject<Item> AMMO_TACTICAL_VEST = ITEMS
+      .register("ammo_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> BLACK_TACTICAL_VEST = ITEMS
+      .register("black_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GHILLIE_TACTICAL_VEST = ITEMS
+      .register("ghillie_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREEN_TACTICAL_VEST = ITEMS
+      .register("green_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> GREY_TACTICAL_VEST = ITEMS
+      .register("grey_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> RIOT_VEST = ITEMS
+      .register("riot_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  public static final RegistryObject<Item> TAN_TACTICAL_VEST = ITEMS
+      .register("tan_tactical_vest", () -> new VestItem(
+          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
   // ================================================================================
   // Hats, Helmets and Masks
   // ================================================================================
@@ -1012,8 +1067,8 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-  public static final RegistryObject<Item> SHERIFF_HAT = ITEMS
-      .register("sheriff_hat",
+  public static final RegistryObject<Item> FIREMAN_CHIEF_HAT = ITEMS
+      .register("chief_fireman_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
@@ -1225,8 +1280,9 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-  public static final RegistryObject<Item> SCUBA_HAT = ITEMS
-      .register("scuba_hat",
+  //TODO Add respiration ability to the CLOTHING+MASK item combo
+  public static final RegistryObject<Item> SCUBA_MASK = ITEMS
+      .register("scuba_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));

@@ -1,0 +1,5 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/hats/knight_hat.obj",
+	"flip-v":true
+}

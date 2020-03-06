@@ -2,7 +2,9 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -20,14 +22,22 @@ import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
 import com.craftingdead.mod.client.gui.transition.TransitionManager;
 import com.craftingdead.mod.client.gui.transition.Transitions;
-import com.craftingdead.mod.client.model.ComplexModel;
+import com.craftingdead.mod.client.model.PerspectiveAwareModel;
+import com.craftingdead.mod.client.model.EquipableModel;
 import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
+import com.craftingdead.mod.client.renderer.entity.player.layer.ExtraSkinsLayer;
+import com.craftingdead.mod.client.renderer.entity.player.FirstPersonRenderer;
+import com.craftingdead.mod.client.renderer.entity.player.IHasExtraSkin;
+import com.craftingdead.mod.client.renderer.entity.player.ExtraSkinProviders;
+import com.craftingdead.mod.client.renderer.entity.player.layer.EquipableModelLayer;
+import com.craftingdead.mod.client.renderer.entity.player.layer.EquippedMeleeLayer;
 import com.craftingdead.mod.client.renderer.texture.PaintSpriteUploader;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.GunItem;
@@ -36,7 +46,10 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -110,6 +123,8 @@ public class ClientDist implements IModDist {
 
   private PaintSpriteUploader paintSpriteUploader;
 
+  private ExtraSkinProviders extraSkinTextureProviders = new ExtraSkinProviders();
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
@@ -163,8 +178,11 @@ public class ClientDist implements IModDist {
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
     ModelLoaderRegistry
-        .registerLoader(new ResourceLocation(CraftingDead.ID, "complex"),
-            ComplexModel.Loader.INSTANCE);
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "perspective"),
+            PerspectiveAwareModel.Loader.INSTANCE);
+    ModelLoaderRegistry
+        .registerLoader(new ResourceLocation(CraftingDead.ID, "equipable"),
+            EquipableModel.Loader.INSTANCE);
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
@@ -184,6 +202,64 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
 
+    StartupMessageManager.addModMessage("Setup CustomFirstPersonRenderer before setting up layers");
+
+    try {
+      FirstPersonRenderer.inject(this.extraSkinTextureProviders);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to initialize CustomFirstPersonRenderer", e);
+    }
+
+    StartupMessageManager.addModMessage("Setup CD layers");
+
+    this.extraSkinTextureProviders.registerExtraSkinProvider((player) -> {
+      ItemStack clothingStack = player.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+
+      // Check if the ItemStack has a skin texture
+      if (clothingStack.getItem() instanceof IHasExtraSkin) {
+        return Optional.of((IHasExtraSkin) clothingStack.getItem());
+      }
+
+      // Item does not has a skin texture
+      return Optional.empty();
+    });
+
+    this.registerPlayerLayer(renderer -> new ExtraSkinsLayer(renderer, this.extraSkinTextureProviders));
+    this.registerPlayerLayer(EquippedMeleeLayer::new);
+    this.registerPlayerLayer(renderer -> new EquipableModelLayer.Builder()
+        .withRenderer(renderer)
+        .withItemStackGetter(
+            player -> player.getInventory().getStackInSlot(InventorySlotType.VEST.getIndex())
+        )
+        .withCrouchingOrientation(true)
+        .build());
+    this.registerPlayerLayer(renderer -> new EquipableModelLayer.Builder()
+        .withRenderer(renderer)
+        .withItemStackGetter(
+            player -> player.getInventory().getStackInSlot(InventorySlotType.HAT.getIndex())
+        )
+        .withHeadOrientation(true)
+
+        // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
+        // TODO Find a reason to not remove this line. Also, if you remove it, you will
+        // need to change the json file of every helmet since the scale affects positions.
+        .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
+
+        .build());
+    this.registerPlayerLayer(renderer -> new EquipableModelLayer.Builder()
+        .withRenderer(renderer)
+        .withItemStackGetter(
+            player -> player.getInventory().getStackInSlot(InventorySlotType.GUN.getIndex())
+        )
+        .withCrouchingOrientation(true)
+        .build());
+    this.registerPlayerLayer(renderer -> new EquipableModelLayer.Builder()
+        .withRenderer(renderer)
+        .withItemStackGetter(
+            player -> player.getInventory().getStackInSlot(InventorySlotType.BACKPACK.getIndex())
+        )
+        .withCrouchingOrientation(true)
+        .build());
 
     // GLFW code needs to run on main thread
     minecraft.enqueue(() -> {
@@ -193,21 +269,36 @@ public class ClientDist implements IModDist {
             .glfwSetWindowTitle(minecraft.getWindow().getHandle(),
                 String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
         try {
-          InputStream inputstream = minecraft
+          InputStream smallIcon = minecraft
               .getResourceManager()
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_16x16.png"))
               .getInputStream();
-          InputStream inputstream1 = minecraft
+          InputStream mediumIcon = minecraft
               .getResourceManager()
               .getResource(
                   new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_32x32.png"))
               .getInputStream();
-          minecraft.getWindow().setWindowIcon(inputstream, inputstream1);
+          minecraft.getWindow().setWindowIcon(smallIcon, mediumIcon);
         } catch (IOException e) {
           logger.error("Couldn't set icon", e);
         }
       }
+    });
+  }
+
+  /**
+   * Registers a layer into {@link PlayerRenderer}. Can be used normally during
+   * {@link FMLClientSetupEvent}.
+   *
+   * @param function {@link Function} with a {@link PlayerRenderer} as input and a
+   *        {@link LayerRenderer} as output.
+   */
+  public void registerPlayerLayer(
+      Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
+    // A little dirty way, blame Mojang
+    minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
+      renderer.addLayer(function.apply(renderer));
     });
   }
 
@@ -306,9 +397,14 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
-    ItemStack itemStack = event.getEntity().getHeldItemMainhand();
+
+    /*
+     *  Renders the ArmPose as BOW_AND_ARROW if the living entity is holding a gun.
+     */
+
+    ItemStack heldStack = event.getEntity().getHeldItemMainhand();
     if (event.getRenderer().getEntityModel() instanceof BipedModel
-        && itemStack.getItem() instanceof GunItem) {
+        && heldStack.getItem() instanceof GunItem) {
       BipedModel<?> model = event.getRenderer().getEntityModel();
       switch (event.getEntity().getPrimaryHand()) {
         case LEFT:
@@ -321,6 +417,7 @@ public class ClientDist implements IModDist {
           break;
       }
     }
+
   }
 
   @SubscribeEvent

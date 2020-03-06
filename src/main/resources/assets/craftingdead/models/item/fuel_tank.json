@@ -1,0 +1,15 @@
+{
+    "loader":"craftingdead:equipable",
+    "equipped": {
+		"parent":"craftingdead:item/backpacks/fuel_tank",
+		"textures": {
+			"base":"craftingdead:models/backpacks/fuel_tank"
+		}
+    },
+    "default": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/fuel_tank"
+		}
+    }
+}

@@ -1,0 +1,10 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/backpacks/gun_backpack.obj",
+	"flip-v":true,
+	"transform": {
+		"rotation":  [ 180, 0, 180 ],
+		"translation":  [ -1.5, -0.3, -1.2 ],
+		"scale":  [ 1, 1, 1 ]
+	}
+}

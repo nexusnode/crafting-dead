@@ -1,0 +1,9 @@
+# MTL Export was created with the Minecraft-SMP Modelling Toolbox 2.3.0.0
+#  Copyright (C) 2020 Minecraft-SMP.de
+# 
+
+newmtl ModelMaterial
+Ka 1 1 1
+Kd 1 1 1
+map_Ka #base
+map_Kd #base
