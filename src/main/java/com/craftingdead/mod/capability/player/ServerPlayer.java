@@ -5,12 +5,14 @@ import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
-import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
+import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
+import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -23,12 +25,15 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   /**
    * Used to determine whether a data sync packet should be sent to the client.
    */
-  private boolean dirty = true;
+  private boolean statisticsDirty = true;
 
   private int waterTimer;
 
+  private boolean inventoryDirty = true;
+
   public ServerPlayer(ServerPlayerEntity entity) {
     super(entity);
+    this.inventory.addListener(inventory -> this.inventoryDirty = true);
   }
 
   /**
@@ -46,13 +51,26 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
       this.setDaysSurvived(aliveDays);
     }
 
-    if (this.dirty) {
+    if (this.statisticsDirty) {
       NetworkChannel.MAIN
           .getSimpleChannel()
           .send(PacketDistributor.PLAYER.with(this::getEntity),
-              new UpdateStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
+              new SyncStatisticsMessage(this.daysSurvived, this.zombiesKilled, this.playersKilled,
                   this.water, this.maxWater, this.stamina, this.maxStamina));
-      this.dirty = false;
+      this.statisticsDirty = false;
+    }
+
+    if (this.inventoryDirty) {
+      NonNullList<ItemStack> inventoryContents =
+          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
+      for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+        inventoryContents.set(i, this.inventory.getStackInSlot(i));
+      }
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+              new SyncInventoryMessage(this.entity.getEntityId(), inventoryContents));
+      this.inventoryDirty = false;
     }
   }
 
@@ -147,43 +165,43 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   @Override
   public void setDaysSurvived(int daysSurvived) {
     super.setDaysSurvived(daysSurvived);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setZombiesKilled(int zombiesKilled) {
     super.setZombiesKilled(zombiesKilled);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setPlayersKilled(int playersKilled) {
     super.setPlayersKilled(playersKilled);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setWater(int water) {
     super.setWater(water);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setMaxWater(int maxWater) {
     super.setMaxWater(maxWater);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setStamina(int stamina) {
     super.setStamina(stamina);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   @Override
   public void setMaxStamina(int maxStamina) {
     super.setMaxStamina(maxStamina);
-    this.dirty = true;
+    this.statisticsDirty = true;
   }
 
   public void copyFrom(ServerPlayer that, boolean wasDeath) {

@@ -3,6 +3,7 @@ package com.craftingdead.mod.capability.player;
 import java.util.Random;
 import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModPlayerContainer;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
@@ -90,7 +91,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   private boolean aiming;
 
-  private final IInventory inventory = new Inventory(11);
+  protected final Inventory inventory = new Inventory(InventorySlotType.values().length);
 
   public DefaultPlayer() {
     this(null);

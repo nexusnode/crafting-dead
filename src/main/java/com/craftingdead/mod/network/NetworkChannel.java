@@ -3,7 +3,8 @@ package com.craftingdead.mod.network;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
-import com.craftingdead.mod.network.message.main.UpdateStatisticsMessage;
+import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
+import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -16,10 +17,10 @@ public enum NetworkChannel {
       int id = 0;
 
       simpleChannel
-          .messageBuilder(UpdateStatisticsMessage.class, ++id)
-          .encoder(UpdateStatisticsMessage::encode)
-          .decoder(UpdateStatisticsMessage::decode)
-          .consumer(UpdateStatisticsMessage::handle)
+          .messageBuilder(SyncStatisticsMessage.class, ++id)
+          .encoder(SyncStatisticsMessage::encode)
+          .decoder(SyncStatisticsMessage::decode)
+          .consumer(SyncStatisticsMessage::handle)
           .add();
 
       simpleChannel
@@ -34,6 +35,13 @@ public enum NetworkChannel {
           .encoder(SyncGunMessage::encode)
           .decoder(SyncGunMessage::decode)
           .consumer(SyncGunMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(SyncInventoryMessage.class, ++id)
+          .encoder(SyncInventoryMessage::encode)
+          .decoder(SyncInventoryMessage::decode)
+          .consumer(SyncInventoryMessage::handle)
           .add();
     }
   };
