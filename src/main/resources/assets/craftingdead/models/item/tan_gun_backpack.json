@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/backpacks/gun_backpack",
-		"textures": {
-			"base":"craftingdead:models/backpacks/tan_gun_backpack"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
-		"layer0": "craftingdead:item/tan_gun_backpack"
+			"layer0": "craftingdead:item/tan_gun_backpack"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/backpacks/gun_backpack",
+				"textures": {
+					"base":"craftingdead:models/backpacks/tan_gun_backpack"
+				}
+			}
+		}
+	]
 }

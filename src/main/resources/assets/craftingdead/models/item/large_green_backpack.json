@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/backpacks/large_backpack",
-		"textures": {
-			"base":"craftingdead:models/backpacks/large_green_backpack"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/large_green_backpack"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/backpacks/large_backpack",
+				"textures": {
+					"base":"craftingdead:models/backpacks/large_green_backpack"
+				}
+			}
+		}
+	]
 }

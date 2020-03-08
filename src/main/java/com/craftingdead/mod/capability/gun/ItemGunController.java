@@ -111,7 +111,7 @@ public class ItemGunController implements IGunController {
 
   @Override
   public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed) {
-    this.triggerPressed = triggerPressed && !this.isReloading();
+    this.triggerPressed = triggerPressed;
     this.tryShoot(entity, itemStack);
   }
 
@@ -153,11 +153,27 @@ public class ItemGunController implements IGunController {
   }
 
   private void tryShoot(Entity entity, ItemStack itemStack) {
+    if (!this.triggerPressed) {
+      return;
+    }
+
+    if (this.isReloading()) {
+      this.triggerPressed = false;
+      return;
+    }
+
+    if (this.ammo <= 0) {
+      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      entity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> player.reload(false));
+      this.triggerPressed = false;
+      return;
+    }
+
     long fireRateNanoseconds =
         TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRate(), TimeUnit.MILLISECONDS);
     long time = System.nanoTime();
     long timeDelta = time - this.lastShotNanos;
-    if (timeDelta > fireRateNanoseconds && this.triggerPressed) {
+    if (timeDelta > fireRateNanoseconds) {
       this.lastShotNanos = time;
       this.shoot(entity, itemStack);
     }
@@ -165,10 +181,7 @@ public class ItemGunController implements IGunController {
 
   private void shoot(Entity entity, ItemStack itemStack) {
     if (this.ammo <= 0) {
-      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      entity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> {
-        player.reload(false);
-      });
+
       return;
     }
 
@@ -318,6 +331,7 @@ public class ItemGunController implements IGunController {
   @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
+    nbt.put("magazineStack", this.magazineStack.write(new CompoundNBT()));
     nbt.putInt("ammo", this.ammo);
     ListNBT attachmentsTag = this.attachments
         .stream()
@@ -332,6 +346,7 @@ public class ItemGunController implements IGunController {
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
+    this.magazineStack = ItemStack.read(nbt.getCompound("magazineStack"));
     this.ammo = nbt.getInt("ammo");
     this.attachments = nbt
         .getList("attachments", 8)

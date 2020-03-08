@@ -1,17 +1,22 @@
 package com.craftingdead.mod.client.model;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.client.util.RenderUtil;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Pair;
@@ -22,6 +27,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
@@ -46,19 +52,10 @@ import net.minecraftforge.common.util.LazyOptional;
 @SuppressWarnings("deprecation")
 public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareModel> {
 
-  /**
-   * Model to be shown when held.
-   */
-  private final IUnbakedModel heldModel;
+  private final Map<ItemCameraTransforms.TransformType, IUnbakedModel> models;
 
-  /**
-   * Model to be shown otherwise.
-   */
-  private final IUnbakedModel simpleModel;
-
-  public PerspectiveAwareModel(IUnbakedModel unbakedHeldModel, IUnbakedModel unbakedSimpleModel) {
-    this.heldModel = unbakedHeldModel;
-    this.simpleModel = unbakedSimpleModel;
+  public PerspectiveAwareModel(Map<ItemCameraTransforms.TransformType, IUnbakedModel> models) {
+    this.models = models;
   }
 
   @Override
@@ -66,24 +63,24 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
 
-    IBakedModel bakedSimpleModel = null;
+    Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels =
+        this.models.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+          IUnbakedModel model = entry.getValue();
+          if (model instanceof BlockModel) {
+            BlockModel blockModel = (BlockModel) model;
+            // Generates a default 2D model if the model has a generation marker
+            if (RenderUtil.hasGenerationMarker(blockModel)) {
+              return RenderUtil
+                  .generateSpriteModel(blockModel, bakery, spriteGetter, modelTransform,
+                      modelLocation);
+            }
+          }
+          return model.bake(bakery, spriteGetter, modelTransform, modelLocation);
+        }, (u, v) -> {
+          throw new IllegalStateException(String.format("Duplicate key %s", u));
+        }, () -> new EnumMap<>(ItemCameraTransforms.TransformType.class)));
 
-    if (this.simpleModel instanceof BlockModel) {
-      BlockModel blockModel = (BlockModel) this.simpleModel;
-
-      // Generates a default 2D model if the model has a generation marker
-      if (RenderUtil.hasGenerationMarker(blockModel)) {
-        bakedSimpleModel = RenderUtil.generateSpriteModel(blockModel, bakery, spriteGetter,
-            modelTransform, modelLocation);
-      }
-    }
-
-    if (bakedSimpleModel == null) {
-      bakedSimpleModel = this.simpleModel.bake(bakery, spriteGetter, modelTransform, modelLocation);
-    }
-
-    return new BakedLegacyLikeModel(
-        this.heldModel.bake(bakery, spriteGetter, modelTransform, modelLocation), bakedSimpleModel,
+    return new BakedPerspectiveAwareModel(bakedModels,
         spriteGetter.apply(owner.resolveTexture("particle")));
   }
 
@@ -93,36 +90,34 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
       Set<Pair<String, String>> missingTextureErrors) {
     Set<Material> materials = new HashSet<>();
     materials.add(owner.resolveTexture("particle"));
-    materials.addAll(this.heldModel.getTextureDependencies(modelGetter, missingTextureErrors));
-    materials.addAll(this.simpleModel.getTextureDependencies(modelGetter, missingTextureErrors));
+    materials
+        .addAll(this.models
+            .values()
+            .stream()
+            .flatMap(
+                model -> model.getTextureDependencies(modelGetter, missingTextureErrors).stream())
+            .collect(Collectors.toSet()));
     return materials;
   }
 
-  public static class BakedLegacyLikeModel implements IBakedModel {
+  public static class BakedPerspectiveAwareModel implements IBakedModel {
 
     private static final ItemOverrideList OVERRIDE_LIST = new ModelOverrideHandler();
 
-    /**
-     * Model to be shown when held.
-     */
-    private final IBakedModel heldModel;
-
-    /**
-     * Model to be shown otherwise.
-     */
-    private final IBakedModel simpleModel;
+    private final Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels;
     private final TextureAtlasSprite particle;
     private final LazyOptional<IAnimationController> animationController;
 
-    public BakedLegacyLikeModel(IBakedModel heldModel, IBakedModel simpleModel,
+    public BakedPerspectiveAwareModel(
+        Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels,
         TextureAtlasSprite particle) {
-      this(heldModel, simpleModel, particle, LazyOptional.empty());
+      this(bakedModels, particle, LazyOptional.empty());
     }
 
-    public BakedLegacyLikeModel(IBakedModel heldModel, IBakedModel simpleModel,
+    public BakedPerspectiveAwareModel(
+        Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels,
         TextureAtlasSprite particle, LazyOptional<IAnimationController> animationController) {
-      this.heldModel = heldModel;
-      this.simpleModel = simpleModel;
+      this.bakedModels = bakedModels;
       this.particle = particle;
       this.animationController = animationController;
     }
@@ -136,7 +131,9 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side,
         @Nonnull Random rand, @Nonnull IModelData extraData) {
-      return this.simpleModel.getQuads(state, side, rand, extraData);
+      return this.bakedModels
+          .get(ItemCameraTransforms.TransformType.NONE)
+          .getQuads(state, side, rand, extraData);
     }
 
     @Override
@@ -172,31 +169,18 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
-      if (isHeld(cameraTransformType)) {
-        this.animationController.ifPresent(controller -> controller.apply(mat));
-        return this.heldModel.handlePerspective(cameraTransformType, mat);
-      } else {
-        return this.simpleModel.handlePerspective(cameraTransformType, mat);
-      }
-
+      this.animationController
+          .filter(controller -> controller.isAcceptedPerspective(cameraTransformType))
+          .ifPresent(controller -> controller.apply(mat));
+      return this.bakedModels
+          .getOrDefault(cameraTransformType,
+              this.bakedModels.get(ItemCameraTransforms.TransformType.NONE))
+          .handlePerspective(cameraTransformType, mat);
     }
 
     @Override
     public ItemOverrideList getOverrides() {
       return OVERRIDE_LIST;
-    }
-
-    // TODO Will this actually be the only supported perspective?
-    private static boolean isHeld(ItemCameraTransforms.TransformType cameraTransformType) {
-      switch (cameraTransformType) {
-        case THIRD_PERSON_LEFT_HAND:
-        case THIRD_PERSON_RIGHT_HAND:
-        case FIRST_PERSON_LEFT_HAND:
-        case FIRST_PERSON_RIGHT_HAND:
-          return true;
-        default:
-          return false;
-      }
     }
   }
 
@@ -205,12 +189,18 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     @Override
     public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
         @Nullable World world, @Nullable LivingEntity entity) {
-      BakedLegacyLikeModel model = (BakedLegacyLikeModel) originalModel;
-      return new BakedLegacyLikeModel(
-          model.heldModel
-              .getOverrides()
-              .getModelWithOverrides(model.heldModel, itemStack, world, entity),
-          model.simpleModel, model.particle,
+      BakedPerspectiveAwareModel perspectiveModel = (BakedPerspectiveAwareModel) originalModel;
+      Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels =
+          perspectiveModel.bakedModels
+              .entrySet()
+              .stream()
+              .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                IBakedModel model = entry.getValue();
+                return model.getOverrides().getModelWithOverrides(model, itemStack, world, entity);
+              }, (u, v) -> {
+                throw new IllegalStateException(String.format("Duplicate key %s", u));
+              }, () -> new EnumMap<>(ItemCameraTransforms.TransformType.class)));
+      return new BakedPerspectiveAwareModel(bakedModels, perspectiveModel.particle,
           itemStack.getCapability(ModCapabilities.ANIMATION_CONTROLLER));
     }
   }
@@ -225,11 +215,51 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     @Override
     public PerspectiveAwareModel read(JsonDeserializationContext deserializationContext,
         JsonObject modelContents) {
-      IUnbakedModel unbakedHeldModel = deserializationContext
-          .deserialize(JSONUtils.getJsonObject(modelContents, "held"), BlockModel.class);
-      IUnbakedModel unbakedSimpleModel = deserializationContext
-          .deserialize(JSONUtils.getJsonObject(modelContents, "simple"), BlockModel.class);
-      return new PerspectiveAwareModel(unbakedHeldModel, unbakedSimpleModel);
+      Map<ItemCameraTransforms.TransformType, IUnbakedModel> models =
+          new EnumMap<>(ItemCameraTransforms.TransformType.class);
+      models
+          .put(TransformType.NONE, deserializationContext
+              .deserialize(JSONUtils.getJsonObject(modelContents, "model"), BlockModel.class));
+
+      JsonArray modelsJson = modelContents.getAsJsonArray("perspective_overrides");
+      for (JsonElement element : modelsJson) {
+        JsonObject modelJson = element.getAsJsonObject();
+        BlockModel model = deserializationContext
+            .deserialize(JSONUtils.getJsonObject(modelJson, "model"), BlockModel.class);
+        JsonArray perspectives = modelJson.getAsJsonArray("perspectives");
+        this
+            .putIfPresent(perspectives, "thirdperson_righthand",
+                TransformType.THIRD_PERSON_RIGHT_HAND, model, models);
+        this
+            .putIfPresent(perspectives, "thirdperson_lefthand",
+                TransformType.THIRD_PERSON_LEFT_HAND, model, models);
+        this
+            .putIfPresent(perspectives, "firstperson_righthand",
+                TransformType.FIRST_PERSON_RIGHT_HAND, model, models);
+        this
+            .putIfPresent(perspectives, "firstperson_lefthand",
+                TransformType.FIRST_PERSON_LEFT_HAND, model, models);
+        this.putIfPresent(perspectives, "head", TransformType.HEAD, model, models);
+        this.putIfPresent(perspectives, "gui", TransformType.GUI, model, models);
+        this.putIfPresent(perspectives, "ground", TransformType.GROUND, model, models);
+        this.putIfPresent(perspectives, "fixed", TransformType.FIXED, model, models);
+      }
+      return new PerspectiveAwareModel(models);
+    }
+
+    private void putIfPresent(JsonArray perspectives, String key,
+        ItemCameraTransforms.TransformType cameraTransformType, IUnbakedModel model,
+        Map<ItemCameraTransforms.TransformType, IUnbakedModel> models) {
+      for (JsonElement element : perspectives) {
+        if (element.getAsString().equals(key)) {
+          models.compute(cameraTransformType, (transform, existingModel) -> {
+            if (existingModel != null) {
+              throw new IllegalStateException("Multiple models specified for same perspective");
+            }
+            return model;
+          });
+        }
+      }
     }
   }
 }

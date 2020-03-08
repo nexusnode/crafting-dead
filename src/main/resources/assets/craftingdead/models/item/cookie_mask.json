@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/textured_helmet_multiple_of_8",
-		"textures": {
-			"base":"craftingdead:models/hats/cookie_mask"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/cookie_mask"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_8",
+				"textures": {
+					"base":"craftingdead:models/hats/cookie_mask"
+				}
+			}
+		}
+	]
 }

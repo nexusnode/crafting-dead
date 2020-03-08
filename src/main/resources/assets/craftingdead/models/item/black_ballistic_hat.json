@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/ballistic_helmet",
-		"textures": {
-			"base":"craftingdead:models/hats/black_ballistic_hat"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/black_ballistic_hat"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/ballistic_helmet",
+				"textures": {
+					"base":"craftingdead:models/hats/black_ballistic_hat"
+				}
+			}
+		}
+	]
 }

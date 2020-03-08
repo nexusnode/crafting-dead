@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/vests/tactical_vest",
+	"loader":"craftingdead:perspective_aware",
+	"model": {
+		"parent": "item/generated",
 		"textures": {
-			"base":"craftingdead:models/vests/ghillie_tactical_vest"
+			"layer0": "craftingdead:item/ghillie_tactical_vest"
 		}
-    },
-    "default": {
-        "parent": "item/generated",
-        "textures": {
-            "layer0": "craftingdead:item/ghillie_tactical_vest"
-        }
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/vests/tactical_vest",
+				"textures": {
+					"base":"craftingdead:models/vests/ghillie_tactical_vest"
+				}
+			}
+		}
+	]
 }

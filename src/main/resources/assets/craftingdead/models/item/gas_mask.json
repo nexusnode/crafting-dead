@@ -1,20 +1,25 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/gas_mask",
-		"textures": {
-			"base":"craftingdead:models/hats/gas_mask"
-		},
-		"transform": {
-			"rotation":  [ 0, 0, 0 ],
-			"translation":  [ 0.775, -0.5, 0.225 ],
-			"scale":  [ 1, 1, 1 ]
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/gas_mask"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/gas_mask",
+				"textures": {
+					"base":"craftingdead:models/hats/gas_mask"
+				},
+				"transform": {
+					"rotation":  [ 0, 0, 0 ],
+					"translation":  [ 0.775, -0.5, 0.225 ],
+					"scale":  [ 1, 1, 1 ]
+				}
+			}
+		}
+	]
 }

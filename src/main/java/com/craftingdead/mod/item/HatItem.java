@@ -1,9 +1,7 @@
 package com.craftingdead.mod.item;
 
 import java.util.List;
-
 import javax.annotation.Nullable;
-
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,8 +27,8 @@ public class HatItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World world,
-      List<ITextComponent> lore, ITooltipFlag tooltipFlag) {
+  public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
+      ITooltipFlag tooltipFlag) {
     if (this.hasHeadshotReduction()) {
       ITextComponent text = new TranslationTextComponent("attribute.hat.headshot_reduction",
           this.headshotReductionPercentage);
@@ -50,8 +48,8 @@ public class HatItem extends Item {
   }
 
   /**
-   * Checks whether this hat has night vision ability.
-   * Consider that could be more than one single hat that have night vision ability.
+   * Checks whether this hat has night vision ability. Consider that could be more than one single
+   * hat that have night vision ability.
    */
   public boolean hasNightVision() {
     return allowsNightVision;

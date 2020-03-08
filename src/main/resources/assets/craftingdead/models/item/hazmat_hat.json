@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
-		"textures": {
-			"base":"craftingdead:models/hats/hazmat_hat"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/hazmat_hat"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
+				"textures": {
+					"base":"craftingdead:models/hats/hazmat_hat"
+				}
+			}
+		}
+	]
 }

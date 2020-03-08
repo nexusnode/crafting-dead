@@ -5,7 +5,6 @@ import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.player.IPlayer;
-import com.craftingdead.mod.client.model.IEquipableModel;
 import com.craftingdead.mod.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
@@ -25,7 +24,7 @@ import net.minecraft.item.ItemStack;
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
  */
 @SuppressWarnings("deprecation")
-public class EquipableModelLayer
+public class EquipmentLayer
     extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
   /**
@@ -48,7 +47,7 @@ public class EquipableModelLayer
    */
   private final Consumer<MatrixStack> transformation;
 
-  private EquipableModelLayer(Builder builder) {
+  private EquipmentLayer(Builder builder) {
     super(builder.entityRenderer);
     this.itemStackGetter = builder.itemStackGetter;
     this.useCrouchingOrientation = builder.useCrouchingOrientation;
@@ -66,39 +65,36 @@ public class EquipableModelLayer
 
     playerEntity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> {
 
-      ItemStack itemStack = itemStackGetter.apply(player);
+      ItemStack itemStack = this.itemStackGetter.apply(player);
 
       if (!itemStack.isEmpty()) {
         IBakedModel itemModel =
-            itemRenderer.getItemModelWithOverrides(itemStack, playerEntity.world, null);
+            itemRenderer.getItemModelWithOverrides(itemStack, playerEntity.world, playerEntity);
 
-        // Only equip-able models can be rendered
-        if (itemModel instanceof IEquipableModel) {
-          IBakedModel equippedModel = ((IEquipableModel) itemModel).getEquippedModel();
 
-          matrix.push();
+        matrix.push();
 
-          // Applies crouching rotation is needed
-          if (this.useCrouchingOrientation && playerEntity.isCrouching()) {
-            RenderUtil.applyPlayerCrouchRotation(matrix);
-          }
-
-          // Applies the head rotation if needed
-          if (this.useHeadOrientation) {
-            this.getEntityModel().func_205072_a().rotate(matrix);
-          }
-
-          // Applies the arbitrary transformation if needed
-          if (transformation != null) {
-            transformation.accept(matrix);
-          }
-
-          // Renders the item. Also note the TransformType.
-          itemRenderer.renderItem(itemStack, TransformType.NONE, false, matrix, buffers,
-              somethingThatSeemsToBeLightLevel, OverlayTexture.DEFAULT_UV, equippedModel);
-
-          matrix.pop();
+        // Applies crouching rotation is needed
+        if (this.useCrouchingOrientation && playerEntity.isCrouching()) {
+          RenderUtil.applyPlayerCrouchRotation(matrix);
         }
+
+        // Applies the head rotation if needed
+        if (this.useHeadOrientation) {
+          this.getEntityModel().func_205072_a().rotate(matrix);
+        }
+
+        // Applies the arbitrary transformation if needed
+        if (this.transformation != null) {
+          this.transformation.accept(matrix);
+        }
+
+        // Renders the item. Also note the TransformType.
+        itemRenderer
+            .renderItem(itemStack, TransformType.HEAD, false, matrix, buffers,
+                somethingThatSeemsToBeLightLevel, OverlayTexture.DEFAULT_UV, itemModel);
+
+        matrix.pop();
       }
     });
   }
@@ -137,11 +133,11 @@ public class EquipableModelLayer
       return this;
     }
 
-    public EquipableModelLayer build() {
+    public EquipmentLayer build() {
       Validate.notNull(this.entityRenderer, "The renderer must not be null");
       Validate.notNull(this.itemStackGetter, "The ItemStack getter must not be null");
 
-      return new EquipableModelLayer(this);
+      return new EquipmentLayer(this);
     }
   }
 }

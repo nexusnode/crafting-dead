@@ -42,7 +42,6 @@ public class GunItem extends ShootableItem {
   private static final UUID REACH_DISTANCE_MODIFIER =
       UUID.fromString("A625D496-9464-4891-9E1F-9345989E5DAE");
 
-
   /**
    * Time between shots in milliseconds.
    */

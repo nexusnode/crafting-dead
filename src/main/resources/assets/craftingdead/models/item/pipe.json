@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "craftingdead:item/melee",
   "textures": {
     "layer0": "craftingdead:item/pipe"
   }

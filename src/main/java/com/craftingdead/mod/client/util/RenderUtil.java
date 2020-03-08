@@ -1,7 +1,6 @@
 package com.craftingdead.mod.client.util;
 
 import java.awt.Color;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
@@ -9,7 +8,6 @@ import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.util.PlayerResource;
-import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -36,8 +34,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 
 public class RenderUtil {
-
-  private static final Map<String, ResourceLocation> CACHED_RESOURCE_MAP = Maps.newHashMap();
 
   private static final ItemModelGenerator MODEL_GENERATOR = new ItemModelGenerator();
 
@@ -81,17 +77,6 @@ public class RenderUtil {
   }
 
   /**
-   * Instantiates and gets a {@link ResourceLocation} using {@link CraftingDead} ID as source.
-   * The resulting {@link ResourceLocation} is cached to be used instead of creating new
-   * instances every time.
-   * @param location The {@link ResourceLocation} location.
-   */
-  public static ResourceLocation getCachedResource(String location) {
-    return CACHED_RESOURCE_MAP.computeIfAbsent(location,
-        (key) -> new ResourceLocation(CraftingDead.ID, key));
-  }
-
-  /**
    * Applies the same body rotation of a vanilla crouching player.
    */
   public static void applyPlayerCrouchRotation(MatrixStack matrix) {
@@ -103,8 +88,8 @@ public class RenderUtil {
   }
 
   /**
-   * Checks whether the model has a generation marker.
-   * This means the model may be waiting to be generated.
+   * Checks whether the model has a generation marker. This means the model may be waiting to be
+   * generated.
    */
   public static boolean hasGenerationMarker(BlockModel blockModel) {
     return blockModel.getRootModel().name.equals("generation marker");
@@ -115,9 +100,9 @@ public class RenderUtil {
    * item models.
    *
    * @param blockModel The unbaked model of the item
-   * @throws IllegalArgumentException Throws if the model does not have a generation marker. It is a good
-   *         practice to check if the item has a generation marker before trying to generating the
-   *         model.
+   * @throws IllegalArgumentException Throws if the model does not have a generation marker. It is a
+   *         good practice to check if the item has a generation marker before trying to generating
+   *         the model.
    * @return The {@link IBakedModel} of this item, ready to be rendered.
    */
   public static IBakedModel generateSpriteModel(BlockModel blockModel, ModelBakery bakery,
@@ -127,8 +112,9 @@ public class RenderUtil {
     // It is a good practice check if the model can be generated before trying to generate.
     Validate.isTrue(hasGenerationMarker(blockModel), "The model does not have a generation marker");
 
-    return MODEL_GENERATOR.makeItemModel(spriteGetter, blockModel).bake(bakery, blockModel,
-        spriteGetter, modelTransform, modelLocation, false);
+    return MODEL_GENERATOR
+        .makeItemModel(spriteGetter, blockModel)
+        .bake(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
   }
 
   public static void drawTexturedRectangle(double x, double y, float width, float height,

@@ -1,20 +1,25 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/chief_fireman_hat",
-		"textures": {
-			"base":"craftingdead:models/hats/chief_fireman_hat"
-		},
-		"transform": {
-			"rotation":  [ 0, 0, 0 ],
-			"translation":  [ 0.585, -0.65, 0.525 ],
-			"scale":  [ 1.05, 1.05, 1.05 ]
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/chief_fireman_hat"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/chief_fireman_hat",
+				"textures": {
+					"base":"craftingdead:models/hats/chief_fireman_hat"
+				},
+				"transform": {
+					"rotation":  [ 0, 0, 0 ],
+					"translation":  [ 0.585, -0.65, 0.525 ],
+					"scale":  [ 1.05, 1.05, 1.05 ]
+				}
+			}
+		}
+	]
 }

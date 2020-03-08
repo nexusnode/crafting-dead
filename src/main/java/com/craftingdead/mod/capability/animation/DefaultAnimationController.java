@@ -3,9 +3,11 @@ package com.craftingdead.mod.capability.animation;
 import java.util.LinkedList;
 import java.util.Queue;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
+@SuppressWarnings("deprecation")
 public class DefaultAnimationController implements IAnimationController {
 
   private final Queue<IAnimation> animations = new LinkedList<>();
@@ -44,6 +46,19 @@ public class DefaultAnimationController implements IAnimationController {
       if (progress > 1.0D) {
         this.cancelCurrentAnimation();
       }
+    }
+  }
+
+  @Override
+  public boolean isAcceptedPerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+    switch (cameraTransformType) {
+      case THIRD_PERSON_RIGHT_HAND:
+      case THIRD_PERSON_LEFT_HAND:
+      case FIRST_PERSON_RIGHT_HAND:
+      case FIRST_PERSON_LEFT_HAND:
+        return true;
+      default:
+        return false;
     }
   }
 }

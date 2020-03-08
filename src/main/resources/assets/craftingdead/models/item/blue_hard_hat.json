@@ -1,15 +1,20 @@
 {
-    "loader":"craftingdead:equipable",
-    "equipped": {
-		"parent":"craftingdead:item/hats/hard_hat",
-		"textures": {
-			"base":"craftingdead:models/hats/blue_hard_hat"
-		}
-    },
-    "default": {
+	"loader":"craftingdead:perspective_aware",
+	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/blue_hard_hat"
 		}
-    }
+	},
+	"perspective_overrides":[
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/hats/hard_hat",
+				"textures": {
+					"base":"craftingdead:models/hats/blue_hard_hat"
+				}
+			}
+		}
+	]
 }

@@ -1,8 +1,6 @@
 package com.craftingdead.mod.item;
 
 import java.util.Random;
-import com.craftingdead.mod.capability.player.IPlayer;
-import com.craftingdead.mod.client.renderer.entity.player.IHasExtraSkin;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -11,9 +9,10 @@ import net.minecraft.item.UseAction;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class ClothingItem extends Item implements IHasExtraSkin {
+public class ClothingItem extends Item {
 
   public ClothingItem(Properties properties) {
     super(properties);
@@ -62,10 +61,9 @@ public class ClothingItem extends Item implements IHasExtraSkin {
     return UseAction.BLOCK;
   }
 
-  @Override
-  public String getExtraSkinLocation(IPlayer<? extends PlayerEntity> player, String lowerCaseSkinType) {
-    String clothingRegistryName = this.getRegistryName().getPath();
-    return "textures/models/clothing/" + clothingRegistryName + "_" + lowerCaseSkinType + ".png";
+  public ResourceLocation getClothingSkin(String skinType) {
+    return new ResourceLocation(this.getRegistryName().getNamespace(),
+        "textures/models/clothing/" + this.getRegistryName().getPath() + "_" + skinType + ".png");
   }
 
   public static class Properties extends Item.Properties {
