@@ -44,8 +44,6 @@ public class CraftingDead {
 
   public static final String DISPLAY_NAME;
 
-  public static final String MASTER_SERVER_VERSION = "0.0.1";
-
   static {
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
