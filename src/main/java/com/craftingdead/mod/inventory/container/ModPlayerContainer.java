@@ -100,4 +100,41 @@ public class ModPlayerContainer extends Container {
       return true;
     }).orElse(false);
   }
+
+  @Override
+  public ItemStack transferStackInSlot(PlayerEntity playerEntity, int clickedIndex) {
+    Slot clickedSlot = this.inventorySlots.get(clickedIndex);
+    if (clickedSlot != null && clickedSlot.getHasStack()) {
+      // Shift-clicking gun crafting slots is currently unavailable due to
+      // the nature of how itemstacks are merged when shift-clicking.
+      // In other words, attachments do not get attached.
+      if (clickedSlot instanceof GunCraftSlot) {
+        return ItemStack.EMPTY;
+      }
+
+      ItemStack clickedStack = clickedSlot.getStack();
+
+      if (clickedIndex < 27) {
+        // Pushes the clicked stack to the higher slots in a "negative direction"
+        if (!this.mergeItemStack(clickedStack, 27, this.inventorySlots.size(), true)) {
+          return ItemStack.EMPTY;
+        }
+      }
+      else {
+        // Pushes the clicked stack to the lower slots in a "positive direction"
+        if (!this.mergeItemStack(clickedStack, 0, 27, false)) {
+          return ItemStack.EMPTY;
+        }
+      }
+
+      // From vanilla code. Seems to be mandatory.
+      if (clickedStack.isEmpty()) {
+        clickedSlot.putStack(ItemStack.EMPTY);
+      } else {
+        clickedSlot.onSlotChanged();
+      }
+    }
+
+    return ItemStack.EMPTY;
+  }
 }
