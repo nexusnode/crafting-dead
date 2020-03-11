@@ -57,11 +57,29 @@ public class GunItem extends ShootableItem {
   private final float accuracy;
 
   /**
+   * Amount of "pellets" to be fired in a single shoot.
+   * It is used by shotguns.
+   */
+  private final int bulletAmountToFire;
+
+  /**
+   * Whether the player can aim with this gun or not
+   */
+  private final boolean aimable;
+
+  /**
+   * Whether the crosshair should be rendered or not while holding this item
+   */
+  private final boolean crosshairVisibility;
+
+  /**
    * {@link FireMode}s the gun can cycle through.
    */
   private final List<FireMode> fireModes;
 
   private final Supplier<SoundEvent> shootSound;
+
+  private final Supplier<SoundEvent> silencedShootSound;
 
   private final Supplier<SoundEvent> reloadSound;
 
@@ -79,8 +97,12 @@ public class GunItem extends ShootableItem {
     this.damage = properties.damage;
     this.reloadDurationTicks = properties.reloadDurationTicks;
     this.accuracy = properties.accuracy;
+    this.bulletAmountToFire = properties.bulletAmountToFire;
+    this.aimable = properties.aimable;
+    this.crosshairVisibility = properties.crosshairVisibility;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
+    this.silencedShootSound = properties.silencedShootSound;
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
     this.acceptedMagazines = properties.acceptedMagazines;
@@ -111,12 +133,28 @@ public class GunItem extends ShootableItem {
     return this.accuracy;
   }
 
+  public int getBulletAmountToFire() {
+    return this.bulletAmountToFire;
+  }
+
+  public boolean isAimable() {
+    return this.aimable;
+  }
+
+  public boolean getCrosshairVisibility() {
+    return this.crosshairVisibility;
+  }
+
   public List<FireMode> getFireModes() {
     return this.fireModes;
   }
 
   public Supplier<SoundEvent> getShootSound() {
     return this.shootSound;
+  }
+
+  public Supplier<SoundEvent> getSilencedShootSound() {
+    return silencedShootSound;
   }
 
   public Supplier<SoundEvent> getReloadSound() {
@@ -221,11 +259,19 @@ public class GunItem extends ShootableItem {
 
     private int reloadDurationTicks;
 
+    private int bulletAmountToFire = 1;
+
     private float accuracy;
+
+    private boolean aimable;
+
+    private boolean crosshairVisibility = true;
 
     private final List<FireMode> fireModes = new ArrayList<>();
 
     private Supplier<SoundEvent> shootSound;
+
+    private Supplier<SoundEvent> silencedShootSound;
 
     private Supplier<SoundEvent> reloadSound;
 
@@ -253,6 +299,21 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
+    public Properties setBulletAmountToFire(int amount) {
+      this.bulletAmountToFire = amount;
+      return this;
+    }
+
+    public Properties setAimable(boolean aimable) {
+      this.aimable = aimable;
+      return this;
+    }
+
+    public Properties setCrosshairVisibility(boolean crosshairVisibility) {
+      this.crosshairVisibility = crosshairVisibility;
+      return this;
+    }
+
     public Properties setAccuracy(float accuracy) {
       this.accuracy = accuracy;
       return this;
@@ -265,6 +326,11 @@ public class GunItem extends ShootableItem {
 
     public Properties setShootSound(Supplier<SoundEvent> shootSound) {
       this.shootSound = shootSound;
+      return this;
+    }
+
+    public Properties setSilencedShootSound(Supplier<SoundEvent> silencedShootSound) {
+      this.silencedShootSound = silencedShootSound;
       return this;
     }
 
