@@ -205,6 +205,7 @@ public class ItemGunController implements IGunController {
           });
     }
 
+    // TODO Add support to suppressor
     entity.playSound(this.gunItem.getShootSound().get(), 0.25F, 1.0F);
 
     Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
@@ -359,5 +360,10 @@ public class ItemGunController implements IGunController {
         ? Optional
             .of((PaintItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation(paintLocation)))
         : Optional.empty();
+  }
+
+  @Override
+  public Optional<GunItem> getGun() {
+    return Optional.of(this.gunItem);
   }
 }

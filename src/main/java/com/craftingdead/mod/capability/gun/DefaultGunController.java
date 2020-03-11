@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
+import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.PaintItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -56,7 +57,7 @@ public class DefaultGunController implements IGunController {
   public ItemStack getMagazineStack() {
     return ItemStack.EMPTY;
   }
-  
+
   @Override
   public int getAmmo() {
     return 0;
@@ -93,4 +94,9 @@ public class DefaultGunController implements IGunController {
 
   @Override
   public void toggleFireMode(Entity entity) {}
+
+  @Override
+  public Optional<GunItem> getGun() {
+    return Optional.empty();
+  }
 }
