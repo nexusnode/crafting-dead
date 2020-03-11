@@ -415,10 +415,17 @@ public class ClientDist implements IModDist {
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
               event.setCanceled(true);
-              this.ingameGui
-                  .renderCrosshairs(gunController.getAccuracy(playerEntity, heldStack),
-                      event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                      event.getWindow().getScaledHeight());
+
+              boolean showCrosshair = gunController.getGun()
+                  .map(gun -> gun.getCrosshairVisibility())
+                  .orElse(false);
+
+              if (showCrosshair) {
+                this.ingameGui
+                .renderCrosshairs(gunController.getAccuracy(playerEntity, heldStack),
+                    event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                    event.getWindow().getScaledHeight());
+              }
             });
           }
         });
