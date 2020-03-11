@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -57,7 +58,7 @@ public class GunItem extends ShootableItem {
   private final float accuracy;
 
   /**
-   * Amount of "pellets" to be fired in a single shoot.
+   * Amount of "pellets" to be fired in a single shot.
    * It is used by shotguns.
    */
   private final int bulletAmountToFire;
@@ -153,12 +154,12 @@ public class GunItem extends ShootableItem {
     return this.shootSound;
   }
 
-  public Supplier<SoundEvent> getSilencedShootSound() {
-    return silencedShootSound;
+  public Optional<SoundEvent> getSilencedShootSound() {
+    return Optional.ofNullable(this.silencedShootSound).map(sound -> sound.get());
   }
 
-  public Supplier<SoundEvent> getReloadSound() {
-    return this.reloadSound;
+  public Optional<SoundEvent> getReloadSound() {
+    return Optional.ofNullable(this.reloadSound).map(sound -> sound.get());
   }
 
   public Map<AnimationType, Supplier<IAnimation>> getAnimations() {
