@@ -2,6 +2,7 @@
 	"loader":"forge:obj",
 	"model":"craftingdead:models/item/hats/textured_helmet_multiple_of_8.obj",
 	"flip-v":true,
+	"ambientToFullbright": false,
 	"transform": {
 		"rotation":  [ 0, 0, 0 ],
 		"translation":  [ 0.7, -0.8, 0.7 ],

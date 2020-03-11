@@ -4,6 +4,7 @@
 		"loader":"forge:obj",
 		"model":"craftingdead:models/item/guns/ak47/ak47.obj",
 		"flip-v":true,
+		"ambientToFullbright": false,
 		"textures" : {
 			"base": "craftingdead:item/ak47"
 		}

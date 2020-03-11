@@ -1,5 +1,6 @@
 {
 	"loader":"forge:obj",
 	"model":"craftingdead:models/item/hats/bunny_hat.obj",
-	"flip-v":true
+	"flip-v":true,
+	"ambientToFullbright": false
 }

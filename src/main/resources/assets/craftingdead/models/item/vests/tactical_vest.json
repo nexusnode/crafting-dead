@@ -2,6 +2,7 @@
 	"loader":"forge:obj",
 	"model":"craftingdead:models/item/vests/tactical_vest.obj",
 	"flip-v":true,
+	"ambientToFullbright": false,
 	"transform": {
 		"rotation":  [ 0, 0, 180 ],
 		"translation":  [ -1.575, -0.005, 0.3735 ],
