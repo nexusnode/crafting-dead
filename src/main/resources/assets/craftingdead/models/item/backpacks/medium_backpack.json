@@ -2,6 +2,7 @@
 	"loader":"forge:obj",
 	"model":"craftingdead:models/item/backpacks/medium_backpack.obj",
 	"flip-v":true,
+	"ambientToFullbright": false,
 	"transform": {
 		"rotation":  [ 180, 0, 0 ],
 		"translation":  [ 0.5, -0.085, -1.25 ],
