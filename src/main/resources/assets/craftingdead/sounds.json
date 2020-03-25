@@ -53,12 +53,6 @@
       "craftingdead:bullet_impact_stone"
     ]
   },
-  "bullet_impact_water": {
-    "category": "master",
-    "sounds": [
-      "craftingdead:bullet_impact_water"
-    ]
-  },
   "bullet_impact_wood": {
     "category": "master",
     "sounds": [

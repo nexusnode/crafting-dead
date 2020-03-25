@@ -21,7 +21,6 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL = register("bullet_impact_metal");
   public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL2 = register("bullet_impact_metal2");
   public static final RegistryObject<SoundEvent> BULLET_IMPACT_STONE = register("bullet_impact_stone");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_WATER = register("bullet_impact_water");
   public static final RegistryObject<SoundEvent> BULLET_IMPACT_WOOD = register("bullet_impact_wood");
   public static final RegistryObject<SoundEvent> DESERT_EAGLE_SHOOT = register("desert_eagle_shoot");
   public static final RegistryObject<SoundEvent> DRY_FIRE = register("dry_fire");
