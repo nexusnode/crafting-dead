@@ -5,16 +5,64 @@
       "craftingdead:acr_shoot"
     ]
   },
+  "ak47_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:ak47_reload"
+    ]
+  },
   "ak47_shoot": {
     "category": "master",
     "sounds": [
       "craftingdead:ak47_shoot"
     ]
   },
-  "ak47_reload": {
+  "bullet_impact_dirt": {
     "category": "master",
     "sounds": [
-      "craftingdead:ak47_reload"
+      "craftingdead:bullet_impact_dirt"
+    ]
+  },
+  "bullet_impact_flesh": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_flesh"
+    ]
+  },
+  "bullet_impact_glass": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_glass"
+    ]
+  },
+  "bullet_impact_metal": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_metal"
+    ]
+  },
+  "bullet_impact_metal2": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_metal2"
+    ]
+  },
+  "bullet_impact_stone": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_stone"
+    ]
+  },
+  "bullet_impact_water": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_water"
+    ]
+  },
+  "bullet_impact_wood": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:bullet_impact_wood"
     ]
   },
   "desert_eagle_shoot": {
@@ -23,34 +71,10 @@
       "craftingdead:desert_eagle_shoot"
     ]
   },
-  "m4a1_shoot": {
+  "dry_fire": {
     "category": "master",
     "sounds": [
-      "craftingdead:m4a1_shoot"
-    ]
-  },
-  "m4a1_reload": {
-    "category": "master",
-    "sounds": [
-      "craftingdead:m4a1_reload"
-    ]
-  },
-  "m9_shoot": {
-    "category": "master",
-    "sounds": [
-      "craftingdead:m9_shoot"
-    ]
-  },
-  "taser_shoot": {
-    "category": "master",
-    "sounds": [
-      "craftingdead:taser_shoot"
-    ]
-  },
-  "magnum_shoot": {
-    "category": "master",
-    "sounds": [
-      "craftingdead:magnum_shoot"
+      "craftingdead:dry_fire"
     ]
   },
   "fn57_shoot": {
@@ -59,14 +83,38 @@
       "craftingdead:fn57_shoot"
     ]
   },
-  "dry_fire": {
+  "m4a1_reload": {
     "category": "master",
     "sounds": [
-      "craftingdead:dry_fire"
+      "craftingdead:m4a1_reload"
+    ]
+  },
+  "m4a1_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m4a1_shoot"
+    ]
+  },
+  "m9_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m9_shoot"
+    ]
+  },
+  "magnum_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:magnum_shoot"
+    ]
+  },
+  "taser_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:taser_shoot"
     ]
   },
   "toggle_fire_mode": {
-    "category":"master",
+    "category": "master",
     "sounds": [
       "craftingdead:toggle_fire_mode"
     ]
