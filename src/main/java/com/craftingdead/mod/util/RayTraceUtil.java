@@ -89,7 +89,7 @@ public class RayTraceUtil {
 
     Optional<BlockRayTraceResult> blockRayTraceResult = Optional
         .ofNullable(fromEntity.world
-            .rayTraceBlocks(new RayTraceContext(start, end, RayTraceContext.BlockMode.OUTLINE,
+            .rayTraceBlocks(new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER,
                 RayTraceContext.FluidMode.NONE, fromEntity)));
 
     AxisAlignedBB boundingBox =
