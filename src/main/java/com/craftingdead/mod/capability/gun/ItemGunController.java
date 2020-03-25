@@ -261,7 +261,8 @@ public class ItemGunController implements IGunController {
     // The sound is played at client side too
     entityHit.playSound(ModSoundEvents.BULLET_IMPACT_FLESH.get(), 0.75F,
         (float) Math.random() + 0.7F);
-    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
+    ModDamageSource.causeDamageWithoutKnockback(entityHit,
+        ModDamageSource.causeGunDamage(entity, headshot), damage);
 
     // Runs at server side only
     if (world instanceof ServerWorld) {
