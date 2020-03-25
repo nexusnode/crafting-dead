@@ -1,0 +1,55 @@
+{
+	"loader":"craftingdead:gun",
+	"base_model": {
+		"loader":"forge:obj",
+    	"model":"craftingdead:models/item/guns/minigun/minigun.obj",
+		"flip-v":true,
+		"ambientToFullbright": false,
+		"textures": {
+			"base":"craftingdead:models/guns/minigun"
+		}
+	},
+	"attachment_transforms":{
+		"craftingdead:m4a1_iron_sight": {
+			"translation":[-0.25, -0.225, -0.07],
+			"scale":[0.4, 0.4, 0.4]
+		}
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation":  [ 0, -90, 0 ],
+			"translation":  [ -7.5, -19.5, 17.5 ],
+			"scale":  [ 0.85, 0.85, 0.85 ]
+		},
+		"thirdperson_lefthand": {
+			"rotation":  [ 0, 90, 0 ],
+			"translation":  [ 7.5, -19.5, 17.5 ],
+			"scale":  [ 0.85, 0.85, 0.85 ]
+		},
+		"firstperson_righthand": {
+			"rotation":  [ 5, -90, 0 ],
+			"translation":  [ -2, -30, -3 ],
+			"scale":  [ 1.4, 1.4, 1.4 ]
+		},
+		"firstperson_lefthand": {
+			"rotation":  [ 5, 90, 0 ],
+			"translation":  [ 22, -30, -3 ],
+			"scale":  [ 1.4, 1.4, 1.4 ]
+		},
+		"gui": {
+			"rotation": [ 0, 0, 45 ],
+			"translation": [ 1, 4.5, 0 ],
+			"scale":  [ 0.5, 0.5, 0.5 ]
+		},
+		"ground": {
+			"rotation":  [ 0, 0, 45 ],
+			"translation":  [ 0, 5, 0 ],
+			"scale":  [ 0.25, 0.25, 0.25 ]
+		},
+		"fixed": {
+			"rotation":  [ 0, 0, -45 ],
+			"translation":  [ -1, 5, 5 ],
+			"scale":  [ -0.5, 0.5, 0.5 ]
+		}
+	}
+}

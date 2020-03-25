@@ -3,7 +3,7 @@
 	"model": {
 		"parent": "item/generated",
 		"textures": {
-			"layer0": "craftingdead:item/ak47_simple"
+			"layer0": "craftingdead:item/ak47"
 		}
 	},
 	"perspective_overrides" : [

@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/m4a1_is1/m4a1_is1.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

@@ -1,0 +1,5 @@
+newmtl ModelMaterial
+Kd 1 1 1
+Ka 1 1 1
+map_Kd craftingdead:models/attachments/bipod
+map_Ka craftingdead:models/attachments/bipod

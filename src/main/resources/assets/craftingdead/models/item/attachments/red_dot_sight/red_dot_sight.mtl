@@ -1,0 +1,5 @@
+newmtl ModelMaterial
+Kd 1 1 1
+Ka 1 1 1
+map_Kd craftingdead:models/attachments/red_dot_sight
+map_Ka craftingdead:models/attachments/red_dot_sight

@@ -6,7 +6,7 @@
 		"flip-v":true,
 		"ambientToFullbright": false,
 		"textures" : {
-			"base": "craftingdead:item/ak47"
+			"base": "craftingdead:models/guns/ak47"
 		}
 	},
 	"display": {

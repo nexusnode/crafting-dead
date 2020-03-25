@@ -1,0 +1,36 @@
+{
+	"loader":"craftingdead:perspective_aware",
+	"model": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/m107"
+		}
+	},
+	"perspective_overrides" : [
+		{
+			"perspectives":["thirdperson_righthand", "thirdperson_lefthand", "firstperson_righthand", "firstperson_lefthand"],
+			"model":{
+				"parent":"craftingdead:item/guns/m107/m107",
+				"overrides": [
+					{
+						"predicate": {
+							"aiming": 1
+						},
+						"model": "craftingdead:item/guns/m107/m107_aiming"
+					}
+				]
+			}
+		},
+		{
+			"perspectives":["head"],
+			"model":{
+				"parent":"craftingdead:item/guns/m107/m107",
+				"transform": {
+					"rotation":  [ 0, 90, -90 ],
+					"translation":  [ -0.2, -0.6, -0.7 ],
+					"scale":  [ 0.5, 0.5, 0.5 ]
+				}
+			}
+		}
+	]
+}

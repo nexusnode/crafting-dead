@@ -1,0 +1,49 @@
+{
+	"loader":"craftingdead:gun",
+	"base_model": {
+		"loader":"forge:obj",
+		"model":"craftingdead:models/item/guns/mk48mod/mk48mod.obj",
+		"flip-v":true,
+		"ambientToFullbright": false,
+		"textures" : {
+			"base": "craftingdead:models/guns/mk48mod"
+		}
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation":  [ 0, -90, 0 ],
+			"translation":  [ -2, -2.75, 1 ],
+			"scale":  [ 0.3, 0.3, 0.3 ]
+		},
+		"thirdperson_lefthand": {
+			"rotation":  [ 0, 90, 0 ],
+			"translation":  [ 2, -2.75, 1 ],
+			"scale":  [ 0.3, 0.3, 0.3 ]
+		},
+		"firstperson_righthand": {
+			"rotation":  [ 5, -90, 0 ],
+			"translation":  [ -2, -2, 0 ],
+			"scale":  [ 0.3, 0.3, 0.3 ]
+		},
+		"firstperson_lefthand": {
+			"rotation":  [ 5, 90, 0 ],
+			"translation":  [ 2, -2, 0 ],
+			"scale":  [ 0.3, 0.3, 0.3 ]
+		},
+		"gui": {
+			"rotation": [ 0, 0, 45 ],
+			"translation": [ 3, 5.5, 0 ],
+			"scale":  [ 0.15, 0.15, 0.15 ]
+		},
+		"ground": {
+			"rotation":  [ 0, 0, 45 ],
+			"translation":  [ 0, 5, 0 ],
+			"scale":  [ 0.1, 0.1, 0.1 ]
+		},
+		"fixed": {
+			"rotation":  [ 0, 0, -45 ],
+			"translation":  [ -2, 5, 2 ],
+			"scale":  [ -0.15, 0.15, 0.15 ]
+		}
+	}
+}

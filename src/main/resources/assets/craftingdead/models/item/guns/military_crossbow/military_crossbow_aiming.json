@@ -1,0 +1,15 @@
+{
+    "parent": "craftingdead:item/guns/military_crossbow/military_crossbow",
+    "display": {
+		"firstperson_righthand": {
+			"rotation":  [ 0, -90, 0 ],
+			"translation":  [ -12.5, -1, 8 ],
+			"scale":  [ 0.5, 0.5, 0.5 ]
+		},
+		"firstperson_lefthand": {
+			"rotation":  [ 0, -270, 0 ],
+			"translation":  [ -5, 5, 8 ],
+			"scale":  [ 0.5, 0.5, 0.5 ]
+		}
+	}
+}

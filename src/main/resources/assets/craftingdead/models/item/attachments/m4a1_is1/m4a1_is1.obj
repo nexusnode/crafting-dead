@@ -1,7 +1,7 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
 mtllib m4a1_is1.mtl
-usemtl m4a1_is1:ModelMaterial
+usemtl ModelMaterial
 o Shape1
 v 0.000000 1.400000 0.000000
 v -0.250000 1.400000 0.000000
