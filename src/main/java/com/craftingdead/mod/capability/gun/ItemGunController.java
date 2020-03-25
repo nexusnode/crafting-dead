@@ -19,6 +19,7 @@ import com.craftingdead.mod.item.MagazineItem;
 import com.craftingdead.mod.item.PaintItem;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
+import com.craftingdead.mod.util.ParticleUtil;
 import com.craftingdead.mod.util.RayTraceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -252,10 +253,12 @@ public class ItemGunController implements IGunController {
       // Runs at server side only
       if (world instanceof ServerWorld) {
         ServerWorld serverWorld = (ServerWorld) world;
-        // TODO Make this do not be shown for the victim-player
-        serverWorld.spawnParticle(
+
+        // Sends to everyone near, except the player
+        ParticleUtil.spawnParticleServerside(serverWorld,
             new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
-            hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
+            hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+            (player) -> player != entityHit);
       }
     }
     // The sound is played at client side too
@@ -267,10 +270,12 @@ public class ItemGunController implements IGunController {
     // Runs at server side only
     if (world instanceof ServerWorld) {
       ServerWorld serverWorld = (ServerWorld) world;
-      // TODO Make this do not be shown for the victim-player
-      serverWorld.spawnParticle(
+
+      // Sends to everyone near, except the player
+      ParticleUtil.spawnParticleServerside(serverWorld,
           new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-          hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
+          hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+          (player) -> player != entityHit);
     }
   }
 
