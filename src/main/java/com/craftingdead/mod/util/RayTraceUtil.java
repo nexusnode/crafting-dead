@@ -2,6 +2,7 @@ package com.craftingdead.mod.util;
 
 import java.util.Optional;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -101,7 +102,21 @@ public class RayTraceUtil {
         fromEntity
             .getEntityWorld()
             .getEntitiesInAABBexcluding(fromEntity, boundingBox,
-                (entityTest) -> !entityTest.isSpectator() && entityTest.canBeCollidedWith()),
+                (entityTest) -> {
+                  // Ignores entities that cannot be collided
+                  if (entityTest.isSpectator() || !entityTest.canBeCollidedWith()) {
+                    return false;
+                  }
+                  if (entityTest instanceof LivingEntity) {
+                    LivingEntity livingEntity = (LivingEntity) entityTest;
+
+                    // Ignores dead entities
+                    if (livingEntity.getHealth() <= 0F) {
+                      return false;
+                    }
+                  }
+                  return true;
+                }),
         sqrDistance);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : blockRayTraceResult;
