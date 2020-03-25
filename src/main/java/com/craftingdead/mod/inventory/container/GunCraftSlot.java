@@ -1,7 +1,6 @@
 package com.craftingdead.mod.inventory.container;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.CraftingInventorySlotType;
@@ -30,11 +29,9 @@ public class GunCraftSlot extends GunSlot {
             .setInventorySlotContents(attachment.getInventorySlot().getIndex(),
                 new ItemStack(attachment));
       });
-      gunController.getPaint().ifPresent(paint -> {
-        this.craftingInventory
-            .setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
-                new ItemStack(paint));
-      });
+      this.craftingInventory
+          .setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
+              gunController.getPaint());
     });
     super.putStack(itemStack);
   }
@@ -42,7 +39,7 @@ public class GunCraftSlot extends GunSlot {
   @Override
   public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
     gunStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
-      gunController.setPaint(Optional.empty());
+      gunController.setPaint(ItemStack.EMPTY);
       Set<AttachmentItem> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
         ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
@@ -50,7 +47,7 @@ public class GunCraftSlot extends GunSlot {
           if (itemStack.getItem() instanceof AttachmentItem) {
             attachments.add((AttachmentItem) itemStack.getItem());
           } else if (itemStack.getItem() instanceof PaintItem) {
-            gunController.setPaint(Optional.of((PaintItem) itemStack.getItem()));
+            gunController.setPaint(itemStack);
           }
           this.craftingInventory.setInventorySlotContents(i, ItemStack.EMPTY);
         }

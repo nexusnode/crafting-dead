@@ -1,374 +1,374 @@
 {
-  "m4a1_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m4a1_silenced_shoot"
-    ]
-  }, 
-  "rpk_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:rpk_silenced_shoot"
-    ]
-  }, 
-  "awp_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:awp_reload"
-    ]
-  }, 
   "acr_shoot": {
-    "category": "master", 
+    "category": "master",
     "sounds": [
       "craftingdead:acr_shoot"
     ]
-  }, 
-  "mp5a5_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mp5a5_reload"
-    ]
-  }, 
-  "dmr_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:dmr_reload"
-    ]
-  }, 
-  "m9_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m9_silenced_shoot"
-    ]
-  }, 
-  "as50_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:as50_shoot"
-    ]
-  }, 
-  "minigun_barrel": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:minigun_barrel"
-    ]
-  }, 
-  "rpk_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:rpk_shoot"
-    ]
-  }, 
-  "mk48mod_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mk48mod_shoot"
-    ]
-  }, 
-  "mk48mod_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mk48mod_silenced_shoot"
-    ]
-  }, 
-  "m4a1_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m4a1_shoot"
-    ]
-  }, 
-  "fn57_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:fn57_shoot"
-    ]
-  }, 
-  "sporter22_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:sporter22_shoot"
-    ]
-  }, 
-  "shotgun_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:shotgun_reload"
-    ]
-  }, 
-  "p90_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:p90_shoot"
-    ]
-  }, 
-  "as50_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:as50_reload"
-    ]
-  }, 
-  "p250_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:p250_shoot"
-    ]
-  }, 
-  "zoom_in": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:zoom_in"
-    ]
-  }, 
-  "vector_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:vector_shoot"
-    ]
-  }, 
-  "dragunov_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:dragunov_shoot"
-    ]
-  }, 
-  "scarh_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:scarh_shoot"
-    ]
-  }, 
-  "m1911_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m1911_reload"
-    ]
-  }, 
-  "ak47_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:ak47_silenced_shoot"
-    ]
-  }, 
-  "g18_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:g18_shoot"
-    ]
-  }, 
-  "dmr_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:dmr_shoot"
-    ]
-  }, 
-  "dry_fire": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:dry_fire"
-    ]
-  }, 
-  "p90_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:p90_silenced_shoot"
-    ]
-  }, 
-  "g36c_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:g36c_shoot"
-    ]
-  }, 
-  "p90_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:p90_reload"
-    ]
-  }, 
-  "m4a1_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m4a1_reload"
-    ]
-  }, 
-  "rpk_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:rpk_reload"
-    ]
-  }, 
-  "magnum_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:magnum_shoot"
-    ]
-  }, 
-  "m9_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m9_shoot"
-    ]
-  }, 
-  "mossberg_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mossberg_reload"
-    ]
-  }, 
-  "desert_eagle_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:desert_eagle_shoot"
-    ]
-  }, 
-  "trenchgun_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:trenchgun_shoot"
-    ]
-  }, 
-  "m9_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m9_reload"
-    ]
-  }, 
-  "taser_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:taser_shoot"
-    ]
-  }, 
-  "m240b_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m240b_reload"
-    ]
-  }, 
-  "m107_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m107_reload"
-    ]
-  }, 
-  "crossbow_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:crossbow_shoot"
-    ]
-  }, 
-  "mpt_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mpt_shoot"
-    ]
-  }, 
-  "minigun_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:minigun_shoot"
-    ]
-  }, 
-  "m1911_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m1911_shoot"
-    ]
-  }, 
-  "m240b_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m240b_silenced_shoot"
-    ]
-  }, 
-  "mac10_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mac10_shoot"
-    ]
-  }, 
-  "mossberg_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mossberg_shoot"
-    ]
-  }, 
-  "fnfal_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:fnfal_shoot"
-    ]
-  }, 
-  "magnum_reload": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:magnum_reload"
-    ]
-  }, 
-  "mp5a5_silenced_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:mp5a5_silenced_shoot"
-    ]
-  }, 
-  "toggle_fire_mode": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:toggle_fire_mode"
-    ]
-  }, 
-  "m107_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m107_shoot"
-    ]
-  }, 
-  "m1garand_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:m1garand_shoot"
-    ]
-  }, 
-  "hk417_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:hk417_shoot"
-    ]
-  }, 
-  "awp_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:awp_shoot"
-    ]
-  }, 
-  "ak47_shoot": {
-    "category": "master", 
-    "sounds": [
-      "craftingdead:ak47_shoot"
-    ]
-  }, 
+  },
   "ak47_reload": {
-    "category": "master", 
+    "category": "master",
     "sounds": [
       "craftingdead:ak47_reload"
     ]
-  }, 
-  "m240b_shoot": {
-    "category": "master", 
+  },
+  "ak47_shoot": {
+    "category": "master",
     "sounds": [
-      "craftingdead:m240b_shoot"
+      "craftingdead:ak47_shoot"
     ]
-  }, 
+  },
+  "as50_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:as50_reload"
+    ]
+  },
+  "as50_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:as50_shoot"
+    ]
+  },
+  "awp_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:awp_reload"
+    ]
+  },
+  "awp_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:awp_shoot"
+    ]
+  },
+  "crossbow_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:crossbow_shoot"
+    ]
+  },
+  "desert_eagle_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:desert_eagle_shoot"
+    ]
+  },
+  "dmr_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:dmr_reload"
+    ]
+  },
+  "dmr_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:dmr_shoot"
+    ]
+  },
+  "dragunov_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:dragunov_shoot"
+    ]
+  },
+  "dry_fire": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:dry_fire"
+    ]
+  },
   "fn57_reload": {
-    "category": "master", 
+    "category": "master",
     "sounds": [
       "craftingdead:fn57_reload"
     ]
-  }, 
+  },
+  "fn57_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:fn57_shoot"
+    ]
+  },
+  "fnfal_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:fnfal_shoot"
+    ]
+  },
+  "g18_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:g18_shoot"
+    ]
+  },
+  "g36c_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:g36c_shoot"
+    ]
+  },
+  "hk417_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:hk417_shoot"
+    ]
+  },
+  "m107_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m107_reload"
+    ]
+  },
+  "m107_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m107_shoot"
+    ]
+  },
+  "m1911_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m1911_reload"
+    ]
+  },
+  "m1911_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m1911_shoot"
+    ]
+  },
+  "m1garand_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m1garand_shoot"
+    ]
+  },
+  "m240b_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m240b_reload"
+    ]
+  },
+  "m240b_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m240b_shoot"
+    ]
+  },
+  "m4a1_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m4a1_reload"
+    ]
+  },
+  "m4a1_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m4a1_shoot"
+    ]
+  },
+  "m9_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m9_reload"
+    ]
+  },
+  "m9_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:m9_shoot"
+    ]
+  },
+  "mac10_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mac10_shoot"
+    ]
+  },
+  "magnum_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:magnum_reload"
+    ]
+  },
+  "magnum_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:magnum_shoot"
+    ]
+  },
+  "minigun_barrel": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:minigun_barrel"
+    ]
+  },
+  "minigun_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:minigun_shoot"
+    ]
+  },
+  "mk48mod_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mk48mod_shoot"
+    ]
+  },
+  "mossberg_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mossberg_reload"
+    ]
+  },
+  "mossberg_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mossberg_shoot"
+    ]
+  },
+  "mp5a5_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mp5a5_reload"
+    ]
+  },
   "mp5a5_shoot": {
-    "category": "master", 
+    "category": "master",
     "sounds": [
       "craftingdead:mp5a5_shoot"
+    ]
+  },
+  "mpt_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:mpt_shoot"
+    ]
+  },
+  "p250_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:p250_shoot"
+    ]
+  },
+  "p90_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:p90_reload"
+    ]
+  },
+  "p90_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:p90_shoot"
+    ]
+  },
+  "rpk_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:rpk_reload"
+    ]
+  },
+  "rpk_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:rpk_shoot"
+    ]
+  },
+  "scarh_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:scarh_shoot"
+    ]
+  },
+  "shotgun_reload": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:shotgun_reload"
+    ]
+  },
+  "silenced_ak47_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_ak47_shoot"
+    ]
+  },
+  "silenced_m240b_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_m240b_shoot"
+    ]
+  },
+  "silenced_m4a1_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_m4a1_shoot"
+    ]
+  },
+  "silenced_m9_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_m9_shoot"
+    ]
+  },
+  "silenced_mk48mod_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_mk48mod_shoot"
+    ]
+  },
+  "silenced_mp5a5_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_mp5a5_shoot"
+    ]
+  },
+  "silenced_p90_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_p90_shoot"
+    ]
+  },
+  "silenced_rpk_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:silenced_rpk_shoot"
+    ]
+  },
+  "sporter22_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:sporter22_shoot"
+    ]
+  },
+  "taser_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:taser_shoot"
+    ]
+  },
+  "toggle_fire_mode": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:toggle_fire_mode"
+    ]
+  },
+  "trenchgun_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:trenchgun_shoot"
+    ]
+  },
+  "vector_shoot": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:vector_shoot"
+    ]
+  },
+  "zoom_in": {
+    "category": "master",
+    "sounds": [
+      "craftingdead:zoom_in"
     ]
   }
 }

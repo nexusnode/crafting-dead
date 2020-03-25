@@ -6,6 +6,8 @@ import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.gun.DefaultGunController;
 import com.craftingdead.mod.capability.gun.IGunController;
+import com.craftingdead.mod.capability.paint.DefaultPaintColor;
+import com.craftingdead.mod.capability.paint.IPaintColor;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,6 +31,9 @@ public class ModCapabilities {
   @CapabilityInject(IAction.class)
   public static final Capability<IAction> ACTION = null;
 
+  @CapabilityInject(IPaintColor.class)
+  public static final Capability<IPaintColor> PAINT_COLOR = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
     CapabilityManager.INSTANCE
@@ -37,6 +42,7 @@ public class ModCapabilities {
     CapabilityManager.INSTANCE
         .register(IGunController.class, new EmptyStorage<>(), DefaultGunController::new);
     CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);
+    CapabilityManager.INSTANCE.register(IPaintColor.class, new EmptyStorage<>(), DefaultPaintColor::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

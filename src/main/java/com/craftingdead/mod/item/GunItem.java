@@ -155,11 +155,11 @@ public class GunItem extends ShootableItem {
   }
 
   public Optional<SoundEvent> getSilencedShootSound() {
-    return Optional.ofNullable(this.silencedShootSound).map(sound -> sound.get());
+    return Optional.ofNullable(this.silencedShootSound.get());
   }
 
   public Optional<SoundEvent> getReloadSound() {
-    return Optional.ofNullable(this.reloadSound).map(sound -> sound.get());
+    return Optional.ofNullable(this.reloadSound.get());
   }
 
   public Map<AnimationType, Supplier<IAnimation>> getAnimations() {
@@ -272,9 +272,9 @@ public class GunItem extends ShootableItem {
 
     private Supplier<SoundEvent> shootSound;
 
-    private Supplier<SoundEvent> silencedShootSound;
+    private Supplier<SoundEvent> silencedShootSound = () -> null;
 
-    private Supplier<SoundEvent> reloadSound;
+    private Supplier<SoundEvent> reloadSound = () -> null;
 
     private final Map<AnimationType, Supplier<IAnimation>> animations =
         new EnumMap<>(AnimationType.class);
