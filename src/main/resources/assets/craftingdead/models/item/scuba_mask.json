@@ -16,8 +16,8 @@
 				},
 				"transform": {
 					"rotation":  [ 0, 90, 0 ],
-					"translation":  [ 0.25, -0.45, -1.725 ],
-					"scale":  [ 1, 1, 1 ]
+					"translation":  [ 0.325, -0.5, -1.85 ],
+					"scale":  [ 1.1, 1.1, 1.1 ]
 				}
 			}
 		}

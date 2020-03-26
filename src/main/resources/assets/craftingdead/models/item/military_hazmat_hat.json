@@ -10,7 +10,7 @@
 		{
 			"perspectives":["head"],
 			"model":{
-				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_8",
+				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
 				"textures": {
 					"base":"craftingdead:models/hats/military_hazmat_hat"
 				}

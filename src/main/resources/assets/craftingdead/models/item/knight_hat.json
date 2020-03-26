@@ -13,12 +13,12 @@
 				"parent":"craftingdead:item/hats/knight_hat",
 				"textures": {
 					"base":"craftingdead:models/hats/knight_hat"
+				},
+				"transform": {
+					"rotation":  [ 0, 180, 0 ],
+					"translation":  [ -1.65, -0.825, -1.65 ],
+					"scale":  [ 1.15, 1.15, 1.15 ]
 				}
-			},
-			"transform": {
-				"rotation":  [ 0, 180, 0 ],
-				"translation":  [ -1.65, -0.825, -1.65 ],
-				"scale":  [ 1.15, 1.15, 1.15 ]
 			}
 		}
 	]
