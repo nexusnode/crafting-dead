@@ -92,6 +92,8 @@ public class GunItem extends ShootableItem {
 
   private final Set<Supplier<PaintItem>> acceptedPaints;
 
+  private final Set<Supplier<AttachmentItem>> defaultAttachments;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireRate = properties.fireRate;
@@ -108,6 +110,7 @@ public class GunItem extends ShootableItem {
     this.animations = properties.animations;
     this.acceptedMagazines = properties.acceptedMagazines;
     this.acceptedAttachments = properties.acceptedAttachments;
+    this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
@@ -176,6 +179,10 @@ public class GunItem extends ShootableItem {
 
   public Set<PaintItem> getAcceptedPaints() {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Set<AttachmentItem> getDefaultAttachments() {
+    return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   @Override
@@ -285,6 +292,8 @@ public class GunItem extends ShootableItem {
 
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
 
+    private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
+
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
       return this;
@@ -352,6 +361,13 @@ public class GunItem extends ShootableItem {
 
     public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
       this.acceptedAttachments.add(acceptedAttachment);
+      return this;
+    }
+
+    public Properties addDefaultAttachment(Supplier<AttachmentItem> defaultAttachment) {
+      // Default attachments are also accepted attachments
+      this.addAcceptedAttachment(defaultAttachment);
+      this.defaultAttachments.add(defaultAttachment);
       return this;
     }
 

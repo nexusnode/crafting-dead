@@ -1,6 +1,5 @@
 package com.craftingdead.mod.capability.gun;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +76,7 @@ public class ItemGunController implements IGunController {
    */
   private int shotsInARow;
 
-  private Set<AttachmentItem> attachments = new HashSet<>();
+  private Set<AttachmentItem> attachments;
 
   private ItemStack paint = ItemStack.EMPTY;
 
@@ -90,6 +89,7 @@ public class ItemGunController implements IGunController {
     this.gunItemOptional = Optional.of(this.gunItem);
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = fireModeInfiniteIterator.next();
+    this.attachments = gunItem.getDefaultAttachments();
   }
 
   @Override
