@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -17,11 +16,8 @@ import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.gun.IGunController;
 import com.craftingdead.mod.capability.gun.ItemGunController;
-import com.google.common.collect.Multimap;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
@@ -38,9 +34,6 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class GunItem extends ShootableItem {
-
-  private static final UUID REACH_DISTANCE_MODIFIER =
-      UUID.fromString("A625D496-9464-4891-9E1F-9345989E5DAE");
 
   /**
    * Time between shots in milliseconds.
@@ -137,19 +130,6 @@ public class GunItem extends ShootableItem {
 
   public Set<PaintItem> getAcceptedPaints() {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
-  }
-
-  @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot,
-      ItemStack itemStack) {
-    Multimap<String, AttributeModifier> modifiers =
-        super.getAttributeModifiers(equipmentSlot, itemStack);
-    if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-      modifiers
-          .put(PlayerEntity.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER,
-              "Weapon modifier", 100, AttributeModifier.Operation.ADDITION));
-    }
-    return modifiers;
   }
 
   @Override
