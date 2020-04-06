@@ -27,7 +27,6 @@ public class AirDropRadioItem extends Item {
     SupplyDropEntity airDropEntity =
         new SupplyDropEntity(ModEntityTypes.supplyDrop, world, this.lootTable, random.nextLong(),
             blockPos.getX(), blockPos.getY() + 25.0D, blockPos.getZ());
-    airDropEntity.setCustomName(itemStack.getDisplayName());
     world.addEntity(airDropEntity);
     itemStack.shrink(1);
     return ActionResultType.SUCCESS;
