@@ -13,6 +13,7 @@ import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.util.ModSoundEvents;
+import com.craftingdead.mod.world.biome.ModBiomes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -79,6 +80,7 @@ public class CraftingDead {
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
 
+    ModBiomes.BIOMES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     ModContainerTypes.CONTAINERS.register(modEventBus);

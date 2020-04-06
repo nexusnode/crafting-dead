@@ -296,5 +296,6 @@
   "item.craftingdead.fuel_tank": "Fuel Tank Backpack",
   "item.craftingdead.tan_quiver": "Tan Quiver",
   "item.craftingdead.green_quiver": "Green Quiver",
-  "item.craftingdead.black_quiver": "Black Quiver"
+  "item.craftingdead.black_quiver": "Black Quiver",
+  "biome.craftingdead.zombie_forest": "Zombie Forest"
 }

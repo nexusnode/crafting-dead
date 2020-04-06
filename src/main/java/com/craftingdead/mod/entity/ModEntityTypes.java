@@ -9,9 +9,11 @@ import com.craftingdead.mod.entity.monster.TankZombieEntity;
 import com.craftingdead.mod.entity.monster.WeakZombieEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.world.gen.Heightmap;
 
 public class ModEntityTypes {
 
@@ -71,6 +73,27 @@ public class ModEntityTypes {
 
     supplyDrop = add("supply_drop", EntityType.Builder
         .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
+
+    // Spawn placement rules
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::areSpawnConditionsMet);
+
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.fastZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::areSpawnConditionsMet);
+
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.tankZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::areSpawnConditionsMet);
+
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.weakZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::areSpawnConditionsMet);
   }
 
   public static void register(RegistryEvent.Register<EntityType<?>> event) {

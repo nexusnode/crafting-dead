@@ -292,5 +292,6 @@
   "item.craftingdead.fuel_tank": "Tanque de Combustível em Mochila",
   "item.craftingdead.tan_quiver": "Aljava Bronzeada",
   "item.craftingdead.green_quiver": "Aljava Verde",
-  "item.craftingdead.black_quiver": "Aljava Preta"
+  "item.craftingdead.black_quiver": "Aljava Preta",
+  "biome.craftingdead.zombie_forest": "Floresta de Zumbis"
 }
