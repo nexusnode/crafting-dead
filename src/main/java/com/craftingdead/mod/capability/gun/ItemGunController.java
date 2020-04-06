@@ -155,7 +155,8 @@ public class ItemGunController implements IGunController {
                 || !((PlayerEntity) entity).findAmmo(itemStack).isEmpty())
             : true;
     if (!this.isReloading() && canReload) {
-      entity.playSound(this.gunItem.getReloadSound().get(), 1.0F, 1.0F);
+      entity.world.playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
+          SoundCategory.PLAYERS, 1.0F, 1.0F);
       this.reloadDurationTicks =
           this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
     }
@@ -247,7 +248,8 @@ public class ItemGunController implements IGunController {
         && rayTrace.getHitVec().y >= (entityHit.getY() + entityHit.getEyeHeight());
     if (headshot) {
       // The sound is played at client side too
-      entity.playSound(SoundEvents.ENTITY_ITEM_BREAK, 2F, 1.5F);
+      world.playMovingSound(null, entity, SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F,
+          1.5F);
       damage *= HEADSHOT_MULTIPLIER;
 
       // Runs at server side only
@@ -262,8 +264,8 @@ public class ItemGunController implements IGunController {
       }
     }
     // The sound is played at client side too
-    entityHit.playSound(ModSoundEvents.BULLET_IMPACT_FLESH.get(), 0.75F,
-        (float) Math.random() + 0.7F);
+    world.playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
+        SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
     ModDamageSource.causeDamageWithoutKnockback(entityHit,
         ModDamageSource.causeGunDamage(entity, headshot), damage);
 
