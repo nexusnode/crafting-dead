@@ -39,10 +39,10 @@ public class GrenadeItem extends Item {
   public void addInformation(ItemStack p_77624_1_, @Nullable World p_77624_2_,
       List<ITextComponent> p_77624_3_, ITooltipFlag p_77624_4_) {
     ITextComponent text = ITextComponent.copyWithoutSiblings(p_77624_3_.get(0));
-    text.getStyle().setBold(true);
-    text.getStyle().setColor(TextFormatting.DARK_RED);
-    text.appendText("[Countdown After Throw : " + timeUntilExplosion + " ticks]" + "\n");
-    text.appendText("[Explosion Radius : " + explosionRadius + "]");
+    text.getStyle().setColor(TextFormatting.DARK_GREEN);
+    text.appendText("" + "\n");
+    text.appendText("Explosion Time: " + timeUntilExplosion / 20 + " seconds" + "\n");
+    text.appendText("Explosion Radius: " + explosionRadius);
     p_77624_3_.add(text);
   }
 

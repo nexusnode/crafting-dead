@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
 
-  public static final ItemGroup CRAFTING_DEAD_FOOD = (new ItemGroup("craftingdead_foodstuffs") {
+  public static final ItemGroup CRAFTING_DEAD_FOOD = (new ItemGroup("craftingdead_consumables") {
 
     @Override
     public ItemStack createIcon() {

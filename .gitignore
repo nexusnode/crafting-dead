@@ -4,6 +4,10 @@
 /bin/
 /.settings/
 /build/
+/logs/
+eula.txt
+/crash-reports/
+server.properties
 /run/
 /runClient.launch
 /runServer.launch
