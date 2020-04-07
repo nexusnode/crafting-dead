@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/laser_sight/laser_sight.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

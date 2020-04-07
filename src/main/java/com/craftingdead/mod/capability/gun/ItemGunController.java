@@ -1,11 +1,12 @@
 package com.craftingdead.mod.capability.gun;
 
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.IAnimation;
@@ -15,12 +16,13 @@ import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.Color;
 import com.craftingdead.mod.item.MagazineItem;
-import com.craftingdead.mod.item.PaintItem;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.ParticleUtil;
 import com.craftingdead.mod.util.RayTraceUtil;
+import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -58,6 +60,7 @@ public class ItemGunController implements IGunController {
   private static final float HEADSHOT_MULTIPLIER = 4;
 
   private final GunItem gunItem;
+  private final Optional<GunItem> gunItemOptional;
 
   private boolean triggerPressed;
 
@@ -66,27 +69,43 @@ public class ItemGunController implements IGunController {
    */
   private long lastShotNanos = Integer.MIN_VALUE;
 
-  protected int reloadDurationTicks = 0;
+  private int reloadDurationTicks = 0;
 
-  protected int totalReloadDurationTicks;
+  private int totalReloadDurationTicks;
 
-  private int fireModeIndex = 0;
+  private FireMode fireMode;
 
   private ItemStack magazineStack = ItemStack.EMPTY;
 
   private int ammo;
 
-  private Set<AttachmentItem> attachments = new HashSet<>();
+  /**
+   * The amount of shots since the last time the trigger was pressed.
+   */
+  private int shotsInARow;
 
-  private Optional<PaintItem> paint = Optional.empty();
+  private Set<AttachmentItem> attachments;
+
+  private ItemStack paint = ItemStack.EMPTY;
+
+  private Optional<Color> color = Optional.empty();
+
+  private final Iterator<FireMode> fireModeInfiniteIterator;
 
   public ItemGunController(GunItem gunItem) {
     this.gunItem = gunItem;
+    this.gunItemOptional = Optional.of(this.gunItem);
+    this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
+    this.fireMode = fireModeInfiniteIterator.next();
+    this.attachments = gunItem.getDefaultAttachments();
   }
 
   @Override
   public void tick(Entity entity, ItemStack itemStack) {
-    if (this.gunItem.getFireModes().get(this.fireModeIndex) == FireMode.AUTO) {
+    boolean isMaxShotsReached =
+        fireMode.getMaxShots().map(max -> this.shotsInARow >= max).orElse(false);
+
+    if (!isMaxShotsReached) {
       this.tryShoot(entity, itemStack);
     }
 
@@ -121,7 +140,13 @@ public class ItemGunController implements IGunController {
   @Override
   public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed) {
     this.triggerPressed = triggerPressed;
-    this.tryShoot(entity, itemStack);
+
+    if (this.triggerPressed) {
+      // Resets the counter
+      this.shotsInARow = 0;
+
+      this.tryShoot(entity, itemStack);
+    }
   }
 
   @Override
@@ -168,7 +193,6 @@ public class ItemGunController implements IGunController {
     }
 
     if (this.isReloading()) {
-      this.triggerPressed = false;
       return;
     }
 
@@ -191,10 +215,10 @@ public class ItemGunController implements IGunController {
 
   private void shoot(Entity entity, ItemStack itemStack) {
     if (this.ammo <= 0) {
-
       return;
     }
 
+    this.shotsInARow++;
     this.ammo--;
 
     if (entity.world.isRemote()) {
@@ -215,28 +239,37 @@ public class ItemGunController implements IGunController {
           });
     }
 
-    entity.playSound(this.gunItem.getShootSound().get(), 0.25F, 1.0F);
-
-    Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
-
-    if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(itemStack, entity, rayTrace))) {
-      return;
+    SoundEvent shootSound = this.gunItem.getShootSound().get();
+    if (this.getAttachments().stream().anyMatch(AttachmentItem::isSoundSuppressor)) {
+      // Tries to get the silenced shoot sound.
+      // If it does not exists, the default shoot sound is used instead.
+      shootSound = this.gunItem.getSilencedShootSound().orElse(shootSound);
     }
+    entity.playSound(shootSound, 0.25F, 1.0F);
 
-    rayTrace.ifPresent(result -> {
-      switch (result.getType()) {
-        case BLOCK:
-          this.hitBlock(entity, (BlockRayTraceResult) result);
-          break;
-        case ENTITY:
-          this.hitEntity(entity, (EntityRayTraceResult) result);
-          break;
-        default:
-          break;
+    for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
+      // TODO Add per-bullet imprecision due to shotguns
+      Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
+
+      if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(itemStack, entity, rayTrace))) {
+        continue;
       }
-    });
 
-    MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(itemStack, entity, rayTrace));
+      rayTrace.ifPresent(result -> {
+        switch (result.getType()) {
+          case BLOCK:
+            this.hitBlock(entity, (BlockRayTraceResult) result);
+            break;
+          case ENTITY:
+            this.hitEntity(entity, (EntityRayTraceResult) result);
+            break;
+          default:
+            break;
+        }
+      });
+
+      MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(itemStack, entity, rayTrace));
+    }
   }
 
   private void hitEntity(Entity entity, EntityRayTraceResult rayTrace) {
@@ -244,8 +277,9 @@ public class ItemGunController implements IGunController {
     Vec3d hitVec3d = rayTrace.getHitVec();
     World world = entityHit.getEntityWorld();
     float damage = this.gunItem.getDamage();
+    double chinHeight = (entityHit.getY() + entityHit.getEyeHeight() - 0.2F);
     boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
-        && rayTrace.getHitVec().y >= (entityHit.getY() + entityHit.getEyeHeight());
+        && rayTrace.getHitVec().y >= chinHeight;
     if (headshot) {
       // The sound is played at client side too
       world.playMovingSound(null, entity, SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F,
@@ -279,6 +313,13 @@ public class ItemGunController implements IGunController {
           hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
           (player) -> player != entityHit);
     }
+
+    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
+
+    // Removes the temporary invincibility after causing the damage.
+    // Allows more bullets to hit the same target at the same time.
+    // Good for shotguns and teaming.
+    entityHit.hurtResistantTime = 0;
   }
 
   private void hitBlock(Entity entity, BlockRayTraceResult rayTrace) {
@@ -366,13 +407,19 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
-  public Optional<PaintItem> getPaint() {
+  public ItemStack getPaint() {
     return this.paint;
   }
 
   @Override
-  public void setPaint(Optional<PaintItem> paint) {
+  public void setPaint(ItemStack paint) {
     this.paint = paint;
+
+    // Updates the color
+    this.color = Optional.empty();
+    paint.getCapability(ModCapabilities.PAINT_COLOR).ifPresent(paintColorCap -> {
+      this.color = paintColorCap.getColor();
+    });
   }
 
   @Override
@@ -384,12 +431,14 @@ public class ItemGunController implements IGunController {
 
   @Override
   public void toggleFireMode(Entity entity) {
-    this.fireModeIndex = ~this.fireModeIndex & 1;
+    if (this.fireModeInfiniteIterator.hasNext()) {
+      this.fireMode = fireModeInfiniteIterator.next();
+    }
+
     entity.playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
     if (entity instanceof PlayerEntity) {
       ((PlayerEntity) entity)
-          .sendStatusMessage(new TranslationTextComponent(
-              this.gunItem.getFireModes().get(this.fireModeIndex).getTranslationKey()), true);
+          .sendStatusMessage(new TranslationTextComponent(fireMode.getTranslationKey()), true);
     }
   }
 
@@ -403,26 +452,39 @@ public class ItemGunController implements IGunController {
         .map(attachment -> StringNBT.of(attachment.getRegistryName().toString()))
         .collect(ListNBT::new, ListNBT::add, List::addAll);
     nbt.put("attachments", attachmentsTag);
-    this.paint.ifPresent(item -> {
-      nbt.putString("paint", item.getRegistryName().toString());
-    });
+    nbt.put("paint", this.paint.write(new CompoundNBT()));
     return nbt;
   }
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
-    this.magazineStack = ItemStack.read(nbt.getCompound("magazineStack"));
-    this.ammo = nbt.getInt("ammo");
-    this.attachments = nbt
+    this.setMagazineStack(ItemStack.read(nbt.getCompound("magazineStack")));
+    this.setAmmo(nbt.getInt("ammo"));
+    this.setAttachments(nbt
         .getList("attachments", 8)
         .stream()
         .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
             .getValue(new ResourceLocation(tag.getString())))
-        .collect(Collectors.toSet());
-    String paintLocation = nbt.getString("paint");
-    this.paint = !paintLocation.isEmpty()
-        ? Optional
-            .of((PaintItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation(paintLocation)))
-        : Optional.empty();
+        .collect(Collectors.toSet()));
+    this.setPaint(ItemStack.read(nbt.getCompound("paint")));
+  }
+
+  @Override
+  public Optional<GunItem> getGun() {
+    return this.gunItemOptional;
+  }
+
+  @Override
+  public Optional<Color> getColor() {
+    return this.color;
+  }
+
+  @Override
+  public void setMagazineStack(ItemStack stack) {
+    if (!stack.isEmpty()) {
+      Validate.isInstanceOf(MagazineItem.class, stack.getItem(),
+          "Non-empty ItemStack must be a magazine");
+    }
+    this.magazineStack = stack;
   }
 }

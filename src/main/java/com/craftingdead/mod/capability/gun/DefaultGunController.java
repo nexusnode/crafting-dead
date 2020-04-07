@@ -5,7 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
-import com.craftingdead.mod.item.PaintItem;
+import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.Color;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -56,7 +57,7 @@ public class DefaultGunController implements IGunController {
   public ItemStack getMagazineStack() {
     return ItemStack.EMPTY;
   }
-  
+
   @Override
   public int getAmmo() {
     return 0;
@@ -79,12 +80,12 @@ public class DefaultGunController implements IGunController {
   public void setAttachments(Set<AttachmentItem> attachments) {}
 
   @Override
-  public Optional<PaintItem> getPaint() {
-    return Optional.empty();
+  public ItemStack getPaint() {
+    return ItemStack.EMPTY;
   }
 
   @Override
-  public void setPaint(Optional<PaintItem> paint) {}
+  public void setPaint(ItemStack paint) {}
 
   @Override
   public boolean isAcceptedPaintOrAttachment(ItemStack itemStack) {
@@ -93,4 +94,17 @@ public class DefaultGunController implements IGunController {
 
   @Override
   public void toggleFireMode(Entity entity) {}
+
+  @Override
+  public Optional<GunItem> getGun() {
+    return Optional.empty();
+  }
+
+  @Override
+  public void setMagazineStack(ItemStack stack) {}
+
+  @Override
+  public Optional<Color> getColor() {
+    return Optional.empty();
+  }
 }

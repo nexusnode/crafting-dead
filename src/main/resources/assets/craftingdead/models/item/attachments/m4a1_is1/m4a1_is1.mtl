@@ -1,5 +1,5 @@
-newmtl m4a1_is1:ModelMaterial
+newmtl ModelMaterial
 Kd 1 1 1
 Ka 1 1 1
-map_Kd craftingdead:item/m4a1_is1
-map_Ka craftingdead:item/m4a1_is1
+map_Kd craftingdead:models/attachments/m4a1_is1
+map_Ka craftingdead:models/attachments/m4a1_is1

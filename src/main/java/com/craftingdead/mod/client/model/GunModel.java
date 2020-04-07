@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.item.AttachmentItem;
+import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.PaintItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -36,6 +37,7 @@ import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
@@ -180,7 +182,12 @@ public class GunModel implements IModelGeometry<GunModel> {
 
       return itemStack.getCapability(ModCapabilities.GUN_CONTROLLER).map(gunController -> {
         final Set<AttachmentItem> attachments = gunController.getAttachments();
-        final Optional<PaintItem> paint = gunController.getPaint();
+        final Item paintItem = gunController.getPaint().getItem();
+        // TODO Refactor the following variable.
+        // I have changed it due to requirements but it seems bad now.
+        final Optional<PaintItem> paint =
+            Optional.ofNullable(paintItem instanceof PaintItem ? (PaintItem) paintItem : null);
+        final GunItem gunItem = gunController.getGun().get(); // Supposing the gun is present
         final int hash =
             attachments.hashCode() + paint.map(p -> p.getRegistryName().hashCode()).orElse(0);
 
@@ -205,14 +212,17 @@ public class GunModel implements IModelGeometry<GunModel> {
                         attachmentModel.getQuads(null, null, random, EmptyModelData.INSTANCE)));
           }
 
-          IBakedModel bakedModel = paint.map(p -> {
+          IBakedModel bakedModel = paint.filter(PaintItem::hasSkin).map(p -> {
+            // Resource example: "craftingdead:models/guns/m4a1_diamond_paint"
+            ResourceLocation gunTexture =
+                new ResourceLocation(gunItem.getRegistryName().getNamespace(), "models/guns/"
+                    + gunItem.getRegistryName().getPath() + "_" + p.getRegistryName().getPath());
             BlockModel paintedModel = new BlockModel(null, new ArrayList<>(),
                 ImmutableMap
                     .of("base",
                         Either
                             .left(new Material(AtlasTexture.LOCATION_BLOCKS_TEXTURE,
-                                new ResourceLocation(p.getRegistryName().getNamespace(),
-                                    "paint/" + p.getRegistryName().getPath())))),
+                                gunTexture))),
                 false, null, ItemCameraTransforms.DEFAULT, new ArrayList<>());
             paintedModel.parent = GunModel.this.baseModel;
             return paintedModel

@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/bipod/bipod.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

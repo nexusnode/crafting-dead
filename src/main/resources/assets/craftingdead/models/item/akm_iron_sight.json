@@ -1,0 +1,11 @@
+{
+    "loader":"forge:composite",
+    "parts" : {
+        "akm_is1": {
+			"parent":"craftingdead:item/attachments/akm_is1/akm_is1"
+        },
+        "akm_is2" : {
+			"parent":"craftingdead:item/attachments/akm_is2/akm_is2"
+        }
+    }
+}

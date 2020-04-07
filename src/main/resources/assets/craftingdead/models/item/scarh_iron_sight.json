@@ -1,0 +1,11 @@
+{
+    "loader":"forge:composite",
+    "parts" : {
+        "scarh_is1": {
+			"parent":"craftingdead:item/attachments/scarh_is1/scarh_is1"
+        },
+        "scarh_is2" : {
+			"parent":"craftingdead:item/attachments/scarh_is2/scarh_is2"
+        }
+    }
+}

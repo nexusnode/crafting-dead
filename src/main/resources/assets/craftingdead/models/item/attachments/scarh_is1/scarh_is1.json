@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/scarh_is1/scarh_is1.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

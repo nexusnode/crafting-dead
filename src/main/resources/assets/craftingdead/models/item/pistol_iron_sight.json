@@ -1,0 +1,11 @@
+{
+    "loader":"forge:composite",
+    "parts" : {
+        "pistol_is1": {
+			"parent":"craftingdead:item/attachments/pistol_is1/pistol_is1"
+        },
+        "pistol_is2" : {
+			"parent":"craftingdead:item/attachments/pistol_is2/pistol_is2"
+        }
+    }
+}

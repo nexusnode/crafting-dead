@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/red_dot_sight/red_dot_sight.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

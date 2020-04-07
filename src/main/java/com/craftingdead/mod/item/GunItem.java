@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -50,11 +51,29 @@ public class GunItem extends ShootableItem {
   private final float accuracy;
 
   /**
+   * Amount of "pellets" to be fired in a single shot.
+   * It is used by shotguns.
+   */
+  private final int bulletAmountToFire;
+
+  /**
+   * Whether the player can aim with this gun or not
+   */
+  private final boolean aimable;
+
+  /**
+   * Whether the crosshair should be rendered or not while holding this item
+   */
+  private final boolean crosshairVisibility;
+
+  /**
    * {@link FireMode}s the gun can cycle through.
    */
   private final List<FireMode> fireModes;
 
   private final Supplier<SoundEvent> shootSound;
+
+  private final Supplier<SoundEvent> silencedShootSound;
 
   private final Supplier<SoundEvent> reloadSound;
 
@@ -66,18 +85,25 @@ public class GunItem extends ShootableItem {
 
   private final Set<Supplier<PaintItem>> acceptedPaints;
 
+  private final Set<Supplier<AttachmentItem>> defaultAttachments;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireRate = properties.fireRate;
     this.damage = properties.damage;
     this.reloadDurationTicks = properties.reloadDurationTicks;
     this.accuracy = properties.accuracy;
+    this.bulletAmountToFire = properties.bulletAmountToFire;
+    this.aimable = properties.aimable;
+    this.crosshairVisibility = properties.crosshairVisibility;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
+    this.silencedShootSound = properties.silencedShootSound;
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
     this.acceptedMagazines = properties.acceptedMagazines;
     this.acceptedAttachments = properties.acceptedAttachments;
+    this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
@@ -104,6 +130,18 @@ public class GunItem extends ShootableItem {
     return this.accuracy;
   }
 
+  public int getBulletAmountToFire() {
+    return this.bulletAmountToFire;
+  }
+
+  public boolean isAimable() {
+    return this.aimable;
+  }
+
+  public boolean getCrosshairVisibility() {
+    return this.crosshairVisibility;
+  }
+
   public List<FireMode> getFireModes() {
     return this.fireModes;
   }
@@ -112,8 +150,12 @@ public class GunItem extends ShootableItem {
     return this.shootSound;
   }
 
-  public Supplier<SoundEvent> getReloadSound() {
-    return this.reloadSound;
+  public Optional<SoundEvent> getSilencedShootSound() {
+    return Optional.ofNullable(this.silencedShootSound.get());
+  }
+
+  public Optional<SoundEvent> getReloadSound() {
+    return Optional.ofNullable(this.reloadSound.get());
   }
 
   public Map<AnimationType, Supplier<IAnimation>> getAnimations() {
@@ -130,6 +172,10 @@ public class GunItem extends ShootableItem {
 
   public Set<PaintItem> getAcceptedPaints() {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Set<AttachmentItem> getDefaultAttachments() {
+    return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   @Override
@@ -201,13 +247,21 @@ public class GunItem extends ShootableItem {
 
     private int reloadDurationTicks;
 
+    private int bulletAmountToFire = 1;
+
     private float accuracy;
+
+    private boolean aimable;
+
+    private boolean crosshairVisibility = true;
 
     private final List<FireMode> fireModes = new ArrayList<>();
 
     private Supplier<SoundEvent> shootSound;
 
-    private Supplier<SoundEvent> reloadSound;
+    private Supplier<SoundEvent> silencedShootSound = () -> null;
+
+    private Supplier<SoundEvent> reloadSound = () -> null;
 
     private final Map<AnimationType, Supplier<IAnimation>> animations =
         new EnumMap<>(AnimationType.class);
@@ -217,6 +271,8 @@ public class GunItem extends ShootableItem {
     private final Set<Supplier<AttachmentItem>> acceptedAttachments = new HashSet<>();
 
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
+
+    private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -233,6 +289,21 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
+    public Properties setBulletAmountToFire(int amount) {
+      this.bulletAmountToFire = amount;
+      return this;
+    }
+
+    public Properties setAimable(boolean aimable) {
+      this.aimable = aimable;
+      return this;
+    }
+
+    public Properties setCrosshairVisibility(boolean crosshairVisibility) {
+      this.crosshairVisibility = crosshairVisibility;
+      return this;
+    }
+
     public Properties setAccuracy(float accuracy) {
       this.accuracy = accuracy;
       return this;
@@ -245,6 +316,11 @@ public class GunItem extends ShootableItem {
 
     public Properties setShootSound(Supplier<SoundEvent> shootSound) {
       this.shootSound = shootSound;
+      return this;
+    }
+
+    public Properties setSilencedShootSound(Supplier<SoundEvent> silencedShootSound) {
+      this.silencedShootSound = silencedShootSound;
       return this;
     }
 
@@ -265,6 +341,13 @@ public class GunItem extends ShootableItem {
 
     public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
       this.acceptedAttachments.add(acceptedAttachment);
+      return this;
+    }
+
+    public Properties addDefaultAttachment(Supplier<AttachmentItem> defaultAttachment) {
+      // Default attachments are also accepted attachments
+      this.addAcceptedAttachment(defaultAttachment);
+      this.defaultAttachments.add(defaultAttachment);
       return this;
     }
 

@@ -1,0 +1,6 @@
+{
+	"loader":"forge:obj",
+	"model":"craftingdead:models/item/attachments/hp_scope/hp_scope.obj",
+	"flip-v":true,
+	"ambientToFullbright": false
+}

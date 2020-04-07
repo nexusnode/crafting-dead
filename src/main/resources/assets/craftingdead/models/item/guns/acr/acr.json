@@ -6,7 +6,7 @@
 		"flip-v":true,
 		"ambientToFullbright": false,
 		"textures": {
-			"base":"craftingdead:item/acr"
+			"base":"craftingdead:models/guns/acr"
 		}
 	},
 	"attachment_transforms":{

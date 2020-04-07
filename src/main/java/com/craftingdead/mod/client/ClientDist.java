@@ -2,6 +2,7 @@ package com.craftingdead.mod.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
@@ -35,11 +36,15 @@ import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.Color;
+import com.craftingdead.mod.item.ModItems;
+import com.craftingdead.mod.item.PaintItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -54,6 +59,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
@@ -67,6 +73,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -264,7 +271,7 @@ public class ClientDist implements IModDist {
    * Registers a layer into {@link PlayerRenderer}. Can be used normally during
    * {@link FMLClientSetupEvent}.
    *
-   * @param function {@link Function} with a {@link PlayerRenderer} as input and a
+   * @param function - {@link Function} with a {@link PlayerRenderer} as input and a
    *        {@link LayerRenderer} as output.
    */
   public void registerPlayerLayer(
@@ -415,10 +422,17 @@ public class ClientDist implements IModDist {
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
               event.setCanceled(true);
-              this.ingameGui
-                  .renderCrosshairs(gunController.getAccuracy(playerEntity, heldStack),
-                      event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                      event.getWindow().getScaledHeight());
+
+              boolean showCrosshair = gunController.getGun()
+                  .map(gun -> gun.getCrosshairVisibility())
+                  .orElse(false);
+
+              if (showCrosshair) {
+                this.ingameGui
+                .renderCrosshairs(gunController.getAccuracy(playerEntity, heldStack),
+                    event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                    event.getWindow().getScaledHeight());
+              }
             });
           }
         });
@@ -478,7 +492,52 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
+  public void handleItemColor(ColorHandlerEvent.Item event) {
+    // Color for stacks with GUN_CONTROLLER capability
+    IItemColor gunColor = (stack, tintIndex) -> {
+      return stack.getCapability(ModCapabilities.GUN_CONTROLLER)
+          .map(gunController -> gunController.getColor().map(Color::getMergedValues))
+          .orElse(Optional.empty())
+          .orElse(Integer.MAX_VALUE);
+    };
+
+    // Registers the color for every matching CD item
+    ModItems.ITEMS.getEntries().stream()
+        .map(RegistryObject::get)
+        .filter(item -> item instanceof GunItem)
+        .forEach(item -> event.getItemColors().register(gunColor, () -> item));
+
+    // Color for stacks with PAINT_COLOR capability
+    IItemColor paintStackColor = (stack, tintIndex) -> {
+      return stack.getCapability(ModCapabilities.PAINT_COLOR)
+          .map(paintColorCap -> paintColorCap.getColor().map(Color::getMergedValues))
+          .orElse(Optional.empty())
+          .orElse(Integer.MAX_VALUE);
+    };
+
+    // Registers the color for every matching CD item
+    ModItems.ITEMS.getEntries().stream()
+        .map(RegistryObject::get)
+        .filter(item -> item instanceof PaintItem)
+        .forEach(item -> event.getItemColors().register(paintStackColor, () -> item));
+  }
+
+  @SubscribeEvent
   public void handleTextureStitch(TextureStitchEvent.Pre event) {
-    event.addSprite(new ResourceLocation(CraftingDead.ID, "paint/vulcan_paint"));
+    // Automatically adds every painted gun skins
+    ModItems.ITEMS.getEntries().stream()
+        .map(RegistryObject::get)
+        .filter(item -> item instanceof GunItem)
+        .map(item -> (GunItem) item)
+        .forEach(gun -> {
+          gun.getAcceptedPaints().stream()
+            .filter(PaintItem::hasSkin)
+            .forEach(paint -> {
+              event.addSprite(
+                  // Example: "craftingdead:models/guns/m4a1_diamond_paint"
+                  new ResourceLocation(gun.getRegistryName().getNamespace(), "models/guns/"
+                      + gun.getRegistryName().getPath() + "_" + paint.getRegistryName().getPath()));
+          });
+        });
   }
 }

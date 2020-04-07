@@ -4,7 +4,8 @@ import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.item.AttachmentItem;
-import com.craftingdead.mod.item.PaintItem;
+import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.Color;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -30,8 +31,10 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
   void startReloading(Entity entity, ItemStack itemStack);
 
   float getAccuracy(Entity entity, ItemStack itemStack);
-  
+
   ItemStack getMagazineStack();
+
+  void setMagazineStack(ItemStack stack);
 
   int getAmmo();
 
@@ -49,9 +52,16 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   void setAttachments(Set<AttachmentItem> attachments);
 
-  Optional<PaintItem> getPaint();
+  ItemStack getPaint();
 
-  void setPaint(Optional<PaintItem> paint);
+  Optional<GunItem> getGun();
+
+  void setPaint(ItemStack paint);
+
+  /**
+   * Color of the gun
+   */
+  Optional<Color> getColor();
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 

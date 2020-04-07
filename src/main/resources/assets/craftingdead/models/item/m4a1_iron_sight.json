@@ -2,16 +2,14 @@
     "loader":"forge:composite",
     "parts" : {
         "m4a1_is1": {
-            "loader":"forge:obj",
-            "model":"craftingdead:models/item/attachments/m4a1_is1/m4a1_is1.obj",
-            "flip-v":true,
-			"ambientToFullbright": false
+			"parent":"craftingdead:item/attachments/m4a1_is1/m4a1_is1"
         },
         "m4a1_is2" : {
-            "loader":"forge:obj",
-            "model":"craftingdead:models/item/attachments/m4a1_is2/m4a1_is2.obj",
-            "flip-v":true,
-			"ambientToFullbright": false
+			"parent":"craftingdead:item/attachments/m4a1_is2/m4a1_is2",
+			"transform": {
+				"translation":[ 3.2, 0.15, -0.525 ],
+				"scale":[ 0.6, 1, 0.6 ]
+			}
         }
     }
 }
