@@ -48,6 +48,7 @@ public class ModEntityTypes {
             .<AdvancedZombieEntity>create(AdvancedZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     fastZombie = add("fast_zombie",
@@ -55,6 +56,7 @@ public class ModEntityTypes {
             .<FastZombieEntity>create(FastZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     tankZombie = add("tank_zombie",
@@ -62,6 +64,7 @@ public class ModEntityTypes {
             .<TankZombieEntity>create(TankZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     weakZombie = add("weak_zombie",
@@ -69,6 +72,7 @@ public class ModEntityTypes {
             .<WeakZombieEntity>create(WeakZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     supplyDrop = add("supply_drop", EntityType.Builder
