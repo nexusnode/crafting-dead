@@ -26,6 +26,8 @@
   "attribute.hat.immune_to_flashes": "Immune to flashes",
   "attribute.hat.has_night_vision": "Has Night Vision ability",
   "itemGroup.craftingdead_consumables": "Crafting Dead Consumables",
+  "itemGroup.craftingdead_clothing": "Crafting Dead Clothing",
+  "itemGroup.craftingdead_blocks": "Crafting Dead Blocks",
   "itemGroup.craftingdead_misc": "Crafting Dead Miscellaneous",
   "itemGroup.craftingdead_med": "Crafting Dead Medical",
   "itemGroup.craftingdead_combat": "Crafting Dead Combat",
