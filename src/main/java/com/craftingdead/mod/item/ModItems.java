@@ -9,6 +9,7 @@ import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.type.Backpack;
+import com.craftingdead.mod.type.Vest;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -2379,37 +2380,33 @@ public class ModItems {
   // ================================================================================
   // Vests
   // ================================================================================
-
-  // TODO Allow vests to carry every item, but not backpacks, guns and vests
-  // TODO Set inventory size of all vests
-
-  // TODO Make ammo vest provide magazines as a primary inventory
+  
   public static final RegistryObject<Item> AMMO_TACTICAL_VEST = ITEMS
-      .register("ammo_tactical_vest", () -> new VestItem(
+      .register("ammo_tactical_vest", () -> new VestItem(Vest.AMMO,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BLACK_TACTICAL_VEST = ITEMS
-      .register("black_tactical_vest", () -> new VestItem(
+      .register("black_tactical_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GHILLIE_TACTICAL_VEST = ITEMS
-      .register("ghillie_tactical_vest", () -> new VestItem(
+      .register("ghillie_tactical_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_TACTICAL_VEST = ITEMS
-      .register("green_tactical_vest", () -> new VestItem(
+      .register("green_tactical_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREY_TACTICAL_VEST = ITEMS
-      .register("grey_tactical_vest", () -> new VestItem(
+      .register("grey_tactical_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RIOT_VEST = ITEMS
-      .register("riot_vest", () -> new VestItem(
+      .register("riot_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> TAN_TACTICAL_VEST = ITEMS
-      .register("tan_tactical_vest", () -> new VestItem(
+      .register("tan_tactical_vest", () -> new VestItem(Vest.NORM,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================
