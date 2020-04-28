@@ -1,0 +1,8 @@
+modLoader="javafml"
+loaderVersion="[27,)"
+
+[[mods]]
+modId="craftingdeadimmerse" 
+version="${file.jarVersion}"
+displayName="Crafting Dead Immerse"
+displayURL="http://craftingdead.com"

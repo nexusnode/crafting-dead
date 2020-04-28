@@ -1,0 +1,39 @@
+repositories {
+	maven {
+		name 'jitpack'
+		url 'https://jitpack.io' 
+	}
+}
+
+minecraft {    
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            mods {
+                craftingdeadimmerse {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('server')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            mods {
+                craftingdeadimmerse {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation group: 'com.github.arcnor', name: 'universal-tween-engine', version: '6.3.4'
+	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'    
+}
