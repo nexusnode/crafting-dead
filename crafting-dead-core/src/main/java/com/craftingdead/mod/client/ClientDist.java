@@ -74,11 +74,9 @@ public class ClientDist implements IModDist {
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
   public static final KeyBinding TOGGLE_FIRE_MODE =
-      new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_M, "key.categories.gameplay");
-  public static final KeyBinding CROUCH =
-      new KeyBinding("key.crouch", GLFW.GLFW_KEY_BACKSLASH, "key.categories.gameplay");
+      new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
   public static final KeyBinding OPEN_PLAYER_CONTAINER =
-      new KeyBinding("key.player", GLFW.GLFW_KEY_X, "key.categories.inventory");
+      new KeyBinding("key.player", GLFW.GLFW_KEY_Z, "key.categories.inventory");
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
@@ -154,7 +152,7 @@ public class ClientDist implements IModDist {
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
-    ClientRegistry.registerKeyBinding(CROUCH);
+    ClientRegistry.registerKeyBinding(OPEN_PLAYER_CONTAINER);
 
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
@@ -206,7 +204,6 @@ public class ClientDist implements IModDist {
             // TODO Find a reason to not remove this line. Also, if you remove it, you will
             // need to change the json file of every helmet since the scale affects positions.
             .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
-
             .build());
     this
         .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()

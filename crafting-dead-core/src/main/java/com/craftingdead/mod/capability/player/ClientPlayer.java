@@ -5,8 +5,15 @@ import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.PlayerActionMessage;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Pose;
+import net.minecraft.util.Util;
 
 public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
+
+  private static final int DOUBLE_CLICK_DURATION = 500;
+
+  private boolean wasHoldingSneakKey;
+  private long lastSneakPressTime;
+  private boolean crouching;
 
   public ClientPlayer(ClientPlayerEntity entity) {
     super(entity);
@@ -27,7 +34,20 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
   public void tick() {
     super.tick();
 
-    if (ClientDist.CROUCH.isKeyDown()) {
+    if (this.entity.isHoldingSneakKey() != this.wasHoldingSneakKey) {
+      if (this.entity.isHoldingSneakKey()) {
+        final long currentTime = Util.milliTime();
+        if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
+          this.crouching = true;
+        }
+        this.lastSneakPressTime = Util.milliTime();
+      } else {
+        this.crouching = false;
+      }
+    }
+    this.wasHoldingSneakKey = this.entity.isHoldingSneakKey();
+
+    if (this.crouching) {
       this.entity.setPose(Pose.SWIMMING);
     }
 
