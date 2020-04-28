@@ -72,8 +72,7 @@ public class GunModel implements IModelGeometry<GunModel> {
         .bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, true);
     final Random random = new Random();
     random.setSeed(42L);
-    return new BakedGunModel(bakedModel,
-        bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE),
+    return new BakedGunModel(bakedModel, ImmutableMap.of(),
         new AttachmentOverrideHandler(bakery, overrides), owner.getCombinedTransform());
   }
 
@@ -87,14 +86,14 @@ public class GunModel implements IModelGeometry<GunModel> {
   public static class BakedGunModel implements IBakedModel {
 
     private final IBakedModel baseModel;
-    private final List<BakedQuad> quads;
+    private final Map<IBakedModel, QuadTransformer> attachments;
     private final ItemOverrideList itemOverrideList;
     private final IModelTransform transform;
 
-    public BakedGunModel(IBakedModel model, List<BakedQuad> quads,
+    public BakedGunModel(IBakedModel model, Map<IBakedModel, QuadTransformer> attachments,
         ItemOverrideList itemOverrideList, IModelTransform transform) {
       this.baseModel = model;
-      this.quads = quads;
+      this.attachments = attachments;
       this.itemOverrideList = itemOverrideList;
       this.transform = transform;
     }
@@ -107,7 +106,15 @@ public class GunModel implements IModelGeometry<GunModel> {
     @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side,
         @Nonnull Random rand, @Nonnull IModelData extraData) {
-      return this.quads;
+      ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
+      for (Map.Entry<IBakedModel, QuadTransformer> entry : this.attachments.entrySet()) {
+        builder
+            .addAll(entry
+                .getValue()
+                .processMany(entry.getKey().getQuads(state, side, rand, EmptyModelData.INSTANCE)));
+      }
+      builder.addAll(this.baseModel.getQuads(state, side, rand, EmptyModelData.INSTANCE));
+      return builder.build();
     }
 
     @Override
@@ -144,7 +151,17 @@ public class GunModel implements IModelGeometry<GunModel> {
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
       this.transform.getPartTransformation(cameraTransformType).push(mat);
-      return this;
+      ImmutableMap.Builder<IBakedModel, QuadTransformer> transformedAttachments =
+          ImmutableMap.builder();
+      for (Map.Entry<IBakedModel, QuadTransformer> entry : this.attachments.entrySet()) {
+        transformedAttachments
+            .put(entry.getKey() instanceof PerspectiveAwareModel.BakedPerspectiveAwareModel
+                ? ((PerspectiveAwareModel.BakedPerspectiveAwareModel) entry.getKey())
+                    .getModelForPerspective(cameraTransformType)
+                : entry.getKey(), entry.getValue());
+      }
+      return new BakedGunModel(this.baseModel, transformedAttachments.build(),
+          this.itemOverrideList, this.transform);
     }
 
     @Override
@@ -195,7 +212,9 @@ public class GunModel implements IModelGeometry<GunModel> {
         random.setSeed(42L);
 
         return this.cachedModels.computeIfAbsent(hash, key -> {
-          ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
+
+          ImmutableMap.Builder<IBakedModel, QuadTransformer> attachmentModels =
+              ImmutableMap.builder();
 
           for (AttachmentItem attachment : attachments) {
             IBakedModel attachmentModel = Minecraft
@@ -205,11 +224,7 @@ public class GunModel implements IModelGeometry<GunModel> {
             QuadTransformer quadTransformer = GunModel.this.attachmentTransforms
                 .getOrDefault(attachment.getRegistryName(),
                     new QuadTransformer(TransformationMatrix.identity()));
-
-            builder
-                .addAll(quadTransformer
-                    .processMany(
-                        attachmentModel.getQuads(null, null, random, EmptyModelData.INSTANCE)));
+            attachmentModels.put(attachmentModel, quadTransformer);
           }
 
           IBakedModel bakedModel = paint.filter(PaintItem::hasSkin).map(p -> {
@@ -221,8 +236,7 @@ public class GunModel implements IModelGeometry<GunModel> {
                 ImmutableMap
                     .of("base",
                         Either
-                            .left(new Material(AtlasTexture.LOCATION_BLOCKS_TEXTURE,
-                                gunTexture))),
+                            .left(new Material(AtlasTexture.LOCATION_BLOCKS_TEXTURE, gunTexture))),
                 false, null, ItemCameraTransforms.DEFAULT, new ArrayList<>());
             paintedModel.parent = GunModel.this.baseModel;
             return paintedModel
@@ -230,9 +244,7 @@ public class GunModel implements IModelGeometry<GunModel> {
                     gunModel.transform, new ResourceLocation(CraftingDead.ID, "generated"), true);
           }).orElse(gunModel.baseModel);
 
-          builder.addAll(bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE));
-
-          return new BakedGunModel(bakedModel, builder.build(), this, gunModel.transform);
+          return new BakedGunModel(bakedModel, attachmentModels.build(), this, gunModel.transform);
         });
       }).orElse(gunModel);
     }

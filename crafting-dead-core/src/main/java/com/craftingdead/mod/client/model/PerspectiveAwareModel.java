@@ -172,10 +172,16 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
       this.animationController
           .filter(controller -> controller.isAcceptedPerspective(cameraTransformType))
           .ifPresent(controller -> controller.apply(mat));
+      return this
+          .getModelForPerspective(cameraTransformType)
+          .handlePerspective(cameraTransformType, mat);
+    }
+
+    public IBakedModel getModelForPerspective(
+        ItemCameraTransforms.TransformType cameraTransformType) {
       return this.bakedModels
           .getOrDefault(cameraTransformType,
-              this.bakedModels.get(ItemCameraTransforms.TransformType.NONE))
-          .handlePerspective(cameraTransformType, mat);
+              this.bakedModels.get(ItemCameraTransforms.TransformType.NONE));
     }
 
     @Override

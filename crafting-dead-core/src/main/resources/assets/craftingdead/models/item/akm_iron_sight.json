@@ -1,11 +1,25 @@
 {
-    "loader":"forge:composite",
-    "parts" : {
-        "akm_is1": {
-			"parent":"craftingdead:item/attachments/akm_is1/akm_is1"
-        },
-        "akm_is2" : {
-			"parent":"craftingdead:item/attachments/akm_is2/akm_is2"
+    "loader":"craftingdead:perspective_aware",
+    "model": {
+        "parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/akm_iron_sight"
+		}
+    },
+    "perspective_overrides" : [
+        {
+            "perspectives":["thirdperson_righthand", "thirdperson_lefthand", "firstperson_righthand", "firstperson_lefthand", "head"],
+			"model":{
+				"loader":"forge:composite",
+                "parts" : {
+                    "akm_is1": {
+                        "parent":"craftingdead:item/attachments/akm_is1/akm_is1"
+                    },
+                    "akm_is2" : {
+                        "parent":"craftingdead:item/attachments/akm_is2/akm_is2"
+                    }
+                }
+			}
         }
-    }
+    ]
 }

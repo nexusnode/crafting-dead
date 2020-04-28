@@ -1,3 +1,17 @@
 {
-	"parent":"craftingdead:item/attachments/tactical_grip/tactical_grip"
+    "loader":"craftingdead:perspective_aware",
+    "model": {
+        "parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/tactical_grip"
+		}
+    },
+    "perspective_overrides" : [
+        {
+            "perspectives":["thirdperson_righthand", "thirdperson_lefthand", "firstperson_righthand", "firstperson_lefthand", "head"],
+			"model":{
+                "parent":"craftingdead:item/attachments/tactical_grip/tactical_grip"
+			}
+        }
+    ]
 }

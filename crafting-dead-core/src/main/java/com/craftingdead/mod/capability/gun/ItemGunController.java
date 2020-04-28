@@ -14,14 +14,15 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
+import com.craftingdead.mod.item.Color;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.item.Color;
 import com.craftingdead.mod.item.MagazineItem;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.ParticleUtil;
 import com.craftingdead.mod.util.RayTraceUtil;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -398,7 +399,7 @@ public class ItemGunController implements IGunController {
 
   @Override
   public Set<AttachmentItem> getAttachments() {
-    return this.attachments;
+    return ImmutableSet.copyOf(this.attachments);
   }
 
   @Override

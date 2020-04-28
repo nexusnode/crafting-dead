@@ -51,8 +51,7 @@ public class GunItem extends ShootableItem {
   private final float accuracy;
 
   /**
-   * Amount of "pellets" to be fired in a single shot.
-   * It is used by shotguns.
+   * Amount of "pellets" to be fired in a single shot. It is used by shotguns.
    */
   private final int bulletAmountToFire;
 
@@ -233,6 +232,16 @@ public class GunItem extends ShootableItem {
           .ifPresent(player -> player.toggleAiming(true));
     }
     return super.onItemRightClick(world, playerEntity, hand);
+  }
+
+  @Override
+  public CompoundNBT getShareTag(ItemStack stack) {
+    return stack.serializeNBT();
+  }
+
+  @Override
+  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    stack.deserializeNBT(nbt);
   }
 
   public static enum AnimationType {
