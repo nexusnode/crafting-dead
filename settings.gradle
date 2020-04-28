@@ -1,0 +1,4 @@
+rootProject.name = 'crafting-dead'
+
+include 'crafting-dead-core'
+include 'crafting-dead-immerse'

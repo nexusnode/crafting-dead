@@ -17,73 +17,38 @@ plugins {
     id 'eclipse'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
+subprojects {
+    apply plugin: 'net.minecraftforge.gradle'
 
-version = '0.0.1'
-group = 'com.craftingdead.mod'
-archivesBaseName = 'craftingdead'
+	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+    group = 'com.craftingdead.mod'
+    version = '0.0.0.1'
+	archivesBaseName = project.name
+	
+	minecraft {
+    	mappings channel: "${mappings_channel}", version: "${mappings_version}"
+    }
+    
+    dependencies {
+    	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
+	}
+	
+	jar {
+	    manifest {
+	        attributes([
+	            "Implementation-Title": project.name,
+	            "Implementation-Version": project.version,
+	            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+	        ])
+	    }
+	}
+}
 
 repositories {
-	maven {
-		name 'jitpack'
-		url 'https://jitpack.io' 
-	}
-	maven {
+    jcenter()
+    maven {
         name 'tterrag'
         url 'https://maven.tterrag.com'
-    }
-}
-
-minecraft {
-    mappings channel: "${mappings_channel}", version: "${mappings_version}"
-    
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            mods {
-                craftingdead {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('server')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            mods {
-                craftingdead {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-dependencies {
-    minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
-    	
-	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
-}
-
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "craftingdead",
-            "Specification-Vendor": "craftingdead",
-            "Specification-Version": "1",
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"craftingdead",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
     }
 }
