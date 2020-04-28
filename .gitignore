@@ -24,6 +24,7 @@ crafting-dead-immerse/.idea/
 
 /.classpath
 /.project
-/.idea/
-/.settings/
 /.gradle/
+/bin/
+/.settings/
+/.idea/
