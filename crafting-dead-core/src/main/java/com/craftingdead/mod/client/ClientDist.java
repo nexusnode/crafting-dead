@@ -1,14 +1,9 @@
 package com.craftingdead.mod.client;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
@@ -84,8 +79,6 @@ public class ClientDist implements IModDist {
       new KeyBinding("key.crouch", GLFW.GLFW_KEY_BACKSLASH, "key.categories.gameplay");
   public static final KeyBinding OPEN_PLAYER_CONTAINER =
       new KeyBinding("key.player", GLFW.GLFW_KEY_X, "key.categories.inventory");
-
-  private static final Logger logger = LogManager.getLogger();
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
@@ -230,31 +223,6 @@ public class ClientDist implements IModDist {
                 .getStackInSlot(InventorySlotType.BACKPACK.getIndex()))
             .withCrouchingOrientation(true)
             .build());
-
-    // GLFW code needs to run on main thread
-    minecraft.enqueue(() -> {
-      if (CommonConfig.clientConfig.applyBranding.get()) {
-        StartupMessageManager.addModMessage("Applying branding");
-        GLFW
-            .glfwSetWindowTitle(minecraft.getWindow().getHandle(),
-                String.format("%s %s", CraftingDead.DISPLAY_NAME, CraftingDead.VERSION));
-        try {
-          InputStream smallIcon = minecraft
-              .getResourceManager()
-              .getResource(
-                  new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_16x16.png"))
-              .getInputStream();
-          InputStream mediumIcon = minecraft
-              .getResourceManager()
-              .getResource(
-                  new ResourceLocation(CraftingDead.ID, "textures/gui/icons/icon_32x32.png"))
-              .getInputStream();
-          minecraft.getWindow().setWindowIcon(smallIcon, mediumIcon);
-        } catch (IOException e) {
-          logger.error("Couldn't set icon", e);
-        }
-      }
-    });
   }
 
   /**
