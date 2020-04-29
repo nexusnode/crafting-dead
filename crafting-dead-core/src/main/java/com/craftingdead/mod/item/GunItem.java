@@ -63,7 +63,7 @@ public class GunItem extends ShootableItem {
   /**
    * Whether the crosshair should be rendered or not while holding this item
    */
-  private final boolean crosshairVisibility;
+  private final boolean crosshair;
 
   /**
    * {@link FireMode}s the gun can cycle through.
@@ -94,7 +94,7 @@ public class GunItem extends ShootableItem {
     this.accuracy = properties.accuracy;
     this.bulletAmountToFire = properties.bulletAmountToFire;
     this.aimable = properties.aimable;
-    this.crosshairVisibility = properties.crosshairVisibility;
+    this.crosshair = properties.crosshair;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
     this.silencedShootSound = properties.silencedShootSound;
@@ -137,8 +137,8 @@ public class GunItem extends ShootableItem {
     return this.aimable;
   }
 
-  public boolean getCrosshairVisibility() {
-    return this.crosshairVisibility;
+  public boolean hasCrosshair() {
+    return this.crosshair;
   }
 
   public List<FireMode> getFireModes() {
@@ -262,7 +262,7 @@ public class GunItem extends ShootableItem {
 
     private boolean aimable;
 
-    private boolean crosshairVisibility = true;
+    private boolean crosshair = true;
 
     private final List<FireMode> fireModes = new ArrayList<>();
 
@@ -308,8 +308,8 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties setCrosshairVisibility(boolean crosshairVisibility) {
-      this.crosshairVisibility = crosshairVisibility;
+    public Properties setCrosshair(boolean crosshair) {
+      this.crosshair = crosshair;
       return this;
     }
 

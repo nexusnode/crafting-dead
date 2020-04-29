@@ -31,7 +31,7 @@ public class GunCraftSlot extends GunSlot {
       });
       this.craftingInventory
           .setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
-              gunController.getPaint());
+              gunController.getPaintStack());
     });
     super.putStack(itemStack);
   }
@@ -39,7 +39,7 @@ public class GunCraftSlot extends GunSlot {
   @Override
   public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
     gunStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
-      gunController.setPaint(ItemStack.EMPTY);
+      gunController.setPaintStack(ItemStack.EMPTY);
       Set<AttachmentItem> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
         ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
@@ -47,7 +47,7 @@ public class GunCraftSlot extends GunSlot {
           if (itemStack.getItem() instanceof AttachmentItem) {
             attachments.add((AttachmentItem) itemStack.getItem());
           } else if (itemStack.getItem() instanceof PaintItem) {
-            gunController.setPaint(itemStack);
+            gunController.setPaintStack(itemStack);
           }
           this.craftingInventory.setInventorySlotContents(i, ItemStack.EMPTY);
         }

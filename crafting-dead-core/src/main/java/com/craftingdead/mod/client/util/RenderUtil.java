@@ -1,13 +1,10 @@
 package com.craftingdead.mod.client.util;
 
-import java.awt.Color;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.util.PlayerResource;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -21,15 +18,12 @@ import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.ItemModelGenerator;
 import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.DownloadingTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 
@@ -148,19 +142,6 @@ public class RenderUtil {
     tessellator.draw();
   }
 
-  public static ResourceLocation getPlayerAvatar(UUID playerId) {
-    ResourceLocation resourceLocation =
-        new ResourceLocation(CraftingDead.ID, "textures/avatars/" + playerId + ".png");
-    Texture object = minecraft.getTextureManager().getTexture(resourceLocation);
-    if (object == null) {
-      DownloadingTexture imageData =
-          new DownloadingTexture(null, PlayerResource.AVATAR_URL.getUrl(playerId),
-              new ResourceLocation(CraftingDead.ID, "textures/gui/avatar.png"), false, null);
-      minecraft.getTextureManager().registerTexture(resourceLocation, imageData);
-    }
-    return resourceLocation;
-  }
-
   public static void renderModel(IBakedModel model, ItemStack itemStack, MatrixStack matrixStack,
       IVertexBuilder vertexBuilder) {
     renderModel(model, itemStack, 0xF000F0, OverlayTexture.DEFAULT_UV, matrixStack, vertexBuilder,
@@ -194,22 +175,5 @@ public class RenderUtil {
 
   public static void bind(ResourceLocation resourceLocation) {
     minecraft.getTextureManager().bindTexture(resourceLocation);
-  }
-
-  public static Color lerp(Color color1, Color color2, double pct) {
-    double r = MathHelper.lerp(pct, color1.getRed(), color2.getRed());
-    double g = MathHelper.lerp(pct, color1.getGreen(), color2.getGreen());
-    double b = MathHelper.lerp(pct, color1.getBlue(), color2.getBlue());
-    double a = MathHelper.lerp(pct, color1.getAlpha(), color2.getAlpha());
-    return new Color((int) Math.round(r), (int) Math.round(g), (int) Math.round(b),
-        (int) Math.round(a));
-  }
-
-  public static double getScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.getWindow().getWidth() / imageWidth;
-    double heightScale = minecraft.getWindow().getHeight() / imageHeight;
-    final double scale =
-        imageHeight * widthScale < minecraft.getWindow().getHeight() ? heightScale : widthScale;
-    return scale / minecraft.getWindow().getGuiScaleFactor();
   }
 }

@@ -1,11 +1,8 @@
 package com.craftingdead.mod.capability.gun;
 
-import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.item.AttachmentItem;
-import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.item.Color;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -52,20 +49,15 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   void setAttachments(Set<AttachmentItem> attachments);
 
-  ItemStack getPaint();
+  ItemStack getPaintStack();
 
-  Optional<GunItem> getGun();
-
-  void setPaint(ItemStack paint);
-
-  /**
-   * Color of the gun
-   */
-  Optional<Color> getColor();
+  void setPaintStack(ItemStack paintStack);
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 
   void toggleFireMode(Entity entity);
+
+  boolean hasCrosshair();
 
   @Override
   default boolean isActive(ClientPlayerEntity playerEntity) {

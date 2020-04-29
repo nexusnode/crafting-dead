@@ -14,7 +14,6 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
-import com.craftingdead.mod.item.Color;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.MagazineItem;
@@ -61,7 +60,6 @@ public class ItemGunController implements IGunController {
   private static final float HEADSHOT_MULTIPLIER = 4;
 
   private final GunItem gunItem;
-  private final Optional<GunItem> gunItemOptional;
 
   private boolean triggerPressed;
 
@@ -87,24 +85,21 @@ public class ItemGunController implements IGunController {
 
   private Set<AttachmentItem> attachments;
 
-  private ItemStack paint = ItemStack.EMPTY;
-
-  private Optional<Color> color = Optional.empty();
+  private ItemStack paintStack = ItemStack.EMPTY;
 
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
   public ItemGunController(GunItem gunItem) {
     this.gunItem = gunItem;
-    this.gunItemOptional = Optional.of(this.gunItem);
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
-    this.fireMode = fireModeInfiniteIterator.next();
+    this.fireMode = this.fireModeInfiniteIterator.next();
     this.attachments = gunItem.getDefaultAttachments();
   }
 
   @Override
   public void tick(Entity entity, ItemStack itemStack) {
     boolean isMaxShotsReached =
-        fireMode.getMaxShots().map(max -> this.shotsInARow >= max).orElse(false);
+        this.fireMode.getMaxShots().map(max -> this.shotsInARow >= max).orElse(false);
 
     if (!isMaxShotsReached) {
       this.tryShoot(entity, itemStack);
@@ -181,8 +176,9 @@ public class ItemGunController implements IGunController {
                 || !((PlayerEntity) entity).findAmmo(itemStack).isEmpty())
             : true;
     if (!this.isReloading() && canReload) {
-      entity.world.playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
-          SoundCategory.PLAYERS, 1.0F, 1.0F);
+      entity.world
+          .playMovingSound(null, entity, this.gunItem.getReloadSound().get(), SoundCategory.PLAYERS,
+              1.0F, 1.0F);
       this.reloadDurationTicks =
           this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
     }
@@ -283,8 +279,9 @@ public class ItemGunController implements IGunController {
         && rayTrace.getHitVec().y >= chinHeight;
     if (headshot) {
       // The sound is played at client side too
-      world.playMovingSound(null, entity, SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F,
-          1.5F);
+      world
+          .playMovingSound(null, entity, SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F,
+              1.5F);
       damage *= HEADSHOT_MULTIPLIER;
 
       // Runs at server side only
@@ -292,27 +289,31 @@ public class ItemGunController implements IGunController {
         ServerWorld serverWorld = (ServerWorld) world;
 
         // Sends to everyone near, except the player
-        ParticleUtil.spawnParticleServerside(serverWorld,
-            new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
-            hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-            (player) -> player != entityHit);
+        ParticleUtil
+            .spawnParticleServerside(serverWorld,
+                new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
+                hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+                (player) -> player != entityHit);
       }
     }
     // The sound is played at client side too
-    world.playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
-        SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
-    ModDamageSource.causeDamageWithoutKnockback(entityHit,
-        ModDamageSource.causeGunDamage(entity, headshot), damage);
+    world
+        .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
+            SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
+    ModDamageSource
+        .causeDamageWithoutKnockback(entityHit, ModDamageSource.causeGunDamage(entity, headshot),
+            damage);
 
     // Runs at server side only
     if (world instanceof ServerWorld) {
       ServerWorld serverWorld = (ServerWorld) world;
 
       // Sends to everyone near, except the player
-      ParticleUtil.spawnParticleServerside(serverWorld,
-          new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-          hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-          (player) -> player != entityHit);
+      ParticleUtil
+          .spawnParticleServerside(serverWorld,
+              new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
+              hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+              (player) -> player != entityHit);
     }
 
     entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
@@ -350,13 +351,15 @@ public class ItemGunController implements IGunController {
       hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
     }
 
+    world.playSound(null, blockPos, hitSound, SoundCategory.BLOCKS, 1.2F, 1.0F); // volume, pitch
+
     // Runs at server side only
     if (world instanceof ServerWorld) {
       ServerWorld serverWorld = (ServerWorld) world;
-      serverWorld.spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState),
-          hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
+      serverWorld
+          .spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.getX(),
+              hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
 
-      world.playSound(null, blockPos, hitSound, SoundCategory.BLOCKS, 1.2F, 1.0F); // volume, pitch
     }
   }
 
@@ -408,19 +411,13 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
-  public ItemStack getPaint() {
-    return this.paint;
+  public ItemStack getPaintStack() {
+    return this.paintStack;
   }
 
   @Override
-  public void setPaint(ItemStack paint) {
-    this.paint = paint;
-
-    // Updates the color
-    this.color = Optional.empty();
-    paint.getCapability(ModCapabilities.PAINT_COLOR).ifPresent(paintColorCap -> {
-      this.color = paintColorCap.getColor();
-    });
+  public void setPaintStack(ItemStack paintStack) {
+    this.paintStack = paintStack;
   }
 
   @Override
@@ -444,6 +441,11 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
+  public boolean hasCrosshair() {
+    return this.gunItem.hasCrosshair();
+  }
+
+  @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("magazineStack", this.magazineStack.write(new CompoundNBT()));
@@ -453,7 +455,7 @@ public class ItemGunController implements IGunController {
         .map(attachment -> StringNBT.of(attachment.getRegistryName().toString()))
         .collect(ListNBT::new, ListNBT::add, List::addAll);
     nbt.put("attachments", attachmentsTag);
-    nbt.put("paint", this.paint.write(new CompoundNBT()));
+    nbt.put("paintStack", this.paintStack.write(new CompoundNBT()));
     return nbt;
   }
 
@@ -461,30 +463,22 @@ public class ItemGunController implements IGunController {
   public void deserializeNBT(CompoundNBT nbt) {
     this.setMagazineStack(ItemStack.read(nbt.getCompound("magazineStack")));
     this.setAmmo(nbt.getInt("ammo"));
-    this.setAttachments(nbt
-        .getList("attachments", 8)
-        .stream()
-        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
-            .getValue(new ResourceLocation(tag.getString())))
-        .collect(Collectors.toSet()));
-    this.setPaint(ItemStack.read(nbt.getCompound("paint")));
-  }
-
-  @Override
-  public Optional<GunItem> getGun() {
-    return this.gunItemOptional;
-  }
-
-  @Override
-  public Optional<Color> getColor() {
-    return this.color;
+    this
+        .setAttachments(nbt
+            .getList("attachments", 8)
+            .stream()
+            .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
+                .getValue(new ResourceLocation(tag.getString())))
+            .collect(Collectors.toSet()));
+    this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
   }
 
   @Override
   public void setMagazineStack(ItemStack stack) {
     if (!stack.isEmpty()) {
-      Validate.isInstanceOf(MagazineItem.class, stack.getItem(),
-          "Non-empty ItemStack must be a magazine");
+      Validate
+          .isInstanceOf(MagazineItem.class, stack.getItem(),
+              "Non-empty ItemStack must be a magazine");
     }
     this.magazineStack = stack;
   }

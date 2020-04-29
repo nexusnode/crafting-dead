@@ -53,16 +53,16 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> CYREX_PAINT = ITEMS
-        .register("cyrex_paint",
-            () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                .maxStackSize(1)
-                .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("cyrex_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> DIAMOND_PAINT = ITEMS
-        .register("diamond_paint",
-            () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                .maxStackSize(1)
-                .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("diamond_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> DRAGON_PAINT = ITEMS
       .register("dragon_paint",
@@ -97,7 +97,7 @@ public class ModItems {
   public static final RegistryObject<PaintItem> MULTI_PAINT = ITEMS
       .register("multi_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .setColorGenerator(Color::createRandom)
+              .setColour()
               .setHasSkin(false)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1128,7 +1128,7 @@ public class ModItems {
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 2.75F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.SPORTER22_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
@@ -1156,7 +1156,7 @@ public class ModItems {
               .setDamage(20)
               .setReloadDurationTicks((int) (20 * 2.75F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M107_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
@@ -1185,7 +1185,7 @@ public class ModItems {
               .setDamage(14)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AS50_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
@@ -1212,7 +1212,7 @@ public class ModItems {
               .setDamage(10)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1GARAND_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
@@ -1235,7 +1235,7 @@ public class ModItems {
               .setDamage(20)
               .setReloadDurationTicks((int) (20 * 2.75F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AWP_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
@@ -1260,7 +1260,7 @@ public class ModItems {
               .setDamage(15)
               .setReloadDurationTicks((int) (20 * 2.75F))
               .setAccuracy(0.9F)
-              .setCrosshairVisibility(false)
+              .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DMR_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
@@ -1360,7 +1360,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
 
               // TODO Create the following animation from legacy
-              //.addAnimation(GunItem.AnimationType.SHOOT, MinigunShootAnimation::new)
+              // .addAnimation(GunItem.AnimationType.SHOOT, MinigunShootAnimation::new)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
 
               .addAcceptedMagazine(MINIGUN_MAGAZINE)
@@ -2380,7 +2380,7 @@ public class ModItems {
   // ================================================================================
   // Vests
   // ================================================================================
-  
+
   public static final RegistryObject<Item> AMMO_TACTICAL_VEST = ITEMS
       .register("ammo_tactical_vest", () -> new VestItem(Vest.AMMO,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
@@ -2646,7 +2646,7 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
-  //TODO Add respiration ability to the CLOTHING+MASK item combo
+  // TODO Add respiration ability to the CLOTHING+MASK item combo
   public static final RegistryObject<Item> SCUBA_MASK = ITEMS
       .register("scuba_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()

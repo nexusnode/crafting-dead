@@ -9,6 +9,7 @@ import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.paint.IPaint;
 import com.craftingdead.mod.capability.player.ClientPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
@@ -26,12 +27,10 @@ import com.craftingdead.mod.client.renderer.entity.player.layer.ClothingLayer;
 import com.craftingdead.mod.client.renderer.entity.player.layer.EquipmentLayer;
 import com.craftingdead.mod.client.tutorial.IModTutorialStep;
 import com.craftingdead.mod.client.tutorial.ModTutorialSteps;
-import com.craftingdead.mod.client.tutorial.OpenModInventoryStep;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.AttachmentItem;
-import com.craftingdead.mod.item.Color;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
@@ -273,7 +272,7 @@ public class ClientDist implements IModDist {
                 .ifPresent(IPlayer::openPlayerContainer);
 
             if (minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
-              ((OpenModInventoryStep) minecraft.getTutorial().tutorialStep).openModInventory();
+              ((IModTutorialStep) minecraft.getTutorial().tutorialStep).openModInventory();
             }
           }
 
@@ -312,23 +311,18 @@ public class ClientDist implements IModDist {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
               new SerializableProvider<>(new ClientPlayer((ClientPlayerEntity) event.getObject()),
-                  ModCapabilities.PLAYER));
+                  () -> ModCapabilities.PLAYER));
     } else if (event.getObject() instanceof AbstractClientPlayerEntity) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
               new SerializableProvider<>(
                   new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
-                  ModCapabilities.PLAYER));
+                  () -> ModCapabilities.PLAYER));
     }
   }
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
-
-    /*
-     * Renders the ArmPose as BOW_AND_ARROW if the living entity is holding a gun.
-     */
-
     ItemStack heldStack = event.getEntity().getHeldItemMainhand();
     if (event.getRenderer().getEntityModel() instanceof BipedModel
         && heldStack.getItem() instanceof GunItem) {
@@ -344,7 +338,6 @@ public class ClientDist implements IModDist {
           break;
       }
     }
-
   }
 
   @SubscribeEvent
@@ -369,11 +362,7 @@ public class ClientDist implements IModDist {
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
               event.setCanceled(true);
-
-              boolean showCrosshair =
-                  gunController.getGun().map(gun -> gun.getCrosshairVisibility()).orElse(false);
-
-              if (showCrosshair) {
+              if (gunController.hasCrosshair()) {
                 this.ingameGui
                     .renderCrosshairs(gunController.getAccuracy(playerEntity, heldStack),
                         event.getPartialTicks(), event.getWindow().getScaledWidth(),
@@ -432,13 +421,17 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleItemColor(ColorHandlerEvent.Item event) {
     // Color for stacks with GUN_CONTROLLER capability
-    IItemColor gunColor = (stack, tintIndex) -> {
-      return stack
-          .getCapability(ModCapabilities.GUN_CONTROLLER)
-          .map(gunController -> gunController.getColor().map(Color::getMergedValues))
-          .orElse(Optional.empty())
-          .orElse(Integer.MAX_VALUE);
-    };
+    IItemColor gunColor = (stack,
+        tintIndex) -> stack
+            .getCapability(ModCapabilities.GUN_CONTROLLER)
+            .map(gunController -> gunController
+                .getPaintStack()
+                .getCapability(ModCapabilities.PAINT)
+                .map(IPaint::getColour)
+                .orElse(Optional.empty()))
+            .orElse(Optional.empty())
+            .orElse(0xFFFFFF) | 0xFF << 24;
+
 
     // Registers the color for every matching CD item
     ModItems.ITEMS
@@ -446,16 +439,14 @@ public class ClientDist implements IModDist {
         .stream()
         .map(RegistryObject::get)
         .filter(item -> item instanceof GunItem)
-        .forEach(item -> event.getItemColors().register(gunColor, () -> item));
+        .forEach(item -> event.getItemColors().register(gunColor, item));
 
     // Color for stacks with PAINT_COLOR capability
-    IItemColor paintStackColor = (stack, tintIndex) -> {
-      return stack
-          .getCapability(ModCapabilities.PAINT_COLOR)
-          .map(paintColorCap -> paintColorCap.getColor().map(Color::getMergedValues))
-          .orElse(Optional.empty())
-          .orElse(Integer.MAX_VALUE);
-    };
+    IItemColor paintStackColor = (stack, tintIndex) -> stack
+        .getCapability(ModCapabilities.PAINT)
+        .map(IPaint::getColour)
+        .orElse(Optional.empty())
+        .orElse(Integer.MAX_VALUE);
 
     // Registers the color for every matching CD item
     ModItems.ITEMS
@@ -480,7 +471,7 @@ public class ClientDist implements IModDist {
             event
                 .addSprite(
                     // Example: "craftingdead:models/guns/m4a1_diamond_paint"
-                    new ResourceLocation(gun.getRegistryName().getNamespace(),
+                    new ResourceLocation(paint.getRegistryName().getNamespace(),
                         "models/guns/" + gun.getRegistryName().getPath() + "_"
                             + paint.getRegistryName().getPath()));
           });

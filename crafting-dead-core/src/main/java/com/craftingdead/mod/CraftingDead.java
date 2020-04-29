@@ -181,7 +181,7 @@ public class CraftingDead {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-              new SerializableProvider<>(player, ModCapabilities.PLAYER));
+              new SerializableProvider<>(player, () -> ModCapabilities.PLAYER));
     }
   }
 }
