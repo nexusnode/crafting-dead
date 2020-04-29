@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import org.lwjgl.glfw.GLFW;
+import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
@@ -23,6 +24,9 @@ import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.client.renderer.entity.player.CustomPlayerRenderer;
 import com.craftingdead.mod.client.renderer.entity.player.layer.ClothingLayer;
 import com.craftingdead.mod.client.renderer.entity.player.layer.EquipmentLayer;
+import com.craftingdead.mod.client.tutorial.IModTutorialStep;
+import com.craftingdead.mod.client.tutorial.ModTutorialSteps;
+import com.craftingdead.mod.client.tutorial.OpenModInventoryStep;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
@@ -42,6 +46,8 @@ import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.tutorial.Tutorial;
+import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
@@ -75,8 +81,8 @@ public class ClientDist implements IModDist {
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
   public static final KeyBinding TOGGLE_FIRE_MODE =
       new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
-  public static final KeyBinding OPEN_PLAYER_CONTAINER =
-      new KeyBinding("key.player", GLFW.GLFW_KEY_Z, "key.categories.inventory");
+  public static final KeyBinding OPEN_MOD_INVENTORY =
+      new KeyBinding("key.craftingdead.inventory", GLFW.GLFW_KEY_Z, "key.categories.inventory");
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
@@ -103,6 +109,8 @@ public class ClientDist implements IModDist {
 
   private IngameGui ingameGui;
 
+  private TutorialSteps lastTutorialStep;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
@@ -120,6 +128,13 @@ public class ClientDist implements IModDist {
         new Vec2f(this.rotationVelocity.x + randomAmount, this.rotationVelocity.y - amount);
     this.rollStartTime = Util.milliTime();
     this.roll = randomAmount;
+  }
+
+  public void setTutorialStep(ModTutorialSteps step) {
+    CommonConfig.clientConfig.tutorialStep.set(step);
+    Tutorial tutorial = minecraft.getTutorial();
+    tutorial.setStep(TutorialSteps.NONE);
+    tutorial.tutorialStep = step.create(this);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -152,7 +167,7 @@ public class ClientDist implements IModDist {
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
-    ClientRegistry.registerKeyBinding(OPEN_PLAYER_CONTAINER);
+    ClientRegistry.registerKeyBinding(OPEN_MOD_INVENTORY);
 
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
@@ -252,10 +267,22 @@ public class ClientDist implements IModDist {
                 .getCapability(ModCapabilities.PLAYER)
                 .ifPresent(player -> player.toggleFireMode(true));
           }
-          while (OPEN_PLAYER_CONTAINER.isPressed()) {
+          while (OPEN_MOD_INVENTORY.isPressed()) {
             minecraft.player
                 .getCapability(ModCapabilities.PLAYER)
                 .ifPresent(IPlayer::openPlayerContainer);
+
+            if (minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
+              ((OpenModInventoryStep) minecraft.getTutorial().tutorialStep).openModInventory();
+            }
+          }
+
+          TutorialSteps currentTutorialStep = minecraft.gameSettings.tutorialStep;
+          if (this.lastTutorialStep != currentTutorialStep) {
+            if (currentTutorialStep == TutorialSteps.NONE) {
+              this.setTutorialStep(CommonConfig.clientConfig.tutorialStep.get());
+            }
+            this.lastTutorialStep = currentTutorialStep;
           }
         }
         break;

@@ -44,8 +44,8 @@ public class ClientPlayer extends DefaultPlayer<ClientPlayerEntity> {
       } else {
         this.crouching = false;
       }
+      this.wasHoldingSneakKey = this.entity.isHoldingSneakKey();
     }
-    this.wasHoldingSneakKey = this.entity.isHoldingSneakKey();
 
     if (this.crouching) {
       this.entity.setPose(Pose.SWIMMING);

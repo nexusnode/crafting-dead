@@ -1,10 +1,8 @@
 package com.craftingdead.mod;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import org.apache.commons.lang3.tuple.Pair;
+import com.craftingdead.mod.client.tutorial.ModTutorialSteps;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class CommonConfig {
 
@@ -26,9 +24,9 @@ public class CommonConfig {
     clientConfig = clientConfigPair.getLeft();
   }
 
-  public final ConfigValue<String> masterServerHost;
+  public final ForgeConfigSpec.ConfigValue<String> masterServerHost;
 
-  public final IntValue masterServerPort;
+  public final ForgeConfigSpec.IntValue masterServerPort;
 
   private CommonConfig(ForgeConfigSpec.Builder builder) {
     builder.push("common");
@@ -45,11 +43,13 @@ public class CommonConfig {
 
   public static class ClientConfig {
 
-    public final BooleanValue applyBranding;
+    public final ForgeConfigSpec.BooleanValue applyBranding;
 
-    public final BooleanValue enableDiscordRpc;
+    public final ForgeConfigSpec.BooleanValue enableDiscordRpc;
 
-    public final BooleanValue displayBlood;
+    public final ForgeConfigSpec.BooleanValue displayBlood;
+
+    public final ForgeConfigSpec.EnumValue<ModTutorialSteps> tutorialStep;
 
     private ClientConfig(ForgeConfigSpec.Builder builder) {
       builder.push("client");
@@ -63,6 +63,7 @@ public class CommonConfig {
         this.displayBlood = builder //
             .translation("options.craftingdead.client.display_blood") //
             .define("displayBlood", true);
+        this.tutorialStep = builder.defineEnum("tutorialStep", ModTutorialSteps.OPEN_INVENTORY);
       }
       builder.pop();
     }
