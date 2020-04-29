@@ -22,7 +22,6 @@ import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
-import com.craftingdead.mod.client.renderer.entity.player.CustomPlayerRenderer;
 import com.craftingdead.mod.client.renderer.entity.player.layer.ClothingLayer;
 import com.craftingdead.mod.client.renderer.entity.player.layer.EquipmentLayer;
 import com.craftingdead.mod.client.tutorial.IModTutorialStep;
@@ -31,19 +30,25 @@ import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.AttachmentItem;
+import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
@@ -181,14 +186,6 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
-
-    StartupMessageManager.addModMessage("Injecting CustomPlayerRenderer");
-
-    try {
-      CustomPlayerRenderer.inject();
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to inject CustomPlayerRenderer", e);
-    }
 
     StartupMessageManager.addModMessage("Loading model layers");
 
@@ -476,5 +473,41 @@ public class ClientDist implements IModDist {
                             + paint.getRegistryName().getPath()));
           });
         });
+  }
+
+  // ================================================================================
+  // ASM Hooks
+  // ================================================================================
+
+  public static void renderArmsWithExtraSkins(PlayerRenderer renderer, MatrixStack matrix,
+      IRenderTypeBuffer buffer, int p_229144_3_, AbstractClientPlayerEntity playerEntity,
+      ModelRenderer firstLayerModel, ModelRenderer secondLayerModel) {
+    playerEntity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> {
+      String skinType = playerEntity.getSkinType();
+      ItemStack clothingStack =
+          player.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+      if (clothingStack.getItem() instanceof ClothingItem) {
+        ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
+        ResourceLocation clothingSkin = clothingItem.getClothingSkin(skinType);
+
+        PlayerModel<AbstractClientPlayerEntity> playermodel = renderer.getEntityModel();
+        playermodel.swingProgress = 0.0F;
+        playermodel.isSneaking = false;
+        playermodel.swimAnimation = 0.0F;
+        playermodel.setAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+
+        firstLayerModel.showModel = true;
+        secondLayerModel.showModel = true;
+
+        firstLayerModel.rotateAngleX = 0.0F;
+        firstLayerModel
+            .render(matrix, buffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)),
+                p_229144_3_, OverlayTexture.DEFAULT_UV);
+        secondLayerModel.rotateAngleX = 0.0F;
+        secondLayerModel
+            .render(matrix, buffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)),
+                p_229144_3_, OverlayTexture.DEFAULT_UV);
+      }
+    });
   }
 }

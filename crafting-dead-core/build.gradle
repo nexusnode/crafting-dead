@@ -5,8 +5,9 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
+            property 'forge.logging.markers', 'SCAN,REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            
             mods {
                 craftingdead {
                     source sourceSets.main
@@ -17,8 +18,9 @@ minecraft {
         server {
             workingDirectory project.file('server')
 
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
+            property 'forge.logging.markers', 'SCAN,REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            
             mods {
                 craftingdead {
                     source sourceSets.main
