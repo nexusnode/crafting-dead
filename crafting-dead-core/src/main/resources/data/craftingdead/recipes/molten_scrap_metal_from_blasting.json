@@ -1,0 +1,9 @@
+{
+    "type": "minecraft:smelting",
+    "ingredient": {
+      "item": "craftingdead:scrap_metal"
+    },
+    "result": "craftingdead:molten_scrap_metal",
+    "experience": 0.7,
+    "cookingtime": 100
+  }

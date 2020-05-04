@@ -357,7 +357,7 @@ public class ClientDist implements IModDist {
                   .orElse(false) || player.isAiming());
 
           if (!event.isCanceled()) {
-            heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
               event.setCanceled(true);
               if (gunController.hasCrosshair()) {
                 this.ingameGui
@@ -388,7 +388,7 @@ public class ClientDist implements IModDist {
   public void handeFOVUpdate(FOVUpdateEvent event) {
     ItemStack heldStack = minecraft.player.getHeldItemMainhand();
     if (this.getPlayer().map(IPlayer::isAiming).orElse(false)) {
-      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
         event
             .setNewfov(event.getFov()
                 * gunController.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV));
@@ -420,7 +420,7 @@ public class ClientDist implements IModDist {
     // Color for stacks with GUN_CONTROLLER capability
     IItemColor gunColor = (stack,
         tintIndex) -> stack
-            .getCapability(ModCapabilities.GUN_CONTROLLER)
+            .getCapability(ModCapabilities.GUN)
             .map(gunController -> gunController
                 .getPaintStack()
                 .getCapability(ModCapabilities.PAINT)

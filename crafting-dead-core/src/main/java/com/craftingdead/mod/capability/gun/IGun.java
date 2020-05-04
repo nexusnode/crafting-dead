@@ -2,6 +2,7 @@ package com.craftingdead.mod.capability.gun;
 
 import java.util.Set;
 import com.craftingdead.mod.capability.action.IAction;
+import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.item.AttachmentItem;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -11,7 +12,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
+public interface IGun extends IAction, IAnimationController, INBTSerializable<CompoundNBT> {
 
   void tick(Entity entity, ItemStack itemStack);
 
@@ -23,9 +24,9 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   int getReloadDurationTicks();
 
-  void stopReloading();
+  void cancelActions();
 
-  void startReloading(Entity entity, ItemStack itemStack);
+  void reload(Entity entity, ItemStack itemStack);
 
   float getAccuracy(Entity entity, ItemStack itemStack);
 
@@ -33,9 +34,9 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   void setMagazineStack(ItemStack stack);
 
-  int getAmmo();
+  int getMagazineSize();
 
-  void setAmmo(int ammo);
+  void setMagazineSize(int size);
 
   Set<AttachmentItem> getAttachments();
 
@@ -66,7 +67,8 @@ public interface IGunController extends IAction, INBTSerializable<CompoundNBT> {
 
   @Override
   default ITextComponent getText(ClientPlayerEntity playerEntity) {
-    return new TranslationTextComponent("action.reload");
+    return this.getMagazineStack().isEmpty() ? new TranslationTextComponent("action.reload")
+        : new TranslationTextComponent("action.unload");
   }
 
   @Override

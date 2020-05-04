@@ -90,7 +90,7 @@ public class ModPlayerContainer extends Container {
   }
 
   public boolean isCraftable() {
-    return this.getGunStack().getCapability(ModCapabilities.GUN_CONTROLLER).map(gunController -> {
+    return this.getGunStack().getCapability(ModCapabilities.GUN).map(gunController -> {
       for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
         ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
         if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {

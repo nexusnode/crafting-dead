@@ -193,7 +193,7 @@ public class GunModel implements IModelGeometry<GunModel> {
         return override.getOverrides().getModelWithOverrides(override, itemStack, world, entity);
       }
 
-      return itemStack.getCapability(ModCapabilities.GUN_CONTROLLER).map(gunController -> {
+      return itemStack.getCapability(ModCapabilities.GUN).map(gunController -> {
         final Set<AttachmentItem> attachments = gunController.getAttachments();
         final int hash = attachments.hashCode()
             + gunController.getPaintStack().getItem().getRegistryName().hashCode();

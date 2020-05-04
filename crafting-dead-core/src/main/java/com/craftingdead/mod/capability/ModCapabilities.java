@@ -4,8 +4,10 @@ import com.craftingdead.mod.capability.action.DefaultAction;
 import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimationController;
-import com.craftingdead.mod.capability.gun.DefaultGunController;
-import com.craftingdead.mod.capability.gun.IGunController;
+import com.craftingdead.mod.capability.gun.DefaultGun;
+import com.craftingdead.mod.capability.gun.IGun;
+import com.craftingdead.mod.capability.magazine.DefaultMagazine;
+import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.capability.paint.DefaultPaint;
 import com.craftingdead.mod.capability.paint.IPaint;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
@@ -25,8 +27,8 @@ public class ModCapabilities {
   @CapabilityInject(IAnimationController.class)
   public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;
 
-  @CapabilityInject(IGunController.class)
-  public static final Capability<IGunController> GUN_CONTROLLER = null;
+  @CapabilityInject(IGun.class)
+  public static final Capability<IGun> GUN = null;
 
   @CapabilityInject(IAction.class)
   public static final Capability<IAction> ACTION = null;
@@ -34,16 +36,20 @@ public class ModCapabilities {
   @CapabilityInject(IPaint.class)
   public static final Capability<IPaint> PAINT = null;
 
+  @CapabilityInject(IMagazine.class)
+  public static final Capability<IMagazine> MAGAZINE = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
     CapabilityManager.INSTANCE
         .register(IAnimationController.class, new EmptyStorage<>(),
             DefaultAnimationController::new);
-    CapabilityManager.INSTANCE
-        .register(IGunController.class, new EmptyStorage<>(), DefaultGunController::new);
+    CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), DefaultGun::new);
     CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);
     CapabilityManager.INSTANCE
         .register(IPaint.class, new EmptyStorage<>(), () -> new DefaultPaint(null, null));
+    CapabilityManager.INSTANCE
+        .register(IMagazine.class, new EmptyStorage<>(), DefaultMagazine::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

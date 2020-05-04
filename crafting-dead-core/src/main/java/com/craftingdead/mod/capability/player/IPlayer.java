@@ -62,6 +62,8 @@ public interface IPlayer<E extends PlayerEntity> extends INBTSerializable<Compou
   void reload(boolean sendUpdate);
 
   void openPlayerContainer();
+  
+  void infect(float chance);
 
   int getDaysSurvived();
 

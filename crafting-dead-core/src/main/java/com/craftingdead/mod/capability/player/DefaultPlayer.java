@@ -105,15 +105,15 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void tick() {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     if (heldStack != this.lastHeldStack) {
-      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
-        gunController.stopReloading();
+      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
+        gunController.cancelActions();
         gunController.setTriggerPressed(this.entity, heldStack, false);
       });
       this.lastHeldStack = heldStack;
     }
 
     heldStack
-        .getCapability(ModCapabilities.GUN_CONTROLLER)
+        .getCapability(ModCapabilities.GUN)
         .ifPresent(gunController -> gunController.tick(this.entity, heldStack));
 
     this.updateBrokenLeg();
@@ -147,12 +147,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
 
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    if (source.getTrueSource() instanceof ZombieEntity && random.nextFloat() < INFECTION_CHANCE
-        && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
-      this.entity
-          .sendStatusMessage(new TranslationTextComponent("message.infected")
-              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+    if (source.getTrueSource() instanceof ZombieEntity) {
+      this.infect(INFECTION_CHANCE);
     }
     return false;
   }
@@ -176,7 +172,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void setTriggerPressed(boolean triggerPressed, boolean sendUpdate) {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     heldStack
-        .getCapability(ModCapabilities.GUN_CONTROLLER)
+        .getCapability(ModCapabilities.GUN)
         .ifPresent(gunController -> gunController
             .setTriggerPressed(this.entity, heldStack, triggerPressed));
   }
@@ -190,7 +186,7 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void toggleFireMode(boolean sendUpdate) {
     this.entity
         .getHeldItemMainhand()
-        .getCapability(ModCapabilities.GUN_CONTROLLER)
+        .getCapability(ModCapabilities.GUN)
         .ifPresent(gunController -> gunController.toggleFireMode(this.entity));
   }
 
@@ -203,8 +199,8 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
   public void reload(boolean sendUpdate) {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     heldStack
-        .getCapability(ModCapabilities.GUN_CONTROLLER)
-        .ifPresent(gunController -> gunController.startReloading(this.entity, heldStack));
+        .getCapability(ModCapabilities.GUN)
+        .ifPresent(gunController -> gunController.reload(this.entity, heldStack));
   }
 
   @Override
@@ -213,6 +209,16 @@ public class DefaultPlayer<E extends PlayerEntity> implements IPlayer<E> {
         .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
             playerEntity) -> new ModPlayerContainer(windowId, this.entity.inventory),
             new TranslationTextComponent("container.player")));
+  }
+
+  @Override
+  public void infect(float chance) {
+    if (random.nextFloat() < chance && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
+      this.entity
+          .sendStatusMessage(new TranslationTextComponent("message.infected")
+              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+      this.entity.addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+    }
   }
 
   @Override

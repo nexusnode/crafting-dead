@@ -6,6 +6,7 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
+import com.craftingdead.mod.enchantment.ModEnchantments;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.ModItems;
@@ -85,6 +86,7 @@ public class CraftingDead {
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     ModContainerTypes.CONTAINERS.register(modEventBus);
     ModEffects.EFFECTS.register(modEventBus);
+    ModEnchantments.ENCHANTMENTS.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
 

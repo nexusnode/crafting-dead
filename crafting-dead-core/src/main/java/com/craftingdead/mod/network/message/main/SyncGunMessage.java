@@ -13,16 +13,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class SyncGunMessage {
 
   private final int entityId;
-  private final int ammoCount;
+  private final int magazineSize;
 
-  public SyncGunMessage(int entityId, int ammoCount) {
+  public SyncGunMessage(int entityId, int magazineSize) {
     this.entityId = entityId;
-    this.ammoCount = ammoCount;
+    this.magazineSize = magazineSize;
   }
 
   public static void encode(SyncGunMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
-    out.writeVarInt(msg.ammoCount);
+    out.writeVarInt(msg.magazineSize);
   }
 
   public static SyncGunMessage decode(PacketBuffer in) {
@@ -37,8 +37,8 @@ public class SyncGunMessage {
     world.map(w -> w.getEntityByID(msg.entityId)).ifPresent(entity -> {
       if (entity instanceof LivingEntity) {
         ItemStack heldStack = ((LivingEntity) entity).getHeldItemMainhand();
-        heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
-          gunController.setAmmo(msg.ammoCount);
+        heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
+          gunController.setMagazineSize(msg.magazineSize);
         });
       }
     });

@@ -12,11 +12,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.animation.DefaultAnimationController;
+import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.animation.IAnimation;
-import com.craftingdead.mod.capability.animation.IAnimationController;
-import com.craftingdead.mod.capability.gun.IGunController;
-import com.craftingdead.mod.capability.gun.ItemGunController;
+import com.craftingdead.mod.capability.gun.ItemGun;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -24,15 +23,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class GunItem extends ShootableItem {
 
@@ -187,29 +182,10 @@ public class GunItem extends ShootableItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new ICapabilitySerializable<CompoundNBT>() {
-      private final IAnimationController animationController = new DefaultAnimationController();
-      private final IGunController gunController = new ItemGunController(GunItem.this);
-
-      @Override
-      public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        return cap == ModCapabilities.ANIMATION_CONTROLLER
-            ? LazyOptional.of(() -> this.animationController).cast()
-            : cap == ModCapabilities.GUN_CONTROLLER || cap == ModCapabilities.ACTION
-                ? LazyOptional.of(() -> this.gunController).cast()
-                : LazyOptional.empty();
-      }
-
-      @Override
-      public CompoundNBT serializeNBT() {
-        return this.gunController.serializeNBT();
-      }
-
-      @Override
-      public void deserializeNBT(CompoundNBT nbt) {
-        this.gunController.deserializeNBT(nbt);
-      }
-    };
+    return new SerializableProvider<>(new ItemGun(this),
+        ImmutableSet
+            .of(() -> ModCapabilities.ANIMATION_CONTROLLER, () -> ModCapabilities.GUN,
+                () -> ModCapabilities.ACTION));
   }
 
   @Override

@@ -20,7 +20,6 @@ public class ClothingItem extends Item {
 
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-
     if (!worldIn.isRemote) {
       Random rand = new Random();
       int randomRagAmount = rand.nextInt(3) + 3;

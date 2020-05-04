@@ -3,13 +3,16 @@ package com.craftingdead.mod.capability.gun;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimation;
+import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
@@ -32,14 +35,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -55,9 +62,11 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ItemGunController implements IGunController {
+public class ItemGun extends DefaultAnimationController implements IGun {
 
   private static final float HEADSHOT_MULTIPLIER = 4;
+
+  private static final Random random = new Random();
 
   private final GunItem gunItem;
 
@@ -76,8 +85,6 @@ public class ItemGunController implements IGunController {
 
   private ItemStack magazineStack = ItemStack.EMPTY;
 
-  private int ammo;
-
   /**
    * The amount of shots since the last time the trigger was pressed.
    */
@@ -89,7 +96,7 @@ public class ItemGunController implements IGunController {
 
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
-  public ItemGunController(GunItem gunItem) {
+  public ItemGun(GunItem gunItem) {
     this.gunItem = gunItem;
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
@@ -102,33 +109,29 @@ public class ItemGunController implements IGunController {
         this.fireMode.getMaxShots().map(max -> this.shotsInARow >= max).orElse(false);
 
     if (!isMaxShotsReached) {
-      this.tryShoot(entity, itemStack);
+      this.shoot(entity, itemStack);
     }
 
     if (this.isReloading() && --this.reloadDurationTicks == 0) {
-      ItemStack magazineStack = null;
-      if (entity instanceof PlayerEntity) {
-        PlayerEntity playerEntity = (PlayerEntity) entity;
-        if (!playerEntity.isCreative()) {
-          magazineStack = playerEntity.findAmmo(itemStack);
+      // Reload
+      if (this.magazineStack.isEmpty()) {
+        ItemStack magazineStack = null;
+        if (entity instanceof PlayerEntity) {
+          PlayerEntity playerEntity = (PlayerEntity) entity;
+          magazineStack = findAmmo(playerEntity, itemStack);
         }
-      }
 
-      if (magazineStack == null) {
-        magazineStack = new ItemStack(this.gunItem.getAcceptedMagazines().iterator().next());
-      }
+        this.magazineStack = magazineStack.copy();
 
-      this.magazineStack = magazineStack;
-      this.ammo = ((MagazineItem) magazineStack.getItem()).getSize();
-
-      if (entity instanceof PlayerEntity) {
-        PlayerEntity playerEntity = (PlayerEntity) entity;
-        if (!playerEntity.isCreative()) {
+        if (entity instanceof PlayerEntity) {
+          PlayerEntity playerEntity = (PlayerEntity) entity;
           magazineStack.shrink(1);
           if (magazineStack.isEmpty()) {
             playerEntity.inventory.deleteStack(magazineStack);
           }
         }
+      } else if (entity instanceof PlayerEntity) { // Unload
+        ((PlayerEntity) entity).addItemStackToInventory(this.magazineStack);
       }
     }
   }
@@ -140,8 +143,7 @@ public class ItemGunController implements IGunController {
     if (this.triggerPressed) {
       // Resets the counter
       this.shotsInARow = 0;
-
-      this.tryShoot(entity, itemStack);
+      this.shoot(entity, itemStack);
     }
   }
 
@@ -161,30 +163,35 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
-  public void stopReloading() {
+  public void cancelActions() {
     if (this.isReloading()) {
+      // Stop reload sound
       Minecraft.getInstance().getSoundHandler().stop(null, SoundCategory.PLAYERS);
       this.reloadDurationTicks = 0;
     }
   }
 
   @Override
-  public void startReloading(Entity entity, ItemStack itemStack) {
-    boolean canReload =
-        entity instanceof PlayerEntity
-            ? (((PlayerEntity) entity).isCreative()
-                || !((PlayerEntity) entity).findAmmo(itemStack).isEmpty())
-            : true;
-    if (!this.isReloading() && canReload) {
-      entity.world
-          .playMovingSound(null, entity, this.gunItem.getReloadSound().get(), SoundCategory.PLAYERS,
-              1.0F, 1.0F);
+  public void reload(Entity entity, ItemStack itemStack) {
+    // Reload
+    if (this.magazineStack.isEmpty()) {
+      boolean canReload =
+          entity instanceof PlayerEntity ? (!findAmmo((PlayerEntity) entity, itemStack).isEmpty())
+              : true;
+      if (!this.isReloading() && canReload) {
+        entity.world
+            .playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
+                SoundCategory.PLAYERS, 1.0F, 1.0F);
+        this.reloadDurationTicks =
+            this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
+      }
+    } else { // Unload
       this.reloadDurationTicks =
-          this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
+          this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks() / 2;
     }
   }
 
-  private void tryShoot(Entity entity, ItemStack itemStack) {
+  private void shoot(Entity entity, ItemStack itemStack) {
     if (!this.triggerPressed) {
       return;
     }
@@ -193,10 +200,11 @@ public class ItemGunController implements IGunController {
       return;
     }
 
-    if (this.ammo <= 0) {
-      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      entity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> player.reload(false));
+    if (this.getMagazineSize() <= 0) {
       this.triggerPressed = false;
+      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      this.magazineStack = ItemStack.EMPTY;
+      entity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> player.reload(false));
       return;
     }
 
@@ -204,19 +212,20 @@ public class ItemGunController implements IGunController {
         TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRate(), TimeUnit.MILLISECONDS);
     long time = System.nanoTime();
     long timeDelta = time - this.lastShotNanos;
-    if (timeDelta > fireRateNanoseconds) {
-      this.lastShotNanos = time;
-      this.shoot(entity, itemStack);
-    }
-  }
-
-  private void shoot(Entity entity, ItemStack itemStack) {
-    if (this.ammo <= 0) {
+    if (timeDelta < fireRateNanoseconds) {
       return;
     }
+    this.lastShotNanos = time;
 
     this.shotsInARow++;
-    this.ammo--;
+    if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
+      this.magazineStack
+          .getCapability(ModCapabilities.MAGAZINE)
+          .ifPresent(magazine -> magazine.decrementSize(this.magazineStack, random));
+      if (this.getMagazineSize() <= 0) {
+        this.magazineStack = ItemStack.EMPTY;
+      }
+    }
 
     if (entity.world.isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
@@ -274,6 +283,22 @@ public class ItemGunController implements IGunController {
     Vec3d hitVec3d = rayTrace.getHitVec();
     World world = entityHit.getEntityWorld();
     float damage = this.gunItem.getDamage();
+
+    if (entity instanceof LivingEntity) {
+      LivingEntity livingEntityHit = (LivingEntity) entityHit;
+      float reducedDamage = damage - CombatRules
+          .getDamageAfterAbsorb(damage, livingEntityHit.getTotalArmorValue(),
+              (float) livingEntityHit
+                  .getAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS)
+                  .getValue());
+      float armorPenetration = this.magazineStack
+          .getCapability(ModCapabilities.MAGAZINE)
+          .map(IMagazine::getArmorPenetration)
+          .orElse(0.0F);
+      // Apply armor penetration by adding to the damage lost by armor absorption
+      damage += reducedDamage * armorPenetration;
+    }
+
     double chinHeight = (entityHit.getY() + entityHit.getEyeHeight() - 0.2F);
     boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
         && rayTrace.getHitVec().y >= chinHeight;
@@ -322,6 +347,21 @@ public class ItemGunController implements IGunController {
     // Allows more bullets to hit the same target at the same time.
     // Good for shotguns and teaming.
     entityHit.hurtResistantTime = 0;
+
+    this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .ifPresent(magazine -> magazine.hitEntity(this.magazineStack, entity, rayTrace));
+
+    float dropChance = this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .map(IMagazine::getEntityHitDropChance)
+        .orElse(0.0F);
+
+    if (random.nextFloat() < dropChance) {
+      ItemEntity ammoEntity = new ItemEntity(world, hitVec3d.getX(), hitVec3d.getY(),
+          hitVec3d.getZ(), this.magazineStack);
+      world.addEntity(ammoEntity);
+    }
   }
 
   private void hitBlock(Entity entity, BlockRayTraceResult rayTrace) {
@@ -359,7 +399,21 @@ public class ItemGunController implements IGunController {
       serverWorld
           .spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.getX(),
               hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
+    }
 
+    this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .ifPresent(magazine -> magazine.hitBlock(this.magazineStack, entity, rayTrace));
+
+    float dropChance = this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .map(IMagazine::getBlockHitDropChance)
+        .orElse(0.0F);
+
+    if (random.nextFloat() < dropChance) {
+      ItemEntity ammoEntity = new ItemEntity(world, hitVec3d.getX(), hitVec3d.getY(),
+          hitVec3d.getZ(), new ItemStack(this.magazineStack.getItem()));
+      world.addEntity(ammoEntity);
     }
   }
 
@@ -391,13 +445,18 @@ public class ItemGunController implements IGunController {
   }
 
   @Override
-  public int getAmmo() {
-    return this.ammo;
+  public int getMagazineSize() {
+    return this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .map(IMagazine::getSize)
+        .orElse(0);
   }
 
   @Override
-  public void setAmmo(int ammo) {
-    this.ammo = ammo;
+  public void setMagazineSize(int size) {
+    this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .ifPresent(magazine -> magazine.setSize(size));
   }
 
   @Override
@@ -449,7 +508,6 @@ public class ItemGunController implements IGunController {
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("magazineStack", this.magazineStack.write(new CompoundNBT()));
-    nbt.putInt("ammo", this.ammo);
     ListNBT attachmentsTag = this.attachments
         .stream()
         .map(attachment -> StringNBT.of(attachment.getRegistryName().toString()))
@@ -462,7 +520,6 @@ public class ItemGunController implements IGunController {
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     this.setMagazineStack(ItemStack.read(nbt.getCompound("magazineStack")));
-    this.setAmmo(nbt.getInt("ammo"));
     this
         .setAttachments(nbt
             .getList("attachments", 8)
@@ -481,5 +538,11 @@ public class ItemGunController implements IGunController {
               "Non-empty ItemStack must be a magazine");
     }
     this.magazineStack = stack;
+  }
+
+  private static ItemStack findAmmo(PlayerEntity playerEntity, ItemStack gunStack) {
+    ItemStack ammoStack = playerEntity.findAmmo(gunStack);
+    // findAmmo returns an Arrow if in creative
+    return ammoStack.getItem() == Items.ARROW ? ItemStack.EMPTY : ammoStack;
   }
 }

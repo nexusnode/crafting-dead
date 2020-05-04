@@ -1,77 +1,96 @@
 package com.craftingdead.mod.item;
 
+import javax.annotation.Nullable;
+import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.magazine.IMagazine;
+import com.craftingdead.mod.capability.magazine.ItemMagazine;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class MagazineItem extends Item {
 
+  private final float armorPenetration;
+  private final float entityHitDropChance;
+  private final float blockHitDropChance;
   private final int size;
-
-  /**
-   * The amount in % of how much this item will ignore the target's armor
-   */
-  private final double armorPenetrationPercentage;
-
-  /**
-   * The chance in % to drop the ammo at the hit location
-   */
-  private final double groundHitDropChance;
-
-  /**
-   * The chance in % to drop the ammo at the entity hit
-   */
-  private final double entityHitDropChance;
 
   public MagazineItem(Properties properties) {
     super(properties);
     this.size = properties.size;
-    this.armorPenetrationPercentage = properties.armorPenetrationPercentage;
-    this.groundHitDropChance = properties.groundHitDropChance;
+    this.armorPenetration = properties.armorPenetration;
     this.entityHitDropChance = properties.entityHitDropChance;
+    this.blockHitDropChance = properties.blockHitDropChance;
+  }
+
+  public float getArmorPenetration() {
+    return this.armorPenetration;
+  }
+
+  public float getEntityHitDropChance() {
+    return this.entityHitDropChance;
+  }
+
+  public float getBlockHitDropChance() {
+    return this.blockHitDropChance;
   }
 
   public int getSize() {
     return this.size;
   }
 
-  public double getArmorPenetrationPercentage() {
-    return armorPenetrationPercentage;
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SerializableProvider<>(new ItemMagazine(this), () -> ModCapabilities.MAGAZINE);
+  }
+  
+  @Override
+  public int getItemEnchantability() {
+    return 1;
   }
 
-  public double getGroundHitDropChance() {
-    return groundHitDropChance;
+  @Override
+  public int getDamage(ItemStack itemStack) {
+    return this.size - itemStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .map(IMagazine::getSize)
+        .orElse(this.size);
   }
 
-  public double getEntityHitDropChance() {
-    return entityHitDropChance;
+  @Override
+  public void setDamage(ItemStack itemStack, int damage) {
+    itemStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .ifPresent(magazine -> magazine.setSize(Math.max(0, damage)));
   }
 
   public static class Properties extends Item.Properties {
 
+    private float armorPenetration;
+    private float entityHitDropChance;
+    private float blockHitDropChance;
     private int size;
 
-    private double armorPenetrationPercentage;
-
-    private int groundHitDropChance;
-
-    private int entityHitDropChance;
-
-    public Properties setSize(int magazineSize) {
-      this.size = magazineSize;
+    public Properties setArmorPenetration(float armorPenetration) {
+      this.armorPenetration = armorPenetration;
       return this;
     }
 
-    public Properties setGroundHitDropChance(int percentage) {
-      this.groundHitDropChance = percentage;
+    public Properties setEntityHitDropChance(float entityHitDropChance) {
+      this.entityHitDropChance = entityHitDropChance;
       return this;
     }
 
-    public Properties setEntityHitDropChance(int percentage) {
-      this.entityHitDropChance = percentage;
+    public Properties setBlockHitDropChance(float blockHitDropChance) {
+      this.blockHitDropChance = blockHitDropChance;
       return this;
     }
 
-    public Properties setArmorPenetration(double percentage) {
-      this.armorPenetrationPercentage = percentage;
+    public Properties setSize(int size) {
+      this.size = size;
+      this.maxDamage(size);
       return this;
     }
   }

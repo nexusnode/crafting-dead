@@ -23,7 +23,7 @@ public class GunCraftSlot extends GunSlot {
 
   @Override
   public void putStack(ItemStack itemStack) {
-    itemStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
       gunController.getAttachments().forEach(attachment -> {
         this.craftingInventory
             .setInventorySlotContents(attachment.getInventorySlot().getIndex(),
@@ -38,7 +38,7 @@ public class GunCraftSlot extends GunSlot {
 
   @Override
   public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
-    gunStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
       gunController.setPaintStack(ItemStack.EMPTY);
       Set<AttachmentItem> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {

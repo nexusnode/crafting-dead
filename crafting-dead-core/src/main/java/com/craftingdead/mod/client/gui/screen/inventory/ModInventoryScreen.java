@@ -46,7 +46,7 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModPlayerContainer>
     this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 
     ItemStack gunStack = this.container.getGunStack();
-    gunStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
 
       this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 0, 22, 22);
 

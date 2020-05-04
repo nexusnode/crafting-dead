@@ -2,13 +2,17 @@ package com.craftingdead.mod.capability.gun;
 
 import java.util.HashSet;
 import java.util.Set;
+import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 
-public class DefaultGunController implements IGunController {
+@SuppressWarnings("deprecation")
+public class DefaultGun implements IGun {
 
   @Override
   public CompoundNBT serializeNBT() {
@@ -40,10 +44,10 @@ public class DefaultGunController implements IGunController {
   }
 
   @Override
-  public void stopReloading() {}
+  public void cancelActions() {}
 
   @Override
-  public void startReloading(Entity entity, ItemStack itemStack) {}
+  public void reload(Entity entity, ItemStack itemStack) {}
 
   @Override
   public float getAccuracy(Entity entity, ItemStack itemStack) {
@@ -56,12 +60,12 @@ public class DefaultGunController implements IGunController {
   }
 
   @Override
-  public int getAmmo() {
+  public int getMagazineSize() {
     return 0;
   }
 
   @Override
-  public void setAmmo(int ammo) {}
+  public void setMagazineSize(int ammo) {}
 
   @Override
   public Set<AttachmentItem> getAttachments() {
@@ -97,6 +101,23 @@ public class DefaultGunController implements IGunController {
 
   @Override
   public boolean hasCrosshair() {
+    return false;
+  }
+
+  @Override
+  public void addAnimation(IAnimation animation) {}
+
+  @Override
+  public void cancelCurrentAnimation() {}
+
+  @Override
+  public void clearAnimations() {}
+
+  @Override
+  public void apply(MatrixStack matrixStack) {}
+
+  @Override
+  public boolean isAcceptedPerspective(ItemCameraTransforms.TransformType cameraTransformType) {
     return false;
   }
 }

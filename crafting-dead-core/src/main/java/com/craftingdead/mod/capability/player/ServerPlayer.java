@@ -120,11 +120,11 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
                       : PlayerActionMessage.Action.TRIGGER_RELEASED));
 
       ItemStack heldStack = this.entity.getHeldItemMainhand();
-      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
         NetworkChannel.MAIN
             .getSimpleChannel()
             .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-                new SyncGunMessage(this.entity.getEntityId(), gunController.getAmmo()));
+                new SyncGunMessage(this.entity.getEntityId(), gunController.getMagazineSize()));
       });
     }
   }

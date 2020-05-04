@@ -55,9 +55,9 @@ public class IngameGui {
       ClientPlayerEntity playerEntity = player.getEntity();
 
       ItemStack heldStack = playerEntity.getHeldItemMainhand();
-      heldStack.getCapability(ModCapabilities.GUN_CONTROLLER).ifPresent(gunController -> {
+      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
         renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer, width, height,
-            gunController.getAmmo(), gunController.getMagazineStack());
+            gunController.getMagazineSize(), gunController.getMagazineStack());
       });
 
       playerEntity.getHeldItemMainhand().getCapability(ModCapabilities.ACTION).ifPresent(action -> {

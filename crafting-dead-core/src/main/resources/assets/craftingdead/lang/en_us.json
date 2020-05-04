@@ -1,33 +1,47 @@
 {
+  "enchantment.craftingdead.explosion":"Explosion",
+  "enchantment.craftingdead.incendiary":"Incendiary",
+  "enchantment.craftingdead.infection":"Infection",
+
   "key.reload": "Reload",
   "key.toggle_fire_mode": "Toggle Fire Mode",
   "key.craftingdead.inventory":"Open/Close Crafting Dead Inventory",
+
   "tutorial.craftingdead.open_inventory.title":"Open Crafting Dead menu",
+
   "death.attack.bullet": "%1$s was shot",
   "death.attack.bullet.headshot": "%1$s was shot in the head",
+
   "options.craftingdead.client": "Client",
   "options.craftingdead.client.apply_branding": "Apply Branding",
   "options.craftingdead.client.enable_discord_rpc": "Enable Discord RPC",
   "options.craftingdead.client.display_blood": "Display Blood",
+
   "effect.craftingdead.broken_leg": "Broken Leg",
   "effect.craftingdead.dehydration": "Dehydration",
   "effect.craftingdead.bleeding":"Bleeding",
   "effect.craftingdead.infected":"Infected",
+
   "entity.craftingdead.advanced_zombie": "Advanced Zombie",
   "entity.craftingdead.fast_zombie": "Fast Zombie",
   "entity.craftingdead.tank_zombie": "Tank Zombie",
   "entity.craftingdead.weak_zombie": "Weak Zombie",
   "entity.craftingdead.supply_drop": "Supply Drop",
+
   "message.fire_mode.auto":"Switched to automatic",
   "message.fire_mode.semi":"Switched to semi-automatic",
   "message.fire_mode.burst":"Switched to burst",
   "message.broken_leg": "Ouch! You broke your leg.",
   "message.bleeding": "You're bleeding out!",
   "message.infected": "You've been infected with RBI.",
+
   "action.reload":"Reloading",
+  "action.unload":"Removing magazine",
+
   "attribute.hat.headshot_reduction": "Headshot protection: %s%%",
   "attribute.hat.immune_to_flashes": "Immune to flashes",
   "attribute.hat.has_night_vision": "Has Night Vision ability",
+
   "itemGroup.craftingdead.consumables": "Crafting Dead Consumables",
   "itemGroup.craftingdead.clothing": "Crafting Dead Clothing",
   "itemGroup.craftingdead.blocks": "Crafting Dead Blocks",
@@ -52,6 +66,9 @@
   "item.craftingdead.uv_paint": "UV Paint",
 
   "item.craftingdead.stanag_20_round_magazine": "STANAG 20rnd Magazine",
+  "item.craftingdead.explosive_stanag_20_round_magazine":"Explosive STANAG 20rnd Magazine",
+  "item.craftingdead.incendiary_stanag_20_round_magazine":"Incendiary STANAG 20rnd Magazine",
+  "item.craftingdead.infected_stanag_20_round_magazine":"Infected STANAG 20rnd Magazine",
   "item.craftingdead.stanag_30_round_magazine": "STANAG 30rnd Magazine",
   "item.craftingdead.stanag_drum_magazine": "STANAG Drum Magazine",
   "item.craftingdead.stanag_box_magazine": "STANAG Box Magazine",
@@ -402,6 +419,9 @@
   "item.craftingdead.beanie_hat": "Beanie Hat",
   "item.craftingdead.army_helmet": "Army Helmet",
   "item.craftingdead.scrap_metal":"Scrap Metal",
+  "item.craftingdead.molten_scrap_metal":"Molten Scrap Metal",
+  "item.craftingdead.incendiary_powder":"Incendiary Powder",
+  
   "item.craftingdead.ammo_tactical_vest": "Ammo Tactical Vest",
   "item.craftingdead.black_tactical_vest": "Black Tactical Vest",
   "item.craftingdead.ghillie_tactical_vest": "Ghillie Tactical Vest",
