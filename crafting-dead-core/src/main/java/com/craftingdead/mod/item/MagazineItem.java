@@ -45,10 +45,15 @@ public class MagazineItem extends Item {
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SerializableProvider<>(new ItemMagazine(this), () -> ModCapabilities.MAGAZINE);
   }
-  
+
   @Override
   public int getItemEnchantability() {
     return 1;
+  }
+
+  @Override
+  public int getMaxDamage(ItemStack itemStack) {
+    return this.size;
   }
 
   @Override
@@ -90,7 +95,6 @@ public class MagazineItem extends Item {
 
     public Properties setSize(int size) {
       this.size = size;
-      this.maxDamage(size);
       return this;
     }
   }

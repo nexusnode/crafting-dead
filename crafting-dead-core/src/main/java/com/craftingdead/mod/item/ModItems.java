@@ -135,6 +135,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(40)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_30_ROUND_MAGAZINE = ITEMS
@@ -142,6 +143,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(40)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_DRUM_MAGAZINE = ITEMS
@@ -149,6 +151,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(40)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_BOX_MAGAZINE = ITEMS
@@ -156,6 +159,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(85)
               .setArmorPenetration(40)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MPT55_MAGAZINE = ITEMS
@@ -163,12 +167,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(40)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AK47_30_ROUND_MAGAZINE = ITEMS
       .register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> FNFAL_MAGAZINE = ITEMS
@@ -176,6 +182,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(55)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> ACR_MAGAZINE = ITEMS
@@ -183,6 +190,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(50)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> G36C_MAGAZINE = ITEMS
@@ -190,6 +198,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(45)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> HK417_MAGAZINE = ITEMS
@@ -197,6 +206,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(47)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M1911_MAGAZINE = ITEMS
@@ -204,6 +214,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(7)
               .setArmorPenetration(8)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> G18_MAGAZINE = ITEMS
@@ -211,6 +222,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(8)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M9_MAGAZINE = ITEMS
@@ -218,6 +230,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(15)
               .setArmorPenetration(8)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> DESERT_EAGLE_MAGAZINE = ITEMS
@@ -225,6 +238,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(13)
               .setArmorPenetration(35)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> P250_MAGAZINE = ITEMS
@@ -232,6 +246,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(12)
               .setArmorPenetration(8)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAGNUM_AMMO = ITEMS
@@ -239,6 +254,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(65)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> FN57_MAGAZINE = ITEMS
@@ -246,6 +262,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(9)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAC10_MAGAZINE = ITEMS
@@ -253,6 +270,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> P90_MAGAZINE = ITEMS
@@ -260,6 +278,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(50)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> VECTOR_MAGAZINE = ITEMS
@@ -267,6 +286,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MP5A5_21_ROUND_MAGAZINE = ITEMS
@@ -274,6 +294,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(21)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MP5A5_35_ROUND_MAGAZINE = ITEMS
@@ -281,6 +302,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(35)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAC10_EXTENDED_MAGAZINE = ITEMS
@@ -288,12 +310,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(15)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> SPORTER22_MAGAZINE = ITEMS
       .register("sporter22_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M107_MAGAZINE = ITEMS
@@ -301,6 +325,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(65)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M107_AP_MAGAZINE = ITEMS
@@ -308,6 +333,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(95)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AS50_MAGAZINE = ITEMS
@@ -315,6 +341,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(65)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AS50_AP_MAGAZINE = ITEMS
@@ -322,6 +349,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(5)
               .setArmorPenetration(95)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M1GARAND_MAGAZINE = ITEMS
@@ -329,6 +357,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(95)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AWP_MAGAZINE = ITEMS
@@ -336,6 +365,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(95)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> TRENCHGUN_SHELLS = ITEMS
@@ -343,6 +373,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(35)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MOSSBERG_SLUGS = ITEMS
@@ -350,6 +381,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(30)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> DMR_MAGAZINE = ITEMS
@@ -357,6 +389,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(5)
               .setArmorPenetration(65)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> CROSSBOW_BOLT = ITEMS
@@ -364,12 +397,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(1)
               .setArmorPenetration(12)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> TASER_CARTRIDGE = ITEMS
       .register("taser_cartridge",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(3)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M240B_MAGAZINE = ITEMS
@@ -377,6 +412,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(50)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> RPK_MAGAZINE = ITEMS
@@ -384,6 +420,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(60)
               .setArmorPenetration(50)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> RPK_DRUM_MAGAZINE = ITEMS
@@ -391,6 +428,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(100)
               .setArmorPenetration(50)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MINIGUN_MAGAZINE = ITEMS
@@ -398,6 +436,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(350)
               .setArmorPenetration(30)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MK48MOD_MAGAZINE = ITEMS
@@ -405,6 +444,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(52)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> COMBAT_ARROW = ITEMS
@@ -414,6 +454,7 @@ public class ModItems {
               .setArmorPenetration(25)
               .setEntityHitDropChance(95)
               .setEntityHitDropChance(90)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> EXPLOSIVE_ARROW = ITEMS
@@ -421,6 +462,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(1)
               .setArmorPenetration(12)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> FIRE_ARROW = ITEMS
@@ -428,6 +470,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(1)
               .setArmorPenetration(12)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> POISON_ARROW = ITEMS
@@ -437,6 +480,7 @@ public class ModItems {
               .setArmorPenetration(12)
               .setEntityHitDropChance(95)
               .setEntityHitDropChance(70)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> WOODEN_ARROW = ITEMS
@@ -446,6 +490,7 @@ public class ModItems {
               .setArmorPenetration(12)
               .setEntityHitDropChance(75)
               .setEntityHitDropChance(75)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> BOLT = ITEMS
@@ -455,6 +500,7 @@ public class ModItems {
               .setArmorPenetration(12)
               .setEntityHitDropChance(95)
               .setEntityHitDropChance(85)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> POISON_BOLT = ITEMS
@@ -464,6 +510,7 @@ public class ModItems {
               .setArmorPenetration(12)
               .setEntityHitDropChance(95)
               .setEntityHitDropChance(70)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> EXPLOSIVE_BOLT = ITEMS
@@ -471,6 +518,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(1)
               .setArmorPenetration(12)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
