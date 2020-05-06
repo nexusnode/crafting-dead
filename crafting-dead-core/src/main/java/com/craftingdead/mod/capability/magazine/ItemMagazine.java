@@ -2,6 +2,7 @@ package com.craftingdead.mod.capability.magazine;
 
 import java.util.Random;
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.enchantment.ModEnchantments;
 import com.craftingdead.mod.item.MagazineItem;
 import net.minecraft.block.Blocks;
@@ -50,7 +51,9 @@ public class ItemMagazine implements IMagazine {
     }
 
     entity
-        .getCapability(ModCapabilities.PLAYER)
+        .getCapability(ModCapabilities.LIVING)
+        .filter(living -> living instanceof IPlayer)
+        .<IPlayer<?>>cast()
         .ifPresent(player -> player
             .infect(EnchantmentHelper
                 .getEnchantmentLevel(ModEnchantments.INFECTION.get(), magazineStack) / 255.0F));

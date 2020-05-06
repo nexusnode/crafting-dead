@@ -1,36 +1,31 @@
-package com.craftingdead.mod.client.renderer.entity.player.layer;
+package com.craftingdead.mod.client.renderer.entity.layer;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.client.util.RenderUtil;
+import com.craftingdead.mod.inventory.InventorySlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
 /**
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
  */
 @SuppressWarnings("deprecation")
-public class EquipmentLayer
-    extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
+public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
+    extends LayerRenderer<T, M> {
 
-  /**
-   * A getter {@link Function} that gets the {@link ItemStack} that will be rendered by this layer.
-   */
-  private final Function<IPlayer<? extends PlayerEntity>, ItemStack> itemStackGetter;
+  private final InventorySlotType slot;
 
   /**
    * Whether this model should be rotated when the player is crouching.
@@ -47,9 +42,9 @@ public class EquipmentLayer
    */
   private final Consumer<MatrixStack> transformation;
 
-  private EquipmentLayer(Builder builder) {
+  private EquipmentLayer(Builder<T, M> builder) {
     super(builder.entityRenderer);
-    this.itemStackGetter = builder.itemStackGetter;
+    this.slot = builder.slot;
     this.useCrouchingOrientation = builder.useCrouchingOrientation;
     this.transformation = builder.tranformation;
     this.useHeadOrientation = builder.useHeadOrientation;
@@ -57,25 +52,25 @@ public class EquipmentLayer
 
   @Override
   public void render(MatrixStack matrix, IRenderTypeBuffer buffers,
-      int somethingThatSeemsToBeLightLevel, AbstractClientPlayerEntity playerEntity,
-      float p_225628_5_, float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_,
+      int somethingThatSeemsToBeLightLevel, LivingEntity entity, float p_225628_5_,
+      float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_,
       float p_225628_10_) {
 
     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
-    playerEntity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> {
+    entity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
 
-      ItemStack itemStack = this.itemStackGetter.apply(player);
+      ItemStack itemStack = living.getInventory().getStackInSlot(this.slot.getIndex());
 
       if (!itemStack.isEmpty()) {
         IBakedModel itemModel =
-            itemRenderer.getItemModelWithOverrides(itemStack, playerEntity.world, playerEntity);
+            itemRenderer.getItemModelWithOverrides(itemStack, entity.world, entity);
 
 
         matrix.push();
 
         // Applies crouching rotation is needed
-        if (this.useCrouchingOrientation && playerEntity.isCrouching()) {
+        if (this.useCrouchingOrientation && entity.isCrouching()) {
           RenderUtil.applyPlayerCrouchRotation(matrix);
         }
 
@@ -99,45 +94,42 @@ public class EquipmentLayer
     });
   }
 
-  public static class Builder {
-    private IEntityRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> entityRenderer;
-    private Function<IPlayer<? extends PlayerEntity>, ItemStack> itemStackGetter;
+  public static class Builder<T extends LivingEntity, M extends BipedModel<T>> {
+    private LivingRenderer<T, M> entityRenderer;
+    private InventorySlotType slot;
     private Consumer<MatrixStack> tranformation;
     private boolean useCrouchingOrientation;
     private boolean useHeadOrientation;
 
-    public Builder withRenderer(
-        IEntityRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> entityRenderer) {
+    public Builder<T, M> withRenderer(LivingRenderer<T, M> entityRenderer) {
       this.entityRenderer = entityRenderer;
       return this;
     }
 
-    public Builder withItemStackGetter(
-        Function<IPlayer<? extends PlayerEntity>, ItemStack> itemStackGetter) {
-      this.itemStackGetter = itemStackGetter;
+    public Builder<T, M> withSlot(InventorySlotType slot) {
+      this.slot = slot;
       return this;
     }
 
-    public Builder withArbitraryTransformation(Consumer<MatrixStack> transformation) {
+    public Builder<T, M> withArbitraryTransformation(Consumer<MatrixStack> transformation) {
       this.tranformation = transformation;
       return this;
     }
 
-    public Builder withCrouchingOrientation(boolean useCrouchingOrientation) {
+    public Builder<T, M> withCrouchingOrientation(boolean useCrouchingOrientation) {
       this.useCrouchingOrientation = useCrouchingOrientation;
       return this;
     }
 
-    public Builder withHeadOrientation(boolean useHeadOrientation) {
+    public Builder<T, M> withHeadOrientation(boolean useHeadOrientation) {
       this.useHeadOrientation = useHeadOrientation;
       return this;
     }
 
-    public EquipmentLayer build() {
+    public EquipmentLayer<T, M> build() {
       Validate.notNull(this.entityRenderer, "The renderer must not be null");
-      Validate.notNull(this.itemStackGetter, "The ItemStack getter must not be null");
-
-      return new EquipmentLayer(this);
+      Validate.notNull(this.slot, "The slot must not be null");
+      return new EquipmentLayer<>(this);
     }
   }
 }

@@ -17,6 +17,11 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
+import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.ReloadMessage;
+import com.craftingdead.mod.network.message.main.SyncGunMessage;
+import com.craftingdead.mod.network.message.main.ToggleFireModeMessage;
+import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
 import com.craftingdead.mod.item.FireMode;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.MagazineItem;
@@ -60,6 +65,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemGun extends DefaultAnimationController implements IGun {
@@ -119,6 +126,8 @@ public class ItemGun extends DefaultAnimationController implements IGun {
         if (entity instanceof PlayerEntity) {
           PlayerEntity playerEntity = (PlayerEntity) entity;
           magazineStack = findAmmo(playerEntity, itemStack);
+        } else {
+          magazineStack = new ItemStack(this.gunItem.getAcceptedMagazines().iterator().next());
         }
 
         this.magazineStack = magazineStack.copy();
@@ -137,7 +146,8 @@ public class ItemGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed) {
+  public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed,
+      boolean sendUpdate) {
     this.triggerPressed = triggerPressed;
 
     if (this.triggerPressed) {
@@ -145,6 +155,27 @@ public class ItemGun extends DefaultAnimationController implements IGun {
       this.shotsInARow = 0;
       this.shoot(entity, itemStack);
     }
+
+    if (sendUpdate) {
+      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(target, new TriggerPressedMessage(entity.getEntityId(), triggerPressed));
+    }
+
+    // Sync magazine size before/after shooting as due to network latency this can get out of sync
+    if (!entity.getEntityWorld().isRemote()) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
+              new SyncGunMessage(entity.getEntityId(), this.getMagazineSize()));
+    }
+  }
+
+  @Override
+  public boolean isTriggerPressed() {
+    return this.triggerPressed;
   }
 
   @Override
@@ -163,16 +194,18 @@ public class ItemGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void cancelActions() {
+  public void cancelActions(Entity entity, ItemStack itemStack) {
     if (this.isReloading()) {
       // Stop reload sound
       Minecraft.getInstance().getSoundHandler().stop(null, SoundCategory.PLAYERS);
       this.reloadDurationTicks = 0;
     }
+
+    this.setTriggerPressed(entity, itemStack, false, false);
   }
 
   @Override
-  public void reload(Entity entity, ItemStack itemStack) {
+  public void reload(Entity entity, ItemStack itemStack, boolean sendUpdate) {
     // Reload
     if (this.magazineStack.isEmpty()) {
       boolean canReload =
@@ -189,6 +222,12 @@ public class ItemGun extends DefaultAnimationController implements IGun {
       this.reloadDurationTicks =
           this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks() / 2;
     }
+
+    if (sendUpdate) {
+      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      NetworkChannel.MAIN.getSimpleChannel().send(target, new ReloadMessage(entity.getEntityId()));
+    }
   }
 
   private void shoot(Entity entity, ItemStack itemStack) {
@@ -204,7 +243,7 @@ public class ItemGun extends DefaultAnimationController implements IGun {
       this.triggerPressed = false;
       entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
       this.magazineStack = ItemStack.EMPTY;
-      entity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> player.reload(false));
+      this.reload(entity, itemStack, false);
       return;
     }
 
@@ -284,7 +323,7 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     World world = entityHit.getEntityWorld();
     float damage = this.gunItem.getDamage();
 
-    if (entity instanceof LivingEntity) {
+    if (entityHit instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) entityHit;
       float reducedDamage = damage - CombatRules
           .getDamageAfterAbsorb(damage, livingEntityHit.getTotalArmorValue(),
@@ -487,15 +526,23 @@ public class ItemGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void toggleFireMode(Entity entity) {
+  public void toggleFireMode(Entity entity, boolean sendUpdate) {
     if (this.fireModeInfiniteIterator.hasNext()) {
-      this.fireMode = fireModeInfiniteIterator.next();
+      this.fireMode = this.fireModeInfiniteIterator.next();
     }
 
     entity.playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
     if (entity instanceof PlayerEntity) {
       ((PlayerEntity) entity)
-          .sendStatusMessage(new TranslationTextComponent(fireMode.getTranslationKey()), true);
+          .sendStatusMessage(new TranslationTextComponent(this.fireMode.getTranslationKey()), true);
+    }
+
+    if (sendUpdate) {
+      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(target, new ToggleFireModeMessage(entity.getEntityId()));
     }
   }
 

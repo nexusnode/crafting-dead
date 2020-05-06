@@ -2,17 +2,14 @@ package com.craftingdead.mod.capability.gun;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.mod.capability.animation.IAnimation;
+import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 
-@SuppressWarnings("deprecation")
-public class DefaultGun implements IGun {
+public class DefaultGun extends DefaultAnimationController implements IGun {
 
   @Override
   public CompoundNBT serializeNBT() {
@@ -26,7 +23,13 @@ public class DefaultGun implements IGun {
   public void tick(Entity entity, ItemStack itemStack) {}
 
   @Override
-  public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed) {}
+  public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed,
+      boolean sendUpdate) {}
+
+  @Override
+  public boolean isTriggerPressed() {
+    return false;
+  }
 
   @Override
   public boolean isReloading() {
@@ -44,10 +47,10 @@ public class DefaultGun implements IGun {
   }
 
   @Override
-  public void cancelActions() {}
+  public void cancelActions(Entity entity, ItemStack itemStack) {}
 
   @Override
-  public void reload(Entity entity, ItemStack itemStack) {}
+  public void reload(Entity entity, ItemStack itemStack, boolean sendUpdate) {}
 
   @Override
   public float getAccuracy(Entity entity, ItemStack itemStack) {
@@ -94,30 +97,13 @@ public class DefaultGun implements IGun {
   }
 
   @Override
-  public void toggleFireMode(Entity entity) {}
+  public void toggleFireMode(Entity entity, boolean sendUpdate) {}
 
   @Override
   public void setMagazineStack(ItemStack stack) {}
 
   @Override
   public boolean hasCrosshair() {
-    return false;
-  }
-
-  @Override
-  public void addAnimation(IAnimation animation) {}
-
-  @Override
-  public void cancelCurrentAnimation() {}
-
-  @Override
-  public void clearAnimations() {}
-
-  @Override
-  public void apply(MatrixStack matrixStack) {}
-
-  @Override
-  public boolean isAcceptedPerspective(ItemCameraTransforms.TransformType cameraTransformType) {
     return false;
   }
 }

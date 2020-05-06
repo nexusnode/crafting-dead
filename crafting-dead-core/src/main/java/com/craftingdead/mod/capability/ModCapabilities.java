@@ -6,13 +6,13 @@ import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.gun.DefaultGun;
 import com.craftingdead.mod.capability.gun.IGun;
+import com.craftingdead.mod.capability.living.DefaultLiving;
+import com.craftingdead.mod.capability.living.ILiving;
 import com.craftingdead.mod.capability.magazine.DefaultMagazine;
 import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.capability.paint.DefaultPaint;
 import com.craftingdead.mod.capability.paint.IPaint;
-import com.craftingdead.mod.capability.player.DefaultPlayer;
-import com.craftingdead.mod.capability.player.IPlayer;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -21,8 +21,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 public class ModCapabilities {
 
-  @CapabilityInject(IPlayer.class)
-  public static final Capability<IPlayer<? extends PlayerEntity>> PLAYER = null;
+  @CapabilityInject(ILiving.class)
+  public static final Capability<ILiving<? extends LivingEntity>> LIVING = null;
 
   @CapabilityInject(IAnimationController.class)
   public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;
@@ -40,7 +40,7 @@ public class ModCapabilities {
   public static final Capability<IMagazine> MAGAZINE = null;
 
   public static void registerCapabilities() {
-    CapabilityManager.INSTANCE.register(IPlayer.class, new EmptyStorage<>(), DefaultPlayer::new);
+    CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
     CapabilityManager.INSTANCE
         .register(IAnimationController.class, new EmptyStorage<>(),
             DefaultAnimationController::new);

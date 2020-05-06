@@ -16,7 +16,9 @@ public interface IGun extends IAction, IAnimationController, INBTSerializable<Co
 
   void tick(Entity entity, ItemStack itemStack);
 
-  void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed);
+  void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed, boolean sendUpdate);
+  
+  boolean isTriggerPressed();
 
   boolean isReloading();
 
@@ -24,9 +26,9 @@ public interface IGun extends IAction, IAnimationController, INBTSerializable<Co
 
   int getReloadDurationTicks();
 
-  void cancelActions();
+  void cancelActions(Entity entity, ItemStack itemStack);
 
-  void reload(Entity entity, ItemStack itemStack);
+  void reload(Entity entity, ItemStack itemStack, boolean sendUpdate);
 
   float getAccuracy(Entity entity, ItemStack itemStack);
 
@@ -56,7 +58,7 @@ public interface IGun extends IAction, IAnimationController, INBTSerializable<Co
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 
-  void toggleFireMode(Entity entity);
+  void toggleFireMode(Entity entity, boolean sendUpdate);
 
   boolean hasCrosshair();
 

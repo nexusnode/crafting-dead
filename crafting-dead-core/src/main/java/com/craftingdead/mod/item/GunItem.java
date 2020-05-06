@@ -102,8 +102,8 @@ public class GunItem extends ShootableItem {
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
             (itemStack, world, entity) -> entity != null ? entity
-                .getCapability(ModCapabilities.PLAYER)
-                .map(player -> entity.getHeldItemMainhand() == itemStack && player.isAiming() ? 1.0F
+                .getCapability(ModCapabilities.LIVING)
+                .map(living -> entity.getHeldItemMainhand() == itemStack && living.isAiming() ? 1.0F
                     : 0.0F)
                 .orElse(0.0F) : 0.0F);
   }
@@ -204,8 +204,8 @@ public class GunItem extends ShootableItem {
       Hand hand) {
     if (world.isRemote()) {
       playerEntity
-          .getCapability(ModCapabilities.PLAYER)
-          .ifPresent(player -> player.toggleAiming(true));
+          .getCapability(ModCapabilities.LIVING)
+          .ifPresent(living -> living.toggleAiming(true));
     }
     return super.onItemRightClick(world, playerEntity, hand);
   }

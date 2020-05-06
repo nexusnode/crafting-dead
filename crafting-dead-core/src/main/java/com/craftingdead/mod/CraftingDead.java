@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.living.DefaultLiving;
+import com.craftingdead.mod.capability.living.ILiving;
 import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.enchantment.ModEnchantments;
@@ -17,14 +19,16 @@ import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.world.biome.ModBiomes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -119,28 +123,22 @@ public class CraftingDead {
   // ================================================================================
 
   @SubscribeEvent
-  public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
-    switch (event.phase) {
-      case END:
-        event.player.getCapability(ModCapabilities.PLAYER).ifPresent((player) -> player.tick());
-        break;
-      default:
-        break;
-    }
+  public void handlePlayerTick(LivingEvent.LivingUpdateEvent event) {
+    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
     event
         .getEntity()
-        .getCapability(ModCapabilities.PLAYER)
-        .ifPresent(player -> event.setCanceled(player.onDeath(event.getSource())));
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(living -> event.setCanceled(living.onDeath(event.getSource())));
     if (event.getSource().getTrueSource() != null) {
       event
           .getSource()
           .getTrueSource()
-          .getCapability(ModCapabilities.PLAYER)
-          .ifPresent(player -> event.setCanceled(player.onKill(event.getEntity())));
+          .getCapability(ModCapabilities.LIVING)
+          .ifPresent(living -> event.setCanceled(living.onKill(event.getEntity())));
     }
   }
 
@@ -148,30 +146,32 @@ public class CraftingDead {
   public void handleLivingAttack(LivingAttackEvent event) {
     event
         .getEntity()
-        .getCapability(ModCapabilities.PLAYER)
-        .ifPresent(player -> player.onAttacked(event.getSource(), event.getAmount()));
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(living -> living.onAttacked(event.getSource(), event.getAmount()));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDamage(LivingDamageEvent event) {
     event
         .getEntity()
-        .getCapability(ModCapabilities.PLAYER)
-        .ifPresent(player -> player.onDamaged(event.getSource(), event.getAmount()));
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(living -> living.onDamaged(event.getSource(), event.getAmount()));
   }
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
     event
         .getPlayer()
-        .getCapability(ModCapabilities.PLAYER)
+        .getCapability(ModCapabilities.LIVING)
+        .filter(living -> living instanceof ServerPlayer)
         .<ServerPlayer>cast()
-        .ifPresent((player) -> {
+        .ifPresent(player -> {
           event
               .getOriginal()
-              .getCapability(ModCapabilities.PLAYER)
+              .getCapability(ModCapabilities.LIVING)
+              .filter(living -> living instanceof ServerPlayer)
               .<ServerPlayer>cast()
-              .ifPresent((that) -> {
+              .ifPresent(that -> {
                 player.copyFrom(that, event.isWasDeath());
               });
         });
@@ -179,11 +179,16 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-    if (event.getObject() instanceof ServerPlayerEntity) {
+    if (event.getObject() instanceof ZombieEntity) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
+              new SerializableProvider<>(new DefaultLiving<>((LivingEntity) event.getObject()),
+                  () -> ModCapabilities.LIVING));
+    } else if (event.getObject() instanceof ServerPlayerEntity) {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
       event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-              new SerializableProvider<>(player, () -> ModCapabilities.PLAYER));
+          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
+              new SerializableProvider<>(player, () -> ModCapabilities.LIVING));
     }
   }
 }

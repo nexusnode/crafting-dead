@@ -23,8 +23,8 @@ public class ModPlayerContainer extends Container {
     super(ModContainerTypes.PLAYER.get(), windowId);
     this.inventory = playerInventory;
     this.modInventory = playerInventory.player
-        .getCapability(ModCapabilities.PLAYER)
-        .orElseThrow(() -> new IllegalStateException("No player capability"))
+        .getCapability(ModCapabilities.LIVING)
+        .orElseThrow(() -> new IllegalStateException("No living capability"))
         .getInventory();
     this.craftingInventory.addListener(this::onCraftMatrixChanged);
 
@@ -119,8 +119,7 @@ public class ModPlayerContainer extends Container {
         if (!this.mergeItemStack(clickedStack, 27, this.inventorySlots.size(), true)) {
           return ItemStack.EMPTY;
         }
-      }
-      else {
+      } else {
         // Pushes the clicked stack to the lower slots in a "positive direction"
         if (!this.mergeItemStack(clickedStack, 0, 27, false)) {
           return ItemStack.EMPTY;

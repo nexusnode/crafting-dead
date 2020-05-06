@@ -3,6 +3,7 @@ package com.craftingdead.mod.client;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
@@ -10,7 +11,7 @@ import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.paint.IPaint;
-import com.craftingdead.mod.capability.player.ClientPlayer;
+import com.craftingdead.mod.capability.player.SelfPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
@@ -22,8 +23,8 @@ import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
-import com.craftingdead.mod.client.renderer.entity.player.layer.ClothingLayer;
-import com.craftingdead.mod.client.renderer.entity.player.layer.EquipmentLayer;
+import com.craftingdead.mod.client.renderer.entity.layer.ClothingLayer;
+import com.craftingdead.mod.client.renderer.entity.layer.EquipmentLayer;
 import com.craftingdead.mod.client.tutorial.IModTutorialStep;
 import com.craftingdead.mod.client.tutorial.ModTutorialSteps;
 import com.craftingdead.mod.entity.ModEntityTypes;
@@ -34,6 +35,7 @@ import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
+import com.google.common.collect.Streams;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -42,6 +44,7 @@ import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -53,6 +56,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -77,6 +81,7 @@ import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientDist implements IModDist {
@@ -145,9 +150,12 @@ public class ClientDist implements IModDist {
     return this.crosshairManager;
   }
 
-  public LazyOptional<ClientPlayer> getPlayer() {
+  public LazyOptional<SelfPlayer> getPlayer() {
     return minecraft.player != null
-        ? minecraft.player.getCapability(ModCapabilities.PLAYER, null).cast()
+        ? minecraft.player
+            .getCapability(ModCapabilities.LIVING)
+            .filter(living -> living instanceof SelfPlayer)
+            .cast()
         : LazyOptional.empty();
   }
 
@@ -186,51 +194,52 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
+  }
 
+  @SubscribeEvent
+  public void handleLoadComplete(FMLLoadCompleteEvent event) {
     StartupMessageManager.addModMessage("Loading model layers");
 
-    this.registerPlayerLayer(ClothingLayer::new);
-    this
-        .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()
-            .withRenderer(renderer)
-            .withItemStackGetter(
-                player -> player.getInventory().getStackInSlot(InventorySlotType.MELEE.getIndex()))
-            .withCrouchingOrientation(true)
-            .build());
-    this
-        .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()
-            .withRenderer(renderer)
-            .withItemStackGetter(
-                player -> player.getInventory().getStackInSlot(InventorySlotType.VEST.getIndex()))
-            .withCrouchingOrientation(true)
-            .build());
-    this
-        .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()
-            .withRenderer(renderer)
-            .withItemStackGetter(
-                player -> player.getInventory().getStackInSlot(InventorySlotType.HAT.getIndex()))
-            .withHeadOrientation(true)
+    this.getBipedRenderers().forEach(renderer -> {
+      renderer.addLayer(new ClothingLayer<>(renderer));
 
-            // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
-            // TODO Find a reason to not remove this line. Also, if you remove it, you will
-            // need to change the json file of every helmet since the scale affects positions.
-            .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
-            .build());
-    this
-        .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()
-            .withRenderer(renderer)
-            .withItemStackGetter(
-                player -> player.getInventory().getStackInSlot(InventorySlotType.GUN.getIndex()))
-            .withCrouchingOrientation(true)
-            .build());
-    this
-        .registerPlayerLayer(renderer -> new EquipmentLayer.Builder()
-            .withRenderer(renderer)
-            .withItemStackGetter(player -> player
-                .getInventory()
-                .getStackInSlot(InventorySlotType.BACKPACK.getIndex()))
-            .withCrouchingOrientation(true)
-            .build());
+      renderer
+          .addLayer(new EquipmentLayer.Builder<>()
+              .withRenderer(renderer)
+              .withSlot(InventorySlotType.MELEE)
+              .withCrouchingOrientation(true)
+              .build());
+      renderer
+          .addLayer(new EquipmentLayer.Builder<>()
+              .withRenderer(renderer)
+              .withSlot(InventorySlotType.VEST)
+              .withCrouchingOrientation(true)
+              .build());
+      renderer
+          .addLayer(new EquipmentLayer.Builder<>()
+              .withRenderer(renderer)
+              .withSlot(InventorySlotType.HAT)
+              .withHeadOrientation(true)
+
+              // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
+              // TODO Find a reason to not remove this line. Also, if you remove it, you will
+              // need to change the json file of every helmet since the scale affects positions.
+              .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
+              .build());
+      renderer
+          .addLayer(new EquipmentLayer.Builder<>()
+              .withRenderer(renderer)
+              .withSlot(InventorySlotType.GUN)
+              .withCrouchingOrientation(true)
+              .build());
+
+      renderer
+          .addLayer(new EquipmentLayer.Builder<>()
+              .withRenderer(renderer)
+              .withSlot(InventorySlotType.BACKPACK)
+              .withCrouchingOrientation(true)
+              .build());
+    });
   }
 
   /**
@@ -248,6 +257,24 @@ public class ClientDist implements IModDist {
     });
   }
 
+  @SuppressWarnings("unchecked")
+  public <T extends LivingEntity, M extends BipedModel<T>> Stream<LivingRenderer<T, M>> getBipedRenderers() {
+    return Streams
+        .concat(
+            minecraft
+                .getRenderManager()
+                .getSkinMap()
+                .values()
+                .stream()
+                .map(renderer -> (LivingRenderer<T, M>) renderer),
+            minecraft.getRenderManager().renderers
+                .values()
+                .stream()
+                .filter(renderer -> renderer instanceof LivingRenderer
+                    && ((LivingRenderer<?, ?>) renderer).getEntityModel() instanceof BipedModel)
+                .map(renderer -> (LivingRenderer<T, M>) renderer));
+  }
+
   // ================================================================================
   // Forge Events
   // ================================================================================
@@ -259,15 +286,17 @@ public class ClientDist implements IModDist {
         if (minecraft.loadingGui == null
             && (minecraft.currentScreen == null || minecraft.currentScreen.passEvents)) {
           while (TOGGLE_FIRE_MODE.isPressed()) {
-            minecraft.player
-                .getCapability(ModCapabilities.PLAYER)
-                .ifPresent(player -> player.toggleFireMode(true));
+            ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+            heldStack
+                .getCapability(ModCapabilities.GUN)
+                .ifPresent(gun -> gun.toggleFireMode(minecraft.player, true));
           }
           while (OPEN_MOD_INVENTORY.isPressed()) {
             minecraft.player
-                .getCapability(ModCapabilities.PLAYER)
+                .getCapability(ModCapabilities.LIVING)
+                .filter(living -> living instanceof IPlayer)
+                .<IPlayer<?>>cast()
                 .ifPresent(IPlayer::openPlayerContainer);
-
             if (minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
               ((IModTutorialStep) minecraft.getTutorial().tutorialStep).openModInventory();
             }
@@ -292,12 +321,11 @@ public class ClientDist implements IModDist {
     if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
       if (minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
-        this.getPlayer().ifPresent(player -> {
-          if (player.getEntity().getHeldItemMainhand().getItem() instanceof GunItem) {
-            event.setCanceled(true);
-            player.setTriggerPressed(triggerPressed, true);
-          }
-        });
+        ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+        heldStack
+            .getCapability(ModCapabilities.GUN)
+            .ifPresent(
+                gun -> gun.setTriggerPressed(minecraft.player, heldStack, triggerPressed, true));
       }
     }
   }
@@ -306,15 +334,15 @@ public class ClientDist implements IModDist {
   public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof ClientPlayerEntity) {
       event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
-              new SerializableProvider<>(new ClientPlayer((ClientPlayerEntity) event.getObject()),
-                  () -> ModCapabilities.PLAYER));
+          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
+              new SerializableProvider<>(new SelfPlayer((ClientPlayerEntity) event.getObject()),
+                  () -> ModCapabilities.LIVING));
     } else if (event.getObject() instanceof AbstractClientPlayerEntity) {
       event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "player"),
+          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
               new SerializableProvider<>(
                   new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
-                  () -> ModCapabilities.PLAYER));
+                  () -> ModCapabilities.LIVING));
     }
   }
 
@@ -482,10 +510,10 @@ public class ClientDist implements IModDist {
   public static void renderArmsWithExtraSkins(PlayerRenderer renderer, MatrixStack matrix,
       IRenderTypeBuffer buffer, int p_229144_3_, AbstractClientPlayerEntity playerEntity,
       ModelRenderer firstLayerModel, ModelRenderer secondLayerModel) {
-    playerEntity.getCapability(ModCapabilities.PLAYER).ifPresent(player -> {
+    playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       String skinType = playerEntity.getSkinType();
       ItemStack clothingStack =
-          player.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+          living.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
       if (clothingStack.getItem() instanceof ClothingItem) {
         ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
         ResourceLocation clothingSkin = clothingItem.getClothingSkin(skinType);

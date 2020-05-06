@@ -1,10 +1,14 @@
 package com.craftingdead.mod.network;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.network.message.main.PlayerActionMessage;
+import com.craftingdead.mod.network.message.main.OpenPlayerContainerMessage;
+import com.craftingdead.mod.network.message.main.ReloadMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
 import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
 import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
+import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
+import com.craftingdead.mod.network.message.main.ToggleFireModeMessage;
+import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -24,10 +28,38 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(PlayerActionMessage.class, ++id)
-          .encoder(PlayerActionMessage::encode)
-          .decoder(PlayerActionMessage::decode)
-          .consumer(PlayerActionMessage::handle)
+          .messageBuilder(OpenPlayerContainerMessage.class, ++id)
+          .encoder(OpenPlayerContainerMessage::encode)
+          .decoder(OpenPlayerContainerMessage::decode)
+          .consumer(OpenPlayerContainerMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(ReloadMessage.class, ++id)
+          .encoder(ReloadMessage::encode)
+          .decoder(ReloadMessage::decode)
+          .consumer(ReloadMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(ToggleAimingMessage.class, ++id)
+          .encoder(ToggleAimingMessage::encode)
+          .decoder(ToggleAimingMessage::decode)
+          .consumer(ToggleAimingMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(ToggleFireModeMessage.class, ++id)
+          .encoder(ToggleFireModeMessage::encode)
+          .decoder(ToggleFireModeMessage::decode)
+          .consumer(ToggleFireModeMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(TriggerPressedMessage.class, ++id)
+          .encoder(TriggerPressedMessage::encode)
+          .decoder(TriggerPressedMessage::decode)
+          .consumer(TriggerPressedMessage::handle)
           .add();
 
       simpleChannel

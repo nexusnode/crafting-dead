@@ -45,9 +45,9 @@ public class SyncInventoryMessage {
     world
         .map(w -> w.getEntityByID(msg.entityId))
         .flatMap(entity -> Optional
-            .ofNullable(entity.getCapability(ModCapabilities.PLAYER).orElse(null)))
-        .ifPresent(player -> {
-          IInventory inventory = player.getInventory();
+            .ofNullable(entity.getCapability(ModCapabilities.LIVING).orElse(null)))
+        .ifPresent(living -> {
+          IInventory inventory = living.getInventory();
           for (int i = 0; i < msg.inventoryContents.size(); i++) {
             inventory.setInventorySlotContents(i, msg.inventoryContents.get(i));
           }
