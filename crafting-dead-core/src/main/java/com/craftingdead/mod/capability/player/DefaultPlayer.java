@@ -146,7 +146,8 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
 
   @Override
   public void infect(float chance) {
-    if (random.nextFloat() < chance && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
+    if (!this.entity.isCreative() && random.nextFloat() < chance
+        && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
       this.entity
           .sendStatusMessage(new TranslationTextComponent("message.infected")
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
