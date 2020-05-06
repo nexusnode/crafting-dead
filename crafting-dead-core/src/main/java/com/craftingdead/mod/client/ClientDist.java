@@ -322,10 +322,10 @@ public class ClientDist implements IModDist {
       if (minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         ItemStack heldStack = minecraft.player.getHeldItemMainhand();
-        heldStack
-            .getCapability(ModCapabilities.GUN)
-            .ifPresent(
-                gun -> gun.setTriggerPressed(minecraft.player, heldStack, triggerPressed, true));
+        heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+          event.setCanceled(true);
+          gun.setTriggerPressed(minecraft.player, heldStack, triggerPressed, true);
+        });
       }
     }
   }
