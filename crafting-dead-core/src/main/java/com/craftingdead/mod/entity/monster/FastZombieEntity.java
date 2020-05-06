@@ -6,12 +6,8 @@ import net.minecraft.world.World;
 
 public class FastZombieEntity extends AdvancedZombieEntity {
 
-  public FastZombieEntity(EntityType<? extends FastZombieEntity> type, World world) {
+  public FastZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world) {
     super(type, world);
-  }
-
-  public FastZombieEntity(World world) {
-    super(world);
   }
 
   @Override

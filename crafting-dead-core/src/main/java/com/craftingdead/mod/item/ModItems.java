@@ -3033,6 +3033,10 @@ public class ModItems {
       .register("weak_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.weakZombie, 0x000000,
           0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
+  public static final RegistryObject<Item> POLICE_ZOMBIE_SPAWN_EGG = ITEMS
+      .register("police_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.policeZombie,
+          0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
   // ================================================================================
   // Miscellaneous
   // ================================================================================

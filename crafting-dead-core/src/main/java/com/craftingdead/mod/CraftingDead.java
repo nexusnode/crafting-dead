@@ -10,6 +10,7 @@ import com.craftingdead.mod.capability.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.enchantment.ModEnchantments;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.network.NetworkChannel;
@@ -20,7 +21,6 @@ import com.craftingdead.mod.world.biome.ModBiomes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -179,7 +179,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-    if (event.getObject() instanceof ZombieEntity) {
+    if (event.getObject() instanceof AdvancedZombieEntity) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
               new SerializableProvider<>(new DefaultLiving<>((LivingEntity) event.getObject()),

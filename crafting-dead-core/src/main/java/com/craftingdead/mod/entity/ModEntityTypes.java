@@ -7,6 +7,7 @@ import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.entity.monster.FastZombieEntity;
 import com.craftingdead.mod.entity.monster.TankZombieEntity;
 import com.craftingdead.mod.entity.monster.WeakZombieEntity;
+import com.craftingdead.mod.item.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -25,6 +26,7 @@ public class ModEntityTypes {
   public static EntityType<FastZombieEntity> fastZombie;
   public static EntityType<TankZombieEntity> tankZombie;
   public static EntityType<WeakZombieEntity> weakZombie;
+  public static EntityType<AdvancedZombieEntity> policeZombie;
 
   public static EntityType<GrenadeEntity> grenade;
 
@@ -70,6 +72,14 @@ public class ModEntityTypes {
     weakZombie = add("weak_zombie",
         EntityType.Builder
             .<WeakZombieEntity>create(WeakZombieEntity::new, EntityClassification.MONSTER)
+            .setTrackingRange(64)
+            .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
+            .setShouldReceiveVelocityUpdates(false));
+    
+    policeZombie = add("police_zombie",
+        EntityType.Builder
+            .<AdvancedZombieEntity>create((type, world) -> new AdvancedZombieEntity(type, world, ModItems.G18::get, ModItems.POLICE_CLOTHING::get, null), EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
             .size(0.6F, 1.95F)

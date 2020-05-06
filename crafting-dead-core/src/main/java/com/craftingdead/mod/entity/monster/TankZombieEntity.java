@@ -10,10 +10,6 @@ public class TankZombieEntity extends AdvancedZombieEntity {
     super(type, world);
   }
 
-  public TankZombieEntity(World world) {
-    super(world);
-  }
-
   @Override
   protected void registerAttributes() {
     super.registerAttributes();

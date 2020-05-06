@@ -3,7 +3,6 @@ package com.craftingdead.mod.client;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
@@ -11,9 +10,9 @@ import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.paint.IPaint;
-import com.craftingdead.mod.capability.player.SelfPlayer;
 import com.craftingdead.mod.capability.player.DefaultPlayer;
 import com.craftingdead.mod.capability.player.IPlayer;
+import com.craftingdead.mod.capability.player.SelfPlayer;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
@@ -35,7 +34,6 @@ import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
-import com.google.common.collect.Streams;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -44,7 +42,6 @@ import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -56,7 +53,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -81,7 +77,6 @@ import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientDist implements IModDist {
@@ -192,54 +187,53 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.weakZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.policeZombie, AdvancedZombieRenderer::new);
+    RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
-  }
 
-  @SubscribeEvent
-  public void handleLoadComplete(FMLLoadCompleteEvent event) {
     StartupMessageManager.addModMessage("Loading model layers");
 
-    this.getBipedRenderers().forEach(renderer -> {
-      renderer.addLayer(new ClothingLayer<>(renderer));
-
-      renderer
-          .addLayer(new EquipmentLayer.Builder<>()
-              .withRenderer(renderer)
-              .withSlot(InventorySlotType.MELEE)
-              .withCrouchingOrientation(true)
-              .build());
-      renderer
-          .addLayer(new EquipmentLayer.Builder<>()
-              .withRenderer(renderer)
-              .withSlot(InventorySlotType.VEST)
-              .withCrouchingOrientation(true)
-              .build());
-      renderer
-          .addLayer(new EquipmentLayer.Builder<>()
-              .withRenderer(renderer)
-              .withSlot(InventorySlotType.HAT)
-              .withHeadOrientation(true)
-
-              // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
-              // TODO Find a reason to not remove this line. Also, if you remove it, you will
-              // need to change the json file of every helmet since the scale affects positions.
-              .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
-              .build());
-      renderer
-          .addLayer(new EquipmentLayer.Builder<>()
-              .withRenderer(renderer)
-              .withSlot(InventorySlotType.GUN)
-              .withCrouchingOrientation(true)
-              .build());
-
-      renderer
-          .addLayer(new EquipmentLayer.Builder<>()
-              .withRenderer(renderer)
-              .withSlot(InventorySlotType.BACKPACK)
-              .withCrouchingOrientation(true)
-              .build());
-    });
+    this.registerPlayerLayer(ClothingLayer::new);
+    this
+        .registerPlayerLayer(
+            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+                .withRenderer(renderer)
+                .withSlot(InventorySlotType.MELEE)
+                .withCrouchingOrientation(true)
+                .build());
+    this
+        .registerPlayerLayer(
+            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+                .withRenderer(renderer)
+                .withSlot(InventorySlotType.VEST)
+                .withCrouchingOrientation(true)
+                .build());
+    this
+        .registerPlayerLayer(
+            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+                .withRenderer(renderer)
+                .withSlot(InventorySlotType.HAT)
+                .withHeadOrientation(true)
+                // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
+                // TODO Find a reason to not remove this line. Also, if you remove it, you will
+                // need to change the json file of every helmet since the scale affects positions.
+                .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
+                .build());
+    this
+        .registerPlayerLayer(
+            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+                .withRenderer(renderer)
+                .withSlot(InventorySlotType.GUN)
+                .withCrouchingOrientation(true)
+                .build());
+    this
+        .registerPlayerLayer(
+            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+                .withRenderer(renderer)
+                .withSlot(InventorySlotType.BACKPACK)
+                .withCrouchingOrientation(true)
+                .build());
   }
 
   /**
@@ -255,24 +249,6 @@ public class ClientDist implements IModDist {
     minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
       renderer.addLayer(function.apply(renderer));
     });
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends LivingEntity, M extends BipedModel<T>> Stream<LivingRenderer<T, M>> getBipedRenderers() {
-    return Streams
-        .concat(
-            minecraft
-                .getRenderManager()
-                .getSkinMap()
-                .values()
-                .stream()
-                .map(renderer -> (LivingRenderer<T, M>) renderer),
-            minecraft.getRenderManager().renderers
-                .values()
-                .stream()
-                .filter(renderer -> renderer instanceof LivingRenderer
-                    && ((LivingRenderer<?, ?>) renderer).getEntityModel() instanceof BipedModel)
-                .map(renderer -> (LivingRenderer<T, M>) renderer));
   }
 
   // ================================================================================

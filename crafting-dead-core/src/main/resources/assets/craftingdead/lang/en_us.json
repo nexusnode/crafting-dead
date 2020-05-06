@@ -26,6 +26,7 @@
   "entity.craftingdead.fast_zombie": "Fast Zombie",
   "entity.craftingdead.tank_zombie": "Tank Zombie",
   "entity.craftingdead.weak_zombie": "Weak Zombie",
+  "entity.craftingdead.police_zombie": "Police Zombie",
   "entity.craftingdead.supply_drop": "Supply Drop",
 
   "message.fire_mode.auto":"Switched to automatic",
@@ -322,10 +323,13 @@
   "item.craftingdead.open_canned_dog_food": "Open Canned Dog Food",
   "item.craftingdead.canned_tomato_soup": "Canned Tomato Soup",
   "item.craftingdead.open_canned_tomato_soup": "Open Canned Tomato Soup",
+
   "item.craftingdead.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",
   "item.craftingdead.fast_zombie_spawn_egg": "Fast Zombie Spawn Egg",
   "item.craftingdead.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",
   "item.craftingdead.weak_zombie_spawn_egg": "Weak Zombie Spawn Egg",
+  "item.craftingdead.police_zombie_spawn_egg": "Police Zombie Spawn Egg",
+
   "item.craftingdead.contractor_clothing": "Constractor Clothing",
   "item.craftingdead.ddpat_clothing": "Navy DDPAT Clothing",
   "item.craftingdead.scuba_clothing": "Scuba Driving Clothing",

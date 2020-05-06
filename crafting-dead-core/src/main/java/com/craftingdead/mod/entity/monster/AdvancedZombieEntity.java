@@ -3,6 +3,8 @@ package com.craftingdead.mod.entity.monster;
 import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
+import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.inventory.InventorySlotType;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
@@ -12,10 +14,13 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
@@ -27,16 +32,29 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   private static final DataParameter<Integer> TEXTURE_NUMBER =
       EntityDataManager.createKey(AdvancedZombieEntity.class, DataSerializers.VARINT);
 
+  private final IItemProvider heldItem;
+  private final IItemProvider clothingItem;
+  private final IItemProvider hatItem;
+
   private RangedAttackGoal rangedAttackGoal;
 
   private long triggerPressedStartTime;
 
   public AdvancedZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world) {
-    super(type, world);
+    this(type, world, null, null, null);
   }
 
-  public AdvancedZombieEntity(World world) {
-    super(world);
+  public AdvancedZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world,
+      IItemProvider heldItem, IItemProvider clothingItem, IItemProvider hatItem) {
+    super(type, world);
+    this.heldItem = heldItem;
+    this.clothingItem = clothingItem;
+    this.hatItem = hatItem;
+  }
+
+  public AdvancedZombieEntity(World world, IItemProvider heldItem, IItemProvider clothingItem,
+      IItemProvider hatItem) {
+    this(ModEntityTypes.advancedZombie, world, heldItem, clothingItem, hatItem);
   }
 
   @Override
@@ -100,6 +118,16 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
       SpawnReason reason, @Nullable ILivingEntityData spawnData, @Nullable CompoundNBT dataTag) {
     spawnData = super.onInitialSpawn(world, difficulty, reason, spawnData, dataTag);
     this.dataManager.set(TEXTURE_NUMBER, this.rand.nextInt(23));
+    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(this.heldItem));
+    this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+      living
+          .getInventory()
+          .setInventorySlotContents(InventorySlotType.CLOTHING.getIndex(),
+              new ItemStack(this.clothingItem));
+      living
+          .getInventory()
+          .setInventorySlotContents(InventorySlotType.HAT.getIndex(), new ItemStack(this.hatItem));
+    });
     return spawnData;
   }
 

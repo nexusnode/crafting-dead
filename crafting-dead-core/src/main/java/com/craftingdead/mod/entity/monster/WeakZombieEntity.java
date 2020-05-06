@@ -10,10 +10,6 @@ public class WeakZombieEntity extends AdvancedZombieEntity {
     super(type, world);
   }
 
-  public WeakZombieEntity(World world) {
-    super(world);
-  }
-
   @Override
   protected void registerAttributes() {
     super.registerAttributes();
