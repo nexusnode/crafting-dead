@@ -189,6 +189,8 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.policeZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.doctorZombie, AdvancedZombieRenderer::new);
+    RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
 

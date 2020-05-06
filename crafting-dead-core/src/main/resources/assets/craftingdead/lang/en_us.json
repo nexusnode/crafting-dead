@@ -27,6 +27,7 @@
   "entity.craftingdead.tank_zombie": "Tank Zombie",
   "entity.craftingdead.weak_zombie": "Weak Zombie",
   "entity.craftingdead.police_zombie": "Police Zombie",
+  "entity.craftingdead.doctor_zombie": "Doctor Zombie",
   "entity.craftingdead.supply_drop": "Supply Drop",
 
   "message.fire_mode.auto":"Switched to automatic",
@@ -329,6 +330,7 @@
   "item.craftingdead.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",
   "item.craftingdead.weak_zombie_spawn_egg": "Weak Zombie Spawn Egg",
   "item.craftingdead.police_zombie_spawn_egg": "Police Zombie Spawn Egg",
+  "item.craftingdead.doctor_zombie_spawn_egg": "Doctor Zombie Spawn Egg",
 
   "item.craftingdead.contractor_clothing": "Constractor Clothing",
   "item.craftingdead.ddpat_clothing": "Navy DDPAT Clothing",

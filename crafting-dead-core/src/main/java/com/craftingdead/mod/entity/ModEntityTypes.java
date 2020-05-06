@@ -27,6 +27,7 @@ public class ModEntityTypes {
   public static EntityType<TankZombieEntity> tankZombie;
   public static EntityType<WeakZombieEntity> weakZombie;
   public static EntityType<AdvancedZombieEntity> policeZombie;
+  public static EntityType<AdvancedZombieEntity> doctorZombie;
 
   public static EntityType<GrenadeEntity> grenade;
 
@@ -76,10 +77,21 @@ public class ModEntityTypes {
             .setUpdateInterval(3)
             .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
-    
-    policeZombie = add("police_zombie",
+
+    policeZombie = add("police_zombie", EntityType.Builder
+        .<AdvancedZombieEntity>create((type, world) -> new AdvancedZombieEntity(type, world,
+            ModItems.G18::get, ModItems.POLICE_CLOTHING::get, null), EntityClassification.MONSTER)
+        .setTrackingRange(64)
+        .setUpdateInterval(3)
+        .size(0.6F, 1.95F)
+        .setShouldReceiveVelocityUpdates(false));
+
+    doctorZombie = add("doctor_zombie",
         EntityType.Builder
-            .<AdvancedZombieEntity>create((type, world) -> new AdvancedZombieEntity(type, world, ModItems.G18::get, ModItems.POLICE_CLOTHING::get, null), EntityClassification.MONSTER)
+            .<AdvancedZombieEntity>create(
+                (type, world) -> new AdvancedZombieEntity(type, world, null,
+                    ModItems.DOCTOR_CLOTHING::get, ModItems.DOCTOR_MASK::get),
+                EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
             .size(0.6F, 1.95F)
@@ -89,25 +101,22 @@ public class ModEntityTypes {
         .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
 
     // Spawn placement rules
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-        AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry
+        .register(ModEntityTypes.advancedZombie,
+            EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.fastZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-        AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry
+        .register(ModEntityTypes.fastZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.tankZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-        AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry
+        .register(ModEntityTypes.tankZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.weakZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-        AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry
+        .register(ModEntityTypes.weakZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
   }
 
   public static void register(RegistryEvent.Register<EntityType<?>> event) {
