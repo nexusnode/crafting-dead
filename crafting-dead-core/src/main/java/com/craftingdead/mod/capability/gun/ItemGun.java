@@ -17,14 +17,14 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
+import com.craftingdead.mod.item.FireMode;
+import com.craftingdead.mod.item.GunItem;
+import com.craftingdead.mod.item.MagazineItem;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.ReloadMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
 import com.craftingdead.mod.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
-import com.craftingdead.mod.item.FireMode;
-import com.craftingdead.mod.item.GunItem;
-import com.craftingdead.mod.item.MagazineItem;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.ParticleUtil;
@@ -42,6 +42,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -339,7 +341,8 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     }
 
     double chinHeight = (entityHit.getY() + entityHit.getEyeHeight() - 0.2F);
-    boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity)
+    boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity
+        || entityHit instanceof SkeletonEntity || entityHit instanceof CreeperEntity)
         && rayTrace.getHitVec().y >= chinHeight;
     if (headshot) {
       // The sound is played at client side too

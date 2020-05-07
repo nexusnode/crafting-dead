@@ -1,4 +1,4 @@
-package com.craftingdead.mod.capability.player;
+package com.craftingdead.mod.capability.living.player;
 
 import java.util.Random;
 import java.util.UUID;
@@ -115,7 +115,7 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
 
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    if (source.getTrueSource() instanceof ZombieEntity) {
+    if (!source.isProjectile() && source.getTrueSource() instanceof ZombieEntity) {
       this.infect(INFECTION_CHANCE);
     }
     return false;

@@ -5,6 +5,7 @@ import java.util.List;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.entity.monster.FastZombieEntity;
+import com.craftingdead.mod.entity.monster.GiantZombieEntity;
 import com.craftingdead.mod.entity.monster.TankZombieEntity;
 import com.craftingdead.mod.entity.monster.WeakZombieEntity;
 import com.craftingdead.mod.item.ModItems;
@@ -13,8 +14,8 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraftforge.event.RegistryEvent;
 
 public class ModEntityTypes {
 
@@ -28,6 +29,7 @@ public class ModEntityTypes {
   public static EntityType<WeakZombieEntity> weakZombie;
   public static EntityType<AdvancedZombieEntity> policeZombie;
   public static EntityType<AdvancedZombieEntity> doctorZombie;
+  public static EntityType<GiantZombieEntity> giantZombie;
 
   public static EntityType<GrenadeEntity> grenade;
 
@@ -95,6 +97,17 @@ public class ModEntityTypes {
             .setTrackingRange(64)
             .setUpdateInterval(3)
             .size(0.6F, 1.95F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    giantZombie = add("giant_zombie",
+        EntityType.Builder
+            .<GiantZombieEntity>create(
+                (type, world) -> new GiantZombieEntity(type, world, ModItems.M4A1::get,
+                    ModItems.ARMY_CLOTHING::get, ModItems.ARMY_HELMET::get),
+                EntityClassification.MONSTER)
+            .setTrackingRange(64)
+            .setUpdateInterval(3)
+            .size(3.6F, 12.0F)
             .setShouldReceiveVelocityUpdates(false));
 
     supplyDrop = add("supply_drop", EntityType.Builder

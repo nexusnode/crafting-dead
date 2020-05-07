@@ -28,6 +28,7 @@
   "entity.craftingdead.weak_zombie": "Weak Zombie",
   "entity.craftingdead.police_zombie": "Police Zombie",
   "entity.craftingdead.doctor_zombie": "Doctor Zombie",
+  "entity.craftingdead.giant_zombie": "Giant Zombie",
   "entity.craftingdead.supply_drop": "Supply Drop",
 
   "message.fire_mode.auto":"Switched to automatic",

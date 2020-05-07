@@ -9,10 +9,10 @@ import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.living.player.DefaultPlayer;
+import com.craftingdead.mod.capability.living.player.IPlayer;
+import com.craftingdead.mod.capability.living.player.SelfPlayer;
 import com.craftingdead.mod.capability.paint.IPaint;
-import com.craftingdead.mod.capability.player.DefaultPlayer;
-import com.craftingdead.mod.capability.player.IPlayer;
-import com.craftingdead.mod.capability.player.SelfPlayer;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
@@ -20,6 +20,7 @@ import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.model.PerspectiveAwareModel;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
+import com.craftingdead.mod.client.renderer.entity.GiantZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.mod.client.renderer.entity.layer.ClothingLayer;
@@ -191,6 +192,8 @@ public class ClientDist implements IModDist {
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.doctorZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.giantZombie, GiantZombieRenderer::new);
+    RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
 
@@ -344,13 +347,21 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
+  public void handleRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
     switch (event.getType()) {
       case ALL:
         this.ingameGui
             .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
                 event.getWindow().getScaledHeight());
         break;
+      default:
+        break;
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
+    switch (event.getType()) {
       case CROSSHAIRS:
         this.getPlayer().ifPresent(player -> {
           ClientPlayerEntity playerEntity = player.getEntity();

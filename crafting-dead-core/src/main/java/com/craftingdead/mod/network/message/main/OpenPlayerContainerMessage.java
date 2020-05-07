@@ -3,7 +3,7 @@ package com.craftingdead.mod.network.message.main;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.player.IPlayer;
+import com.craftingdead.mod.capability.living.player.IPlayer;
 import com.craftingdead.mod.network.util.NetworkUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;

@@ -2,7 +2,7 @@ package com.craftingdead.mod.capability.magazine;
 
 import java.util.Random;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.player.IPlayer;
+import com.craftingdead.mod.capability.living.player.IPlayer;
 import com.craftingdead.mod.enchantment.ModEnchantments;
 import com.craftingdead.mod.item.MagazineItem;
 import net.minecraft.block.Blocks;

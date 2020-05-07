@@ -1,4 +1,4 @@
-package com.craftingdead.mod.capability.player;
+package com.craftingdead.mod.capability.living.player;
 
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.network.NetworkChannel;

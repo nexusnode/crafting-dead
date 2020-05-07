@@ -1,4 +1,4 @@
-package com.craftingdead.mod.capability.player;
+package com.craftingdead.mod.capability.living.player;
 
 import com.craftingdead.mod.capability.living.ILiving;
 import net.minecraft.entity.player.PlayerEntity;

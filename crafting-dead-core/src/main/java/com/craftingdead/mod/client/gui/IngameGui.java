@@ -97,7 +97,6 @@ public class IngameGui {
       RenderSystem.pushMatrix();
       {
         itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
-        RenderSystem.scalef(0.75F, 0.75F, 0.75F);
       }
       RenderSystem.popMatrix();
     }

@@ -6,7 +6,7 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.living.DefaultLiving;
 import com.craftingdead.mod.capability.living.ILiving;
-import com.craftingdead.mod.capability.player.ServerPlayer;
+import com.craftingdead.mod.capability.living.player.ServerPlayer;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.enchantment.ModEnchantments;
 import com.craftingdead.mod.entity.ModEntityTypes;
