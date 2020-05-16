@@ -5,6 +5,14 @@ import com.craftingdead.mod.capability.animation.fire.PistolShootAnimation;
 import com.craftingdead.mod.capability.animation.fire.RifleShootAnimation;
 import com.craftingdead.mod.capability.animation.fire.SubmachineShootAnimation;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.entity.grenade.C4ExplosiveEntity;
+import com.craftingdead.mod.entity.grenade.DecoyGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FireGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FlashGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FragGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.GasGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.PipeGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.potion.ModEffects;
@@ -1543,28 +1551,67 @@ public class ModItems {
   // Grenades
   // ================================================================================
 
-  public static final RegistryObject<Item> FIRE_GRENADE = ITEMS
+  public static final RegistryObject<GrenadeItem> FIRE_GRENADE = ITEMS
       .register("fire_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setTyoe(GrenadeType.FIRE)
-              .setExplosionRadius(1f)
-              .setTimeUntilExplosion(10)
+              .setGrenadeEntitySupplier(FireGrenadeEntity::new)
+              .maxStackSize(3)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> GAS_GRENADE = ITEMS
+  public static final RegistryObject<GrenadeItem> GAS_GRENADE = ITEMS
       .register("gas_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setTyoe(GrenadeType.GAS)
-              .setExplosionRadius(1f)
-              .setTimeUntilExplosion(10)
+              .setGrenadeEntitySupplier(GasGrenadeEntity::new)
+              .maxStackSize(3)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> SMOKE_GRENADE = ITEMS
+  public static final RegistryObject<GrenadeItem> SMOKE_GRENADE = ITEMS
       .register("smoke_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setTyoe(GrenadeType.SMOKE)
-              .setExplosionRadius(1f)
-              .setTimeUntilExplosion(10)
+              .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
+              .maxStackSize(3)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<GrenadeItem> FLASH_GRENADE = ITEMS
+      .register("flash_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
+              .maxStackSize(3)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<GrenadeItem> DECOY_GRENADE = ITEMS
+      .register("decoy_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
+              .maxStackSize(3)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<GrenadeItem> FRAG_GRENADE = ITEMS
+      .register("frag_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(FragGrenadeEntity::new)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<GrenadeItem> PIPE_GRENADE = ITEMS
+      .register("pipe_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(PipeGrenadeEntity::new)
+              .maxStackSize(3)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<GrenadeItem> C4 = ITEMS
+      .register("c4_explosive",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(C4ExplosiveEntity::new)
+              .setThrowSpeed(0.75F)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<Item> REMOTE_DETONATOR = ITEMS
+      .register("remote_detonator",
+          () -> new RemoteDetonatorItem(new Item.Properties()
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================

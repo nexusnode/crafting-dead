@@ -7,12 +7,14 @@ import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.client.crosshair.Crosshair;
 import com.craftingdead.mod.client.util.RenderUtil;
 import com.craftingdead.mod.item.MagazineItem;
+import com.craftingdead.mod.potion.ModEffects;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -66,6 +68,16 @@ public class IngameGui {
               action.getText(playerEntity), action.getProgress(playerEntity));
         }
       });
+
+      // Draws Flashbang effect
+      EffectInstance flashEffect =
+          player.getEntity().getActivePotionEffect(ModEffects.FLASH_BLINDNESS.get());
+      if (flashEffect != null) {
+        int alpha = (int) (255F
+            * (MathHelper.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
+        int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
+        RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
+      }
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {

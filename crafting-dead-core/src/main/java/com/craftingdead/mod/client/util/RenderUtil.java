@@ -9,9 +9,13 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
@@ -24,6 +28,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 
@@ -35,6 +40,35 @@ public class RenderUtil {
       new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
 
   private static final Minecraft minecraft = Minecraft.getInstance();
+
+  public static ClippingHelperImpl createClippingHelper(float partialTicks, boolean considerF5) {
+    GameRenderer gameRenderer = minecraft.gameRenderer;
+    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    Vec3d projectedViewVec3d = considerF5 ? activerenderinfo.getProjectedView()
+        : minecraft.player.getPositionVec().add(0, minecraft.player.getEyeHeight(), 0);
+    double viewerX = projectedViewVec3d.getX();
+    double viewerY = projectedViewVec3d.getY();
+    double viewerZ = projectedViewVec3d.getZ();
+    float pitch = considerF5 ? activerenderinfo.getPitch() : minecraft.player.rotationPitch;
+    float yaw = considerF5 ? activerenderinfo.getYaw() : minecraft.player.rotationYaw;
+
+    MatrixStack cameraRotationStack = new MatrixStack();
+    // Reminder: At 1.15.2, roll cannot be get from ActiveRenderInfo
+    // cameraRotationStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rollHere));
+    cameraRotationStack
+        .multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
+    cameraRotationStack
+        .multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw + 180.0F));
+
+    Matrix4f fovAndWindowMatrix = new MatrixStack().peek().getModel();
+    fovAndWindowMatrix.multiply(gameRenderer.func_228382_a_(activerenderinfo, partialTicks, true));
+
+    ClippingHelperImpl clippingHelper =
+        new ClippingHelperImpl(cameraRotationStack.peek().getModel(), fovAndWindowMatrix);
+    clippingHelper.setPosition(viewerX, viewerY, viewerZ);
+
+    return clippingHelper;
+  }
 
   public static void drawGradientRectangle(double x, double y, double x2, double y2, int startColor,
       int endColor) {

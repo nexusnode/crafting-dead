@@ -3,6 +3,14 @@ package com.craftingdead.mod.entity;
 import java.util.ArrayList;
 import java.util.List;
 import com.craftingdead.mod.CraftingDead;
+import com.craftingdead.mod.entity.grenade.C4ExplosiveEntity;
+import com.craftingdead.mod.entity.grenade.DecoyGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FireGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FlashGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.FragGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.GasGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.PipeGrenadeEntity;
+import com.craftingdead.mod.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.entity.monster.FastZombieEntity;
 import com.craftingdead.mod.entity.monster.GiantZombieEntity;
@@ -31,15 +39,81 @@ public class ModEntityTypes {
   public static EntityType<AdvancedZombieEntity> doctorZombie;
   public static EntityType<GiantZombieEntity> giantZombie;
 
-  public static EntityType<GrenadeEntity> grenade;
+  public static EntityType<C4ExplosiveEntity> c4Explosive;
+  public static EntityType<DecoyGrenadeEntity> decoyGrenade;
+  public static EntityType<FireGrenadeEntity> fireGrenade;
+  public static EntityType<FlashGrenadeEntity> flashGrenade;
+  public static EntityType<FragGrenadeEntity> fragGrenade;
+  public static EntityType<GasGrenadeEntity> gasGrenade;
+  public static EntityType<PipeGrenadeEntity> pipeGrenade;
+  public static EntityType<SmokeGrenadeEntity> smokeGrenade;
 
   public static EntityType<SupplyDropEntity> supplyDrop;
 
   public static void initialize() {
-    grenade = add("fire_grenade",
+    c4Explosive = add("c4_explosive",
         EntityType.Builder
-            .<GrenadeEntity>create(GrenadeEntity::new, EntityClassification.MISC)
-            .size(0.25F, 0.25F));
+            .<C4ExplosiveEntity>create(C4ExplosiveEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.65F, 0.25F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    decoyGrenade = add("decoy_grenade",
+        EntityType.Builder
+            .<DecoyGrenadeEntity>create(DecoyGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    fireGrenade = add("fire_grenade",
+        EntityType.Builder
+            .<FireGrenadeEntity>create(FireGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    flashGrenade = add("flash_grenade",
+        EntityType.Builder
+            .<FlashGrenadeEntity>create(FlashGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    fragGrenade = add("frag_grenade",
+        EntityType.Builder
+            .<FragGrenadeEntity>create(FragGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.25F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    gasGrenade = add("gas_grenade",
+        EntityType.Builder
+            .<GasGrenadeEntity>create(GasGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    pipeGrenade = add("pipe_grenade",
+        EntityType.Builder
+            .<PipeGrenadeEntity>create(PipeGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
+
+    smokeGrenade = add("smoke_grenade",
+        EntityType.Builder
+            .<SmokeGrenadeEntity>create(SmokeGrenadeEntity::new, EntityClassification.MISC)
+            .setTrackingRange(64)
+            .setUpdateInterval(4)
+            .size(0.25F, 0.5F)
+            .setShouldReceiveVelocityUpdates(false));
 
     corpse = add("corpse",
         EntityType.Builder

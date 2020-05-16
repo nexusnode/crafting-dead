@@ -9,6 +9,9 @@ import net.minecraft.util.EntityDamageSource;
 
 public class ModDamageSource {
 
+  public static final String BULLET_HEADSHOT_DAMAGE_TYPE = "bullet.headshot";
+  public static final String BULLET_BODY_DAMAGE_TYPE = "bullet";
+
   public static final DamageSource DEHYDRATION =
       new DamageSource("dehydration").setDamageBypassesArmor();
   public static final DamageSource BLEEDING = new DamageSource("bleeding").setDamageBypassesArmor();
@@ -16,9 +19,14 @@ public class ModDamageSource {
       new DamageSource("infection").setDamageBypassesArmor();
 
   public static DamageSource causeGunDamage(Entity source, boolean headshot) {
-    return new EntityDamageSource(headshot ? "bullet.headshot" : "bullet", source)
+    return new EntityDamageSource(headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source)
         .setDamageBypassesArmor()
         .setProjectile();
+  }
+
+  public static boolean isGunDamage(DamageSource source) {
+    return source.getDamageType().equals(BULLET_HEADSHOT_DAMAGE_TYPE)
+        || source.getDamageType().equals(BULLET_BODY_DAMAGE_TYPE);
   }
 
   public static void causeDamageWithoutKnockback(Entity entity, DamageSource source, float amount) {

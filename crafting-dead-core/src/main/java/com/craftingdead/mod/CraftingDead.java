@@ -14,6 +14,7 @@ import com.craftingdead.mod.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.particle.ModParticleTypes;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
 import com.craftingdead.mod.util.ModSoundEvents;
@@ -21,6 +22,7 @@ import com.craftingdead.mod.world.biome.ModBiomes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +31,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -91,6 +94,7 @@ public class CraftingDead {
     ModContainerTypes.CONTAINERS.register(modEventBus);
     ModEffects.EFFECTS.register(modEventBus);
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
+    ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
 
@@ -125,6 +129,17 @@ public class CraftingDead {
   @SubscribeEvent
   public void handlePlayerTick(LivingEvent.LivingUpdateEvent event) {
     event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+  }
+
+  @SubscribeEvent
+  public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
+    if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
+      MobEntity mobEntity = (MobEntity) event.getEntityLiving();
+
+      if (mobEntity.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+        mobEntity.setAttackTarget(null);
+      }
+    }
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
