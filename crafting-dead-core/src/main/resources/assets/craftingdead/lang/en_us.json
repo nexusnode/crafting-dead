@@ -43,6 +43,7 @@
 
   "attribute.hat.headshot_reduction": "Headshot protection: %s%%",
   "attribute.hat.immune_to_flashes": "Immune to flashes",
+  "attribute.hat.immune_to_gas": "Immune to gas",
   "attribute.hat.has_night_vision": "Has Night Vision ability",
 
   "itemGroup.craftingdead.consumables": "Crafting Dead Consumables",

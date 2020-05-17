@@ -25,6 +25,7 @@
   "message.infected": "Você foi infectado com RBI.",
   "attribute.hat.headshot_reduction": "Proteção contra headshot: %s%%",
   "attribute.hat.immune_to_flashes": "Imune a flashes",
+  "attribute.hat.immune_to_gas": "Imune a gás",
   "attribute.hat.has_night_vision": "Tem Visão Noturna",
   "itemGroup.craftingdead.consumables": "Crafting Dead: Consumíveis",
   "itemGroup.craftingdead.clothing": "Crafting Dead: Roupas",

@@ -17,12 +17,15 @@ public class HatItem extends Item {
   /** In 1.6.4, flash-resistant helmets used to be actually immune. */
   private final boolean immuneToFlashes;
 
+  private final boolean immuneToGas;
+
   private final boolean allowsNightVision;
 
   public HatItem(Properties properties) {
     super(properties);
     this.headshotReductionPercentage = properties.headshotReductionPercentage;
     this.immuneToFlashes = properties.immuneToFlashes;
+    this.immuneToGas = properties.immuneToGas;
     this.allowsNightVision = properties.allowsNightVision;
   }
 
@@ -40,6 +43,11 @@ public class HatItem extends Item {
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
+    if (this.isImmuneToGas()) {
+      ITextComponent text = new TranslationTextComponent("attribute.hat.immune_to_gas");
+      text.getStyle().setColor(TextFormatting.GRAY);
+      lore.add(text);
+    }
     if (this.hasNightVision()) {
       ITextComponent text = new TranslationTextComponent("attribute.hat.has_night_vision");
       text.getStyle().setColor(TextFormatting.GRAY);
@@ -52,7 +60,7 @@ public class HatItem extends Item {
    * hat that have night vision ability.
    */
   public boolean hasNightVision() {
-    return allowsNightVision;
+    return this.allowsNightVision;
   }
 
   /**
@@ -63,19 +71,22 @@ public class HatItem extends Item {
   }
 
   public double getHeadshotReductionPercentage() {
-    return headshotReductionPercentage;
+    return this.headshotReductionPercentage;
   }
 
   public boolean isImmuneToFlashes() {
-    return immuneToFlashes;
+    return this.immuneToFlashes;
+  }
+
+  public boolean isImmuneToGas() {
+    return this.immuneToGas;
   }
 
   public static class Properties extends Item.Properties {
 
     private double headshotReductionPercentage;
-
     private boolean immuneToFlashes;
-
+    private boolean immuneToGas;
     private boolean allowsNightVision;
 
     public Properties setHeadshotReductionPercentage(double headshotReductionPercentage) {
@@ -90,6 +101,11 @@ public class HatItem extends Item {
 
     public Properties setImmuneToFlashes(boolean immuneToFlashes) {
       this.immuneToFlashes = immuneToFlashes;
+      return this;
+    }
+
+    public Properties setImmuneToGas(boolean immuneToGas) {
+      this.immuneToGas = immuneToGas;
       return this;
     }
   }

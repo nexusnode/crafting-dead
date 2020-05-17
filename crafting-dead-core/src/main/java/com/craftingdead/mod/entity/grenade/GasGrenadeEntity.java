@@ -5,12 +5,14 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.item.GrenadeItem;
+import com.craftingdead.mod.item.HatItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.particle.GrenadeSmokeParticleData;
 import com.craftingdead.mod.potion.ModEffects;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
@@ -132,12 +134,15 @@ public class GasGrenadeEntity extends GrenadeEntity {
   }
 
   public boolean canInhaleGas(LivingEntity livingEntity) {
-    boolean hasMask = livingEntity.getCapability(ModCapabilities.LIVING)
+    ItemStack hatItemStack = livingEntity.getCapability(ModCapabilities.LIVING)
         .map(entity -> entity.getInventory()
-        .getStackInSlot(InventorySlotType.HAT.getIndex()).getItem() == ModItems.GAS_MASK.get())
-        .orElse(false);
+        .getStackInSlot(InventorySlotType.HAT.getIndex()))
+        .orElse(ItemStack.EMPTY);
 
-    return !hasMask
+    boolean hasHatImmuneToGas = hatItemStack.getItem() instanceof HatItem
+        && ((HatItem) hatItemStack.getItem()).isImmuneToGas();
+
+    return !hasHatImmuneToGas
         && !livingEntity.areEyesInFluid(FluidTags.WATER)
         && !livingEntity.areEyesInFluid(FluidTags.LAVA);
   }

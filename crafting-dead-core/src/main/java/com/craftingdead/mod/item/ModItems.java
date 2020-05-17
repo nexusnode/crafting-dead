@@ -2560,6 +2560,7 @@ public class ModItems {
       .register("gas_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setImmuneToFlashes(true)
+              .setImmuneToGas(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
