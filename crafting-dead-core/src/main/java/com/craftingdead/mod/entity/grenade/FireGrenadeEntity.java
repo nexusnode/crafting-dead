@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.GrenadeItem;
 import com.craftingdead.mod.item.ModItems;
+import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -42,8 +43,10 @@ public class FireGrenadeEntity extends GrenadeEntity {
     if (activated) {
       if (!this.world.isRemote()) {
         this.remove();
-        this.world.createExplosion(this.getThrower().orElse(this), this.getX(), this.getY() + this.getHeight(),
-            this.getZ(), 2F, true, Explosion.Mode.NONE);
+        this.world.createExplosion(this,
+            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
+            this.getX(), this.getY() + this.getHeight(), this.getZ(), 2F, true,
+            Explosion.Mode.NONE);
 
         BlockPos.getAllInBox(this.getPosition().add(-FIRE_RADIUS, 0, -FIRE_RADIUS),
             this.getPosition().add(FIRE_RADIUS, 0, FIRE_RADIUS)).forEach(blockPos -> {

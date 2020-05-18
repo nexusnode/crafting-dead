@@ -32,6 +32,8 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   @Override
   public boolean attackEntityFrom(DamageSource source, float amount) {
     if (ModDamageSource.isGunDamage(source) || source.isExplosion() || source.isFireDamage()) {
+      // TODO Save who activated the grenade, so the true source
+      // of this DamageSource could be used when the grenade explodes.
       this.setActivated(true);
     }
     return super.attackEntityFrom(source, amount);
@@ -45,8 +47,10 @@ public class C4ExplosiveEntity extends GrenadeEntity {
     if (activated) {
       if (!this.world.isRemote()) {
         this.remove();
-        this.world.createExplosion(this.getThrower().orElse(this), this.getX(), this.getY() + this.getHeight(),
-            this.getZ(), 4F, Explosion.Mode.NONE);
+        this.world.createExplosion(this,
+            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
+            this.getX(), this.getY() + this.getHeight(), this.getZ(), 4F, false,
+            Explosion.Mode.NONE);
       }
     }
   }

@@ -3,6 +3,7 @@ package com.craftingdead.mod.entity.grenade;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.item.GrenadeItem;
 import com.craftingdead.mod.item.ModItems;
+import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.Explosion;
@@ -31,8 +32,10 @@ public class FragGrenadeEntity extends GrenadeEntity {
     if (activated) {
       if (!this.world.isRemote()) {
         this.remove();
-        this.world.createExplosion(this.getThrower().orElse(this), this.getX(), this.getY() + this.getHeight(),
-            this.getZ(), 4F, Explosion.Mode.NONE);
+        this.world.createExplosion(this,
+            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
+            this.getX(), this.getY() + this.getHeight(), this.getZ(), 4F, false,
+            Explosion.Mode.NONE);
       }
     }
   }

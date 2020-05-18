@@ -1,5 +1,6 @@
 package com.craftingdead.mod.util;
 
+import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -22,6 +23,15 @@ public class ModDamageSource {
     return new EntityDamageSource(headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source)
         .setDamageBypassesArmor()
         .setProjectile();
+  }
+
+  /**
+   * Creates an explosion damage source without difficulty scaling.
+   */
+  public static DamageSource causeUnscaledExplosionDamage(@Nullable Entity source) {
+    return source != null
+        ? new EntityDamageSource("explosion.player", source).setExplosion()
+        : new DamageSource("explosion").setExplosion();
   }
 
   public static boolean isGunDamage(DamageSource source) {
