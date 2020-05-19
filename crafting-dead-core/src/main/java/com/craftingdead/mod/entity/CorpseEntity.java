@@ -87,8 +87,7 @@ public class CorpseEntity extends Entity {
   @Override
   public void baseTick() {
     super.baseTick();
-    // Every 5 seconds
-    if (!this.world.isRemote && this.ticksExisted % (20 * 10) == 0) {
+    if (!this.world.isRemote && this.ticksExisted % (20 * 120) == 0) {
       this.decrementLimbCount();
     }
     if (!this.onGround) {
