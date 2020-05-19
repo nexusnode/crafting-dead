@@ -39,9 +39,17 @@ public class ModDamageSource {
         || source.getDamageType().equals(BULLET_BODY_DAMAGE_TYPE);
   }
 
-  public static void causeDamageWithoutKnockback(Entity entity, DamageSource source, float amount) {
-    if (entity instanceof LivingEntity) {
-      LivingEntity livingHit = (LivingEntity) entity;
+  /**
+   * Causes a damage without doing knockback.
+   *
+   * @param victim - the victim
+   * @param source - the source
+   * @param amount - the amount of dmg
+   * @return the result from <code>victim.attackEntityFrom()</code>
+   */
+  public static boolean causeDamageWithoutKnockback(Entity victim, DamageSource source, float amount) {
+    if (victim instanceof LivingEntity) {
+      LivingEntity livingHit = (LivingEntity) victim;
 
       // Gets the KNOCKBACK RESISTANCE attribute of the victim
       IAttributeInstance livingResistance =
@@ -52,12 +60,12 @@ public class ModDamageSource {
       // Sets the resistance to make the living not receive knockback
       livingResistance.setBaseValue(Integer.MAX_VALUE);
       // Finally attacks the entity without doing any knockback
-      livingHit.attackEntityFrom(source, amount);
+      boolean attackResult = livingHit.attackEntityFrom(source, amount);
       // Restores the previous knockback resistance value, so the
       // entity can receive knockback again.
       livingResistance.setBaseValue(previousResistance);
-    } else {
-      entity.attackEntityFrom(source, amount);
+      return attackResult;
     }
+    return victim.attackEntityFrom(source, amount);
   }
 }

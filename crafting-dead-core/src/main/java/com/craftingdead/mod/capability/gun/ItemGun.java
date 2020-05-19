@@ -368,23 +368,22 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     world
         .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
             SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
-    ModDamageSource
-        .causeDamageWithoutKnockback(entityHit, ModDamageSource.causeGunDamage(entity, headshot),
-            damage);
+    boolean damageWasCaused = ModDamageSource.causeDamageWithoutKnockback(entityHit,
+        ModDamageSource.causeGunDamage(entity, headshot), damage);
 
-    // Runs at server side only
-    if (world instanceof ServerWorld) {
-      ServerWorld serverWorld = (ServerWorld) world;
+    if (damageWasCaused) {
+      // Runs at server side only
+      if (world instanceof ServerWorld) {
+        ServerWorld serverWorld = (ServerWorld) world;
 
-      // Sends to everyone near, except the player
-      ParticleUtil
-          .spawnParticleServerside(serverWorld,
-              new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-              hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-              (player) -> player != entityHit);
+        // Sends to everyone near, except the player
+        ParticleUtil
+            .spawnParticleServerside(serverWorld,
+                new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
+                hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+                (player) -> player != entityHit);
+      }
     }
-
-    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
 
     // Removes the temporary invincibility after causing the damage.
     // Allows more bullets to hit the same target at the same time.
