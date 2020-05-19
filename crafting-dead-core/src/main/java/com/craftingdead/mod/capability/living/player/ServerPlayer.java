@@ -141,5 +141,12 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
       this.zombiesKilled = that.zombiesKilled;
       this.playersKilled = that.playersKilled;
     }
+
+    // Copies the inventory. Doesn't actually matter if it was death or not.
+    // Death drops from 'that' should be cleared on death drops to prevent item duplication.
+    this.getInventory().clear();
+    for (int i = 0; i < that.getInventory().getSizeInventory(); i++) {
+      this.getInventory().setInventorySlotContents(i, that.getInventory().getStackInSlot(i));
+    }
   }
 }
