@@ -12,7 +12,7 @@ import net.minecraft.potion.EffectType;
 public class BleedingEffect extends Effect {
 
   protected BleedingEffect() {
-    super(EffectType.HARMFUL, 0x4e9331);
+    super(EffectType.HARMFUL, 0x8B0000);
   }
 
   @Override
