@@ -214,9 +214,10 @@ public class ItemGun extends DefaultAnimationController implements IGun {
           entity instanceof PlayerEntity ? (!findAmmo((PlayerEntity) entity, itemStack).isEmpty())
               : true;
       if (!this.isReloading() && canReload) {
-        entity.world
-            .playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
-                SoundCategory.PLAYERS, 1.0F, 1.0F);
+        // Some guns may not have a reload sound
+        this.gunItem.getReloadSound().ifPresent(sound -> {
+          entity.world.playMovingSound(null, entity, sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        });
         this.reloadDurationTicks =
             this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
       }
