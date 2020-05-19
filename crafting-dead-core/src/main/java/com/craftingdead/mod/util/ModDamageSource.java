@@ -1,5 +1,6 @@
 package com.craftingdead.mod.util;
 
+import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -9,6 +10,9 @@ import net.minecraft.util.EntityDamageSource;
 
 public class ModDamageSource {
 
+  public static final String BULLET_HEADSHOT_DAMAGE_TYPE = "bullet.headshot";
+  public static final String BULLET_BODY_DAMAGE_TYPE = "bullet";
+
   public static final DamageSource DEHYDRATION =
       new DamageSource("dehydration").setDamageBypassesArmor();
   public static final DamageSource BLEEDING = new DamageSource("bleeding").setDamageBypassesArmor();
@@ -16,9 +20,23 @@ public class ModDamageSource {
       new DamageSource("infection").setDamageBypassesArmor();
 
   public static DamageSource causeGunDamage(Entity source, boolean headshot) {
-    return new EntityDamageSource(headshot ? "bullet.headshot" : "bullet", source)
+    return new EntityDamageSource(headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source)
         .setDamageBypassesArmor()
         .setProjectile();
+  }
+
+  /**
+   * Creates an explosion damage source without difficulty scaling.
+   */
+  public static DamageSource causeUnscaledExplosionDamage(@Nullable Entity source) {
+    return source != null
+        ? new EntityDamageSource("explosion.player", source).setExplosion()
+        : new DamageSource("explosion").setExplosion();
+  }
+
+  public static boolean isGunDamage(DamageSource source) {
+    return source.getDamageType().equals(BULLET_HEADSHOT_DAMAGE_TYPE)
+        || source.getDamageType().equals(BULLET_BODY_DAMAGE_TYPE);
   }
 
   public static void causeDamageWithoutKnockback(Entity entity, DamageSource source, float amount) {

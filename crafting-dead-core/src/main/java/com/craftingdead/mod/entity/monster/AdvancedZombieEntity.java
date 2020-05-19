@@ -4,6 +4,9 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.entity.ModEntityTypes;
+import com.craftingdead.mod.entity.ai.FollowAttractiveGrenadeGoal;
+import com.craftingdead.mod.entity.ai.LookAtEntityGoal;
+import com.craftingdead.mod.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
@@ -62,6 +65,9 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     super.registerGoals();
     this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F);
     this.goalSelector.addGoal(2, this.rangedAttackGoal);
+    this.goalSelector.addGoal(1, new FollowAttractiveGrenadeGoal(this, 1.15F));
+    this.goalSelector.addGoal(4,
+        new LookAtEntityGoal<FlashGrenadeEntity>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
   }
 
   @Override

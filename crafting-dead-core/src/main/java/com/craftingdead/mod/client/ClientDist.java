@@ -18,15 +18,21 @@ import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
 import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.model.PerspectiveAwareModel;
+import com.craftingdead.mod.client.particle.GrenadeSmokeParticle;
+import com.craftingdead.mod.client.particle.RGBFlashParticle;
 import com.craftingdead.mod.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.mod.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.mod.client.renderer.entity.GiantZombieRenderer;
-import com.craftingdead.mod.client.renderer.entity.GrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.SupplyDropRenderer;
+import com.craftingdead.mod.client.renderer.entity.grenade.C4ExplosiveRenderer;
+import com.craftingdead.mod.client.renderer.entity.grenade.CylinderGrenadeRenderer;
+import com.craftingdead.mod.client.renderer.entity.grenade.FragGrenadeRenderer;
+import com.craftingdead.mod.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.mod.client.renderer.entity.layer.ClothingLayer;
 import com.craftingdead.mod.client.renderer.entity.layer.EquipmentLayer;
 import com.craftingdead.mod.client.tutorial.IModTutorialStep;
 import com.craftingdead.mod.client.tutorial.ModTutorialSteps;
+import com.craftingdead.mod.client.util.RenderUtil;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
@@ -35,11 +41,14 @@ import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
+import com.craftingdead.mod.particle.ModParticleTypes;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -58,12 +67,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -155,6 +167,36 @@ public class ClientDist implements IModDist {
     Tutorial tutorial = minecraft.getTutorial();
     tutorial.setStep(TutorialSteps.NONE);
     tutorial.tutorialStep = step.create(this);
+}
+  /**
+   * Checks whether the entity is inside the FOV of the game client. The size of the game
+   * window is also considered. Blocks in front of player's view are not considered.
+   *
+   * @param target - The entity to test from the player's view
+   * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
+   */
+  public boolean isInsideGameFOV(Entity target, boolean considerF5) {
+    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    Vec3d projectedViewVec3d = considerF5 ? activerenderinfo.getProjectedView()
+        : target.getPositionVec().add(0, target.getEyeHeight(), 0);
+    double viewerX = projectedViewVec3d.getX();
+    double viewerY = projectedViewVec3d.getY();
+    double viewerZ = projectedViewVec3d.getZ();
+
+    if (!target.isInRangeToRender3d(viewerX, viewerY, viewerZ)) {
+      return false;
+    }
+
+    AxisAlignedBB renderBoundingBox = target.getRenderBoundingBox();
+
+    // Validation from Vanilla.
+    // Generates a render bounding box if it is needed.
+    if (renderBoundingBox.hasNaN() || renderBoundingBox.getAverageEdgeLength() == 0.0D) {
+      renderBoundingBox = new AxisAlignedBB(target.getX() - 2.0D, target.getY() - 2.0D,
+          target.getZ() - 2.0D, target.getX() + 2.0D, target.getY() + 2.0D, target.getZ() + 2.0D);
+    }
+
+    return RenderUtil.createClippingHelper(1F, considerF5).isVisible(renderBoundingBox);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -210,7 +252,22 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.giantZombie, GiantZombieRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.grenade, GrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.c4Explosive,
+        C4ExplosiveRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fireGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fragGrenade,
+        FragGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.gasGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.pipeGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.decoyGrenade,
+        SlimGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.smokeGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.flashGrenade,
+        SlimGrenadeRenderer::new);
 
     StartupMessageManager.addModMessage("Loading model layers");
 
@@ -269,6 +326,17 @@ public class ClientDist implements IModDist {
     minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
       renderer.addLayer(function.apply(renderer));
     });
+  }
+
+  @SubscribeEvent
+  public void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
+    ParticleManager particleManager = minecraft.particles;
+
+    particleManager.registerFactory(ModParticleTypes.RGB_FLASH.get(),
+        sprite -> new RGBFlashParticle.Factory(sprite));
+
+    particleManager.registerFactory(ModParticleTypes.GRENADE_SMOKE.get(),
+        sprite -> new GrenadeSmokeParticle.Factory(sprite));
   }
 
   // ================================================================================
