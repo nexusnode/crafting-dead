@@ -126,13 +126,19 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
 
   @Override
   public float onDamaged(DamageSource source, float amount) {
-    float bleedChance = 0.1F * amount;
-    if (random.nextFloat() < bleedChance
-        && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
-      this.entity
-          .sendStatusMessage(new TranslationTextComponent("message.bleeding")
-              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+    // Can be null
+    Entity immediateAttacker = source.getImmediateSource();
+
+    boolean isValidSource = immediateAttacker != null || source.isExplosion();
+    if (isValidSource) {
+      float bleedChance = 0.1F * amount;
+      if (random.nextFloat() < bleedChance
+          && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
+        this.entity
+            .sendStatusMessage(new TranslationTextComponent("message.bleeding")
+                .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+        this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+      }
     }
     return amount;
   }
