@@ -1,5 +1,6 @@
 package com.craftingdead.mod;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.ModCapabilities;
@@ -23,6 +24,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -50,6 +52,9 @@ public class CraftingDead {
 
   public static final String DISPLAY_NAME;
 
+  public static final CommonConfig commonConfig;
+  public static final ForgeConfigSpec commonConfigSpec;
+
   static {
     VERSION =
         JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
@@ -57,6 +62,11 @@ public class CraftingDead {
     DISPLAY_NAME =
         JarVersionLookupHandler.getImplementationTitle(CraftingDead.class).orElse("[display_name]");
     assert DISPLAY_NAME != null;
+
+    final Pair<CommonConfig, ForgeConfigSpec> commonConfigPair =
+        new ForgeConfigSpec.Builder().configure(CommonConfig::new);
+    commonConfigSpec = commonConfigPair.getRight();
+    commonConfig = commonConfigPair.getLeft();
   }
 
   /**
@@ -94,8 +104,7 @@ public class CraftingDead {
 
     MinecraftForge.EVENT_BUS.register(this);
 
-    ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CommonConfig.clientConfigSpec);
-    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.commonConfigSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonConfigSpec);
   }
 
   public IModDist getModDist() {
@@ -129,16 +138,18 @@ public class CraftingDead {
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
-    event
+    if (event
         .getEntity()
         .getCapability(ModCapabilities.LIVING)
-        .ifPresent(living -> event.setCanceled(living.onDeath(event.getSource())));
-    if (event.getSource().getTrueSource() != null) {
-      event
-          .getSource()
-          .getTrueSource()
-          .getCapability(ModCapabilities.LIVING)
-          .ifPresent(living -> event.setCanceled(living.onKill(event.getEntity())));
+        .map(living -> living.onDeath(event.getSource()))
+        .orElse(false)
+        || (event.getSource().getTrueSource() != null && event
+            .getSource()
+            .getTrueSource()
+            .getCapability(ModCapabilities.LIVING)
+            .map(living -> living.onKill(event.getEntity()))
+            .orElse(false))) {
+      event.setCanceled(true);
     }
   }
 

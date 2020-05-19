@@ -1,6 +1,5 @@
 package com.craftingdead.mod.client.gui;
 
-import com.craftingdead.mod.CommonConfig;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
@@ -69,7 +68,7 @@ public class IngameGui {
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
-        if (CommonConfig.clientConfig.displayBlood.get()) {
+        if (ClientDist.clientConfig.displayBlood.get()) {
           renderBlood(width, height, playerEntity.getHealth() / playerEntity.getMaxHealth());
         }
 
