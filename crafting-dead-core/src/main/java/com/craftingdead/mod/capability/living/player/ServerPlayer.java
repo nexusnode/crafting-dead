@@ -1,13 +1,16 @@
 package com.craftingdead.mod.capability.living.player;
 
+import java.util.Collection;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
@@ -80,10 +83,15 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   @Override
-  public boolean onDeath(DamageSource cause) {
-    CorpseEntity corpse = new CorpseEntity(this.entity);
-    this.entity.world.addEntity(corpse);
-    return false;
+  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+    if (!super.onDeathDrops(cause, drops)) { // If not cancelled
+      // Prevents useless corpse spawns in worlds with keep inventory.
+      if (!this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        CorpseEntity corpse = new CorpseEntity(this.entity, drops);
+        this.entity.world.addEntity(corpse);
+      }
+    }
+    return true;
   }
 
   @Override

@@ -32,6 +32,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -166,6 +167,15 @@ public class CraftingDead {
             .orElse(false))) {
       event.setCanceled(true);
     }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingDrops(LivingDropsEvent event) {
+    event
+        .getEntity()
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(
+            living -> event.setCanceled(living.onDeathDrops(event.getSource(), event.getDrops())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)

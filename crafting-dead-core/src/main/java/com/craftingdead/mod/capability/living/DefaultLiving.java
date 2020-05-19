@@ -1,5 +1,6 @@
 package com.craftingdead.mod.capability.living;
 
+import java.util.Collection;
 import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.InventorySlotType;
@@ -8,6 +9,8 @@ import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
 import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -15,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
@@ -112,6 +116,26 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
   @Override
   public boolean onDeath(DamageSource cause) {
+    return false;
+  }
+
+  @Override
+  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+    boolean shouldKeepInventory = (this.entity instanceof PlayerEntity
+        && this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY));
+    if (!shouldKeepInventory) {
+      // Adds items from CD inventory
+      for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+        ItemEntity itemEntity = new ItemEntity(entity.world, entity.getX(), entity.getY(),
+            entity.getZ(), this.inventory.getStackInSlot(i));
+        itemEntity.setDefaultPickupDelay();
+
+        drops.add(itemEntity);
+      }
+
+      // Clears CD inventory
+      this.inventory.clear();
+    }
     return false;
   }
 

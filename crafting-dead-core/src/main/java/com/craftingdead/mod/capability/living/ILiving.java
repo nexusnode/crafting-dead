@@ -1,8 +1,10 @@
 package com.craftingdead.mod.capability.living;
 
+import java.util.Collection;
 import java.util.UUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
@@ -14,7 +16,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
   /**
    * When this entity is damaged; with potions and armour taken into account.
-   * 
+   *
    * @param source - the source of damage
    * @param amount - the amount of damage taken
    * @return the new damage amount
@@ -23,7 +25,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
   /**
    * When this entity is attacked.
-   * 
+   *
    * @param source - the source of damage
    * @param amount - the amount of damage taken
    * @return if the event should be cancelled
@@ -45,6 +47,15 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
    * @return if the event should be cancelled
    */
   boolean onDeath(DamageSource cause);
+
+  /**
+   * When this entity's death causes dropped items to appear.
+   *
+   * @param cause - the DamageSource that caused the drop to occur
+   * @param drops - a collections of EntityItems that will be dropped
+   * @return if the event should be cancelled
+   */
+  boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops);
 
   boolean isAiming();
 
