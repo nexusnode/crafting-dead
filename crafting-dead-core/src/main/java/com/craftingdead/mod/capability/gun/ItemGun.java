@@ -368,6 +368,12 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     world
         .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
             SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
+
+    // Resets the temporary invincibility before causing the damage, preventing
+    // previous damages from blocking the gun damage.
+    // Also, allows multiple bullets to hit the same target at the same time.
+    entityHit.hurtResistantTime = 0;
+
     boolean damageWasCaused = ModDamageSource.causeDamageWithoutKnockback(entityHit,
         ModDamageSource.causeGunDamage(entity, headshot), damage);
 
@@ -384,11 +390,6 @@ public class ItemGun extends DefaultAnimationController implements IGun {
                 (player) -> player != entityHit);
       }
     }
-
-    // Removes the temporary invincibility after causing the damage.
-    // Allows more bullets to hit the same target at the same time.
-    // Good for shotguns and teaming.
-    entityHit.hurtResistantTime = 0;
 
     this.magazineStack
         .getCapability(ModCapabilities.MAGAZINE)
