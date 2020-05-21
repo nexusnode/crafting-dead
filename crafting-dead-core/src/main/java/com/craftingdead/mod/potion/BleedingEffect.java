@@ -28,8 +28,8 @@ public class BleedingEffect extends Effect {
 
   @Override
   public boolean isReady(int duration, int amplifier) {
-    int secondsBetweenHits = (MAXIMUM_DELAY - (amplifier * DELAY_REDUCTION_PER_LEVEL));
-    return duration % Math.max(secondsBetweenHits, MINIMUM_DELAY) == 0;
+    int ticksBetweenHits = (MAXIMUM_DELAY - (amplifier * DELAY_REDUCTION_PER_LEVEL));
+    return duration % Math.max(ticksBetweenHits, MINIMUM_DELAY) == 0;
   }
 
   @Override
