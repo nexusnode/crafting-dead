@@ -36,7 +36,7 @@ public class CraftingDeadImmerse {
 
   public CraftingDeadImmerse() {
     instance = this;
-    this.modDist = DistExecutor.runForDist(() -> ClientDist::new, () -> ServerDist::new);
+    this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
   }
 
   public IModDist getModDist() {
