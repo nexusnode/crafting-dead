@@ -74,8 +74,15 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
           RenderUtil.applyPlayerCrouchRotation(matrix);
         }
 
-        // Applies the head rotation if needed
+        // Applies the head orientation if needed
         if (this.useHeadOrientation) {
+          // Vanilla's transformation for child entities, like baby zombies
+          if (entity.isChild()) {
+             matrix.translate(0.0D, 0.03125D, 0.0D);
+             matrix.scale(0.7F, 0.7F, 0.7F);
+             matrix.translate(0.0D, 1.0D, 0.0D);
+          }
+
           this.getEntityModel().func_205072_a().rotate(matrix);
         }
 

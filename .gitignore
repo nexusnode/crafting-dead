@@ -1,7 +1,5 @@
 crafting-dead-core/.classpath
 crafting-dead-core/.project
-crafting-dead-core/runClient.launch
-crafting-dead-core/runServer.launch
 crafting-dead-core/.gradle/
 crafting-dead-core/bin/
 crafting-dead-core/.settings/
@@ -12,8 +10,6 @@ crafting-dead-core/.idea/
 
 crafting-dead-immerse/.classpath
 crafting-dead-immerse/.project
-crafting-dead-immerse/runClient.launch
-crafting-dead-immerse/runServer.launch
 crafting-dead-immerse/.gradle/
 crafting-dead-immerse/bin/
 crafting-dead-immerse/.settings/
@@ -21,6 +17,9 @@ crafting-dead-immerse/build/
 crafting-dead-immerse/server/
 crafting-dead-immerse/run/
 crafting-dead-immerse/.idea/
+
+# Launch configurations from Eclipse
+*.launch
 
 /.classpath
 /.project

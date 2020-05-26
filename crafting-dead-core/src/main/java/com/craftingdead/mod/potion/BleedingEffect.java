@@ -11,8 +11,12 @@ import net.minecraft.potion.EffectType;
 
 public class BleedingEffect extends Effect {
 
+  private static final int MAXIMUM_DELAY = 20 * 6;
+  private static final int MINIMUM_DELAY = 10;
+  private static final int DELAY_REDUCTION_PER_LEVEL = 20;
+
   protected BleedingEffect() {
-    super(EffectType.HARMFUL, 0x4e9331);
+    super(EffectType.HARMFUL, 0x8B0000);
   }
 
   @Override
@@ -24,7 +28,8 @@ public class BleedingEffect extends Effect {
 
   @Override
   public boolean isReady(int duration, int amplifier) {
-    return true;
+    int ticksBetweenHits = (MAXIMUM_DELAY - (amplifier * DELAY_REDUCTION_PER_LEVEL));
+    return duration % Math.max(ticksBetweenHits, MINIMUM_DELAY) == 0;
   }
 
   @Override

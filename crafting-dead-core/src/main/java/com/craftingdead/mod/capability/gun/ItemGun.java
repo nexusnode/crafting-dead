@@ -208,9 +208,10 @@ public class ItemGun extends DefaultAnimationController implements IGun {
           .orElse(ItemStack.EMPTY)
           .isEmpty();
       if (!this.isReloading() && canReload) {
-        entity.world
-            .playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
-                SoundCategory.PLAYERS, 1.0F, 1.0F);
+        // Some guns may not have a reload sound
+        this.gunItem.getReloadSound().ifPresent(sound -> {
+          entity.world.playMovingSound(null, entity, sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        });
         this.reloadDurationTicks =
             this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
       }
@@ -361,28 +362,28 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     world
         .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
             SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
-    ModDamageSource
-        .causeDamageWithoutKnockback(entityHit, ModDamageSource.causeGunDamage(entity, headshot),
-            damage);
 
-    // Runs at server side only
-    if (world instanceof ServerWorld) {
-      ServerWorld serverWorld = (ServerWorld) world;
-
-      // Sends to everyone near, except the player
-      ParticleUtil
-          .spawnParticleServerside(serverWorld,
-              new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-              hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-              (player) -> player != entityHit);
-    }
-
-    entityHit.attackEntityFrom(ModDamageSource.causeGunDamage(entity, headshot), damage);
-
-    // Removes the temporary invincibility after causing the damage.
-    // Allows more bullets to hit the same target at the same time.
-    // Good for shotguns and teaming.
+    // Resets the temporary invincibility before causing the damage, preventing
+    // previous damages from blocking the gun damage.
+    // Also, allows multiple bullets to hit the same target at the same time.
     entityHit.hurtResistantTime = 0;
+
+    boolean damageWasCaused = ModDamageSource.causeDamageWithoutKnockback(entityHit,
+        ModDamageSource.causeGunDamage(entity, headshot), damage);
+
+    if (damageWasCaused) {
+      // Runs at server side only
+      if (world instanceof ServerWorld) {
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        // Sends to everyone near, except the player
+        ParticleUtil
+            .spawnParticleServerside(serverWorld,
+                new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
+                hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
+                (player) -> player != entityHit);
+      }
+    }
 
     this.magazineStack
         .getCapability(ModCapabilities.MAGAZINE)

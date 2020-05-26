@@ -1,5 +1,6 @@
 package com.craftingdead.mod.capability.living.player;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.UUID;
 import com.craftingdead.mod.capability.living.DefaultLiving;
@@ -8,6 +9,7 @@ import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -20,6 +22,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.GameRules;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -124,13 +127,19 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
 
   @Override
   public float onDamaged(DamageSource source, float amount) {
-    float bleedChance = 0.1F * amount;
-    if (random.nextFloat() < bleedChance
-        && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
-      this.entity
-          .sendStatusMessage(new TranslationTextComponent("message.bleeding")
-              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+    // Can be null
+    Entity immediateAttacker = source.getImmediateSource();
+
+    boolean isValidSource = immediateAttacker != null || source.isExplosion();
+    if (isValidSource) {
+      float bleedChance = 0.1F * amount;
+      if (random.nextFloat() < bleedChance
+          && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
+        this.entity
+            .sendStatusMessage(new TranslationTextComponent("message.bleeding")
+                .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+        this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+      }
     }
     return amount;
   }
@@ -154,8 +163,23 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   }
 
   @Override
-  public boolean onDeath(DamageSource cause) {
-    return false;
+  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+    boolean shouldKeepInventory =
+        this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
+    if (!shouldKeepInventory) {
+      // Adds items from CD inventory
+      for (int i = 0; i < this.getSlots(); i++) {
+        ItemEntity itemEntity = new ItemEntity(this.entity.world, this.entity.getX(),
+            this.entity.getY(), this.entity.getZ(), this.getStackInSlot(i));
+        itemEntity.setDefaultPickupDelay();
+
+        drops.add(itemEntity);
+      }
+
+      // Clears CD inventory
+      this.stacks.clear();
+    }
+    return super.onDeathDrops(cause, drops);
   }
 
   @Override

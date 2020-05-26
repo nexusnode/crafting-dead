@@ -1,5 +1,6 @@
 package com.craftingdead.mod.capability.living;
 
+import java.util.Collection;
 import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.InventorySlotType;
@@ -8,6 +9,7 @@ import com.craftingdead.mod.network.message.main.SetSlotMessage;
 import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -79,6 +81,11 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
 
   @Override
   public boolean onDeath(DamageSource cause) {
+    return false;
+  }
+
+  @Override
+  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
     return false;
   }
 

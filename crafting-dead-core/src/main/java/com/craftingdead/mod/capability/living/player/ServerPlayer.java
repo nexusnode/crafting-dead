@@ -1,5 +1,6 @@
 package com.craftingdead.mod.capability.living.player;
 
+import java.util.Collection;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.entity.CorpseEntity;
 import com.craftingdead.mod.inventory.InventorySlotType;
@@ -7,6 +8,7 @@ import com.craftingdead.mod.inventory.container.ModInventoryContainer;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -14,6 +16,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
@@ -102,10 +105,15 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   @Override
-  public boolean onDeath(DamageSource cause) {
-    CorpseEntity corpse = new CorpseEntity(this.entity);
-    this.entity.world.addEntity(corpse);
-    return false;
+  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+    if (!super.onDeathDrops(cause, drops)) { // If not cancelled
+      // Prevents useless corpse spawns in worlds with keep inventory.
+      if (!this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        CorpseEntity corpse = new CorpseEntity(this.entity, drops);
+        this.entity.world.addEntity(corpse);
+      }
+    }
+    return true;
   }
 
   @Override
@@ -154,6 +162,12 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     if (!wasDeath) {
       this.zombiesKilled = that.zombiesKilled;
       this.playersKilled = that.playersKilled;
+    }
+
+    // Copies the inventory. Doesn't actually matter if it was death or not.
+    // Death drops from 'that' should be cleared on death drops to prevent item duplication.
+    for (int i = 0; i < that.getSlots(); i++) {
+      this.setStackInSlot(i, that.getStackInSlot(i));
     }
   }
 }
