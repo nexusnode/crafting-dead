@@ -70,7 +70,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -131,10 +130,11 @@ public class ItemGun extends DefaultAnimationController implements IGun {
       if (this.magazineStack.isEmpty()) {
         this.magazineStack = entity
             .getCapability(ModCapabilities.LIVING)
-            .map(this::findAmmo)
+            .map(living -> this.findAmmo(living, false))
             .orElse(ItemStack.EMPTY);
       } else if (entity instanceof PlayerEntity) { // Unload
         ((PlayerEntity) entity).addItemStackToInventory(this.magazineStack);
+        this.magazineStack = ItemStack.EMPTY;
       }
     }
   }
@@ -204,7 +204,7 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     if (this.magazineStack.isEmpty()) {
       boolean canReload = !entity
           .getCapability(ModCapabilities.LIVING)
-          .map(this::findAmmo)
+          .map(living -> this.findAmmo(living, true))
           .orElse(ItemStack.EMPTY)
           .isEmpty();
       if (!this.isReloading() && canReload) {
@@ -368,8 +368,9 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     // Also, allows multiple bullets to hit the same target at the same time.
     entityHit.hurtResistantTime = 0;
 
-    boolean damageWasCaused = ModDamageSource.causeDamageWithoutKnockback(entityHit,
-        ModDamageSource.causeGunDamage(entity, headshot), damage);
+    boolean damageWasCaused = ModDamageSource
+        .causeDamageWithoutKnockback(entityHit, ModDamageSource.causeGunDamage(entity, headshot),
+            damage);
 
     if (damageWasCaused) {
       // Runs at server side only
@@ -585,20 +586,20 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     this.magazineStack = stack;
   }
 
-  private ItemStack findAmmo(ILiving<?> living) {
+  private ItemStack findAmmo(ILiving<?> living, boolean simulate) {
     List<ICapabilityProvider> ammoProviders = ImmutableList
         .of(living.getStackInSlot(InventorySlotType.VEST.getIndex()),
             living.getStackInSlot(InventorySlotType.BACKPACK.getIndex()), living.getEntity());
     for (ICapabilityProvider ammoProvider : ammoProviders) {
-      LazyOptional<ItemStack> ammoStack = ammoProvider
+      ItemStack ammoStack = ammoProvider
           .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
           .map(itemHandler -> {
             for (int i = 0; i < itemHandler.getSlots(); ++i) {
               ItemStack itemStack = itemHandler.getStackInSlot(i);
               if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem())
                   && itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
-                ItemStack magazineStack = itemStack.split(1);
-                if (living.getEntity() instanceof PlayerEntity) {
+                ItemStack magazineStack = simulate ? itemStack.copy() : itemStack.split(1);
+                if (!simulate && living.getEntity() instanceof PlayerEntity) {
                   PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
                   if (itemStack.isEmpty()) {
                     playerEntity.inventory.deleteStack(itemStack);
@@ -608,9 +609,10 @@ public class ItemGun extends DefaultAnimationController implements IGun {
               }
             }
             return ItemStack.EMPTY;
-          });
-      if (ammoStack.isPresent()) {
-        return ammoStack.orElse(ItemStack.EMPTY);
+          })
+          .orElse(ItemStack.EMPTY);
+      if (ammoStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
+        return ammoStack;
       }
     }
     return ItemStack.EMPTY;
