@@ -60,7 +60,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
     entity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
 
-      ItemStack itemStack = living.getInventory().getStackInSlot(this.slot.getIndex());
+      ItemStack itemStack = living.getStackInSlot(this.slot.getIndex());
 
       if (!itemStack.isEmpty()) {
         IBakedModel itemModel =

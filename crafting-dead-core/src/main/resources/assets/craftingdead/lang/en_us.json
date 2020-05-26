@@ -294,9 +294,8 @@
   "item.craftingdead.large_tan_backpack": "Large Tan Backpack",
   "item.craftingdead.large_black_backpack": "Large Black Backpack",
   "item.craftingdead.large_ghillie_backpack": "Large Ghillie Backpack",
-  "item.craftingdead.tan_gun_backpack": "Tan Gun Bag",
-  "item.craftingdead.grey_gun_backpack": "Gray Gun Bag",
-  "item.craftingdead.ammo_backpack": "Ammo Backpack",
+  "item.craftingdead.tan_gun_bag": "Tan Gun Bag",
+  "item.craftingdead.grey_gun_bag": "Gray Gun Bag",
   "item.craftingdead.can_opener": "Can Opener",
   "item.craftingdead.empty_flask": "Empty Flask",
   "item.craftingdead.flask": "Water Flask",
@@ -436,7 +435,6 @@
   "item.craftingdead.molten_scrap_metal":"Molten Scrap Metal",
   "item.craftingdead.incendiary_powder":"Incendiary Powder",
   
-  "item.craftingdead.ammo_tactical_vest": "Ammo Tactical Vest",
   "item.craftingdead.black_tactical_vest": "Black Tactical Vest",
   "item.craftingdead.ghillie_tactical_vest": "Ghillie Tactical Vest",
   "item.craftingdead.green_tactical_vest": "Green Tactical Vest",
@@ -447,5 +445,6 @@
   "item.craftingdead.tan_quiver": "Tan Quiver",
   "item.craftingdead.green_quiver": "Green Quiver",
   "item.craftingdead.black_quiver": "Black Quiver",
+  
   "biome.craftingdead.zombie_forest": "Zombie Forest"
 }

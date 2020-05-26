@@ -12,9 +12,11 @@ import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimation;
+import com.craftingdead.mod.capability.living.ILiving;
 import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.client.ClientDist;
 import com.craftingdead.mod.event.GunEvent;
+import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.item.FireMode;
@@ -29,6 +31,7 @@ import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.ParticleUtil;
 import com.craftingdead.mod.util.RayTraceUtil;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
@@ -47,7 +50,6 @@ import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -67,8 +69,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemGun extends DefaultAnimationController implements IGun {
@@ -124,23 +129,10 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     if (this.isReloading() && --this.reloadDurationTicks == 0) {
       // Reload
       if (this.magazineStack.isEmpty()) {
-        ItemStack magazineStack = null;
-        if (entity instanceof PlayerEntity) {
-          PlayerEntity playerEntity = (PlayerEntity) entity;
-          magazineStack = findAmmo(playerEntity, itemStack);
-        } else {
-          magazineStack = new ItemStack(this.gunItem.getAcceptedMagazines().iterator().next());
-        }
-
-        this.magazineStack = magazineStack.copy();
-
-        if (entity instanceof PlayerEntity) {
-          PlayerEntity playerEntity = (PlayerEntity) entity;
-          magazineStack.shrink(1);
-          if (magazineStack.isEmpty()) {
-            playerEntity.inventory.deleteStack(magazineStack);
-          }
-        }
+        this.magazineStack = entity
+            .getCapability(ModCapabilities.LIVING)
+            .map(this::findAmmo)
+            .orElse(ItemStack.EMPTY);
       } else if (entity instanceof PlayerEntity) { // Unload
         ((PlayerEntity) entity).addItemStackToInventory(this.magazineStack);
       }
@@ -210,9 +202,11 @@ public class ItemGun extends DefaultAnimationController implements IGun {
   public void reload(Entity entity, ItemStack itemStack, boolean sendUpdate) {
     // Reload
     if (this.magazineStack.isEmpty()) {
-      boolean canReload =
-          entity instanceof PlayerEntity ? (!findAmmo((PlayerEntity) entity, itemStack).isEmpty())
-              : true;
+      boolean canReload = !entity
+          .getCapability(ModCapabilities.LIVING)
+          .map(this::findAmmo)
+          .orElse(ItemStack.EMPTY)
+          .isEmpty();
       if (!this.isReloading() && canReload) {
         entity.world
             .playMovingSound(null, entity, this.gunItem.getReloadSound().get(),
@@ -590,9 +584,34 @@ public class ItemGun extends DefaultAnimationController implements IGun {
     this.magazineStack = stack;
   }
 
-  private static ItemStack findAmmo(PlayerEntity playerEntity, ItemStack gunStack) {
-    ItemStack ammoStack = playerEntity.findAmmo(gunStack);
-    // findAmmo returns an Arrow if in creative
-    return ammoStack.getItem() == Items.ARROW ? ItemStack.EMPTY : ammoStack;
+  private ItemStack findAmmo(ILiving<?> living) {
+    List<ICapabilityProvider> ammoProviders = ImmutableList
+        .of(living.getStackInSlot(InventorySlotType.VEST.getIndex()),
+            living.getStackInSlot(InventorySlotType.BACKPACK.getIndex()), living.getEntity());
+    for (ICapabilityProvider ammoProvider : ammoProviders) {
+      LazyOptional<ItemStack> ammoStack = ammoProvider
+          .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+          .map(itemHandler -> {
+            for (int i = 0; i < itemHandler.getSlots(); ++i) {
+              ItemStack itemStack = itemHandler.getStackInSlot(i);
+              if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem())
+                  && itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
+                ItemStack magazineStack = itemStack.split(1);
+                if (living.getEntity() instanceof PlayerEntity) {
+                  PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
+                  if (itemStack.isEmpty()) {
+                    playerEntity.inventory.deleteStack(itemStack);
+                  }
+                }
+                return magazineStack;
+              }
+            }
+            return ItemStack.EMPTY;
+          });
+      if (ammoStack.isPresent()) {
+        return ammoStack.orElse(ItemStack.EMPTY);
+      }
+    }
+    return ItemStack.EMPTY;
   }
 }

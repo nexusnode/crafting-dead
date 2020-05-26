@@ -49,12 +49,12 @@ public class SyncStatisticsMessage {
         stamina, maxStamina);
   }
 
-  public static void handle(SyncStatisticsMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(SyncStatisticsMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ((ClientDist) CraftingDead.getInstance().getModDist())
         .getPlayer()
         .ifPresent(player -> player
             .updateMetadata(msg.daysSurvived, msg.zombiesKilled, msg.playersKilled, msg.water,
                 msg.maxWater, msg.stamina, msg.maxStamina));
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

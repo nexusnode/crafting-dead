@@ -117,4 +117,9 @@ public class ItemMagazine implements IMagazine {
       this.size--;
     }
   }
+
+  @Override
+  public ItemStack createIcon() {
+    return new ItemStack(this.magazineItem);
+  }
 }

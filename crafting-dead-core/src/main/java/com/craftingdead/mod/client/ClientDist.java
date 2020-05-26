@@ -15,6 +15,7 @@ import com.craftingdead.mod.capability.living.player.SelfPlayer;
 import com.craftingdead.mod.capability.paint.IPaint;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
+import com.craftingdead.mod.client.gui.screen.inventory.GenericContainerScreen;
 import com.craftingdead.mod.client.gui.screen.inventory.ModInventoryScreen;
 import com.craftingdead.mod.client.model.GunModel;
 import com.craftingdead.mod.client.model.PerspectiveAwareModel;
@@ -41,6 +42,8 @@ import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.item.PaintItem;
+import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.mod.particle.ModParticleTypes;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
@@ -74,6 +77,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.FOVUpdateEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -167,10 +171,11 @@ public class ClientDist implements IModDist {
     Tutorial tutorial = minecraft.getTutorial();
     tutorial.setStep(TutorialSteps.NONE);
     tutorial.tutorialStep = step.create(this);
-}
+  }
+
   /**
-   * Checks whether the entity is inside the FOV of the game client. The size of the game
-   * window is also considered. Blocks in front of player's view are not considered.
+   * Checks whether the entity is inside the FOV of the game client. The size of the game window is
+   * also considered. Blocks in front of player's view are not considered.
    *
    * @param target - The entity to test from the player's view
    * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
@@ -223,6 +228,15 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
     ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
+    ScreenManager.registerFactory(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
+    ScreenManager
+        .registerFactory(ModContainerTypes.SMALL_BACKPACK.get(), GenericContainerScreen::new);
+    ScreenManager
+        .registerFactory(ModContainerTypes.MEDIUM_BACKPACK.get(), GenericContainerScreen::new);
+    ScreenManager
+        .registerFactory(ModContainerTypes.LARGE_BACKPACK.get(), GenericContainerScreen::new);
+    ScreenManager.registerFactory(ModContainerTypes.GUN_BAG.get(), GenericContainerScreen::new);
+    ScreenManager.registerFactory(ModContainerTypes.QUIVER.get(), GenericContainerScreen::new);
 
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
@@ -252,22 +266,22 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.giantZombie, GiantZombieRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.c4Explosive,
-        C4ExplosiveRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fireGrenade,
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fragGrenade,
-        FragGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.gasGrenade,
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.pipeGrenade,
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.decoyGrenade,
-        SlimGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.smokeGrenade,
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.flashGrenade,
-        SlimGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.c4Explosive, C4ExplosiveRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.fireGrenade, CylinderGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.fragGrenade, FragGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.gasGrenade, CylinderGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.pipeGrenade, CylinderGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.decoyGrenade, SlimGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.smokeGrenade, CylinderGrenadeRenderer::new);
+    RenderingRegistry
+        .registerEntityRenderingHandler(ModEntityTypes.flashGrenade, SlimGrenadeRenderer::new);
 
     StartupMessageManager.addModMessage("Loading model layers");
 
@@ -332,11 +346,13 @@ public class ClientDist implements IModDist {
   public void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
     ParticleManager particleManager = minecraft.particles;
 
-    particleManager.registerFactory(ModParticleTypes.RGB_FLASH.get(),
-        sprite -> new RGBFlashParticle.Factory(sprite));
+    particleManager
+        .registerFactory(ModParticleTypes.RGB_FLASH.get(),
+            sprite -> new RGBFlashParticle.Factory(sprite));
 
-    particleManager.registerFactory(ModParticleTypes.GRENADE_SMOKE.get(),
-        sprite -> new GrenadeSmokeParticle.Factory(sprite));
+    particleManager
+        .registerFactory(ModParticleTypes.GRENADE_SMOKE.get(),
+            sprite -> new GrenadeSmokeParticle.Factory(sprite));
   }
 
   // ================================================================================
@@ -356,11 +372,7 @@ public class ClientDist implements IModDist {
                 .ifPresent(gun -> gun.toggleFireMode(minecraft.player, true));
           }
           while (OPEN_MOD_INVENTORY.isPressed()) {
-            minecraft.player
-                .getCapability(ModCapabilities.LIVING)
-                .filter(living -> living instanceof IPlayer)
-                .<IPlayer<?>>cast()
-                .ifPresent(IPlayer::openPlayerContainer);
+            NetworkChannel.MAIN.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
             if (minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
               ((IModTutorialStep) minecraft.getTutorial().tutorialStep).openModInventory();
             }
@@ -575,6 +587,14 @@ public class ClientDist implements IModDist {
         });
   }
 
+  @SubscribeEvent
+  public void handleGuiOpen(GuiOpenEvent event) {
+    if (minecraft.currentScreen instanceof ModInventoryScreen && event.getGui() == null
+        && ((ModInventoryScreen) minecraft.currentScreen).isTransitioning()) {
+      event.setCanceled(true);
+    }
+  }
+
   // ================================================================================
   // ASM Hooks
   // ================================================================================
@@ -584,8 +604,7 @@ public class ClientDist implements IModDist {
       ModelRenderer firstLayerModel, ModelRenderer secondLayerModel) {
     playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       String skinType = playerEntity.getSkinType();
-      ItemStack clothingStack =
-          living.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+      ItemStack clothingStack = living.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
       if (clothingStack.getItem() instanceof ClothingItem) {
         ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
         ResourceLocation clothingSkin = clothingItem.getClothingSkin(skinType);

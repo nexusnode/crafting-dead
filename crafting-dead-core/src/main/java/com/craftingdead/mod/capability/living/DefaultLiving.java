@@ -4,28 +4,22 @@ import java.util.UUID;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.network.NetworkChannel;
-import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
+import com.craftingdead.mod.network.message.main.SetSlotMessage;
 import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.items.ItemStackHandler;
 
-public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
+public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler implements ILiving<E> {
 
   /**
    * The vanilla entity.
    */
   protected final E entity;
-
-  protected final Inventory inventory = new Inventory(InventorySlotType.values().length);
 
   /**
    * The last held {@link ItemStack} - used to check if the entity has switched item.
@@ -34,36 +28,22 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
   private boolean aiming;
 
-  private boolean inventoryDirty = true;
-
   public DefaultLiving() {
     this(null);
   }
 
   public DefaultLiving(E entity) {
+    super(InventorySlotType.values().length);
     this.entity = entity;
-    this.inventory.addListener(inventory -> this.inventoryDirty = true);
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
-    NonNullList<ItemStack> items =
-        NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
-    for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
-      items.set(i, this.inventory.getStackInSlot(i));
-    }
-    nbt.put("inventory", ItemStackHelper.saveAllItems(nbt.getCompound("inventory"), items));
-    return nbt;
-  }
-
-  @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    NonNullList<ItemStack> items =
-        NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
-    ItemStackHelper.loadAllItems(nbt.getCompound("inventory"), items);
-    for (int i = 0; i < items.size(); i++) {
-      this.inventory.setInventorySlotContents(i, items.get(i));
+  public void onContentsChanged(int slot) {
+    if (!this.entity.getEntityWorld().isRemote()) {
+      NetworkChannel.MAIN
+          .getSimpleChannel()
+          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+              new SetSlotMessage(this.entity.getEntityId(), slot, this.getStackInSlot(slot)));
     }
   }
 
@@ -80,19 +60,6 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     heldStack
         .getCapability(ModCapabilities.GUN)
         .ifPresent(gunController -> gunController.tick(this.entity, heldStack));
-
-    if (!this.entity.getEntityWorld().isRemote() && this.inventoryDirty) {
-      NonNullList<ItemStack> inventoryContents =
-          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
-      for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
-        inventoryContents.set(i, this.inventory.getStackInSlot(i));
-      }
-      NetworkChannel.MAIN
-          .getSimpleChannel()
-          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-              new SyncInventoryMessage(this.entity.getEntityId(), inventoryContents));
-      this.inventoryDirty = false;
-    }
   }
 
   @Override
@@ -131,11 +98,6 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
   @Override
   public boolean isAiming() {
     return this.aiming;
-  }
-
-  @Override
-  public IInventory getInventory() {
-    return this.inventory;
   }
 
   @Override

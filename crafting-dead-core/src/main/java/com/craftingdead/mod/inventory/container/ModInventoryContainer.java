@@ -1,31 +1,34 @@
 package com.craftingdead.mod.inventory.container;
 
+import java.util.function.BiPredicate;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.inventory.InventorySlotType;
+import com.craftingdead.mod.item.AttachmentItem;
+import com.craftingdead.mod.item.ClothingItem;
+import com.craftingdead.mod.item.HatItem;
+import com.craftingdead.mod.item.MeleeWeaponItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 
-public class ModPlayerContainer extends Container {
+public class ModInventoryContainer extends Container {
 
-  private final PlayerInventory inventory;
-  private final IInventory modInventory;
+  private final IItemHandler itemHandler;
+
   private final CraftResultInventory outputInventory = new CraftResultInventory();
   private final Inventory craftingInventory = new Inventory(4);
 
-  public ModPlayerContainer(int windowId, PlayerInventory playerInventory) {
+  public ModInventoryContainer(int windowId, PlayerInventory playerInventory) {
     super(ModContainerTypes.PLAYER.get(), windowId);
-    this.inventory = playerInventory;
-    this.modInventory = playerInventory.player
+    this.itemHandler = playerInventory.player
         .getCapability(ModCapabilities.LIVING)
-        .orElseThrow(() -> new IllegalStateException("No living capability"))
-        .getInventory();
+        .orElseThrow(() -> new IllegalStateException("No living capability"));
     this.craftingInventory.addListener(this::onCraftMatrixChanged);
 
     final int deltaY = 20;
@@ -40,36 +43,59 @@ public class ModPlayerContainer extends Container {
       this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142 + deltaY));
     }
 
-    this.addSlot(new MeleeSlot(this.modInventory, InventorySlotType.MELEE.getIndex(), 26, 9));
-    this.addSlot(new GunSlot(this.modInventory, InventorySlotType.GUN.getIndex(), 44, 9));
-    this.addSlot(new ClothingSlot(this.modInventory, InventorySlotType.CLOTHING.getIndex(), 65, 9));
-
-    this.addSlot(new HatSlot(this.modInventory, InventorySlotType.HAT.getIndex(), 65, 30));
+    this
+        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.MELEE.getIndex(), 26,
+            9, (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
+    this
+        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.GUN.getIndex(), 44, 9,
+            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
+    this
+        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.CLOTHING.getIndex(),
+            65, 9, (slot, itemStack) -> itemStack.getItem() instanceof ClothingItem));
+    this
+        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.HAT.getIndex(), 65, 30,
+            (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
     this
         .addSlot(
-            new BackpackSlot(this.modInventory, InventorySlotType.BACKPACK.getIndex(), 65, 48));
-    this.addSlot(new VestSlot(this.modInventory, InventorySlotType.VEST.getIndex(), 65, 66));
+            new PredicateItemHandlerSlot(itemHandler, InventorySlotType.BACKPACK.getIndex(), 65, 48,
+                (slot, itemStack) -> itemStack
+                    .getCapability(ModCapabilities.STORAGE)
+                    .map(storage -> storage.isValidForSlot(InventorySlotType.BACKPACK))
+                    .orElse(false)));
+    this
+        .addSlot(
+            new PredicateItemHandlerSlot(itemHandler, InventorySlotType.VEST.getIndex(), 65, 66,
+                (slot, itemStack) -> itemStack
+                    .getCapability(ModCapabilities.STORAGE)
+                    .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
+                    .orElse(false)));
 
     this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, 48, this.craftingInventory));
 
+    final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
+        (slot, itemStack) -> itemStack.getItem() instanceof AttachmentItem
+            && ((AttachmentItem) itemStack.getItem()).getInventorySlot().getIndex() == slot
+                .getSlotIndex();
     this
-        .addSlot(new AttachmentSlot(this.craftingInventory,
-            CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104, 48));
+        .addSlot(new PredicateSlot(this.craftingInventory,
+            CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104, 48, attachmentPredicate));
     this
-        .addSlot(new AttachmentSlot(this.craftingInventory,
-            CraftingInventorySlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125, 69));
+        .addSlot(new PredicateSlot(this.craftingInventory,
+            CraftingInventorySlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125, 69,
+            attachmentPredicate));
     this
-        .addSlot(new AttachmentSlot(this.craftingInventory,
-            CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, 27));
+        .addSlot(new PredicateSlot(this.craftingInventory,
+            CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, 27,
+            attachmentPredicate));
     this
-        .addSlot(new PaintSlot(this.craftingInventory, CraftingInventorySlotType.PAINT.getIndex(),
-            146, 48));
+        .addSlot(new PredicateSlot(this.craftingInventory,
+            CraftingInventorySlotType.PAINT.getIndex(), 146, 48,
+            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent()));
   }
 
   @Override
   public boolean canInteractWith(PlayerEntity playerEntity) {
-    return this.inventory.isUsableByPlayer(playerEntity)
-        && this.modInventory.isUsableByPlayer(playerEntity);
+    return true;
   }
 
   @Override
@@ -79,6 +105,10 @@ public class ModPlayerContainer extends Container {
       this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.craftingInventory);
       this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.outputInventory);
     }
+  }
+
+  public IItemHandler getItemHandler() {
+    return this.itemHandler;
   }
 
   public ItemStack getGunStack() {

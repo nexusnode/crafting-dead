@@ -1,12 +1,18 @@
 package com.craftingdead.mod.capability.living.player;
 
+import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.entity.CorpseEntity;
+import com.craftingdead.mod.inventory.InventorySlotType;
+import com.craftingdead.mod.inventory.container.ModInventoryContainer;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -77,6 +83,22 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     } else {
       this.setStamina(this.getStamina() + 8);
     }
+  }
+
+  public void openInventory() {
+    this.entity
+        .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
+            playerEntity) -> new ModInventoryContainer(windowId, this.entity.inventory),
+            new TranslationTextComponent("container.player")));
+  }
+
+  public void openStorage(InventorySlotType slotType) {
+    ItemStack storageStack = this.getStackInSlot(slotType.getIndex());
+    storageStack
+        .getCapability(ModCapabilities.STORAGE)
+        .ifPresent(storage -> this.entity
+            .openContainer(
+                new SimpleNamedContainerProvider(storage, storageStack.getDisplayName())));
   }
 
   @Override

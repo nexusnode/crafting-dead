@@ -3,12 +3,13 @@ package com.craftingdead.mod.capability.living;
 import java.util.UUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ILiving<E extends LivingEntity> extends INBTSerializable<CompoundNBT> {
+public interface ILiving<E extends LivingEntity>
+    extends INBTSerializable<CompoundNBT>, IItemHandlerModifiable {
 
   void tick();
 
@@ -49,8 +50,6 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
   boolean isAiming();
 
   void toggleAiming(boolean sendUpdate);
-
-  IInventory getInventory();
 
   E getEntity();
 

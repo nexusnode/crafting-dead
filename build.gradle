@@ -13,9 +13,10 @@ buildscript {
 }
 
 plugins {
-    id 'java-library'
-    id 'eclipse'
+	id 'java-library'
+	id 'eclipse'
 }
+
 
 subprojects {
     apply plugin: 'net.minecraftforge.gradle'

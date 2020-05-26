@@ -64,18 +64,20 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
   public void flash() {
     if (this.world.isRemote()) {
-      this.world.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(),
-          this.getY(), this.getZ(), 0D, 0D, 0D);
+      this.world
+          .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(), this.getY(),
+              this.getZ(), 0D, 0D, 0D);
 
       // Applies the flash effect at client side for a better delay compensation
       // and better FOV calculation
 
       ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
       clientDist.getPlayer().ifPresent(clientPlayer -> {
-        int duration = this.calculateDuration(clientPlayer.getEntity(),
-            clientDist.isInsideGameFOV(this, false));
+        int duration = this
+            .calculateDuration(clientPlayer.getEntity(), clientDist.isInsideGameFOV(this, false));
         if (duration > 0) {
-          EffectInstance flashEffect = new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
+          EffectInstance flashEffect =
+              new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
           ModEffects.applyOrOverrideIfLonger(clientPlayer.getEntity(), flashEffect);
         }
       });
@@ -88,11 +90,12 @@ public class FlashGrenadeEntity extends GrenadeEntity {
           .stream()
           .map(entity -> (LivingEntity) entity)
           .forEach(livingEntity -> {
-            int duration = this.calculateDuration(livingEntity,
-                EntityUtil.isInsideFOV(livingEntity, this, 90F));
+            int duration = this
+                .calculateDuration(livingEntity, EntityUtil.isInsideFOV(livingEntity, this, 90F));
             if (duration > 0) {
-              boolean wasFlashApplied = ModEffects.applyOrOverrideIfLonger(livingEntity,
-                  new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration));
+              boolean wasFlashApplied = ModEffects
+                  .applyOrOverrideIfLonger(livingEntity,
+                      new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration));
               if (wasFlashApplied && livingEntity instanceof MobEntity) {
                 MobEntity mobEntity = (MobEntity) livingEntity;
                 // Removes the attack target
@@ -114,8 +117,9 @@ public class FlashGrenadeEntity extends GrenadeEntity {
       return 0;
     }
 
-    ItemStack hatItemStack = viewerEntity.getCapability(ModCapabilities.LIVING)
-        .map(living -> living.getInventory().getStackInSlot(InventorySlotType.HAT.getIndex()))
+    ItemStack hatItemStack = viewerEntity
+        .getCapability(ModCapabilities.LIVING)
+        .map(living -> living.getStackInSlot(InventorySlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 
     boolean isImmuneToFlashes = hatItemStack.getItem() instanceof HatItem
@@ -124,7 +128,8 @@ public class FlashGrenadeEntity extends GrenadeEntity {
     if (insideFOV && !isImmuneToFlashes) {
       double distanceProportion =
           MathHelper.clamp(this.getDistance(viewerEntity.getEntity()) / FLASH_MAX_RANGE, 0F, 1F);
-      int calculatedDuration = (int) MathHelper.lerp(1F - distanceProportion, 0, EFFECT_MAX_DURATION);
+      int calculatedDuration =
+          (int) MathHelper.lerp(1F - distanceProportion, 0, EFFECT_MAX_DURATION);
 
       if (!(viewerEntity instanceof PlayerEntity)) {
         // Non-player entities has extra duration

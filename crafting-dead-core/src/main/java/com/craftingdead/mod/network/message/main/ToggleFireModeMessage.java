@@ -24,7 +24,7 @@ public class ToggleFireModeMessage {
     return new ToggleFireModeMessage(in.readVarInt());
   }
 
-  public static void handle(ToggleFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ToggleFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
@@ -36,6 +36,6 @@ public class ToggleFireModeMessage {
               .ifPresent(gun -> gun
                   .toggleFireMode(entity, ctx.get().getDirection().getReceptionSide().isServer()));
         });
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

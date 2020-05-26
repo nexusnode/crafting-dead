@@ -23,13 +23,13 @@ public class ToggleAimingMessage {
     return new ToggleAimingMessage(in.readVarInt());
   }
 
-  public static void handle(ToggleAimingMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ToggleAimingMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .flatMap(entity -> Optional
             .ofNullable(entity.getCapability(ModCapabilities.LIVING).orElse(null)))
         .ifPresent(
             living -> living.toggleAiming(ctx.get().getDirection().getReceptionSide().isServer()));
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

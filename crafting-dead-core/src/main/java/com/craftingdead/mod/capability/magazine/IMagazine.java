@@ -24,5 +24,11 @@ public interface IMagazine extends INBTSerializable<CompoundNBT> {
 
   void setSize(int size);
 
+  default boolean isEmpty() {
+    return this.getSize() == 0;
+  }
+
   void decrementSize(ItemStack magazineStack, Random random);
+
+  ItemStack createIcon();
 }

@@ -27,8 +27,7 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
       String skinType = livingEntity instanceof ClientPlayerEntity
           ? ((ClientPlayerEntity) livingEntity).getSkinType()
           : "default";
-      ItemStack clothingStack =
-          living.getInventory().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+      ItemStack clothingStack = living.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
       if (clothingStack.getItem() instanceof ClothingItem && !livingEntity.isInvisible()) {
         ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
         LayerRenderer

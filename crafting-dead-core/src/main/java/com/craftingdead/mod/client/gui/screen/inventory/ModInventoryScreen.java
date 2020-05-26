@@ -2,16 +2,20 @@ package com.craftingdead.mod.client.gui.screen.inventory;
 
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.inventory.container.ModPlayerContainer;
+import com.craftingdead.mod.client.gui.SimpleButton;
+import com.craftingdead.mod.inventory.InventorySlotType;
+import com.craftingdead.mod.inventory.container.ModInventoryContainer;
+import com.craftingdead.mod.network.NetworkChannel;
+import com.craftingdead.mod.network.message.main.OpenStorageMessage;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
-public class ModInventoryScreen extends DisplayEffectsScreen<ModPlayerContainer> {
+public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContainer> {
 
   private static final ResourceLocation INVENTORY_BACKGROUND =
       new ResourceLocation(CraftingDead.ID, "textures/gui/container/inventory.png");
@@ -19,16 +23,37 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModPlayerContainer>
   private int oldMouseX;
   private int oldMouseY;
 
-  public ModInventoryScreen(PlayerInventory playerInventory) {
-    this(new ModPlayerContainer(0, playerInventory), playerInventory,
-        new TranslationTextComponent("container.crafting"));
-    playerInventory.player.openContainer = this.container;
-  }
+  private Button backpackButton;
+  private Button vestButton;
 
-  public ModInventoryScreen(ModPlayerContainer container, PlayerInventory playerInventory,
+  private boolean transitioning = false;
+
+  public ModInventoryScreen(ModInventoryContainer container, PlayerInventory playerInventory,
       ITextComponent title) {
     super(container, playerInventory, title);
     this.ySize = 186;
+  }
+
+  @Override
+  public void init() {
+    super.init();
+    this.backpackButton =
+        new SimpleButton(this.guiLeft + 83, this.guiTop + 48, 10, 16, ">", (button) -> {
+          NetworkChannel.MAIN
+              .getSimpleChannel()
+              .sendToServer(new OpenStorageMessage(InventorySlotType.BACKPACK));
+          this.transitioning = true;
+        });
+    this.addButton(this.backpackButton);
+    this.vestButton =
+        new SimpleButton(this.guiLeft + 83, this.guiTop + 66, 10, 16, ">", (button) -> {
+          NetworkChannel.MAIN
+              .getSimpleChannel()
+              .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));
+          this.transitioning = true;
+        });
+    this.addButton(this.vestButton);
+    this.refreshButtonStatus();
   }
 
   @Override
@@ -40,7 +65,31 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModPlayerContainer>
   }
 
   @Override
+  public void tick() {
+    super.tick();
+    this.refreshButtonStatus();
+  }
+
+  private void refreshButtonStatus() {
+    this.backpackButton.active = this.container
+        .getItemHandler()
+        .getStackInSlot(InventorySlotType.BACKPACK.getIndex())
+        .getCapability(ModCapabilities.STORAGE)
+        .isPresent();
+    this.vestButton.active = this.container
+        .getItemHandler()
+        .getStackInSlot(InventorySlotType.VEST.getIndex())
+        .getCapability(ModCapabilities.STORAGE)
+        .isPresent();
+  }
+
+  public boolean isTransitioning() {
+    return this.transitioning;
+  }
+
+  @Override
   protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    this.renderBackground();
     this.minecraft.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
 
     this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);

@@ -5,13 +5,15 @@ import java.util.Set;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.item.AttachmentItem;
+import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.PaintItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class GunCraftSlot extends GunSlot {
+public class GunCraftSlot extends Slot {
 
   private final Inventory craftingInventory;
 
@@ -19,6 +21,11 @@ public class GunCraftSlot extends GunSlot {
       Inventory craftingInventory) {
     super(inventory, slotIndex, x, y);
     this.craftingInventory = craftingInventory;
+  }
+
+  @Override
+  public boolean isItemValid(ItemStack itemStack) {
+    return itemStack.getItem() instanceof GunItem;
   }
 
   @Override

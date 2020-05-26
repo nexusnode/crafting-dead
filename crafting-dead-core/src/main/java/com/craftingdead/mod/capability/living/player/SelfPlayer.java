@@ -2,8 +2,6 @@ package com.craftingdead.mod.capability.living.player;
 
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.client.ClientDist;
-import com.craftingdead.mod.network.NetworkChannel;
-import com.craftingdead.mod.network.message.main.OpenPlayerContainerMessage;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Pose;
 import net.minecraft.item.ItemStack;
@@ -58,11 +56,5 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
           .getCapability(ModCapabilities.GUN)
           .ifPresent(gun -> gun.reload(this.entity, heldStack, true));
     }
-  }
-
-  @Override
-  public void openPlayerContainer() {
-    super.openPlayerContainer();
-    NetworkChannel.MAIN.getSimpleChannel().sendToServer(new OpenPlayerContainerMessage(0));
   }
 }

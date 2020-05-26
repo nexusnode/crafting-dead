@@ -8,6 +8,10 @@ public class DefaultPaint implements IPaint {
   private Optional<ResourceLocation> skin;
   private Optional<Integer> colour;
 
+  public DefaultPaint() {
+    this(null, null);
+  }
+
   public DefaultPaint(ResourceLocation skin, Integer colour) {
     this.setSkin(skin);
     this.setColour(colour);

@@ -1,10 +1,11 @@
 package com.craftingdead.mod.network;
 
 import com.craftingdead.mod.CraftingDead;
-import com.craftingdead.mod.network.message.main.OpenPlayerContainerMessage;
+import com.craftingdead.mod.network.message.main.OpenModInventoryMessage;
+import com.craftingdead.mod.network.message.main.OpenStorageMessage;
 import com.craftingdead.mod.network.message.main.ReloadMessage;
+import com.craftingdead.mod.network.message.main.SetSlotMessage;
 import com.craftingdead.mod.network.message.main.SyncGunMessage;
-import com.craftingdead.mod.network.message.main.SyncInventoryMessage;
 import com.craftingdead.mod.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
 import com.craftingdead.mod.network.message.main.ToggleFireModeMessage;
@@ -28,10 +29,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(OpenPlayerContainerMessage.class, ++id)
-          .encoder(OpenPlayerContainerMessage::encode)
-          .decoder(OpenPlayerContainerMessage::decode)
-          .consumer(OpenPlayerContainerMessage::handle)
+          .messageBuilder(OpenModInventoryMessage.class, ++id)
+          .encoder(OpenModInventoryMessage::encode)
+          .decoder(OpenModInventoryMessage::decode)
+          .consumer(OpenModInventoryMessage::handle)
           .add();
 
       simpleChannel
@@ -70,10 +71,17 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(SyncInventoryMessage.class, ++id)
-          .encoder(SyncInventoryMessage::encode)
-          .decoder(SyncInventoryMessage::decode)
-          .consumer(SyncInventoryMessage::handle)
+          .messageBuilder(SetSlotMessage.class, ++id)
+          .encoder(SetSlotMessage::encode)
+          .decoder(SetSlotMessage::decode)
+          .consumer(SetSlotMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(OpenStorageMessage.class, ++id)
+          .encoder(OpenStorageMessage::encode)
+          .decoder(OpenStorageMessage::decode)
+          .consumer(OpenStorageMessage::handle)
           .add();
     }
   };

@@ -31,7 +31,7 @@ public class SyncGunMessage {
     return new SyncGunMessage(entityId, size);
   }
 
-  public static void handle(SyncGunMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(SyncGunMessage msg, Supplier<NetworkEvent.Context> ctx) {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.map(w -> w.getEntityByID(msg.entityId)).ifPresent(entity -> {
@@ -42,6 +42,6 @@ public class SyncGunMessage {
         });
       }
     });
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

@@ -5,8 +5,6 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public interface IPlayer<E extends PlayerEntity> extends ILiving<E> {
 
-  void openPlayerContainer();
-
   void infect(float chance);
 
   int getDaysSurvived();

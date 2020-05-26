@@ -24,7 +24,7 @@ public class ReloadMessage {
     return new ReloadMessage(in.readVarInt());
   }
 
-  public static void handle(ReloadMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ReloadMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
@@ -37,6 +37,6 @@ public class ReloadMessage {
                   .reload(entity, heldStack,
                       ctx.get().getDirection().getReceptionSide().isServer()));
         });
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

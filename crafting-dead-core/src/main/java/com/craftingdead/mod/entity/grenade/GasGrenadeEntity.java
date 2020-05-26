@@ -73,9 +73,9 @@ public class GasGrenadeEntity extends GrenadeEntity {
             Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
                 / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
         float gradualPitch = MathHelper.lerp(1F - progress, 0.5F, 1.7F);
-        this.world.playSound(this.getX(), this.getY(), this.getZ(),
-            SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1.5F,
-            gradualPitch, false);
+        this.world
+            .playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH,
+                SoundCategory.HOSTILE, 1.5F, gradualPitch, false);
       }
 
       if (activatedTicksCount % 10 == 0) {
@@ -89,8 +89,9 @@ public class GasGrenadeEntity extends GrenadeEntity {
           double extraY = height * this.rand.nextDouble();
           double extraZ = radius * Math.cos(phi);
 
-          this.world.addParticle(MEDIUM_DARK_GREEN_SMOKE, true, this.getX() + extraX,
-              this.getY() + extraY, this.getZ() + extraZ, 0, 0, 0);
+          this.world
+              .addParticle(MEDIUM_DARK_GREEN_SMOKE, true, this.getX() + extraX,
+                  this.getY() + extraY, this.getZ() + extraZ, 0, 0, 0);
         }
       }
     } else {
@@ -98,34 +99,36 @@ public class GasGrenadeEntity extends GrenadeEntity {
         // Extra size for better detection
         double detectionRadius = radius + 0.75D;
 
-        List<Entity> foundEntities = this.world.getEntitiesInAABBexcluding(this,
-            this.getBoundingBox().grow(detectionRadius, height, detectionRadius),
-            (foundEntity) -> {
-              if (!(foundEntity instanceof LivingEntity)) {
-                return false;
-              }
+        List<Entity> foundEntities = this.world
+            .getEntitiesInAABBexcluding(this,
+                this.getBoundingBox().grow(detectionRadius, height, detectionRadius),
+                (foundEntity) -> {
+                  if (!(foundEntity instanceof LivingEntity)) {
+                    return false;
+                  }
 
-              double xDiff = this.getX() - foundEntity.getX();
-              double zDiff = this.getZ() - foundEntity.getZ();
-              double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
+                  double xDiff = this.getX() - foundEntity.getX();
+                  double zDiff = this.getZ() - foundEntity.getZ();
+                  double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
 
-              // Entity should be inside the cylinder's radius,
-              // as BoundingBox is a cube
-              if (distance2D > detectionRadius) {
-                return false;
-              }
+                  // Entity should be inside the cylinder's radius,
+                  // as BoundingBox is a cube
+                  if (distance2D > detectionRadius) {
+                    return false;
+                  }
 
-              return true;
-            });
+                  return true;
+                });
 
         foundEntities.forEach(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           if (this.canInhaleGas(livingEntity)) {
-            boolean wasPoisonApplied = ModEffects.applyOrOverrideIfLonger(livingEntity,
-                new EffectInstance(Effects.POISON, 100, 2));
+            boolean wasPoisonApplied = ModEffects
+                .applyOrOverrideIfLonger(livingEntity, new EffectInstance(Effects.POISON, 100, 2));
             if (wasPoisonApplied) {
-              ModEffects.applyOrOverrideIfLonger(livingEntity,
-                  new EffectInstance(Effects.SLOWNESS, 100, 2));
+              ModEffects
+                  .applyOrOverrideIfLonger(livingEntity,
+                      new EffectInstance(Effects.SLOWNESS, 100, 2));
             }
           }
         });
@@ -134,16 +137,15 @@ public class GasGrenadeEntity extends GrenadeEntity {
   }
 
   public boolean canInhaleGas(LivingEntity livingEntity) {
-    ItemStack hatItemStack = livingEntity.getCapability(ModCapabilities.LIVING)
-        .map(entity -> entity.getInventory()
-        .getStackInSlot(InventorySlotType.HAT.getIndex()))
+    ItemStack hatItemStack = livingEntity
+        .getCapability(ModCapabilities.LIVING)
+        .map(entity -> entity.getStackInSlot(InventorySlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 
     boolean hasHatImmuneToGas = hatItemStack.getItem() instanceof HatItem
         && ((HatItem) hatItemStack.getItem()).isImmuneToGas();
 
-    return !hasHatImmuneToGas
-        && !livingEntity.areEyesInFluid(FluidTags.WATER)
+    return !hasHatImmuneToGas && !livingEntity.areEyesInFluid(FluidTags.WATER)
         && !livingEntity.areEyesInFluid(FluidTags.LAVA);
   }
 

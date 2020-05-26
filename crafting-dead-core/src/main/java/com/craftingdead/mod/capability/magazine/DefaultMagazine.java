@@ -48,4 +48,9 @@ public class DefaultMagazine implements IMagazine {
 
   @Override
   public void decrementSize(ItemStack magazineStack, Random random) {}
+
+  @Override
+  public ItemStack createIcon() {
+    return ItemStack.EMPTY;
+  }
 }

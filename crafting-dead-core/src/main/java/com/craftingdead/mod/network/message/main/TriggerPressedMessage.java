@@ -27,7 +27,7 @@ public class TriggerPressedMessage {
     return new TriggerPressedMessage(in.readVarInt(), in.readBoolean());
   }
 
-  public static void handle(TriggerPressedMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(TriggerPressedMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
@@ -40,6 +40,6 @@ public class TriggerPressedMessage {
                   .setTriggerPressed(entity, heldStack, msg.triggerPressed,
                       ctx.get().getDirection().getReceptionSide().isServer()));
         });
-    ctx.get().setPacketHandled(true);
+    return true;
   }
 }

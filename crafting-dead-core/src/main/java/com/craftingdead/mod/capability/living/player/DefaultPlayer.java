@@ -4,7 +4,6 @@ import java.util.Random;
 import java.util.UUID;
 import com.craftingdead.mod.capability.living.DefaultLiving;
 import com.craftingdead.mod.inventory.InventorySlotType;
-import com.craftingdead.mod.inventory.container.ModPlayerContainer;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.potion.ModEffects;
 import com.google.common.primitives.Ints;
@@ -12,7 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
@@ -94,7 +92,7 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   }
 
   private void updateScubaClothing() {
-    ItemStack clothingStack = this.inventory.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+    ItemStack clothingStack = this.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
     if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
         && this.entity.areEyesInFluid(FluidTags.WATER)) {
       this.entity
@@ -103,7 +101,7 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   }
 
   private void updateScubaMask() {
-    ItemStack headStack = this.inventory.getStackInSlot(InventorySlotType.HAT.getIndex());
+    ItemStack headStack = this.getStackInSlot(InventorySlotType.HAT.getIndex());
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.areEyesInFluid(FluidTags.WATER)) {
       this.entity
@@ -158,14 +156,6 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   @Override
   public boolean onDeath(DamageSource cause) {
     return false;
-  }
-
-  @Override
-  public void openPlayerContainer() {
-    this.entity
-        .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
-            playerEntity) -> new ModPlayerContainer(windowId, this.entity.inventory),
-            new TranslationTextComponent("container.player")));
   }
 
   @Override

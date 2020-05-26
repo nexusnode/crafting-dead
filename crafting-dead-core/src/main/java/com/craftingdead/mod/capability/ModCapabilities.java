@@ -12,6 +12,8 @@ import com.craftingdead.mod.capability.magazine.DefaultMagazine;
 import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.capability.paint.DefaultPaint;
 import com.craftingdead.mod.capability.paint.IPaint;
+import com.craftingdead.mod.capability.storage.DefaultStorage;
+import com.craftingdead.mod.capability.storage.IStorage;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -39,6 +41,9 @@ public class ModCapabilities {
   @CapabilityInject(IMagazine.class)
   public static final Capability<IMagazine> MAGAZINE = null;
 
+  @CapabilityInject(IStorage.class)
+  public static final Capability<IStorage> STORAGE = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
     CapabilityManager.INSTANCE
@@ -46,10 +51,10 @@ public class ModCapabilities {
             DefaultAnimationController::new);
     CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), DefaultGun::new);
     CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);
-    CapabilityManager.INSTANCE
-        .register(IPaint.class, new EmptyStorage<>(), () -> new DefaultPaint(null, null));
+    CapabilityManager.INSTANCE.register(IPaint.class, new EmptyStorage<>(), DefaultPaint::new);
     CapabilityManager.INSTANCE
         .register(IMagazine.class, new EmptyStorage<>(), DefaultMagazine::new);
+    CapabilityManager.INSTANCE.register(IStorage.class, new EmptyStorage<>(), DefaultStorage::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

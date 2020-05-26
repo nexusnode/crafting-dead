@@ -48,9 +48,9 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   public AdvancedZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world,
-      IItemProvider heldItem, IItemProvider clothingItem, IItemProvider hatItem) {
+      IItemProvider mainHandItem, IItemProvider clothingItem, IItemProvider hatItem) {
     super(type, world);
-    this.heldItem = heldItem;
+    this.heldItem = mainHandItem;
     this.clothingItem = clothingItem;
     this.hatItem = hatItem;
   }
@@ -66,8 +66,9 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F);
     this.goalSelector.addGoal(2, this.rangedAttackGoal);
     this.goalSelector.addGoal(1, new FollowAttractiveGrenadeGoal(this, 1.15F));
-    this.goalSelector.addGoal(4,
-        new LookAtEntityGoal<FlashGrenadeEntity>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
+    this.goalSelector
+        .addGoal(4,
+            new LookAtEntityGoal<FlashGrenadeEntity>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
   }
 
   @Override
@@ -127,12 +128,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(this.heldItem));
     this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       living
-          .getInventory()
-          .setInventorySlotContents(InventorySlotType.CLOTHING.getIndex(),
-              new ItemStack(this.clothingItem));
-      living
-          .getInventory()
-          .setInventorySlotContents(InventorySlotType.HAT.getIndex(), new ItemStack(this.hatItem));
+          .setStackInSlot(InventorySlotType.CLOTHING.getIndex(), new ItemStack(this.clothingItem));
+      living.setStackInSlot(InventorySlotType.HAT.getIndex(), new ItemStack(this.hatItem));
     });
     return spawnData;
   }
