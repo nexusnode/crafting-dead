@@ -91,7 +91,7 @@ public class CraftingDead {
   public CraftingDead() {
     instance = this;
 
-    this.modDist = DistExecutor.runForDist(() -> ClientDist::new, () -> ServerDist::new);
+    this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.register(this);

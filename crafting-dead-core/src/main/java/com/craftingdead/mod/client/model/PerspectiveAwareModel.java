@@ -49,7 +49,6 @@ import net.minecraftforge.common.util.LazyOptional;
 /**
  * A model that can be rendered as a different model depending on the view perspective.
  */
-@SuppressWarnings("deprecation")
 public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareModel> {
 
   private final Map<ItemCameraTransforms.TransformType, IUnbakedModel> models;

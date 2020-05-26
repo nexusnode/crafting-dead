@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-@SuppressWarnings("deprecation")
 public class DefaultAnimationController implements IAnimationController {
 
   private final Queue<IAnimation> animations = new LinkedList<>();

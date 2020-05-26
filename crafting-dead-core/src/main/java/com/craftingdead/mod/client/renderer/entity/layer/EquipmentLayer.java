@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,6 @@ import net.minecraft.item.ItemStack;
 /**
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
  */
-@SuppressWarnings("deprecation")
 public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
     extends LayerRenderer<T, M> {
 
@@ -78,9 +77,9 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
         if (this.useHeadOrientation) {
           // Vanilla's transformation for child entities, like baby zombies
           if (entity.isChild()) {
-             matrix.translate(0.0D, 0.03125D, 0.0D);
-             matrix.scale(0.7F, 0.7F, 0.7F);
-             matrix.translate(0.0D, 1.0D, 0.0D);
+            matrix.translate(0.0D, 0.03125D, 0.0D);
+            matrix.scale(0.7F, 0.7F, 0.7F);
+            matrix.translate(0.0D, 1.0D, 0.0D);
           }
 
           this.getEntityModel().func_205072_a().rotate(matrix);
@@ -93,7 +92,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
         // Renders the item. Also note the TransformType.
         itemRenderer
-            .renderItem(itemStack, TransformType.HEAD, false, matrix, buffers,
+            .renderItem(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
                 somethingThatSeemsToBeLightLevel, OverlayTexture.DEFAULT_UV, itemModel);
 
         matrix.pop();
