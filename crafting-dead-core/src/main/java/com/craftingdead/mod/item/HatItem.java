@@ -2,12 +2,12 @@ package com.craftingdead.mod.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import com.craftingdead.mod.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class HatItem extends Item {
@@ -33,23 +33,25 @@ public class HatItem extends Item {
   public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
       ITooltipFlag tooltipFlag) {
     if (this.hasHeadshotReduction()) {
-      ITextComponent text = new TranslationTextComponent("attribute.hat.headshot_reduction",
-          this.headshotReductionPercentage);
-      text.getStyle().setColor(TextFormatting.GRAY);
-      lore.add(text);
+      ITextComponent percentageText =
+          Text.of(String.format("%.1f", this.headshotReductionPercentage) + "%")
+              .applyTextStyle(TextFormatting.RED);
+
+      lore.add(Text.translate("item_lore.hat_item.headshot_reduction")
+          .applyTextStyle(TextFormatting.GRAY).appendSibling(percentageText));
     }
     if (this.isImmuneToFlashes()) {
-      ITextComponent text = new TranslationTextComponent("attribute.hat.immune_to_flashes");
+      ITextComponent text = Text.translate("item_lore.hat_item.immune_to_flashes");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
     if (this.isImmuneToGas()) {
-      ITextComponent text = new TranslationTextComponent("attribute.hat.immune_to_gas");
+      ITextComponent text = Text.translate("item_lore.hat_item.immune_to_gas");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
     if (this.hasNightVision()) {
-      ITextComponent text = new TranslationTextComponent("attribute.hat.has_night_vision");
+      ITextComponent text = Text.translate("item_lore.hat_item.has_night_vision");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }

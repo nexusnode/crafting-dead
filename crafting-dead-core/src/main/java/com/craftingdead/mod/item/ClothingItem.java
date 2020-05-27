@@ -1,6 +1,9 @@
 package com.craftingdead.mod.item;
 
+import java.util.List;
 import java.util.Random;
+import com.craftingdead.mod.util.Text;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -10,12 +13,22 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class ClothingItem extends Item {
 
+  private final int armorLevel;
+  private final double movementSpeedModifier;
+  private final boolean fireImmunity;
+
   public ClothingItem(Properties properties) {
     super(properties);
+
+    this.armorLevel = properties.armorLevel;
+    this.movementSpeedModifier = properties.movementSpeedModifier;
+    this.fireImmunity = properties.fireImmunity;
   }
 
   @Override
@@ -41,6 +54,18 @@ public class ClothingItem extends Item {
     return stack;
   }
 
+  public int getArmorLevel() {
+    return this.armorLevel;
+  }
+
+  public double getMovementSpeedModifier() {
+    return this.movementSpeedModifier;
+  }
+
+  public boolean hasFireImmunity() {
+    return this.fireImmunity;
+  }
+
   @Override
   public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
@@ -48,6 +73,29 @@ public class ClothingItem extends Item {
 
     playerIn.setActiveHand(handIn);
     return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world,
+      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+    super.addInformation(stack, world, lines, tooltipFlag);
+    ITextComponent armorLevelText = Text.of(this.armorLevel).applyTextStyle(TextFormatting.RED);
+
+    lines.add(Text.translate("item_lore.clothing.protection_level")
+        .applyTextStyle(TextFormatting.GRAY).appendSibling(armorLevelText));
+
+    if (this.movementSpeedModifier != 1D) {
+      ITextComponent movemendSpeedText = Text.of((int) (this.movementSpeedModifier * 100D) + "%")
+          .applyTextStyle(TextFormatting.RED);
+
+      lines.add(Text.translate("item_lore.clothing.movement_speed")
+          .applyTextStyle(TextFormatting.GRAY).appendSibling(movemendSpeedText));
+    }
+
+    if (this.fireImmunity) {
+      lines.add(
+          Text.translate("item_lore.clothing.immune_to_fire").applyTextStyle(TextFormatting.GRAY));
+    }
   }
 
   @Override
@@ -67,19 +115,22 @@ public class ClothingItem extends Item {
 
   public static class Properties extends Item.Properties {
 
-    public Properties setArmorValue(int armorValue) {
-      return this;
-    }
+    private int armorLevel = 0;
+    private double movementSpeedModifier = 1D;
+    private boolean fireImmunity = false;
 
     public Properties setArmorLevel(int armorLevel) {
+      this.armorLevel = armorLevel;
       return this;
     }
 
-    public Properties setSlowness() {
+    public Properties setMovementSpeedModifier(double movementSpeed) {
+      this.movementSpeedModifier = movementSpeed;
       return this;
     }
 
-    public Properties setFireResistance() {
+    public Properties setFireImmunity(boolean fireImmunity) {
+      this.fireImmunity = fireImmunity;
       return this;
     }
   }

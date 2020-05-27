@@ -49,11 +49,6 @@
   "action.reload":"Reloading",
   "action.unload":"Removing magazine",
 
-  "attribute.hat.headshot_reduction": "Headshot protection: %s%%",
-  "attribute.hat.immune_to_flashes": "Immune to flashes",
-  "attribute.hat.immune_to_gas": "Immune to gas",
-  "attribute.hat.has_night_vision": "Has Night Vision ability",
-
   "itemGroup.craftingdead.consumables": "Crafting Dead Consumables",
   "itemGroup.craftingdead.clothing": "Crafting Dead Clothing",
   "itemGroup.craftingdead.blocks": "Crafting Dead Blocks",
@@ -453,6 +448,34 @@
   "item.craftingdead.tan_quiver": "Tan Quiver",
   "item.craftingdead.green_quiver": "Green Quiver",
   "item.craftingdead.black_quiver": "Black Quiver",
+  
+  "item_lore.hat_item.headshot_reduction": "Headshot protection: ",
+  "item_lore.hat_item.immune_to_flashes": "Immune to flashes",
+  "item_lore.hat_item.immune_to_gas": "Immune to gas",
+  "item_lore.hat_item.has_night_vision": "Has Night Vision ability",
+  "item_lore.grenade": "Shift-click to throw close",
+  "item_lore.remote_detonator": "Right click to remotely detonate explosives within %d meters",
+  "item_lore.clothing.protection_level": "Protection level: ",
+  "item_lore.clothing.movement_speed": "Movement speed: ",
+  "item_lore.clothing.immune_to_fire": "Immune to fire",
+  "item_lore.magazine_item.amount": "Amount: ",
+  "item_lore.magazine_item.armor_penetration": "Armor penetration: ",
+  "item_lore.magazine_item.entity_hit_recovery_chance": "Entity hit recovery chance: ",
+  "item_lore.magazine_item.block_hit_recovery_chance": "Block hit recovery chance: ",
+  "item_lore.gun_item.ammo_amount": "Ammo: ",
+  "item_lore.gun_item.damage": "Damage: ",
+  "item_lore.gun_item.headshot_damage": "Headshot damage: ",
+  "item_lore.gun_item.pellets_shot": "Pellets shot: ",
+  "item_lore.gun_item.attachment": "Equipped: ",
+  "item_lore.gun_item.rpm": "Rounds per minute: ",
+  "item_lore.gun_item.accuracy": "Accuracy: ",
+  "item_lore.fillable_item.can_be_filled": "Can be turned into ",
+  "item_lore.fillable_item.when_used_on": " when used on ",
+  "item_lore.tool_item.open_canned_items": "Opens cans when crafted with canned goods",
+  
+  "attachment_multiplier_type.damage": "Damage",
+  "attachment_multiplier_type.accuracy": "Accuracy",
+  "attachment_multiplier_type.fov": "Zoom",
   
   "biome.craftingdead.zombie_forest": "Zombie Forest"
 }

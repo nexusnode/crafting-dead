@@ -9,12 +9,13 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.paint.DefaultPaint;
 import com.craftingdead.mod.capability.paint.IPaint;
+import com.craftingdead.mod.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
@@ -40,7 +41,8 @@ public class PaintItem extends Item {
         .getCapability(ModCapabilities.PAINT)
         .map(IPaint::getColour)
         .orElse(Optional.empty())
-        .ifPresent(colour -> lines.add(new StringTextComponent("#" + Integer.toHexString(colour))));
+        .ifPresent(colour -> lines
+            .add(Text.of("#" + Integer.toHexString(colour)).applyTextStyle(TextFormatting.GRAY)));
   }
 
   @Override

@@ -18,6 +18,7 @@ import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.particle.ModParticleTypes;
 import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.server.ServerDist;
+import com.craftingdead.mod.util.ArbitraryTooltips;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.world.biome.ModBiomes;
 import net.minecraft.entity.Entity;
@@ -25,6 +26,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -106,6 +108,9 @@ public class CraftingDead {
     ModEffects.EFFECTS.register(modEventBus);
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
+
+    // Should be registered after ITEMS registration
+    modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
     MinecraftForge.EVENT_BUS.register(this);
 

@@ -1,5 +1,6 @@
 package com.craftingdead.mod.client;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
@@ -45,6 +46,8 @@ import com.craftingdead.mod.item.PaintItem;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.mod.particle.ModParticleTypes;
+import com.craftingdead.mod.util.ArbitraryTooltips;
+import com.craftingdead.mod.util.ArbitraryTooltips.TooltipFunction;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -74,6 +77,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.FOVUpdateEvent;
@@ -89,6 +94,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
@@ -358,6 +364,23 @@ public class ClientDist implements IModDist {
   // ================================================================================
   // Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleTooltipEvent(ItemTooltipEvent event) {
+    Collection<TooltipFunction> functions =
+        ArbitraryTooltips.getFunctions(event.getItemStack().getItem());
+    int lineIndex = 1;
+
+    // Applies the arbitrary tooltip
+    for (TooltipFunction function : functions) {
+      World world = event.getEntity() != null ? event.getEntity().world : null;
+      ITextComponent tooltip =
+          function.createTooltip(event.getItemStack(), world, event.getFlags());
+      if (tooltip != null) {
+        event.getToolTip().add(lineIndex++, tooltip);
+      }
+    }
+  }
 
   @SubscribeEvent
   public void handleClientTick(TickEvent.ClientTickEvent event) {

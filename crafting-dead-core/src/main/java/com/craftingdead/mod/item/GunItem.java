@@ -15,7 +15,9 @@ import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.gun.ItemGun;
+import com.craftingdead.mod.util.Text;
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -26,6 +28,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
@@ -110,6 +114,10 @@ public class GunItem extends ShootableItem {
 
   public int getFireRate() {
     return this.fireRate;
+  }
+
+  public int getRPM() {
+    return 60000 / this.getFireRate();
   }
 
   public int getDamage() {
@@ -208,6 +216,49 @@ public class GunItem extends ShootableItem {
           .ifPresent(living -> living.toggleAiming(true));
     }
     return super.onItemRightClick(world, playerEntity, hand);
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+      ITooltipFlag tooltipFlag) {
+    super.addInformation(stack, world, lines, tooltipFlag);
+
+    stack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      ITextComponent magazineSizeText =
+          Text.of(gun.getMagazineSize()).applyTextStyle(TextFormatting.RED);
+      ITextComponent damageText = Text.of(this.damage).applyTextStyle(TextFormatting.RED);
+      ITextComponent headshotDamageText = Text.of((int) (this.damage * ItemGun.HEADSHOT_MULTIPLIER))
+          .applyTextStyle(TextFormatting.RED);
+      ITextComponent accuracyText =
+          Text.of((int) (this.accuracy * 100D) + "%").applyTextStyle(TextFormatting.RED);
+      ITextComponent rpmText = Text.of(this.getRPM()).applyTextStyle(TextFormatting.RED);
+
+      lines.add(Text.translate("item_lore.gun_item.ammo_amount").applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(magazineSizeText));
+      lines.add(Text.translate("item_lore.gun_item.damage").applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(damageText));
+      lines.add(Text.translate("item_lore.gun_item.headshot_damage")
+          .applyTextStyle(TextFormatting.GRAY).appendSibling(headshotDamageText));
+
+      if (this.bulletAmountToFire > 1) {
+        ITextComponent pelletsText =
+            Text.of(this.bulletAmountToFire).applyTextStyle(TextFormatting.RED);
+
+        lines.add(Text.translate("item_lore.gun_item.pellets_shot")
+            .applyTextStyle(TextFormatting.GRAY).appendSibling(pelletsText));
+      }
+
+      for (AttachmentItem attachment : gun.getAttachments()) {
+        ITextComponent attachmentNameText = attachment.getName().applyTextStyle(TextFormatting.RED);
+        lines.add(Text.translate("item_lore.gun_item.attachment")
+            .applyTextStyle(TextFormatting.GRAY).appendSibling(attachmentNameText));
+      }
+
+      lines.add(Text.translate("item_lore.gun_item.rpm").applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(rpmText));
+      lines.add(Text.translate("item_lore.gun_item.accuracy").applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(accuracyText));
+    });
   }
 
   @Override

@@ -77,7 +77,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemGun extends DefaultAnimationController implements IGun {
 
-  private static final float HEADSHOT_MULTIPLIER = 4;
+  public static final float HEADSHOT_MULTIPLIER = 4;
 
   private static final Random random = new Random();
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.entity.grenade.GrenadeEntity;
+import com.craftingdead.mod.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,8 +34,8 @@ public class GrenadeItem extends Item {
   @Override
   public void addInformation(ItemStack stack, @Nullable World world,
       List<ITextComponent> texts, ITooltipFlag tooltipFlag) {
-    ITextComponent text = ITextComponent.copyWithoutSiblings(texts.get(0));
-    text.getStyle().setColor(TextFormatting.DARK_GREEN);
+    texts
+        .add(Text.translate("item_lore.grenade").applyTextStyle(TextFormatting.GRAY));
   }
 
   @Override

@@ -1,13 +1,19 @@
 package com.craftingdead.mod.item;
 
+import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.capability.magazine.ItemMagazine;
+import com.craftingdead.mod.util.Text;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class MagazineItem extends Item {
@@ -69,6 +75,45 @@ public class MagazineItem extends Item {
     itemStack
         .getCapability(ModCapabilities.MAGAZINE)
         .ifPresent(magazine -> magazine.setSize(Math.max(0, damage)));
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world,
+      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+    super.addInformation(stack, world, lines, tooltipFlag);
+
+    // Shows the current amount if the maximum size is higher than 1
+    if (this.getSize() > 1) {
+      int currentAmount =
+          stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::getSize).orElse(0);
+
+      ITextComponent amountText =
+          Text.of(currentAmount + "/" + this.getSize()).applyTextStyle(TextFormatting.RED);
+
+      lines.add(Text.translate("item_lore.magazine_item.amount").applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(amountText));
+    }
+
+    if (this.armorPenetration > 0) {
+      lines.add(Text.translate("item_lore.magazine_item.armor_penetration")
+          .applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(Text.of(String.format("%.1f", this.armorPenetration) + "%")
+              .applyTextStyle(TextFormatting.RED)));
+    }
+
+    if (this.entityHitDropChance > 0) {
+      lines.add(Text.translate("item_lore.magazine_item.entity_hit_recovery_chance")
+          .applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(Text.of(String.format("%.1f", this.entityHitDropChance) + "%")
+              .applyTextStyle(TextFormatting.RED)));
+    }
+
+    if (this.blockHitDropChance > 0) {
+      lines.add(Text.translate("item_lore.magazine_item.block_hit_recovery_chance")
+          .applyTextStyle(TextFormatting.GRAY)
+          .appendSibling(Text.of(String.format("%.1f", this.blockHitDropChance) + "%")
+              .applyTextStyle(TextFormatting.RED)));
+    }
   }
 
   public static class Properties extends Item.Properties {
