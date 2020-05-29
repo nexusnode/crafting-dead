@@ -459,6 +459,8 @@
   "item_lore.fillable_item.can_be_filled": "Pode ser transformado em ",
   "item_lore.fillable_item.when_used_on": " quando usado em ",
   "item_lore.tool_item.open_canned_items": "Abre latas quando craftado com enlatados",
+  "item_lore.clothing_item.water_breathing": "Provê respiração em baixo d'água",
+  "item_lore.clothing_item.water_speed": "Aumenta velocidade do nado",
   
   "attachment_multiplier_type.damage": "Dano",
   "attachment_multiplier_type.accuracy": "Precisão",

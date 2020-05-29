@@ -31,6 +31,7 @@ import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -2800,6 +2801,11 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
+  static {
+    ArbitraryTooltips.registerFunction(SCUBA_MASK, (stack, world, tooltipFlags) -> Text
+        .translate("item_lore.clothing_item.water_breathing").applyTextStyle(TextFormatting.GRAY));
+  }
+
   // ================================================================================
   // Clothing
   // ================================================================================
@@ -2871,6 +2877,7 @@ public class ModItems {
       .register("hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setArmorLevel(2)
+              .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
@@ -2906,6 +2913,8 @@ public class ModItems {
       .register("juggernaut_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setArmorLevel(3)
+              .setFireImmunity(true)
+              .setSlownessLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
@@ -2913,6 +2922,7 @@ public class ModItems {
       .register("fireman_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setArmorLevel(3)
+              .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
@@ -2962,6 +2972,7 @@ public class ModItems {
       .register("mil_hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setArmorLevel(2)
+              .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
@@ -3101,6 +3112,11 @@ public class ModItems {
               .setLootTable(new ResourceLocation(CraftingDead.ID, "supply_drops/military"))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+
+  static {
+    ArbitraryTooltips.registerFunction(SCUBA_CLOTHING, (stack, world, tooltipFlags) -> Text
+        .translate("item_lore.clothing_item.water_speed").applyTextStyle(TextFormatting.GRAY));
+  }
 
   // ================================================================================
   // Spawn Eggs

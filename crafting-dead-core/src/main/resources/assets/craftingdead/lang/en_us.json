@@ -472,6 +472,8 @@
   "item_lore.fillable_item.can_be_filled": "Can be turned into ",
   "item_lore.fillable_item.when_used_on": " when used on ",
   "item_lore.tool_item.open_canned_items": "Opens cans when crafted with canned goods",
+  "item_lore.clothing_item.water_breathing": "Gives water breathing ability",
+  "item_lore.clothing_item.water_speed": "Increases swimming speed",
   
   "attachment_multiplier_type.damage": "Damage",
   "attachment_multiplier_type.accuracy": "Accuracy",

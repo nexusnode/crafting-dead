@@ -2,13 +2,16 @@ package com.craftingdead.mod.item;
 
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 import com.craftingdead.mod.util.Text;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.UseAction;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -20,14 +23,15 @@ import net.minecraft.world.World;
 public class ClothingItem extends Item {
 
   private final int armorLevel;
-  private final double movementSpeedModifier;
+  @Nullable
+  private final Integer slownessLevel;
   private final boolean fireImmunity;
 
   public ClothingItem(Properties properties) {
     super(properties);
 
     this.armorLevel = properties.armorLevel;
-    this.movementSpeedModifier = properties.movementSpeedModifier;
+    this.slownessLevel = properties.slownessLevel;
     this.fireImmunity = properties.fireImmunity;
   }
 
@@ -58,8 +62,9 @@ public class ClothingItem extends Item {
     return this.armorLevel;
   }
 
-  public double getMovementSpeedModifier() {
-    return this.movementSpeedModifier;
+  @Nullable
+  public Integer getSlownessLevel() {
+    return this.slownessLevel;
   }
 
   public boolean hasFireImmunity() {
@@ -84,12 +89,11 @@ public class ClothingItem extends Item {
     lines.add(Text.translate("item_lore.clothing.protection_level")
         .applyTextStyle(TextFormatting.GRAY).appendSibling(armorLevelText));
 
-    if (this.movementSpeedModifier != 1D) {
-      ITextComponent movemendSpeedText = Text.of((int) (this.movementSpeedModifier * 100D) + "%")
-          .applyTextStyle(TextFormatting.RED);
+    if (this.slownessLevel != null) {
+      String potionNameAndLevel = I18n.format(Effects.SLOWNESS.getName()) + " "
+          + I18n.format("enchantment.level." + (this.slownessLevel + 1));
 
-      lines.add(Text.translate("item_lore.clothing.movement_speed")
-          .applyTextStyle(TextFormatting.GRAY).appendSibling(movemendSpeedText));
+      lines.add(Text.of(potionNameAndLevel).applyTextStyle(TextFormatting.GRAY));
     }
 
     if (this.fireImmunity) {
@@ -116,7 +120,7 @@ public class ClothingItem extends Item {
   public static class Properties extends Item.Properties {
 
     private int armorLevel = 0;
-    private double movementSpeedModifier = 1D;
+    private Integer slownessLevel = null;
     private boolean fireImmunity = false;
 
     public Properties setArmorLevel(int armorLevel) {
@@ -124,8 +128,11 @@ public class ClothingItem extends Item {
       return this;
     }
 
-    public Properties setMovementSpeedModifier(double movementSpeed) {
-      this.movementSpeedModifier = movementSpeed;
+    /**
+     * Potion levels starts at 0.
+     */
+    public Properties setSlownessLevel(int slownessLevel) {
+      this.slownessLevel = slownessLevel;
       return this;
     }
 
