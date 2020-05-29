@@ -26,14 +26,14 @@ public class ArbitraryTooltips {
   /**
    * Registers a function that creates an {@link ITextComponent}.
    */
-  public static void registerFunction(Supplier<Item> item, TooltipFunction function) {
+  public static void registerTooltip(Supplier<Item> item, TooltipFunction function) {
     TO_REGISTER.put(item, function);
   }
 
   /**
    * Registers a function that creates an {@link ITextComponent}.
    */
-  public static void registerFunction(Item item, TooltipFunction function) {
+  public static void registerTooltip(Item item, TooltipFunction function) {
     REGISTERED_FUNCTIONS.put(item, function);
   }
 

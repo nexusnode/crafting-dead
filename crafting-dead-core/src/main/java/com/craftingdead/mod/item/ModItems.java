@@ -1632,11 +1632,11 @@ public class ModItems {
           new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   static {
-    ArbitraryTooltips.registerFunction(CAN_OPENER,
+    ArbitraryTooltips.registerTooltip(CAN_OPENER,
         (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips.registerFunction(SCREWDRIVER,
+    ArbitraryTooltips.registerTooltip(SCREWDRIVER,
         (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips.registerFunction(MULTI_TOOL,
+    ArbitraryTooltips.registerTooltip(MULTI_TOOL,
         (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
   }
 
@@ -2802,7 +2802,7 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   static {
-    ArbitraryTooltips.registerFunction(SCUBA_MASK, (stack, world, tooltipFlags) -> Text
+    ArbitraryTooltips.registerTooltip(SCUBA_MASK, (stack, world, tooltipFlags) -> Text
         .translate("item_lore.clothing_item.water_breathing").applyTextStyle(TextFormatting.GRAY));
   }
 
@@ -3114,7 +3114,7 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   static {
-    ArbitraryTooltips.registerFunction(SCUBA_CLOTHING, (stack, world, tooltipFlags) -> Text
+    ArbitraryTooltips.registerTooltip(SCUBA_CLOTHING, (stack, world, tooltipFlags) -> Text
         .translate("item_lore.clothing_item.water_speed").applyTextStyle(TextFormatting.GRAY));
   }
 
