@@ -3,6 +3,12 @@ repositories {
 		name 'jitpack'
 		url 'https://jitpack.io' 
 	}
+	maven {
+      	url 'http://maven.ferenyr.info/artifactory/ourten'
+    }
+    flatDir {
+       dirs 'lib'
+   	}
 }
 
 minecraft {    
@@ -34,6 +40,6 @@ minecraft {
 }
 
 dependencies {
-    implementation group: 'com.github.arcnor', name: 'universal-tween-engine', version: '6.3.4'
+    implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'    
 }

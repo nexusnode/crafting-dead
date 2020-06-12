@@ -9,6 +9,7 @@ import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.screen.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
+import com.craftingdead.immerse.client.util.IFramebufferResizeListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
@@ -24,6 +25,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 
 public class ClientDist implements IModDist {
+
+  public static final ResourceLocation BLUR_SHADER =
+      new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
 
   private static final String DISCORD_CLIENT_ID = "475405055302828034";
 
@@ -116,5 +120,15 @@ public class ClientDist implements IModDist {
         .setCanceled(this.transitionManager
             .checkDrawTransition(event.getMouseX(), event.getMouseY(),
                 event.getRenderPartialTicks(), event.getGui()));
+  }
+
+  // ================================================================================
+  // ASM Hooks
+  // ================================================================================
+
+  public static void framebufferResized() {
+    if (minecraft.currentScreen instanceof IFramebufferResizeListener) {
+      ((IFramebufferResizeListener) minecraft.currentScreen).framebufferResized();
+    }
   }
 }

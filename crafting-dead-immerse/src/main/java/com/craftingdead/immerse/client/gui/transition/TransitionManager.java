@@ -42,7 +42,7 @@ public class TransitionManager {
 
   public boolean checkDrawTransition(int mouseX, int mouseY, float partialTicks, Screen screen) {
     ITransition transition =
-        screen instanceof ModScreen ? ((ModScreen) screen).getTransition() : this.defaultTransition;
+        screen instanceof ModScreen ? ((ModScreen) screen).getTransition() : null;
 
     // Blending issues in world
     if (this.minecraft.world != null || transition == null) {

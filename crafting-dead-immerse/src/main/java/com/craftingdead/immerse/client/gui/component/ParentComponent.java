@@ -17,16 +17,24 @@ abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Compo
   private IGuiEventListener focused;
   private boolean dragging;
 
-  private Component<?> lastMouseOver;
-
-  public ParentComponent(RegionBuilder regionBuilder) {
-    super(regionBuilder);
+  @Override
+  protected void resized() {
+    for (Component<?> child : this.children) {
+      child.resized();
+    }
   }
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     for (Component<?> child : this.children) {
       child.render(mouseX, mouseY, partialTicks);
+    }
+  }
+
+  @Override
+  public void removed() {
+    for (Component<?> child : this.children) {
+      child.removed();
     }
   }
 
@@ -44,44 +52,32 @@ abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Compo
 
   public SELF addChild(Component<?> child) {
     this.children.add(child);
-    child.getParentProperty().set(this);
+    child.parent = Optional.of(this);
+    child.added();
     return this.self();
   }
 
   private Optional<Component<?>> getComponentForPos(double mouseX, double mouseY) {
-    return INestedGuiEventHandler.super.getEventListenerForPos(mouseX, mouseY)
-        .map(e -> e instanceof Component ? (Component<?>) e : null);
-  }
-
-  @Override
-  public void mouseEntered() {
-    super.mouseEntered();
-  }
-
-  @Override
-  public void mouseLeft() {
-    super.mouseLeft();
-    if (this.lastMouseOver != null) {
-      this.lastMouseOver.mouseLeft();
-      this.lastMouseOver = null;
+    for (int i = this.children.size() - 1; i > 0; i--) {
+      Component<?> component = this.children.get(i);
+      if (component.isMouseOver(mouseX, mouseY)) {
+        if (component instanceof ParentComponent) {
+          ParentComponent<?> parent = (ParentComponent<?>) component;
+          return parent.getComponentForPos(mouseX, mouseY);
+        } else if (component instanceof Component) {
+          return Optional.of((Component<?>) component);
+        }
+      }
     }
+    return Optional.empty();
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    Component<?> current = this.getComponentForPos(mouseX, mouseY).orElse(null);
-    if (current != this.lastMouseOver) {
-      if (current != null) {
-        current.mouseEntered();
-      }
-      if (this.lastMouseOver != null) {
-        this.lastMouseOver.mouseLeft();
-      }
+    super.mouseMoved(mouseX, mouseY);
+    for (Component<?> child : this.children) {
+      child.mouseMoved(mouseX, mouseY);
     }
-    if (current != null) {
-      current.mouseMoved(mouseX, mouseY);
-    }
-    this.lastMouseOver = current;
   }
 
   @Override

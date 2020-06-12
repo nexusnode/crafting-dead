@@ -1,78 +1,140 @@
 package com.craftingdead.immerse.client.gui.screen;
 
-import com.craftingdead.immerse.client.gui.component.AbsoluteLocation;
-import com.craftingdead.immerse.client.gui.component.CentredPercentLocation;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.component.BlurComponent;
+import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
+import com.craftingdead.immerse.client.gui.component.ComponentScreen;
+import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.ImageComponent;
 import com.craftingdead.immerse.client.gui.component.LabelComponent;
-import com.craftingdead.immerse.client.gui.component.PercentLocation;
-import com.craftingdead.immerse.client.gui.property.ColourProperty;
-import com.craftingdead.immerse.client.gui.property.FunctionalProperty;
-import com.craftingdead.immerse.client.gui.property.IProperty;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.LanguageScreen;
+import com.craftingdead.immerse.client.gui.component.PanoramaComponent;
+import com.craftingdead.immerse.client.gui.component.RectangleComponent;
+import com.craftingdead.immerse.client.util.RenderUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-public class MenuScreen extends ModScreen {
+public class MenuScreen extends ComponentScreen {
 
   protected MenuScreen(ITextComponent title) {
     super(title);
 
-    final int spacing = 15;
-    int y = -50;
-    final IProperty<FontRenderer> fontRenderer =
-        new FunctionalProperty<>(() -> this.font, (font) -> this.font = font);
+    final Minecraft mc = Minecraft.getInstance();
 
     this
         .getRoot()
-        .addChild(new LabelComponent(
-            new Component.RegionBuilder()
-                .setX(new PercentLocation(0.075F))
-                .setY(new CentredPercentLocation(0.5F).add(new AbsoluteLocation(y += spacing))),
-            fontRenderer, new TranslationTextComponent("menu.play"), new ColourProperty(0xCCCCCC),
-            true)
-                .addHoverAnimation(LabelComponent::getColourProperty,
-                    new ColourProperty(0xFFFFFF).getAnimatedValues(), 400.0F)
-                .addActionListener(component -> this.minecraft.displayGuiScreen(new PlayScreen())));
+        .addChild(
+            new PanoramaComponent(new ResourceLocation("textures/gui/title/background/panorama")));
 
-    this
-        .getRoot()
-        .addChild(new LabelComponent(
-            new Component.RegionBuilder()
-                .setX(new PercentLocation(0.075F))
-                .setY(new CentredPercentLocation(0.5F).add(new AbsoluteLocation(y += spacing))),
-            fontRenderer, new TranslationTextComponent("menu.options"),
-            new ColourProperty(0xCCCCCC), true)
-                .addHoverAnimation(LabelComponent::getColourProperty,
-                    new ColourProperty(0xFFFFFF).getAnimatedValues(), 400.0F)
-                .addActionListener(component -> this.minecraft
+    ContainerComponent sideBar =
+        new ContainerComponent().setX(0).setY(0).setWidth(25).setHeightPercent(1.0F);
+
+    BlurComponent sideBarBlur = new BlurComponent();
+    sideBar.addChild(sideBarBlur);
+
+    RectangleComponent sideBarBackground =
+        new RectangleComponent(new Colour(new float[] {0.5F, 0.5F, 0.5F, 0.25F}));
+    sideBar.addChild(sideBarBackground);
+
+    sideBar
+        .addChild(new ImageComponent(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/home.png"))
+                .setXPercent(0.5F)
+                .setCentre(true)
+                .setY(10)
+                .setWidthPercent(0.5F)
+                .setAutoHeight()
+                .addHoverAnimation(ImageComponent.COLOUR,
+                    RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+                .addHoverAnimation(Component.X_SCALE, new float[] {1.25F}, 150.0F)
+                .addHoverAnimation(Component.Y_SCALE, new float[] {1.25F}, 150.0F)
+                .addClickSound(SoundEvents.UI_BUTTON_CLICK));
+
+    sideBar
+        .addChild(new RectangleComponent(new Colour(0x80888888))
+            .setX(0)
+            .setY(20)
+            .setWidthPercent(1.0F)
+            .setHeight(1)
+            .setScaleHeight(false));
+
+    sideBar
+        .addChild(new ImageComponent(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"))
+                .setXPercent(0.5F)
+                .setCentre(true)
+                .setY(30)
+                .setWidthPercent(0.5F)
+                .setAutoHeight()
+                .addHoverAnimation(ImageComponent.COLOUR,
+                    RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+                .addHoverAnimation(Component.X_SCALE, new float[] {1.25F}, 150.0F)
+                .addHoverAnimation(Component.Y_SCALE, new float[] {1.25F}, 150.0F)
+                .addClickSound(SoundEvents.UI_BUTTON_CLICK));
+
+    sideBar
+        .addChild(new RectangleComponent(new Colour(0x80888888))
+            .setX(0)
+            .setY(40)
+            .setWidthPercent(1.0F)
+            .setScaleHeight(false)
+            .setHeight(1));
+
+    sideBar
+        .addChild(new ImageComponent(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"))
+                .setXPercent(0.5F)
+                .setCentre(true)
+                .setY(50)
+                .setWidthPercent(0.5F)
+                .setAutoHeight()
+                .addHoverAnimation(ImageComponent.COLOUR,
+                    RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+                .addHoverAnimation(Component.X_SCALE, new float[] {1.25F}, 150.0F)
+                .addHoverAnimation(Component.Y_SCALE, new float[] {1.25F}, 150.0F)
+                .addClickSound(SoundEvents.UI_BUTTON_CLICK)
+                .addActionListener(c -> this.minecraft
                     .displayGuiScreen(new OptionsScreen(this, this.minecraft.gameSettings))));
 
-    this
-        .getRoot()
-        .addChild(new LabelComponent(
-            new Component.RegionBuilder()
-                .setX(new PercentLocation(0.075F))
-                .setY(new CentredPercentLocation(0.5F).add(new AbsoluteLocation(y += spacing))),
-            fontRenderer, new TranslationTextComponent("options.language"),
-            new ColourProperty(0xCCCCCC), true)
-                .addHoverAnimation(LabelComponent::getColourProperty,
-                    new ColourProperty(0xFFFFFF).getAnimatedValues(), 400.0F)
-                .addActionListener(component -> this.minecraft
-                    .displayGuiScreen(new LanguageScreen(this, this.minecraft.gameSettings,
-                        this.minecraft.getLanguageManager()))));
+    sideBar
+        .addChild(new ImageComponent(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"))
+                .setXPercent(0.5F)
+                .setCentre(true)
+                .setYPercent(0.925F)
+                .setWidthPercent(0.5F)
+                .setAutoHeight()
+                .addHoverAnimation(ImageComponent.COLOUR,
+                    RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+                .addHoverAnimation(Component.X_SCALE, new float[] {1.25F}, 150.0F)
+                .addHoverAnimation(Component.Y_SCALE, new float[] {1.25F}, 150.0F)
+                .addClickSound(SoundEvents.UI_BUTTON_CLICK)
+                .addActionListener(c -> this.minecraft.shutdown()));
+
+    sideBar
+        .addChild(new RectangleComponent(new Colour(0x80888888))
+            .setXPercent(1.0F)
+            .setY(0)
+            .setWidth(1)
+            .setScaleWidth(false)
+            .setHeightPercent(1.0F));
 
     this
         .getRoot()
-        .addChild(new LabelComponent(
-            new Component.RegionBuilder()
-                .setX(new PercentLocation(0.075F))
-                .setY(new CentredPercentLocation(0.5F).add(new AbsoluteLocation(y += spacing))),
-            fontRenderer, new TranslationTextComponent("menu.quit"), new ColourProperty(0xFF6257),
-            true)
-                .addHoverAnimation(LabelComponent::getColourProperty,
-                    new ColourProperty(0xE51C23).getAnimatedValues(), 400.0F)
-                .addActionListener(component -> this.minecraft.shutdown()));
+        .addChild(new LabelComponent(mc.fontRenderer, new StringTextComponent("Hello World!"),
+            new Colour(0xFFFFFFFF), false)
+                .setXPercent(0.5F)
+                .setYPercent(0.5F)
+                .setAutoWidth()
+                .setAutoHeight()
+                .setCentre(true)
+                .addHoverAnimation(Component.X_SCALE, new float[] {2.0F}, 150.0F)
+                .addHoverAnimation(Component.Y_SCALE, new float[] {2.0F}, 150.0F));
+
+    this.getRoot().addChild(sideBar);
   }
 }

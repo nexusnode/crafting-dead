@@ -1,18 +1,20 @@
 package com.craftingdead.immerse.client.gui.component;
 
-import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.property.IAnimatableProperty;
-import com.craftingdead.immerse.client.gui.property.Property;
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Cubic;
+import io.noties.tumbleweed.Tween;
+import io.noties.tumbleweed.TweenManager;
+import io.noties.tumbleweed.TweenType;
+import net.minecraft.client.MainWindow;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -21,33 +23,55 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public abstract class Component<SELF extends Component<SELF>> extends AbstractGui
     implements IRenderable, IGuiEventListener {
 
+  public static final TweenType<Component<?>> X_SCALE =
+      new SimpleTweenType<Component<?>>(1, t -> new float[] {t.xScale}, (t, v) -> t.xScale = v[0]);
+  public static final TweenType<Component<?>> Y_SCALE =
+      new SimpleTweenType<Component<?>>(1, t -> new float[] {t.yScale}, (t, v) -> t.yScale = v[0]);
+  public static final TweenType<Component<?>> X_TRANSLATION = new SimpleTweenType<Component<?>>(1,
+      t -> new float[] {t.xTranslation}, (t, v) -> t.xTranslation = v[0]);
+  public static final TweenType<Component<?>> Y_TRANSLATION = new SimpleTweenType<Component<?>>(1,
+      t -> new float[] {t.yTranslation}, (t, v) -> t.yTranslation = v[0]);
+
+  private final MainWindow window = Minecraft.getInstance().getWindow();
+
   private final IEventBus eventBus = BusBuilder.builder().build();
 
-  private final Property<ILocation> x;
-  private final Property<ILocation> y;
-  private final Property<ISize> width;
-  private final Property<ISize> height;
+  private final TweenManager tweenManager = TweenManager.create();
 
-  private final Property<ParentComponent<?>> parent = new Property<>(null);
+  private Supplier<Double> xFactory = () -> 0.0D;
+  private Supplier<Double> yFactory = () -> 0.0D;
+  private Supplier<Double> widthFactory =
+      () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth());
+  private Supplier<Double> heightFactory =
+      () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight());
 
-  private final TweenManager tweenManager = new TweenManager();
+  private boolean centre;
 
-  static {
-    Tween.setCombinedAttributesLimit(4);
-  }
+  private boolean scaleWidth = true;
+  private boolean scaleHeight = true;
 
-  public Component(RegionBuilder regionBuilder) {
-    this.x = new Property<>(regionBuilder.x);
-    this.y = new Property<>(regionBuilder.y);
-    this.width = new Property<>(regionBuilder.width);
-    this.height = new Property<>(regionBuilder.height);
-  }
+  private float xScale = 1.0F;
+  private float yScale = 1.0F;
+
+  private float xTranslation = 1.0F;
+  private float yTranslation = 1.0F;
+
+  protected Optional<ParentComponent<?>> parent = Optional.empty();
+
+  private boolean wasMouseOver;
+
+  protected abstract void added();
+
+  protected abstract void removed();
 
   protected abstract void tick();
 
+  protected abstract void resized();
+
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
-    this.tweenManager.update(partialTicks * 50);
+    final float delta = partialTicks * 50;
+    this.tweenManager.update(delta);
   }
 
   protected void mouseEntered() {
@@ -60,6 +84,13 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
+    boolean mouseOver = this.isMouseOver(mouseX, mouseY);
+    if (mouseOver && !this.wasMouseOver) {
+      this.mouseEntered();
+    } else if (this.wasMouseOver && !mouseOver) {
+      this.mouseLeft();
+    }
+    this.wasMouseOver = mouseOver;
     this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
 
@@ -105,23 +136,39 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
         && mouseY < this.getY() + this.getHeight();
   }
 
-  public SELF addHoverAnimation(Function<SELF, IAnimatableProperty<?>> target, float[] to,
-      float duration) {
-    final float[] from = Arrays.copyOf(target.apply(this.self()).getAnimatedValues(), 4);
+  /**
+   * Helper method to add an animation triggered by {@link MouseEnterEvent} that will be reversed
+   * upon {@link MouseLeaveEvent}.
+   * 
+   * @param target - the {@link IAnimatedProperty} to animate
+   * @param to - the target value
+   * @param fadeDuration - the duration of the animation
+   * @return instance of self for easy construction
+   */
+  public SELF addHoverAnimation(TweenType<? super SELF> tweenType, float[] to, float duration) {
+    float[] from = new float[tweenType.getValuesSize()];
+    tweenType.getValues(this.self(), from);
     this
         .addListener(MouseEnterEvent.class,
             (component, event) -> Tween
-                .to(target.apply(this.self()), 0, duration)
-                .ease(Cubic.INOUT)
+                .to(this.self(), tweenType, duration)
                 .target(to)
                 .start(this.tweenManager))
         .addListener(MouseLeaveEvent.class,
             (component, event) -> Tween
-                .to(target.apply(this.self()), 0, duration)
-                .ease(Cubic.INOUT)
+                .to(this.self(), tweenType, duration)
                 .target(from)
                 .start(this.tweenManager));
     return this.self();
+  }
+
+  public SELF addClickSound(SoundEvent soundEvent) {
+    return this.addListener(MouseEvent.ButtonEvent.class, (component, event) -> {
+      if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
+          && event.getAction() == GLFW.GLFW_PRESS) {
+        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(soundEvent, 1.0F));
+      }
+    });
   }
 
   public SELF addActionListener(Consumer<SELF> consumer) {
@@ -136,7 +183,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public <T extends Event> SELF addListener(Class<T> eventType, BiConsumer<SELF, T> consumer) {
     this.eventBus
-        .addListener(EventPriority.NORMAL, false, eventType,
+        .addListener(EventPriority.NORMAL, true, eventType,
             event -> consumer.accept(this.self(), event));
     return this.self();
   }
@@ -145,24 +192,115 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.eventBus.post(event);
   }
 
-  public int getX() {
-    return this.x.get().getX(this);
+  public double getX() {
+    double x =
+        (this.parent.map(Component::getX).orElse(0.0D) + this.xFactory.get()) * this.xTranslation;
+    return this.centre ? x - this.getWidth() / 2 : x;
   }
 
-  public int getY() {
-    return this.y.get().getY(this);
+  public SELF setX(int x) {
+    this.xFactory = () -> (double) x;
+    return this.self();
   }
 
-  public int getWidth() {
-    return this.width.get().getWidth(this);
+  public SELF setXPercent(float xPercent) {
+    this.xFactory =
+        () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth())
+            * xPercent;
+    return this.self();
   }
 
-  public int getHeight() {
-    return this.height.get().getHeight(this);
+  public double getY() {
+    double y =
+        (this.parent.map(Component::getY).orElse(0.0D) + this.yFactory.get()) * this.yTranslation;
+    return this.centre ? y - this.getHeight() / 2 : y;
   }
 
-  protected Property<ParentComponent<?>> getParentProperty() {
-    return this.parent;
+  public SELF setY(int y) {
+    this.yFactory = () -> (double) y;
+    return this.self();
+  }
+
+  public SELF setYPercent(float yPercent) {
+    this.yFactory =
+        () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight())
+            * yPercent;
+    return this.self();
+  }
+
+  public double getWidth() {
+    double width = this.widthFactory.get() * this.xScale;
+    return this.scaleWidth ? width : width / this.window.getGuiScaleFactor();
+  }
+
+  public SELF setWidth(int width) {
+    this.widthFactory = () -> (double) width;
+    return this.self();
+  }
+
+  public SELF setWidthPercent(float widthPercent) {
+    this.widthFactory =
+        () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth())
+            * widthPercent;
+    return this.self();
+  }
+
+  public SELF setAutoWidth() {
+    this.widthFactory = () -> this.getBestWidth().orElseGet(this.heightFactory);
+    return this.self();
+  }
+
+  public double getHeight() {
+    double height = this.heightFactory.get() * this.yScale;
+    return this.scaleHeight ? height : height / this.window.getGuiScaleFactor();
+  }
+
+  public SELF setHeight(int height) {
+    this.heightFactory = () -> (double) height;
+    return this.self();
+  }
+
+  public SELF setHeightPercent(float heightPercent) {
+    this.heightFactory =
+        () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight())
+            * heightPercent;
+    return this.self();
+  }
+
+  public SELF setAutoHeight() {
+    this.heightFactory = () -> this.getBestHeight().orElseGet(this.widthFactory);
+    return this.self();
+  }
+
+  public SELF setCentre(boolean centre) {
+    this.centre = centre;
+    return this.self();
+  }
+
+  public SELF setScaleWidth(boolean scaleWidth) {
+    this.scaleWidth = scaleWidth;
+    return this.self();
+  }
+
+  public SELF setScaleHeight(boolean scaleHeight) {
+    this.scaleHeight = scaleHeight;
+    return this.self();
+  }
+
+  public float getXScale() {
+    return this.xScale;
+  }
+
+  public float getYScale() {
+    return this.yScale;
+  }
+
+  protected Optional<Double> getBestWidth() {
+    return Optional.empty();
+  }
+
+  protected Optional<Double> getBestHeight() {
+    return Optional.empty();
   }
 
   public TweenManager getTweenManager() {
@@ -172,94 +310,5 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @SuppressWarnings("unchecked")
   protected SELF self() {
     return (SELF) this;
-  }
-
-  public static class RegionBuilder {
-
-    private ILocation x;
-    private ILocation y;
-    private ISize width;
-    private ISize height;
-
-    public RegionBuilder inherit() {
-      this.setLocation(new InheritedLocation());
-      this.setSize(new InheritedSize());
-      return this;
-    }
-
-    public RegionBuilder setLocation(ILocation location) {
-      this.x = this.y = location;
-      return this;
-    }
-
-    public RegionBuilder setLocation(String x, String y) {
-      return this.setX(x).setY(y);
-    }
-
-    public RegionBuilder setSize(ISize size) {
-      this.width = this.height = size;
-      return this;
-    }
-
-    public RegionBuilder setSize(String width, String height) {
-      return this.setWidth(width).setHeight(height);
-    }
-
-    public RegionBuilder setX(ILocation x) {
-      this.x = x;
-      return this;
-    }
-
-    public RegionBuilder setY(ILocation y) {
-      this.y = y;
-      return this;
-    }
-
-    public RegionBuilder setX(String x) {
-      this.x = parse(x, PercentLocation::new, AbsoluteLocation::new);
-      return this;
-    }
-
-    public RegionBuilder setY(String y) {
-      this.y = parse(y, PercentLocation::new, AbsoluteLocation::new);
-      return this;
-    }
-
-    public RegionBuilder setWidth(ISize width) {
-      this.width = width;
-      return this;
-    }
-
-    public RegionBuilder setHeight(ISize height) {
-      this.height = height;
-      return this;
-    }
-
-    public RegionBuilder setWidth(String width) {
-      this.width = parse(width, PercentSize::new, FixedSize::new);
-      return this;
-    }
-
-    public RegionBuilder setHeight(String height) {
-      this.height = parse(height, PercentSize::new, FixedSize::new);
-      return this;
-    }
-
-    private static <T> T parse(String str, Function<Float, ? extends T> pct,
-        Function<Integer, ? extends T> px) {
-      try {
-        if (str.contains("%")) {
-          float pctSize = Integer.parseInt(str.split("%")[0]) / 100;
-          return pct.apply(pctSize);
-        } else if (str.contains("px")) {
-          int pxSize = Integer.parseInt(str.split("px")[0]);
-          return px.apply(pxSize);
-        } else {
-          throw new IllegalArgumentException();
-        }
-      } catch (IllegalArgumentException e) {
-        throw new IllegalArgumentException("Invalid location string");
-      }
-    }
   }
 }

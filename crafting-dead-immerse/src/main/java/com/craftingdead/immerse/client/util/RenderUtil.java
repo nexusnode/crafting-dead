@@ -1,17 +1,76 @@
 package com.craftingdead.immerse.client.util;
 
+import java.lang.reflect.Field;
+import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.shader.Shader;
+import net.minecraft.client.shader.ShaderDefault;
+import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class RenderUtil {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
+
+  private static final Field listShaders =
+      ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148031_d");
+
+  public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
+    ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
+    if (sg != null) {
+      try {
+        @SuppressWarnings("unchecked")
+        List<Shader> shaders = (List<Shader>) listShaders.get(sg);
+        for (Shader shader : shaders) {
+          ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+          if (variable != null) {
+            variable.set(value);
+          }
+        }
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  public static void fill(double x, double y, double x2, double y2, int colour) {
+    if (x < x2) {
+      double i = x;
+      x = x2;
+      x2 = i;
+    }
+
+    if (y < y2) {
+      double j = y;
+      y = y2;
+      y2 = j;
+    }
+
+    float f3 = (float) (colour >> 24 & 255) / 255.0F;
+    float f = (float) (colour >> 16 & 255) / 255.0F;
+    float f1 = (float) (colour >> 8 & 255) / 255.0F;
+    float f2 = (float) (colour & 255) / 255.0F;
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder buffer = tessellator.getBuffer();
+    RenderSystem.enableBlend();
+    RenderSystem.disableTexture();
+    RenderSystem.defaultBlendFunc();
+    buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+    buffer.vertex(x, y2, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.vertex(x2, y2, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.vertex(x2, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.vertex(x, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    tessellator.draw();
+    RenderSystem.enableTexture();
+    RenderSystem.disableBlend();
+  }
 
   public static void fillGradient(double x, double y, double x2, double y2, int startColor,
       int endColor) {

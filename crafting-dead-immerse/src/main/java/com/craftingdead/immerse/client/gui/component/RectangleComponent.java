@@ -1,27 +1,36 @@
 package com.craftingdead.immerse.client.gui.component;
 
-import com.craftingdead.immerse.client.gui.property.ColourProperty;
+import com.craftingdead.immerse.client.util.RenderUtil;
 
 public class RectangleComponent extends Component<RectangleComponent> {
 
-  private final ColourProperty colour;
+  private final Colour colour;
 
-  public RectangleComponent(RegionBuilder regionBuilder, ColourProperty colour) {
-    super(regionBuilder);
+  public RectangleComponent(Colour colour) {
     this.colour = colour;
   }
 
-  public ColourProperty getColourProperty() {
+  public Colour getColourProperty() {
     return this.colour;
   }
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
-    fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(),
-        this.colour.get());
+    RenderUtil
+        .fill(this.getX(), this.getY(), this.getX() + this.getWidth(),
+            this.getY() + this.getHeight(), this.colour.getHexColour());
   }
 
   @Override
+  protected void added() {}
+
+  @Override
+  protected void removed() {}
+
+  @Override
   public void tick() {}
+
+  @Override
+  protected void resized() {}
 }
