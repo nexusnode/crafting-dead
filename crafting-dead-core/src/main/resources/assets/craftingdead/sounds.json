@@ -407,10 +407,10 @@
       "craftingdead:vector_shoot"
     ]
   },
-  "zoom_in": {
+  "scope_zoom": {
     "category": "master",
     "sounds": [
-      "craftingdead:zoom_in"
+      "craftingdead:scope_zoom"
     ]
   }
 }

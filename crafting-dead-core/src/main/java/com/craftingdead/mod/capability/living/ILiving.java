@@ -58,10 +58,6 @@ public interface ILiving<E extends LivingEntity>
    */
   boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops);
 
-  boolean isAiming();
-
-  void toggleAiming(boolean sendUpdate);
-
   E getEntity();
 
   UUID getId();

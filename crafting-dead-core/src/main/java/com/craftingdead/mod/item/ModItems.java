@@ -1632,12 +1632,15 @@ public class ModItems {
           new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   static {
-    ArbitraryTooltips.registerTooltip(CAN_OPENER,
-        (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips.registerTooltip(SCREWDRIVER,
-        (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips.registerTooltip(MULTI_TOOL,
-        (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
+    ArbitraryTooltips
+        .registerTooltip(CAN_OPENER,
+            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
+    ArbitraryTooltips
+        .registerTooltip(SCREWDRIVER,
+            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
+    ArbitraryTooltips
+        .registerTooltip(MULTI_TOOL,
+            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
   }
 
   // ================================================================================
@@ -1649,8 +1652,9 @@ public class ModItems {
           () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
               .setFullItem(new ResourceLocation(CraftingDead.ID, "bottled_water"))
               .setBlockPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                      Text.translate(Blocks.WATER.getTranslationKey())),
+                  Text
+                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
+                          Text.translate(Blocks.WATER.getTranslationKey())),
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
               .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
 
@@ -2034,8 +2038,9 @@ public class ModItems {
           () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
               .setFullItem(new ResourceLocation(CraftingDead.ID, "water_canteen"))
               .setBlockPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                      Text.translate(Blocks.WATER.getTranslationKey())),
+                  Text
+                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
+                          Text.translate(Blocks.WATER.getTranslationKey())),
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
@@ -2054,8 +2059,9 @@ public class ModItems {
           () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
               .setFullItem(new ResourceLocation(CraftingDead.ID, "flask"))
               .setBlockPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                      Text.translate(Blocks.WATER.getTranslationKey())),
+                  Text
+                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
+                          Text.translate(Blocks.WATER.getTranslationKey())),
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
@@ -2171,8 +2177,9 @@ public class ModItems {
           () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
               .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
               .setBlockPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                      Text.translate(Blocks.WATER.getTranslationKey())),
+                  Text
+                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
+                          Text.translate(Blocks.WATER.getTranslationKey())),
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
@@ -2181,8 +2188,9 @@ public class ModItems {
           () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
               .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
               .setBlockPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                      Text.translate(Blocks.WATER.getTranslationKey())),
+                  Text
+                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
+                          Text.translate(Blocks.WATER.getTranslationKey())),
                   (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
@@ -2221,139 +2229,112 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> CROWBAR = ITEMS
-      .register("crowbar",
-          () -> new MeleeWeaponItem(3, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("crowbar", () -> new MeleeWeaponItem(3, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BAT = ITEMS
-      .register("bat",
-          () -> new MeleeWeaponItem(5, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bat", () -> new MeleeWeaponItem(5, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> KATANA = ITEMS
-      .register("katana",
-          () -> new MeleeWeaponItem(18, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("katana", () -> new MeleeWeaponItem(18, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> PIPE = ITEMS
-      .register("pipe",
-          () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("pipe", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> RUSTY_PIPE = ITEMS
-      .register("rusty_pipe",
-          () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("rusty_pipe", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> FIRE_AXE = ITEMS
-      .register("fire_axe",
-          () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("fire_axe", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> CHAINSAW = ITEMS
-      .register("chainsaw",
-          () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("chainsaw", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BOWIE = ITEMS
-      .register("bowie",
-          () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bowie", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> GOLF_CLUB = ITEMS
-      .register("golf_club",
-          () -> new MeleeWeaponItem(6, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("golf_club", () -> new MeleeWeaponItem(6, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> NIGHT_STICK = ITEMS
-      .register("night_stick",
-          () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("night_stick", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> SLEDGEHAMMER = ITEMS
-      .register("sledge_hammer",
-          () -> new MeleeWeaponItem(10, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("sledge_hammer", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> NAIL_BAT = ITEMS
-      .register("nail_bat",
-          () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("nail_bat", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> SHOVEL = ITEMS
-      .register("shovel",
-          () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("shovel", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> HATCHET = ITEMS
-      .register("hatchet",
-          () -> new MeleeWeaponItem(16, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("hatchet", () -> new MeleeWeaponItem(16, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BROADSWORD = ITEMS
-      .register("broad_sword",
-          () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("broad_sword", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> MACHETE = ITEMS
-      .register("machete",
-          () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("machete", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> WEAPONIZED_SCYTHE = ITEMS
-      .register("weaponized_scythe",
-          () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("weaponized_scythe", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> SCYTHE = ITEMS
-      .register("scythe",
-          () -> new MeleeWeaponItem(20, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("scythe", () -> new MeleeWeaponItem(20, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> PICKAXE = ITEMS
-      .register("pickaxe",
-          () -> new MeleeWeaponItem(10, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("pickaxe", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BO_STAFF = ITEMS
-      .register("bo_staff",
-          () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bo_staff", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> WRENCH = ITEMS
-      .register("wrench",
-          () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("wrench", () -> new MeleeWeaponItem(4, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> FRYING_PAN = ITEMS
-      .register("frying_pan",
-          () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("frying_pan", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BOLT_CUTTERS = ITEMS
-      .register("bolt_cutters",
-          () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bolt_cutters", () -> new MeleeWeaponItem(9, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> COMBAT_KNIFE = ITEMS
-      .register("combat_knife",
-          () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("combat_knife", () -> new MeleeWeaponItem(14, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> STEEL_BAT = ITEMS
-      .register("steel_bat",
-          () -> new MeleeWeaponItem(7, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("steel_bat", () -> new MeleeWeaponItem(7, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> CLEAVER = ITEMS
-      .register("cleaver",
-          () -> new MeleeWeaponItem(10, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("cleaver", () -> new MeleeWeaponItem(10, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> BROKEN_BOTTLE = ITEMS
-      .register("broken_bottle",
-          () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-              .maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("broken_bottle", () -> new MeleeWeaponItem(15, -2.4F,
+          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   // ================================================================================
   // Backpacks
@@ -2802,8 +2783,11 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   static {
-    ArbitraryTooltips.registerTooltip(SCUBA_MASK, (stack, world, tooltipFlags) -> Text
-        .translate("item_lore.clothing_item.water_breathing").applyTextStyle(TextFormatting.GRAY));
+    ArbitraryTooltips
+        .registerTooltip(SCUBA_MASK,
+            (stack, world, tooltipFlags) -> Text
+                .translate("item_lore.clothing_item.water_breathing")
+                .applyTextStyle(TextFormatting.GRAY));
   }
 
   // ================================================================================
@@ -3114,8 +3098,11 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   static {
-    ArbitraryTooltips.registerTooltip(SCUBA_CLOTHING, (stack, world, tooltipFlags) -> Text
-        .translate("item_lore.clothing_item.water_speed").applyTextStyle(TextFormatting.GRAY));
+    ArbitraryTooltips
+        .registerTooltip(SCUBA_CLOTHING,
+            (stack, world, tooltipFlags) -> Text
+                .translate("item_lore.clothing_item.water_speed")
+                .applyTextStyle(TextFormatting.GRAY));
   }
 
   // ================================================================================
@@ -3158,7 +3145,7 @@ public class ModItems {
       .register("molten_scrap_metal",
           () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
-  public static final RegistryObject<Item> INCENDIARY_POWDER = ITEMS
-      .register("incendiary_powder",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+  public static final RegistryObject<Item> BINOCULARS = ITEMS
+      .register("binoculars",
+          () -> new BinocularsItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
 }

@@ -19,15 +19,23 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> AS50_SHOOT = register("as50_shoot");
   public static final RegistryObject<SoundEvent> AWP_RELOAD = register("awp_reload");
   public static final RegistryObject<SoundEvent> AWP_SHOOT = register("awp_shoot");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_DIRT = register("bullet_impact_dirt");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_FLESH = register("bullet_impact_flesh");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_GLASS = register("bullet_impact_glass");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL = register("bullet_impact_metal");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL2 = register("bullet_impact_metal2");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_STONE = register("bullet_impact_stone");
-  public static final RegistryObject<SoundEvent> BULLET_IMPACT_WOOD = register("bullet_impact_wood");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_DIRT =
+      register("bullet_impact_dirt");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_FLESH =
+      register("bullet_impact_flesh");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_GLASS =
+      register("bullet_impact_glass");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL =
+      register("bullet_impact_metal");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_METAL2 =
+      register("bullet_impact_metal2");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_STONE =
+      register("bullet_impact_stone");
+  public static final RegistryObject<SoundEvent> BULLET_IMPACT_WOOD =
+      register("bullet_impact_wood");
   public static final RegistryObject<SoundEvent> CROSSBOW_SHOOT = register("crossbow_shoot");
-  public static final RegistryObject<SoundEvent> DESERT_EAGLE_SHOOT = register("desert_eagle_shoot");
+  public static final RegistryObject<SoundEvent> DESERT_EAGLE_SHOOT =
+      register("desert_eagle_shoot");
   public static final RegistryObject<SoundEvent> DMR_RELOAD = register("dmr_reload");
   public static final RegistryObject<SoundEvent> DMR_SHOOT = register("dmr_shoot");
   public static final RegistryObject<SoundEvent> DRAGUNOV_SHOOT = register("dragunov_shoot");
@@ -67,20 +75,27 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> RPK_SHOOT = register("rpk_shoot");
   public static final RegistryObject<SoundEvent> SCARH_SHOOT = register("scarh_shoot");
   public static final RegistryObject<SoundEvent> SHOTGUN_RELOAD = register("shotgun_reload");
-  public static final RegistryObject<SoundEvent> SILENCED_AK47_SHOOT = register("silenced_ak47_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_M240B_SHOOT = register("silenced_m240b_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_M4A1_SHOOT = register("silenced_m4a1_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_AK47_SHOOT =
+      register("silenced_ak47_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_M240B_SHOOT =
+      register("silenced_m240b_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_M4A1_SHOOT =
+      register("silenced_m4a1_shoot");
   public static final RegistryObject<SoundEvent> SILENCED_M9_SHOOT = register("silenced_m9_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_MK48MOD_SHOOT = register("silenced_mk48mod_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_MP5A5_SHOOT = register("silenced_mp5a5_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_P90_SHOOT = register("silenced_p90_shoot");
-  public static final RegistryObject<SoundEvent> SILENCED_RPK_SHOOT = register("silenced_rpk_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_MK48MOD_SHOOT =
+      register("silenced_mk48mod_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_MP5A5_SHOOT =
+      register("silenced_mp5a5_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_P90_SHOOT =
+      register("silenced_p90_shoot");
+  public static final RegistryObject<SoundEvent> SILENCED_RPK_SHOOT =
+      register("silenced_rpk_shoot");
   public static final RegistryObject<SoundEvent> SPORTER22_SHOOT = register("sporter22_shoot");
   public static final RegistryObject<SoundEvent> TASER_SHOOT = register("taser_shoot");
   public static final RegistryObject<SoundEvent> TOGGLE_FIRE_MODE = register("toggle_fire_mode");
   public static final RegistryObject<SoundEvent> TRENCHGUN_SHOOT = register("trenchgun_shoot");
   public static final RegistryObject<SoundEvent> VECTOR_SHOOT = register("vector_shoot");
-  public static final RegistryObject<SoundEvent> ZOOM_IN = register("zoom_in");
+  public static final RegistryObject<SoundEvent> SCOPE_ZOOM = register("scope_zoom");
 
   private static RegistryObject<SoundEvent> register(String name) {
     ResourceLocation registryName = new ResourceLocation(CraftingDead.ID, name);

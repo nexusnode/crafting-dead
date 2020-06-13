@@ -77,7 +77,7 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   public boolean isInFireDelay() {
     long currentNanos = System.nanoTime();
     long fireRateNanos =
-        TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRate(), TimeUnit.MILLISECONDS);
+        TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRateMs(), TimeUnit.MILLISECONDS);
 
     return (currentNanos - this.lastSoundNanos) < fireRateNanos;
   }

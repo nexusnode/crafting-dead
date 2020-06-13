@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.animation.IAnimation;
-import com.craftingdead.mod.capability.gun.ItemGun;
+import com.craftingdead.mod.capability.gun.DefaultGun;
 import com.craftingdead.mod.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -38,7 +38,7 @@ public class GunItem extends ShootableItem {
   /**
    * Time between shots in milliseconds.
    */
-  private final int fireRate;
+  private final int fireRateMs;
 
   private final int damage;
 
@@ -87,7 +87,7 @@ public class GunItem extends ShootableItem {
 
   public GunItem(Properties properties) {
     super(properties);
-    this.fireRate = properties.fireRate;
+    this.fireRateMs = properties.fireRate;
     this.damage = properties.damage;
     this.reloadDurationTicks = properties.reloadDurationTicks;
     this.accuracy = properties.accuracy;
@@ -105,19 +105,18 @@ public class GunItem extends ShootableItem {
     this.acceptedPaints = properties.acceptedPaints;
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
-            (itemStack, world, entity) -> entity != null ? entity
-                .getCapability(ModCapabilities.LIVING)
-                .map(living -> entity.getHeldItemMainhand() == itemStack && living.isAiming() ? 1.0F
-                    : 0.0F)
+            (itemStack, world, entity) -> entity != null ? itemStack
+                .getCapability(ModCapabilities.GUN)
+                .map(gun -> gun.isAiming(entity, itemStack) ? 1.0F : 0.0F)
                 .orElse(0.0F) : 0.0F);
   }
 
-  public int getFireRate() {
-    return this.fireRate;
+  public int getFireRateMs() {
+    return this.fireRateMs;
   }
 
-  public int getRPM() {
-    return 60000 / this.getFireRate();
+  public int getFireRateRPM() {
+    return 60000 / this.getFireRateMs();
   }
 
   public int getDamage() {
@@ -190,10 +189,10 @@ public class GunItem extends ShootableItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(new ItemGun(this),
+    return new SerializableProvider<>(new DefaultGun(this),
         ImmutableSet
             .of(() -> ModCapabilities.ANIMATION_CONTROLLER, () -> ModCapabilities.GUN,
-                () -> ModCapabilities.ACTION));
+                () -> ModCapabilities.ACTION, () -> ModCapabilities.SCOPE));
   }
 
   @Override
@@ -212,8 +211,9 @@ public class GunItem extends ShootableItem {
       Hand hand) {
     if (world.isRemote()) {
       playerEntity
-          .getCapability(ModCapabilities.LIVING)
-          .ifPresent(living -> living.toggleAiming(true));
+          .getHeldItem(hand)
+          .getCapability(ModCapabilities.GUN)
+          .ifPresent(gun -> gun.toggleAiming(playerEntity, true));
     }
     return super.onItemRightClick(world, playerEntity, hand);
   }
@@ -227,37 +227,59 @@ public class GunItem extends ShootableItem {
       ITextComponent magazineSizeText =
           Text.of(gun.getMagazineSize()).applyTextStyle(TextFormatting.RED);
       ITextComponent damageText = Text.of(this.damage).applyTextStyle(TextFormatting.RED);
-      ITextComponent headshotDamageText = Text.of((int) (this.damage * ItemGun.HEADSHOT_MULTIPLIER))
+      ITextComponent headshotDamageText = Text
+          .of((int) (this.damage * DefaultGun.HEADSHOT_MULTIPLIER))
           .applyTextStyle(TextFormatting.RED);
       ITextComponent accuracyText =
           Text.of((int) (this.accuracy * 100D) + "%").applyTextStyle(TextFormatting.RED);
-      ITextComponent rpmText = Text.of(this.getRPM()).applyTextStyle(TextFormatting.RED);
+      ITextComponent rpmText = Text.of(this.getFireRateRPM()).applyTextStyle(TextFormatting.RED);
 
-      lines.add(Text.translate("item_lore.gun_item.ammo_amount").applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(magazineSizeText));
-      lines.add(Text.translate("item_lore.gun_item.damage").applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(damageText));
-      lines.add(Text.translate("item_lore.gun_item.headshot_damage")
-          .applyTextStyle(TextFormatting.GRAY).appendSibling(headshotDamageText));
+      lines
+          .add(Text
+              .translate("item_lore.gun_item.ammo_amount")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(magazineSizeText));
+      lines
+          .add(Text
+              .translate("item_lore.gun_item.damage")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(damageText));
+      lines
+          .add(Text
+              .translate("item_lore.gun_item.headshot_damage")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(headshotDamageText));
 
       if (this.bulletAmountToFire > 1) {
         ITextComponent pelletsText =
             Text.of(this.bulletAmountToFire).applyTextStyle(TextFormatting.RED);
 
-        lines.add(Text.translate("item_lore.gun_item.pellets_shot")
-            .applyTextStyle(TextFormatting.GRAY).appendSibling(pelletsText));
+        lines
+            .add(Text
+                .translate("item_lore.gun_item.pellets_shot")
+                .applyTextStyle(TextFormatting.GRAY)
+                .appendSibling(pelletsText));
       }
 
       for (AttachmentItem attachment : gun.getAttachments()) {
         ITextComponent attachmentNameText = attachment.getName().applyTextStyle(TextFormatting.RED);
-        lines.add(Text.translate("item_lore.gun_item.attachment")
-            .applyTextStyle(TextFormatting.GRAY).appendSibling(attachmentNameText));
+        lines
+            .add(Text
+                .translate("item_lore.gun_item.attachment")
+                .applyTextStyle(TextFormatting.GRAY)
+                .appendSibling(attachmentNameText));
       }
 
-      lines.add(Text.translate("item_lore.gun_item.rpm").applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(rpmText));
-      lines.add(Text.translate("item_lore.gun_item.accuracy").applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(accuracyText));
+      lines
+          .add(Text
+              .translate("item_lore.gun_item.rpm")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(rpmText));
+      lines
+          .add(Text
+              .translate("item_lore.gun_item.accuracy")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(accuracyText));
     });
   }
 

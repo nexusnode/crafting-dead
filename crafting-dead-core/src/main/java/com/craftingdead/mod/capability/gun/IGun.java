@@ -3,6 +3,7 @@ package com.craftingdead.mod.capability.gun;
 import java.util.Set;
 import com.craftingdead.mod.capability.action.IAction;
 import com.craftingdead.mod.capability.animation.IAnimationController;
+import com.craftingdead.mod.capability.scope.IScope;
 import com.craftingdead.mod.item.AttachmentItem;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -12,12 +13,13 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IGun extends IAction, IAnimationController, INBTSerializable<CompoundNBT> {
+public interface IGun extends IScope, IAction, IAnimationController, INBTSerializable<CompoundNBT> {
 
   void tick(Entity entity, ItemStack itemStack);
 
-  void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed, boolean sendUpdate);
-  
+  void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed,
+      boolean sendUpdate);
+
   boolean isTriggerPressed();
 
   boolean isReloading();
@@ -61,6 +63,8 @@ public interface IGun extends IAction, IAnimationController, INBTSerializable<Co
   void toggleFireMode(Entity entity, boolean sendUpdate);
 
   boolean hasCrosshair();
+
+  void toggleAiming(Entity entity, boolean sendUpdate);
 
   @Override
   default boolean isActive(ClientPlayerEntity playerEntity) {

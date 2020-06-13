@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.magazine.IMagazine;
-import com.craftingdead.mod.capability.magazine.ItemMagazine;
+import com.craftingdead.mod.capability.magazine.DefaultMagazine;
 import com.craftingdead.mod.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -49,7 +49,7 @@ public class MagazineItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(new ItemMagazine(this), () -> ModCapabilities.MAGAZINE);
+    return new SerializableProvider<>(new DefaultMagazine(this), () -> ModCapabilities.MAGAZINE);
   }
 
   @Override

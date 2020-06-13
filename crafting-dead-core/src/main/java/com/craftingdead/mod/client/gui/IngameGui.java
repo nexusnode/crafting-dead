@@ -56,17 +56,25 @@ public class IngameGui {
       ClientPlayerEntity playerEntity = player.getEntity();
 
       ItemStack heldStack = playerEntity.getHeldItemMainhand();
-      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
-        renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer, width, height,
-            gunController.getMagazineSize(), gunController.getMagazineStack());
-      });
-
-      playerEntity.getHeldItemMainhand().getCapability(ModCapabilities.ACTION).ifPresent(action -> {
-        if (action.isActive(playerEntity)) {
-          renderActionProgress(this.minecraft.fontRenderer, width, height,
-              action.getText(playerEntity), action.getProgress(playerEntity));
-        }
-      });
+      heldStack
+          .getCapability(ModCapabilities.SCOPE)
+          .filter(scope -> scope.isAiming(playerEntity, heldStack))
+          .ifPresent(scope -> {
+            scope.getOverlayTexture(playerEntity, heldStack).ifPresent(overlayTexture -> {
+              RenderUtil.bind(overlayTexture);
+              double overlayTextureWidth = scope.getOverlayTextureWidth();
+              double overlayTextureHeight = scope.getOverlayTextureHeight();
+              double scale = RenderUtil.getFitScale(overlayTextureWidth, overlayTextureHeight);
+              overlayTextureWidth *= scale;
+              overlayTextureHeight *= scale;
+              RenderSystem.enableBlend();
+              RenderUtil
+                  .drawTexturedRectangle(width / 2 - overlayTextureWidth / 2,
+                      height / 2 - overlayTextureHeight / 2, overlayTextureWidth,
+                      overlayTextureHeight);
+              RenderSystem.disableBlend();
+            });
+          });
 
       // Draws Flashbang effect
       EffectInstance flashEffect =
@@ -77,6 +85,18 @@ public class IngameGui {
         int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
         RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
       }
+
+      heldStack
+          .getCapability(ModCapabilities.GUN)
+          .ifPresent(
+              gun -> renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
+                  width, height, gun.getMagazineSize(), gun.getMagazineStack()));
+
+      heldStack
+          .getCapability(ModCapabilities.ACTION)
+          .filter(action -> action.isActive(playerEntity))
+          .ifPresent(action -> renderActionProgress(this.minecraft.fontRenderer, width, height,
+              action.getText(playerEntity), action.getProgress(playerEntity)));
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {

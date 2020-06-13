@@ -55,10 +55,8 @@ public class RenderUtil {
     MatrixStack cameraRotationStack = new MatrixStack();
     // Reminder: At 1.15.2, roll cannot be get from ActiveRenderInfo
     // cameraRotationStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rollHere));
-    cameraRotationStack
-        .multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
-    cameraRotationStack
-        .multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw + 180.0F));
+    cameraRotationStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
+    cameraRotationStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw + 180.0F));
 
     Matrix4f fovAndWindowMatrix = new MatrixStack().peek().getModel();
     fovAndWindowMatrix.multiply(gameRenderer.func_228382_a_(activerenderinfo, partialTicks, true));
@@ -209,5 +207,13 @@ public class RenderUtil {
 
   public static void bind(ResourceLocation resourceLocation) {
     minecraft.getTextureManager().bindTexture(resourceLocation);
+  }
+
+  public static double getFitScale(final double imageWidth, final double imageHeight) {
+    double widthScale = minecraft.getWindow().getWidth() / imageWidth;
+    double heightScale = minecraft.getWindow().getHeight() / imageHeight;
+    final double scale =
+        imageHeight * widthScale < minecraft.getWindow().getHeight() ? heightScale : widthScale;
+    return scale / minecraft.getWindow().getGuiScaleFactor();
   }
 }

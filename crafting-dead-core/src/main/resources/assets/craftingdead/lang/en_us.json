@@ -73,9 +73,6 @@
   "item.craftingdead.uv_paint": "UV Paint",
 
   "item.craftingdead.stanag_20_round_magazine": "STANAG 20rnd Magazine",
-  "item.craftingdead.explosive_stanag_20_round_magazine":"Explosive STANAG 20rnd Magazine",
-  "item.craftingdead.incendiary_stanag_20_round_magazine":"Incendiary STANAG 20rnd Magazine",
-  "item.craftingdead.infected_stanag_20_round_magazine":"Infected STANAG 20rnd Magazine",
   "item.craftingdead.stanag_30_round_magazine": "STANAG 30rnd Magazine",
   "item.craftingdead.stanag_drum_magazine": "STANAG Drum Magazine",
   "item.craftingdead.stanag_box_magazine": "STANAG Box Magazine",
@@ -436,7 +433,7 @@
   "item.craftingdead.army_helmet": "Army Helmet",
   "item.craftingdead.scrap_metal":"Scrap Metal",
   "item.craftingdead.molten_scrap_metal":"Molten Scrap Metal",
-  "item.craftingdead.incendiary_powder":"Incendiary Powder",
+  "item.craftingdead.binoculars": "Binoculars",
   
   "item.craftingdead.black_tactical_vest": "Black Tactical Vest",
   "item.craftingdead.ghillie_tactical_vest": "Ghillie Tactical Vest",

@@ -11,7 +11,6 @@ import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
 import com.craftingdead.mod.capability.SerializableProvider;
 import com.craftingdead.mod.capability.living.player.DefaultPlayer;
-import com.craftingdead.mod.capability.living.player.IPlayer;
 import com.craftingdead.mod.capability.living.player.SelfPlayer;
 import com.craftingdead.mod.capability.paint.IPaint;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
@@ -38,7 +37,6 @@ import com.craftingdead.mod.client.util.RenderUtil;
 import com.craftingdead.mod.entity.ModEntityTypes;
 import com.craftingdead.mod.inventory.InventorySlotType;
 import com.craftingdead.mod.inventory.container.ModContainerTypes;
-import com.craftingdead.mod.item.AttachmentItem;
 import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.GunItem;
 import com.craftingdead.mod.item.ModItems;
@@ -467,11 +465,7 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
     switch (event.getType()) {
-      case ALL:
-        this.ingameGui
-            .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                event.getWindow().getScaledHeight());
-        break;
+
       default:
         break;
     }
@@ -480,6 +474,11 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
+      case ALL:
+        this.ingameGui
+            .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                event.getWindow().getScaledHeight());
+        break;
       case CROSSHAIRS:
         this.getPlayer().ifPresent(player -> {
           ClientPlayerEntity playerEntity = player.getEntity();
@@ -489,7 +488,11 @@ public class ClientDist implements IModDist {
               .setCanceled(heldStack
                   .getCapability(ModCapabilities.ACTION)
                   .map(action -> action.isActive(playerEntity))
-                  .orElse(false) || player.isAiming());
+                  .orElse(false)
+                  || heldStack
+                      .getCapability(ModCapabilities.SCOPE)
+                      .map(scope -> scope.isAiming(playerEntity, heldStack))
+                      .orElse(false));
 
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
@@ -522,13 +525,11 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
     ItemStack heldStack = minecraft.player.getHeldItemMainhand();
-    if (this.getPlayer().map(IPlayer::isAiming).orElse(false)) {
-      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
-        event
-            .setNewfov(event.getFov()
-                * gunController.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV));
-      });
-    }
+    heldStack.getCapability(ModCapabilities.SCOPE).ifPresent(scope -> {
+      if (scope.isAiming(minecraft.player, heldStack)) {
+        event.setNewfov(event.getFov() * scope.getFovModifier(minecraft.player, heldStack));
+      }
+    });
   }
 
   @SubscribeEvent

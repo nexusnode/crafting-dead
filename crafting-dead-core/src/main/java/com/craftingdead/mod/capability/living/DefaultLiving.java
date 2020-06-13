@@ -8,7 +8,6 @@ import com.craftingdead.mod.item.ClothingItem;
 import com.craftingdead.mod.item.ModItems;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.SetSlotMessage;
-import com.craftingdead.mod.network.message.main.ToggleAimingMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -18,7 +17,6 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler implements ILiving<E> {
@@ -32,8 +30,6 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
    * The last held {@link ItemStack} - used to check if the entity has switched item.
    */
   protected ItemStack lastHeldStack = null;
-
-  private boolean aiming;
 
   public DefaultLiving() {
     this(null);
@@ -110,8 +106,9 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
 
     // Movement speed
     if (clothingItem.getSlownessLevel() != null) {
-      this.entity.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 2,
-          clothingItem.getSlownessLevel(), false, false, false));
+      this.entity
+          .addPotionEffect(new EffectInstance(Effects.SLOWNESS, 2, clothingItem.getSlownessLevel(),
+              false, false, false));
     }
   }
 
@@ -138,24 +135,6 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
   @Override
   public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
     return false;
-  }
-
-  @Override
-  public void toggleAiming(boolean sendUpdate) {
-    this.aiming = !this.aiming;
-    if (sendUpdate) {
-      PacketTarget target =
-          this.entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY.with(this::getEntity);
-      NetworkChannel.MAIN
-          .getSimpleChannel()
-          .send(target, new ToggleAimingMessage(this.entity.getEntityId()));
-    }
-  }
-
-  @Override
-  public boolean isAiming() {
-    return this.aiming;
   }
 
   @Override
