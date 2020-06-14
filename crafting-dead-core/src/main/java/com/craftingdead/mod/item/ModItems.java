@@ -16,10 +16,10 @@ import com.craftingdead.mod.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.mod.inventory.CraftingInventorySlotType;
 import com.craftingdead.mod.item.AttachmentItem.MultiplierType;
 import com.craftingdead.mod.potion.ModEffects;
+import com.craftingdead.mod.util.ArbitraryTooltips;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
 import com.craftingdead.mod.util.Text;
-import com.craftingdead.mod.util.ArbitraryTooltips;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -27,7 +27,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
@@ -536,8 +535,6 @@ public class ModItems {
   // Attachments
   // ================================================================================
 
-  // TODO Add the correct multipliers and their correct values
-
   public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
       .register("m4a1_iron_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
@@ -597,7 +594,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 10F)
+              .addMultiplier(MultiplierType.FOV, 8F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -613,7 +610,6 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> TACTICAL_GRIP = ITEMS
       .register("tactical_grip",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              // The following multiplier value differs from 1.6.4
               .addMultiplier(MultiplierType.ACCURACY, 1.25F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
               .maxStackSize(1)
@@ -622,8 +618,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> BIPOD = ITEMS
       .register("bipod",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              // The following multiplier value differs from 1.6.4
-              .addMultiplier(MultiplierType.ACCURACY, 1.25F)
+              .addMultiplier(MultiplierType.ACCURACY, 1.5F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -631,7 +626,6 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              // The following multiplier value differs from 1.6.4
               .addMultiplier(MultiplierType.FOV, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
@@ -640,7 +634,6 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> RETICLE_SIGHT = ITEMS
       .register("reticle_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              // The following multiplier value differs from 1.6.4
               .addMultiplier(MultiplierType.FOV, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
@@ -1644,456 +1637,6 @@ public class ModItems {
   }
 
   // ================================================================================
-  // Consumable
-  // ================================================================================
-
-  public static final RegistryObject<Item> EMPTY_WATER_BOTTLE = ITEMS
-      .register("empty_water_bottle",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "bottled_water"))
-              .setBlockPredicate(
-                  Text
-                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                          Text.translate(Blocks.WATER.getTranslationKey())),
-                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> BOTTLED_WATER = ITEMS
-      .register("bottled_water",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
-              .containerItem(EMPTY_WATER_BOTTLE.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> POWER_BAR = ITEMS
-      .register("power_bar", () -> new Item(
-          new Item.Properties().food(ModFoods.POWER_BAR).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANDY_BAR = ITEMS
-      .register("candy_bar", () -> new Item(
-          new Item.Properties().food(ModFoods.CANDY_BAR).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CEREAL = ITEMS
-      .register("cereal", () -> new Item(
-          new Item.Properties().food(ModFoods.CEREAL).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_CORN = ITEMS
-      .register("canned_corn",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_CORN = ITEMS
-      .register("open_canned_corn",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_CORN)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_BEANS = ITEMS
-      .register("canned_beans",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_BEANS = ITEMS
-      .register("open_canned_beans",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_BEANS)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_TUNA = ITEMS
-      .register("canned_tuna",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_TUNA = ITEMS
-      .register("open_canned_tuna",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_TUNA)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_PEACH = ITEMS
-      .register("canned_peach",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_PEACH = ITEMS
-      .register("open_canned_peach",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_PEACH)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_PASTA = ITEMS
-      .register("canned_pasta",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_PASTA = ITEMS
-      .register("open_canned_pasta",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_PASTA)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_BACON = ITEMS
-      .register("canned_bacon",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_BACON = ITEMS
-      .register("open_canned_bacon",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_BACON)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_CUSTARD = ITEMS
-      .register("canned_custard",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_CUSTARD = ITEMS
-      .register("open_canned_custard",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_CUSTARD)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_PICKLES = ITEMS
-      .register("canned_pickles",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_PICKLES = ITEMS
-      .register("open_canned_pickles",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_PICKLES)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_DOG_FOOD = ITEMS
-      .register("canned_dog_food",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_DOG_FOOD = ITEMS
-      .register("open_canned_dog_food",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_DOG_FOOD)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CANNED_TOMATO_SOUP = ITEMS
-      .register("canned_tomato_soup",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> OPEN_CANNED_TOMATO_SOUP = ITEMS
-      .register("open_canned_tomato_soup",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CANNED_TOMATO_SOUP)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_ORANGE_SODA = ITEMS
-      .register("empty_orange_soda",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ORANGE_SODA = ITEMS
-      .register("orange_soda",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .containerItem(EMPTY_ORANGE_SODA.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_ICED_TEA = ITEMS
-      .register("empty_iced_tea",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ICED_TEA = ITEMS
-      .register("iced_tea",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .containerItem(EMPTY_ICED_TEA.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_JUICE_POUCH = ITEMS
-      .register("empty_juice_pouch",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> JUICE_POUCH = ITEMS
-      .register("juice_pouch",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 1), 1.0F)
-              .containerItem(EMPTY_JUICE_POUCH.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_PEPE_SODA = ITEMS
-      .register("empty_pepe_soda",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> PEPE_SODA = ITEMS
-      .register("pepe_soda",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .containerItem(EMPTY_PEPE_SODA.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_LEMON_SODA = ITEMS
-      .register("empty_lemon_soda",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> LEMON_SODA = ITEMS
-      .register("lemon_soda",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .containerItem(EMPTY_LEMON_SODA.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_COLA_SODA = ITEMS
-      .register("empty_cola_soda",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> COLA_SODA = ITEMS
-      .register("cola_soda",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .containerItem(EMPTY_COLA_SODA.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_MILK_CARTON = ITEMS
-      .register("empty_milk_carton",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> MILK_CARTON = ITEMS
-      .register("milk_carton",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 7), 1.0F)
-              .containerItem(EMPTY_MILK_CARTON.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTON_MILK = ITEMS
-      .register("rotten_milk",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
-              .effect(() -> new EffectInstance(Effects.HUNGER, 600, 1), 0.2F)
-              .containerItem(EMPTY_MILK_CARTON.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_COLA_POP = ITEMS
-      .register("empty_cola_pop",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> COLA_POP = ITEMS
-      .register("cola_pop",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-              .containerItem(EMPTY_COLA_POP.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_IRON_BREW = ITEMS
-      .register("empty_iron_brew",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> IRON_BREW = ITEMS
-      .register("iron_brew",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-              .containerItem(EMPTY_IRON_BREW.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_SPRITE = ITEMS
-      .register("empty_sprite",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> SPRITE = ITEMS
-      .register("sprite",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-              .containerItem(EMPTY_SPRITE.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_ZOMBIE_ENERGY = ITEMS
-      .register("empty_zombie_energy",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ZOMBIE_ENERGY = ITEMS
-      .register("zombie_energy",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-              .containerItem(EMPTY_ZOMBIE_ENERGY.get())
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> MRE = ITEMS
-      .register("mre", () -> new Item(
-          new Item.Properties().food(ModFoods.MRE).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ORANGE = ITEMS
-      .register("orange", () -> new Item(
-          new Item.Properties().food(ModFoods.ORANGE).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_ORANGE = ITEMS
-      .register("rotten_orange",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_ORANGE)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> PEAR = ITEMS
-      .register("pear", () -> new Item(
-          new Item.Properties().food(ModFoods.PEAR).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_PEAR = ITEMS
-      .register("rotten_pear",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_PEAR)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> RICE_BAG = ITEMS
-      .register("rice_bag", () -> new Item(
-          new Item.Properties().food(ModFoods.RICE_BAG).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> APPLE = ITEMS
-      .register("apple", () -> new Item(
-          new Item.Properties().food(ModFoods.APPLE).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_APPLE = ITEMS
-      .register("rotten_apple",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_APPLE)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> NOODLES = ITEMS
-      .register("noodles", () -> new Item(
-          new Item.Properties().food(ModFoods.NOODLE_CUP).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> WATERMELON = ITEMS
-      .register("watermelon", () -> new Item(
-          new Item.Properties().food(ModFoods.WATERMELON).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_WATERMELON = ITEMS
-      .register("rotten_watermelon",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_WATERMELON)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> BLUEBERRY = ITEMS
-      .register("blueberry", () -> new Item(
-          new Item.Properties().food(ModFoods.BLUEBERRY).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_BLUEBERRY = ITEMS
-      .register("rotten_blueberry",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_BLUEBERRY)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> RASPBERRY = ITEMS
-      .register("raspberry", () -> new Item(
-          new Item.Properties().food(ModFoods.RASPBERRY).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> ROTTEN_RASPBERRY = ITEMS
-      .register("rotten_raspberry",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.ROTTEN_RASPBERRY)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CHIPS = ITEMS
-      .register("chips", () -> new Item(
-          new Item.Properties().food(ModFoods.CHIPS).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> RANCH_CHIPS = ITEMS
-      .register("ranch_chips",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.RANCH_CHIPS)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> CHEESE_CHIPS = ITEMS
-      .register("cheese_chips",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.CHEESE_CHIPS)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> SALT_CHIPS = ITEMS
-      .register("salt_chips", () -> new Item(
-          new Item.Properties().food(ModFoods.SALT_CHIPS).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> POPCORN = ITEMS
-      .register("popcorn", () -> new Item(
-          new Item.Properties().food(ModFoods.POPCORN).group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> NUTTY_CEREAL = ITEMS
-      .register("nutty_cereal",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.NUTTY_CEREAL)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMERALD_CEREAL = ITEMS
-      .register("emerald_cereal",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.EMERALD_CEREAL)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> FLAKE_CEREAL = ITEMS
-      .register("flake_cereal",
-          () -> new Item(new Item.Properties()
-              .food(ModFoods.FLAKE_CEREAL)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_WATER_CANTEEN = ITEMS
-      .register("empty_water_canteen",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "water_canteen"))
-              .setBlockPredicate(
-                  Text
-                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                          Text.translate(Blocks.WATER.getTranslationKey())),
-                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> WATER_CANTEEN = ITEMS
-      .register("water_canteen",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 8), 1.0F)
-              .containerItem(EMPTY_WATER_CANTEEN.get())
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> EMPTY_FLASK = ITEMS
-      .register("empty_flask",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "flask"))
-              .setBlockPredicate(
-                  Text
-                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                          Text.translate(Blocks.WATER.getTranslationKey())),
-                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> FLASK = ITEMS
-      .register("flask",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-              .containerItem(EMPTY_FLASK.get())
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> TEA_FLASK = ITEMS
-      .register("tea_flask",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-              .containerItem(EMPTY_FLASK.get())
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  public static final RegistryObject<Item> COFFEE_FLASK = ITEMS
-      .register("coffee_flask",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setUseAction(UseAction.DRINK)
-              .effect(() -> new EffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-              .containerItem(EMPTY_FLASK.get())
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_FOOD)));
-
-  // ================================================================================
   // Medical
   // ================================================================================
 
@@ -2133,7 +1676,7 @@ public class ModItems {
   public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS
       .register("adrenaline_syringe",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.SPEED, (20 * 20), 1), 1.0F)
+              .effect(() -> new EffectInstance(ModEffects.ADRENALINE.get(), (20 * 20), 1), 1.0F)
               .setShowProgress(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));

@@ -13,22 +13,31 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class SyncGunMessage {
 
   private final int entityId;
+  private final ItemStack paintStack;
+  private final ItemStack magazineStack;
   private final int magazineSize;
 
-  public SyncGunMessage(int entityId, int magazineSize) {
+  public SyncGunMessage(int entityId, ItemStack paintStack, ItemStack magazineStack,
+      int magazineSize) {
     this.entityId = entityId;
+    this.paintStack = paintStack;
+    this.magazineStack = magazineStack;
     this.magazineSize = magazineSize;
   }
 
   public static void encode(SyncGunMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
+    out.writeItemStack(msg.paintStack);
+    out.writeItemStack(msg.magazineStack);
     out.writeVarInt(msg.magazineSize);
   }
 
   public static SyncGunMessage decode(PacketBuffer in) {
     int entityId = in.readVarInt();
+    ItemStack paintStack = in.readItemStack();
+    ItemStack magazineStack = in.readItemStack();
     int size = in.readVarInt();
-    return new SyncGunMessage(entityId, size);
+    return new SyncGunMessage(entityId, paintStack, magazineStack, size);
   }
 
   public static boolean handle(SyncGunMessage msg, Supplier<NetworkEvent.Context> ctx) {
@@ -38,6 +47,8 @@ public class SyncGunMessage {
       if (entity instanceof LivingEntity) {
         ItemStack heldStack = ((LivingEntity) entity).getHeldItemMainhand();
         heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
+          gunController.setMagazineStack(msg.magazineStack);
+          gunController.setPaintStack(msg.paintStack);
           gunController.setMagazineSize(msg.magazineSize);
         });
       }

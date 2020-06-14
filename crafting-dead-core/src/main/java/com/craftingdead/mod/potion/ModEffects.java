@@ -30,15 +30,17 @@ public class ModEffects {
   public static final RegistryObject<Effect> FLASH_BLINDNESS =
       EFFECTS.register("flash_blindness", FlashBlindnessEffect::new);
 
+  public static final RegistryObject<Effect> ADRENALINE =
+      EFFECTS.register("adrenaline", AdrenalineEffect::new);
+
   /**
-   * If the potion effect is not present, the potion effect is applied.
-   * Otherwise, overrides the potion effect if its duration is longer than the current instance.
+   * If the potion effect is not present, the potion effect is applied. Otherwise, overrides the
+   * potion effect if its duration is longer than the current instance.
    *
    * @return <code>true</code> if the effect was applied. <code>false</code> otherwise.
    */
   public static boolean applyOrOverrideIfLonger(LivingEntity target, EffectInstance effect) {
-    EffectInstance currentEffect =
-        target.getActivePotionEffect(effect.getPotion());
+    EffectInstance currentEffect = target.getActivePotionEffect(effect.getPotion());
     if (currentEffect == null || currentEffect.getDuration() < effect.getDuration()) {
       target.removePotionEffect(effect.getPotion());
       return target.addPotionEffect(effect);

@@ -6,6 +6,8 @@ import com.craftingdead.mod.capability.animation.DefaultAnimationController;
 import com.craftingdead.mod.capability.animation.IAnimationController;
 import com.craftingdead.mod.capability.gun.DefaultGun;
 import com.craftingdead.mod.capability.gun.IGun;
+import com.craftingdead.mod.capability.hydration.DefaultHydration;
+import com.craftingdead.mod.capability.hydration.IHydration;
 import com.craftingdead.mod.capability.living.DefaultLiving;
 import com.craftingdead.mod.capability.living.ILiving;
 import com.craftingdead.mod.capability.magazine.DefaultMagazine;
@@ -49,6 +51,9 @@ public class ModCapabilities {
   @CapabilityInject(IScope.class)
   public static final Capability<IScope> SCOPE = null;
 
+  @CapabilityInject(IHydration.class)
+  public static final Capability<IHydration> HYDRATION = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
     CapabilityManager.INSTANCE
@@ -61,6 +66,8 @@ public class ModCapabilities {
         .register(IMagazine.class, new EmptyStorage<>(), DefaultMagazine::new);
     CapabilityManager.INSTANCE.register(IStorage.class, new EmptyStorage<>(), DefaultStorage::new);
     CapabilityManager.INSTANCE.register(IScope.class, new EmptyStorage<>(), DefaultScope::new);
+    CapabilityManager.INSTANCE
+        .register(IHydration.class, new EmptyStorage<>(), DefaultHydration::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

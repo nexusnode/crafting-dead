@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SimpleCapabilityProvider;
 import com.craftingdead.mod.capability.paint.DefaultPaint;
 import com.craftingdead.mod.capability.paint.IPaint;
 import com.craftingdead.mod.util.Text;
@@ -47,8 +47,10 @@ public class PaintItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(new DefaultPaint(this.hasSkin ? this.getRegistryName() : null,
-        this.colour.map(Supplier::get).orElse(null)), () -> ModCapabilities.PAINT);
+    return new SimpleCapabilityProvider<>(
+        new DefaultPaint(this.hasSkin ? this.getRegistryName() : null,
+            this.colour.map(Supplier::get).orElse(null)),
+        () -> ModCapabilities.PAINT);
   }
 
   public static class Properties extends Item.Properties {

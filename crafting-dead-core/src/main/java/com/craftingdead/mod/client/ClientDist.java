@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.IModDist;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SerializableCapabilityProvider;
 import com.craftingdead.mod.capability.living.player.DefaultPlayer;
 import com.craftingdead.mod.capability.living.player.SelfPlayer;
 import com.craftingdead.mod.capability.paint.IPaint;
@@ -141,9 +141,15 @@ public class ClientDist implements IModDist {
    */
   private Vec2f prevRotationVelocity = this.rotationVelocity;
 
-  private long rollStartTime = 0;
+  private long rollDurationMs = 250L;
+
+  private long joltStartTime = 0;
 
   private float roll;
+
+  private float pitch;
+
+  private float fovMultiplier = 1.0F;
 
   private IngameGui ingameGui;
 
@@ -161,13 +167,18 @@ public class ClientDist implements IModDist {
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
   }
 
-  public void joltCamera(float accuracy) {
-    float amount = ((1.0F - accuracy) * 100) / 2.5F;
-    float randomAmount = random.nextBoolean() ? amount : -amount;
-    this.rotationVelocity =
-        new Vec2f(this.rotationVelocity.x + randomAmount, this.rotationVelocity.y - amount);
-    this.rollStartTime = Util.milliTime();
-    this.roll = randomAmount;
+  public void joltCamera(float amountPercent, boolean permenantJolt) {
+    float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
+    float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
+    if (permenantJolt) {
+      this.rotationVelocity = new Vec2f(this.rotationVelocity.x + randomNegativeAmount * 20.0F,
+          this.rotationVelocity.y - randomAmount * 20.0F);
+    }
+    this.joltStartTime = Util.milliTime();
+    this.roll = randomNegativeAmount;
+    this.pitch = randomAmount / 3.0F;
+    this.fovMultiplier = 1.0F + (-randomAmount / 20.0F);
+    this.rollDurationMs = (long) (250L * (amountPercent / 2));
   }
 
   public void setTutorialStep(ModTutorialSteps step) {
@@ -432,12 +443,13 @@ public class ClientDist implements IModDist {
     if (event.getObject() instanceof ClientPlayerEntity) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableProvider<>(new SelfPlayer((ClientPlayerEntity) event.getObject()),
+              new SerializableCapabilityProvider<>(
+                  new SelfPlayer((ClientPlayerEntity) event.getObject()),
                   () -> ModCapabilities.LIVING));
     } else if (event.getObject() instanceof AbstractClientPlayerEntity) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableProvider<>(
+              new SerializableCapabilityProvider<>(
                   new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
                   () -> ModCapabilities.LIVING));
     }
@@ -514,16 +526,23 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    float pct = MathHelper.clamp((Util.milliTime() - this.rollStartTime) / 1000.0F * 5, 0.0F, 1.0F);
-    float roll = (float) Math.sin(Math.toRadians(180 * pct)) * this.roll / 20;
+    float pct = MathHelper
+        .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
+    float roll = (float) Math.sin(Math.toRadians(180 * pct)) * this.roll;
+    float pitch = (float) Math.sin(Math.toRadians(360 * pct)) * this.pitch;
     if (pct == 1.0F) {
       this.roll = 0;
+      this.pitch = 0;
     }
-    event.setRoll(roll);
+
+    event.setRoll(event.getRoll() + roll);
+    event.setPitch(event.getPitch() + pitch);
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
+    event.setNewfov(event.getFov() * this.fovMultiplier);
+    this.fovMultiplier = 1.0F;
     ItemStack heldStack = minecraft.player.getHeldItemMainhand();
     heldStack.getCapability(ModCapabilities.SCOPE).ifPresent(scope -> {
       if (scope.isAiming(minecraft.player, heldStack)) {
@@ -538,9 +557,9 @@ public class ClientDist implements IModDist {
       case START:
         if (minecraft.player != null) {
           float smoothYaw =
-              MathHelper.lerp(0.25F, this.prevRotationVelocity.x, this.rotationVelocity.x);
+              MathHelper.lerp(0.15F, this.prevRotationVelocity.x, this.rotationVelocity.x);
           float smoothPitch =
-              MathHelper.lerp(0.25F, this.prevRotationVelocity.y, this.rotationVelocity.y);
+              MathHelper.lerp(0.15F, this.prevRotationVelocity.y, this.rotationVelocity.y);
           this.rotationVelocity = Vec2f.ZERO;
           this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
           minecraft.player.rotateTowards(smoothYaw, smoothPitch);

@@ -11,13 +11,19 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class IngameGui {
 
@@ -33,6 +39,9 @@ public class IngameGui {
   private static final ResourceLocation BLOOD_2 =
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
 
+  private static final ResourceLocation ADRENALINE_SHADER =
+      new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
+
   private final Minecraft minecraft;
 
   private final ClientDist client;
@@ -41,19 +50,24 @@ public class IngameGui {
 
   private float lastSpread;
 
+  private long adrenalineShaderStartTime = 0L;
+
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
     this.crosshairLocation = crosshairLocation;
+    MinecraftForge.EVENT_BUS.register(this);
+
   }
 
   public void renderGameOverlay(float partialTicks, int width, int height) {
     // final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
     // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
     // - 1;
-
     this.client.getPlayer().ifPresent(player -> {
       ClientPlayerEntity playerEntity = player.getEntity();
+
+      // this.updateAdrenalineShader();
 
       ItemStack heldStack = playerEntity.getHeldItemMainhand();
       heldStack
@@ -86,17 +100,12 @@ public class IngameGui {
         RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
       }
 
-      heldStack
-          .getCapability(ModCapabilities.GUN)
-          .ifPresent(
-              gun -> renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
-                  width, height, gun.getMagazineSize(), gun.getMagazineStack()));
 
       heldStack
           .getCapability(ModCapabilities.ACTION)
           .filter(action -> action.isActive(playerEntity))
           .ifPresent(action -> renderActionProgress(this.minecraft.fontRenderer, width, height,
-              action.getText(playerEntity), action.getProgress(playerEntity)));
+              action.getText(playerEntity), action.getProgress(playerEntity, partialTicks)));
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
@@ -114,7 +123,45 @@ public class IngameGui {
         renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
             player.getZombiesKilled(), player.getPlayersKilled());
       }
+
+      // Needs to render after blood or else it causes Z level issues
+      heldStack
+          .getCapability(ModCapabilities.GUN)
+          .ifPresent(
+              gun -> renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
+                  width, height, gun.getMagazineSize(), gun.getMagazineStack()));
     });
+  }
+
+
+  @SubscribeEvent
+  public void updateAdrenalineShader(TickEvent.RenderTickEvent event) {
+    if (event.phase != TickEvent.Phase.END || this.minecraft.player == null) {
+      return;
+    }
+    final GameRenderer gameRenderer = this.minecraft.gameRenderer;
+    final boolean shaderLoaded = gameRenderer.getShaderGroup() != null
+        && gameRenderer.getShaderGroup().getShaderGroupName().equals(ADRENALINE_SHADER.toString());
+    if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+      final long currentTime = Util.milliTime();
+      if (this.adrenalineShaderStartTime == 0L) {
+        this.adrenalineShaderStartTime = currentTime;
+      }
+      float progress = MathHelper
+          .clamp((((currentTime - this.adrenalineShaderStartTime)
+              - Minecraft.getInstance().getRenderPartialTicks())) / 5000.0F, 0.0F, 1.0F);
+      if (!shaderLoaded) {
+        if (gameRenderer.getShaderGroup() != null) {
+          gameRenderer.stopUseShader();
+        }
+        gameRenderer.loadShader(ADRENALINE_SHADER);
+      }
+      ShaderGroup shaderGroup = gameRenderer.getShaderGroup();
+      RenderUtil.updateUniform("Saturation", progress * 0.25F, shaderGroup);
+    } else if (shaderLoaded) {
+      this.adrenalineShaderStartTime = 0L;
+      gameRenderer.stopUseShader();
+    }
   }
 
   private static void renderAmmo(ItemRenderer itemRenderer, FontRenderer fontRenderer, int width,
@@ -125,11 +172,10 @@ public class IngameGui {
       int x = width - 15 - fontRenderer.getStringWidth(text);
       int y = height - 10 - fontRenderer.FONT_HEIGHT;
       fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
-      RenderSystem.pushMatrix();
-      {
-        itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
-      }
-      RenderSystem.popMatrix();
+
+      itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
+
+
     }
   }
 
@@ -150,12 +196,13 @@ public class IngameGui {
       ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
 
       RenderSystem.enableBlend();
+      RenderSystem.disableAlphaTest();
 
       RenderUtil.bind(res);
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
       RenderUtil.drawTexturedRectangle(0, 0, width, height);
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+      RenderSystem.enableAlphaTest();
       RenderSystem.disableBlend();
     }
   }

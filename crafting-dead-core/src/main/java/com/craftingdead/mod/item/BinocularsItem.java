@@ -3,7 +3,7 @@ package com.craftingdead.mod.item;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.CraftingDead;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SimpleProvider;
+import com.craftingdead.mod.capability.SimpleCapabilityProvider;
 import com.craftingdead.mod.capability.scope.DefaultScope;
 import com.craftingdead.mod.util.ModSoundEvents;
 import net.minecraft.client.Minecraft;
@@ -46,7 +46,7 @@ public class BinocularsItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-    return new SimpleProvider<>(new DefaultScope(1 / 14, SCOPE_OVERLAY_TEXTURE, 2048, 512),
+    return new SimpleCapabilityProvider<>(new DefaultScope(1 / 14, SCOPE_OVERLAY_TEXTURE, 2048, 512),
         () -> ModCapabilities.SCOPE);
   }
 }

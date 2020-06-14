@@ -21,6 +21,7 @@
   "effect.craftingdead.dehydration": "Dehydration",
   "effect.craftingdead.bleeding":"Bleeding",
   "effect.craftingdead.infected":"Infected",
+  "effect.craftingdead.adrenaline":"Adrenaline",
 
   "entity.craftingdead.advanced_zombie": "Advanced Zombie",
   "entity.craftingdead.fast_zombie": "Fast Zombie",
@@ -258,7 +259,7 @@
   "item.craftingdead.raspberry": "Raspberry",
   "item.craftingdead.watermelon": "Watermelon Slice",
   "item.craftingdead.first_aid_kit": "First Aid Kit",
-  "item.craftingdead.adrenaline_syringe": "Andrenaline Syringe",
+  "item.craftingdead.adrenaline_syringe": "Adrenaline Syringe",
   "item.craftingdead.morphine_syringe": "Morphine Syringe",
   "item.craftingdead.blood_bag": "Blood Bag",
   "item.craftingdead.bandage": "Bandage",

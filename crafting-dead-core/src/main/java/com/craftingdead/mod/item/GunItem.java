@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SerializableCapabilityProvider;
 import com.craftingdead.mod.capability.animation.IAnimation;
 import com.craftingdead.mod.capability.gun.DefaultGun;
 import com.craftingdead.mod.util.Text;
@@ -189,7 +189,7 @@ public class GunItem extends ShootableItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(new DefaultGun(this),
+    return new SerializableCapabilityProvider<>(new DefaultGun(this),
         ImmutableSet
             .of(() -> ModCapabilities.ANIMATION_CONTROLLER, () -> ModCapabilities.GUN,
                 () -> ModCapabilities.ACTION, () -> ModCapabilities.SCOPE));

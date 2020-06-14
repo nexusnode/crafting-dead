@@ -1,6 +1,7 @@
 package com.craftingdead.mod.util;
 
 import java.util.Optional;
+import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -68,8 +69,8 @@ public class RayTraceUtil {
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
-      final double distance) {
-    return traceAllObjects(fromEntity, distance, 1.0F);
+      final double distance, final float accuracy, final Random random) {
+    return traceAllObjects(fromEntity, distance, 1.0F, accuracy, random);
   }
 
   /**
@@ -81,9 +82,19 @@ public class RayTraceUtil {
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
   public static Optional<? extends RayTraceResult> traceAllObjects(final Entity fromEntity,
-      final double distance, final float partialTicks) {
+      final double distance, final float partialTicks, final float accuracy, final Random random) {
     Vec3d start = fromEntity.getEyePosition(partialTicks);
     Vec3d look = fromEntity.getLook(partialTicks);
+
+    if (accuracy < 1.0F) {
+
+      look = look
+          .add(
+              (1.0F - accuracy) / 7.5F * random.nextFloat() * (random.nextBoolean() ? -1.0F : 1.0F),
+              0, (1.0F - accuracy) / 7.5F * random.nextFloat()
+                  * (random.nextBoolean() ? -1.0F : 1.0F));
+    }
+
     Vec3d scaledLook = look.scale(distance);
     Vec3d end = start.add(scaledLook);
 
@@ -101,22 +112,21 @@ public class RayTraceUtil {
     Optional<EntityRayTraceResult> entityRayTraceResult = rayTraceEntities(fromEntity, start, end,
         fromEntity
             .getEntityWorld()
-            .getEntitiesInAABBexcluding(fromEntity, boundingBox,
-                (entityTest) -> {
-                  // Ignores entities that cannot be collided
-                  if (entityTest.isSpectator() || !entityTest.canBeCollidedWith()) {
-                    return false;
-                  }
-                  if (entityTest instanceof LivingEntity) {
-                    LivingEntity livingEntity = (LivingEntity) entityTest;
+            .getEntitiesInAABBexcluding(fromEntity, boundingBox, (entityTest) -> {
+              // Ignores entities that cannot be collided
+              if (entityTest.isSpectator() || !entityTest.canBeCollidedWith()) {
+                return false;
+              }
+              if (entityTest instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entityTest;
 
-                    // Ignores dead entities
-                    if (livingEntity.getHealth() <= 0F) {
-                      return false;
-                    }
-                  }
-                  return true;
-                }),
+                // Ignores dead entities
+                if (livingEntity.getHealth() <= 0F) {
+                  return false;
+                }
+              }
+              return true;
+            }),
         sqrDistance);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : blockRayTraceResult;

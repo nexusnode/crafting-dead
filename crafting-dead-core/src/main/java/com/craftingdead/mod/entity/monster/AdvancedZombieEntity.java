@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.Hand;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -151,6 +152,11 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     super.tick();
     if (!this.getEntityWorld().isRemote()) {
       this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+        if (gun.getMagazineSize() == 0) {
+          this
+              .setHeldItem(Hand.OFF_HAND,
+                  new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
+        }
         if (gun.isTriggerPressed()
             && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
                 - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {

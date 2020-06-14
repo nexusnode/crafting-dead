@@ -28,7 +28,6 @@ import com.craftingdead.mod.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.mod.network.message.main.TriggerPressedMessage;
 import com.craftingdead.mod.util.ModDamageSource;
 import com.craftingdead.mod.util.ModSoundEvents;
-import com.craftingdead.mod.util.ParticleUtil;
 import com.craftingdead.mod.util.RayTraceUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -44,10 +43,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.merchant.villager.WanderingTraderEntity;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.monster.VindicatorEntity;
+import net.minecraft.entity.monster.WitchEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -167,8 +172,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     if (!entity.getEntityWorld().isRemote()) {
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-              new SyncGunMessage(entity.getEntityId(), this.getMagazineSize()));
+          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new SyncGunMessage(
+              entity.getEntityId(), this.paintStack, this.magazineStack, this.getMagazineSize()));
     }
   }
 
@@ -271,7 +276,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     if (entity.world.isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist())
-            .joltCamera(this.getAccuracy(entity, itemStack));
+            .joltCamera(1.0F - this.getAccuracy(entity, itemStack), true);
       }
 
       itemStack
@@ -295,8 +300,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     entity.playSound(shootSound, 0.25F, 1.0F);
 
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
-      // TODO Add per-bullet imprecision due to shotguns
-      Optional<? extends RayTraceResult> rayTrace = RayTraceUtil.traceAllObjects(entity, 100, 1.0F);
+      Optional<? extends RayTraceResult> rayTrace = RayTraceUtil
+          .traceAllObjects(entity, 100, 1.0F, this.getAccuracy(entity, itemStack), random);
 
       if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(itemStack, entity, rayTrace))) {
         continue;
@@ -342,8 +347,10 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
     double chinHeight = (entityHit.getY() + entityHit.getEyeHeight() - 0.2F);
     boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity
-        || entityHit instanceof SkeletonEntity || entityHit instanceof CreeperEntity)
-        && rayTrace.getHitVec().y >= chinHeight;
+        || entityHit instanceof SkeletonEntity || entityHit instanceof CreeperEntity
+        || entityHit instanceof EndermanEntity || entityHit instanceof WitchEntity
+        || entityHit instanceof VillagerEntity || entityHit instanceof VindicatorEntity
+        || entityHit instanceof WanderingTraderEntity) && rayTrace.getHitVec().y >= chinHeight;
     if (headshot) {
       // The sound is played at client side too
       world
@@ -354,19 +361,28 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       // Runs at server side only
       if (world instanceof ServerWorld) {
         ServerWorld serverWorld = (ServerWorld) world;
-
-        // Sends to everyone near, except the player
-        ParticleUtil
-            .spawnParticleServerside(serverWorld,
-                new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
-                hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-                (player) -> player != entityHit);
+        // Sends to everyone near
+        serverWorld
+            .getPlayers()
+            .stream()
+            .filter(player -> player != entityHit)
+            .forEach(
+                player -> serverWorld
+                    .spawnParticle(player,
+                        new BlockParticleData(ParticleTypes.BLOCK,
+                            Blocks.BONE_BLOCK.getDefaultState()),
+                        false, hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0.0D, 0.0D,
+                        0.0D, 0.0D));
       }
     }
     // The sound is played at client side too
     world
         .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
             SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
+
+    if (entityHit instanceof ClientPlayerEntity) {
+      ((ClientDist) CraftingDead.getInstance().getModDist()).joltCamera(1.5F, false);
+    }
 
     // Resets the temporary invincibility before causing the damage, preventing
     // previous damages from blocking the gun damage.
@@ -381,13 +397,16 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       // Runs at server side only
       if (world instanceof ServerWorld) {
         ServerWorld serverWorld = (ServerWorld) world;
-
-        // Sends to everyone near, except the player
-        ParticleUtil
-            .spawnParticleServerside(serverWorld,
-                new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-                hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D,
-                (player) -> player != entityHit);
+        serverWorld
+            .getPlayers()
+            .stream()
+            .filter(player -> player != entityHit)
+            .forEach(player -> serverWorld
+                .spawnParticle(player,
+                    new BlockParticleData(ParticleTypes.BLOCK,
+                        Blocks.REDSTONE_BLOCK.getDefaultState()),
+                    false, hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0.0D, 0.0D, 0.0D,
+                    0.0D));
       }
     }
 
@@ -463,10 +482,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   @Override
   public float getAccuracy(Entity entity, ItemStack itemStack) {
     float accuracy = 1.0F;
-
-    if (entity.getX() != entity.lastTickPosX || entity.getY() != entity.lastTickPosY
-        || entity.getZ() != entity.lastTickPosZ) {
-
+    if (entity.getX() != entity.prevPosX || entity.getY() != entity.prevPosY
+        || entity.getZ() != entity.prevPosZ) {
       accuracy = 0.5F;
 
       if (entity.isSprinting()) {
@@ -477,7 +494,6 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
         accuracy = 1.0F;
       }
     }
-
     return accuracy * this.gunItem.getAccuracy()
         * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
   }
@@ -596,6 +612,11 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   @Override
   public void setMagazineStack(ItemStack stack) {
     this.magazineStack = stack;
+  }
+
+  @Override
+  public Set<? extends Item> getAcceptedMagazines() {
+    return this.gunItem.getAcceptedMagazines();
   }
 
   @Override

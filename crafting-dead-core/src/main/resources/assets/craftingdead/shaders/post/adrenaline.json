@@ -1,0 +1,84 @@
+{
+    "targets": [
+        "blur",
+        "swap",
+        "colour_blur"
+    ],
+    "passes": [
+        {
+            "name": "blur",
+            "intarget": "minecraft:main",
+            "outtarget": "swap",
+            "uniforms": [
+                {
+                    "name": "BlurDir",
+                    "values": [ 1.0, 0.0 ]
+                },
+                {
+                    "name": "Radius",
+                    "values": [ 15.0 ]
+                }
+            ]
+        },
+        {
+            "name": "blur",
+            "intarget": "swap",
+            "outtarget": "blur",
+            "uniforms": [
+                {
+                    "name": "BlurDir",
+                    "values": [ 0.0, 1.0 ]
+                },
+                {
+                    "name": "Radius",
+                    "values": [ 15.0 ]
+                }
+            ]
+        },
+        {
+            "name": "color_convolve",
+            "intarget": "blur",
+            "outtarget": "colour_blur",
+            "uniforms": [
+                {
+                    "name": "RedMatrix",
+                    "values": [ 0.3, 0.59, 0.11 ]
+                },
+                {
+                    "name": "GreenMatrix",
+                    "values": [ 0.1, 0.1, 0.1 ]
+                },
+                {
+                    "name": "BlueMatrix",
+                    "values": [ 0.1, 0.1, 0.1 ]
+                },
+                {
+                    "name": "Saturation",
+                    "values": [ 0.25 ]
+                }
+            ]
+        },
+        {
+            "name": "spider",
+            "intarget": "minecraft:main",
+            "outtarget": "swap",
+            "auxtargets": [
+                {
+                    "name": "BlurSampler",
+                    "id": "colour_blur"
+                }
+            ],
+            "uniforms": [
+                {
+                    "name": "Vignette",
+                    "values": [ 0.25, 0.25, 0.75, 0.75 ]
+                }
+            ]
+        },
+        {
+            "name": "blit",
+            "intarget": "swap",
+            "outtarget": "minecraft:main"
+        }
+    ]
+}

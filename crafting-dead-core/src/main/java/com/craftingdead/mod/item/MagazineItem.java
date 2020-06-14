@@ -3,7 +3,7 @@ package com.craftingdead.mod.item;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SerializableCapabilityProvider;
 import com.craftingdead.mod.capability.magazine.IMagazine;
 import com.craftingdead.mod.capability.magazine.DefaultMagazine;
 import com.craftingdead.mod.util.Text;
@@ -49,7 +49,7 @@ public class MagazineItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(new DefaultMagazine(this), () -> ModCapabilities.MAGAZINE);
+    return new SerializableCapabilityProvider<>(new DefaultMagazine(this), () -> ModCapabilities.MAGAZINE);
   }
 
   @Override

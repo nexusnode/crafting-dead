@@ -9,5 +9,5 @@ public interface IAction {
 
   ITextComponent getText(ClientPlayerEntity playerEntity);
 
-  float getProgress(ClientPlayerEntity playerEntity);
+  float getProgress(ClientPlayerEntity playerEntity, float partialTicks);
 }

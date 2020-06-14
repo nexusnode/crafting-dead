@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SerializableCapabilityProvider;
 import com.craftingdead.mod.capability.storage.DefaultStorage;
 import com.craftingdead.mod.capability.storage.IStorage;
 import com.craftingdead.mod.inventory.InventorySlotType;
@@ -48,7 +48,7 @@ public class StorageItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableProvider<>(this.storageContainer.get(), ImmutableSet
+    return new SerializableCapabilityProvider<>(this.storageContainer.get(), ImmutableSet
         .of(() -> ModCapabilities.STORAGE, () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY));
   }
 

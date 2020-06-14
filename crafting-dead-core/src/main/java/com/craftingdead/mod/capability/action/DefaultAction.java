@@ -16,8 +16,8 @@ public class DefaultAction implements IAction {
   }
 
   @Override
-  public float getProgress(ClientPlayerEntity playerEntity) {
-    return (float) playerEntity.getItemInUseMaxCount()
+  public float getProgress(ClientPlayerEntity playerEntity, float partialTicks) {
+    return (float) (playerEntity.getItemInUseMaxCount() + partialTicks)
         / playerEntity.getActiveItemStack().getUseDuration();
   }
 }

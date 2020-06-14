@@ -1,18 +1,9 @@
 package com.craftingdead.mod.item;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
-
-  public static final ItemGroup CRAFTING_DEAD_FOOD = (new ItemGroup("craftingdead.consumables") {
-
-    @Override
-    public ItemStack createIcon() {
-      return new ItemStack(ModItems.POWER_BAR::get);
-    }
-  });
 
   public static final ItemGroup CRAFTING_DEAD_MED = (new ItemGroup("craftingdead.med") {
 
@@ -43,14 +34,6 @@ public class ModItemGroups {
     @Override
     public ItemStack createIcon() {
       return new ItemStack(ModItems.CAN_OPENER::get);
-    }
-  });
-
-  public static final ItemGroup CRAFTING_DEAD_BLOCKS = (new ItemGroup("craftingdead.blocks") {
-
-    @Override
-    public ItemStack createIcon() {
-      return new ItemStack(Blocks.ANDESITE);
     }
   });
 }

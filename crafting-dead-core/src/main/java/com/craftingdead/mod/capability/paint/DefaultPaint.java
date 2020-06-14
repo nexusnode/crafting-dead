@@ -5,16 +5,16 @@ import net.minecraft.util.ResourceLocation;
 
 public class DefaultPaint implements IPaint {
 
-  private Optional<ResourceLocation> skin;
-  private Optional<Integer> colour;
+  private final Optional<ResourceLocation> skin;
+  private final Optional<Integer> colour;
 
   public DefaultPaint() {
     this(null, null);
   }
 
   public DefaultPaint(ResourceLocation skin, Integer colour) {
-    this.setSkin(skin);
-    this.setColour(colour);
+    this.skin = Optional.ofNullable(skin);
+    this.colour = Optional.ofNullable(colour);
   }
 
   @Override
@@ -23,17 +23,7 @@ public class DefaultPaint implements IPaint {
   }
 
   @Override
-  public void setSkin(ResourceLocation skin) {
-    this.skin = Optional.ofNullable(skin);
-  }
-
-  @Override
   public Optional<Integer> getColour() {
     return this.colour;
-  }
-
-  @Override
-  public void setColour(Integer colour) {
-    this.colour = Optional.ofNullable(colour);
   }
 }

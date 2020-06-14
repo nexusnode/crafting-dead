@@ -4,7 +4,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.mod.capability.ModCapabilities;
-import com.craftingdead.mod.capability.SerializableProvider;
+import com.craftingdead.mod.capability.SerializableCapabilityProvider;
+import com.craftingdead.mod.capability.SimpleCapabilityProvider;
+import com.craftingdead.mod.capability.hydration.DefaultHydration;
+import com.craftingdead.mod.capability.hydration.IHydration;
 import com.craftingdead.mod.capability.living.DefaultLiving;
 import com.craftingdead.mod.capability.living.ILiving;
 import com.craftingdead.mod.capability.living.player.ServerPlayer;
@@ -25,17 +28,23 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -142,8 +151,21 @@ public class CraftingDead {
   // ================================================================================
 
   @SubscribeEvent
-  public void handlePlayerTick(LivingEvent.LivingUpdateEvent event) {
-    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+  public void handleLivingUpdate(LivingUpdateEvent event) {
+    if (!(event.getEntityLiving() instanceof PlayerEntity)) {
+      event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+    }
+  }
+
+  @SubscribeEvent
+  public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
+    switch (event.phase) {
+      case END:
+        event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+        break;
+      default:
+        break;
+    }
   }
 
   @SubscribeEvent
@@ -223,13 +245,58 @@ public class CraftingDead {
     if (event.getObject() instanceof AdvancedZombieEntity) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableProvider<>(new DefaultLiving<>((LivingEntity) event.getObject()),
+              new SerializableCapabilityProvider<>(
+                  new DefaultLiving<>((LivingEntity) event.getObject()),
                   () -> ModCapabilities.LIVING));
     } else if (event.getObject() instanceof ServerPlayerEntity) {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableProvider<>(player, () -> ModCapabilities.LIVING));
+              new SerializableCapabilityProvider<>(player, () -> ModCapabilities.LIVING));
     }
+  }
+
+  @SubscribeEvent
+  public void handleAttachCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event) {
+    final Item item = event.getObject().getItem();
+    if (item == Items.APPLE || item == Items.RABBIT_STEW) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(2),
+                  () -> ModCapabilities.HYDRATION));
+    } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.field_226638_pX_) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(1),
+                  () -> ModCapabilities.HYDRATION));
+    } else if (item == Items.CHORUS_FRUIT || item == Items.SWEET_BERRIES) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(3),
+                  () -> ModCapabilities.HYDRATION));
+    } else if (item == Items.ENCHANTED_GOLDEN_APPLE || item == Items.GOLDEN_APPLE
+        || item == Items.MUSHROOM_STEW || item == Items.SUSPICIOUS_STEW
+        || item == Items.BEETROOT_SOUP || item == Items.MELON_SLICE) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(5),
+                  () -> ModCapabilities.HYDRATION));
+    } else if (item == Items.GOLDEN_CARROT) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(6),
+                  () -> ModCapabilities.HYDRATION));
+    }
+  }
+
+  @SubscribeEvent
+  public void handleUseItem(LivingEntityUseItemEvent.Finish event) {
+    event
+        .getItem()
+        .getCapability(ModCapabilities.HYDRATION)
+        .map(IHydration::getHydration)
+        .ifPresent(hydration -> event
+            .getEntityLiving()
+            .addPotionEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));
   }
 }

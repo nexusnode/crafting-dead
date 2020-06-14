@@ -7,6 +7,7 @@ import com.craftingdead.mod.capability.scope.IScope;
 import com.craftingdead.mod.item.AttachmentItem;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
@@ -66,6 +67,8 @@ public interface IGun extends IScope, IAction, IAnimationController, INBTSeriali
 
   void toggleAiming(Entity entity, boolean sendUpdate);
 
+  Set<? extends Item> getAcceptedMagazines();
+
   @Override
   default boolean isActive(ClientPlayerEntity playerEntity) {
     return this.isReloading();
@@ -78,8 +81,8 @@ public interface IGun extends IScope, IAction, IAnimationController, INBTSeriali
   }
 
   @Override
-  default float getProgress(ClientPlayerEntity playerEntity) {
-    return (float) (this.getTotalReloadDurationTicks() - this.getReloadDurationTicks())
-        / this.getTotalReloadDurationTicks();
+  default float getProgress(ClientPlayerEntity playerEntity, float partialTicks) {
+    return (float) ((this.getTotalReloadDurationTicks() - this.getReloadDurationTicks())
+        + partialTicks) / this.getTotalReloadDurationTicks();
   }
 }
