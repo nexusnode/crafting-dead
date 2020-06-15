@@ -172,10 +172,7 @@ public class IngameGui {
       int x = width - 15 - fontRenderer.getStringWidth(text);
       int y = height - 10 - fontRenderer.FONT_HEIGHT;
       fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
-
       itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
-
-
     }
   }
 

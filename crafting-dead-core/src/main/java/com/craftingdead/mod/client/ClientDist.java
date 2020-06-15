@@ -13,6 +13,7 @@ import com.craftingdead.mod.capability.SerializableCapabilityProvider;
 import com.craftingdead.mod.capability.living.player.DefaultPlayer;
 import com.craftingdead.mod.capability.living.player.SelfPlayer;
 import com.craftingdead.mod.capability.paint.IPaint;
+import com.craftingdead.mod.client.audio.EffectsManager;
 import com.craftingdead.mod.client.crosshair.CrosshairManager;
 import com.craftingdead.mod.client.gui.IngameGui;
 import com.craftingdead.mod.client.gui.screen.inventory.GenericContainerScreen;
@@ -44,6 +45,7 @@ import com.craftingdead.mod.item.PaintItem;
 import com.craftingdead.mod.network.NetworkChannel;
 import com.craftingdead.mod.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.mod.particle.ModParticleTypes;
+import com.craftingdead.mod.potion.ModEffects;
 import com.craftingdead.mod.util.ArbitraryTooltips;
 import com.craftingdead.mod.util.ArbitraryTooltips.TooltipFunction;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -86,6 +88,8 @@ import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -112,7 +116,7 @@ public class ClientDist implements IModDist {
   public static final KeyBinding OPEN_MOD_INVENTORY =
       new KeyBinding("key.craftingdead.inventory", GLFW.GLFW_KEY_Z, "key.categories.inventory");
 
-  private static final Minecraft minecraft = Minecraft.getInstance();
+  private final Minecraft minecraft = Minecraft.getInstance();
 
   /**
    * Random.
@@ -130,6 +134,8 @@ public class ClientDist implements IModDist {
   }
 
   private final CrosshairManager crosshairManager = new CrosshairManager();
+
+  private final EffectsManager effectsManager = new EffectsManager();
 
   /**
    * Current camera velocity.
@@ -155,14 +161,16 @@ public class ClientDist implements IModDist {
 
   private TutorialSteps lastTutorialStep;
 
+  private boolean effectsManagerLoaded = false;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
 
-    ((IReloadableResourceManager) minecraft.getResourceManager())
+    ((IReloadableResourceManager) this.minecraft.getResourceManager())
         .addReloadListener(this.crosshairManager);
 
-    this.ingameGui = new IngameGui(minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+    this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
   }
@@ -183,7 +191,7 @@ public class ClientDist implements IModDist {
 
   public void setTutorialStep(ModTutorialSteps step) {
     clientConfig.tutorialStep.set(step);
-    Tutorial tutorial = minecraft.getTutorial();
+    Tutorial tutorial = this.minecraft.getTutorial();
     tutorial.setStep(TutorialSteps.NONE);
     tutorial.tutorialStep = step.create(this);
   }
@@ -196,7 +204,7 @@ public class ClientDist implements IModDist {
    * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
    */
   public boolean isInsideGameFOV(Entity target, boolean considerF5) {
-    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    ActiveRenderInfo activerenderinfo = this.minecraft.gameRenderer.getActiveRenderInfo();
     Vec3d projectedViewVec3d = considerF5 ? activerenderinfo.getProjectedView()
         : target.getPositionVec().add(0, target.getEyeHeight(), 0);
     double viewerX = projectedViewVec3d.getX();
@@ -224,8 +232,8 @@ public class ClientDist implements IModDist {
   }
 
   public LazyOptional<SelfPlayer> getPlayer() {
-    return minecraft.player != null
-        ? minecraft.player
+    return this.minecraft.player != null
+        ? this.minecraft.player
             .getCapability(ModCapabilities.LIVING)
             .filter(living -> living instanceof SelfPlayer)
             .cast()
@@ -352,14 +360,14 @@ public class ClientDist implements IModDist {
   public void registerPlayerLayer(
       Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
     // A little dirty way, blame Mojang
-    minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
+    this.minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
       renderer.addLayer(function.apply(renderer));
     });
   }
 
   @SubscribeEvent
   public void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    ParticleManager particleManager = minecraft.particles;
+    ParticleManager particleManager = this.minecraft.particles;
 
     particleManager
         .registerFactory(ModParticleTypes.RGB_FLASH.get(),
@@ -373,6 +381,16 @@ public class ClientDist implements IModDist {
   // ================================================================================
   // Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleSoundLoad(SoundLoadEvent event) {
+    this.effectsManager.reload(event.getManager());
+  }
+
+  @SubscribeEvent
+  public void handlePlaySound(PlaySoundEvent event) {
+    this.effectsManager.setLevels(event.getSound(), 5.0F, 1.0F);
+  }
 
   @SubscribeEvent
   public void handleTooltipEvent(ItemTooltipEvent event) {
@@ -395,27 +413,36 @@ public class ClientDist implements IModDist {
   public void handleClientTick(TickEvent.ClientTickEvent event) {
     switch (event.phase) {
       case START:
-        if (minecraft.loadingGui == null
-            && (minecraft.currentScreen == null || minecraft.currentScreen.passEvents)) {
+        // TODO SoundLoadEvent is not called upon initial startup - see
+        // https://github.com/MinecraftForge/MinecraftForge/pull/6777
+        if (!this.effectsManagerLoaded) {
+          this.effectsManager.reload(this.minecraft.getSoundHandler().sndManager);
+          this.effectsManagerLoaded = true;
+        }
+        if (this.minecraft.loadingGui == null
+            && (this.minecraft.currentScreen == null || this.minecraft.currentScreen.passEvents)) {
           while (TOGGLE_FIRE_MODE.isPressed()) {
-            ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+            ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
             heldStack
                 .getCapability(ModCapabilities.GUN)
-                .ifPresent(gun -> gun.toggleFireMode(minecraft.player, true));
+                .ifPresent(gun -> gun.toggleFireMode(this.minecraft.player, true));
           }
           while (OPEN_MOD_INVENTORY.isPressed()) {
             NetworkChannel.MAIN.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
-            if (minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
-              ((IModTutorialStep) minecraft.getTutorial().tutorialStep).openModInventory();
+            if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
+              ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
             }
           }
 
-          TutorialSteps currentTutorialStep = minecraft.gameSettings.tutorialStep;
+          TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
           if (this.lastTutorialStep != currentTutorialStep) {
             if (currentTutorialStep == TutorialSteps.NONE) {
               this.setTutorialStep(clientConfig.tutorialStep.get());
             }
             this.lastTutorialStep = currentTutorialStep;
+          }
+          if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+            this.effectsManager.setAllLevels(1.0F, 0.015F);
           }
         }
         break;
@@ -426,13 +453,13 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    if (minecraft.getConnection() != null && minecraft.currentScreen == null) {
-      if (minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
+    if (this.minecraft.getConnection() != null && this.minecraft.currentScreen == null) {
+      if (this.minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
-        ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+        ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
         heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
           event.setCanceled(true);
-          gun.setTriggerPressed(minecraft.player, heldStack, triggerPressed, true);
+          gun.setTriggerPressed(this.minecraft.player, heldStack, triggerPressed, true);
         });
       }
     }
@@ -543,10 +570,10 @@ public class ClientDist implements IModDist {
   public void handeFOVUpdate(FOVUpdateEvent event) {
     event.setNewfov(event.getFov() * this.fovMultiplier);
     this.fovMultiplier = 1.0F;
-    ItemStack heldStack = minecraft.player.getHeldItemMainhand();
+    ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
     heldStack.getCapability(ModCapabilities.SCOPE).ifPresent(scope -> {
-      if (scope.isAiming(minecraft.player, heldStack)) {
-        event.setNewfov(event.getFov() * scope.getFovModifier(minecraft.player, heldStack));
+      if (scope.isAiming(this.minecraft.player, heldStack)) {
+        event.setNewfov(event.getFov() * scope.getFovModifier(this.minecraft.player, heldStack));
       }
     });
   }
@@ -555,14 +582,14 @@ public class ClientDist implements IModDist {
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
       case START:
-        if (minecraft.player != null) {
+        if (this.minecraft.player != null) {
           float smoothYaw =
               MathHelper.lerp(0.15F, this.prevRotationVelocity.x, this.rotationVelocity.x);
           float smoothPitch =
               MathHelper.lerp(0.15F, this.prevRotationVelocity.y, this.rotationVelocity.y);
           this.rotationVelocity = Vec2f.ZERO;
           this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
-          minecraft.player.rotateTowards(smoothYaw, smoothPitch);
+          this.minecraft.player.rotateTowards(smoothYaw, smoothPitch);
         }
         break;
       default:
@@ -632,8 +659,8 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
-    if (minecraft.currentScreen instanceof ModInventoryScreen && event.getGui() == null
-        && ((ModInventoryScreen) minecraft.currentScreen).isTransitioning()) {
+    if (this.minecraft.currentScreen instanceof ModInventoryScreen && event.getGui() == null
+        && ((ModInventoryScreen) this.minecraft.currentScreen).isTransitioning()) {
       event.setCanceled(true);
     }
   }

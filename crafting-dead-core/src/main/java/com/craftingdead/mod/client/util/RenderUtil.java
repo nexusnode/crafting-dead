@@ -1,7 +1,5 @@
 package com.craftingdead.mod.client.util;
 
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
@@ -36,7 +34,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class RenderUtil {
 
@@ -47,41 +44,26 @@ public class RenderUtil {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
-  private static final Field listShaders =
-      ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148031_d");
-
   public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
     ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
     if (sg != null) {
-      try {
-        @SuppressWarnings("unchecked")
-        List<Shader> shaders = (List<Shader>) listShaders.get(sg);
-        for (Shader shader : shaders) {
-          ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
-          if (variable != null) {
-            variable.set(value);
-          }
+      for (Shader shader : sg.listShaders) {
+        ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+        if (variable != null) {
+          variable.set(value);
         }
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        throw new RuntimeException(e);
       }
     }
   }
-  
+
   public static void updateUniform(String name, float[] value, ShaderGroup shaderGroup) {
     ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
     if (sg != null) {
-      try {
-        @SuppressWarnings("unchecked")
-        List<Shader> shaders = (List<Shader>) listShaders.get(sg);
-        for (Shader shader : shaders) {
-          ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
-          if (variable != null) {
-            variable.set(value);
-          }
+      for (Shader shader : sg.listShaders) {
+        ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+        if (variable != null) {
+          variable.set(value);
         }
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        throw new RuntimeException(e);
       }
     }
   }
