@@ -5,6 +5,7 @@ import java.util.List;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
@@ -23,6 +24,9 @@ public class BleedingEffect extends Effect {
   public void performEffect(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.getHealth() > 1.0F) {
       livingEntity.attackEntityFrom(ModDamageSource.BLEEDING, 1.0F);
+    }
+    if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).isCreative()) {
+      livingEntity.removePotionEffect(ModEffects.BLEEDING.get());
     }
   }
 
