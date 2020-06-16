@@ -27,7 +27,7 @@ function initializeCoreMod() {
                         il.add(new VarInsnNode(Opcodes.ALOAD, 4));
                         il.add(new VarInsnNode(Opcodes.ALOAD, 5));
                         il.add(new VarInsnNode(Opcodes.ALOAD, 6));
-                        il.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/craftingdead/mod/client/ClientDist", "renderArmsWithExtraSkins", "(Lnet/minecraft/client/renderer/entity/PlayerRenderer;Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;ILnet/minecraft/client/entity/player/AbstractClientPlayerEntity;Lnet/minecraft/client/renderer/model/ModelRenderer;Lnet/minecraft/client/renderer/model/ModelRenderer;)V", false));
+                        il.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/craftingdead/core/client/ClientDist", "renderArmsWithExtraSkins", "(Lnet/minecraft/client/renderer/entity/PlayerRenderer;Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;ILnet/minecraft/client/entity/player/AbstractClientPlayerEntity;Lnet/minecraft/client/renderer/model/ModelRenderer;Lnet/minecraft/client/renderer/model/ModelRenderer;)V", false));
                         mn.instructions.insert(il);
                     }
                 });
