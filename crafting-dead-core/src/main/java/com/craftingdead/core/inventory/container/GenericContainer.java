@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ArrowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -157,16 +156,5 @@ public class GenericContainer extends Container {
   public static GenericContainer createGunBag(int windowId, PlayerInventory playerInventory) {
     return new GenericContainer(ModContainerTypes.GUN_BAG.get(), windowId, playerInventory, 4,
         (slot, itemStack) -> !(itemStack.getCapability(ModCapabilities.STORAGE).isPresent()));
-  }
-
-  public static GenericContainer createQuiver(int windowId, PlayerInventory playerInventory,
-      IItemHandler itemHandler) {
-    return new GenericContainer(ModContainerTypes.QUIVER.get(), windowId, playerInventory,
-        itemHandler, 6, (slot, itemStack) -> itemStack.getItem() instanceof ArrowItem);
-  }
-
-  public static GenericContainer createQuiver(int windowId, PlayerInventory playerInventory) {
-    return new GenericContainer(ModContainerTypes.QUIVER.get(), windowId, playerInventory, 6,
-        (slot, itemStack) -> itemStack.getItem() instanceof ArrowItem);
   }
 }

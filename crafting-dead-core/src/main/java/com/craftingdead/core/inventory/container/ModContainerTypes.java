@@ -27,9 +27,6 @@ public class ModContainerTypes {
   public static final RegistryObject<ContainerType<GenericContainer>> GUN_BAG = CONTAINERS
       .register("gun_backpack", () -> new ContainerType<>(GenericContainer::createGunBag));
 
-  public static final RegistryObject<ContainerType<GenericContainer>> QUIVER =
-      CONTAINERS.register("quiver", () -> new ContainerType<>(GenericContainer::createQuiver));
-
   public static final RegistryObject<ContainerType<GenericContainer>> VEST =
       CONTAINERS.register("vest", () -> new ContainerType<>(GenericContainer::createVest));
 }

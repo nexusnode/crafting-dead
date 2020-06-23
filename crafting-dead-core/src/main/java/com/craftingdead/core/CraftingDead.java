@@ -23,7 +23,6 @@ import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
-import com.craftingdead.core.stats.ModStats;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.world.biome.ModBiomes;
@@ -37,10 +36,13 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -144,14 +146,18 @@ public class CraftingDead {
   // Mod Events
   // ================================================================================
 
+  @SuppressWarnings("deprecation")
   @SubscribeEvent
   public void handleCommonSetup(FMLCommonSetupEvent event) {
     logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-    logger.info("Registering custom stats");
-    ModStats.registerCustomStats();
+    net.minecraftforge.fml.DeferredWorkQueue
+        .runLater(() -> BrewingRecipeRegistry
+            .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
+                Ingredient.fromTag(Tags.Items.NUGGETS_GOLD),
+                new ItemStack(ModItems.CURE_SYRINGE.get())));
   }
 
   @SubscribeEvent

@@ -261,7 +261,6 @@ public class ClientDist implements IModDist {
     ScreenManager
         .registerFactory(ModContainerTypes.LARGE_BACKPACK.get(), GenericContainerScreen::new);
     ScreenManager.registerFactory(ModContainerTypes.GUN_BAG.get(), GenericContainerScreen::new);
-    ScreenManager.registerFactory(ModContainerTypes.QUIVER.get(), GenericContainerScreen::new);
 
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);

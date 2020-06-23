@@ -34,8 +34,6 @@ public class StorageItem extends Item {
       InventorySlotType.BACKPACK, GenericContainer::createLargeBackpack);
   public static final Supplier<IStorage> GUN_BAG =
       () -> new DefaultStorage(4 * 9, InventorySlotType.BACKPACK, GenericContainer::createGunBag);
-  public static final Supplier<IStorage> QUIVER =
-      () -> new DefaultStorage(6 * 9, InventorySlotType.BACKPACK, GenericContainer::createQuiver);
   public static final Supplier<IStorage> VEST =
       () -> new DefaultStorage(2 * 9, InventorySlotType.VEST, GenericContainer::createVest);
 
@@ -53,15 +51,17 @@ public class StorageItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack backpackStack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public void addInformation(ItemStack backpackStack, World world, List<ITextComponent> lines,
+      ITooltipFlag tooltipFlag) {
     super.addInformation(backpackStack, world, lines, tooltipFlag);
 
     backpackStack.getCapability(ModCapabilities.STORAGE).ifPresent(storage -> {
       if (!storage.isEmpty()) {
         lines.add(Text.of(" "));
-        lines.add(Text.translate("container.inventory").applyTextStyles(TextFormatting.RED,
-            TextFormatting.BOLD));
+        lines
+            .add(Text
+                .translate("container.inventory")
+                .applyTextStyles(TextFormatting.RED, TextFormatting.BOLD));
 
         int rowsBeyondLimit = 0;
 

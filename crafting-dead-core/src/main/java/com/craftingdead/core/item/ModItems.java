@@ -20,17 +20,21 @@ import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.Text;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -446,111 +450,99 @@ public class ModItems {
 
   public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
       .register("m4a1_iron_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 0.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 0.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> PISTOL_IRON_SIGHT = ITEMS
       .register("pistol_iron_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 0.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 0.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> SCARH_IRON_SIGHT = ITEMS
       .register("scarh_iron_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 0.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 0.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> AKM_IRON_SIGHT = ITEMS
       .register("akm_iron_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 0.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 0.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> RED_DOT_SIGHT = ITEMS
       .register("red_dot_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 2.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 2.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> ACOG_SIGHT = ITEMS
       .register("acog_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 3.25F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 3.25F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> LP_SCOPE = ITEMS
       .register("lp_scope",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 8F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 8F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> SUPPRESSOR = ITEMS
       .register("suppressor",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
-                  .setSuppressesSounds(true)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
+              .setSuppressesSounds(true)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> TACTICAL_GRIP = ITEMS
       .register("tactical_grip",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.ACCURACY, 1.25F)
-                  .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.ACCURACY, 1.25F)
+              .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> BIPOD = ITEMS
       .register("bipod",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.ACCURACY, 1.5F)
-                  .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.ACCURACY, 1.5F)
+              .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
-          () -> new AttachmentItem(
-              (AttachmentItem.Properties) new AttachmentItem.Properties()
-                  .addMultiplier(MultiplierType.FOV, 2.5F)
-                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-                  .maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
+              .addMultiplier(MultiplierType.FOV, 2.5F)
+              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Assault Rifles
@@ -1410,61 +1402,8 @@ public class ModItems {
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
-  // Tools
-  // ================================================================================
-
-  public static final RegistryObject<Item> CAN_OPENER = ITEMS
-      .register("can_opener", () -> new ToolItem(
-          new Item.Properties().maxDamage(8).group(ModItemGroups.CRAFTING_DEAD_MISC)));
-
-  public static final RegistryObject<Item> SCREWDRIVER = ITEMS
-      .register("screwdriver", () -> new ToolItem(
-          new Item.Properties().maxDamage(4).group(ModItemGroups.CRAFTING_DEAD_MISC)));
-
-  public static final RegistryObject<Item> MULTI_TOOL = ITEMS
-      .register("multi_tool", () -> new MeleeWeaponItem(8, -2.4F,
-          new Item.Properties().maxDamage(20).group(ModItemGroups.CRAFTING_DEAD_MISC)));
-
-  static {
-    ArbitraryTooltips
-        .registerTooltip(CAN_OPENER,
-            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips
-        .registerTooltip(SCREWDRIVER,
-            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-    ArbitraryTooltips
-        .registerTooltip(MULTI_TOOL,
-            (stack, world, tooltipFlag) -> ToolItem.CAN_OPEN_CANNED_ITEMS_TOOLTIP);
-  }
-
-  // ================================================================================
   // Medical
   // ================================================================================
-
-  public static final RegistryObject<Item> EMPTY_BLOOD_BAG = ITEMS
-      .register("empty_blood_bag",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "blood_bag"))
-              .setEntityPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP, EntityType.PLAYER.getName()),
-                  (entity) -> {
-                    if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHealth() > 4) {
-                      entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
-                      return true;
-                    }
-                    return false;
-                  })
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-  public static final RegistryObject<Item> BLOOD_BAG = ITEMS
-      .register("blood_bag",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-              .setShowProgress(true)
-              .maxStackSize(1)
-              .containerItem(EMPTY_BLOOD_BAG.get())
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS
       .register("first_aid_kit",
@@ -1483,21 +1422,45 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> SYRINGE = ITEMS
-      .register("syringe",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))
-              .setEntityPredicate(
-                  Text.copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP, EntityType.ZOMBIE.getName()),
-                  (entity) -> entity instanceof ZombieEntity)
-              .setProbability(0.25F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+      .register("syringe", () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+          .setEntityAction((itemStack, playerEntity, entity, random) -> {
+            if (random.nextFloat() < 0.25F && entity instanceof ZombieEntity) {
+              entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
+              return ActionResult
+                  .success(ActionItem
+                      .useReturn(itemStack,
+                          new ItemStack(ForgeRegistries.ITEMS
+                              .getValue(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))),
+                          playerEntity));
+            } else if (entity instanceof LivingEntity
+                && !(entity instanceof ZombieEntity || entity instanceof SkeletonEntity)) {
+              if (((LivingEntity) entity).getHealth() > 4) {
+                entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
+                return ActionResult
+                    .success(ActionItem
+                        .useReturn(itemStack,
+                            new ItemStack(ForgeRegistries.ITEMS
+                                .getValue(new ResourceLocation("craftingdead:blood_syringe"))),
+                            playerEntity));
+              } else {
+                playerEntity
+                    .sendStatusMessage(new TranslationTextComponent("message.low_blood_level",
+                        entity.getDisplayName()).setStyle(new Style().setColor(TextFormatting.RED)),
+                        true);
+              }
+            }
+            return ActionResult.fail(itemStack);
+          })
+          .maxStackSize(1)
+          .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
-  public static final RegistryObject<Item> MORPHINE_SYRINGE = ITEMS
-      .register("morphine_syringe",
+  public static final RegistryObject<Item> BLOOD_SYRINGE = ITEMS
+      .register("blood_syringe",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
               .setShowProgress(true)
               .maxStackSize(1)
+              .containerItem(SYRINGE.get())
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> BANDAGE = ITEMS
@@ -1509,33 +1472,56 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS
-      .register("rbi_syringe", () -> new Item(
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-  public static final RegistryObject<Item> BOTTLED_RBI = ITEMS
-      .register("bottled_rbi", () -> new Item(
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
+      .register("rbi_syringe",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setEntityAction((itemStack, playerEntity, entity, random) -> {
+                if (entity instanceof LivingEntity) {
+                  ((LivingEntity) entity)
+                      .addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+                  return ActionResult
+                      .success(ActionItem
+                          .useReturn(itemStack,
+                              new ItemStack(ForgeRegistries.ITEMS
+                                  .getValue(new ResourceLocation(CraftingDead.ID, "syringe"))),
+                              playerEntity));
+                }
+                return ActionResult.fail(itemStack);
+              })
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> DIRTY_RAG = ITEMS
       .register("dirty_rag",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
-              .setBlockPredicate(
-                  Text
-                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                          Text.translate(Blocks.WATER.getTranslationKey())),
-                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setBlockAction((itemStack, playerEntity, blockPos, blockState, random) -> {
+                if (blockState.getFluidState().getFluid() == Fluids.WATER) {
+                  playerEntity.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
+                  return ActionResult
+                      .success(ActionItem
+                          .useReturn(itemStack,
+                              new ItemStack(ForgeRegistries.ITEMS
+                                  .getValue(new ResourceLocation(CraftingDead.ID, "clean_rag"))),
+                              playerEntity));
+                }
+                return ActionResult.fail(itemStack);
+              })
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS
       .register("bloody_rag",
-          () -> new FillableItem((FillableItem.Properties) new FillableItem.Properties()
-              .setFullItem(new ResourceLocation(CraftingDead.ID, "clean_rag"))
-              .setBlockPredicate(
-                  Text
-                      .copyAndJoin(FillableItem.WHEN_USED_ON_TOOLTIP,
-                          Text.translate(Blocks.WATER.getTranslationKey())),
-                  (blockPos, blockState) -> blockState.getFluidState().getFluid() == Fluids.WATER)
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setBlockAction((itemStack, playerEntity, blockPos, blockState, random) -> {
+                if (blockState.getFluidState().getFluid() == Fluids.WATER) {
+                  playerEntity.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
+                  return ActionResult
+                      .success(ActionItem
+                          .useReturn(itemStack,
+                              new ItemStack(ForgeRegistries.ITEMS
+                                  .getValue(new ResourceLocation(CraftingDead.ID, "clean_rag"))),
+                              playerEntity));
+                }
+                return ActionResult.fail(itemStack);
+              })
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS
@@ -1552,18 +1538,6 @@ public class ModItems {
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS
       .register("cure_syringe",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setShowProgress(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-  public static final RegistryObject<Item> BOTTLED_CURE = ITEMS
-      .register("bottled_cure", () -> new Item(
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_MED)));
-
-  public static final RegistryObject<Item> ANTIBIOTICS = ITEMS
-      .register("antibiotics",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
               .setShowProgress(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
@@ -1774,11 +1748,6 @@ public class ModItems {
 
   public static final RegistryObject<Item> GREY_GUN_BAG = ITEMS
       .register("grey_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
-
-  // TODO Make it only carry fuel
-  public static final RegistryObject<Item> FUEL_TANK = ITEMS
-      .register("fuel_tank", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================

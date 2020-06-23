@@ -20,14 +20,14 @@ public class InfectionEffect extends Effect {
 
   @Override
   public void performEffect(LivingEntity livingEntity, int amplifier) {
-    if (livingEntity.getHealth() > 1.0F && random.nextFloat() < 0.5F) {
+    if (livingEntity.getHealth() > 1.0F) {
       livingEntity.attackEntityFrom(ModDamageSource.INFECTION, 1.0F);
     }
   }
 
   @Override
   public boolean isReady(int duration, int amplifier) {
-    return true;
+    return random.nextFloat() < 0.5F;
   }
 
   @Override

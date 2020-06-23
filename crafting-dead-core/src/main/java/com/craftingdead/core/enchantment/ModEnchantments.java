@@ -15,7 +15,8 @@ public class ModEnchantments {
   public static final RegistryObject<InfectionEnchantment> INFECTION = ENCHANTMENTS
       .register("infection",
           () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlotType.MAINHAND));
-  public static final RegistryObject<InfectionEnchantment> ARMOR_PENETRATION = ENCHANTMENTS
+  public static final RegistryObject<ArmorPenetrationEnchantment> ARMOR_PENETRATION = ENCHANTMENTS
       .register("armor_penetration",
-          () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlotType.MAINHAND));
+          () -> new ArmorPenetrationEnchantment(Enchantment.Rarity.COMMON,
+              EquipmentSlotType.MAINHAND));
 }

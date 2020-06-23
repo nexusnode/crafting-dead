@@ -28,9 +28,7 @@ public class BrokenLegEffect extends Effect {
   public List<ItemStack> getCurativeItems() {
     List<ItemStack> items = new ArrayList<ItemStack>();
     items.add(new ItemStack(ModItems.FIRST_AID_KIT::get));
-    items.add(new ItemStack(ModItems.MORPHINE_SYRINGE::get));
     items.add(new ItemStack(ModItems.SPLINT::get));
-    items.add(new ItemStack(ModItems.ANTIBIOTICS::get));
     return items;
   }
 }
