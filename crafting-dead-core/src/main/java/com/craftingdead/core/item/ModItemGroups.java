@@ -33,7 +33,7 @@ public class ModItemGroups {
 
     @Override
     public ItemStack createIcon() {
-      return new ItemStack(ModItems.CAN_OPENER::get);
+      return new ItemStack(ModItems.MEDICAL_DROP_RADIO::get);
     }
   });
 }
