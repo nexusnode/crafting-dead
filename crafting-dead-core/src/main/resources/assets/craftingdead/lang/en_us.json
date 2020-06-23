@@ -111,14 +111,6 @@
   "item.craftingdead.rpk_drum_magazine": "RPK Drum Magazine",
   "item.craftingdead.minigun_magazine": "Minigun Magazine",
   "item.craftingdead.mk48mod_magazine": "MK48MOD Magazine",
-  "item.craftingdead.combat_arrow": "Combat Arrow",
-  "item.craftingdead.explosive_arrow": "Explosive Arrow",
-  "item.craftingdead.fire_arrow": "Fire Arrow",
-  "item.craftingdead.poison_arrow": "Poison Arrow",
-  "item.craftingdead.wooden_arrow": "Wooden Arrow",
-  "item.craftingdead.bolt": "Bolt",
-  "item.craftingdead.poison_bolt": "Poison Bolt",
-  "item.craftingdead.explosive_bolt": "Explosive Bolt",
   
   "item.craftingdead.red_dot_sight": "Red Dot Sight",
   "item.craftingdead.acog_sight": "ACOG Sight",
@@ -454,10 +446,7 @@
   "item.craftingdead.riot_vest": "Riot Vest",
   "item.craftingdead.tan_tactical_vest": "Tan Tactical Vest",
   "item.craftingdead.fuel_tank": "Fuel Tank Backpack",
-  "item.craftingdead.tan_quiver": "Tan Quiver",
-  "item.craftingdead.green_quiver": "Green Quiver",
-  "item.craftingdead.black_quiver": "Black Quiver",
-  
+
   "item_lore.hat_item.headshot_reduction": "Headshot protection: ",
   "item_lore.hat_item.immune_to_flashes": "Immune to flashes",
   "item_lore.hat_item.immune_to_gas": "Immune to gas",

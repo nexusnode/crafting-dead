@@ -391,14 +391,6 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<MagazineItem> CROSSBOW_BOLT = ITEMS
-      .register("crossbow_bolt",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
   public static final RegistryObject<MagazineItem> TASER_CARTRIDGE = ITEMS
       .register("taser_cartridge",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
@@ -448,196 +440,117 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<MagazineItem> COMBAT_ARROW = ITEMS
-      .register("combat_arrow",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.25F)
-              .setEntityHitDropChance(0.95F)
-              .setBlockHitDropChance(0.9F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> EXPLOSIVE_ARROW = ITEMS
-      .register("explosive_arrow",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> FIRE_ARROW = ITEMS
-      .register("fire_arrow",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> POISON_ARROW = ITEMS
-      .register("poison_arrow",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .setEntityHitDropChance(0.95F)
-              .setBlockHitDropChance(0.7F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> WOODEN_ARROW = ITEMS
-      .register("wooden_arrow",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .setEntityHitDropChance(0.75F)
-              .setBlockHitDropChance(0.75F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> BOLT = ITEMS
-      .register("bolt",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .setEntityHitDropChance(0.95F)
-              .setBlockHitDropChance(0.85F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> POISON_BOLT = ITEMS
-      .register("poison_bolt",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .setEntityHitDropChance(0.95F)
-              .setBlockHitDropChance(0.7F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<MagazineItem> EXPLOSIVE_BOLT = ITEMS
-      .register("explosive_bolt",
-          () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
-              .setSize(1)
-              .setArmorPenetration(0.12F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
   // ================================================================================
   // Attachments
   // ================================================================================
 
   public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
       .register("m4a1_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 0.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> PISTOL_IRON_SIGHT = ITEMS
       .register("pistol_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 0.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> SCARH_IRON_SIGHT = ITEMS
       .register("scarh_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 0.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> AKM_IRON_SIGHT = ITEMS
       .register("akm_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 0.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> RED_DOT_SIGHT = ITEMS
       .register("red_dot_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 2.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> ACOG_SIGHT = ITEMS
       .register("acog_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 3.25F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 3.25F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> LP_SCOPE = ITEMS
       .register("lp_scope",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 8F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 8F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> SUPPRESSOR = ITEMS
       .register("suppressor",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
-              .setSuppressesSounds(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
+                  .setSuppressesSounds(true)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> TACTICAL_GRIP = ITEMS
       .register("tactical_grip",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.ACCURACY, 1.25F)
-              .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.ACCURACY, 1.25F)
+                  .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> BIPOD = ITEMS
       .register("bipod",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.ACCURACY, 1.5F)
-              .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.ACCURACY, 1.5F)
+                  .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<AttachmentItem> RETICLE_SIGHT = ITEMS
-      .register("reticle_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  // TODO Show a green light when it is equipped
-  public static final RegistryObject<AttachmentItem> LASER_SIGHT = ITEMS
-      .register("laser_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .setHasLaser(true)
-              .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          () -> new AttachmentItem(
+              (AttachmentItem.Properties) new AttachmentItem.Properties()
+                  .addMultiplier(MultiplierType.FOV, 2.5F)
+                  .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+                  .maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Assault Rifles
@@ -1432,52 +1345,6 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
-  // Bows
-  // ================================================================================
-
-  // TODO Reminder: Military Crossbow uses only the back part of the iron sight model.
-  // See RenderMilitaryCrossbow.java (1.6.4)
-  public static final RegistryObject<Item> MILITARY_CROSSBOW = ITEMS
-      .register("military_crossbow",
-          () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(1000)
-              .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 2F))
-              .setAccuracy(0.9F)
-              .addFireMode(FireMode.SEMI)
-              .setShootSound(ModSoundEvents.CROSSBOW_SHOOT)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
-              .setDefaultMagazine(BOLT)
-              .addAcceptedMagazine(POISON_BOLT)
-              .addAcceptedMagazine(EXPLOSIVE_BOLT)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
-              .addAcceptedAttachment(ACOG_SIGHT)
-              .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<Item> COMBAT_BOW = ITEMS
-      .register("combat_bow",
-          () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(1000)
-              .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 2F))
-              .setAccuracy(0.9F)
-              .addFireMode(FireMode.SEMI)
-              .setShootSound(ModSoundEvents.CROSSBOW_SHOOT)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
-              .setDefaultMagazine(WOODEN_ARROW)
-              .addAcceptedMagazine(POISON_ARROW)
-              .addAcceptedMagazine(COMBAT_ARROW)
-              .addAcceptedMagazine(FIRE_ARROW)
-              .addAcceptedMagazine(EXPLOSIVE_ARROW)
-              .addAcceptedAttachment(RETICLE_SIGHT)
-              .addAcceptedAttachment(LASER_SIGHT)
-              .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  // ================================================================================
   // Grenades
   // ================================================================================
 
@@ -1912,20 +1779,6 @@ public class ModItems {
   // TODO Make it only carry fuel
   public static final RegistryObject<Item> FUEL_TANK = ITEMS
       .register("fuel_tank", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
-
-  /* TODO Make quivers only carry arrows and bolts */
-
-  public static final RegistryObject<Item> TAN_QUIVER = ITEMS
-      .register("tan_quiver", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
-
-  public static final RegistryObject<Item> GREEN_QUIVER = ITEMS
-      .register("green_quiver", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
-
-  public static final RegistryObject<Item> BLACK_QUIVER = ITEMS
-      .register("black_quiver", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
           new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================

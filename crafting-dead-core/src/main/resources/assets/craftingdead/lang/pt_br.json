@@ -362,15 +362,7 @@
   "item.craftingdead.rpk_drum_magazine": "Tambor de RPK",
   "item.craftingdead.minigun_magazine": "Pente de Minigun",
   "item.craftingdead.mk48mod_magazine": "Pente de MK48MOD",
-  "item.craftingdead.combat_arrow": "Flecha de Combate",
-  "item.craftingdead.explosive_arrow": "Flecha Explosiva",
-  "item.craftingdead.fire_arrow": "Flecha Flamejante",
-  "item.craftingdead.poison_arrow": "Flecha Venenosa",
-  "item.craftingdead.wooden_arrow": "Flecha de Madeira",
-  "item.craftingdead.bolt": "Dardo",
-  "item.craftingdead.poison_bolt": "Dardo Venenoso",
-  "item.craftingdead.explosive_bolt": "Dardo Explosivo",
-  
+
   "item.craftingdead.red_dot_sight": "Mira Red Dot",
   "item.craftingdead.acog_sight": "Mira ACOG",
   "item.craftingdead.lp_scope": "Mira Telescópica LP (Baixo Alcance)",
@@ -432,10 +424,7 @@
   "item.craftingdead.riot_vest": "Colete Riot",
   "item.craftingdead.tan_tactical_vest": "Colete Tático Bronzeado",
   "item.craftingdead.fuel_tank": "Tanque de Combustível em Mochila",
-  "item.craftingdead.tan_quiver": "Aljava Bronzeada",
-  "item.craftingdead.green_quiver": "Aljava Verde",
-  "item.craftingdead.black_quiver": "Aljava Preta",
-  
+
   "item_lore.hat_item.headshot_reduction": "Proteção contra headshot: ",
   "item_lore.hat_item.immune_to_flashes": "Imune a flashes",
   "item_lore.hat_item.immune_to_gas": "Imune a gás",

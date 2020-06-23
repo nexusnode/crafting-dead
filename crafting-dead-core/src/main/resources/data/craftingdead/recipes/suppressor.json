@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "isi",
+        "isi",
+        "isi"
+    ],
+    "key": {
+        "s": {
+            "item": "minecraft:string"
+        },
+        "i": {
+            "item": "minecraft:iron_ore"
+        }
+    },
+    "result": {
+        "item": "craftingdead:suppressor"
+    }
+}
