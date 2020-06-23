@@ -1,10 +1,7 @@
 package com.craftingdead.core.capability.living.player;
 
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Pose;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 
 public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
@@ -48,13 +45,6 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
 
     if (this.crouching) {
       this.entity.setPose(Pose.SWIMMING);
-    }
-
-    if (ClientDist.RELOAD.isKeyDown()) {
-      ItemStack heldStack = this.entity.getHeldItemMainhand();
-      heldStack
-          .getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.reload(this.entity, heldStack, true));
     }
   }
 }

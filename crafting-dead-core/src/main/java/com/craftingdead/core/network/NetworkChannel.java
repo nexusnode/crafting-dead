@@ -3,7 +3,7 @@ package com.craftingdead.core.network;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.main.OpenStorageMessage;
-import com.craftingdead.core.network.message.main.ReloadMessage;
+import com.craftingdead.core.network.message.main.GunActionMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
@@ -36,10 +36,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(ReloadMessage.class, ++id)
-          .encoder(ReloadMessage::encode)
-          .decoder(ReloadMessage::decode)
-          .consumer(ReloadMessage::handle)
+          .messageBuilder(GunActionMessage.class, ++id)
+          .encoder(GunActionMessage::encode)
+          .decoder(GunActionMessage::decode)
+          .consumer(GunActionMessage::handle)
           .add();
 
       simpleChannel

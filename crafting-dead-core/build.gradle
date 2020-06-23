@@ -27,5 +27,22 @@ minecraft {
                 }
             }
         }
+        
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'craftingdead', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            environment 'target', 'fmluserdevdata'
+
+            mods {
+                craftingdead {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }

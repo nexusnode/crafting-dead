@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "aia",
+        "sts",
+        " a "
+    ],
+    "key": {
+        "a": {
+            "item": "minecraft:stick"
+        },
+        "s": {
+            "item": "minecraft:string"
+        },
+        "i": {
+            "item": "minecraft:gold_ingot"
+        },
+        "t": {
+            "item": "minecraft:tripwire_hook"
+        }
+    },
+    "result": {
+        "item": "craftingdead:military_crossbow"
+    }
+}

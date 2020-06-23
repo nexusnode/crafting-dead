@@ -7,23 +7,27 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.capability.hydration.DefaultHydration;
-import com.craftingdead.core.capability.hydration.IHydration;
+import com.craftingdead.core.capability.hydration.PresetHydration;
 import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.ServerPlayer;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.data.Recipes;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
+import com.craftingdead.core.stats.ModStats;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.world.biome.ModBiomes;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -55,6 +59,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 
@@ -108,7 +113,7 @@ public class CraftingDead {
     modEventBus.register(this);
 
     ModEntityTypes.initialize();
-    modEventBus.addGenericListener(EntityType.class, ModEntityTypes::register);
+    modEventBus.addGenericListener(EntityType.class, ModEntityTypes::registerAll);
 
     ModBiomes.BIOMES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
@@ -117,6 +122,7 @@ public class CraftingDead {
     ModEffects.EFFECTS.register(modEventBus);
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
+    ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
 
     // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
@@ -144,6 +150,14 @@ public class CraftingDead {
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
+    logger.info("Registering custom stats");
+    ModStats.registerCustomStats();
+  }
+
+  @SubscribeEvent
+  public void handleGatherData(GatherDataEvent event) {
+    DataGenerator dataGenerator = event.getGenerator();
+    dataGenerator.addProvider(new Recipes(dataGenerator));
   }
 
   // ================================================================================
@@ -259,32 +273,29 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleAttachCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event) {
     final Item item = event.getObject().getItem();
+    int hydration = -1;
     if (item == Items.APPLE || item == Items.RABBIT_STEW) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(2),
-                  () -> ModCapabilities.HYDRATION));
+      hydration = 2;
     } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.field_226638_pX_) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(1),
-                  () -> ModCapabilities.HYDRATION));
+      hydration = 1;
     } else if (item == Items.CHORUS_FRUIT || item == Items.SWEET_BERRIES) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(3),
-                  () -> ModCapabilities.HYDRATION));
+      hydration = 3;
     } else if (item == Items.ENCHANTED_GOLDEN_APPLE || item == Items.GOLDEN_APPLE
         || item == Items.MUSHROOM_STEW || item == Items.SUSPICIOUS_STEW
         || item == Items.BEETROOT_SOUP || item == Items.MELON_SLICE) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(5),
-                  () -> ModCapabilities.HYDRATION));
+      hydration = 5;
     } else if (item == Items.GOLDEN_CARROT) {
+      hydration = 6;
+    }
+    if (hydration != -1) {
       event
           .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(6),
+              new SimpleCapabilityProvider<>(new PresetHydration(hydration),
+                  () -> ModCapabilities.HYDRATION));
+    } else if (item == Items.POTION) {
+      event
+          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+              new SimpleCapabilityProvider<>(new DefaultHydration(),
                   () -> ModCapabilities.HYDRATION));
     }
   }
@@ -294,7 +305,7 @@ public class CraftingDead {
     event
         .getItem()
         .getCapability(ModCapabilities.HYDRATION)
-        .map(IHydration::getHydration)
+        .map(hydration -> hydration.getHydration(event.getItem()))
         .ifPresent(hydration -> event
             .getEntityLiving()
             .addPotionEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));

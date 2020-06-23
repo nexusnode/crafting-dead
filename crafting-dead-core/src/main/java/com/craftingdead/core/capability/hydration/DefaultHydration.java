@@ -1,19 +1,13 @@
 package com.craftingdead.core.capability.hydration;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
+
 public class DefaultHydration implements IHydration {
 
-  private final int hydration;
-
-  public DefaultHydration() {
-    this(0);
-  }
-
-  public DefaultHydration(int hydration) {
-    this.hydration = hydration;
-  }
-
   @Override
-  public int getHydration() {
-    return this.hydration;
+  public int getHydration(ItemStack itemStack) {
+    return PotionUtils.getPotionFromItem(itemStack) == Potions.WATER ? 5 : 0;
   }
 }

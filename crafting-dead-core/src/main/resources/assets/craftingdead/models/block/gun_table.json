@@ -1,0 +1,7 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "block/gun_table_top",
+        "side": "block/gun_table_side"
+    }
+}

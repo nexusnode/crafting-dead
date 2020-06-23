@@ -12,16 +12,18 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animation.DefaultAnimationController;
 import com.craftingdead.core.capability.animation.IAnimation;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.capability.living.player.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
+import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.ReloadMessage;
+import com.craftingdead.core.network.message.main.GunActionMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleAimingMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
@@ -39,6 +41,9 @@ import net.minecraft.block.TNTBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.enchantment.UnbreakingEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -70,6 +75,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -94,9 +100,9 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
    */
   private long lastShotNanos = Integer.MIN_VALUE;
 
-  private int reloadDurationTicks = 0;
+  private int actionDurationTicks = 0;
 
-  private int totalReloadDurationTicks;
+  private int totalActionDurationTicks;
 
   private FireMode fireMode;
 
@@ -105,7 +111,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   /**
    * The amount of shots since the last time the trigger was pressed.
    */
-  private int shotsInARow;
+  private int shotCount;
 
   private Set<AttachmentItem> attachments;
 
@@ -114,6 +120,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
   private boolean aiming;
+
+  private boolean reloading;
 
   public DefaultGun() {
     this(null);
@@ -124,27 +132,28 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.attachments = gunItem.getDefaultAttachments();
+    this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
+    this.magazineStack
+        .getCapability(ModCapabilities.MAGAZINE)
+        .ifPresent(magazine -> magazine.setSize(0));
   }
 
   @Override
   public void tick(Entity entity, ItemStack itemStack) {
-    boolean isMaxShotsReached =
-        this.fireMode.getMaxShots().map(max -> this.shotsInARow >= max).orElse(false);
+    this.tryShoot(entity, itemStack);
 
-    if (!isMaxShotsReached) {
-      this.shoot(entity, itemStack);
-    }
-
-    if (this.isReloading() && --this.reloadDurationTicks == 0) {
-      // Reload
-      if (this.magazineStack.isEmpty()) {
+    if (this.isPerformingAction() && --this.actionDurationTicks == 0) {
+      ItemStack oldMagazine = this.magazineStack;
+      if (this.reloading) {
         this.magazineStack = entity
             .getCapability(ModCapabilities.LIVING)
             .map(living -> this.findAmmo(living, false))
             .orElse(ItemStack.EMPTY);
-      } else if (entity instanceof PlayerEntity) { // Unload
-        ((PlayerEntity) entity).addItemStackToInventory(this.magazineStack);
+      } else {
         this.magazineStack = ItemStack.EMPTY;
+      }
+      if (!oldMagazine.isEmpty() && entity instanceof PlayerEntity) {
+        ((PlayerEntity) entity).addItemStackToInventory(oldMagazine);
       }
     }
   }
@@ -156,8 +165,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
     if (this.triggerPressed) {
       // Resets the counter
-      this.shotsInARow = 0;
-      this.shoot(entity, itemStack);
+      this.shotCount = 0;
+      this.tryShoot(entity, itemStack);
     }
 
     if (sendUpdate) {
@@ -183,73 +192,93 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public boolean isReloading() {
-    return this.reloadDurationTicks > 0;
-  }
-
-  @Override
   public int getTotalReloadDurationTicks() {
-    return this.totalReloadDurationTicks;
+    return this.totalActionDurationTicks;
   }
 
   @Override
   public int getReloadDurationTicks() {
-    return this.reloadDurationTicks;
+    return this.actionDurationTicks;
+  }
+
+  @Override
+  public boolean isPerformingAction() {
+    return this.actionDurationTicks > 0;
+  }
+
+  @Override
+  public boolean isReloading() {
+    return this.isPerformingAction() && this.reloading;
   }
 
   @Override
   public void cancelActions(Entity entity, ItemStack itemStack) {
-    if (this.isReloading()) {
-      // Stop reload sound
-      Minecraft.getInstance().getSoundHandler().stop(null, SoundCategory.PLAYERS);
-      this.reloadDurationTicks = 0;
+    if (this.isPerformingAction()) {
+      if (this.reloading && this.gunItem.getReloadSound().isPresent()) {
+        // Stop reload sound
+        Minecraft
+            .getInstance()
+            .getSoundHandler()
+            .stop(this.gunItem.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
+      }
+      this.actionDurationTicks = 0;
     }
-
     this.setTriggerPressed(entity, itemStack, false, false);
   }
 
   @Override
   public void reload(Entity entity, ItemStack itemStack, boolean sendUpdate) {
-    // Reload
-    if (this.magazineStack.isEmpty()) {
-      boolean canReload = !entity
-          .getCapability(ModCapabilities.LIVING)
-          .map(living -> this.findAmmo(living, true))
-          .orElse(ItemStack.EMPTY)
-          .isEmpty();
-      if (!this.isReloading() && canReload) {
-        // Some guns may not have a reload sound
-        this.gunItem.getReloadSound().ifPresent(sound -> {
-          entity.world.playMovingSound(null, entity, sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
-        });
-        this.reloadDurationTicks =
-            this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks();
+    boolean canReload = !entity
+        .getCapability(ModCapabilities.LIVING)
+        .map(living -> this.findAmmo(living, true))
+        .orElse(ItemStack.EMPTY)
+        .isEmpty();
+    if (!this.isPerformingAction() && canReload) {
+      this.reloading = true;
+      // Some guns may not have a reload sound
+      this.gunItem.getReloadSound().ifPresent(sound -> {
+        entity.world.playMovingSound(null, entity, sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+      });
+      this.actionDurationTicks =
+          this.totalActionDurationTicks = this.gunItem.getReloadDurationTicks();
+      if (sendUpdate) {
+        PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+            : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+        NetworkChannel.MAIN
+            .getSimpleChannel()
+            .send(target, new GunActionMessage(entity.getEntityId(), true));
       }
-    } else { // Unload
-      this.reloadDurationTicks =
-          this.totalReloadDurationTicks = this.gunItem.getReloadDurationTicks() / 2;
-    }
-
-    if (sendUpdate) {
-      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
-      NetworkChannel.MAIN.getSimpleChannel().send(target, new ReloadMessage(entity.getEntityId()));
     }
   }
 
-  private void shoot(Entity entity, ItemStack itemStack) {
+  @Override
+  public void removeMagazine(Entity entity, ItemStack itemStack, boolean sendUpdate) {
+    if (!this.isPerformingAction() && !this.magazineStack.isEmpty()) {
+      this.reloading = false;
+      this.actionDurationTicks =
+          this.totalActionDurationTicks = this.gunItem.getReloadDurationTicks() / 2;
+      if (sendUpdate) {
+        PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+            : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+        NetworkChannel.MAIN
+            .getSimpleChannel()
+            .send(target, new GunActionMessage(entity.getEntityId(), false));
+      }
+    }
+  }
+
+  private void tryShoot(Entity entity, ItemStack itemStack) {
     if (!this.triggerPressed) {
       return;
     }
 
-    if (this.isReloading()) {
+    if (this.isPerformingAction()) {
       return;
     }
 
     if (this.getMagazineSize() <= 0) {
       this.triggerPressed = false;
       entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.magazineStack = ItemStack.EMPTY;
       this.reload(entity, itemStack, false);
       return;
     }
@@ -263,13 +292,20 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     }
     this.lastShotNanos = time;
 
-    this.shotsInARow++;
+    boolean isMaxShotsReached =
+        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+    if (isMaxShotsReached) {
+      return;
+    }
+    this.shotCount++;
+
     if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
-      this.magazineStack
-          .getCapability(ModCapabilities.MAGAZINE)
-          .ifPresent(magazine -> magazine.decrementSize(this.magazineStack, random));
-      if (this.getMagazineSize() <= 0) {
-        this.magazineStack = ItemStack.EMPTY;
+      final int unbreakingLevel =
+          EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
+      if (!UnbreakingEnchantment.negateDamage(itemStack, unbreakingLevel, random)) {
+        this.magazineStack
+            .getCapability(ModCapabilities.MAGAZINE)
+            .ifPresent(IMagazine::decrementSize);
       }
     }
 
@@ -310,10 +346,10 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       rayTrace.ifPresent(result -> {
         switch (result.getType()) {
           case BLOCK:
-            this.hitBlock(entity, (BlockRayTraceResult) result);
+            this.hitBlock(entity, itemStack, (BlockRayTraceResult) result);
             break;
           case ENTITY:
-            this.hitEntity(entity, (EntityRayTraceResult) result);
+            this.hitEntity(entity, itemStack, (EntityRayTraceResult) result);
             break;
           default:
             break;
@@ -324,23 +360,27 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     }
   }
 
-  private void hitEntity(Entity entity, EntityRayTraceResult rayTrace) {
+  private void hitEntity(Entity entity, ItemStack itemStack, EntityRayTraceResult rayTrace) {
     Entity entityHit = rayTrace.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
     World world = entityHit.getEntityWorld();
     float damage = this.gunItem.getDamage();
 
-    if (entityHit instanceof LivingEntity) {
+    float armorPenetration = (1.0F
+        + (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(), itemStack)
+            / 255.0F))
+        * this.magazineStack
+            .getCapability(ModCapabilities.MAGAZINE)
+            .map(IMagazine::getArmorPenetration)
+            .orElse(0.0F);
+    armorPenetration = armorPenetration > 1.0F ? 1.0F : armorPenetration;
+    if (armorPenetration > 0 && entityHit instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) entityHit;
       float reducedDamage = damage - CombatRules
           .getDamageAfterAbsorb(damage, livingEntityHit.getTotalArmorValue(),
               (float) livingEntityHit
                   .getAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS)
                   .getValue());
-      float armorPenetration = this.magazineStack
-          .getCapability(ModCapabilities.MAGAZINE)
-          .map(IMagazine::getArmorPenetration)
-          .orElse(0.0F);
       // Apply armor penetration by adding to the damage lost by armor absorption
       damage += reducedDamage * armorPenetration;
     }
@@ -410,9 +450,20 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       }
     }
 
-    this.magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .ifPresent(magazine -> magazine.hitEntity(this.magazineStack, entity, rayTrace));
+    checkCreateExplosion(itemStack, entity, rayTrace.getHitVec());
+
+    if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, itemStack) > 0) {
+      rayTrace.getEntity().setFire(100);
+    }
+
+    entity
+        .getCapability(ModCapabilities.LIVING)
+        .filter(living -> living instanceof IPlayer)
+        .<IPlayer<?>>cast()
+        .ifPresent(player -> player
+            .infect(
+                EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
+                    / 255.0F));
 
     float dropChance = this.magazineStack
         .getCapability(ModCapabilities.MAGAZINE)
@@ -426,7 +477,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     }
   }
 
-  private void hitBlock(Entity entity, BlockRayTraceResult rayTrace) {
+  private void hitBlock(Entity entity, ItemStack itemStack, BlockRayTraceResult rayTrace) {
     Vec3d hitVec3d = rayTrace.getHitVec();
     BlockPos blockPos = rayTrace.getPos();
     BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
@@ -463,9 +514,13 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
               hitVec3d.getY(), hitVec3d.getZ(), 12, 0D, 0D, 0D, 0D);
     }
 
-    this.magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .ifPresent(magazine -> magazine.hitBlock(this.magazineStack, entity, rayTrace));
+    checkCreateExplosion(itemStack, entity, rayTrace.getHitVec());
+    if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, itemStack) > 0) {
+      BlockPos blockAbove = rayTrace.getPos().add(0, 1, 0);
+      if (!world.isAirBlock(rayTrace.getPos()) && world.isAirBlock(blockAbove)) {
+        world.setBlockState(blockAbove, Blocks.FIRE.getDefaultState());
+      }
+    }
 
     float dropChance = this.magazineStack
         .getCapability(ModCapabilities.MAGAZINE)
@@ -494,8 +549,9 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
         accuracy = 1.0F;
       }
     }
-    return accuracy * this.gunItem.getAccuracy()
+    accuracy = accuracy * this.gunItem.getAccuracy()
         * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
+    return accuracy > 1.0F ? 1.0F : accuracy;
   }
 
   @Override
@@ -644,6 +700,17 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     return 512;
   }
 
+  private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {
+    float explosionSize = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, magazineStack)
+        / Enchantments.POWER.getMaxLevel();
+    if (explosionSize > 0) {
+      entity
+          .getEntityWorld()
+          .createExplosion(entity, position.getX(), position.getY(), position.getZ(), explosionSize,
+              Explosion.Mode.NONE);
+    }
+  }
+
   private ItemStack findAmmo(ILiving<?> living, boolean simulate) {
     List<ICapabilityProvider> ammoProviders = ImmutableList
         .of(living.getStackInSlot(InventorySlotType.VEST.getIndex()),
@@ -654,8 +721,10 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
           .map(itemHandler -> {
             for (int i = 0; i < itemHandler.getSlots(); ++i) {
               ItemStack itemStack = itemHandler.getStackInSlot(i);
-              if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem())
-                  && itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
+              if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem()) && !itemStack
+                  .getCapability(ModCapabilities.MAGAZINE)
+                  .map(IMagazine::isEmpty)
+                  .orElse(true)) {
                 ItemStack magazineStack = simulate ? itemStack.copy() : itemStack.split(1);
                 if (!simulate && living.getEntity() instanceof PlayerEntity) {
                   PlayerEntity playerEntity = (PlayerEntity) living.getEntity();

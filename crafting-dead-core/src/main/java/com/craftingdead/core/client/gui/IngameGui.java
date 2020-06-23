@@ -109,8 +109,10 @@ public class IngameGui {
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
-        if (ClientDist.clientConfig.displayBlood.get()) {
-          renderBlood(width, height, playerEntity.getHealth() / playerEntity.getMaxHealth());
+        float healthPercentage = playerEntity.getHealth() / playerEntity.getMaxHealth();
+        if (ClientDist.clientConfig.displayBlood.get() && healthPercentage < 1.0F
+            && playerEntity.isPotionActive(ModEffects.BLEEDING.get())) {
+          renderBlood(width, height, healthPercentage);
         }
 
         // Only render when air level is not being rendered
@@ -189,19 +191,17 @@ public class IngameGui {
   }
 
   private static void renderBlood(int width, int height, float healthPercentage) {
-    if (healthPercentage < 1.0F) {
-      ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
+    ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
 
-      RenderSystem.enableBlend();
-      RenderSystem.disableAlphaTest();
+    RenderSystem.enableBlend();
+    RenderSystem.disableAlphaTest();
 
-      RenderUtil.bind(res);
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
-      RenderUtil.drawTexturedRectangle(0, 0, width, height);
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.enableAlphaTest();
-      RenderSystem.disableBlend();
-    }
+    RenderUtil.bind(res);
+    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
+    RenderUtil.drawTexturedRectangle(0, 0, width, height);
+    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.enableAlphaTest();
+    RenderSystem.disableBlend();
   }
 
   private static void renderPlayerStats(FontRenderer fontRenderer, int width, int height,

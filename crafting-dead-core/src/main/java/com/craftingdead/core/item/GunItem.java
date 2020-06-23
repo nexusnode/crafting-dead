@@ -15,9 +15,12 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.animation.IAnimation;
 import com.craftingdead.core.capability.gun.DefaultGun;
+import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -32,6 +35,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 
 public class GunItem extends ShootableItem {
 
@@ -79,6 +83,8 @@ public class GunItem extends ShootableItem {
 
   private final Set<Supplier<MagazineItem>> acceptedMagazines;
 
+  private final Supplier<MagazineItem> defaultMagazine;
+
   private final Set<Supplier<AttachmentItem>> acceptedAttachments;
 
   private final Set<Supplier<PaintItem>> acceptedPaints;
@@ -100,6 +106,7 @@ public class GunItem extends ShootableItem {
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
     this.acceptedMagazines = properties.acceptedMagazines;
+    this.defaultMagazine = properties.defaultMagazine;
     this.acceptedAttachments = properties.acceptedAttachments;
     this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
@@ -165,6 +172,10 @@ public class GunItem extends ShootableItem {
 
   public Set<MagazineItem> getAcceptedMagazines() {
     return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Supplier<MagazineItem> getDefaultMagazine() {
+    return this.defaultMagazine;
   }
 
   public Set<AttachmentItem> getAcceptedAttachments() {
@@ -285,12 +296,32 @@ public class GunItem extends ShootableItem {
 
   @Override
   public CompoundNBT getShareTag(ItemStack stack) {
-    return stack.serializeNBT();
+    CompoundNBT nbt = super.getShareTag(stack);
+    if (nbt != null) {
+      nbt.put("gun", stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null));
+    }
+    return nbt;
   }
 
   @Override
   public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    stack.deserializeNBT(nbt);
+    super.readShareTag(stack, nbt);
+    if (nbt != null && nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
+      stack
+          .getCapability(ModCapabilities.GUN)
+          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("gun")));
+    }
+  }
+
+  @Override
+  public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+    return enchantment == Enchantments.FLAME || enchantment == Enchantments.POWER
+        || super.canApplyAtEnchantingTable(stack, enchantment);
+  }
+
+  @Override
+  public int getItemEnchantability() {
+    return 1;
   }
 
   public static enum AnimationType {
@@ -325,6 +356,8 @@ public class GunItem extends ShootableItem {
         new EnumMap<>(AnimationType.class);
 
     private final Set<Supplier<MagazineItem>> acceptedMagazines = new HashSet<>();
+
+    private Supplier<MagazineItem> defaultMagazine;
 
     private final Set<Supplier<AttachmentItem>> acceptedAttachments = new HashSet<>();
 
@@ -397,16 +430,22 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
+    public Properties setDefaultMagazine(Supplier<MagazineItem> defaultMagazine) {
+      if (this.defaultMagazine != null) {
+        throw new IllegalArgumentException("Default magazine already set");
+      }
+      this.defaultMagazine = defaultMagazine;
+      return this.addAcceptedMagazine(defaultMagazine);
+    }
+
     public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
       this.acceptedAttachments.add(acceptedAttachment);
       return this;
     }
 
     public Properties addDefaultAttachment(Supplier<AttachmentItem> defaultAttachment) {
-      // Default attachments are also accepted attachments
-      this.addAcceptedAttachment(defaultAttachment);
       this.defaultAttachments.add(defaultAttachment);
-      return this;
+      return this.addAcceptedAttachment(defaultAttachment);
     }
 
     public Properties addAcceptedPaint(Supplier<PaintItem> acceptedPaint) {

@@ -111,6 +111,8 @@ public class ClientDist implements IModDist {
 
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
+  public static final KeyBinding REMOVE_MAGAZINE =
+      new KeyBinding("key.remove_magazine", GLFW.GLFW_KEY_J, "key.categories.gameplay");
   public static final KeyBinding TOGGLE_FIRE_MODE =
       new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
   public static final KeyBinding OPEN_MOD_INVENTORY =
@@ -269,6 +271,7 @@ public class ClientDist implements IModDist {
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
+    ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_MOD_INVENTORY);
 
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
@@ -421,11 +424,21 @@ public class ClientDist implements IModDist {
         }
         if (this.minecraft.loadingGui == null
             && (this.minecraft.currentScreen == null || this.minecraft.currentScreen.passEvents)) {
+          final ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
           while (TOGGLE_FIRE_MODE.isPressed()) {
-            ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
             heldStack
                 .getCapability(ModCapabilities.GUN)
                 .ifPresent(gun -> gun.toggleFireMode(this.minecraft.player, true));
+          }
+          while (RELOAD.isPressed()) {
+            heldStack
+                .getCapability(ModCapabilities.GUN)
+                .ifPresent(gun -> gun.reload(this.minecraft.player, heldStack, true));
+          }
+          while (REMOVE_MAGAZINE.isPressed()) {
+            heldStack
+                .getCapability(ModCapabilities.GUN)
+                .ifPresent(gun -> gun.removeMagazine(this.minecraft.player, heldStack, true));
           }
           while (OPEN_MOD_INVENTORY.isPressed()) {
             NetworkChannel.MAIN.getSimpleChannel().sendToServer(new OpenModInventoryMessage());

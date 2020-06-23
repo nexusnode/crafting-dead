@@ -44,31 +44,32 @@ public class ModInventoryContainer extends Container {
     }
 
     this
-        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.MELEE.getIndex(), 26,
-            9, (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.MELEE.getIndex(),
+            26, 9, (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
     this
-        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.GUN.getIndex(), 44, 9,
-            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
-    this
-        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.CLOTHING.getIndex(),
-            65, 9, (slot, itemStack) -> itemStack.getItem() instanceof ClothingItem));
-    this
-        .addSlot(new PredicateItemHandlerSlot(itemHandler, InventorySlotType.HAT.getIndex(), 65, 30,
-            (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.GUN.getIndex(),
+            44, 9, (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
     this
         .addSlot(
-            new PredicateItemHandlerSlot(itemHandler, InventorySlotType.BACKPACK.getIndex(), 65, 48,
-                (slot, itemStack) -> itemStack
-                    .getCapability(ModCapabilities.STORAGE)
-                    .map(storage -> storage.isValidForSlot(InventorySlotType.BACKPACK))
-                    .orElse(false)));
+            new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.CLOTHING.getIndex(),
+                65, 9, (slot, itemStack) -> itemStack.getItem() instanceof ClothingItem));
     this
-        .addSlot(
-            new PredicateItemHandlerSlot(itemHandler, InventorySlotType.VEST.getIndex(), 65, 66,
-                (slot, itemStack) -> itemStack
-                    .getCapability(ModCapabilities.STORAGE)
-                    .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
-                    .orElse(false)));
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.HAT.getIndex(),
+            65, 30, (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
+    this
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler,
+            InventorySlotType.BACKPACK.getIndex(), 65, 48,
+            (slot, itemStack) -> itemStack
+                .getCapability(ModCapabilities.STORAGE)
+                .map(storage -> storage.isValidForSlot(InventorySlotType.BACKPACK))
+                .orElse(false)));
+    this
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.VEST.getIndex(),
+            65, 66,
+            (slot, itemStack) -> itemStack
+                .getCapability(ModCapabilities.STORAGE)
+                .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
+                .orElse(false)));
 
     this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, 48, this.craftingInventory));
 

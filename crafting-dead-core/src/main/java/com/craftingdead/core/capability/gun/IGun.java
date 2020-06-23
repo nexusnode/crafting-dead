@@ -23,15 +23,19 @@ public interface IGun extends IScope, IAction, IAnimationController, INBTSeriali
 
   boolean isTriggerPressed();
 
-  boolean isReloading();
-
   int getTotalReloadDurationTicks();
 
   int getReloadDurationTicks();
 
+  boolean isPerformingAction();
+
+  boolean isReloading();
+
   void cancelActions(Entity entity, ItemStack itemStack);
 
   void reload(Entity entity, ItemStack itemStack, boolean sendUpdate);
+
+  void removeMagazine(Entity entity, ItemStack itemStack, boolean sendUpdate);
 
   float getAccuracy(Entity entity, ItemStack itemStack);
 
@@ -71,13 +75,13 @@ public interface IGun extends IScope, IAction, IAnimationController, INBTSeriali
 
   @Override
   default boolean isActive(ClientPlayerEntity playerEntity) {
-    return this.isReloading();
+    return this.isPerformingAction();
   }
 
   @Override
   default ITextComponent getText(ClientPlayerEntity playerEntity) {
-    return this.getMagazineStack().isEmpty() ? new TranslationTextComponent("action.reload")
-        : new TranslationTextComponent("action.unload");
+    return this.isReloading() ? new TranslationTextComponent("action.reload")
+        : new TranslationTextComponent("action.remove_magazine");
   }
 
   @Override

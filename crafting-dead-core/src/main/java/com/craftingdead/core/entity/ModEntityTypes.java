@@ -206,7 +206,7 @@ public class ModEntityTypes {
             Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
   }
 
-  public static void register(RegistryEvent.Register<EntityType<?>> event) {
+  public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
     toRegister.forEach(event.getRegistry()::register);
   }
 

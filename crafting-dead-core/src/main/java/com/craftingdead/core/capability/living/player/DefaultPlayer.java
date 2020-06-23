@@ -85,7 +85,23 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   @Override
   public void tick() {
     super.tick();
+    this.updateEffects();
     this.updateBrokenLeg();
+  }
+
+  private void updateEffects() {
+    if (this.entity.isCreative()) {
+      if (this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
+        this.entity.removePotionEffect(ModEffects.BLEEDING.get());
+      }
+      if (this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())) {
+        this.entity.removePotionEffect(ModEffects.BROKEN_LEG.get());
+
+      }
+      if (this.entity.isPotionActive(ModEffects.INFECTION.get())) {
+        this.entity.removePotionEffect(ModEffects.INFECTION.get());
+      }
+    }
   }
 
   private void updateBrokenLeg() {

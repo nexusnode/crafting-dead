@@ -1,6 +1,7 @@
 package com.craftingdead.core.item;
 
 import java.util.List;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class MagazineItem extends Item {
@@ -22,6 +24,7 @@ public class MagazineItem extends Item {
   private final float entityHitDropChance;
   private final float blockHitDropChance;
   private final int size;
+  private final Supplier<? extends Item> nextTier;
 
   public MagazineItem(Properties properties) {
     super(properties);
@@ -29,6 +32,7 @@ public class MagazineItem extends Item {
     this.armorPenetration = properties.armorPenetration;
     this.entityHitDropChance = properties.entityHitDropChance;
     this.blockHitDropChance = properties.blockHitDropChance;
+    this.nextTier = properties.nextTier;
   }
 
   public float getArmorPenetration() {
@@ -47,14 +51,20 @@ public class MagazineItem extends Item {
     return this.size;
   }
 
-  @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(new DefaultMagazine(this), () -> ModCapabilities.MAGAZINE);
+  public Supplier<? extends Item> getNextTier() {
+    return this.nextTier;
   }
 
   @Override
-  public int getItemEnchantability() {
-    return 1;
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SerializableCapabilityProvider<>(new DefaultMagazine(this),
+        () -> ModCapabilities.MAGAZINE);
+  }
+
+  @Override
+  public boolean getIsRepairable(ItemStack itemStack, ItemStack materialStack) {
+    return Tags.Items.GUNPOWDER.contains(materialStack.getItem())
+        || super.getIsRepairable(itemStack, materialStack);
   }
 
   @Override
@@ -74,12 +84,17 @@ public class MagazineItem extends Item {
   public void setDamage(ItemStack itemStack, int damage) {
     itemStack
         .getCapability(ModCapabilities.MAGAZINE)
-        .ifPresent(magazine -> magazine.setSize(Math.max(0, damage)));
+        .ifPresent(magazine -> magazine.setSize(Math.max(0, this.size - damage)));
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public boolean isDamageable() {
+    return true;
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+      ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
 
     // Shows the current amount if the maximum size is higher than 1
@@ -90,29 +105,41 @@ public class MagazineItem extends Item {
       ITextComponent amountText =
           Text.of(currentAmount + "/" + this.getSize()).applyTextStyle(TextFormatting.RED);
 
-      lines.add(Text.translate("item_lore.magazine_item.amount").applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(amountText));
+      lines
+          .add(Text
+              .translate("item_lore.magazine_item.amount")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(amountText));
     }
 
     if (this.armorPenetration > 0) {
-      lines.add(Text.translate("item_lore.magazine_item.armor_penetration")
-          .applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(Text.of(String.format("%.1f", this.armorPenetration) + "%")
-              .applyTextStyle(TextFormatting.RED)));
+      lines
+          .add(Text
+              .translate("item_lore.magazine_item.armor_penetration")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(Text
+                  .of(String.format("%.1f", this.armorPenetration) + "%")
+                  .applyTextStyle(TextFormatting.RED)));
     }
 
     if (this.entityHitDropChance > 0) {
-      lines.add(Text.translate("item_lore.magazine_item.entity_hit_recovery_chance")
-          .applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(Text.of(String.format("%.1f", this.entityHitDropChance) + "%")
-              .applyTextStyle(TextFormatting.RED)));
+      lines
+          .add(Text
+              .translate("item_lore.magazine_item.entity_hit_recovery_chance")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(Text
+                  .of(String.format("%.1f", this.entityHitDropChance) + "%")
+                  .applyTextStyle(TextFormatting.RED)));
     }
 
     if (this.blockHitDropChance > 0) {
-      lines.add(Text.translate("item_lore.magazine_item.block_hit_recovery_chance")
-          .applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(Text.of(String.format("%.1f", this.blockHitDropChance) + "%")
-              .applyTextStyle(TextFormatting.RED)));
+      lines
+          .add(Text
+              .translate("item_lore.magazine_item.block_hit_recovery_chance")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(Text
+                  .of(String.format("%.1f", this.blockHitDropChance) + "%")
+                  .applyTextStyle(TextFormatting.RED)));
     }
   }
 
@@ -122,6 +149,7 @@ public class MagazineItem extends Item {
     private float entityHitDropChance;
     private float blockHitDropChance;
     private int size;
+    private Supplier<? extends Item> nextTier;
 
     public Properties setArmorPenetration(float armorPenetration) {
       this.armorPenetration = armorPenetration;
@@ -140,6 +168,11 @@ public class MagazineItem extends Item {
 
     public Properties setSize(int size) {
       this.size = size;
+      return this;
+    }
+
+    public Properties setNextTier(Supplier<? extends Item> nextTier) {
+      this.nextTier = nextTier;
       return this;
     }
   }
