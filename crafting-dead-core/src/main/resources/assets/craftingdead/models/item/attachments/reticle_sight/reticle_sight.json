@@ -1,6 +1,0 @@
-{
-	"loader":"forge:obj",
-	"model":"craftingdead:models/item/attachments/reticle_sight/reticle_sight.obj",
-	"flip-v":true,
-	"ambientToFullbright": false
-}
