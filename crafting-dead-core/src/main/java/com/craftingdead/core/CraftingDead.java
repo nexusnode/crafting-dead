@@ -153,11 +153,16 @@ public class CraftingDead {
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-    net.minecraftforge.fml.DeferredWorkQueue
-        .runLater(() -> BrewingRecipeRegistry
-            .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
-                Ingredient.fromTag(Tags.Items.NUGGETS_GOLD),
-                new ItemStack(ModItems.CURE_SYRINGE.get())));
+    net.minecraftforge.fml.DeferredWorkQueue.runLater(() -> {
+      BrewingRecipeRegistry
+          .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
+              Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+              new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
+      BrewingRecipeRegistry
+          .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
+              Ingredient.fromItems(Items.ENCHANTED_GOLDEN_APPLE),
+              new ItemStack(ModItems.CURE_SYRINGE.get()));
+    });
   }
 
   @SubscribeEvent
