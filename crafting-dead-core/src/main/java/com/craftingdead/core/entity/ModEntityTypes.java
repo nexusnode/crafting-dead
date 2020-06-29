@@ -8,15 +8,15 @@ import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
 import com.craftingdead.core.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.entity.grenade.FragGrenadeEntity;
-import com.craftingdead.core.entity.grenade.GasGrenadeEntity;
 import com.craftingdead.core.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.core.entity.monster.DoctorZombieEntity;
 import com.craftingdead.core.entity.monster.FastZombieEntity;
 import com.craftingdead.core.entity.monster.GiantZombieEntity;
+import com.craftingdead.core.entity.monster.PoliceZombieEntity;
 import com.craftingdead.core.entity.monster.TankZombieEntity;
 import com.craftingdead.core.entity.monster.WeakZombieEntity;
-import com.craftingdead.core.item.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -44,7 +44,6 @@ public class ModEntityTypes {
   public static EntityType<FireGrenadeEntity> fireGrenade;
   public static EntityType<FlashGrenadeEntity> flashGrenade;
   public static EntityType<FragGrenadeEntity> fragGrenade;
-  public static EntityType<GasGrenadeEntity> gasGrenade;
   public static EntityType<PipeGrenadeEntity> pipeGrenade;
   public static EntityType<SmokeGrenadeEntity> smokeGrenade;
 
@@ -89,14 +88,6 @@ public class ModEntityTypes {
             .setTrackingRange(64)
             .setUpdateInterval(4)
             .size(0.25F, 0.25F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    gasGrenade = add("gas_grenade",
-        EntityType.Builder
-            .<GasGrenadeEntity>create(GasGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     pipeGrenade = add("pipe_grenade",
@@ -154,20 +145,17 @@ public class ModEntityTypes {
             .size(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
-    policeZombie = add("police_zombie", EntityType.Builder
-        .<AdvancedZombieEntity>create((type, world) -> new AdvancedZombieEntity(type, world,
-            ModItems.G18::get, ModItems.POLICE_CLOTHING::get, null), EntityClassification.MONSTER)
-        .setTrackingRange(64)
-        .setUpdateInterval(3)
-        .size(0.6F, 1.95F)
-        .setShouldReceiveVelocityUpdates(false));
+    policeZombie = add("police_zombie",
+        EntityType.Builder
+            .<AdvancedZombieEntity>create(PoliceZombieEntity::new, EntityClassification.MONSTER)
+            .setTrackingRange(64)
+            .setUpdateInterval(3)
+            .size(0.6F, 1.95F)
+            .setShouldReceiveVelocityUpdates(false));
 
     doctorZombie = add("doctor_zombie",
         EntityType.Builder
-            .<AdvancedZombieEntity>create(
-                (type, world) -> new AdvancedZombieEntity(type, world, null,
-                    ModItems.DOCTOR_CLOTHING::get, ModItems.DOCTOR_MASK::get),
-                EntityClassification.MONSTER)
+            .<AdvancedZombieEntity>create(DoctorZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
             .size(0.6F, 1.95F)
@@ -175,9 +163,7 @@ public class ModEntityTypes {
 
     giantZombie = add("giant_zombie",
         EntityType.Builder
-            .<GiantZombieEntity>create(
-                (type, world) -> new GiantZombieEntity(type, world, ModItems.M4A1::get,
-                    ModItems.ARMY_CLOTHING::get, ModItems.ARMY_HELMET::get),
+            .<GiantZombieEntity>create(GiantZombieEntity::new,
                 EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)

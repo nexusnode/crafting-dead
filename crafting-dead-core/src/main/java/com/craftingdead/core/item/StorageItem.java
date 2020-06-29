@@ -26,14 +26,6 @@ public class StorageItem extends Item {
 
   public static final int MAX_ROWS_TO_SHOW = 6;
 
-  public static final Supplier<IStorage> SMALL_BACKPACK = () -> new DefaultStorage(2 * 9,
-      InventorySlotType.BACKPACK, GenericContainer::createSmallBackpack);
-  public static final Supplier<IStorage> MEDIUM_BACKPACK = () -> new DefaultStorage(4 * 9,
-      InventorySlotType.BACKPACK, GenericContainer::createMediumBackpack);
-  public static final Supplier<IStorage> LARGE_BACKPACK = () -> new DefaultStorage(6 * 9,
-      InventorySlotType.BACKPACK, GenericContainer::createLargeBackpack);
-  public static final Supplier<IStorage> GUN_BAG =
-      () -> new DefaultStorage(4 * 9, InventorySlotType.BACKPACK, GenericContainer::createGunBag);
   public static final Supplier<IStorage> VEST =
       () -> new DefaultStorage(2 * 9, InventorySlotType.VEST, GenericContainer::createVest);
 

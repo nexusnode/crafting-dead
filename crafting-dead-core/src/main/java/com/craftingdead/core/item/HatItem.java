@@ -2,102 +2,97 @@ package com.craftingdead.core.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.hat.DefaultHat;
+import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class HatItem extends Item {
 
-  private final double headshotReductionPercentage;
+  private final float headshotReductionPercentage;
 
-  /** In 1.6.4, flash-resistant helmets used to be actually immune. */
   private final boolean immuneToFlashes;
 
   private final boolean immuneToGas;
 
-  private final boolean allowsNightVision;
+  private final boolean nightVision;
 
   public HatItem(Properties properties) {
     super(properties);
     this.headshotReductionPercentage = properties.headshotReductionPercentage;
     this.immuneToFlashes = properties.immuneToFlashes;
     this.immuneToGas = properties.immuneToGas;
-    this.allowsNightVision = properties.allowsNightVision;
+    this.nightVision = properties.nightVision;
+    this.addPropertyOverride(new ResourceLocation("wearing"),
+        (itemStack, world, entity) -> entity.getCapability(ModCapabilities.LIVING)
+            .map(living -> living.getStackInSlot(InventorySlotType.HAT.getIndex()) == itemStack
+                ? 1.0F
+                : 0.0F)
+            .orElse(0.0F));
   }
 
   @Override
   public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
       ITooltipFlag tooltipFlag) {
-    if (this.hasHeadshotReduction()) {
-      ITextComponent percentageText =
-          Text.of(String.format("%.1f", this.headshotReductionPercentage) + "%")
-              .applyTextStyle(TextFormatting.RED);
+    if (this.headshotReductionPercentage > 0.0F) {
+      ITextComponent percentageText = Text
+          .of(String.format("%.1f", this.headshotReductionPercentage) + "%")
+          .applyTextStyle(TextFormatting.RED);
 
-      lore.add(Text.translate("item_lore.hat_item.headshot_reduction")
-          .applyTextStyle(TextFormatting.GRAY).appendSibling(percentageText));
+      lore
+          .add(Text
+              .translate("item_lore.hat_item.headshot_reduction")
+              .applyTextStyle(TextFormatting.GRAY)
+              .appendSibling(percentageText));
     }
-    if (this.isImmuneToFlashes()) {
+    if (this.immuneToFlashes) {
       ITextComponent text = Text.translate("item_lore.hat_item.immune_to_flashes");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
-    if (this.isImmuneToGas()) {
+    if (this.immuneToGas) {
       ITextComponent text = Text.translate("item_lore.hat_item.immune_to_gas");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
-    if (this.hasNightVision()) {
+    if (this.nightVision) {
       ITextComponent text = Text.translate("item_lore.hat_item.has_night_vision");
       text.getStyle().setColor(TextFormatting.GRAY);
       lore.add(text);
     }
   }
 
-  /**
-   * Checks whether this hat has night vision ability. Consider that could be more than one single
-   * hat that have night vision ability.
-   */
-  public boolean hasNightVision() {
-    return this.allowsNightVision;
-  }
-
-  /**
-   * Checks whether the headshot reduction percentage is higher than zero.
-   */
-  public boolean hasHeadshotReduction() {
-    return this.headshotReductionPercentage > 0D;
-  }
-
-  public double getHeadshotReductionPercentage() {
-    return this.headshotReductionPercentage;
-  }
-
-  public boolean isImmuneToFlashes() {
-    return this.immuneToFlashes;
-  }
-
-  public boolean isImmuneToGas() {
-    return this.immuneToGas;
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SimpleCapabilityProvider<>(new DefaultHat(this.nightVision,
+        this.headshotReductionPercentage, this.immuneToFlashes, this.immuneToGas),
+        () -> ModCapabilities.HAT);
   }
 
   public static class Properties extends Item.Properties {
 
-    private double headshotReductionPercentage;
+    private float headshotReductionPercentage;
     private boolean immuneToFlashes;
     private boolean immuneToGas;
-    private boolean allowsNightVision;
+    private boolean nightVision;
 
-    public Properties setHeadshotReductionPercentage(double headshotReductionPercentage) {
+    public Properties setHeadshotReductionPercentage(float headshotReductionPercentage) {
       this.headshotReductionPercentage = headshotReductionPercentage;
       return this;
     }
 
-    public Properties setAllowsNightVision(boolean allowsNightVision) {
-      this.allowsNightVision = allowsNightVision;
+    public Properties setNightVision(boolean nightVision) {
+      this.nightVision = nightVision;
       return this;
     }
 

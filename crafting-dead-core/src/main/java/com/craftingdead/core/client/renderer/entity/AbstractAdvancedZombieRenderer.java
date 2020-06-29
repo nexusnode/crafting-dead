@@ -44,12 +44,6 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
             .withSlot(InventorySlotType.GUN)
             .withCrouchingOrientation(true)
             .build());
-    this
-        .addLayer(new EquipmentLayer.Builder<T, M>()
-            .withRenderer(this)
-            .withSlot(InventorySlotType.BACKPACK)
-            .withCrouchingOrientation(true)
-            .build());
   }
 
   @Override

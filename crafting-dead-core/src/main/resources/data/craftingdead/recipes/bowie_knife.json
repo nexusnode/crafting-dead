@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " s ",
+    "k  "
+  ],
+  "key": {
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "k": {
+      "item": "craftingdead:combat_knife"
+    }
+  },
+  "result": {
+    "item": "craftingdead:bowie_knife"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:bowie_knife"
+    ]
+  },
+  "criteria": {
+    "has_combat_knife": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:combat_knife"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:bowie_knife"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_combat_knife",
+      "has_the_recipe"
+    ]
+  ]
+}

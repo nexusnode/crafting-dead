@@ -232,39 +232,68 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
         BlockModel model = deserializationContext
             .deserialize(JSONUtils.getJsonObject(modelJson, "model"), BlockModel.class);
         JsonArray perspectives = modelJson.getAsJsonArray("perspectives");
-        this
-            .putIfPresent(perspectives, "thirdperson_righthand",
-                TransformType.THIRD_PERSON_RIGHT_HAND, model, models);
-        this
-            .putIfPresent(perspectives, "thirdperson_lefthand",
-                TransformType.THIRD_PERSON_LEFT_HAND, model, models);
-        this
-            .putIfPresent(perspectives, "firstperson_righthand",
-                TransformType.FIRST_PERSON_RIGHT_HAND, model, models);
-        this
-            .putIfPresent(perspectives, "firstperson_lefthand",
-                TransformType.FIRST_PERSON_LEFT_HAND, model, models);
-        this.putIfPresent(perspectives, "head", TransformType.HEAD, model, models);
-        this.putIfPresent(perspectives, "gui", TransformType.GUI, model, models);
-        this.putIfPresent(perspectives, "ground", TransformType.GROUND, model, models);
-        this.putIfPresent(perspectives, "fixed", TransformType.FIXED, model, models);
+        for (JsonElement perspectiveJson : perspectives) {
+          Perspective perpective = Perspective.fromKey(perspectiveJson.getAsString());
+          if (perpective != null) {
+            models.compute(perpective.getTransformType(), (transform, existingModel) -> {
+              if (existingModel != null) {
+                throw new IllegalStateException("Multiple models specified for same perspective");
+              }
+              return model;
+            });
+          }
+        }
       }
       return new PerspectiveAwareModel(models);
     }
+  }
 
-    private void putIfPresent(JsonArray perspectives, String key,
-        ItemCameraTransforms.TransformType cameraTransformType, IUnbakedModel model,
-        Map<ItemCameraTransforms.TransformType, IUnbakedModel> models) {
-      for (JsonElement element : perspectives) {
-        if (element.getAsString().equals(key)) {
-          models.compute(cameraTransformType, (transform, existingModel) -> {
-            if (existingModel != null) {
-              throw new IllegalStateException("Multiple models specified for same perspective");
-            }
-            return model;
-          });
+  public static enum Perspective {
+    THIRD_PERSON_LEFT_HAND(ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
+        "thirdperson_lefthand"), THIRD_PERSON_RIGHT_HAND(
+            ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
+            "thirdperson_righthand"), FIRST_PERSON_LEFT_HAND(
+                ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
+                "firstperson_lefthand"), FIRST_PERSON_RIGHT_HAND(
+                    ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
+                    "firstperson_righthand"), HEAD(ItemCameraTransforms.TransformType.HEAD,
+                        "head"), GUI(ItemCameraTransforms.TransformType.GUI, "gui"), GROUND(
+                            ItemCameraTransforms.TransformType.GROUND,
+                            "ground"), FIXED(ItemCameraTransforms.TransformType.FIXED, "fixed");
+
+    private final ItemCameraTransforms.TransformType transformType;
+    private final String key;
+
+    private Perspective(ItemCameraTransforms.TransformType transformType, String key) {
+      this.transformType = transformType;
+      this.key = key;
+    }
+
+    public ItemCameraTransforms.TransformType getTransformType() {
+      return transformType;
+    }
+
+    public String getKey() {
+      return key;
+    }
+
+    public static Perspective fromTransformType(
+        ItemCameraTransforms.TransformType transformType) {
+      for (Perspective perspective : values()) {
+        if (perspective.transformType == transformType) {
+          return perspective;
         }
       }
+      return null;
+    }
+
+    public static Perspective fromKey(String key) {
+      for (Perspective perspective : values()) {
+        if (perspective.key == key) {
+          return perspective;
+        }
+      }
+      return null;
     }
   }
 }

@@ -35,6 +35,8 @@ subprojects {
     	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
 	}
 	
+	jar.finalizedBy('reobfJar') 
+	
 	jar {
 	    manifest {
 	        attributes([

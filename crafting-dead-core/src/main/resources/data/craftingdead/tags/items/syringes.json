@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "craftingdead:adrenaline_syringe",
+    "craftingdead:syringe",
+    "craftingdead:blood_syringe",
+    "craftingdead:rbi_syringe",
+    "craftingdead:cure_syringe"
+  ]
+}

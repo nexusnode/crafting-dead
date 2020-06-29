@@ -1,13 +1,14 @@
 package com.craftingdead.core.capability.living;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.item.ClothingItem;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -31,6 +32,8 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
    */
   protected ItemStack lastHeldStack = null;
 
+  private List<Integer> dirtySlots = new IntArrayList();
+
   public DefaultLiving() {
     this(null);
   }
@@ -43,10 +46,7 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
   @Override
   public void onContentsChanged(int slot) {
     if (!this.entity.getEntityWorld().isRemote()) {
-      NetworkChannel.MAIN
-          .getSimpleChannel()
-          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-              new SetSlotMessage(this.entity.getEntityId(), slot, this.getStackInSlot(slot)));
+      this.dirtySlots.add(slot);
     }
   }
 
@@ -54,19 +54,24 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
   public void tick() {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     if (heldStack != this.lastHeldStack) {
-      heldStack
-          .getCapability(ModCapabilities.GUN)
+      heldStack.getCapability(ModCapabilities.GUN)
           .ifPresent(gunController -> gunController.cancelActions(this.entity, heldStack));
       this.lastHeldStack = heldStack;
     }
 
-    heldStack
-        .getCapability(ModCapabilities.GUN)
+    heldStack.getCapability(ModCapabilities.GUN)
         .ifPresent(gunController -> gunController.tick(this.entity, heldStack));
 
     this.updateGeneralClothingEffects();
     this.updateScubaClothing();
     this.updateScubaMask();
+
+    for (int slot : this.dirtySlots) {
+      NetworkChannel.MAIN.getSimpleChannel().send(
+          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+          new SetSlotMessage(this.entity.getEntityId(), slot, this.getStackInSlot(slot)));
+    }
+    this.dirtySlots.clear();
   }
 
   private void updateScubaClothing() {
@@ -89,27 +94,22 @@ public class DefaultLiving<E extends LivingEntity> extends ItemStackHandler impl
 
   private void updateGeneralClothingEffects() {
     ItemStack clothingStack = this.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-    if (!(clothingStack.getItem() instanceof ClothingItem)) {
-      return;
-    }
-    ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
+    clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
+      // Fire immunity
+      if (clothing.hasFireImmunity()) {
+        if (this.entity.getFireTimer() > 0) {
+          this.entity.extinguish();
+        }
 
-    // Fire immunity
-    if (clothingItem.hasFireImmunity()) {
-      if (this.entity.getFireTimer() > 0) {
-        this.entity.extinguish();
+        this.entity.addPotionEffect(
+            new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
 
-      this.entity
-          .addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
-    }
-
-    // Movement speed
-    if (clothingItem.getSlownessLevel() != null) {
-      this.entity
-          .addPotionEffect(new EffectInstance(Effects.SLOWNESS, 2, clothingItem.getSlownessLevel(),
-              false, false, false));
-    }
+      // Movement speed
+      clothing.getSlownessAmplifier()
+          .ifPresent(amplifier -> this.entity.addPotionEffect(
+              new EffectInstance(Effects.SLOWNESS, 2, amplifier, false, false, false)));
+    });
   }
 
   @Override

@@ -2,11 +2,11 @@ package com.craftingdead.core.entity.grenade;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.GrenadeItem;
-import com.craftingdead.core.item.HatItem;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.particle.RGBFlashParticleData;
 import com.craftingdead.core.potion.FlashBlindnessEffect;
@@ -122,8 +122,8 @@ public class FlashGrenadeEntity extends GrenadeEntity {
         .map(living -> living.getStackInSlot(InventorySlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 
-    boolean isImmuneToFlashes = hatItemStack.getItem() instanceof HatItem
-        && ((HatItem) hatItemStack.getItem()).isImmuneToFlashes();
+    final boolean isImmuneToFlashes =
+        hatItemStack.getCapability(ModCapabilities.HAT).map(IHat::isImmuneToFlashes).orElse(false);
 
     if (insideFOV && !isImmuneToFlashes) {
       double distanceProportion =

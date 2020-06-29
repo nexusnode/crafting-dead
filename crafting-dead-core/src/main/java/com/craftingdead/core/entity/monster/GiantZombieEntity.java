@@ -1,17 +1,32 @@
 package com.craftingdead.core.entity.monster;
 
+import com.craftingdead.core.item.ModItems;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.item.Item;
 import net.minecraft.world.World;
 
 public class GiantZombieEntity extends AdvancedZombieEntity {
 
-  public GiantZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world,
-      IItemProvider heldItem, IItemProvider clothingItem, IItemProvider hatItem) {
-    super(type, world, heldItem, clothingItem, hatItem);
+  public GiantZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world) {
+    super(type, world);
+  }
+
+  @Override
+  protected Item getMelee() {
+    return ModItems.M4A1.get();
+  }
+
+  @Override
+  protected Item getClothing() {
+    return ModItems.ARMY_CLOTHING.get();
+  }
+
+  @Override
+  protected Item getHat() {
+    return ModItems.ARMY_HELMET.get();
   }
 
   @Override

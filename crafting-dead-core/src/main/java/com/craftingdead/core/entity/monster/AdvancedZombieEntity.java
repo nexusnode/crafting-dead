@@ -1,16 +1,20 @@
 package com.craftingdead.core.entity.monster;
 
+import java.util.List;
 import java.util.Random;
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.inventory.InventorySlotType;
+import com.craftingdead.core.item.ClothingItem;
+import com.craftingdead.core.item.HatItem;
+import com.craftingdead.core.item.MeleeWeaponItem;
+import com.craftingdead.core.item.ModItems;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -18,47 +22,35 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Hand;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.RegistryObject;
 
 public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackMob {
 
+  private static final float MELEE_CHANCE = 0.15F;
+  private static final float CLOTHING_CHANCE = 0.25F;
+  private static final float HAT_CHANCE = 0.05F;
+
   private static final DataParameter<Integer> TEXTURE_NUMBER =
       EntityDataManager.createKey(AdvancedZombieEntity.class, DataSerializers.VARINT);
-
-  private final IItemProvider heldItem;
-  private final IItemProvider clothingItem;
-  private final IItemProvider hatItem;
 
   private RangedAttackGoal rangedAttackGoal;
 
   private long triggerPressedStartTime;
 
   public AdvancedZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world) {
-    this(type, world, null, null, null);
-  }
-
-  public AdvancedZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world,
-      IItemProvider mainHandItem, IItemProvider clothingItem, IItemProvider hatItem) {
     super(type, world);
-    this.heldItem = mainHandItem;
-    this.clothingItem = clothingItem;
-    this.hatItem = hatItem;
-  }
-
-  public AdvancedZombieEntity(World world, IItemProvider heldItem, IItemProvider clothingItem,
-      IItemProvider hatItem) {
-    this(ModEntityTypes.advancedZombie, world, heldItem, clothingItem, hatItem);
   }
 
   @Override
@@ -122,17 +114,43 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   @Override
-  public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty,
-      SpawnReason reason, @Nullable ILivingEntityData spawnData, @Nullable CompoundNBT dataTag) {
-    spawnData = super.onInitialSpawn(world, difficulty, reason, spawnData, dataTag);
+  protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
     this.dataManager.set(TEXTURE_NUMBER, this.rand.nextInt(23));
-    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(this.heldItem));
+    this.setItemStackToSlot(EquipmentSlotType.MAINHAND,
+        new ItemStack(this.getMelee()));
     this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       living
-          .setStackInSlot(InventorySlotType.CLOTHING.getIndex(), new ItemStack(this.clothingItem));
-      living.setStackInSlot(InventorySlotType.HAT.getIndex(), new ItemStack(this.hatItem));
+          .setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
+              new ItemStack(
+                  this.getClothing()));
+      living.setStackInSlot(InventorySlotType.HAT.getIndex(),
+          new ItemStack(this.getHat()));
     });
-    return spawnData;
+  }
+
+  protected Item getMelee() {
+    return this.getRandomItem(item -> item instanceof MeleeWeaponItem, MELEE_CHANCE);
+  }
+
+  protected Item getClothing() {
+    return this.getRandomItem(item -> item instanceof ClothingItem, CLOTHING_CHANCE);
+  }
+
+  protected Item getHat() {
+    return this.getRandomItem(item -> item instanceof HatItem, HAT_CHANCE);
+  }
+
+  protected Item getRandomItem(Predicate<Item> predicate, float probability) {
+    if (this.rand.nextFloat() < probability) {
+      List<Item> items = ModItems.ITEMS
+          .getEntries()
+          .stream()
+          .map(RegistryObject::get)
+          .filter(predicate)
+          .collect(Collectors.toList());
+      return items.get(this.rand.nextInt(items.size()));
+    }
+    return null;
   }
 
   public int getTextureNumber() {

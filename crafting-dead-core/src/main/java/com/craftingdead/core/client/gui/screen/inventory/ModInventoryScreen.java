@@ -23,7 +23,6 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
   private int oldMouseX;
   private int oldMouseY;
 
-  private Button backpackButton;
   private Button vestButton;
 
   private boolean transitioning = false;
@@ -37,14 +36,6 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
   @Override
   public void init() {
     super.init();
-    this.backpackButton =
-        new SimpleButton(this.guiLeft + 83, this.guiTop + 48, 10, 16, ">", (button) -> {
-          NetworkChannel.MAIN
-              .getSimpleChannel()
-              .sendToServer(new OpenStorageMessage(InventorySlotType.BACKPACK));
-          this.transitioning = true;
-        });
-    this.addButton(this.backpackButton);
     this.vestButton =
         new SimpleButton(this.guiLeft + 83, this.guiTop + 66, 10, 16, ">", (button) -> {
           NetworkChannel.MAIN
@@ -71,11 +62,6 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
   }
 
   private void refreshButtonStatus() {
-    this.backpackButton.active = this.container
-        .getItemHandler()
-        .getStackInSlot(InventorySlotType.BACKPACK.getIndex())
-        .getCapability(ModCapabilities.STORAGE)
-        .isPresent();
     this.vestButton.active = this.container
         .getItemHandler()
         .getStackInSlot(InventorySlotType.VEST.getIndex())

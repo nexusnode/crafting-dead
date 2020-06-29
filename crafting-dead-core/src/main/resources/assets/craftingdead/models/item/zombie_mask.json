@@ -1,10 +1,8 @@
 {
 	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/zombie_mask"
-		}
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "craftingdead:item/zombie_mask"
 	},
 	"perspective_overrides":[
 		{

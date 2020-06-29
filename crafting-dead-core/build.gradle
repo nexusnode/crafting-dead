@@ -1,3 +1,18 @@
+plugins {
+	id 'com.wynprice.cursemaven' version '2.1.5'
+}
+
+repositories {
+	maven {
+        name 'curseforge'
+        url 'https://minecraft.curseforge.com/api/maven/'
+    }
+}
+
+dependencies {
+	implementation fg.deobf("curse.maven:travelers-backpack:${travelers_backpack_id}")
+}
+
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 

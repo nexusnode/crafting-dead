@@ -5,7 +5,6 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
-import com.craftingdead.core.item.ClothingItem;
 import com.craftingdead.core.item.HatItem;
 import com.craftingdead.core.item.MeleeWeaponItem;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,22 +49,15 @@ public class ModInventoryContainer extends Container {
         .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.GUN.getIndex(),
             44, 9, (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
     this
-        .addSlot(
-            new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.CLOTHING.getIndex(),
-                65, 9, (slot, itemStack) -> itemStack.getItem() instanceof ClothingItem));
+        .addSlot(new PredicateItemHandlerSlot(this.itemHandler,
+            InventorySlotType.CLOTHING.getIndex(), 65, 9,
+            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.CLOTHING).isPresent()));
     this
         .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.HAT.getIndex(),
             65, 30, (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
     this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler,
-            InventorySlotType.BACKPACK.getIndex(), 65, 48,
-            (slot, itemStack) -> itemStack
-                .getCapability(ModCapabilities.STORAGE)
-                .map(storage -> storage.isValidForSlot(InventorySlotType.BACKPACK))
-                .orElse(false)));
-    this
         .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.VEST.getIndex(),
-            65, 66,
+            65, 48,
             (slot, itemStack) -> itemStack
                 .getCapability(ModCapabilities.STORAGE)
                 .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))

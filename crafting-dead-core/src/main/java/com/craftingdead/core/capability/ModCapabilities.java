@@ -4,8 +4,12 @@ import com.craftingdead.core.capability.action.DefaultAction;
 import com.craftingdead.core.capability.action.IAction;
 import com.craftingdead.core.capability.animation.DefaultAnimationController;
 import com.craftingdead.core.capability.animation.IAnimationController;
+import com.craftingdead.core.capability.clothing.DefaultClothing;
+import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.capability.hat.DefaultHat;
+import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.capability.hydration.DefaultHydration;
 import com.craftingdead.core.capability.hydration.IHydration;
 import com.craftingdead.core.capability.living.DefaultLiving;
@@ -54,6 +58,12 @@ public class ModCapabilities {
   @CapabilityInject(IHydration.class)
   public static final Capability<IHydration> HYDRATION = null;
 
+  @CapabilityInject(IClothing.class)
+  public static final Capability<IClothing> CLOTHING = null;
+
+  @CapabilityInject(IHat.class)
+  public static final Capability<IHat> HAT = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
     CapabilityManager.INSTANCE
@@ -68,6 +78,9 @@ public class ModCapabilities {
     CapabilityManager.INSTANCE.register(IScope.class, new EmptyStorage<>(), DefaultScope::new);
     CapabilityManager.INSTANCE
         .register(IHydration.class, new EmptyStorage<>(), DefaultHydration::new);
+    CapabilityManager.INSTANCE
+        .register(IClothing.class, new EmptyStorage<>(), DefaultClothing::new);
+    CapabilityManager.INSTANCE.register(IHat.class, new EmptyStorage<>(), DefaultHat::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

@@ -34,6 +34,8 @@ import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
+import com.tiviacz.travelersbackpack.inventory.TravelersBackpackInventory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -79,10 +81,11 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class DefaultGun extends DefaultAnimationController implements IGun {
@@ -711,35 +714,36 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     }
   }
 
+  private List<IItemHandler> collectAmmoProviders(ILiving<?> living) {
+    ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
+    // Vest first
+    living.getStackInSlot(InventorySlotType.VEST.getIndex())
+        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
+    // Backpack second
+    if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
+        && living.getEntity() instanceof PlayerEntity) {
+      PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
+      TravelersBackpackInventory backpackInventory = CapabilityUtils.getBackpackInv(playerEntity);
+      if (backpackInventory != null) {
+        builder.add(new InvWrapper(backpackInventory));
+      }
+    }
+    // Inventory third
+    living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        .ifPresent(builder::add);
+    return builder.build();
+  }
+
   private ItemStack findAmmo(ILiving<?> living, boolean simulate) {
-    List<ICapabilityProvider> ammoProviders = ImmutableList
-        .of(living.getStackInSlot(InventorySlotType.VEST.getIndex()),
-            living.getStackInSlot(InventorySlotType.BACKPACK.getIndex()), living.getEntity());
-    for (ICapabilityProvider ammoProvider : ammoProviders) {
-      ItemStack ammoStack = ammoProvider
-          .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-          .map(itemHandler -> {
-            for (int i = 0; i < itemHandler.getSlots(); ++i) {
-              ItemStack itemStack = itemHandler.getStackInSlot(i);
-              if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem()) && !itemStack
-                  .getCapability(ModCapabilities.MAGAZINE)
-                  .map(IMagazine::isEmpty)
-                  .orElse(true)) {
-                ItemStack magazineStack = simulate ? itemStack.copy() : itemStack.split(1);
-                if (!simulate && living.getEntity() instanceof PlayerEntity) {
-                  PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
-                  if (itemStack.isEmpty()) {
-                    playerEntity.inventory.deleteStack(itemStack);
-                  }
-                }
-                return magazineStack;
-              }
-            }
-            return ItemStack.EMPTY;
-          })
-          .orElse(ItemStack.EMPTY);
-      if (ammoStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
-        return ammoStack;
+    for (IItemHandler ammoProvider : this.collectAmmoProviders(living)) {
+      for (int i = 0; i < ammoProvider.getSlots(); ++i) {
+        ItemStack itemStack = ammoProvider.getStackInSlot(i);
+        if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem()) && !itemStack
+            .getCapability(ModCapabilities.MAGAZINE)
+            .map(IMagazine::isEmpty)
+            .orElse(true)) {
+          return ammoProvider.extractItem(i, 1, simulate);
+        }
       }
     }
     return ItemStack.EMPTY;

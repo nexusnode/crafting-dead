@@ -1,0 +1,32 @@
+{
+  "replace": false,
+  "values": [
+    "craftingdead:bat",
+    "craftingdead:bo_staff",
+    "craftingdead:bolt_cutters",
+    "craftingdead:bowie_knife",
+    "craftingdead:broad_sword",
+    "craftingdead:broken_bottle",
+    "craftingdead:chainsaw",
+    "craftingdead:cleaver",
+    "craftingdead:combat_knife",
+    "craftingdead:crowbar",
+    "craftingdead:fire_axe",
+    "craftingdead:frying_pan",
+    "craftingdead:golf_club",
+    "craftingdead:hatchet",
+    "craftingdead:katana",
+    "craftingdead:machete",
+    "craftingdead:nail_bat",
+    "craftingdead:night_stick",
+    "craftingdead:pickaxe",
+    "craftingdead:pipe",
+    "craftingdead:rusty_pipe",
+    "craftingdead:scythe",
+    "craftingdead:shovel",
+    "craftingdead:sledge_hammer",
+    "craftingdead:steel_bat",
+    "craftingdead:weaponized_scythe",
+    "craftingdead:wrench"
+  ]
+}

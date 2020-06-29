@@ -12,7 +12,8 @@ import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.ServerPlayer;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.data.Recipes;
+import com.craftingdead.core.data.ModItemTagsProvider;
+import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
@@ -57,6 +58,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -91,6 +93,8 @@ public class CraftingDead {
     commonConfig = commonConfigPair.getLeft();
   }
 
+  private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
+
   /**
    * Logger.
    */
@@ -105,6 +109,8 @@ public class CraftingDead {
    * Mod distribution.
    */
   private final IModDist modDist;
+
+  private boolean travelersBackpacksLoaded;
 
   public CraftingDead() {
     instance = this;
@@ -138,6 +144,10 @@ public class CraftingDead {
     return this.modDist;
   }
 
+  public boolean isTravelersBackpacksLoaded() {
+    return this.travelersBackpacksLoaded;
+  }
+
   public static CraftingDead getInstance() {
     return instance;
   }
@@ -163,12 +173,18 @@ public class CraftingDead {
               Ingredient.fromItems(Items.ENCHANTED_GOLDEN_APPLE),
               new ItemStack(ModItems.CURE_SYRINGE.get()));
     });
+
+    this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
+    if (this.travelersBackpacksLoaded) {
+      logger.info("Adding integration for " + TRAVELERS_BACKPACK_ID);
+    }
   }
 
   @SubscribeEvent
   public void handleGatherData(GatherDataEvent event) {
     DataGenerator dataGenerator = event.getGenerator();
-    dataGenerator.addProvider(new Recipes(dataGenerator));
+    dataGenerator.addProvider(new ModItemTagsProvider(dataGenerator));
+    dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
   }
 
   // ================================================================================

@@ -16,7 +16,7 @@ public class SetSlotMessage {
   public SetSlotMessage(int entityId, int slot, ItemStack itemStack) {
     this.entityId = entityId;
     this.slot = slot;
-    this.itemStack = itemStack;
+    this.itemStack = itemStack.copy();
   }
 
   public static void encode(SetSlotMessage msg, PacketBuffer out) {

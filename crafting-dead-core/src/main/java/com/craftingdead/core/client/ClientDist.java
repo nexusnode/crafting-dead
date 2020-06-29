@@ -38,7 +38,6 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
-import com.craftingdead.core.item.ClothingItem;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.PaintItem;
@@ -55,6 +54,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -66,6 +66,7 @@ import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.entity.Entity;
@@ -118,7 +119,8 @@ public class ClientDist implements IModDist {
   public static final KeyBinding OPEN_MOD_INVENTORY =
       new KeyBinding("key.craftingdead.inventory", GLFW.GLFW_KEY_Z, "key.categories.inventory");
 
-  private final Minecraft minecraft = Minecraft.getInstance();
+  private static final ResourceLocation ADRENALINE_SHADER =
+      new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
 
   /**
    * Random.
@@ -135,9 +137,13 @@ public class ClientDist implements IModDist {
     clientConfig = clientConfigPair.getLeft();
   }
 
-  private final CrosshairManager crosshairManager = new CrosshairManager();
+  private final Minecraft minecraft;
 
-  private final EffectsManager effectsManager = new EffectsManager();
+  private final CrosshairManager crosshairManager;
+
+  private final EffectsManager effectsManager;
+
+  private final IngameGui ingameGui;
 
   /**
    * Current camera velocity.
@@ -159,22 +165,26 @@ public class ClientDist implements IModDist {
 
   private float fovMultiplier = 1.0F;
 
-  private IngameGui ingameGui;
-
   private TutorialSteps lastTutorialStep;
 
   private boolean effectsManagerLoaded = false;
 
+  private long adrenalineShaderStartTime = 0L;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
-
-    ((IReloadableResourceManager) this.minecraft.getResourceManager())
-        .addReloadListener(this.crosshairManager);
-
-    this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
-
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
+
+    this.minecraft = Minecraft.getInstance();
+    this.crosshairManager = new CrosshairManager();
+    // Minecraft is null on date gen launch
+    if (this.minecraft != null) {
+      ((IReloadableResourceManager) this.minecraft.getResourceManager())
+          .addReloadListener(this.crosshairManager);
+    }
+    this.effectsManager = new EffectsManager();
+    this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
   }
 
   public void joltCamera(float amountPercent, boolean permenantJolt) {
@@ -254,13 +264,6 @@ public class ClientDist implements IModDist {
   public void handleClientSetup(FMLClientSetupEvent event) {
     ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
     ScreenManager.registerFactory(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
-    ScreenManager
-        .registerFactory(ModContainerTypes.SMALL_BACKPACK.get(), GenericContainerScreen::new);
-    ScreenManager
-        .registerFactory(ModContainerTypes.MEDIUM_BACKPACK.get(), GenericContainerScreen::new);
-    ScreenManager
-        .registerFactory(ModContainerTypes.LARGE_BACKPACK.get(), GenericContainerScreen::new);
-    ScreenManager.registerFactory(ModContainerTypes.GUN_BAG.get(), GenericContainerScreen::new);
 
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
@@ -297,8 +300,6 @@ public class ClientDist implements IModDist {
         .registerEntityRenderingHandler(ModEntityTypes.fireGrenade, CylinderGrenadeRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.fragGrenade, FragGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.gasGrenade, CylinderGrenadeRenderer::new);
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.pipeGrenade, CylinderGrenadeRenderer::new);
     RenderingRegistry
@@ -341,13 +342,6 @@ public class ClientDist implements IModDist {
             renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
                 .withRenderer(renderer)
                 .withSlot(InventorySlotType.GUN)
-                .withCrouchingOrientation(true)
-                .build());
-    this
-        .registerPlayerLayer(
-            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-                .withRenderer(renderer)
-                .withSlot(InventorySlotType.BACKPACK)
                 .withCrouchingOrientation(true)
                 .build());
   }
@@ -514,15 +508,6 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
-    switch (event.getType()) {
-
-      default:
-        break;
-    }
-  }
-
-  @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
@@ -573,7 +558,6 @@ public class ClientDist implements IModDist {
       this.roll = 0;
       this.pitch = 0;
     }
-
     event.setRoll(event.getRoll() + roll);
     event.setPitch(event.getPitch() + pitch);
   }
@@ -595,17 +579,53 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         if (this.minecraft.player != null) {
-          float smoothYaw =
-              MathHelper.lerp(0.15F, this.prevRotationVelocity.x, this.rotationVelocity.x);
-          float smoothPitch =
-              MathHelper.lerp(0.15F, this.prevRotationVelocity.y, this.rotationVelocity.y);
-          this.rotationVelocity = Vec2f.ZERO;
-          this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
-          this.minecraft.player.rotateTowards(smoothYaw, smoothPitch);
+          this.updateCameraRotation();
+        }
+        break;
+      case END:
+        if (this.minecraft.player != null) {
+          this.updateAdrenalineShader(event.renderTickTime);
         }
         break;
       default:
         break;
+    }
+  }
+
+  private void updateCameraRotation() {
+    float smoothYaw =
+        MathHelper.lerp(0.15F, this.prevRotationVelocity.x, this.rotationVelocity.x);
+    float smoothPitch =
+        MathHelper.lerp(0.15F, this.prevRotationVelocity.y, this.rotationVelocity.y);
+    this.rotationVelocity = Vec2f.ZERO;
+    this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
+    this.minecraft.player.rotateTowards(smoothYaw, smoothPitch);
+  }
+
+  private void updateAdrenalineShader(float partialTicks) {
+    final GameRenderer gameRenderer = this.minecraft.gameRenderer;
+    final boolean shaderLoaded = gameRenderer.getShaderGroup() != null
+        && gameRenderer.getShaderGroup().getShaderGroupName()
+            .equals(ADRENALINE_SHADER.toString());
+    if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+      final long currentTime = Util.milliTime();
+      if (this.adrenalineShaderStartTime == 0L) {
+        this.adrenalineShaderStartTime = currentTime;
+      }
+      float progress = MathHelper
+          .clamp(((currentTime - this.adrenalineShaderStartTime)
+              - partialTicks) / 5000.0F, 0.0F, 1.0F);
+      if (!shaderLoaded) {
+        if (gameRenderer.getShaderGroup() != null) {
+          gameRenderer.stopUseShader();
+        }
+        gameRenderer.loadShader(ADRENALINE_SHADER);
+      }
+      ShaderGroup shaderGroup = gameRenderer.getShaderGroup();
+      RenderUtil.updateUniform("Saturation", progress * 0.25F, shaderGroup);
+    } else if (shaderLoaded) {
+      this.adrenalineShaderStartTime = 0L;
+      gameRenderer.stopUseShader();
     }
   }
 
@@ -687,9 +707,8 @@ public class ClientDist implements IModDist {
     playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       String skinType = playerEntity.getSkinType();
       ItemStack clothingStack = living.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-      if (clothingStack.getItem() instanceof ClothingItem) {
-        ClothingItem clothingItem = (ClothingItem) clothingStack.getItem();
-        ResourceLocation clothingSkin = clothingItem.getClothingSkin(skinType);
+      clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
+        ResourceLocation clothingSkin = clothing.getTexture(skinType);
 
         PlayerModel<AbstractClientPlayerEntity> playermodel = renderer.getEntityModel();
         playermodel.swingProgress = 0.0F;
@@ -708,7 +727,7 @@ public class ClientDist implements IModDist {
         secondLayerModel
             .render(matrix, buffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)),
                 p_229144_3_, OverlayTexture.DEFAULT_UV);
-      }
+      });
     });
   }
 }

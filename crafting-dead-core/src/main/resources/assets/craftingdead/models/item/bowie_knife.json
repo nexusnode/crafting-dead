@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdead:item/melee",
+  "textures": {
+    "layer0": "craftingdead:item/bowie_knife"
+  }
+}

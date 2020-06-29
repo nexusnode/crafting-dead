@@ -1,8 +1,11 @@
 package com.craftingdead.core.item;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 import javax.annotation.Nullable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.clothing.DefaultClothing;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -11,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.UseAction;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -19,30 +23,30 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ClothingItem extends Item {
 
   private final int armorLevel;
   @Nullable
-  private final Integer slownessLevel;
+  private final Integer slownessAmplifier;
   private final boolean fireImmunity;
 
   public ClothingItem(Properties properties) {
     super(properties);
 
     this.armorLevel = properties.armorLevel;
-    this.slownessLevel = properties.slownessLevel;
+    this.slownessAmplifier = properties.slownessAmplifier;
     this.fireImmunity = properties.fireImmunity;
   }
 
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
     if (!worldIn.isRemote) {
-      Random rand = new Random();
-      int randomRagAmount = rand.nextInt(3) + 3;
+      int randomRagAmount = random.nextInt(3) + 3;
 
       for (int i = 0; i < randomRagAmount; i++) {
-        if (rand.nextBoolean()) {
+        if (random.nextBoolean()) {
           entityLiving.entityDropItem(new ItemStack(ModItems.CLEAN_RAG::get));
         } else {
           entityLiving.entityDropItem(new ItemStack(ModItems.DIRTY_RAG::get));
@@ -58,47 +62,48 @@ public class ClothingItem extends Item {
     return stack;
   }
 
-  public int getArmorLevel() {
-    return this.armorLevel;
-  }
-
-  @Nullable
-  public Integer getSlownessLevel() {
-    return this.slownessLevel;
-  }
-
-  public boolean hasFireImmunity() {
-    return this.fireImmunity;
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SimpleCapabilityProvider<>(
+        new DefaultClothing(this.armorLevel, Optional.ofNullable(this.slownessAmplifier),
+            this.fireImmunity,
+            new ResourceLocation(this.getRegistryName().getNamespace(), "textures/models/clothing/"
+                + this.getRegistryName().getPath() + "_" + "default" + ".png")),
+        () -> ModCapabilities.CLOTHING);
   }
 
   @Override
   public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
     ItemStack itemstack = playerIn.getHeldItem(handIn);
-
     playerIn.setActiveHand(handIn);
     return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+      ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
     ITextComponent armorLevelText = Text.of(this.armorLevel).applyTextStyle(TextFormatting.RED);
 
-    lines.add(Text.translate("item_lore.clothing.protection_level")
-        .applyTextStyle(TextFormatting.GRAY).appendSibling(armorLevelText));
+    lines
+        .add(Text
+            .translate("item_lore.clothing.protection_level")
+            .applyTextStyle(TextFormatting.GRAY)
+            .appendSibling(armorLevelText));
 
-    if (this.slownessLevel != null) {
+    if (this.slownessAmplifier != null) {
       String potionNameAndLevel = I18n.format(Effects.SLOWNESS.getName()) + " "
-          + I18n.format("enchantment.level." + (this.slownessLevel + 1));
+          + I18n.format("enchantment.level." + (this.slownessAmplifier + 1));
 
       lines.add(Text.of(potionNameAndLevel).applyTextStyle(TextFormatting.GRAY));
     }
 
     if (this.fireImmunity) {
-      lines.add(
-          Text.translate("item_lore.clothing.immune_to_fire").applyTextStyle(TextFormatting.GRAY));
+      lines
+          .add(Text
+              .translate("item_lore.clothing.immune_to_fire")
+              .applyTextStyle(TextFormatting.GRAY));
     }
   }
 
@@ -112,15 +117,10 @@ public class ClothingItem extends Item {
     return UseAction.BLOCK;
   }
 
-  public ResourceLocation getClothingSkin(String skinType) {
-    return new ResourceLocation(this.getRegistryName().getNamespace(),
-        "textures/models/clothing/" + this.getRegistryName().getPath() + "_" + skinType + ".png");
-  }
-
   public static class Properties extends Item.Properties {
 
     private int armorLevel = 0;
-    private Integer slownessLevel = null;
+    private Integer slownessAmplifier = null;
     private boolean fireImmunity = false;
 
     public Properties setArmorLevel(int armorLevel) {
@@ -131,8 +131,8 @@ public class ClothingItem extends Item {
     /**
      * Potion levels starts at 0.
      */
-    public Properties setSlownessLevel(int slownessLevel) {
-      this.slownessLevel = slownessLevel;
+    public Properties setSlownessAmplifier(int slownessAmplifier) {
+      this.slownessAmplifier = slownessAmplifier;
       return this;
     }
 
