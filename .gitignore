@@ -7,6 +7,7 @@ crafting-dead-core/build/
 crafting-dead-core/server/
 crafting-dead-core/run/
 crafting-dead-core/.idea/
+crafting-dead-core/src/generated/
 
 crafting-dead-immerse/.classpath
 crafting-dead-immerse/.project

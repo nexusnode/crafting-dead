@@ -1,17 +1,34 @@
 package com.craftingdead.core.capability.living;
 
 import java.util.Collection;
-import java.util.UUID;
+import java.util.Optional;
+import com.craftingdead.core.action.IAction;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ILiving<E extends LivingEntity>
-    extends INBTSerializable<CompoundNBT>, IItemHandlerModifiable {
+public interface ILiving<E extends LivingEntity> extends INBTSerializable<CompoundNBT> {
+
+  default boolean performAction(IAction action, boolean sendUpdate) {
+    return this.performAction(action, false, sendUpdate);
+  }
+
+  boolean performAction(IAction action, boolean force, boolean sendUpdate);
+
+  void cancelAction(boolean sendUpdate);
+
+  void setActionProgress(IActionProgress actionProgress);
+
+  Optional<IActionProgress> getActionProgress();
+
+  void setFreezeMovement(boolean movementFrozen);
+
+  boolean getFreezeMovement();
 
   void tick();
 
@@ -58,7 +75,18 @@ public interface ILiving<E extends LivingEntity>
    */
   boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops);
 
+  IItemHandlerModifiable getItemHandler();
+
   E getEntity();
 
-  UUID getId();
+  public static interface IActionProgress {
+
+    ITextComponent getMessage();
+
+    ITextComponent getSubMessage();
+
+    float getProgress(float partialTicks);
+
+    void stop();
+  }
 }

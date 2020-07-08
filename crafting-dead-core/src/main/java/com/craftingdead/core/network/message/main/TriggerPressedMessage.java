@@ -34,11 +34,12 @@ public class TriggerPressedMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getHeldItemMainhand();
-          heldStack
-              .getCapability(ModCapabilities.GUN)
-              .ifPresent(gun -> gun
-                  .setTriggerPressed(entity, heldStack, msg.triggerPressed,
-                      ctx.get().getDirection().getReceptionSide().isServer()));
+          livingEntity.getCapability(ModCapabilities.LIVING)
+              .ifPresent(living -> heldStack
+                  .getCapability(ModCapabilities.GUN)
+                  .ifPresent(gun -> gun
+                      .setTriggerPressed(living, heldStack, msg.triggerPressed,
+                          ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

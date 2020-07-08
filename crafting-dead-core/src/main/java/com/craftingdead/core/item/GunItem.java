@@ -203,7 +203,7 @@ public class GunItem extends ShootableItem {
     return new SerializableCapabilityProvider<>(new DefaultGun(this),
         ImmutableSet
             .of(() -> ModCapabilities.ANIMATION_CONTROLLER, () -> ModCapabilities.GUN,
-                () -> ModCapabilities.ACTION, () -> ModCapabilities.SCOPE));
+                () -> ModCapabilities.SCOPE));
   }
 
   @Override
@@ -221,10 +221,10 @@ public class GunItem extends ShootableItem {
   public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
       Hand hand) {
     if (world.isRemote()) {
-      playerEntity
+      playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> playerEntity
           .getHeldItem(hand)
           .getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.toggleAiming(playerEntity, true));
+          .ifPresent(gun -> gun.toggleAiming(living, true)));
     }
     return super.onItemRightClick(world, playerEntity, hand);
   }

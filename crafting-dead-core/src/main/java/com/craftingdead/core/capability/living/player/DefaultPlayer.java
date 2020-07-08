@@ -1,13 +1,10 @@
 package com.craftingdead.core.capability.living.player;
 
-import java.util.Collection;
 import java.util.Random;
-import java.util.UUID;
 import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.potion.ModEffects;
 import com.google.common.primitives.Ints;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -18,7 +15,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -27,7 +23,7 @@ import net.minecraft.world.GameRules;
  * @param <E> - the associated {@link PlayerEntity}
  * @author Sm0keySa1m0n
  */
-public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> implements IPlayer<E> {
+public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> {
 
   /**
    * The % chance of getting infected by a zombie.
@@ -74,10 +70,6 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
    */
   protected int maxStamina = 1500;
 
-  public DefaultPlayer() {
-    super();
-  }
-
   public DefaultPlayer(E entity) {
     super(entity);
   }
@@ -90,30 +82,31 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
   }
 
   private void updateEffects() {
-    if (this.entity.isCreative()) {
-      if (this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
-        this.entity.removePotionEffect(ModEffects.BLEEDING.get());
+    if (this.getEntity().isCreative()) {
+      if (this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
+        this.getEntity().removePotionEffect(ModEffects.BLEEDING.get());
       }
-      if (this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())) {
-        this.entity.removePotionEffect(ModEffects.BROKEN_LEG.get());
+      if (this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())) {
+        this.getEntity().removePotionEffect(ModEffects.BROKEN_LEG.get());
 
       }
-      if (this.entity.isPotionActive(ModEffects.INFECTION.get())) {
-        this.entity.removePotionEffect(ModEffects.INFECTION.get());
+      if (this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
+        this.getEntity().removePotionEffect(ModEffects.INFECTION.get());
       }
     }
   }
 
   private void updateBrokenLeg() {
-    if (!this.entity.isCreative() && !this.entity.isPotionActive(ModEffects.BROKEN_LEG.get())
-        && this.entity.onGround && !this.entity.isInWater()
-        && ((this.entity.fallDistance > 4F && random.nextInt(3) == 0)
-            || this.entity.fallDistance > 10F)) {
-      this.entity
+    if (!this.getEntity().isCreative()
+        && !this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())
+        && this.getEntity().onGround && !this.getEntity().isInWater()
+        && ((this.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
+            || this.getEntity().fallDistance > 10F)) {
+      this.getEntity()
           .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
-      this.entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
+      this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
+      this.getEntity().addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
   }
 
@@ -126,11 +119,11 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
     if (isValidSource) {
       float bleedChance = 0.1F * amount;
       if (random.nextFloat() < bleedChance
-          && !this.entity.isPotionActive(ModEffects.BLEEDING.get())) {
-        this.entity
+          && !this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
+        this.getEntity()
             .sendStatusMessage(new TranslationTextComponent("message.bleeding")
                 .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-        this.entity.addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+        this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
       }
     }
     return amount;
@@ -154,34 +147,13 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
     return false;
   }
 
-  @Override
-  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
-    boolean shouldKeepInventory =
-        this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
-    if (!shouldKeepInventory) {
-      // Adds items from CD inventory
-      for (int i = 0; i < this.getSlots(); i++) {
-        ItemEntity itemEntity = new ItemEntity(this.entity.world, this.entity.getX(),
-            this.entity.getY(), this.entity.getZ(), this.getStackInSlot(i));
-        itemEntity.setDefaultPickupDelay();
-
-        drops.add(itemEntity);
-      }
-
-      // Clears CD inventory
-      this.stacks.clear();
-    }
-    return super.onDeathDrops(cause, drops);
-  }
-
-  @Override
   public void infect(float chance) {
-    if (!this.entity.isCreative() && random.nextFloat() < chance
-        && !this.entity.isPotionActive(ModEffects.INFECTION.get())) {
-      this.entity
+    if (!this.getEntity().isCreative() && random.nextFloat() < chance
+        && !this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
+      this.getEntity()
           .sendStatusMessage(new TranslationTextComponent("message.infected")
               .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
-      this.entity.addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+      this.getEntity().addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
     }
   }
 
@@ -208,84 +180,59 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> impl
     this.setMaxStamina(nbt.getInt("maxStamina"));
   }
 
-  @Override
   public int getDaysSurvived() {
     return this.daysSurvived;
   }
 
-  @Override
   public void setDaysSurvived(int daysSurvived) {
     this.daysSurvived = daysSurvived;
   }
 
-  @Override
   public int getZombiesKilled() {
     return this.zombiesKilled;
   }
 
-  @Override
   public void setZombiesKilled(int zombiesKilled) {
     this.zombiesKilled = zombiesKilled;
   }
 
-
-  @Override
   public int getPlayersKilled() {
     return this.playersKilled;
   }
 
-  @Override
   public void setPlayersKilled(int playersKilled) {
     this.playersKilled = playersKilled;
   }
 
-  @Override
   public int getWater() {
     return this.water;
   }
 
-  @Override
   public void setWater(int water) {
     this.water = Ints.constrainToRange(water, 0, this.getMaxWater());
   }
 
-  @Override
   public int getMaxWater() {
     return this.maxWater;
   }
 
-  @Override
   public void setMaxWater(int maxWater) {
     this.maxWater = maxWater;
   }
 
-  @Override
   public int getStamina() {
     return this.stamina;
   }
 
-  @Override
   public void setStamina(int stamina) {
     this.stamina = Ints.constrainToRange(stamina, 0, this.getMaxStamina());
   }
 
-  @Override
   public int getMaxStamina() {
     return this.maxStamina;
   }
 
-  @Override
   public void setMaxStamina(int maxStamina) {
     this.maxStamina = maxStamina;
-  }
-
-  @Override
-  public E getEntity() {
-    return this.entity;
-  }
-
-  @Override
-  public UUID getId() {
-    return this.entity != null ? this.entity.getUniqueID() : null;
   }
 }

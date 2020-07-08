@@ -57,7 +57,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   protected void registerGoals() {
     super.registerGoals();
     this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F);
-    this.goalSelector.addGoal(2, this.rangedAttackGoal);
+    this.goalSelector.addGoal(3, this.rangedAttackGoal);
     this.goalSelector.addGoal(1, new FollowAttractiveGrenadeGoal(this, 1.15F));
     this.goalSelector
         .addGoal(4,
@@ -119,11 +119,11 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     this.setItemStackToSlot(EquipmentSlotType.MAINHAND,
         new ItemStack(this.getMelee()));
     this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
-      living
+      living.getItemHandler()
           .setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
               new ItemStack(
                   this.getClothing()));
-      living.setStackInSlot(InventorySlotType.HAT.getIndex(),
+      living.getItemHandler().setStackInSlot(InventorySlotType.HAT.getIndex(),
           new ItemStack(this.getHat()));
     });
   }
@@ -169,28 +169,30 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   public void tick() {
     super.tick();
     if (!this.getEntityWorld().isRemote()) {
-      this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-        if (gun.getMagazineSize() == 0) {
-          this
-              .setHeldItem(Hand.OFF_HAND,
-                  new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
-        }
-        if (gun.isTriggerPressed()
-            && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
-                - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {
-          gun.setTriggerPressed(this, this.getHeldItemMainhand(), false, true);
-        }
-      });
+      this.getCapability(ModCapabilities.LIVING).ifPresent(
+          living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+            if (gun.getMagazineSize() == 0) {
+              this
+                  .setHeldItem(Hand.OFF_HAND,
+                      new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
+            }
+            if (gun.isTriggerPressed()
+                && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
+                    - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {
+              gun.setTriggerPressed(living, this.getHeldItemMainhand(), false, true);
+            }
+          }));
     }
   }
 
   @Override
   public void attackEntityWithRangedAttack(LivingEntity livingEntity, float distance) {
     if (!this.getEntityWorld().isRemote()) {
-      this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-        this.triggerPressedStartTime = Util.milliTime();
-        gun.setTriggerPressed(this, this.getHeldItemMainhand(), true, true);
-      });
+      this.getCapability(ModCapabilities.LIVING).ifPresent(
+          living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+            this.triggerPressedStartTime = Util.milliTime();
+            gun.setTriggerPressed(living, this.getHeldItemMainhand(), true, true);
+          }));
     }
   }
 }

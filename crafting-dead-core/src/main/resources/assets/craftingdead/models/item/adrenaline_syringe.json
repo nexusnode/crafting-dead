@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "craftingdead:item/adrenaline"
+    "layer0": "craftingdead:item/adrenaline_syringe"
   }
 }

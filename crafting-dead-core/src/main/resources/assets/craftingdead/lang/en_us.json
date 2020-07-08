@@ -49,6 +49,7 @@
 
   "action.reload":"Reloading",
   "action.remove_magazine":"Removing magazine",
+  "action.using_on":"%1$s is using %2$s on you",
 
   "itemGroup.craftingdead.clothing": "Crafting Dead Clothing",
   "itemGroup.craftingdead.misc": "Crafting Dead Miscellaneous",

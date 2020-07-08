@@ -3,6 +3,8 @@ package com.craftingdead.core;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.action.ActionType;
+import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
@@ -13,6 +15,7 @@ import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.ServerPlayer;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
+import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
@@ -45,6 +48,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -66,6 +70,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -112,6 +119,8 @@ public class CraftingDead {
 
   private boolean travelersBackpacksLoaded;
 
+  private IForgeRegistry<ActionType<?>> actionTypeRegistry;
+
   public CraftingDead() {
     instance = this;
 
@@ -131,6 +140,7 @@ public class CraftingDead {
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+    ActionTypes.ACTION_TYPES.register(modEventBus);
 
     // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
@@ -146,6 +156,10 @@ public class CraftingDead {
 
   public boolean isTravelersBackpacksLoaded() {
     return this.travelersBackpacksLoaded;
+  }
+
+  public IForgeRegistry<ActionType<?>> getActionTypeRegistry() {
+    return this.actionTypeRegistry;
   }
 
   public static CraftingDead getInstance() {
@@ -185,6 +199,20 @@ public class CraftingDead {
     DataGenerator dataGenerator = event.getGenerator();
     dataGenerator.addProvider(new ModItemTagsProvider(dataGenerator));
     dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
+    dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
+  }
+
+  @SuppressWarnings("unchecked")
+  @SubscribeEvent
+  public void handleNewRegistryEvent(RegistryEvent.NewRegistry event) {
+    this.actionTypeRegistry =
+        makeRegistry(new ResourceLocation(CraftingDead.ID, "action_type"), ActionType.class)
+            .create();
+  }
+
+  private static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> makeRegistry(
+      ResourceLocation name, Class<T> type) {
+    return new RegistryBuilder<T>().setName(name).setType(type);
   }
 
   // ================================================================================
@@ -194,7 +222,8 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
     if (!(event.getEntityLiving() instanceof PlayerEntity)) {
-      event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+      event.getEntityLiving().getCapability(ModCapabilities.LIVING)
+          .ifPresent(ILiving::tick);
     }
   }
 
@@ -213,7 +242,6 @@ public class CraftingDead {
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
     if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
       MobEntity mobEntity = (MobEntity) event.getEntityLiving();
-
       if (mobEntity.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
         mobEntity.setAttackTarget(null);
       }
@@ -251,7 +279,8 @@ public class CraftingDead {
     event
         .getEntity()
         .getCapability(ModCapabilities.LIVING)
-        .ifPresent(living -> living.onAttacked(event.getSource(), event.getAmount()));
+        .ifPresent(
+            living -> event.setCanceled(living.onAttacked(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -259,7 +288,8 @@ public class CraftingDead {
     event
         .getEntity()
         .getCapability(ModCapabilities.LIVING)
-        .ifPresent(living -> living.onDamaged(event.getSource(), event.getAmount()));
+        .ifPresent(
+            living -> event.setAmount(living.onDamaged(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent
@@ -275,9 +305,7 @@ public class CraftingDead {
               .getCapability(ModCapabilities.LIVING)
               .filter(living -> living instanceof ServerPlayer)
               .<ServerPlayer>cast()
-              .ifPresent(that -> {
-                player.copyFrom(that, event.isWasDeath());
-              });
+              .ifPresent(that -> player.copyFrom(that, event.isWasDeath()));
         });
   }
 

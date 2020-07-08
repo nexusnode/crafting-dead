@@ -1,5 +1,7 @@
 package com.craftingdead.core.capability.living.player;
 
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Pose;
 import net.minecraft.util.Util;
@@ -28,10 +30,16 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
   }
 
   @Override
+  public void setFreezeMovement(boolean freezeMovement) {
+    super.setFreezeMovement(freezeMovement);
+    ((ClientDist) CraftingDead.getInstance().getModDist()).setFreezeMovementInput(freezeMovement);
+  }
+
+  @Override
   public void tick() {
     super.tick();
-    if (this.entity.isHoldingSneakKey() != this.wasHoldingSneakKey) {
-      if (this.entity.isHoldingSneakKey()) {
+    if (this.getEntity().isHoldingSneakKey() != this.wasHoldingSneakKey) {
+      if (this.getEntity().isHoldingSneakKey()) {
         final long currentTime = Util.milliTime();
         if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
           this.crouching = true;
@@ -40,11 +48,11 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
       } else {
         this.crouching = false;
       }
-      this.wasHoldingSneakKey = this.entity.isHoldingSneakKey();
+      this.wasHoldingSneakKey = this.getEntity().isHoldingSneakKey();
     }
 
     if (this.crouching) {
-      this.entity.setPose(Pose.SWIMMING);
+      this.getEntity().setPose(Pose.SWIMMING);
     }
   }
 }

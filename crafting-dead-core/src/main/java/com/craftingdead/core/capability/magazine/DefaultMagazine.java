@@ -11,7 +11,7 @@ public class DefaultMagazine implements IMagazine {
   private int size;
 
   public DefaultMagazine() {
-    this(null);
+    throw new UnsupportedOperationException("Specify magazine item");
   }
 
   public DefaultMagazine(MagazineItem magazineItem) {

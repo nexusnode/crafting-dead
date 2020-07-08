@@ -8,22 +8,21 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.action.ReloadAction;
+import com.craftingdead.core.action.RemoveMagazineAction;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animation.DefaultAnimationController;
 import com.craftingdead.core.capability.animation.IAnimation;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.player.IPlayer;
+import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.enchantment.ModEnchantments;
-import com.craftingdead.core.event.GunEvent;
-import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.GunActionMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleAimingMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
@@ -31,17 +30,13 @@ import com.craftingdead.core.network.message.main.TriggerPressedMessage;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
-import com.tiviacz.travelersbackpack.inventory.TravelersBackpackInventory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -80,12 +75,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class DefaultGun extends DefaultAnimationController implements IGun {
@@ -102,10 +93,6 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
    * Time of the last shot.
    */
   private long lastShotNanos = Integer.MIN_VALUE;
-
-  private int actionDurationTicks = 0;
-
-  private int totalActionDurationTicks;
 
   private FireMode fireMode;
 
@@ -124,10 +111,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
   private boolean aiming;
 
-  private boolean reloading;
-
   public DefaultGun() {
-    this(null);
+    throw new UnsupportedOperationException("Specify gun item");
   }
 
   public DefaultGun(GunItem gunItem) {
@@ -142,50 +127,42 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void tick(Entity entity, ItemStack itemStack) {
-    this.tryShoot(entity, itemStack);
-
-    if (this.isPerformingAction() && --this.actionDurationTicks == 0) {
-      ItemStack oldMagazine = this.magazineStack;
-      if (this.reloading) {
-        this.magazineStack = entity
-            .getCapability(ModCapabilities.LIVING)
-            .map(living -> this.findAmmo(living, false))
-            .orElse(ItemStack.EMPTY);
-      } else {
-        this.magazineStack = ItemStack.EMPTY;
-      }
-      if (!oldMagazine.isEmpty() && entity instanceof PlayerEntity) {
-        ((PlayerEntity) entity).addItemStackToInventory(oldMagazine);
-      }
-    }
+  public void tick(ILiving<?> living, ItemStack itemStack) {
+    this.tryShoot(living, itemStack);
   }
 
   @Override
-  public void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed,
+  public void setTriggerPressed(ILiving<?> living, ItemStack itemStack,
+      boolean triggerPressed,
       boolean sendUpdate) {
     this.triggerPressed = triggerPressed;
 
     if (this.triggerPressed) {
       // Resets the counter
       this.shotCount = 0;
-      this.tryShoot(entity, itemStack);
+      this.tryShoot(living, itemStack);
     }
 
     if (sendUpdate) {
-      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      PacketTarget target =
+          living.getEntity().getEntityWorld().isRemote()
+              ? PacketDistributor.SERVER.noArg()
+              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .send(target, new TriggerPressedMessage(entity.getEntityId(), triggerPressed));
+          .send(target,
+              new TriggerPressedMessage(living.getEntity().getEntityId(),
+                  triggerPressed));
     }
 
     // Sync magazine size before/after shooting as due to network latency this can get out of sync
-    if (!entity.getEntityWorld().isRemote()) {
+    if (!living.getEntity().getEntityWorld().isRemote()) {
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new SyncGunMessage(
-              entity.getEntityId(), this.paintStack, this.magazineStack, this.getMagazineSize()));
+          .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
+              new SyncGunMessage(
+                  living.getEntity().getEntityId(), this.paintStack, this.magazineStack,
+                  this.getMagazineSize()));
     }
   }
 
@@ -195,94 +172,30 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public int getTotalReloadDurationTicks() {
-    return this.totalActionDurationTicks;
+  public void reload(ILiving<?> living) {
+    living.performAction(new ReloadAction(living), true);
   }
 
   @Override
-  public int getReloadDurationTicks() {
-    return this.actionDurationTicks;
+  public void removeMagazine(ILiving<?> living) {
+    living.performAction(new RemoveMagazineAction(living), true);
   }
 
-  @Override
-  public boolean isPerformingAction() {
-    return this.actionDurationTicks > 0;
-  }
+  private void tryShoot(ILiving<?> living, ItemStack itemStack) {
+    final Entity entity = living.getEntity();
 
-  @Override
-  public boolean isReloading() {
-    return this.isPerformingAction() && this.reloading;
-  }
-
-  @Override
-  public void cancelActions(Entity entity, ItemStack itemStack) {
-    if (this.isPerformingAction()) {
-      if (this.reloading && this.gunItem.getReloadSound().isPresent()) {
-        // Stop reload sound
-        Minecraft
-            .getInstance()
-            .getSoundHandler()
-            .stop(this.gunItem.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
-      }
-      this.actionDurationTicks = 0;
-    }
-    this.setTriggerPressed(entity, itemStack, false, false);
-  }
-
-  @Override
-  public void reload(Entity entity, ItemStack itemStack, boolean sendUpdate) {
-    boolean canReload = !entity
-        .getCapability(ModCapabilities.LIVING)
-        .map(living -> this.findAmmo(living, true))
-        .orElse(ItemStack.EMPTY)
-        .isEmpty();
-    if (!this.isPerformingAction() && canReload) {
-      this.reloading = true;
-      // Some guns may not have a reload sound
-      this.gunItem.getReloadSound().ifPresent(sound -> {
-        entity.world.playMovingSound(null, entity, sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
-      });
-      this.actionDurationTicks =
-          this.totalActionDurationTicks = this.gunItem.getReloadDurationTicks();
-      if (sendUpdate) {
-        PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-            : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
-        NetworkChannel.MAIN
-            .getSimpleChannel()
-            .send(target, new GunActionMessage(entity.getEntityId(), true));
-      }
-    }
-  }
-
-  @Override
-  public void removeMagazine(Entity entity, ItemStack itemStack, boolean sendUpdate) {
-    if (!this.isPerformingAction() && !this.magazineStack.isEmpty()) {
-      this.reloading = false;
-      this.actionDurationTicks =
-          this.totalActionDurationTicks = this.gunItem.getReloadDurationTicks() / 2;
-      if (sendUpdate) {
-        PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-            : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
-        NetworkChannel.MAIN
-            .getSimpleChannel()
-            .send(target, new GunActionMessage(entity.getEntityId(), false));
-      }
-    }
-  }
-
-  private void tryShoot(Entity entity, ItemStack itemStack) {
     if (!this.triggerPressed) {
       return;
     }
 
-    if (this.isPerformingAction()) {
+    if (living.getActionProgress().isPresent()) {
       return;
     }
 
     if (this.getMagazineSize() <= 0) {
       this.triggerPressed = false;
       entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.reload(entity, itemStack, false);
+      this.reload(living);
       return;
     }
 
@@ -315,7 +228,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     if (entity.world.isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist())
-            .joltCamera(1.0F - this.getAccuracy(entity, itemStack), true);
+            .joltCamera(1.0F - this.getAccuracy(living, itemStack), true);
       }
 
       itemStack
@@ -340,30 +253,26 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
       Optional<? extends RayTraceResult> rayTrace = RayTraceUtil
-          .traceAllObjects(entity, 100, 1.0F, this.getAccuracy(entity, itemStack), random);
-
-      if (MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Pre(itemStack, entity, rayTrace))) {
-        continue;
-      }
+          .traceAllObjects(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random);
 
       rayTrace.ifPresent(result -> {
         switch (result.getType()) {
           case BLOCK:
-            this.hitBlock(entity, itemStack, (BlockRayTraceResult) result);
+            this.hitBlock(living, itemStack, (BlockRayTraceResult) result);
             break;
           case ENTITY:
-            this.hitEntity(entity, itemStack, (EntityRayTraceResult) result);
+            this.hitEntity(living, itemStack, (EntityRayTraceResult) result);
             break;
           default:
             break;
         }
       });
-
-      MinecraftForge.EVENT_BUS.post(new GunEvent.ShootEvent.Post(itemStack, entity, rayTrace));
     }
   }
 
-  private void hitEntity(Entity entity, ItemStack itemStack, EntityRayTraceResult rayTrace) {
+  private void hitEntity(ILiving<?> living, ItemStack itemStack,
+      EntityRayTraceResult rayTrace) {
+    final Entity entity = living.getEntity();
     Entity entityHit = rayTrace.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
     World world = entityHit.getEntityWorld();
@@ -459,14 +368,11 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       rayTrace.getEntity().setFire(100);
     }
 
-    entity
-        .getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof IPlayer)
-        .<IPlayer<?>>cast()
-        .ifPresent(player -> player
-            .infect(
-                EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
-                    / 255.0F));
+    if (living instanceof DefaultPlayer) {
+      ((DefaultPlayer<?>) living)
+          .infect(EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
+              / 255.0F);
+    }
 
     float dropChance = this.magazineStack
         .getCapability(ModCapabilities.MAGAZINE)
@@ -480,7 +386,9 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     }
   }
 
-  private void hitBlock(Entity entity, ItemStack itemStack, BlockRayTraceResult rayTrace) {
+  private void hitBlock(ILiving<?> living, ItemStack itemStack,
+      BlockRayTraceResult rayTrace) {
+    final Entity entity = living.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
     BlockPos blockPos = rayTrace.getPos();
     BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
@@ -538,7 +446,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public float getAccuracy(Entity entity, ItemStack itemStack) {
+  public float getAccuracy(ILiving<?> living, ItemStack itemStack) {
+    final Entity entity = living.getEntity();
     float accuracy = 1.0F;
     if (entity.getX() != entity.prevPosX || entity.getY() != entity.prevPosY
         || entity.getZ() != entity.prevPosZ) {
@@ -605,23 +514,25 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void toggleFireMode(Entity entity, boolean sendUpdate) {
+  public void toggleFireMode(ILiving<?> living, boolean sendUpdate) {
     if (this.fireModeInfiniteIterator.hasNext()) {
       this.fireMode = this.fireModeInfiniteIterator.next();
     }
 
-    entity.playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
-    if (entity instanceof PlayerEntity) {
-      ((PlayerEntity) entity)
+    living.getEntity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
+    if (living.getEntity() instanceof PlayerEntity) {
+      ((PlayerEntity) living.getEntity())
           .sendStatusMessage(new TranslationTextComponent(this.fireMode.getTranslationKey()), true);
     }
 
     if (sendUpdate) {
-      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      PacketTarget target =
+          living.getEntity().getEntityWorld().isRemote()
+              ? PacketDistributor.SERVER.noArg()
+              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .send(target, new ToggleFireModeMessage(entity.getEntityId()));
+          .send(target, new ToggleFireModeMessage(living.getEntity().getEntityId()));
     }
   }
 
@@ -631,14 +542,16 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
-  public void toggleAiming(Entity entity, boolean sendUpdate) {
+  public void toggleAiming(ILiving<?> living, boolean sendUpdate) {
     this.aiming = !this.aiming;
     if (sendUpdate) {
-      PacketTarget target = entity.getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(() -> entity);
+      PacketTarget target =
+          living.getEntity().getEntityWorld().isRemote()
+              ? PacketDistributor.SERVER.noArg()
+              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.MAIN
           .getSimpleChannel()
-          .send(target, new ToggleAimingMessage(entity.getEntityId()));
+          .send(target, new ToggleAimingMessage(living.getEntity().getEntityId()));
     }
   }
 
@@ -679,6 +592,16 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
+  public Optional<SoundEvent> getReloadSound() {
+    return this.gunItem.getReloadSound();
+  }
+
+  @Override
+  public int getReloadDurationTicks() {
+    return this.gunItem.getReloadDurationTicks();
+  }
+
+  @Override
   public boolean isAiming(Entity entity, ItemStack itemStack) {
     return this.aiming;
   }
@@ -712,40 +635,5 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
           .createExplosion(entity, position.getX(), position.getY(), position.getZ(), explosionSize,
               Explosion.Mode.NONE);
     }
-  }
-
-  private List<IItemHandler> collectAmmoProviders(ILiving<?> living) {
-    ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
-    // Vest first
-    living.getStackInSlot(InventorySlotType.VEST.getIndex())
-        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
-    // Backpack second
-    if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
-        && living.getEntity() instanceof PlayerEntity) {
-      PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
-      TravelersBackpackInventory backpackInventory = CapabilityUtils.getBackpackInv(playerEntity);
-      if (backpackInventory != null) {
-        builder.add(new InvWrapper(backpackInventory));
-      }
-    }
-    // Inventory third
-    living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-        .ifPresent(builder::add);
-    return builder.build();
-  }
-
-  private ItemStack findAmmo(ILiving<?> living, boolean simulate) {
-    for (IItemHandler ammoProvider : this.collectAmmoProviders(living)) {
-      for (int i = 0; i < ammoProvider.getSlots(); ++i) {
-        ItemStack itemStack = ammoProvider.getStackInSlot(i);
-        if (this.gunItem.getAcceptedMagazines().contains(itemStack.getItem()) && !itemStack
-            .getCapability(ModCapabilities.MAGAZINE)
-            .map(IMagazine::isEmpty)
-            .orElse(true)) {
-          return ammoProvider.extractItem(i, 1, simulate);
-        }
-      }
-    }
-    return ItemStack.EMPTY;
   }
 }

@@ -31,10 +31,12 @@ public class ToggleAimingMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getHeldItemMainhand();
-          heldStack
-              .getCapability(ModCapabilities.GUN)
-              .ifPresent(gun -> gun
-                  .toggleAiming(entity, ctx.get().getDirection().getReceptionSide().isServer()));
+          livingEntity.getCapability(ModCapabilities.LIVING)
+              .ifPresent(living -> heldStack
+                  .getCapability(ModCapabilities.GUN)
+                  .ifPresent(gun -> gun
+                      .toggleAiming(living,
+                          ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

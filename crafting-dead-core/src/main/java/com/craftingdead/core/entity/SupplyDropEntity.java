@@ -35,7 +35,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public class SupplyDropEntity extends Entity implements INamedContainerProvider {
 
-  private Inventory inventory = new Inventory(27);
+  private Inventory inventory = new Inventory(54);
 
   @Nullable
   private ResourceLocation lootTable;
@@ -93,7 +93,8 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
       this.lootTable = new ResourceLocation(compound.getString("lootTable"));
       this.lootTableSeed = compound.getLong("lootTableSeed");
     } else if (compound.contains("inventory")) {
-      NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
+      NonNullList<ItemStack> items =
+          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
       ItemStackHelper.loadAllItems(compound.getCompound("inventory"), items);
       this.inventory = new Inventory(items.toArray(new ItemStack[0]));
     }
@@ -107,7 +108,8 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
         compound.putLong("lootTableSeed", this.lootTableSeed);
       }
     } else {
-      NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
+      NonNullList<ItemStack> items =
+          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
       for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
         items.set(i, this.inventory.getStackInSlot(i));
       }
@@ -169,6 +171,6 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
   @Override
   public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
     this.addLoot(playerEntity);
-    return ChestContainer.createGeneric9X3(id, playerInventory, this.inventory);
+    return ChestContainer.createGeneric9X6(id, playerInventory, this.inventory);
   }
 }

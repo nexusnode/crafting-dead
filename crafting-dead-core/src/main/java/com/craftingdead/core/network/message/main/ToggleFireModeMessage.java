@@ -31,10 +31,12 @@ public class ToggleFireModeMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getHeldItemMainhand();
-          heldStack
-              .getCapability(ModCapabilities.GUN)
-              .ifPresent(gun -> gun
-                  .toggleFireMode(entity, ctx.get().getDirection().getReceptionSide().isServer()));
+          livingEntity.getCapability(ModCapabilities.LIVING)
+              .ifPresent(living -> heldStack
+                  .getCapability(ModCapabilities.GUN)
+                  .ifPresent(gun -> gun
+                      .toggleFireMode(living,
+                          ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

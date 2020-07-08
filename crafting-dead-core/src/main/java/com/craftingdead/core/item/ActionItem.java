@@ -27,19 +27,43 @@ public class ActionItem extends Item {
   private final IBlockAction blockAction;
   private final IEntityAction entityAction;
 
+  /**
+   * Standalone constructor to specify actions upon isntantiation.
+   * 
+   * @param properties - action properties
+   */
   public ActionItem(Properties properties) {
     super(properties);
     this.blockAction = properties.blockAction;
     this.entityAction = properties.entityAction;
   }
 
+  /**
+   * Used by child classes that specify custom actions via overriding.
+   * 
+   * @param properties - standard item properties
+   */
+  protected ActionItem(Item.Properties properties) {
+    super(properties);
+    this.blockAction = null;
+    this.entityAction = null;
+  }
+
+  protected IBlockAction getBlockAction() {
+    return this.blockAction;
+  }
+
+  protected IEntityAction getEntityAction() {
+    return this.entityAction;
+  }
+
   @Override
   public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn,
       LivingEntity target, Hand hand) {
-    if (this.entityAction != null) {
+    if (this.getEntityAction() != null) {
       playerIn.addStat(Stats.ITEM_USED.get(this));
       ActionResult<ItemStack> result =
-          this.entityAction.performAction(stack, playerIn, target, random);
+          this.getEntityAction().performAction(stack, playerIn, target, random);
       playerIn.setHeldItem(hand, result.getResult());
       return result.getType().isAccepted();
     }
@@ -63,22 +87,23 @@ public class ActionItem extends Item {
         (BlockRayTraceResult) rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.ANY);
     BlockState blockState = worldIn.getBlockState(rayTraceResult.getPos());
     ItemStack itemStack = playerIn.getHeldItem(handIn);
-    if (this.blockAction != null) {
+    if (this.getBlockAction() != null) {
       playerIn.addStat(Stats.ITEM_USED.get(this));
-      return this.blockAction
+      return this.getBlockAction()
           .performAction(itemStack, playerIn, rayTraceResult.getPos(), blockState, random);
     }
     return new ActionResult<>(ActionResultType.PASS, itemStack);
   }
 
   public static ItemStack useReturn(ItemStack itemStack, ItemStack returnStack,
-      PlayerEntity player) {
+      LivingEntity from) {
     itemStack.shrink(1);
     if (itemStack.isEmpty()) {
       return returnStack;
     } else {
-      if (!player.inventory.addItemStackToInventory(returnStack)) {
-        player.dropItem(returnStack, false);
+      if (!(from instanceof PlayerEntity)
+          || !((PlayerEntity) from).inventory.addItemStackToInventory(returnStack)) {
+        from.entityDropItem(returnStack);
       }
       return itemStack;
     }
@@ -87,14 +112,14 @@ public class ActionItem extends Item {
   @FunctionalInterface
   public static interface IBlockAction {
     @Nonnull
-    ActionResult<ItemStack> performAction(ItemStack itemStack, PlayerEntity playerEntity,
+    ActionResult<ItemStack> performAction(ItemStack itemStack, LivingEntity from,
         BlockPos blockPos, BlockState blockState, Random random);
   }
 
   @FunctionalInterface
   public static interface IEntityAction {
     @Nonnull
-    ActionResult<ItemStack> performAction(ItemStack itemStack, PlayerEntity playerEntity,
+    ActionResult<ItemStack> performAction(ItemStack itemStack, LivingEntity from,
         Entity entity, Random random);
   }
 

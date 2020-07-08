@@ -2,48 +2,260 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 1,
+      "rolls": 10,
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 1,
-          "name": "craftingdead:tan_gun_backpack"
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:bandage"
         },
         {
-            "type": "minecraft:item",
-            "weight": 1,
-            "functions": [
-              {
-                "function": "minecraft:set_count",
-                "count": {
-                  "min": 1.0,
-                  "max": 3.0,
-                  "type": "minecraft:uniform"
-                }
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
               }
-            ],
-            "name": "craftingdead:orange"
-          },
-          {
-            "type": "minecraft:item",
-            "weight": 1,
-            "functions": [
-              {
-                "function": "minecraft:set_count",
-                "count": {
-                  "min": 1.0,
-                  "max": 2.0,
-                  "type": "minecraft:uniform"
-                }
+            }
+          ],
+          "name": "craftingdead:clean_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 6,
+                "p": 0.12,
+                "type": "minecraft:binomial"
               }
-            ],
-            "name": "craftingdead:apple"
-          },
-          {
-            "type": "minecraft:item",
-            "weight": 1,
-            "name": "craftingdead:antibiotics"
-          }
+            }
+          ],
+          "name": "craftingdead:first_aid_kit"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:adrenaline_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:cure_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:rbi_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:splint"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:army_medic_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m9_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m1911_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:g18_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:pipe_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:smoke_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:adrenaline_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m1911"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:g18"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m9"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.45,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:ak47_30_round_magazine"
+        }
       ]
     }
   ]

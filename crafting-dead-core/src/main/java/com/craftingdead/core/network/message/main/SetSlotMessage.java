@@ -34,7 +34,7 @@ public class SetSlotMessage {
         .getEntity(ctx.get(), msg.entityId)
         .ifPresent(entity -> entity
             .getCapability(ModCapabilities.LIVING)
-            .ifPresent(living -> living.setStackInSlot(msg.slot, msg.itemStack)));
+            .ifPresent(living -> living.getItemHandler().setStackInSlot(msg.slot, msg.itemStack)));
     return true;
   }
 }

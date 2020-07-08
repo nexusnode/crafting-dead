@@ -119,7 +119,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
     ItemStack hatItemStack = viewerEntity
         .getCapability(ModCapabilities.LIVING)
-        .map(living -> living.getStackInSlot(InventorySlotType.HAT.getIndex()))
+        .map(living -> living.getItemHandler().getStackInSlot(InventorySlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 
     final boolean isImmuneToFlashes =

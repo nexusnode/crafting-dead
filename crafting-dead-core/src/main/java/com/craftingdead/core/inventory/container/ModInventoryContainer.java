@@ -25,9 +25,8 @@ public class ModInventoryContainer extends Container {
 
   public ModInventoryContainer(int windowId, PlayerInventory playerInventory) {
     super(ModContainerTypes.PLAYER.get(), windowId);
-    this.itemHandler = playerInventory.player
-        .getCapability(ModCapabilities.LIVING)
-        .orElseThrow(() -> new IllegalStateException("No living capability"));
+    this.itemHandler = playerInventory.player.getCapability(ModCapabilities.LIVING)
+        .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
     this.craftingInventory.addListener(this::onCraftMatrixChanged);
 
     final int deltaY = 20;

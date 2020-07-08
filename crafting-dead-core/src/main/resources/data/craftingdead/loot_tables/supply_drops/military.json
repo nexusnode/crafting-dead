@@ -2,48 +2,596 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 1,
+      "rolls": 10,
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 1,
-          "name": "craftingdead:tan_gun_backpack"
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:bandage"
         },
         {
-            "type": "minecraft:item",
-            "weight": 1,
-            "functions": [
-              {
-                "function": "minecraft:set_count",
-                "count": {
-                  "min": 1.0,
-                  "max": 3.0,
-                  "type": "minecraft:uniform"
-                }
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.7,
+                "type": "minecraft:binomial"
               }
-            ],
-            "name": "craftingdead:orange"
-          },
-          {
-            "type": "minecraft:item",
-            "weight": 1,
-            "functions": [
-              {
-                "function": "minecraft:set_count",
-                "count": {
-                  "min": 1.0,
-                  "max": 2.0,
-                  "type": "minecraft:uniform"
-                }
+            }
+          ],
+          "name": "craftingdead:bolt_cutters"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 6,
+                "p": 0.2,
+                "type": "minecraft:binomial"
               }
-            ],
-            "name": "craftingdead:apple"
-          },
-          {
-            "type": "minecraft:item",
-            "weight": 1,
-            "name": "craftingdead:antibiotics"
-          }
+            }
+          ],
+          "name": "craftingdead:c4_explosive"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.9,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:remote_detonator"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:stanag_30_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 6,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m107_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m9_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:g18_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m240b_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:rpk_drum_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.6,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:minigun_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:mpt55_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:frag_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:fire_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:flash_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:acog_sight"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:suppressor"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.2,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:hp_scope"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:army_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 4,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:tac_ghillie_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.2,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:space_suit_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.8,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:juggernaut_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.8,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:combat_bdu_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.6,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:clone_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:contractor_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.45,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:ak47"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m4a1"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.2,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m107"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 6,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m1911"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:g18"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m9"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 5,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:p250"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.7,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:as50"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.9,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:m240b"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.2,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:minigun"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 3,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:mp5a5"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.3,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:mpt55"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.5,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:fury_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:scorched_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.4,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:inferno_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 2,
+                "p": 0.45,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:ak47_30_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "n": 1,
+                "p": 0.45,
+                "type": "minecraft:binomial"
+              }
+            }
+          ],
+          "name": "craftingdead:mossberg"
+        }
       ]
     }
   ]

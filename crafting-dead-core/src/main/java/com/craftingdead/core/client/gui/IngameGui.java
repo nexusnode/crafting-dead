@@ -1,5 +1,6 @@
 package com.craftingdead.core.client.gui;
 
+import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.ClientDist;
@@ -88,12 +89,10 @@ public class IngameGui {
         RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
       }
 
-
-      heldStack
-          .getCapability(ModCapabilities.ACTION)
-          .filter(action -> action.isActive(playerEntity))
-          .ifPresent(action -> renderActionProgress(this.minecraft.fontRenderer, width, height,
-              action.getText(playerEntity), action.getProgress(playerEntity, partialTicks)));
+      player.getActionProgress()
+          .ifPresent(observer -> renderActionProgress(this.minecraft.fontRenderer, width, height,
+              observer.getMessage(), observer.getSubMessage(),
+              observer.getProgress(partialTicks)));
 
       // Only draw in survival
       if (this.minecraft.playerController.shouldDrawHUD()) {
@@ -140,15 +139,22 @@ public class IngameGui {
   }
 
   private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,
-      ITextComponent text, float percent) {
+      ITextComponent message, @Nullable ITextComponent subMessage, float percent) {
+
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;
     final float x = width / 2 - barWidth / 2;
     final float y = height / 2;
-    fontRenderer.drawStringWithShadow(text.getFormattedText(), x, y - barHeight - 5, 0xFFFFFF);
+    fontRenderer.drawStringWithShadow(message.getFormattedText(), x,
+        y - barHeight - ((fontRenderer.FONT_HEIGHT / 2) + 0.5F), 0xFFFFFF);
     RenderUtil
         .drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour, barColour);
+    if (subMessage != null) {
+      fontRenderer.drawStringWithShadow(subMessage.getFormattedText(), x,
+          y + barHeight + ((fontRenderer.FONT_HEIGHT / 2) + 0.5F),
+          0xFFFFFF);
+    }
   }
 
   private static void renderBlood(int width, int height, float healthPercentage) {

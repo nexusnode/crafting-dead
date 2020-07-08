@@ -1,43 +1,31 @@
 package com.craftingdead.core.capability.gun;
 
+import java.util.Optional;
 import java.util.Set;
-import com.craftingdead.core.capability.action.IAction;
 import com.craftingdead.core.capability.animation.IAnimationController;
+import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.item.AttachmentItem;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IGun extends IScope, IAction, IAnimationController, INBTSerializable<CompoundNBT> {
+public interface IGun extends IScope, IAnimationController, INBTSerializable<CompoundNBT> {
 
-  void tick(Entity entity, ItemStack itemStack);
+  void tick(ILiving<?> living, ItemStack itemStack);
 
-  void setTriggerPressed(Entity entity, ItemStack itemStack, boolean triggerPressed,
+  void setTriggerPressed(ILiving<?> living, ItemStack itemStack, boolean triggerPressed,
       boolean sendUpdate);
 
   boolean isTriggerPressed();
 
-  int getTotalReloadDurationTicks();
+  void reload(ILiving<?> living);
 
-  int getReloadDurationTicks();
+  void removeMagazine(ILiving<?> living);
 
-  boolean isPerformingAction();
-
-  boolean isReloading();
-
-  void cancelActions(Entity entity, ItemStack itemStack);
-
-  void reload(Entity entity, ItemStack itemStack, boolean sendUpdate);
-
-  void removeMagazine(Entity entity, ItemStack itemStack, boolean sendUpdate);
-
-  float getAccuracy(Entity entity, ItemStack itemStack);
+  float getAccuracy(ILiving<?> living, ItemStack itemStack);
 
   ItemStack getMagazineStack();
 
@@ -65,28 +53,15 @@ public interface IGun extends IScope, IAction, IAnimationController, INBTSeriali
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 
-  void toggleFireMode(Entity entity, boolean sendUpdate);
+  void toggleFireMode(ILiving<?> living, boolean sendUpdate);
 
   boolean hasCrosshair();
 
-  void toggleAiming(Entity entity, boolean sendUpdate);
+  void toggleAiming(ILiving<?> living, boolean sendUpdate);
 
   Set<? extends Item> getAcceptedMagazines();
 
-  @Override
-  default boolean isActive(ClientPlayerEntity playerEntity) {
-    return this.isPerformingAction();
-  }
+  Optional<SoundEvent> getReloadSound();
 
-  @Override
-  default ITextComponent getText(ClientPlayerEntity playerEntity) {
-    return this.isReloading() ? new TranslationTextComponent("action.reload")
-        : new TranslationTextComponent("action.remove_magazine");
-  }
-
-  @Override
-  default float getProgress(ClientPlayerEntity playerEntity, float partialTicks) {
-    return (float) ((this.getTotalReloadDurationTicks() - this.getReloadDurationTicks())
-        + partialTicks) / this.getTotalReloadDurationTicks();
-  }
+  int getReloadDurationTicks();
 }

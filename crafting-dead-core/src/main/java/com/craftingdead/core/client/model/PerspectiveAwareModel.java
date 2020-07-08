@@ -289,7 +289,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
 
     public static Perspective fromKey(String key) {
       for (Perspective perspective : values()) {
-        if (perspective.key == key) {
+        if (perspective.key.equals(key)) {
           return perspective;
         }
       }

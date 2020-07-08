@@ -1,6 +1,8 @@
 package com.craftingdead.core.item;
 
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.action.ActionTypes;
+import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
 import com.craftingdead.core.capability.animation.fire.PistolShootAnimation;
 import com.craftingdead.core.capability.animation.fire.RifleShootAnimation;
 import com.craftingdead.core.capability.animation.fire.SubmachineShootAnimation;
@@ -19,15 +21,16 @@ import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.storage.loot.ModLootTables;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
@@ -1400,44 +1403,42 @@ public class ModItems {
   public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS
       .register("first_aid_kit",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F)
-              .setShowProgress(true)
+              .setActionProvider(new DefaultActionProvider(ActionTypes.HEAL))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS
       .register("adrenaline_syringe",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(ModEffects.ADRENALINE.get(), (20 * 20), 1), 1.0F)
-              .setShowProgress(true)
+              .setActionProvider(new DefaultActionProvider(ActionTypes.ADRENALINE))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> SYRINGE = ITEMS
       .register("syringe", () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setEntityAction((itemStack, playerEntity, entity, random) -> {
-            if (random.nextFloat() < 0.25F && entity instanceof ZombieEntity) {
-              entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
+          .setEntityAction((itemStack, from, target, random) -> {
+            if (random.nextFloat() < 0.25F && target instanceof ZombieEntity) {
+              target.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
               return ActionResult
                   .success(ActionItem
                       .useReturn(itemStack,
                           new ItemStack(ForgeRegistries.ITEMS
                               .getValue(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))),
-                          playerEntity));
-            } else if (entity instanceof LivingEntity
-                && !(entity instanceof ZombieEntity || entity instanceof SkeletonEntity)) {
-              if (((LivingEntity) entity).getHealth() > 4) {
-                entity.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
+                          from));
+            } else if (target instanceof LivingEntity
+                && !(target instanceof ZombieEntity || target instanceof SkeletonEntity)) {
+              if (((LivingEntity) target).getHealth() > 4) {
+                target.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
                 return ActionResult
                     .success(ActionItem
                         .useReturn(itemStack,
                             new ItemStack(ForgeRegistries.ITEMS
                                 .getValue(new ResourceLocation("craftingdead:blood_syringe"))),
-                            playerEntity));
-              } else {
-                playerEntity
+                            from));
+              } else if (from instanceof PlayerEntity) {
+                ((PlayerEntity) from)
                     .sendStatusMessage(new TranslationTextComponent("message.low_blood_level",
-                        entity.getDisplayName()).setStyle(new Style().setColor(TextFormatting.RED)),
+                        target.getDisplayName()).setStyle(new Style().setColor(TextFormatting.RED)),
                         true);
               }
             }
@@ -1449,8 +1450,7 @@ public class ModItems {
   public static final RegistryObject<Item> BLOOD_SYRINGE = ITEMS
       .register("blood_syringe",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-              .setShowProgress(true)
+              .setActionProvider(new DefaultActionProvider(ActionTypes.BLOOD_SYRINGE))
               .maxStackSize(1)
               .containerItem(SYRINGE.get())
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
@@ -1458,24 +1458,23 @@ public class ModItems {
   public static final RegistryObject<Item> BANDAGE = ITEMS
       .register("bandage",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .effect(() -> new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F)
-              .setShowProgress(true)
+              .setActionProvider(new DefaultActionProvider(ActionTypes.BANDAGE))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS
       .register("rbi_syringe",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setEntityAction((itemStack, playerEntity, entity, random) -> {
-                if (entity instanceof LivingEntity) {
-                  ((LivingEntity) entity)
+              .setEntityAction((itemStack, from, target, random) -> {
+                if (target instanceof LivingEntity) {
+                  ((LivingEntity) target)
                       .addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
                   return ActionResult
                       .success(ActionItem
                           .useReturn(itemStack,
                               new ItemStack(ForgeRegistries.ITEMS
                                   .getValue(new ResourceLocation(CraftingDead.ID, "syringe"))),
-                              playerEntity));
+                              from));
                 }
                 return ActionResult.fail(itemStack);
               })
@@ -1519,22 +1518,19 @@ public class ModItems {
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS
       .register("clean_rag",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setShowProgress(true)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS
       .register("splint",
           () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setShowProgress(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS
       .register("cure_syringe",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setShowProgress(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new ConsumableItem(
+              (ConsumableItem.Properties) new ConsumableItem.Properties().maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_MED)));
 
   // ================================================================================
   // Weapon
@@ -2283,14 +2279,14 @@ public class ModItems {
   public static final RegistryObject<Item> MEDICAL_DROP_RADIO = ITEMS
       .register("medical_drop_radio",
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
-              .setLootTable(new ResourceLocation(CraftingDead.ID, "supply_drops/medical"))
+              .setLootTable(ModLootTables.MEDICAL_SUPPLY_DROP)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MILITARY_DROP_RADIO = ITEMS
       .register("military_drop_radio",
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
-              .setLootTable(new ResourceLocation(CraftingDead.ID, "supply_drops/military"))
+              .setLootTable(ModLootTables.MILITARY_SUPPLY_DROP)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
 

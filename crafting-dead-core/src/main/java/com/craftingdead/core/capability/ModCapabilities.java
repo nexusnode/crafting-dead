@@ -1,7 +1,7 @@
 package com.craftingdead.core.capability;
 
-import com.craftingdead.core.capability.action.DefaultAction;
-import com.craftingdead.core.capability.action.IAction;
+import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
+import com.craftingdead.core.capability.actionprovider.IActionProvider;
 import com.craftingdead.core.capability.animation.DefaultAnimationController;
 import com.craftingdead.core.capability.animation.IAnimationController;
 import com.craftingdead.core.capability.clothing.DefaultClothing;
@@ -22,7 +22,6 @@ import com.craftingdead.core.capability.scope.DefaultScope;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.capability.storage.DefaultStorage;
 import com.craftingdead.core.capability.storage.IStorage;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -32,16 +31,13 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 public class ModCapabilities {
 
   @CapabilityInject(ILiving.class)
-  public static final Capability<ILiving<? extends LivingEntity>> LIVING = null;
+  public static final Capability<ILiving<?>> LIVING = null;
 
   @CapabilityInject(IAnimationController.class)
   public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;
 
   @CapabilityInject(IGun.class)
   public static final Capability<IGun> GUN = null;
-
-  @CapabilityInject(IAction.class)
-  public static final Capability<IAction> ACTION = null;
 
   @CapabilityInject(IPaint.class)
   public static final Capability<IPaint> PAINT = null;
@@ -64,13 +60,15 @@ public class ModCapabilities {
   @CapabilityInject(IHat.class)
   public static final Capability<IHat> HAT = null;
 
+  @CapabilityInject(IActionProvider.class)
+  public static final Capability<IActionProvider> ACTION_PROVIDER = null;
+
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
     CapabilityManager.INSTANCE
         .register(IAnimationController.class, new EmptyStorage<>(),
             DefaultAnimationController::new);
     CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), DefaultGun::new);
-    CapabilityManager.INSTANCE.register(IAction.class, new EmptyStorage<>(), DefaultAction::new);
     CapabilityManager.INSTANCE.register(IPaint.class, new EmptyStorage<>(), DefaultPaint::new);
     CapabilityManager.INSTANCE
         .register(IMagazine.class, new EmptyStorage<>(), DefaultMagazine::new);
@@ -81,6 +79,8 @@ public class ModCapabilities {
     CapabilityManager.INSTANCE
         .register(IClothing.class, new EmptyStorage<>(), DefaultClothing::new);
     CapabilityManager.INSTANCE.register(IHat.class, new EmptyStorage<>(), DefaultHat::new);
+    CapabilityManager.INSTANCE.register(IActionProvider.class, new EmptyStorage<>(),
+        DefaultActionProvider::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {
@@ -91,8 +91,6 @@ public class ModCapabilities {
     }
 
     @Override
-    public void readNBT(Capability<C> capability, C instance, Direction side, INBT nbt) {
-      ;
-    }
+    public void readNBT(Capability<C> capability, C instance, Direction side, INBT nbt) {}
   }
 }

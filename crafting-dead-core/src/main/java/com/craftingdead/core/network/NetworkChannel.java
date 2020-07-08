@@ -1,9 +1,10 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.network.message.main.CancelActionMessage;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.main.OpenStorageMessage;
-import com.craftingdead.core.network.message.main.GunActionMessage;
+import com.craftingdead.core.network.message.main.PerformActionMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
@@ -33,13 +34,6 @@ public enum NetworkChannel {
           .encoder(OpenModInventoryMessage::encode)
           .decoder(OpenModInventoryMessage::decode)
           .consumer(OpenModInventoryMessage::handle)
-          .add();
-
-      simpleChannel
-          .messageBuilder(GunActionMessage.class, ++id)
-          .encoder(GunActionMessage::encode)
-          .decoder(GunActionMessage::decode)
-          .consumer(GunActionMessage::handle)
           .add();
 
       simpleChannel
@@ -82,6 +76,20 @@ public enum NetworkChannel {
           .encoder(OpenStorageMessage::encode)
           .decoder(OpenStorageMessage::decode)
           .consumer(OpenStorageMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(PerformActionMessage.class, ++id)
+          .encoder(PerformActionMessage::encode)
+          .decoder(PerformActionMessage::decode)
+          .consumer(PerformActionMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(CancelActionMessage.class, ++id)
+          .encoder(CancelActionMessage::encode)
+          .decoder(CancelActionMessage::decode)
+          .consumer(CancelActionMessage::handle)
           .add();
     }
   };

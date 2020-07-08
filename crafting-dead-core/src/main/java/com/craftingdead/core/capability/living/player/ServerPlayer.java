@@ -45,7 +45,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
     this.updateWater();
     this.updateStamina();
 
-    int aliveTicks = this.entity.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
+    int aliveTicks = this.getEntity().getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
     int aliveDays = aliveTicks / 20 / 60 / 20;
     if (this.daysSurvived != aliveDays) {
       this.setDaysSurvived(aliveDays);
@@ -62,17 +62,17 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   private void updateWater() {
-    if (this.entity.world.getDifficulty() != Difficulty.PEACEFUL
-        && !this.entity.abilities.disableDamage) {
+    if (this.getEntity().world.getDifficulty() != Difficulty.PEACEFUL
+        && !this.getEntity().abilities.disableDamage) {
       this.waterTimer++;
       if (this.water <= 0) {
         if (this.waterTimer >= WATER_DAMAGE_DELAY_TICKS && this.water == 0) {
-          this.entity.attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
+          this.getEntity().attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
           this.waterTimer = 0;
         }
       } else if (this.waterTimer >= WATER_DELAY_TICKS) {
         this.setWater(this.getWater() - 1);
-        if (this.entity.isSprinting()) {
+        if (this.getEntity().isSprinting()) {
           this.setWater(this.getWater() - 1);
         }
         this.waterTimer = 0;
@@ -81,7 +81,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   private void updateStamina() {
-    if (this.entity.isSprinting()) {
+    if (this.getEntity().isSprinting()) {
       this.setStamina(this.getStamina() - 3);
     } else {
       this.setStamina(this.getStamina() + 8);
@@ -89,17 +89,17 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   public void openInventory() {
-    this.entity
+    this.getEntity()
         .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
-            playerEntity) -> new ModInventoryContainer(windowId, this.entity.inventory),
+            playerEntity) -> new ModInventoryContainer(windowId, this.getEntity().inventory),
             new TranslationTextComponent("container.player")));
   }
 
   public void openStorage(InventorySlotType slotType) {
-    ItemStack storageStack = this.getStackInSlot(slotType.getIndex());
+    ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack
         .getCapability(ModCapabilities.STORAGE)
-        .ifPresent(storage -> this.entity
+        .ifPresent(storage -> this.getEntity()
             .openContainer(
                 new SimpleNamedContainerProvider(storage, storageStack.getDisplayName())));
   }
@@ -108,9 +108,9 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
     if (!super.onDeathDrops(cause, drops)) { // If not cancelled
       // Prevents useless corpse spawns in worlds with keep inventory.
-      if (!this.entity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-        CorpseEntity corpse = new CorpseEntity(this.entity, drops);
-        this.entity.world.addEntity(corpse);
+      if (!this.getEntity().world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        CorpseEntity corpse = new CorpseEntity(this.getEntity(), drops);
+        this.getEntity().world.addEntity(corpse);
       }
     }
     return true;
@@ -166,8 +166,8 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
 
     // Copies the inventory. Doesn't actually matter if it was death or not.
     // Death drops from 'that' should be cleared on death drops to prevent item duplication.
-    for (int i = 0; i < that.getSlots(); i++) {
-      this.setStackInSlot(i, that.getStackInSlot(i));
+    for (int i = 0; i < that.getItemHandler().getSlots() - 1; i++) {
+      this.getItemHandler().setStackInSlot(i, that.getItemHandler().getStackInSlot(i));
     }
   }
 }
