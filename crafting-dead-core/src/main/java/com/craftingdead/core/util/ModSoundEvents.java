@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModSoundEvents {
 
   public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
-      new DeferredRegister<>(ForgeRegistries.SOUND_EVENTS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDead.ID);
 
   public static final RegistryObject<SoundEvent> ACR_SHOOT = register("acr_shoot");
   public static final RegistryObject<SoundEvent> AK47_RELOAD = register("ak47_reload");

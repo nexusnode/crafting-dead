@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModContainerTypes {
 
   public static final DeferredRegister<ContainerType<?>> CONTAINERS =
-      new DeferredRegister<>(ForgeRegistries.CONTAINERS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.CONTAINERS, CraftingDead.ID);
 
   public static final RegistryObject<ContainerType<ModInventoryContainer>> PLAYER =
       CONTAINERS.register("inventory", () -> new ContainerType<>(ModInventoryContainer::new));

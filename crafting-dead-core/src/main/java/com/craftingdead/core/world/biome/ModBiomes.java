@@ -9,10 +9,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModBiomes {
 
   public static final DeferredRegister<Biome> BIOMES =
-      new DeferredRegister<>(ForgeRegistries.BIOMES, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.BIOMES, CraftingDead.ID);
 
   public static final RegistryObject<Biome> ZOMBIE_FOREST = BIOMES
       .register("zombie_forest",
           () -> new ZombieForestBiome());
-
 }

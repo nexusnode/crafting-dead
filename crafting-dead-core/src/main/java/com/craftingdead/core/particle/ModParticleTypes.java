@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModParticleTypes {
 
   public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
-      new DeferredRegister<>(ForgeRegistries.PARTICLE_TYPES, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CraftingDead.ID);
 
   public static final RegistryObject<ParticleType<RGBFlashParticleData>> RGB_FLASH =
       PARTICLE_TYPES.register("rgb_flash",

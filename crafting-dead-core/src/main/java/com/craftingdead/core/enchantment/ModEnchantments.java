@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModEnchantments {
 
   public static final DeferredRegister<Enchantment> ENCHANTMENTS =
-      new DeferredRegister<>(ForgeRegistries.ENCHANTMENTS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, CraftingDead.ID);
 
   public static final RegistryObject<InfectionEnchantment> INFECTION = ENCHANTMENTS
       .register("infection",

@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModEffects {
 
   public static final DeferredRegister<Effect> EFFECTS =
-      new DeferredRegister<>(ForgeRegistries.POTIONS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.POTIONS, CraftingDead.ID);
 
   public static final RegistryObject<Effect> SCUBA = EFFECTS.register("scuba", ScubaEffect::new);
 

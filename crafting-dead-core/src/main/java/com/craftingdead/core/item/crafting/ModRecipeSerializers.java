@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModRecipeSerializers {
 
   public static final DeferredRegister<IRecipeSerializer<?>> RECIPE_SERIALIZERS =
-      new DeferredRegister<>(ForgeRegistries.RECIPE_SERIALIZERS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, CraftingDead.ID);
 
   public static final RegistryObject<SpecialRecipeSerializer<UpgradeMagazineRecipe>> UPGRADE_MAGAZINE =
       RECIPE_SERIALIZERS

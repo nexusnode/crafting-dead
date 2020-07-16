@@ -30,7 +30,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModItems {
 
   public static final DeferredRegister<Item> ITEMS =
-      new DeferredRegister<>(ForgeRegistries.ITEMS, CraftingDead.ID);
+      DeferredRegister.create(ForgeRegistries.ITEMS, CraftingDead.ID);
 
   // ================================================================================
   // Paints

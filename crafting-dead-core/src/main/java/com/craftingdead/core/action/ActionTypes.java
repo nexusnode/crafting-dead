@@ -7,7 +7,6 @@ import com.craftingdead.core.action.item.EntityActionEntry;
 import com.craftingdead.core.action.item.UseItemAction;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.potion.ModEffects;
-import com.craftingdead.core.util.LazyForgeRegistry;
 import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
@@ -22,19 +21,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class ActionTypes {
 
   @SuppressWarnings("unchecked")
   public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
-      makeDeferredRegister(LazyForgeRegistry.of(ActionType.class), CraftingDead.ID);
-
-  private static <T extends IForgeRegistryEntry<T>> DeferredRegister<T> makeDeferredRegister(
-      IForgeRegistry<T> registry, String modid) {
-    return new DeferredRegister<>(registry, modid);
-  }
+      DeferredRegister.create(ActionType.class, CraftingDead.ID);
 
   public static final RegistryObject<ActionType<?>> RELOAD = ACTION_TYPES
       .register("reload",
