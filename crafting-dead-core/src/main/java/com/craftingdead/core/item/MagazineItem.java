@@ -21,8 +21,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class MagazineItem extends Item {
 
   private final float armorPenetration;
-  private final float entityHitDropChance;
-  private final float blockHitDropChance;
   private final int size;
   private final Supplier<? extends Item> nextTier;
 
@@ -30,21 +28,11 @@ public class MagazineItem extends Item {
     super(properties);
     this.size = properties.size;
     this.armorPenetration = properties.armorPenetration;
-    this.entityHitDropChance = properties.entityHitDropChance;
-    this.blockHitDropChance = properties.blockHitDropChance;
     this.nextTier = properties.nextTier;
   }
 
   public float getArmorPenetration() {
     return this.armorPenetration;
-  }
-
-  public float getEntityHitDropChance() {
-    return this.entityHitDropChance;
-  }
-
-  public float getBlockHitDropChance() {
-    return this.blockHitDropChance;
   }
 
   public int getSize() {
@@ -118,27 +106,7 @@ public class MagazineItem extends Item {
               .translate("item_lore.magazine_item.armor_penetration")
               .applyTextStyle(TextFormatting.GRAY)
               .appendSibling(Text
-                  .of(String.format("%.1f", this.armorPenetration) + "%")
-                  .applyTextStyle(TextFormatting.RED)));
-    }
-
-    if (this.entityHitDropChance > 0) {
-      lines
-          .add(Text
-              .translate("item_lore.magazine_item.entity_hit_recovery_chance")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(Text
-                  .of(String.format("%.1f", this.entityHitDropChance) + "%")
-                  .applyTextStyle(TextFormatting.RED)));
-    }
-
-    if (this.blockHitDropChance > 0) {
-      lines
-          .add(Text
-              .translate("item_lore.magazine_item.block_hit_recovery_chance")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(Text
-                  .of(String.format("%.1f", this.blockHitDropChance) + "%")
+                  .of(String.format("%.0f%%", this.armorPenetration) + "%")
                   .applyTextStyle(TextFormatting.RED)));
     }
   }
@@ -146,23 +114,11 @@ public class MagazineItem extends Item {
   public static class Properties extends Item.Properties {
 
     private float armorPenetration;
-    private float entityHitDropChance;
-    private float blockHitDropChance;
     private int size;
     private Supplier<? extends Item> nextTier;
 
     public Properties setArmorPenetration(float armorPenetration) {
       this.armorPenetration = armorPenetration;
-      return this;
-    }
-
-    public Properties setEntityHitDropChance(float entityHitDropChance) {
-      this.entityHitDropChance = entityHitDropChance;
-      return this;
-    }
-
-    public Properties setBlockHitDropChance(float blockHitDropChance) {
-      this.blockHitDropChance = blockHitDropChance;
       return this;
     }
 

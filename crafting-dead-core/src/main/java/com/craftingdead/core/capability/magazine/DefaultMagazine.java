@@ -37,16 +37,6 @@ public class DefaultMagazine implements IMagazine {
   }
 
   @Override
-  public float getEntityHitDropChance() {
-    return this.magazineItem.getEntityHitDropChance();
-  }
-
-  @Override
-  public float getBlockHitDropChance() {
-    return this.magazineItem.getBlockHitDropChance();
-  }
-
-  @Override
   public int getSize() {
     return this.size;
   }

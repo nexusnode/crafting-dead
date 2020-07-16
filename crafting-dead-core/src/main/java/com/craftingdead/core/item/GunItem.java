@@ -24,11 +24,13 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
@@ -317,6 +319,17 @@ public class GunItem extends ShootableItem {
   public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
     return enchantment == Enchantments.FLAME || enchantment == Enchantments.POWER
         || super.canApplyAtEnchantingTable(stack, enchantment);
+  }
+
+  @Override
+  public void fillItemGroup(ItemGroup itemGroup, NonNullList<ItemStack> items) {
+    if (this.isInGroup(itemGroup)) {
+      ItemStack itemStack = new ItemStack(this);
+      // Fill magazine
+      itemStack.getCapability(ModCapabilities.GUN)
+          .ifPresent(gun -> gun.getMagazineStack().setDamage(0));
+      items.add(itemStack);
+    }
   }
 
   @Override

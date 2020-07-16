@@ -9,10 +9,6 @@ public interface IMagazine extends INBTSerializable<CompoundNBT> {
 
   float getArmorPenetration();
 
-  float getEntityHitDropChance();
-
-  float getBlockHitDropChance();
-
   int getSize();
 
   void setSize(int size);

@@ -44,7 +44,6 @@ import net.minecraft.enchantment.UnbreakingEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.merchant.villager.WanderingTraderEntity;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -121,9 +120,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.attachments = gunItem.getDefaultAttachments();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
-    this.magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .ifPresent(magazine -> magazine.setSize(0));
+    // Empty magazine
+    this.setMagazineSize(0);
   }
 
   @Override
@@ -373,17 +371,6 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
           .infect(EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
               / 255.0F);
     }
-
-    float dropChance = this.magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::getEntityHitDropChance)
-        .orElse(0.0F);
-
-    if (random.nextFloat() < dropChance) {
-      ItemEntity ammoEntity = new ItemEntity(world, hitVec3d.getX(), hitVec3d.getY(),
-          hitVec3d.getZ(), this.magazineStack);
-      world.addEntity(ammoEntity);
-    }
   }
 
   private void hitBlock(ILiving<?> living, ItemStack itemStack,
@@ -431,17 +418,6 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       if (!world.isAirBlock(rayTrace.getPos()) && world.isAirBlock(blockAbove)) {
         world.setBlockState(blockAbove, Blocks.FIRE.getDefaultState());
       }
-    }
-
-    float dropChance = this.magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::getBlockHitDropChance)
-        .orElse(0.0F);
-
-    if (random.nextFloat() < dropChance) {
-      ItemEntity ammoEntity = new ItemEntity(world, hitVec3d.getX(), hitVec3d.getY(),
-          hitVec3d.getZ(), new ItemStack(this.magazineStack.getItem()));
-      world.addEntity(ammoEntity);
     }
   }
 
