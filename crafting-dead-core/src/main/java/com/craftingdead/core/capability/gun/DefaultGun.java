@@ -253,7 +253,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
       Optional<? extends RayTraceResult> rayTrace = RayTraceUtil
-          .traceAllObjects(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random);
+          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random);
 
       rayTrace.ifPresent(result -> {
         switch (result.getType()) {

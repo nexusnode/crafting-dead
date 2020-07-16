@@ -1,141 +1,60 @@
 package com.craftingdead.core.item;
 
-import java.util.List;
-import java.util.Random;
-import javax.annotation.Nonnull;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
+import javax.annotation.Nullable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.actionprovider.IActionProvider;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.Stats;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ActionItem extends Item {
 
-  private final IBlockAction blockAction;
-  private final IEntityAction entityAction;
+  private final IActionProvider actionProvider;
 
-  /**
-   * Standalone constructor to specify actions upon isntantiation.
-   * 
-   * @param properties - action properties
-   */
-  public ActionItem(Properties properties) {
+  public ActionItem(Properties properties, IActionProvider actionProvider) {
     super(properties);
-    this.blockAction = properties.blockAction;
-    this.entityAction = properties.entityAction;
-  }
-
-  /**
-   * Used by child classes that specify custom actions via overriding.
-   * 
-   * @param properties - standard item properties
-   */
-  protected ActionItem(Item.Properties properties) {
-    super(properties);
-    this.blockAction = null;
-    this.entityAction = null;
-  }
-
-  protected IBlockAction getBlockAction() {
-    return this.blockAction;
-  }
-
-  protected IEntityAction getEntityAction() {
-    return this.entityAction;
+    this.actionProvider = actionProvider;
   }
 
   @Override
-  public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn,
-      LivingEntity target, Hand hand) {
-    if (this.getEntityAction() != null) {
-      playerIn.addStat(Stats.ITEM_USED.get(this));
-      ActionResult<ItemStack> result =
-          this.getEntityAction().performAction(stack, playerIn, target, random);
-      playerIn.setHeldItem(hand, result.getResult());
-      return result.getType().isAccepted();
+  public boolean itemInteractionForEntity(ItemStack itemStack, PlayerEntity playerEntity,
+      LivingEntity targetEntity, Hand hand) {
+    if (!playerEntity.getEntityWorld().isRemote()) {
+      this.performAction(playerEntity, targetEntity);
     }
     return false;
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
-      ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
-    String instructionsTranslationKey = this.getRegistryName().toString() + "/instructions";
-    if (I18n.hasKey(instructionsTranslationKey)) {
-      lines.add(new TranslationTextComponent(instructionsTranslationKey));
+  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
+      Hand hand) {
+    if (!playerEntity.getEntityWorld().isRemote()) {
+      this.performAction(playerEntity, null);
+    }
+    return new ActionResult<>(ActionResultType.PASS, playerEntity.getHeldItem(hand));
+  }
+
+  private void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
+    if (this.actionProvider != null) {
+      performerEntity.getCapability(ModCapabilities.LIVING).ifPresent(
+          performer -> this.actionProvider.getEntityAction(performer,
+              targetEntity == null ? null
+                  : targetEntity.getCapability(ModCapabilities.LIVING).orElse(null))
+              .ifPresent(action -> performer.performAction(action, false, true)));
     }
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
-      Hand handIn) {
-    BlockRayTraceResult rayTraceResult =
-        (BlockRayTraceResult) rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.ANY);
-    BlockState blockState = worldIn.getBlockState(rayTraceResult.getPos());
-    ItemStack itemStack = playerIn.getHeldItem(handIn);
-    if (this.getBlockAction() != null) {
-      playerIn.addStat(Stats.ITEM_USED.get(this));
-      return this.getBlockAction()
-          .performAction(itemStack, playerIn, rayTraceResult.getPos(), blockState, random);
-    }
-    return new ActionResult<>(ActionResultType.PASS, itemStack);
-  }
-
-  public static ItemStack useReturn(ItemStack itemStack, ItemStack returnStack,
-      LivingEntity from) {
-    itemStack.shrink(1);
-    if (itemStack.isEmpty()) {
-      return returnStack;
-    } else {
-      if (!(from instanceof PlayerEntity)
-          || !((PlayerEntity) from).inventory.addItemStackToInventory(returnStack)) {
-        from.entityDropItem(returnStack);
-      }
-      return itemStack;
-    }
-  }
-
-  @FunctionalInterface
-  public static interface IBlockAction {
-    @Nonnull
-    ActionResult<ItemStack> performAction(ItemStack itemStack, LivingEntity from,
-        BlockPos blockPos, BlockState blockState, Random random);
-  }
-
-  @FunctionalInterface
-  public static interface IEntityAction {
-    @Nonnull
-    ActionResult<ItemStack> performAction(ItemStack itemStack, LivingEntity from,
-        Entity entity, Random random);
-  }
-
-  public static class Properties extends Item.Properties {
-
-    private IBlockAction blockAction;
-    private IEntityAction entityAction;
-
-    public Properties setBlockAction(IBlockAction blockAction) {
-      this.blockAction = blockAction;
-      return this;
-    }
-
-    public Properties setEntityAction(IEntityAction entityAction) {
-      this.entityAction = entityAction;
-      return this;
-    }
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SimpleCapabilityProvider<>(this.actionProvider,
+        () -> ModCapabilities.ACTION_PROVIDER);
   }
 }

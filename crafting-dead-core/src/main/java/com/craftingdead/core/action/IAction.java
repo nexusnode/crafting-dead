@@ -2,7 +2,6 @@ package com.craftingdead.core.action;
 
 import java.util.Optional;
 import com.craftingdead.core.capability.living.ILiving;
-import net.minecraft.network.PacketBuffer;
 
 public interface IAction {
 
@@ -21,10 +20,6 @@ public interface IAction {
   boolean tick();
 
   void cancel();
-
-  void writeData(PacketBuffer packetBuffer);
-
-  void readData(PacketBuffer packetBuffer);
 
   ILiving<?> getPerformer();
 

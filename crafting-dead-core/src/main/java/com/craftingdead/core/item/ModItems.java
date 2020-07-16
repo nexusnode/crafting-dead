@@ -16,27 +16,13 @@ import com.craftingdead.core.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
-import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.ArbitraryTooltips;
-import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.SkeletonEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -1402,135 +1388,78 @@ public class ModItems {
 
   public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS
       .register("first_aid_kit",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setActionProvider(new DefaultActionProvider(ActionTypes.HEAL))
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_FIRST_AID_KIT)));
 
   public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS
       .register("adrenaline_syringe",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setActionProvider(new DefaultActionProvider(ActionTypes.ADRENALINE))
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_ADRENALINE_SYRINGE)));
 
   public static final RegistryObject<Item> SYRINGE = ITEMS
-      .register("syringe", () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setEntityAction((itemStack, from, target, random) -> {
-            if (random.nextFloat() < 0.25F && target instanceof ZombieEntity) {
-              target.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
-              return ActionResult
-                  .success(ActionItem
-                      .useReturn(itemStack,
-                          new ItemStack(ForgeRegistries.ITEMS
-                              .getValue(new ResourceLocation(CraftingDead.ID, "rbi_syringe"))),
-                          from));
-            } else if (target instanceof LivingEntity
-                && !(target instanceof ZombieEntity || target instanceof SkeletonEntity)) {
-              if (((LivingEntity) target).getHealth() > 4) {
-                target.attackEntityFrom(ModDamageSource.BLEEDING, 2.0F);
-                return ActionResult
-                    .success(ActionItem
-                        .useReturn(itemStack,
-                            new ItemStack(ForgeRegistries.ITEMS
-                                .getValue(new ResourceLocation("craftingdead:blood_syringe"))),
-                            from));
-              } else if (from instanceof PlayerEntity) {
-                ((PlayerEntity) from)
-                    .sendStatusMessage(new TranslationTextComponent("message.low_blood_level",
-                        target.getDisplayName()).setStyle(new Style().setColor(TextFormatting.RED)),
-                        true);
-              }
-            }
-            return ActionResult.fail(itemStack);
-          })
-          .maxStackSize(1)
-          .group(ModItemGroups.CRAFTING_DEAD_MED)));
+      .register("syringe",
+          () -> new ActionItem(new Item.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_SYRINGE)));
 
   public static final RegistryObject<Item> BLOOD_SYRINGE = ITEMS
       .register("blood_syringe",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setActionProvider(new DefaultActionProvider(ActionTypes.BLOOD_SYRINGE))
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
               .containerItem(SYRINGE.get())
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_BLOOD_SYRINGE)));
 
   public static final RegistryObject<Item> BANDAGE = ITEMS
       .register("bandage",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .setActionProvider(new DefaultActionProvider(ActionTypes.BANDAGE))
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_BANDAGE)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS
       .register("rbi_syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setEntityAction((itemStack, from, target, random) -> {
-                if (target instanceof LivingEntity) {
-                  ((LivingEntity) target)
-                      .addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
-                  return ActionResult
-                      .success(ActionItem
-                          .useReturn(itemStack,
-                              new ItemStack(ForgeRegistries.ITEMS
-                                  .getValue(new ResourceLocation(CraftingDead.ID, "syringe"))),
-                              from));
-                }
-                return ActionResult.fail(itemStack);
-              })
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_RBI_SYRINGE)));
 
   public static final RegistryObject<Item> DIRTY_RAG = ITEMS
       .register("dirty_rag",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setBlockAction((itemStack, playerEntity, blockPos, blockState, random) -> {
-                if (blockState.getFluidState().getFluid() == Fluids.WATER) {
-                  playerEntity.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-                  return ActionResult
-                      .success(ActionItem
-                          .useReturn(itemStack,
-                              new ItemStack(ForgeRegistries.ITEMS
-                                  .getValue(new ResourceLocation(CraftingDead.ID, "clean_rag"))),
-                              playerEntity));
-                }
-                return ActionResult.fail(itemStack);
-              })
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new ActionItem(new Item.Properties()
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.WASH_RAG)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS
       .register("bloody_rag",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setBlockAction((itemStack, playerEntity, blockPos, blockState, random) -> {
-                if (blockState.getFluidState().getFluid() == Fluids.WATER) {
-                  playerEntity.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-                  return ActionResult
-                      .success(ActionItem
-                          .useReturn(itemStack,
-                              new ItemStack(ForgeRegistries.ITEMS
-                                  .getValue(new ResourceLocation(CraftingDead.ID, "clean_rag"))),
-                              playerEntity));
-                }
-                return ActionResult.fail(itemStack);
-              })
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new ActionItem(new Item.Properties()
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.WASH_RAG)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS
       .register("clean_rag",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new ActionItem(new Item.Properties()
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_CLEAN_RAG)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS
       .register("splint",
-          () -> new ConsumableItem((ConsumableItem.Properties) new ConsumableItem.Properties()
+          () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED)));
+              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_SPLINT)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS
       .register("cure_syringe",
-          () -> new ConsumableItem(
-              (ConsumableItem.Properties) new ConsumableItem.Properties().maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_MED)));
+          () -> new ActionItem(
+              new Item.Properties().maxStackSize(1)
+                  .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new DefaultActionProvider(ActionTypes.USE_CURE_SYRINGE)));
 
   // ================================================================================
   // Weapon

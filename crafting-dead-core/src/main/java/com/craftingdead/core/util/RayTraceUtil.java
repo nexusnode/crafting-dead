@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -12,6 +14,42 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
 public class RayTraceUtil {
+
+  public static Iterable<Entity> filterEntities(Entity fromEntity, Vec3d scaledLook) {
+    return fromEntity
+        .getEntityWorld()
+        .getEntitiesInAABBexcluding(fromEntity,
+            fromEntity.getBoundingBox().expand(scaledLook).grow(1.0D, 1.0D, 1.0D),
+            (entityTest) -> {
+              // Ignores entities that cannot be collided
+              if (entityTest.isSpectator() || !entityTest.canBeCollidedWith()) {
+                return false;
+              }
+              if (entityTest instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entityTest;
+
+                // Ignores dead entities
+                if (livingEntity.getHealth() <= 0F) {
+                  return false;
+                }
+              }
+              return true;
+            });
+  }
+
+  public static Optional<EntityRayTraceResult> rayTraceEntities(Entity fromEntity) {
+    IAttributeInstance reachDistanceAttribute =
+        fromEntity instanceof PlayerEntity
+            ? ((PlayerEntity) fromEntity).getAttribute(PlayerEntity.REACH_DISTANCE)
+            : null;
+    double distance = reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue();
+    Vec3d start = fromEntity.getEyePosition(1.0F);
+    Vec3d look = fromEntity.getLook(1.0F);
+    Vec3d scaledLook = look.scale(distance);
+    Vec3d end = start.add(scaledLook);
+    return RayTraceUtil.rayTraceEntities(fromEntity, start, end,
+        filterEntities(fromEntity, scaledLook), distance * distance);
+  }
 
   /**
    * Ray trace the specified entities from the parsed entity.
@@ -61,6 +99,16 @@ public class RayTraceUtil {
             finalHitEntity != null ? new EntityRayTraceResult(finalHitEntity, finalHitVec) : null);
   }
 
+  public static Optional<BlockRayTraceResult> rayTraceBlocks(LivingEntity fromEntity,
+      RayTraceContext.FluidMode fluidMode, double distance, float partialTicks) {
+    Vec3d start = fromEntity.getEyePosition(partialTicks);
+    Vec3d look = fromEntity.getLook(partialTicks);
+    Vec3d scaledLook = look.scale(distance);
+    Vec3d end = start.add(scaledLook);
+    return Optional.ofNullable(fromEntity.world.rayTraceBlocks(new RayTraceContext(start, end,
+        RayTraceContext.BlockMode.COLLIDER, fluidMode, fromEntity)));
+  }
+
   /**
    * Perform a full ray trace from the parsed entity.
    *
@@ -70,7 +118,7 @@ public class RayTraceUtil {
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
       final double distance, final float accuracy, final Random random) {
-    return traceAllObjects(fromEntity, distance, 1.0F, accuracy, random);
+    return rayTrace(fromEntity, distance, 1.0F, accuracy, random);
   }
 
   /**
@@ -81,13 +129,12 @@ public class RayTraceUtil {
    * @param partialTicks - the partialTicks
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
-  public static Optional<? extends RayTraceResult> traceAllObjects(final Entity fromEntity,
+  public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
       final double distance, final float partialTicks, final float accuracy, final Random random) {
     Vec3d start = fromEntity.getEyePosition(partialTicks);
     Vec3d look = fromEntity.getLook(partialTicks);
 
     if (accuracy < 1.0F) {
-
       look = look
           .add(
               (1.0F - accuracy) / 7.5F * random.nextFloat() * (random.nextBoolean() ? -1.0F : 1.0F),
@@ -103,31 +150,12 @@ public class RayTraceUtil {
             .rayTraceBlocks(new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER,
                 RayTraceContext.FluidMode.NONE, fromEntity)));
 
-    AxisAlignedBB boundingBox =
-        fromEntity.getBoundingBox().expand(scaledLook).grow(1.0D, 1.0D, 1.0D);
-    double sqrDistance = blockRayTraceResult.isPresent()
+    final double sqrDistance = blockRayTraceResult.isPresent()
         ? blockRayTraceResult.get().getHitVec().squareDistanceTo(start)
         : distance * distance;
 
     Optional<EntityRayTraceResult> entityRayTraceResult = rayTraceEntities(fromEntity, start, end,
-        fromEntity
-            .getEntityWorld()
-            .getEntitiesInAABBexcluding(fromEntity, boundingBox, (entityTest) -> {
-              // Ignores entities that cannot be collided
-              if (entityTest.isSpectator() || !entityTest.canBeCollidedWith()) {
-                return false;
-              }
-              if (entityTest instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entityTest;
-
-                // Ignores dead entities
-                if (livingEntity.getHealth() <= 0F) {
-                  return false;
-                }
-              }
-              return true;
-            }),
-        sqrDistance);
+        filterEntities(fromEntity, scaledLook), sqrDistance);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : blockRayTraceResult;
   }

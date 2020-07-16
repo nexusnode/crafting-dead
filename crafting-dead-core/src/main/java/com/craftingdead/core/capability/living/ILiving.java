@@ -2,6 +2,7 @@ package com.craftingdead.core.capability.living;
 
 import java.util.Collection;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.action.IAction;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -83,6 +84,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
     ITextComponent getMessage();
 
+    @Nullable
     ITextComponent getSubMessage();
 
     float getProgress(float partialTicks);

@@ -46,16 +46,12 @@ public class ReloadAction extends TimedAction {
   }
 
   @Override
-  public boolean tick() {
-    boolean finished = super.tick();
-    if (finished) {
-      ItemStack oldMagazine = this.gun.getMagazineStack();
-      this.gun.setMagazineStack(this.findAmmo(this.performer, false));
-      if (!oldMagazine.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(oldMagazine);
-      }
+  protected void finish() {
+    ItemStack oldMagazine = this.gun.getMagazineStack();
+    this.gun.setMagazineStack(this.findAmmo(this.performer, false));
+    if (!oldMagazine.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
+      ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(oldMagazine);
     }
-    return finished;
   }
 
   @Override

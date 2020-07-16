@@ -14,12 +14,25 @@ public abstract class TimedAction extends AbstractAction {
   protected abstract int getTotalDurationTicks();
 
   @Override
+  public boolean start() {
+    if (this.getTotalDurationTicks() <= 0) {
+      this.finish();
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
   public boolean tick() {
     if (++this.durationTicks >= this.getTotalDurationTicks()) {
+      this.finish();
       return true;
     }
     return false;
   }
+
+  protected abstract void finish();
 
   @Override
   public void cancel() {
