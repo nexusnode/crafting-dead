@@ -37,7 +37,7 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
   public void init() {
     super.init();
     this.vestButton =
-        new SimpleButton(this.guiLeft + 83, this.guiTop + 66, 10, 16, ">", (button) -> {
+        new SimpleButton(this.guiLeft + 83, this.guiTop + 48, 10, 16, ">", (button) -> {
           NetworkChannel.MAIN
               .getSimpleChannel()
               .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));

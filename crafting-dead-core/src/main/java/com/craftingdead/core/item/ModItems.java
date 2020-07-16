@@ -1411,7 +1411,6 @@ public class ModItems {
       .register("blood_syringe",
           () -> new ActionItem(new Item.Properties()
               .maxStackSize(1)
-              .containerItem(SYRINGE.get())
               .group(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_BLOOD_SYRINGE)));
 

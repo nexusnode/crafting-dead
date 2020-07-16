@@ -44,9 +44,10 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
     if (!performer.getEntity().getEntityWorld().isRemote()) {
       Optional<EntityRayTraceResult> entityRayTraceResult =
           RayTraceUtil.rayTraceEntities(performer.getEntity());
-      if (this.selectedTarget.getEntity() != entityRayTraceResult
-          .map(EntityRayTraceResult::getEntity)
-          .orElse(null)) {
+      if (this.selectedTarget != performer
+          && this.selectedTarget.getEntity() != entityRayTraceResult
+              .map(EntityRayTraceResult::getEntity)
+              .orElse(null)) {
         return false;
       }
     }
