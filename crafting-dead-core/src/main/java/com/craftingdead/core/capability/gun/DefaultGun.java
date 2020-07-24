@@ -139,6 +139,10 @@ public class DefaultGun implements IGun {
       boolean sendUpdate) {
     this.triggerPressed = triggerPressed;
 
+    if (!this.canShoot(living)) {
+      return;
+    }
+
     if (this.triggerPressed) {
       // Resets the counter
       this.shotCount = 0;
@@ -183,21 +187,24 @@ public class DefaultGun implements IGun {
     living.performAction(new RemoveMagazineAction(living), true);
   }
 
-  private void tryShoot(ILiving<?> living, ItemStack itemStack) {
-    final Entity entity = living.getEntity();
-
-    if (!this.triggerPressed) {
-      return;
-    }
-
+  private boolean canShoot(ILiving<?> living) {
     if (living.getActionProgress().isPresent() || living.getEntity().isSprinting()) {
-      return;
+      return false;
     }
 
     if (this.getMagazineSize() <= 0) {
-      this.triggerPressed = false;
-      entity.playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
       this.reload(living);
+      return false;
+    }
+
+    return true;
+  }
+
+  private void tryShoot(ILiving<?> living, ItemStack itemStack) {
+    final Entity entity = living.getEntity();
+
+    if (!this.triggerPressed || !this.canShoot(living)) {
       return;
     }
 
