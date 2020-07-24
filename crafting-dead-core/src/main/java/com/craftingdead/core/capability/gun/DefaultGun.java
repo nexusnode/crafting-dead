@@ -11,17 +11,19 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
 import com.craftingdead.core.action.RemoveMagazineAction;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.animation.DefaultAnimationController;
-import com.craftingdead.core.capability.animation.IAnimation;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.renderer.item.IItemRenderer;
+import com.craftingdead.core.client.renderer.item.RenderGun;
 import com.craftingdead.core.enchantment.ModEnchantments;
+import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
+import com.craftingdead.core.item.GunItem.AnimationType;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleAimingMessage;
@@ -36,7 +38,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -78,7 +79,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class DefaultGun extends DefaultAnimationController implements IGun {
+public class DefaultGun implements IGun {
 
   public static final float HEADSHOT_MULTIPLIER = 4;
 
@@ -110,6 +111,8 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
   private boolean aiming;
 
+  private final RenderGun gunRenderer;
+
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
   }
@@ -122,6 +125,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
     // Empty magazine
     this.setMagazineSize(0);
+    this.gunRenderer = gunItem.getRenderer();
   }
 
   @Override
@@ -186,7 +190,7 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
       return;
     }
 
-    if (living.getActionProgress().isPresent()) {
+    if (living.getActionProgress().isPresent() || living.getEntity().isSprinting()) {
       return;
     }
 
@@ -226,19 +230,12 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
     if (entity.world.isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist())
-            .joltCamera(1.0F - this.getAccuracy(living, itemStack), true);
+            .joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
       }
 
-      itemStack
-          .getCapability(ModCapabilities.ANIMATION_CONTROLLER)
-          .ifPresent(animationController -> {
-            IAnimation animation =
-                this.gunItem.getAnimations().get(GunItem.AnimationType.SHOOT).get();
-            if (animation != null) {
-              animationController.cancelCurrentAnimation();
-              animationController.addAnimation(animation);
-            }
-          });
+      this.gunRenderer.flash();
+      this.gunRenderer.cancelCurrentAnimation();
+      this.gunRenderer.addAnimation(this.gunItem.getAnimations().get(AnimationType.SHOOT).get());
     }
 
     SoundEvent shootSound = this.gunItem.getShootSound().get();
@@ -390,15 +387,15 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
 
     // Gets the hit sound to be played
     SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
-    Material blockMaterial = blockState.getMaterial();
-    if (blockMaterial == Material.WOOD) {
+    net.minecraft.block.material.Material blockMaterial = blockState.getMaterial();
+    if (blockMaterial == net.minecraft.block.material.Material.WOOD) {
       hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
-    } else if (blockMaterial == Material.ROCK) {
+    } else if (blockMaterial == net.minecraft.block.material.Material.ROCK) {
       hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
-    } else if (blockMaterial == Material.IRON) {
+    } else if (blockMaterial == net.minecraft.block.material.Material.IRON) {
       hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
           : ModSoundEvents.BULLET_IMPACT_METAL2.get();
-    } else if (blockMaterial == Material.GLASS) {
+    } else if (blockMaterial == net.minecraft.block.material.Material.GLASS) {
       hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
     }
 
@@ -578,13 +575,24 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   }
 
   @Override
+  public boolean hasIronSight() {
+    for (AttachmentItem attachmentItem : this.attachments) {
+      if (attachmentItem.getInventorySlot() == CraftingInventorySlotType.OVERBARREL_ATTACHMENT) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean isAiming(Entity entity, ItemStack itemStack) {
     return this.aiming;
   }
 
   @Override
   public float getFovModifier(Entity entity, ItemStack itemStack) {
-    return this.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV);
+    return this.hasIronSight() ? 0.75F
+        : this.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV);
   }
 
   @Override
@@ -600,6 +608,11 @@ public class DefaultGun extends DefaultAnimationController implements IGun {
   @Override
   public int getOverlayTextureHeight() {
     return 512;
+  }
+
+  @Override
+  public IItemRenderer getItemRenderer() {
+    return this.gunRenderer;
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {

@@ -1,3 +1,15 @@
+buildscript {
+	repositories {
+		maven {
+			name = 'sponge'
+			url = 'https://dist.creeper.host/Sponge/maven'
+		}
+	}
+	dependencies {
+		classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+	}
+}
+
 plugins {
 	id 'com.wynprice.cursemaven' version '2.1.5'
 }
@@ -7,10 +19,17 @@ repositories {
         name 'curseforge'
         url 'https://minecraft.curseforge.com/api/maven/'
     }
+    maven {
+    	name = 'sponge'
+    	url = 'https://dist.creeper.host/Sponge/maven'
+	}
+	google()
 }
 
 dependencies {
+    implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation fg.deobf("curse.maven:travelers-backpack:${travelers_backpack_id}")
+	implementation group: 'org.spongepowered', name: 'mixin', version: '0.8.1-SNAPSHOT'
 }
 
 minecraft {    
@@ -20,7 +39,6 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             
             mods {
@@ -33,7 +51,6 @@ minecraft {
         server {
             workingDirectory project.file('server')
 
-            property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             
             mods {
@@ -61,3 +78,5 @@ minecraft {
         }
     }
 }
+
+apply plugin: 'org.spongepowered.mixin'

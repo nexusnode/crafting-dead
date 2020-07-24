@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "package": "com.craftingdead.core.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "refmap": "craftingdead.refmap.json",
+    "mixins": [
+        "ItemRendererMixin",
+        "PlayerRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

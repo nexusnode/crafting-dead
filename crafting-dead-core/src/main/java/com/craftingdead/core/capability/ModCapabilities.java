@@ -2,8 +2,6 @@ package com.craftingdead.core.capability;
 
 import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
 import com.craftingdead.core.capability.actionprovider.IActionProvider;
-import com.craftingdead.core.capability.animation.DefaultAnimationController;
-import com.craftingdead.core.capability.animation.IAnimationController;
 import com.craftingdead.core.capability.clothing.DefaultClothing;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.gun.DefaultGun;
@@ -18,6 +16,8 @@ import com.craftingdead.core.capability.magazine.DefaultMagazine;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.DefaultPaint;
 import com.craftingdead.core.capability.paint.IPaint;
+import com.craftingdead.core.capability.rendererprovider.DefaultRendererProvider;
+import com.craftingdead.core.capability.rendererprovider.IRendererProvider;
 import com.craftingdead.core.capability.scope.DefaultScope;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.capability.storage.DefaultStorage;
@@ -32,9 +32,6 @@ public class ModCapabilities {
 
   @CapabilityInject(ILiving.class)
   public static final Capability<ILiving<?>> LIVING = null;
-
-  @CapabilityInject(IAnimationController.class)
-  public static final Capability<IAnimationController> ANIMATION_CONTROLLER = null;
 
   @CapabilityInject(IGun.class)
   public static final Capability<IGun> GUN = null;
@@ -62,12 +59,12 @@ public class ModCapabilities {
 
   @CapabilityInject(IActionProvider.class)
   public static final Capability<IActionProvider> ACTION_PROVIDER = null;
+  
+  @CapabilityInject(IRendererProvider.class)
+  public static final Capability<IRendererProvider> RENDERER_PROVIDER = null;
 
   public static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
-    CapabilityManager.INSTANCE
-        .register(IAnimationController.class, new EmptyStorage<>(),
-            DefaultAnimationController::new);
     CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), DefaultGun::new);
     CapabilityManager.INSTANCE.register(IPaint.class, new EmptyStorage<>(), DefaultPaint::new);
     CapabilityManager.INSTANCE
@@ -81,6 +78,8 @@ public class ModCapabilities {
     CapabilityManager.INSTANCE.register(IHat.class, new EmptyStorage<>(), DefaultHat::new);
     CapabilityManager.INSTANCE.register(IActionProvider.class, new EmptyStorage<>(),
         DefaultActionProvider::new);
+    CapabilityManager.INSTANCE.register(IRendererProvider.class, new EmptyStorage<>(),
+        DefaultRendererProvider::new);
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

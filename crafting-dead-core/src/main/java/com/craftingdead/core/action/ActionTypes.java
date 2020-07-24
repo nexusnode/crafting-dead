@@ -26,7 +26,7 @@ public class ActionTypes {
 
   @SuppressWarnings("unchecked")
   public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
-      DeferredRegister.create(ActionType.class, CraftingDead.ID);
+      DeferredRegister.create((Class<ActionType<?>>) (Class<?>) ActionType.class, CraftingDead.ID);
 
   public static final RegistryObject<ActionType<?>> RELOAD = ACTION_TYPES
       .register("reload",

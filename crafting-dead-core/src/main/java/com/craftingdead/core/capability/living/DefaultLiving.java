@@ -156,6 +156,11 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this, heldStack));
 
+    if (this.getEntity().getEntityWorld().isRemote()) {
+      heldStack.getCapability(ModCapabilities.RENDERER_PROVIDER)
+          .ifPresent(provider -> provider.getItemRenderer().tick(heldStack, this.getEntity()));
+    }
+
     if (this.freezeMovement) {
       this.entity.resetPosition(this.entity.prevPosX, this.entity.prevPosY, this.entity.prevPosZ);
       this.freezeMovement = false;

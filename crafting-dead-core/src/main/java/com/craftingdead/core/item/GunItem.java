@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.capability.animation.IAnimation;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.client.renderer.item.RenderGun;
+import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -36,8 +37,10 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.DistExecutor;
 
 public class GunItem extends ShootableItem {
 
@@ -81,7 +84,7 @@ public class GunItem extends ShootableItem {
 
   private final Supplier<SoundEvent> reloadSound;
 
-  private final Map<AnimationType, Supplier<IAnimation>> animations;
+  private final Map<AnimationType, Supplier<GunAnimation>> animations;
 
   private final Set<Supplier<MagazineItem>> acceptedMagazines;
 
@@ -92,6 +95,8 @@ public class GunItem extends ShootableItem {
   private final Set<Supplier<PaintItem>> acceptedPaints;
 
   private final Set<Supplier<AttachmentItem>> defaultAttachments;
+
+  private final RenderGun renderer;
 
   public GunItem(Properties properties) {
     super(properties);
@@ -112,6 +117,7 @@ public class GunItem extends ShootableItem {
     this.acceptedAttachments = properties.acceptedAttachments;
     this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
+    this.renderer = DistExecutor.safeCallWhenOn(Dist.CLIENT, properties.rendererFactory);
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
             (itemStack, world, entity) -> entity != null ? itemStack
@@ -168,7 +174,7 @@ public class GunItem extends ShootableItem {
     return Optional.ofNullable(this.reloadSound.get());
   }
 
-  public Map<AnimationType, Supplier<IAnimation>> getAnimations() {
+  public Map<AnimationType, Supplier<GunAnimation>> getAnimations() {
     return this.animations;
   }
 
@@ -192,6 +198,10 @@ public class GunItem extends ShootableItem {
     return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  public RenderGun getRenderer() {
+    return this.renderer;
+  }
+
   @Override
   public Predicate<ItemStack> getInventoryAmmoPredicate() {
     return itemStack -> this.acceptedMagazines
@@ -204,7 +214,7 @@ public class GunItem extends ShootableItem {
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SerializableCapabilityProvider<>(new DefaultGun(this),
         ImmutableSet
-            .of(() -> ModCapabilities.ANIMATION_CONTROLLER, () -> ModCapabilities.GUN,
+            .of(() -> ModCapabilities.RENDERER_PROVIDER, () -> ModCapabilities.GUN,
                 () -> ModCapabilities.SCOPE));
   }
 
@@ -365,7 +375,7 @@ public class GunItem extends ShootableItem {
 
     private Supplier<SoundEvent> reloadSound = () -> null;
 
-    private final Map<AnimationType, Supplier<IAnimation>> animations =
+    private final Map<AnimationType, Supplier<GunAnimation>> animations =
         new EnumMap<>(AnimationType.class);
 
     private final Set<Supplier<MagazineItem>> acceptedMagazines = new HashSet<>();
@@ -377,6 +387,8 @@ public class GunItem extends ShootableItem {
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
 
     private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
+
+    private Supplier<DistExecutor.SafeCallable<RenderGun>> rendererFactory;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -433,7 +445,7 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties addAnimation(AnimationType type, Supplier<IAnimation> animation) {
+    public Properties addAnimation(AnimationType type, Supplier<GunAnimation> animation) {
       this.animations.put(type, animation);
       return this;
     }
@@ -463,6 +475,12 @@ public class GunItem extends ShootableItem {
 
     public Properties addAcceptedPaint(Supplier<PaintItem> acceptedPaint) {
       this.acceptedPaints.add(acceptedPaint);
+      return this;
+    }
+
+    public Properties setItemRendererFactory(
+        Supplier<DistExecutor.SafeCallable<RenderGun>> rendererFactory) {
+      this.rendererFactory = rendererFactory;
       return this;
     }
   }

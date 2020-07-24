@@ -1,11 +1,18 @@
 package com.craftingdead.core.item;
 
+import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
-import com.craftingdead.core.capability.animation.fire.PistolShootAnimation;
-import com.craftingdead.core.capability.animation.fire.RifleShootAnimation;
-import com.craftingdead.core.capability.animation.fire.SubmachineShootAnimation;
+import com.craftingdead.core.client.renderer.item.RenderACR;
+import com.craftingdead.core.client.renderer.item.RenderAK47;
+import com.craftingdead.core.client.renderer.item.gun.fire.PistolShootAnimation;
+import com.craftingdead.core.client.renderer.item.gun.fire.RifleShootAnimation;
+import com.craftingdead.core.client.renderer.item.gun.fire.SubmachineShootAnimation;
+import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentBipod;
+import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentGrip;
+import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentReddot;
+import com.craftingdead.core.client.renderer.item.model.magazine.ModelAK4730Rnd;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -22,6 +29,7 @@ import com.craftingdead.core.util.Text;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -179,6 +187,7 @@ public class ModItems {
       .register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
+              .setModel(Pair.of(() -> ModelAK4730Rnd::new, (ResourceLocation) null))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -436,43 +445,14 @@ public class ModItems {
   // Attachments
   // ================================================================================
 
-  public static final RegistryObject<AttachmentItem> M4A1_IRON_SIGHT = ITEMS
-      .register("m4a1_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<AttachmentItem> PISTOL_IRON_SIGHT = ITEMS
-      .register("pistol_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<AttachmentItem> SCARH_IRON_SIGHT = ITEMS
-      .register("scarh_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
-  public static final RegistryObject<AttachmentItem> AKM_IRON_SIGHT = ITEMS
-      .register("akm_iron_sight",
-          () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 0.5F)
-              .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
   public static final RegistryObject<AttachmentItem> RED_DOT_SIGHT = ITEMS
       .register("red_dot_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.5F)
+              .addMultiplier(MultiplierType.FOV, 1 / 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .setModel(Pair.of(() -> ModelAttachmentReddot::new,
+                  new ResourceLocation(CraftingDead.ID,
+                      "textures/models/attachments/red_dot_sight.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -511,16 +491,22 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> TACTICAL_GRIP = ITEMS
       .register("tactical_grip",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.ACCURACY, 1.25F)
+              .addMultiplier(MultiplierType.ACCURACY, 1.15F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+              .setModel(Pair.of(() -> ModelAttachmentGrip::new,
+                  new ResourceLocation(CraftingDead.ID,
+                      "textures/models/attachments/tactical_grip.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> BIPOD = ITEMS
       .register("bipod",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.ACCURACY, 1.5F)
+              .addMultiplier(MultiplierType.ACCURACY, 1.05F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
+              .setModel(Pair.of(() -> ModelAttachmentBipod::new,
+                  new ResourceLocation(CraftingDead.ID,
+                      "textures/models/attachments/bipod.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -536,7 +522,6 @@ public class ModItems {
   // Assault Rifles
   // ================================================================================
 
-  // TODO Set accuracy amount for every gun
   public static final RegistryObject<Item> M4A1 = ITEMS
       .register("m4a1",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
@@ -557,7 +542,7 @@ public class ModItems {
               .addAcceptedMagazine(STANAG_DRUM_MAGAZINE)
               .addAcceptedMagazine(STANAG_BOX_MAGAZINE)
               // Attachments
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -573,6 +558,7 @@ public class ModItems {
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -596,7 +582,7 @@ public class ModItems {
               .addAcceptedMagazine(STANAG_DRUM_MAGAZINE)
               .addAcceptedMagazine(STANAG_BOX_MAGAZINE)
               // Attachments
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -608,6 +594,7 @@ public class ModItems {
               // Paints
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -625,7 +612,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AK47_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AK47_30_ROUND_MAGAZINE)
-              .addDefaultAttachment(AKM_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -637,6 +624,7 @@ public class ModItems {
               // Paints
               .addAcceptedPaint(VULCAN_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -653,7 +641,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(FNFAL_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -662,7 +650,7 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> ACR = ITEMS
@@ -679,7 +667,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(ACR_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(LP_SCOPE)
@@ -687,7 +674,7 @@ public class ModItems {
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderACR::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> HK417 = ITEMS
@@ -704,7 +691,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(HK417_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -713,7 +700,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MPT55 = ITEMS
@@ -730,13 +717,13 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(MPT55_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M1GARAND = ITEMS
@@ -752,12 +739,12 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M1GARAND_MAGAZINE)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: Sporter22 uses two different iron sights at the same time.
@@ -776,7 +763,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(SPORTER22_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -785,7 +772,7 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> G36C = ITEMS
@@ -802,13 +789,13 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(G36C_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
@@ -831,14 +818,14 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(M240B_MAGAZINE)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> RPK = ITEMS
@@ -855,12 +842,11 @@ public class ModItems {
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(RPK_MAGAZINE)
               .addAcceptedMagazine(RPK_DRUM_MAGAZINE)
-              .addDefaultAttachment(AKM_IRON_SIGHT)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
@@ -883,7 +869,7 @@ public class ModItems {
               .setDefaultMagazine(MINIGUN_MAGAZINE)
               .addAcceptedPaint(FURY_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: MK48MOD uses two different iron sights at the same time.
@@ -901,14 +887,14 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MK48MOD_MAGAZINE)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -927,7 +913,7 @@ public class ModItems {
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(TASER_CARTRIDGE)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M1911 = ITEMS
@@ -943,11 +929,11 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M1911_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> G18 = ITEMS
@@ -964,12 +950,12 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(G18_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M9 = ITEMS
@@ -985,10 +971,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M9_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
@@ -1005,9 +991,9 @@ public class ModItems {
               .setDefaultMagazine(DESERT_EAGLE_MAGAZINE)
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> P250 = ITEMS
@@ -1023,11 +1009,11 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(P250_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MAGNUM = ITEMS
@@ -1042,9 +1028,9 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(MAGNUM_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FN57 = ITEMS
@@ -1060,10 +1046,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.FN57_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(FN57_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -1084,14 +1070,14 @@ public class ModItems {
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MAC10_MAGAZINE)
               .addAcceptedMagazine(MAC10_EXTENDED_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(UV_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: P90 uses two different iron sights at the same time.
@@ -1109,14 +1095,14 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.P90_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(P90_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(RUBY_PAINT)
               .addAcceptedPaint(GEM_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> VECTOR = ITEMS
@@ -1132,13 +1118,13 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(VECTOR_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(SLAUGHTER_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MP5A5 = ITEMS
@@ -1156,12 +1142,12 @@ public class ModItems {
               .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MP5A5_21_ROUND_MAGAZINE)
               .addAcceptedMagazine(MP5A5_35_ROUND_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -1183,7 +1169,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M107_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -1193,7 +1179,7 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .maxStackSize(1)
+              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: AS50 uses two different iron sights at the same time.
@@ -1211,7 +1197,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AS50_MAGAZINE)
-              .addDefaultAttachment(PISTOL_IRON_SIGHT)
+
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -1221,6 +1207,7 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1241,7 +1228,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AWP_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AWP_MAGAZINE)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
@@ -1249,6 +1236,7 @@ public class ModItems {
               .addAcceptedPaint(DRAGON_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1266,7 +1254,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.DMR_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(DMR_MAGAZINE)
-              .addDefaultAttachment(M4A1_IRON_SIGHT)
+
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
@@ -1275,6 +1263,7 @@ public class ModItems {
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1297,9 +1286,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(TRENCHGUN_SHELLS)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1318,9 +1308,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(MOSSBERG_SLUGS)
-              .addDefaultAttachment(SCARH_IRON_SIGHT)
+
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
+              .setItemRendererFactory(() -> RenderAK47::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 

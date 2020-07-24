@@ -223,7 +223,7 @@ public class IngameGui {
     final double x = (width / 2.0D) - (imageWidth / 2.0D) - 0.5F;
     final double y = (height / 2.0D) - (imageHeight / 2.0D);
 
-    final float newSpread = (1.0F - accuracy) * 60.0F;
+    final float newSpread = (1.15F - accuracy) * 60.0F;
     final float lerpSpread = MathHelper.lerp(0.5F, this.lastSpread, newSpread);
     final Crosshair crosshair =
         this.client.getCrosshairManager().getCrosshair(this.crosshairLocation);

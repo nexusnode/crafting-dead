@@ -48,7 +48,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -71,7 +70,6 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDead.ID)
@@ -140,6 +138,8 @@ public class CraftingDead {
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+
+    ActionTypes.ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new);
     ActionTypes.ACTION_TYPES.register(modEventBus);
 
     // Should be registered after ITEMS registration
@@ -200,19 +200,6 @@ public class CraftingDead {
     dataGenerator.addProvider(new ModItemTagsProvider(dataGenerator));
     dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
     dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
-  }
-
-  @SuppressWarnings("unchecked")
-  @SubscribeEvent
-  public void handleNewRegistryEvent(RegistryEvent.NewRegistry event) {
-    this.actionTypeRegistry =
-        makeRegistry(new ResourceLocation(CraftingDead.ID, "action_type"), ActionType.class)
-            .create();
-  }
-
-  private static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> makeRegistry(
-      ResourceLocation name, Class<T> type) {
-    return new RegistryBuilder<T>().setName(name).setType(type);
   }
 
   // ================================================================================

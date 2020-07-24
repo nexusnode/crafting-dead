@@ -11,8 +11,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.animation.IAnimationController;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -44,7 +42,6 @@ import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
-import net.minecraftforge.common.util.LazyOptional;
 
 /**
  * A model that can be rendered as a different model depending on the view perspective.
@@ -105,20 +102,12 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
 
     private final Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels;
     private final TextureAtlasSprite particle;
-    private final LazyOptional<IAnimationController> animationController;
 
     public BakedPerspectiveAwareModel(
         Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels,
         TextureAtlasSprite particle) {
-      this(bakedModels, particle, LazyOptional.empty());
-    }
-
-    public BakedPerspectiveAwareModel(
-        Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels,
-        TextureAtlasSprite particle, LazyOptional<IAnimationController> animationController) {
       this.bakedModels = bakedModels;
       this.particle = particle;
-      this.animationController = animationController;
     }
 
     @Override
@@ -168,9 +157,6 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     @Override
     public IBakedModel handlePerspective(ItemCameraTransforms.TransformType cameraTransformType,
         MatrixStack mat) {
-      this.animationController
-          .filter(controller -> controller.isAcceptedPerspective(cameraTransformType))
-          .ifPresent(controller -> controller.apply(mat));
       return this
           .getModelForPerspective(cameraTransformType)
           .handlePerspective(cameraTransformType, mat);
@@ -205,8 +191,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
               }, (u, v) -> {
                 throw new IllegalStateException(String.format("Duplicate key %s", u));
               }, () -> new EnumMap<>(ItemCameraTransforms.TransformType.class)));
-      return new BakedPerspectiveAwareModel(bakedModels, perspectiveModel.particle,
-          itemStack.getCapability(ModCapabilities.ANIMATION_CONTROLLER));
+      return new BakedPerspectiveAwareModel(bakedModels, perspectiveModel.particle);
     }
   }
 

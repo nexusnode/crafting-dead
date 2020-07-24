@@ -49,6 +49,7 @@ import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import io.noties.tumbleweed.TweenManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -178,6 +179,10 @@ public class ClientDist implements IModDist {
 
   private boolean freezeMovementInput = false;
 
+  private TweenManager tweenManager = TweenManager.create();
+
+  private float lastTime = 0F;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
@@ -195,6 +200,9 @@ public class ClientDist implements IModDist {
   }
 
   public void joltCamera(float amountPercent, boolean permenantJolt) {
+    if (amountPercent == 0.0F) {
+      return;
+    }
     float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
     if (permenantJolt) {
@@ -265,6 +273,10 @@ public class ClientDist implements IModDist {
 
   public void setFreezeMovementInput(boolean freezeMovementInput) {
     this.freezeMovementInput = freezeMovementInput;
+  }
+
+  public TweenManager getTweenManager() {
+    return this.tweenManager;
   }
 
   // ================================================================================
@@ -416,6 +428,7 @@ public class ClientDist implements IModDist {
   public void handleClientTick(TickEvent.ClientTickEvent event) {
     switch (event.phase) {
       case START:
+        this.lastTime = (float) Math.ceil(this.lastTime);
         // TODO SoundLoadEvent is not called upon initial startup - see
         // https://github.com/MinecraftForge/MinecraftForge/pull/6777
         if (!this.effectsManagerLoaded) {
@@ -544,7 +557,8 @@ public class ClientDist implements IModDist {
                   || heldStack
                       .getCapability(ModCapabilities.SCOPE)
                       .map(scope -> scope.isAiming(playerEntity, heldStack))
-                      .orElse(false));
+                      .orElse(false)
+                  || player.getEntity().isSprinting());
 
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
@@ -594,6 +608,11 @@ public class ClientDist implements IModDist {
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
       case START:
+        float currentTime = (float) Math.floor(this.lastTime) + event.renderTickTime;
+        float deltaTime = (currentTime - this.lastTime) * 50;
+        this.lastTime = currentTime;
+        this.tweenManager.update(deltaTime);
+
         if (this.minecraft.player != null) {
           this.updateCameraRotation();
         }
@@ -729,9 +748,10 @@ public class ClientDist implements IModDist {
       final int overlay, final float limbSwing, final float limbSwingAmount, final float ageInTicks,
       final float netHeadYaw, final float headPitch) {}
 
-  public static void renderArmsWithExtraSkins(PlayerRenderer renderer, MatrixStack matrix,
-      IRenderTypeBuffer buffer, int p_229144_3_, AbstractClientPlayerEntity playerEntity,
-      ModelRenderer firstLayerModel, ModelRenderer secondLayerModel) {
+  public static void renderArmsWithExtraSkins(PlayerRenderer renderer, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer,
+      int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
+      ModelRenderer armwearRenderer) {
     playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       String skinType = playerEntity.getSkinType();
       ItemStack clothingStack =
@@ -739,23 +759,23 @@ public class ClientDist implements IModDist {
       clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
         ResourceLocation clothingSkin = clothing.getTexture(skinType);
 
-        PlayerModel<AbstractClientPlayerEntity> playermodel = renderer.getEntityModel();
-        playermodel.swingProgress = 0.0F;
-        playermodel.isSneaking = false;
-        playermodel.swimAnimation = 0.0F;
-        playermodel.setAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+        PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getEntityModel();
+        playerModel.swingProgress = 0.0F;
+        playerModel.isSneaking = false;
+        playerModel.swimAnimation = 0.0F;
+        playerModel.setAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 
-        firstLayerModel.showModel = true;
-        secondLayerModel.showModel = true;
+        armRenderer.showModel = true;
+        armwearRenderer.showModel = true;
 
-        firstLayerModel.rotateAngleX = 0.0F;
-        firstLayerModel
-            .render(matrix, buffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)),
-                p_229144_3_, OverlayTexture.DEFAULT_UV);
-        secondLayerModel.rotateAngleX = 0.0F;
-        secondLayerModel
-            .render(matrix, buffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)),
-                p_229144_3_, OverlayTexture.DEFAULT_UV);
+        armRenderer.rotateAngleX = 0.0F;
+        armRenderer.render(matrixStack,
+            renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
+            OverlayTexture.DEFAULT_UV);
+        armwearRenderer.rotateAngleX = 0.0F;
+        armwearRenderer.render(matrixStack,
+            renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
+            OverlayTexture.DEFAULT_UV);
       });
     });
   }
