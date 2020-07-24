@@ -6,9 +6,12 @@ import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
 import com.craftingdead.core.client.renderer.item.ACRRenderer;
 import com.craftingdead.core.client.renderer.item.AK47Renderer;
+import com.craftingdead.core.client.renderer.item.gun.AnimationType;
 import com.craftingdead.core.client.renderer.item.gun.fire.PistolShootAnimation;
 import com.craftingdead.core.client.renderer.item.gun.fire.RifleShootAnimation;
 import com.craftingdead.core.client.renderer.item.gun.fire.SubmachineShootAnimation;
+import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReloadACR;
+import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReloadAK47;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentBipod;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentGrip;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentReddot;
@@ -537,7 +540,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.M4A1_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               // Magazines
               .setDefaultMagazine(STANAG_20_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_30_ROUND_MAGAZINE)
@@ -577,7 +580,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.SCARH_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               // Magazines
               .setDefaultMagazine(STANAG_20_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_30_ROUND_MAGAZINE)
@@ -612,9 +615,9 @@ public class ModItems {
               .setShootSound(ModSoundEvents.AK47_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_AK47_SHOOT)
               .setReloadSound(ModSoundEvents.AK47_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadAK47::new)
               .setDefaultMagazine(AK47_30_ROUND_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -641,7 +644,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.FNFAL_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(FNFAL_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -667,7 +670,8 @@ public class ModItems {
               .setShootSound(ModSoundEvents.ACR_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadACR::new)
               .setDefaultMagazine(ACR_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
@@ -692,7 +696,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.HK417_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(HK417_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -718,7 +722,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.MPT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(MPT55_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -740,7 +744,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1GARAND_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M1GARAND_MAGAZINE)
 
               .addAcceptedAttachment(LP_SCOPE)
@@ -764,7 +768,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.SPORTER22_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(SPORTER22_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -790,7 +794,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.G36C_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(G36C_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -819,7 +823,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.M240B_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(M240B_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -842,7 +846,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.RPK_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.RPK_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(RPK_MAGAZINE)
               .addAcceptedMagazine(RPK_DRUM_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -866,8 +870,8 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
 
               // TODO Create the following animation from legacy
-              // .addAnimation(GunItem.AnimationType.SHOOT, MinigunShootAnimation::new)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              // .addAnimation(AnimationType.SHOOT, MinigunShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
 
               .setDefaultMagazine(MINIGUN_MAGAZINE)
               .addAcceptedPaint(FURY_PAINT)
@@ -888,7 +892,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.MK48MOD_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_MK48MOD_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MK48MOD_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -913,7 +917,7 @@ public class ModItems {
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.TASER_SHOOT)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(TASER_CARTRIDGE)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
@@ -930,7 +934,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.M1911_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M1911_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -951,7 +955,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.G18_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(G18_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -972,7 +976,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.M9_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M9_MAGAZINE)
 
               .addAcceptedAttachment(SUPPRESSOR)
@@ -990,7 +994,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(DESERT_EAGLE_MAGAZINE)
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
@@ -1010,7 +1014,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.P250_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(P250_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -1029,7 +1033,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
               .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(MAGNUM_MAGAZINE)
 
               .addAcceptedPaint(MULTI_PAINT)
@@ -1047,7 +1051,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.FN57_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.FN57_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(FN57_MAGAZINE)
 
               .addAcceptedAttachment(SUPPRESSOR)
@@ -1070,7 +1074,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.MAC10_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MAC10_MAGAZINE)
               .addAcceptedMagazine(MAC10_EXTENDED_MAGAZINE)
 
@@ -1096,7 +1100,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.P90_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_P90_SHOOT)
               .setReloadSound(ModSoundEvents.P90_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(P90_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -1119,7 +1123,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.VECTOR_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(VECTOR_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -1142,7 +1146,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.MP5A5_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_MP5A5_SHOOT)
               .setReloadSound(ModSoundEvents.MP5A5_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
               .setDefaultMagazine(MP5A5_21_ROUND_MAGAZINE)
               .addAcceptedMagazine(MP5A5_35_ROUND_MAGAZINE)
 
@@ -1170,7 +1174,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M107_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M107_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -1198,7 +1202,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AS50_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AS50_MAGAZINE)
 
               .addAcceptedAttachment(RED_DOT_SIGHT)
@@ -1229,7 +1233,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.AWP_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.AWP_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AWP_MAGAZINE)
 
               .addAcceptedAttachment(LP_SCOPE)
@@ -1255,7 +1259,7 @@ public class ModItems {
               .setShootSound(ModSoundEvents.DMR_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.DMR_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(DMR_MAGAZINE)
 
               .addAcceptedAttachment(LP_SCOPE)
@@ -1287,7 +1291,7 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.TRENCHGUN_SHOOT)
               .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(TRENCHGUN_SHELLS)
 
               .addAcceptedAttachment(TACTICAL_GRIP)
@@ -1309,9 +1313,8 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MOSSBERG_SHOOT)
               .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
-              .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(MOSSBERG_SLUGS)
-
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> AK47Renderer::new)

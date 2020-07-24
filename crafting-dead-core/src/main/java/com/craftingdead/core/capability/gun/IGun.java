@@ -5,6 +5,9 @@ import java.util.Set;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.rendererprovider.IRendererProvider;
 import com.craftingdead.core.capability.scope.IScope;
+import com.craftingdead.core.client.renderer.item.RenderGun;
+import com.craftingdead.core.client.renderer.item.gun.AnimationType;
+import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.item.AttachmentItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -66,4 +69,9 @@ public interface IGun extends IScope, IRendererProvider, INBTSerializable<Compou
   int getReloadDurationTicks();
   
   boolean hasIronSight();
+  
+  @Override
+  RenderGun getItemRenderer();
+  
+  GunAnimation getAnimation(AnimationType animationType);
 }

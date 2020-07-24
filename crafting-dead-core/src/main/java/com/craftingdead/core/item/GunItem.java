@@ -16,6 +16,7 @@ import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.RenderGun;
+import com.craftingdead.core.client.renderer.item.gun.AnimationType;
 import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
@@ -345,10 +346,6 @@ public class GunItem extends ShootableItem {
   @Override
   public int getItemEnchantability() {
     return 1;
-  }
-
-  public static enum AnimationType {
-    SHOOT;
   }
 
   public static class Properties extends Item.Properties {

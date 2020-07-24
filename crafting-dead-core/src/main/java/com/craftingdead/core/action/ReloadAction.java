@@ -6,6 +6,9 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.client.renderer.item.gun.AnimationType;
+import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
+import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReload;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -22,6 +25,8 @@ public class ReloadAction extends TimedAction {
 
   private final IGun gun;
 
+  private ItemStack oldMagazineStack;
+
   public ReloadAction(ILiving<?> performer) {
     super(ActionTypes.RELOAD.get(), performer, null);
     this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
@@ -35,22 +40,47 @@ public class ReloadAction extends TimedAction {
 
   @Override
   public boolean start() {
-    if (!this.findAmmo(this.performer, true).isEmpty()) {
+    ItemStack magazineStack = this.findAmmo(this.performer, true);
+    if (!magazineStack.isEmpty()) {
+      this.oldMagazineStack = this.gun.getMagazineStack();
       // Some guns may not have a reload sound
       this.gun.getReloadSound()
           .ifPresent(sound -> this.performer.getEntity().getEntityWorld().playMovingSound(null,
               this.performer.getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
+      if (this.performer.getEntity().getEntityWorld().isRemote()) {
+        if (!this.oldMagazineStack.isEmpty()) {
+          GunAnimation ejectAnimation = this.gun.getAnimation(AnimationType.RELOAD);
+          if (ejectAnimation instanceof GunAnimationReload) {
+            ((GunAnimationReload) ejectAnimation).setEjectingClip(true);
+            this.gun.getItemRenderer().addAnimation(ejectAnimation,
+                () -> this.playLoadAnimation(magazineStack));
+          }
+        } else {
+          this.playLoadAnimation(magazineStack);
+        }
+      }
       return true;
     }
     return false;
   }
 
+  private void playLoadAnimation(ItemStack magazineStack) {
+    this.gun.setMagazineStack(magazineStack);
+    GunAnimation loadAnimation = this.gun.getAnimation(AnimationType.RELOAD);
+    if (loadAnimation instanceof GunAnimationReload) {
+      ((GunAnimationReload) loadAnimation).setEjectingClip(false);
+      this.gun.getItemRenderer().addAnimation(loadAnimation, null);
+    }
+  }
+
   @Override
   protected void finish() {
-    ItemStack oldMagazine = this.gun.getMagazineStack();
-    this.gun.setMagazineStack(this.findAmmo(this.performer, false));
-    if (!oldMagazine.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-      ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(oldMagazine);
+    ItemStack magazineStack = this.findAmmo(this.performer, false);
+    if (!magazineStack.isEmpty()) {
+      if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
+        ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
+      }
+      this.gun.setMagazineStack(magazineStack);
     }
   }
 
@@ -62,6 +92,7 @@ public class ReloadAction extends TimedAction {
       Minecraft.getInstance().getSoundHandler()
           .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
     }
+    this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
   private List<IItemHandler> collectAmmoProviders(ILiving<?> living) {

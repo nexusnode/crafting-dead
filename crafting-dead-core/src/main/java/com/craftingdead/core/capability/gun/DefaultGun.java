@@ -15,15 +15,15 @@ import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.renderer.item.IItemRenderer;
 import com.craftingdead.core.client.renderer.item.RenderGun;
+import com.craftingdead.core.client.renderer.item.gun.AnimationType;
+import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.item.GunItem.AnimationType;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleAimingMessage;
@@ -235,7 +235,8 @@ public class DefaultGun implements IGun {
 
       this.gunRenderer.flash();
       this.gunRenderer.cancelCurrentAnimation();
-      this.gunRenderer.addAnimation(this.gunItem.getAnimations().get(AnimationType.SHOOT).get());
+      this.gunRenderer.addAnimation(this.gunItem.getAnimations().get(AnimationType.SHOOT).get(),
+          null);
     }
 
     SoundEvent shootSound = this.gunItem.getShootSound().get();
@@ -611,8 +612,13 @@ public class DefaultGun implements IGun {
   }
 
   @Override
-  public IItemRenderer getItemRenderer() {
+  public RenderGun getItemRenderer() {
     return this.gunRenderer;
+  }
+
+  @Override
+  public GunAnimation getAnimation(AnimationType animationType) {
+    return this.gunItem.getAnimations().get(animationType).get();
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {

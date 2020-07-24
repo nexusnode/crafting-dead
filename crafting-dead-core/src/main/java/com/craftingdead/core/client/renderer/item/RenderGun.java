@@ -39,7 +39,7 @@ public abstract class RenderGun implements IItemRenderer {
 
   protected Minecraft mc = Minecraft.getInstance();
 
-  private final Queue<GunAnimation> animations = new LinkedList<>();
+  private final Queue<Pair<GunAnimation, Runnable>> animations = new LinkedList<>();
 
   private long animationStartTime = 0L;
 
@@ -57,12 +57,15 @@ public abstract class RenderGun implements IItemRenderer {
     this.flash = true;
   }
 
-  public void addAnimation(GunAnimation animation) {
-    this.animations.add(animation);
+  public void addAnimation(GunAnimation animation, Runnable callback) {
+    this.animations.add(Pair.of(animation, callback));
   }
 
   public void cancelCurrentAnimation() {
-    this.animations.poll();
+    Pair<GunAnimation, Runnable> oldAnimation = this.animations.poll();
+    if (oldAnimation != null && oldAnimation.getRight() != null) {
+      oldAnimation.getRight().run();
+    }
     this.animationStartTime = 0L;
   }
 
@@ -72,16 +75,16 @@ public abstract class RenderGun implements IItemRenderer {
 
   @Override
   public void tick(ItemStack itemStack, LivingEntity livingEntity) {
-    GunAnimation animation = this.animations.peek();
+    Pair<GunAnimation, Runnable> animation = this.animations.peek();
     if (animation != null) {
       if (this.animationStartTime == 0L) {
         this.animationStartTime = Util.milliTime();
       }
       float progress =
-          MathHelper.clamp((Util.milliTime() - this.animationStartTime) / animation.getLength(),
+          MathHelper.clamp(
+              (Util.milliTime() - this.animationStartTime) / animation.getLeft().getLength(),
               0.0F, 1.0F);
-      animation.onUpdate(this.mc, livingEntity, itemStack,
-          progress);
+      animation.getLeft().onUpdate(this.mc, livingEntity, itemStack, progress);
       if (progress >= 1.0F) {
         this.cancelCurrentAnimation();
       }
@@ -329,7 +332,8 @@ public abstract class RenderGun implements IItemRenderer {
 
     final float partialTicks = this.mc.getRenderPartialTicks();
 
-    final GunAnimation animation = this.animations.peek();
+    final Pair<GunAnimation, Runnable> animationPair = this.animations.peek();
+    final GunAnimation animation = animationPair == null ? null : animationPair.getLeft();
 
     final ResourceLocation texture = this.getTexture(itemStack.getItem().getRegistryName(), gun);
 
