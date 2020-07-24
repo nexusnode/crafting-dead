@@ -12,6 +12,7 @@ import com.craftingdead.core.client.renderer.item.gun.fire.SubmachineShootAnimat
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentBipod;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentGrip;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentReddot;
+import com.craftingdead.core.client.renderer.item.model.magazine.ModelACRClip;
 import com.craftingdead.core.client.renderer.item.model.magazine.ModelAK4730Rnd;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
@@ -204,6 +205,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.5F)
+              .setModel(Pair.of(() -> ModelACRClip::new, null))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.RenderState;
+import net.minecraft.client.renderer.RenderState.LightmapState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.model.ModelRenderer;
@@ -61,8 +62,9 @@ public class ModelMuzzleFlash extends Model {
 
   private static RenderType getFlashRenderType(ResourceLocation texture) {
     return RenderType.of("flash",
-        DefaultVertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, 7, 256, true,
+        DefaultVertexFormats.POSITION_COLOR_TEXTURE_LIGHT, 7, 256, false,
         true, RenderType.State.builder()
+            .lightmap(new LightmapState(true))
             .texture(new RenderState.TextureState(texture,
                 false, false))
             .transparency(new RenderState.TransparencyState("translucent_transparency", () -> {

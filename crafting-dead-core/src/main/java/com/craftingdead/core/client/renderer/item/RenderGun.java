@@ -407,6 +407,7 @@ public abstract class RenderGun implements IItemRenderer {
   private void renderMainGunAttachments(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
+
     if (gun.hasIronSight()) {
       matrixStack.push();
       {
@@ -415,22 +416,32 @@ public abstract class RenderGun implements IItemRenderer {
       }
       matrixStack.pop();
     }
-    for (AttachmentItem attachmentItem : gun.getAttachments()) {
-      if (attachmentItem.getModel() != null) {
-        Pair<Model, ResourceLocation> model = attachmentItem.getModel();
-        matrixStack.push();
-        {
-          // matrixStack.translate(15, -3.5F, 1.825F);
-          this.renderGunAttachment(livingEntity, attachmentItem, matrixStack);
-          IVertexBuilder vertexBuilder =
-              renderTypeBuffer
-                  .getBuffer(model.getLeft().getLayer(model.getRight()));
-          model.getLeft().render(matrixStack, vertexBuilder, packedLight, packedOverlay,
-              1.0F, 1.0F, 1.0F, 1.0F);
+
+
+    matrixStack.push();
+    {
+      float scale = 0.1F;
+      matrixStack.scale(scale, scale, scale);
+
+      for (AttachmentItem attachmentItem : gun.getAttachments()) {
+        if (attachmentItem.getModel() != null) {
+          Pair<Model, ResourceLocation> model = attachmentItem.getModel();
+          matrixStack.push();
+          {
+            this.renderGunAttachment(livingEntity, attachmentItem, matrixStack);
+            float scale2 = 10F;
+            matrixStack.scale(scale2, scale2, scale2);
+            IVertexBuilder vertexBuilder =
+                renderTypeBuffer
+                    .getBuffer(model.getLeft().getLayer(model.getRight()));
+            model.getLeft().render(matrixStack, vertexBuilder, packedLight, packedOverlay,
+                1.0F, 1.0F, 1.0F, 1.0F);
+          }
+          matrixStack.pop();
         }
-        matrixStack.pop();
       }
     }
+    matrixStack.pop();
   }
 
   private void renderMainGunAmmo(LivingEntity livingEntity, ResourceLocation registryName, IGun gun,
