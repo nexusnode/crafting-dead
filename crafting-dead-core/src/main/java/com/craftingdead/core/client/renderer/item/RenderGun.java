@@ -283,10 +283,16 @@ public abstract class RenderGun implements IItemRenderer {
   private final void renderThirdPerson(LivingEntity entity, ItemStack itemStack, IGun gun,
       MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer,
-      int packedLight, int packedOverlay, ResourceLocation texture) {
+      int packedLight, int packedOverlay, ResourceLocation texture,
+      GunAnimation animation,
+      float partialTicks) {
     matrixStack.push();
     {
       this.renderGunThirdPerson(entity, gun, matrixStack);
+
+      if (animation != null) {
+        animation.doRender(itemStack, partialTicks, matrixStack);
+      }
 
       final IVertexBuilder vertexBuilder =
           renderTypeBuffer.getBuffer(this.gunModel.getLayer(texture));
@@ -357,7 +363,7 @@ public abstract class RenderGun implements IItemRenderer {
         case THIRD_PERSON_LEFT_HAND:
         case THIRD_PERSON_RIGHT_HAND:
           this.renderThirdPerson(entity, itemStack, gun, matrixStack, renderTypeBuffer, packedLight,
-              packedOverlay, texture);
+              packedOverlay, texture, animation, partialTicks);
           break;
         default:
           break;
@@ -414,7 +420,7 @@ public abstract class RenderGun implements IItemRenderer {
         Pair<Model, ResourceLocation> model = attachmentItem.getModel();
         matrixStack.push();
         {
-          matrixStack.translate(15, -3.5F, 1.825F);
+          // matrixStack.translate(15, -3.5F, 1.825F);
           this.renderGunAttachment(livingEntity, attachmentItem, matrixStack);
           IVertexBuilder vertexBuilder =
               renderTypeBuffer
