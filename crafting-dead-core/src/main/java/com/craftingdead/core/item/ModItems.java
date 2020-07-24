@@ -4,8 +4,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
-import com.craftingdead.core.client.renderer.item.RenderACR;
-import com.craftingdead.core.client.renderer.item.RenderAK47;
+import com.craftingdead.core.client.renderer.item.ACRRenderer;
+import com.craftingdead.core.client.renderer.item.AK47Renderer;
 import com.craftingdead.core.client.renderer.item.gun.fire.PistolShootAnimation;
 import com.craftingdead.core.client.renderer.item.gun.fire.RifleShootAnimation;
 import com.craftingdead.core.client.renderer.item.gun.fire.SubmachineShootAnimation;
@@ -558,7 +558,7 @@ public class ModItems {
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -594,7 +594,7 @@ public class ModItems {
               // Paints
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -624,7 +624,7 @@ public class ModItems {
               // Paints
               .addAcceptedPaint(VULCAN_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -650,7 +650,7 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> ACR = ITEMS
@@ -674,7 +674,8 @@ public class ModItems {
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderACR::new).maxStackSize(1)
+              .setRendererFactory(() -> ACRRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> HK417 = ITEMS
@@ -700,7 +701,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MPT55 = ITEMS
@@ -723,7 +724,7 @@ public class ModItems {
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M1GARAND = ITEMS
@@ -744,7 +745,7 @@ public class ModItems {
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: Sporter22 uses two different iron sights at the same time.
@@ -772,7 +773,7 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> G36C = ITEMS
@@ -795,7 +796,7 @@ public class ModItems {
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
@@ -825,7 +826,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> RPK = ITEMS
@@ -846,7 +847,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
@@ -869,7 +870,7 @@ public class ModItems {
               .setDefaultMagazine(MINIGUN_MAGAZINE)
               .addAcceptedPaint(FURY_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: MK48MOD uses two different iron sights at the same time.
@@ -894,7 +895,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -913,7 +914,7 @@ public class ModItems {
               .addAnimation(GunItem.AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(TASER_CARTRIDGE)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M1911 = ITEMS
@@ -933,7 +934,7 @@ public class ModItems {
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> G18 = ITEMS
@@ -955,7 +956,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> M9 = ITEMS
@@ -974,7 +975,7 @@ public class ModItems {
 
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
@@ -993,7 +994,7 @@ public class ModItems {
               .addAcceptedPaint(SCORCHED_PAINT)
 
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> P250 = ITEMS
@@ -1013,7 +1014,7 @@ public class ModItems {
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MAGNUM = ITEMS
@@ -1030,7 +1031,7 @@ public class ModItems {
               .setDefaultMagazine(MAGNUM_MAGAZINE)
 
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FN57 = ITEMS
@@ -1049,7 +1050,7 @@ public class ModItems {
 
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -1077,7 +1078,7 @@ public class ModItems {
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(UV_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: P90 uses two different iron sights at the same time.
@@ -1102,7 +1103,7 @@ public class ModItems {
               .addAcceptedPaint(RUBY_PAINT)
               .addAcceptedPaint(GEM_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> VECTOR = ITEMS
@@ -1124,7 +1125,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(SLAUGHTER_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MP5A5 = ITEMS
@@ -1147,7 +1148,7 @@ public class ModItems {
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -1179,7 +1180,7 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: AS50 uses two different iron sights at the same time.
@@ -1207,7 +1208,7 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1236,7 +1237,7 @@ public class ModItems {
               .addAcceptedPaint(DRAGON_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1263,7 +1264,7 @@ public class ModItems {
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1289,7 +1290,7 @@ public class ModItems {
 
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1311,7 +1312,7 @@ public class ModItems {
 
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
-              .setItemRendererFactory(() -> RenderAK47::new)
+              .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 

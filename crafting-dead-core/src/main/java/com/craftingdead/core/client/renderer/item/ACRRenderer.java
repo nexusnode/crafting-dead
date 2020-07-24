@@ -17,7 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderACR extends RenderGun {
+public class ACRRenderer extends RenderGun {
 
   private Model ironSight1 = new ModelM4A1IS1();
   private Model ironSight2 = new ModelM4A1IS2();

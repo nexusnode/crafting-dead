@@ -478,7 +478,7 @@ public class GunItem extends ShootableItem {
       return this;
     }
 
-    public Properties setItemRendererFactory(
+    public Properties setRendererFactory(
         Supplier<DistExecutor.SafeCallable<RenderGun>> rendererFactory) {
       this.rendererFactory = rendererFactory;
       return this;
