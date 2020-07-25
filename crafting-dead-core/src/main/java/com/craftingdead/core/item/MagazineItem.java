@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
 
 public class MagazineItem extends Item {
@@ -121,6 +122,27 @@ public class MagazineItem extends Item {
               .appendSibling(Text
                   .of(String.format("%.0f%%", this.armorPenetration) + "%")
                   .applyTextStyle(TextFormatting.RED)));
+    }
+  }
+
+  @Override
+  public CompoundNBT getShareTag(ItemStack stack) {
+    CompoundNBT nbt = super.getShareTag(stack);
+    if (nbt == null) {
+      nbt = new CompoundNBT();
+    }
+    nbt.put("magazine",
+        stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::serializeNBT).orElse(null));
+    return nbt;
+  }
+
+  @Override
+  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    super.readShareTag(stack, nbt);
+    if (nbt != null && nbt.contains("magazine", Constants.NBT.TAG_COMPOUND)) {
+      stack
+          .getCapability(ModCapabilities.MAGAZINE)
+          .ifPresent(magazine -> magazine.deserializeNBT(nbt.getCompound("magazine")));
     }
   }
 

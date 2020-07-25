@@ -1,0 +1,9 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/gun/m1911.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "craftingdead:gun/m1911"
+	}
+}

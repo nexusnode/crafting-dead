@@ -4,7 +4,6 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAKMIS1;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelAKMIS2;
-import com.craftingdead.core.client.renderer.item.model.gun.ModelAK47;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -217,10 +216,5 @@ public class AK47Renderer extends RenderGun {
 
     }
     matrixStack.pop();
-  }
-
-  @Override
-  protected Model getGunModel() {
-    return new ModelAK47();
   }
 }

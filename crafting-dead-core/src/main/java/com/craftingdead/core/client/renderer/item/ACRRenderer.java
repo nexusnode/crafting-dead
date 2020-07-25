@@ -4,7 +4,6 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelM4A1IS1;
 import com.craftingdead.core.client.renderer.item.model.attachment.ModelM4A1IS2;
-import com.craftingdead.core.client.renderer.item.model.gun.ModelACR;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -19,8 +18,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ACRRenderer extends RenderGun {
 
-  private Model ironSight1 = new ModelM4A1IS1();
-  private Model ironSight2 = new ModelM4A1IS2();
+  private final Model ironSight1 = new ModelM4A1IS1();
+  private final Model ironSight2 = new ModelM4A1IS2();
 
   @Override
   protected void renderGunThirdPerson(LivingEntity livingEntity, IGun itemstack,
@@ -205,10 +204,5 @@ public class ACRRenderer extends RenderGun {
     } else {
       matrixStack.translate(0.03F, 0.15F, -0.05F);
     }
-  }
-
-  @Override
-  protected Model getGunModel() {
-    return new ModelACR();
   }
 }

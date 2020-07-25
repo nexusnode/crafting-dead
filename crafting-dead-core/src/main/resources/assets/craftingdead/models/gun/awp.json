@@ -1,0 +1,9 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/gun/awp.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "craftingdead:gun/awp"
+	}
+}

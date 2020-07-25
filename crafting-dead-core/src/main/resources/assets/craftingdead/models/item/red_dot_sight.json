@@ -1,17 +1,6 @@
 {
-    "loader":"craftingdead:perspective_aware",
-    "model": {
-        "parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/red_dot_sight"
-		}
-    },
-    "perspective_overrides" : [
-        {
-            "perspectives":["thirdperson_righthand", "thirdperson_lefthand", "firstperson_righthand", "firstperson_lefthand", "head"],
-			"model":{
-				"parent":"craftingdead:item/attachments/red_dot_sight/red_dot_sight"
-			}
-        }
-    ]
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "craftingdead:item/red_dot_sight"
+    }
 }

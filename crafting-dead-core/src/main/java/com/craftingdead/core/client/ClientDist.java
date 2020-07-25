@@ -91,12 +91,14 @@ import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -113,6 +115,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements IModDist {
 
@@ -282,6 +285,14 @@ public class ClientDist implements IModDist {
   // ================================================================================
   // Mod Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleModelRegistry(ModelRegistryEvent event) {
+    ForgeRegistries.ITEMS.getValues().stream().filter(item -> item instanceof GunItem)
+        .forEach(gunItem -> ModelLoader
+            .addSpecialModel(new ResourceLocation(gunItem.getRegistryName().getNamespace(),
+                "gun/" + gunItem.getRegistryName().getPath())));
+  }
 
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
@@ -706,10 +717,9 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleTextureStitch(TextureStitchEvent.Pre event) {
     // Automatically adds every painted gun skins
-    ModItems.ITEMS
-        .getEntries()
+    ForgeRegistries.ITEMS
+        .getValues()
         .stream()
-        .map(RegistryObject::get)
         .filter(item -> item instanceof GunItem)
         .map(item -> (GunItem) item)
         .forEach(gun -> {
@@ -718,7 +728,7 @@ public class ClientDist implements IModDist {
                 .addSprite(
                     // Example: "craftingdead:models/guns/m4a1_diamond_paint"
                     new ResourceLocation(paint.getRegistryName().getNamespace(),
-                        "models/guns/" + gun.getRegistryName().getPath() + "_"
+                        "gun/" + gun.getRegistryName().getPath() + "_"
                             + paint.getRegistryName().getPath()));
           });
         });

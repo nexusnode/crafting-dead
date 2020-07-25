@@ -51,7 +51,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
   @Override
   public void render(MatrixStack matrix, IRenderTypeBuffer buffers,
-      int somethingThatSeemsToBeLightLevel, LivingEntity entity, float p_225628_5_,
+      int packedLight, LivingEntity entity, float p_225628_5_,
       float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_,
       float p_225628_10_) {
 
@@ -93,7 +93,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
         // Renders the item. Also note the TransformType.
         itemRenderer
             .renderItem(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
-                somethingThatSeemsToBeLightLevel, OverlayTexture.DEFAULT_UV, itemModel);
+                packedLight, OverlayTexture.DEFAULT_UV, itemModel);
 
         matrix.pop();
       }

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.item.MagazineItem;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
@@ -57,11 +56,6 @@ public class DefaultMagazine implements IMagazine {
   @Override
   public void decrementSize() {
     this.size--;
-  }
-
-  @Override
-  public ItemStack createIcon() {
-    return new ItemStack(this.magazineItem);
   }
 
   @Override

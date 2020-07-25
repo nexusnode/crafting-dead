@@ -233,11 +233,11 @@ public class GunItem extends ShootableItem {
   @Override
   public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
       Hand hand) {
-    if (world.isRemote()) {
+    if (hand == Hand.MAIN_HAND) {
       playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> playerEntity
           .getHeldItem(hand)
           .getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.toggleAiming(living, true)));
+          .ifPresent(gun -> gun.toggleAiming(living, false)));
     }
     return super.onItemRightClick(world, playerEntity, hand);
   }
@@ -310,9 +310,10 @@ public class GunItem extends ShootableItem {
   @Override
   public CompoundNBT getShareTag(ItemStack stack) {
     CompoundNBT nbt = super.getShareTag(stack);
-    if (nbt != null) {
-      nbt.put("gun", stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null));
+    if (nbt == null) {
+      nbt = new CompoundNBT();
     }
+    nbt.put("gun", stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null));
     return nbt;
   }
 
