@@ -68,7 +68,7 @@ public class ACRRenderer extends RenderGun {
     matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(10.0F));
     matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
-    matrixStack.translate(0F, 0.033F, 0F);
+    matrixStack.translate(0F, 0.05F, 0F);
   }
 
   @Override

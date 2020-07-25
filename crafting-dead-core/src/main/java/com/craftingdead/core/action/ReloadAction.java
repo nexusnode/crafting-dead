@@ -41,7 +41,7 @@ public class ReloadAction extends TimedAction {
   @Override
   public boolean start() {
     ItemStack magazineStack = this.findAmmo(this.performer, true);
-    if (!magazineStack.isEmpty()) {
+    if (!this.getPerformer().getEntity().isSprinting() && !magazineStack.isEmpty()) {
       this.oldMagazineStack = this.gun.getMagazineStack();
       // Some guns may not have a reload sound
       this.gun.getReloadSound()
@@ -74,6 +74,16 @@ public class ReloadAction extends TimedAction {
   }
 
   @Override
+  public boolean tick() {
+    if (!this.getPerformer().getEntity().getEntityWorld().isRemote()
+        && this.getPerformer().getEntity().isSprinting()) {
+      this.getPerformer().cancelAction(true);
+      return false;
+    }
+    return super.tick();
+  }
+
+  @Override
   protected void finish() {
     ItemStack magazineStack = this.findAmmo(this.performer, false);
     if (!magazineStack.isEmpty()) {
@@ -91,6 +101,9 @@ public class ReloadAction extends TimedAction {
       // Stop reload sound
       Minecraft.getInstance().getSoundHandler()
           .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
+    }
+    if (this.getPerformer().getEntity().getEntityWorld().isRemote()) {
+      this.gun.getItemRenderer().removeCurrentAnimation();
     }
     this.gun.setMagazineStack(this.oldMagazineStack);
   }

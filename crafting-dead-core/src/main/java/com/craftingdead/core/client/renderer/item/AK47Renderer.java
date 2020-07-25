@@ -81,7 +81,7 @@ public class AK47Renderer extends RenderGun {
     matrixStack.translate(-0.3F, -0.2F, 0.005F);
 
     if (itemstack.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
-      matrixStack.translate(0F, 0.015F, 0F);
+      matrixStack.translate(0F, 0.05F, 0F);
     }
 
     if (itemstack.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {

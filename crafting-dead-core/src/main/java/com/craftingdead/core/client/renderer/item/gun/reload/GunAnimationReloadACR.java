@@ -82,10 +82,8 @@ public class GunAnimationReloadACR extends GunAnimationReload {
     matrixStack.translate(0.0F, (!ejectingClip ? -(progress / 200) : 0.0F),
         (!ejectingClip ? (progress / 185) : 0.0F));
 
-    matrixStack.multiply(new Vector3f((!ejectingClip ? 2.5F : 4.0F), (!ejectingClip ? 1.0F : 0.0F),
-        (!ejectingClip ? 2.0F : 1.0F)).getDegreesQuaternion(-progress));
-
-    matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(progress));
+    matrixStack.multiply(new Vector3f(1.0F, 0.0F, (!ejectingClip ? -1.0F : 0.0F))
+        .getDegreesQuaternion(progress));
   }
 
   @Override

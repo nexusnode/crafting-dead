@@ -61,11 +61,8 @@ public abstract class RenderGun implements IItemRenderer {
     this.animations.add(Pair.of(animation, callback));
   }
 
-  public void cancelCurrentAnimation() {
-    Pair<GunAnimation, Runnable> oldAnimation = this.animations.poll();
-    if (oldAnimation != null && oldAnimation.getRight() != null) {
-      oldAnimation.getRight().run();
-    }
+  public void removeCurrentAnimation() {
+    this.animations.poll();
     this.animationStartTime = 0L;
   }
 
@@ -86,7 +83,10 @@ public abstract class RenderGun implements IItemRenderer {
               0.0F, 1.0F);
       animation.getLeft().onUpdate(this.mc, livingEntity, itemStack, progress);
       if (progress >= 1.0F) {
-        this.cancelCurrentAnimation();
+        if (animation.getRight() != null) {
+          animation.getRight().run();
+        }
+        this.removeCurrentAnimation();
       }
     }
   }

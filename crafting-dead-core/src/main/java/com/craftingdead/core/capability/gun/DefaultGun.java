@@ -131,17 +131,22 @@ public class DefaultGun implements IGun {
   @Override
   public void tick(ILiving<?> living, ItemStack itemStack) {
     this.tryShoot(living, itemStack);
+
+    if (this.aiming && living.getEntity().isSprinting()) {
+      this.toggleAiming(living, true);
+    }
   }
 
   @Override
   public void setTriggerPressed(ILiving<?> living, ItemStack itemStack,
       boolean triggerPressed,
       boolean sendUpdate) {
-    this.triggerPressed = triggerPressed;
 
     if (!this.canShoot(living)) {
       return;
     }
+
+    this.triggerPressed = triggerPressed;
 
     if (this.triggerPressed) {
       // Resets the counter
@@ -188,23 +193,20 @@ public class DefaultGun implements IGun {
   }
 
   private boolean canShoot(ILiving<?> living) {
-    if (living.getActionProgress().isPresent() || living.getEntity().isSprinting()) {
-      return false;
-    }
-
-    if (this.getMagazineSize() <= 0) {
-      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.reload(living);
-      return false;
-    }
-
-    return true;
+    return !(living.getActionProgress().isPresent() || living.getEntity().isSprinting());
   }
 
   private void tryShoot(ILiving<?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
     if (!this.triggerPressed || !this.canShoot(living)) {
+      return;
+    }
+
+    if (this.getMagazineSize() <= 0) {
+      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      this.reload(living);
+      this.triggerPressed = false;
       return;
     }
 
@@ -241,7 +243,7 @@ public class DefaultGun implements IGun {
       }
 
       this.gunRenderer.flash();
-      this.gunRenderer.cancelCurrentAnimation();
+      this.gunRenderer.removeCurrentAnimation();
       this.gunRenderer.addAnimation(this.gunItem.getAnimations().get(AnimationType.SHOOT).get(),
           null);
     }
@@ -524,6 +526,9 @@ public class DefaultGun implements IGun {
 
   @Override
   public void toggleAiming(ILiving<?> living, boolean sendUpdate) {
+    if (!this.aiming && living.getEntity().isSprinting()) {
+      return;
+    }
     this.aiming = !this.aiming;
     if (sendUpdate) {
       PacketTarget target =
@@ -539,13 +544,13 @@ public class DefaultGun implements IGun {
   @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
-    nbt.put("magazineStack", this.magazineStack.write(new CompoundNBT()));
+    nbt.put("magazineStack", this.magazineStack.serializeNBT());
     ListNBT attachmentsTag = this.attachments
         .stream()
         .map(attachment -> StringNBT.of(attachment.getRegistryName().toString()))
         .collect(ListNBT::new, ListNBT::add, List::addAll);
     nbt.put("attachments", attachmentsTag);
-    nbt.put("paintStack", this.paintStack.write(new CompoundNBT()));
+    nbt.put("paintStack", this.paintStack.serializeNBT());
     return nbt;
   }
 

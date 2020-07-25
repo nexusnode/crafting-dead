@@ -29,7 +29,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean start() {
-    if (!this.gun.getMagazineStack().isEmpty()) {
+    if (!this.getPerformer().getEntity().isSprinting() && !this.gun.getMagazineStack().isEmpty()) {
       if (this.performer.getEntity().getEntityWorld().isRemote()) {
         GunAnimation ejectAnimation = this.gun.getAnimation(AnimationType.RELOAD);
         if (ejectAnimation instanceof GunAnimationReload) {
@@ -44,12 +44,21 @@ public class RemoveMagazineAction extends TimedAction {
   }
 
   @Override
+  public boolean tick() {
+    if (this.getPerformer().getEntity().isSprinting()) {
+      this.getPerformer().cancelAction(false);
+      return false;
+    }
+    return super.tick();
+  }
+
+  @Override
   public void cancel() {
     super.cancel();
-    // Replace old magazine on client because the animation above removes it after completion.
-    if (this.performer.getEntity().getEntityWorld().isRemote()) {
-      this.gun.setMagazineStack(this.oldMagazineStack);
+    if (this.getPerformer().getEntity().getEntityWorld().isRemote()) {
+      this.gun.getItemRenderer().removeCurrentAnimation();
     }
+    this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
   @Override
