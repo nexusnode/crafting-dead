@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib fn57.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape2
 v 0.250000 1.196875 -0.093750

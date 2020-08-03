@@ -20,8 +20,8 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
 
   @Override
   public void render(MatrixStack stack, IRenderTypeBuffer buffers,
-      int somethingThatSeemsToBeLightLevel, T livingEntity, float p_225628_5_, float p_225628_6_,
-      float p_225628_7_, float p_225628_8_, float p_225628_9_, float p_225628_10_) {
+      int packedLight, T livingEntity, float p_225628_5_, float p_225628_6_,
+      float partialTicks, float p_225628_8_, float p_225628_9_, float p_225628_10_) {
     if (!livingEntity.isInvisible()) {
       livingEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
         String skinType = livingEntity instanceof ClientPlayerEntity
@@ -32,8 +32,9 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
         clothingStack
             .getCapability(ModCapabilities.CLOTHING)
             .ifPresent(clothing -> LayerRenderer
-                .renderModel(this.getEntityModel(), clothing.getTexture(skinType), stack, buffers,
-                    somethingThatSeemsToBeLightLevel, livingEntity, 1F, 1F, 1F));
+                .renderCutoutModel(this.getEntityModel(), clothing.getTexture(skinType), stack,
+                    buffers,
+                    packedLight, livingEntity, 1F, 1F, 1F));
       });
     }
   }

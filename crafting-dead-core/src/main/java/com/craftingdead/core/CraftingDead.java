@@ -318,7 +318,7 @@ public class CraftingDead {
     int hydration = -1;
     if (item == Items.APPLE || item == Items.RABBIT_STEW) {
       hydration = 2;
-    } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.field_226638_pX_) {
+    } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.HONEY_BOTTLE) {
       hydration = 1;
     } else if (item == Items.CHORUS_FRUIT || item == Items.SWEET_BERRIES) {
       hydration = 3;

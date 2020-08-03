@@ -44,7 +44,7 @@ public abstract class BounceableProjectileEntity extends Entity
 
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
       LivingEntity throwerEntity, World world) {
-    this(entityType, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
+    this(entityType, throwerEntity.getPosX(), throwerEntity.getPosYEye(), throwerEntity.getPosZ(),
         world);
     this.ownerId = throwerEntity.getUniqueID();
   }
@@ -63,7 +63,7 @@ public abstract class BounceableProjectileEntity extends Entity
       }
 
       boolean notCollided = (this.blockStanding != currentBlockState
-          && this.world.doesNotCollide(this.getBoundingBox().grow(0.0625D)));
+          && this.world.hasNoCollisions(this.getBoundingBox().grow(0.0625D)));
       boolean shouldMove = !this.getMotion().equals(Vec3d.ZERO) || notCollided;
 
       if (shouldMove) {
@@ -95,13 +95,14 @@ public abstract class BounceableProjectileEntity extends Entity
         BlockState blockHitState = this.world.getBlockState(blockRayTraceResult.getPos());
 
         Vec3d difference =
-            blockRayTraceResult.getHitVec().subtract(this.getX(), this.getY(), this.getZ());
+            blockRayTraceResult.getHitVec().subtract(this.getPosX(), this.getPosY(),
+                this.getPosZ());
         this.setMotion(difference);
 
         // From vanilla's AbstractArrowEntity logic.
         // I didn't found a good name for the variable.
         Vec3d vec = difference.normalize().scale(0.05D);
-        this.setPosition(this.getX() - vec.x, this.getY() - vec.y, this.getZ() - vec.z);
+        this.setPosition(this.getPosX() - vec.x, this.getPosY() - vec.y, this.getPosZ() - vec.z);
 
         Float bounceFactor = this.getBounceFactor(blockRayTraceResult);
         if (bounceFactor != null) {
@@ -148,9 +149,9 @@ public abstract class BounceableProjectileEntity extends Entity
 
       Vec3d currentMotion = this.getMotion();
 
-      double nextX = this.getX() + currentMotion.x;
-      double nextY = this.getY() + currentMotion.y;
-      double nextZ = this.getZ() + currentMotion.z;
+      double nextX = this.getPosX() + currentMotion.x;
+      double nextY = this.getPosY() + currentMotion.y;
+      double nextZ = this.getPosZ() + currentMotion.z;
 
       // Use .setPosition instead of .move() for a better collision detection.
       // Otherwise the grenade will bounce imprecisely.

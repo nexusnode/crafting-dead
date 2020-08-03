@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib acr.mtl
+mtllib default_material.mtl
 g default
 v -0.375000 0.312500 0.000000
 v 0.312500 0.312500 0.000000

@@ -43,7 +43,7 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
         this.remove();
         this.world.createExplosion(this,
             ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
-            this.getX(), this.getY() + this.getHeight(), this.getZ(), 1.3F, false,
+            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 1.3F, false,
             Explosion.Mode.NONE);
       }
     } else {
@@ -69,8 +69,8 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
         }
       }
     } else {
-      this.world.addParticle(ParticleTypes.SMOKE, true, this.getX(),
-          this.getY() + 0.4D, this.getZ(), 0, 0, 0);
+      this.world.addParticle(ParticleTypes.SMOKE, true, this.getPosX(),
+          this.getPosY() + 0.4D, this.getPosZ(), 0, 0, 0);
     }
   }
 

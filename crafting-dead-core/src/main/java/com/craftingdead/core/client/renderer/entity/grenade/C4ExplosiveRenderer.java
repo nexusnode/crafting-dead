@@ -23,20 +23,20 @@ public class C4ExplosiveRenderer extends EntityRenderer<GrenadeEntity> {
 
   @Override
   public void render(GrenadeEntity entity, float entityYaw, float partialTicks,
-      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight) {
 
     matrixStack.scale(0.4f, 0.4f, 0.4f);
     if (!entity.isStoppedInGround()) {
       float rotation = (entity.ticksExisted + partialTicks) * 15F;
-      matrixStack.multiply(Vector3f.POSITIVE_X
-          .getDegreesQuaternion(rotation));
-      matrixStack.multiply(Vector3f.POSITIVE_Z
-          .getDegreesQuaternion(rotation));
+      matrixStack.rotate(Vector3f.XP
+          .rotationDegrees(rotation));
+      matrixStack.rotate(Vector3f.ZP
+          .rotationDegrees(rotation));
     }
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(model.getLayer(this.getEntityTexture(entity)));
-    model.render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+        renderTypeBuffer.getBuffer(model.getRenderType(this.getEntityTexture(entity)));
+    model.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
         1.0F, 0.15F);
   }
 

@@ -94,7 +94,8 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
     });
 
     InventoryScreen
-        .drawEntity(this.guiLeft + 33, this.guiTop + 97, 30, (this.guiLeft + 51) - this.oldMouseX,
+        .drawEntityOnScreen(this.guiLeft + 33, this.guiTop + 97, 30,
+            (this.guiLeft + 51) - this.oldMouseX,
             (this.guiTop + 75 - 50) - this.oldMouseY, this.minecraft.player);
   }
 }

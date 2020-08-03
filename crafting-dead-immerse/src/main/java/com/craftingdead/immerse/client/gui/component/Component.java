@@ -32,7 +32,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public static final TweenType<Component<?>> Y_TRANSLATION = new SimpleTweenType<Component<?>>(1,
       t -> new float[] {t.yTranslation}, (t, v) -> t.yTranslation = v[0]);
 
-  private final MainWindow window = Minecraft.getInstance().getWindow();
+  private final MainWindow window = Minecraft.getInstance().getMainWindow();
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 

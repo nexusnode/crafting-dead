@@ -14,13 +14,13 @@ import net.minecraft.client.renderer.model.ModelRenderer;
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin {
 
-  @Inject(at = @At("RETURN"), method = "renderArm")
+  @Inject(at = @At("RETURN"), method = "renderItem")
   private void renderArm(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
       ModelRenderer armwearRenderer,
       CallbackInfo callbackInfo) {
     final PlayerRenderer playerRenderer = (PlayerRenderer) (Object) this;
-    ClientDist.renderArmsWithExtraSkins(playerRenderer, matrixStack, renderTypeBuffer, packedLight,
+    ClientDist.renderArmWithClothing(playerRenderer, matrixStack, renderTypeBuffer, packedLight,
         playerEntity, armRenderer, armwearRenderer);
   }
 }

@@ -4,6 +4,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.GrenadeItem;
@@ -65,8 +66,8 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   public void flash() {
     if (this.world.isRemote()) {
       this.world
-          .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(), this.getY(),
-              this.getZ(), 0D, 0D, 0D);
+          .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(), this.getPosY(),
+              this.getPosZ(), 0D, 0D, 0D);
 
       // Applies the flash effect at client side for a better delay compensation
       // and better FOV calculation
@@ -74,7 +75,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
       ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
       clientDist.getPlayer().ifPresent(clientPlayer -> {
         int duration = this
-            .calculateDuration(clientPlayer.getEntity(), clientDist.isInsideGameFOV(this, false));
+            .calculateDuration(clientPlayer.getEntity(), RenderUtil.isInsideGameFOV(this, false));
         if (duration > 0) {
           EffectInstance flashEffect =
               new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);

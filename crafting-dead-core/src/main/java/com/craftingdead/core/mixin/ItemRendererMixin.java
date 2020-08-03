@@ -5,9 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.rendererprovider.IRendererProvider;
 import com.craftingdead.core.client.renderer.item.IItemRenderer;
+import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -49,14 +48,15 @@ public abstract class ItemRendererMixin {
       ItemStack itemStack,
       ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    IItemRenderer itemRenderer = itemStack.getCapability(ModCapabilities.RENDERER_PROVIDER)
-        .map(IRendererProvider::getItemRenderer)
-        .filter(renderer -> renderer.handleRenderType(itemStack, transformType)).orElse(null);
-    if (itemRenderer == null) {
-      return false;
+    IItemRenderer itemRenderer =
+        itemStack.getItem() instanceof IRendererProvider
+            ? ((IRendererProvider) itemStack.getItem()).getRenderer()
+            : null;
+    if (itemRenderer != null && itemRenderer.handleRenderType(itemStack, transformType)) {
+      itemRenderer.renderItem(itemStack, transformType, livingEntity, matrixStack, renderTypeBuffer,
+          packedLight, packedOverlay);
+      return true;
     }
-    itemRenderer.renderItem(itemStack, transformType, livingEntity, matrixStack, renderTypeBuffer,
-        packedLight, packedOverlay);
-    return true;
+    return false;
   }
 }

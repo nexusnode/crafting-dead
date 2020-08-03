@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib mossberg.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape1
 v 0.150244 1.350326 0.000000

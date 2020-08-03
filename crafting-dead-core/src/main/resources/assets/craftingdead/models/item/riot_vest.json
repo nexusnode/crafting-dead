@@ -1,19 +1,21 @@
 {
-	"loader":"craftingdead:perspective_aware",
+	"loader": "craftingdead:perspective_aware",
 	"model": {
 		"parent": "item/generated",
 		"textures": {
 			"layer0": "craftingdead:item/riot_vest"
 		}
 	},
-	"perspective_overrides":[
+	"perspective_overrides": [
 		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/vests/tactical_vest",
-                "textures": {
-                    "base":"craftingdead:models/vests/riot_vest"
-                }
+			"perspectives": [
+				"head"
+			],
+			"model": {
+				"parent": "craftingdead:vest/tactical_vest",
+				"textures": {
+					"base": "craftingdead:vest/riot_vest"
+				}
 			}
 		}
 	]

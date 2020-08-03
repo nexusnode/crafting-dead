@@ -1,22 +1,17 @@
 package com.craftingdead.core.capability.living.player;
 
-import java.util.Collection;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.entity.CorpseEntity;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModInventoryContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.core.util.ModDamageSource;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
@@ -102,18 +97,6 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
         .ifPresent(storage -> this.getEntity()
             .openContainer(
                 new SimpleNamedContainerProvider(storage, storageStack.getDisplayName())));
-  }
-
-  @Override
-  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
-    if (!super.onDeathDrops(cause, drops)) { // If not cancelled
-      // Prevents useless corpse spawns in worlds with keep inventory.
-      if (!this.getEntity().world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-        CorpseEntity corpse = new CorpseEntity(this.getEntity(), drops);
-        this.getEntity().world.addEntity(corpse);
-      }
-    }
-    return true;
   }
 
   @Override

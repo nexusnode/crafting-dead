@@ -29,8 +29,6 @@ public class ModEntityTypes {
 
   private static final List<EntityType<?>> toRegister = new ArrayList<>();
 
-  public static EntityType<CorpseEntity> corpse;
-
   public static EntityType<AdvancedZombieEntity> advancedZombie;
   public static EntityType<FastZombieEntity> fastZombie;
   public static EntityType<TankZombieEntity> tankZombie;
@@ -104,13 +102,6 @@ public class ModEntityTypes {
             .setTrackingRange(64)
             .setUpdateInterval(4)
             .size(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    corpse = add("corpse",
-        EntityType.Builder
-            .<CorpseEntity>create(CorpseEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(10)
             .setShouldReceiveVelocityUpdates(false));
 
     advancedZombie = add("advanced_zombie",

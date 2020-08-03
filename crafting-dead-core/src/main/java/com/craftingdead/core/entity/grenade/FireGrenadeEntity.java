@@ -45,7 +45,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
         this.remove();
         this.world.createExplosion(this,
             ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
-            this.getX(), this.getY() + this.getHeight(), this.getZ(), 2F, true,
+            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 2F, true,
             Explosion.Mode.NONE);
 
         BlockPos.getAllInBox(this.getPosition().add(-FIRE_RADIUS, 0, -FIRE_RADIUS),

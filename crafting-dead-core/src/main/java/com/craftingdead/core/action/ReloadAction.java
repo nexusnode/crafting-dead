@@ -3,12 +3,12 @@ package com.craftingdead.core.action;
 import java.util.List;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.magazine.IMagazine;
-import com.craftingdead.core.client.renderer.item.gun.AnimationType;
-import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
-import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReload;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -52,7 +52,7 @@ public class ReloadAction extends TimedAction {
           GunAnimation ejectAnimation = this.gun.getAnimation(AnimationType.RELOAD);
           if (ejectAnimation instanceof GunAnimationReload) {
             ((GunAnimationReload) ejectAnimation).setEjectingClip(true);
-            this.gun.getItemRenderer().addAnimation(ejectAnimation,
+            this.gun.getAnimationController().addAnimation(ejectAnimation,
                 () -> this.playLoadAnimation(magazineStack));
           }
         } else {
@@ -69,7 +69,7 @@ public class ReloadAction extends TimedAction {
     GunAnimation loadAnimation = this.gun.getAnimation(AnimationType.RELOAD);
     if (loadAnimation instanceof GunAnimationReload) {
       ((GunAnimationReload) loadAnimation).setEjectingClip(false);
-      this.gun.getItemRenderer().addAnimation(loadAnimation, null);
+      this.gun.getAnimationController().addAnimation(loadAnimation, null);
     }
   }
 
@@ -103,7 +103,7 @@ public class ReloadAction extends TimedAction {
           .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
     }
     if (this.getPerformer().getEntity().getEntityWorld().isRemote()) {
-      this.gun.getItemRenderer().removeCurrentAnimation();
+      this.gun.getAnimationController().removeCurrentAnimation();
     }
     this.gun.setMagazineStack(this.oldMagazineStack);
   }

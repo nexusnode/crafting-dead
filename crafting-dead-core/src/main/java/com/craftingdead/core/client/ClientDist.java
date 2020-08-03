@@ -2,7 +2,6 @@ package com.craftingdead.core.client;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
@@ -22,8 +21,8 @@ import com.craftingdead.core.client.model.GunModel;
 import com.craftingdead.core.client.model.PerspectiveAwareModel;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
+import com.craftingdead.core.client.renderer.CameraManager;
 import com.craftingdead.core.client.renderer.entity.AdvancedZombieRenderer;
-import com.craftingdead.core.client.renderer.entity.CorpseRenderer;
 import com.craftingdead.core.client.renderer.entity.GiantZombieRenderer;
 import com.craftingdead.core.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.C4ExplosiveRenderer;
@@ -32,6 +31,7 @@ import com.craftingdead.core.client.renderer.entity.grenade.FragGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layer.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layer.EquipmentLayer;
+import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.tutorial.IModTutorialStep;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
@@ -55,10 +55,10 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -74,15 +74,14 @@ import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -91,6 +90,7 @@ import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -115,7 +115,6 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements IModDist {
 
@@ -130,11 +129,6 @@ public class ClientDist implements IModDist {
 
   private static final ResourceLocation ADRENALINE_SHADER =
       new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
-
-  /**
-   * Random.
-   */
-  private static final Random random = new Random();
 
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;
@@ -154,25 +148,9 @@ public class ClientDist implements IModDist {
 
   private final IngameGui ingameGui;
 
-  /**
-   * Current camera velocity.
-   */
-  private Vec2f rotationVelocity = Vec2f.ZERO;
+  private final ItemRendererManager itemRendererManager;
 
-  /**
-   * Camera velocity of last tick.
-   */
-  private Vec2f prevRotationVelocity = this.rotationVelocity;
-
-  private long rollDurationMs = 250L;
-
-  private long joltStartTime = 0;
-
-  private float roll;
-
-  private float pitch;
-
-  private float fovMultiplier = 1.0F;
+  private final CameraManager cameraManager;
 
   private TutorialSteps lastTutorialStep;
 
@@ -200,23 +178,8 @@ public class ClientDist implements IModDist {
     }
     this.effectsManager = new EffectsManager();
     this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
-  }
-
-  public void joltCamera(float amountPercent, boolean permenantJolt) {
-    if (amountPercent == 0.0F) {
-      return;
-    }
-    float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
-    float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
-    if (permenantJolt) {
-      this.rotationVelocity = new Vec2f(this.rotationVelocity.x + randomNegativeAmount * 20.0F,
-          this.rotationVelocity.y - randomAmount * 20.0F);
-    }
-    this.joltStartTime = Util.milliTime();
-    this.roll = randomNegativeAmount;
-    this.pitch = randomAmount / 3.0F;
-    this.fovMultiplier = 1.0F + (-randomAmount / 20.0F);
-    this.rollDurationMs = (long) (250L * (amountPercent / 2));
+    this.itemRendererManager = new ItemRendererManager();
+    this.cameraManager = new CameraManager();
   }
 
   public void setTutorialStep(ModTutorialSteps step) {
@@ -224,37 +187,6 @@ public class ClientDist implements IModDist {
     Tutorial tutorial = this.minecraft.getTutorial();
     tutorial.setStep(TutorialSteps.NONE);
     tutorial.tutorialStep = step.create(this);
-  }
-
-  /**
-   * Checks whether the entity is inside the FOV of the game client. The size of the game window is
-   * also considered. Blocks in front of player's view are not considered.
-   *
-   * @param target - The entity to test from the player's view
-   * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
-   */
-  public boolean isInsideGameFOV(Entity target, boolean considerF5) {
-    ActiveRenderInfo activerenderinfo = this.minecraft.gameRenderer.getActiveRenderInfo();
-    Vec3d projectedViewVec3d = considerF5 ? activerenderinfo.getProjectedView()
-        : target.getPositionVec().add(0, target.getEyeHeight(), 0);
-    double viewerX = projectedViewVec3d.getX();
-    double viewerY = projectedViewVec3d.getY();
-    double viewerZ = projectedViewVec3d.getZ();
-
-    if (!target.isInRangeToRender3d(viewerX, viewerY, viewerZ)) {
-      return false;
-    }
-
-    AxisAlignedBB renderBoundingBox = target.getRenderBoundingBox();
-
-    // Validation from Vanilla.
-    // Generates a render bounding box if it is needed.
-    if (renderBoundingBox.hasNaN() || renderBoundingBox.getAverageEdgeLength() == 0.0D) {
-      renderBoundingBox = new AxisAlignedBB(target.getX() - 2.0D, target.getY() - 2.0D,
-          target.getZ() - 2.0D, target.getX() + 2.0D, target.getY() + 2.0D, target.getZ() + 2.0D);
-    }
-
-    return RenderUtil.createClippingHelper(1F, considerF5).isVisible(renderBoundingBox);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -282,22 +214,33 @@ public class ClientDist implements IModDist {
     return this.tweenManager;
   }
 
+  public CameraManager getCameraManager() {
+    return this.cameraManager;
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================
 
   @SubscribeEvent
   public void handleModelRegistry(ModelRegistryEvent event) {
-    ForgeRegistries.ITEMS.getValues().stream().filter(item -> item instanceof GunItem)
-        .forEach(gunItem -> ModelLoader
-            .addSpecialModel(new ResourceLocation(gunItem.getRegistryName().getNamespace(),
-                "gun/" + gunItem.getRegistryName().getPath())));
+    this.itemRendererManager.gatherItemRenderers();
+    this.itemRendererManager.getModelDependencies().forEach(ModelLoader::addSpecialModel);
+  }
+
+  @SubscribeEvent
+  public void handleModelBake(ModelBakeEvent event) {
+    this.itemRendererManager.refreshCachedModels();
   }
 
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
+    StartupMessageManager.addModMessage("Registering container screen factories");
+
     ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
     ScreenManager.registerFactory(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
+
+    StartupMessageManager.addModMessage("Registering model loaders");
 
     ModelLoaderRegistry
         .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
@@ -305,13 +248,15 @@ public class ClientDist implements IModDist {
         .registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
             PerspectiveAwareModel.Loader.INSTANCE);
 
+    StartupMessageManager.addModMessage("Registering key bindings");
+
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_MOD_INVENTORY);
 
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.corpse, CorpseRenderer::new);
+    StartupMessageManager.addModMessage("Registering entity renderers");
+
     RenderingRegistry
         .registerEntityRenderingHandler(ModEntityTypes.advancedZombie, AdvancedZombieRenderer::new);
     RenderingRegistry
@@ -591,22 +536,15 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    float pct = MathHelper
-        .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
-    float roll = (float) Math.sin(Math.toRadians(180 * pct)) * this.roll;
-    float pitch = (float) Math.sin(Math.toRadians(360 * pct)) * this.pitch;
-    if (pct == 1.0F) {
-      this.roll = 0;
-      this.pitch = 0;
-    }
-    event.setRoll(event.getRoll() + roll);
-    event.setPitch(event.getPitch() + pitch);
+    final Vector3f rotations = this.cameraManager.getCameraRotation();
+    event.setPitch(event.getPitch() + rotations.getX());
+    event.setYaw(event.getYaw() + rotations.getY());
+    event.setRoll(event.getRoll() + rotations.getZ());
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
-    event.setNewfov(event.getFov() * this.fovMultiplier);
-    this.fovMultiplier = 1.0F;
+    event.setNewfov(event.getFov() + this.cameraManager.getFov());
     ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
     heldStack.getCapability(ModCapabilities.SCOPE).ifPresent(scope -> {
       if (scope.isAiming(this.minecraft.player, heldStack)) {
@@ -625,7 +563,8 @@ public class ClientDist implements IModDist {
         this.tweenManager.update(deltaTime);
 
         if (this.minecraft.player != null) {
-          this.updateCameraRotation();
+          final Vec2f rotationVelocity = this.cameraManager.getLookRotationVelocity();
+          this.minecraft.player.rotateTowards(rotationVelocity.y, rotationVelocity.x);
         }
         break;
       case END:
@@ -636,16 +575,6 @@ public class ClientDist implements IModDist {
       default:
         break;
     }
-  }
-
-  private void updateCameraRotation() {
-    float smoothYaw =
-        MathHelper.lerp(0.15F, this.prevRotationVelocity.x, this.rotationVelocity.x);
-    float smoothPitch =
-        MathHelper.lerp(0.15F, this.prevRotationVelocity.y, this.rotationVelocity.y);
-    this.rotationVelocity = Vec2f.ZERO;
-    this.prevRotationVelocity = new Vec2f(smoothYaw, smoothPitch);
-    this.minecraft.player.rotateTowards(smoothYaw, smoothPitch);
   }
 
   private void updateAdrenalineShader(float partialTicks) {
@@ -716,22 +645,9 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleTextureStitch(TextureStitchEvent.Pre event) {
-    // Automatically adds every painted gun skins
-    ForgeRegistries.ITEMS
-        .getValues()
-        .stream()
-        .filter(item -> item instanceof GunItem)
-        .map(item -> (GunItem) item)
-        .forEach(gun -> {
-          gun.getAcceptedPaints().stream().filter(PaintItem::hasSkin).forEach(paint -> {
-            event
-                .addSprite(
-                    // Example: "craftingdead:models/guns/m4a1_diamond_paint"
-                    new ResourceLocation(paint.getRegistryName().getNamespace(),
-                        "gun/" + gun.getRegistryName().getPath() + "_"
-                            + paint.getRegistryName().getPath()));
-          });
-        });
+    if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
+      this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
+    }
   }
 
   @SubscribeEvent
@@ -758,7 +674,7 @@ public class ClientDist implements IModDist {
       final int overlay, final float limbSwing, final float limbSwingAmount, final float ageInTicks,
       final float netHeadYaw, final float headPitch) {}
 
-  public static void renderArmsWithExtraSkins(PlayerRenderer renderer, MatrixStack matrixStack,
+  public static void renderArmWithClothing(PlayerRenderer renderer, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer,
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
       ModelRenderer armwearRenderer) {
@@ -771,9 +687,9 @@ public class ClientDist implements IModDist {
 
         PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getEntityModel();
         playerModel.swingProgress = 0.0F;
-        playerModel.isSneaking = false;
+        playerModel.isSneak = false;
         playerModel.swimAnimation = 0.0F;
-        playerModel.setAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+        playerModel.setRotationAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 
         armRenderer.showModel = true;
         armwearRenderer.showModel = true;
@@ -781,11 +697,11 @@ public class ClientDist implements IModDist {
         armRenderer.rotateAngleX = 0.0F;
         armRenderer.render(matrixStack,
             renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
-            OverlayTexture.DEFAULT_UV);
+            OverlayTexture.NO_OVERLAY);
         armwearRenderer.rotateAngleX = 0.0F;
         armwearRenderer.render(matrixStack,
             renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
-            OverlayTexture.DEFAULT_UV);
+            OverlayTexture.NO_OVERLAY);
       });
     });
   }

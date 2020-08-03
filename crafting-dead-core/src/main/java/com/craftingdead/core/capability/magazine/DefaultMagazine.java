@@ -1,11 +1,8 @@
 package com.craftingdead.core.capability.magazine;
 
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.item.MagazineItem;
-import net.minecraft.client.renderer.model.Model;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 
 public class DefaultMagazine implements IMagazine {
 
@@ -64,7 +61,7 @@ public class DefaultMagazine implements IMagazine {
   }
 
   @Override
-  public Pair<Model, ResourceLocation> getModel() {
-    return this.magazineItem.getModel();
+  public boolean hasCustomTexture() {
+    return this.magazineItem.hasCustomTexture();
   }
 }

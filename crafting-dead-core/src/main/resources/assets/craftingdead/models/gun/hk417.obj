@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib hk417.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape1
 v -0.687500 1.400000 0.000000

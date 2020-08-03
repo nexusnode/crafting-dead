@@ -1,0 +1,26 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/attachment/suppressor.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "craftingdead:attachment/suppressor"
+	},
+	"transform": {
+		"scale": [
+			0.7,
+			0.7,
+			0.7
+		],
+		"rotation": [
+			0,
+			180,
+			0
+		],
+		"translation": [
+			-1.7,
+			0.1,
+			-1.7
+		]
+	}
+}

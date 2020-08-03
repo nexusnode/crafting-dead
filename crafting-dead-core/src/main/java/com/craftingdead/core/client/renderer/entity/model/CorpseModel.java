@@ -41,77 +41,77 @@ public class CorpseModel extends Model {
     this.textureHeight = 64;
 
     this.bipedHead = new ModelRenderer(this, 0, 0);
-    this.bipedHead.addCuboid(-4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F);
+    this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F);
     this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
 
     this.bipedBody = new ModelRenderer(this, 16, 16);
-    this.bipedBody.addCuboid(-4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F);
+    this.bipedBody.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F);
     this.bipedBody.setRotationPoint(0.0F, 0.0F, 0.0F);
 
     if (smallArmsIn) {
       this.bipedLeftArm = new ModelRenderer(this, 32, 48);
-      this.bipedLeftArm.addCuboid(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.0F);
+      this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.0F);
       this.bipedLeftArm.setRotationPoint(5.0F, 2.5F, 0.0F);
 
       this.bipedRightArm = new ModelRenderer(this, 40, 16);
-      this.bipedRightArm.addCuboid(-2.0F, -2.0F, -2.0F, 3, 12, 4, 0.0F);
+      this.bipedRightArm.addBox(-2.0F, -2.0F, -2.0F, 3, 12, 4, 0.0F);
       this.bipedRightArm.setRotationPoint(-5.0F, 2.5F, 0.0F);
 
       this.bipedLeftArmwear = new ModelRenderer(this, 48, 48);
-      this.bipedLeftArmwear.addCuboid(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.25F);
+      this.bipedLeftArmwear.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.25F);
       this.bipedLeftArmwear.setRotationPoint(5.0F, 2.5F, 0.0F);
 
       this.bipedRightArmwear = new ModelRenderer(this, 40, 32);
-      this.bipedRightArmwear.addCuboid(-2.0F, -2.0F, -2.0F, 3, 12, 4, 0.25F);
+      this.bipedRightArmwear.addBox(-2.0F, -2.0F, -2.0F, 3, 12, 4, 0.25F);
       this.bipedRightArmwear.setRotationPoint(-5.0F, 2.5F, 10.0F);
     } else {
       this.bipedLeftArm = new ModelRenderer(this, 32, 48);
-      this.bipedLeftArm.addCuboid(-1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F);
+      this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F);
       this.bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
 
       this.bipedRightArm = new ModelRenderer(this, 40, 16);
-      this.bipedRightArm.addCuboid(-3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F);
+      this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F);
       this.bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
 
       this.bipedLeftArmwear = new ModelRenderer(this, 48, 48);
-      this.bipedLeftArmwear.addCuboid(-1.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F);
+      this.bipedLeftArmwear.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F);
       this.bipedLeftArmwear.setRotationPoint(5.0F, 2.0F, 0.0F);
 
       this.bipedRightArmwear = new ModelRenderer(this, 40, 32);
-      this.bipedRightArmwear.addCuboid(-3.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F);
+      this.bipedRightArmwear.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F);
       this.bipedRightArmwear.setRotationPoint(-5.0F, 2.0F, 10.0F);
     }
 
     this.bipedRightLeg = new ModelRenderer(this, 0, 16);
-    this.bipedRightLeg.addCuboid(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F);
+    this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F);
     this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F, 0.0F);
 
     this.bipedLeftLeg = new ModelRenderer(this, 16, 48);
-    this.bipedLeftLeg.addCuboid(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F);
+    this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F);
     this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
 
     this.bipedHeadwear = new ModelRenderer(this, 32, 0);
-    this.bipedHeadwear.addCuboid(-4.0F, -8.0F, -4.0F, 8, 8, 8, 0.5F);
+    this.bipedHeadwear.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, 0.5F);
     this.bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
 
     this.bipedBodyWear = new ModelRenderer(this, 16, 32);
-    this.bipedBodyWear.addCuboid(-4.0F, 0.0F, -2.0F, 8, 12, 4, 0.25F);
+    this.bipedBodyWear.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, 0.25F);
     this.bipedBodyWear.setRotationPoint(0.0F, 0.0F, 0.0F);
 
     this.bipedRightLegwear = new ModelRenderer(this, 0, 32);
-    this.bipedRightLegwear.addCuboid(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F);
+    this.bipedRightLegwear.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F);
     this.bipedRightLegwear.setRotationPoint(-1.9F, 12.0F, 0.0F);
 
     this.bipedLeftLegwear = new ModelRenderer(this, 0, 48);
-    this.bipedLeftLegwear.addCuboid(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F);
+    this.bipedLeftLegwear.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F);
     this.bipedLeftLegwear.setRotationPoint(1.9F, 12.0F, 0.0F);
 
     this.bipedDeadmau5Head = new ModelRenderer(this, 24, 0);
-    this.bipedDeadmau5Head.addCuboid(-3.0F, -6.0F, -1.0F, 6, 6, 1, 0.0F);
+    this.bipedDeadmau5Head.addBox(-3.0F, -6.0F, -1.0F, 6, 6, 1, 0.0F);
 
     this.bipedCape = new ModelRenderer(this, 0, 0);
     this.bipedCape.setTextureSize(64, 32);
-    this.bipedCape.addCuboid(-5.0F, 0.0F, -1.0F, 10, 16, 1, 0.0F);
+    this.bipedCape.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, 0.0F);
   }
 
   public void setLimbCount(int limbCount) {
@@ -120,36 +120,36 @@ public class CorpseModel extends Model {
 
   @Override
   public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
-      int packedOverlay, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
+      int packedOverlay, float red, float green, float blue, float alpha) {
     this.bipedHead
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-            p_225598_7_, p_225598_8_);
+        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+            blue, alpha);
     this.bipedBody
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-            p_225598_7_, p_225598_8_);
+        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+            blue, alpha);
 
     if (this.limbCount > 3) {
       this.bipedRightArm
-          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-              p_225598_7_, p_225598_8_);
+          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+              blue, alpha);
     }
 
     if (this.limbCount > 2) {
       this.bipedLeftArm
-          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-              p_225598_7_, p_225598_8_);
+          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+              blue, alpha);
     }
 
     if (this.limbCount > 1) {
       this.bipedRightLeg
-          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-              p_225598_7_, p_225598_8_);
+          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+              blue, alpha);
     }
 
     if (this.limbCount > 0) {
       this.bipedLeftLeg
-          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, p_225598_5_, p_225598_6_,
-              p_225598_7_, p_225598_8_);
+          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
+              blue, alpha);
     }
   }
 }

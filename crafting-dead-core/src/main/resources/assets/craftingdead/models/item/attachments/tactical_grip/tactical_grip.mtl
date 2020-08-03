@@ -1,5 +1,0 @@
-newmtl ModelMaterial
-Kd 1 1 1
-Ka 1 1 1
-map_Kd craftingdead:models/attachments/tactical_grip
-map_Ka craftingdead:models/attachments/tactical_grip

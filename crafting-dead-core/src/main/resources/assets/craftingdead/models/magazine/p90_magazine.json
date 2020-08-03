@@ -1,0 +1,9 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/magazine/p90_magazine.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "#gun"
+	}
+}

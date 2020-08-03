@@ -2,12 +2,12 @@ package com.craftingdead.core.capability.gun;
 
 import java.util.Optional;
 import java.util.Set;
+import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
+import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.rendererprovider.IRendererProvider;
 import com.craftingdead.core.capability.scope.IScope;
-import com.craftingdead.core.client.renderer.item.RenderGun;
-import com.craftingdead.core.client.renderer.item.gun.AnimationType;
-import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.item.AttachmentItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IGun extends IScope, IRendererProvider, INBTSerializable<CompoundNBT> {
+public interface IGun
+    extends IScope, IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
 
   void tick(ILiving<?> living, ItemStack itemStack);
 
@@ -67,11 +68,10 @@ public interface IGun extends IScope, IRendererProvider, INBTSerializable<Compou
   Optional<SoundEvent> getReloadSound();
 
   int getReloadDurationTicks();
-  
+
   boolean hasIronSight();
-  
-  @Override
-  RenderGun getItemRenderer();
-  
+
   GunAnimation getAnimation(AnimationType animationType);
+
+  boolean hasShotCountChanged();
 }

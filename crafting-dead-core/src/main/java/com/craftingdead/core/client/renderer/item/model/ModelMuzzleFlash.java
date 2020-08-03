@@ -23,19 +23,19 @@ public class ModelMuzzleFlash extends Model {
     textureHeight = 64;
 
     Box_0 = new ModelRenderer(this, 1, 1);
-    Box_0.addCuboid(0F, 0F, 0F, 8, 8, 0);
+    Box_0.addBox(0F, 0F, 0F, 8, 8, 0);
     Box_0.setRotationPoint(-4F, -4F, 0F);
     Box_0.setTextureSize(64, 32);
     Box_0.mirror = true;
     setRotation(Box_0, 0F, 0F, 0F);
     Box_1 = new ModelRenderer(this, 9, 1);
-    Box_1.addCuboid(-4F, 0F, 0F, 8, 0, 15);
+    Box_1.addBox(-4F, 0F, 0F, 8, 0, 15);
     Box_1.setRotationPoint(0F, 0F, -15F);
     Box_1.setTextureSize(64, 32);
     Box_1.mirror = true;
     setRotation(Box_1, 0F, 0F, -0.7853982F);
     Box_3 = new ModelRenderer(this, 1, 17);
-    Box_3.addCuboid(-4F, 0F, 0F, 8, 0, 15);
+    Box_3.addBox(-4F, 0F, 0F, 8, 0, 15);
     Box_3.setRotationPoint(0F, 0F, -15F);
     Box_3.setTextureSize(64, 32);
     Box_3.mirror = true;
@@ -61,9 +61,9 @@ public class ModelMuzzleFlash extends Model {
   }
 
   private static RenderType getFlashRenderType(ResourceLocation texture) {
-    return RenderType.of("flash",
-        DefaultVertexFormats.POSITION_COLOR_TEXTURE_LIGHT, 7, 256, false,
-        true, RenderType.State.builder()
+    return RenderType.makeType("flash",
+        DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, 7, 256, false,
+        true, RenderType.State.getBuilder()
             .lightmap(new LightmapState(true))
             .texture(new RenderState.TextureState(texture,
                 false, false))

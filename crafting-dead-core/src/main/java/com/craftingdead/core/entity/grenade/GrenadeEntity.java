@@ -45,8 +45,8 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   public abstract GrenadeItem asItem();
 
   /**
-   * Called every <code>tick()</code> if the grenade is not marked as removed.
-   * Prefer using this instead of overriding <code>tick()</code>.
+   * Called every <code>tick()</code> if the grenade is not marked as removed. Prefer using this
+   * instead of overriding <code>tick()</code>.
    */
   public abstract void onGrenadeTick();
 
@@ -105,7 +105,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   public void onSurfaceHit(BlockRayTraceResult blockRayTraceResult) {
     Triple<SoundEvent, Float, Float> bounceSound = this.getBounceSound(blockRayTraceResult);
     if (this.world.isRemote()) {
-      this.world.playSound(this.getX(), this.getY(), this.getZ(),
+      this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
           bounceSound.getLeft(), SoundCategory.NEUTRAL, bounceSound.getMiddle(),
           bounceSound.getRight(), false);
     }
@@ -113,11 +113,12 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
 
   @Override
   public final boolean processInitialInteract(PlayerEntity playerEntity, Hand hand) {
-    boolean canPickup = !playerEntity.shouldCancelInteraction() && this.canBePickedUp(playerEntity);
+    boolean canPickup = !playerEntity.isSecondaryUseActive() && this.canBePickedUp(playerEntity);
     if (canPickup) {
       this.remove();
       playerEntity.addItemStackToInventory(new ItemStack(this.asItem(), 1));
-      this.world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ITEM_PICKUP,
+      this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
+          SoundEvents.ENTITY_ITEM_PICKUP,
           SoundCategory.PLAYERS, 0.2F,
           (this.rand.nextFloat() - this.rand.nextFloat()) * 1.4F + 2.0F, false);
     }
@@ -196,7 +197,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
 
   @Override
   public boolean canBeCollidedWith() {
-     return true;
+    return true;
   }
 
   @Override

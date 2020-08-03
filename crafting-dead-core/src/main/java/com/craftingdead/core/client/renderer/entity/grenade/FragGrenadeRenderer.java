@@ -23,7 +23,7 @@ public class FragGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
 
   @Override
   public void render(GrenadeEntity entity, float entityYaw, float partialTicks,
-      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight) {
 
     matrixStack.translate(0D, 0.15D, 0D);
     matrixStack.scale(0.4f, -0.4f, 0.4f);
@@ -33,12 +33,12 @@ public class FragGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
       totalTicks += partialTicks;
     }
 
-    matrixStack.multiply(Vector3f.POSITIVE_X
-        .getDegreesQuaternion(totalTicks * 30F));
+    matrixStack.rotate(Vector3f.XP
+        .rotationDegrees(totalTicks * 30F));
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(model.getLayer(this.getEntityTexture(entity)));
-    model.render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+        renderTypeBuffer.getBuffer(model.getRenderType(this.getEntityTexture(entity)));
+    model.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
         1.0F, 0.15F);
   }
 

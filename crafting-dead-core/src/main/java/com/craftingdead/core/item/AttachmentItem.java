@@ -4,36 +4,28 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.util.Text;
-import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 
 public class AttachmentItem extends Item {
 
   private final Map<MultiplierType, Float> multipliers;
   private final CraftingInventorySlotType inventorySlot;
-  private final boolean suppressesSounds;
-  private final Pair<Model, ResourceLocation> model;
+  private final boolean soundSuppressor;
+  private final boolean scope; 
 
   public AttachmentItem(Properties properties) {
     super(properties);
     this.multipliers = properties.multipliers;
     this.inventorySlot = properties.inventorySlot;
-    this.suppressesSounds = properties.suppressesSounds;
-    this.model = properties.model == null ? null
-        : Pair.of(DistExecutor.safeCallWhenOn(Dist.CLIENT, properties.model.getLeft()),
-            properties.model.getRight());
+    this.soundSuppressor = properties.soundSuppressor;
+    this.scope = properties.scope;
   }
 
   public Float getMultiplier(MultiplierType multiplierType) {
@@ -45,13 +37,13 @@ public class AttachmentItem extends Item {
   }
 
   public boolean isSoundSuppressor() {
-    return this.suppressesSounds;
+    return this.soundSuppressor;
   }
-
-  public Pair<Model, ResourceLocation> getModel() {
-    return this.model;
+  
+  public boolean isScope() {
+    return this.scope;
   }
-
+  
   @Override
   public void addInformation(ItemStack stack, World world,
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
@@ -78,16 +70,16 @@ public class AttachmentItem extends Item {
 
     private final Map<MultiplierType, Float> multipliers = new EnumMap<>(MultiplierType.class);
     private CraftingInventorySlotType inventorySlot;
-    private boolean suppressesSounds;
-    private Pair<Supplier<DistExecutor.SafeCallable<Model>>, ResourceLocation> model;
+    private boolean soundSuppressor;
+    private boolean scope;
 
     public Properties addMultiplier(MultiplierType modifierType, float multiplier) {
       this.multipliers.put(modifierType, multiplier);
       return this;
     }
 
-    public Properties setSuppressesSounds(boolean suppressesSounds) {
-      this.suppressesSounds = suppressesSounds;
+    public Properties setSoundSuppressor(boolean soundSuppressor) {
+      this.soundSuppressor = soundSuppressor;
       return this;
     }
 
@@ -95,10 +87,9 @@ public class AttachmentItem extends Item {
       this.inventorySlot = inventorySlot;
       return this;
     }
-
-    public Properties setModel(
-        Pair<Supplier<DistExecutor.SafeCallable<Model>>, ResourceLocation> model) {
-      this.model = model;
+    
+    public Properties setScope(boolean scope) {
+      this.scope = scope;
       return this;
     }
   }

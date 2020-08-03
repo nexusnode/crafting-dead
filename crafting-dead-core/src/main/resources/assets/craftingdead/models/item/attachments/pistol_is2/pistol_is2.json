@@ -1,6 +1,0 @@
-{
-	"loader":"forge:obj",
-	"model":"craftingdead:models/item/attachments/pistol_is2/pistol_is2.obj",
-	"flip-v":true,
-	"ambientToFullbright": false
-}

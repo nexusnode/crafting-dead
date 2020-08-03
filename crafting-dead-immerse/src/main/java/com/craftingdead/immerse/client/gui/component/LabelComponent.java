@@ -45,11 +45,11 @@ public class LabelComponent extends Component<LabelComponent> {
       RenderSystem.scalef(this.getXScale(), this.getYScale(), 1.0F);
       RenderSystem.enableAlphaTest();
       IRenderTypeBuffer.Impl renderTypeBuffer =
-          IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuffer());
+          IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
       this.fontRenderer
-          .draw(this.text.getFormattedText(), 0, 0, this.colour.getHexColour(), this.shadow,
+          .renderString(this.text.getFormattedText(), 0, 0, this.colour.getHexColour(), this.shadow,
               TransformationMatrix.identity().getMatrix(), renderTypeBuffer, false, 0, 0xF000F0);
-      renderTypeBuffer.draw();
+      renderTypeBuffer.finish();
       RenderSystem.disableAlphaTest();
     }
     RenderSystem.popMatrix();

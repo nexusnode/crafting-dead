@@ -82,7 +82,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
             matrix.translate(0.0D, 1.0D, 0.0D);
           }
 
-          this.getEntityModel().func_205072_a().rotate(matrix);
+          this.getEntityModel().getModelHead().translateRotate(matrix);
         }
 
         // Applies the arbitrary transformation if needed
@@ -93,7 +93,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
         // Renders the item. Also note the TransformType.
         itemRenderer
             .renderItem(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
-                packedLight, OverlayTexture.DEFAULT_UV, itemModel);
+                packedLight, OverlayTexture.NO_OVERLAY, itemModel);
 
         matrix.pop();
       }

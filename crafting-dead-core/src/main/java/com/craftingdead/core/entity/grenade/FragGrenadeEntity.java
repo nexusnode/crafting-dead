@@ -34,7 +34,7 @@ public class FragGrenadeEntity extends GrenadeEntity {
         this.remove();
         this.world.createExplosion(this,
             ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
-            this.getX(), this.getY() + this.getHeight(), this.getZ(), 4F, false,
+            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
             Explosion.Mode.NONE);
       }
     }

@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib p90.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape1
 v 0.500000 1.087500 0.000000

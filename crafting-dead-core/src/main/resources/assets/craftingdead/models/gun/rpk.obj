@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib rpk.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape1
 v -0.004743 1.315764 0.000000

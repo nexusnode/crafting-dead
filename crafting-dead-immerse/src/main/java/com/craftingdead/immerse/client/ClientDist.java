@@ -63,7 +63,7 @@ public class ClientDist implements IModDist {
             .getResource(
                 new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icons/icon_32x32.png"))
             .getInputStream();
-        minecraft.getWindow().setWindowIcon(smallIcon, mediumIcon);
+        minecraft.getMainWindow().setWindowIcon(smallIcon, mediumIcon);
       } catch (IOException e) {
         logger.error("Couldn't set icon", e);
       }

@@ -20,7 +20,8 @@ public class GiantZombieRenderer extends
   }
 
   @Override
-  protected void scale(GiantZombieEntity entity, MatrixStack matrixStack, float scale) {
+  protected void preRenderCallback(GiantZombieEntity entity, MatrixStack matrixStack,
+      float partialTicks) {
     matrixStack.scale(this.scale, this.scale, this.scale);
   }
 }

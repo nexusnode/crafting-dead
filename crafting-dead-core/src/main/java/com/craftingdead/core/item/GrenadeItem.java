@@ -43,15 +43,17 @@ public class GrenadeItem extends Item {
       Hand handIn) {
     ItemStack itemStack = playerIn.getHeldItem(handIn);
     worldIn
-        .playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
+        .playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(),
             SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
             0.4F / (random.nextFloat() * 0.4F + 0.8F));
     if (!worldIn.isRemote) {
       GrenadeEntity grenadeEntity = grenadeEntitySupplier.apply(playerIn, worldIn);
 
       float force = playerIn.isSneaking() ? 0.4F : this.throwSpeed;
-      grenadeEntity.setPosition(playerIn.getX(), playerIn.getY() + playerIn.getEyeHeight(), playerIn.getZ());
-      grenadeEntity.shootFromEntity(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0, force, 1.0F);
+      grenadeEntity.setPosition(playerIn.getPosX(), playerIn.getPosY() + playerIn.getEyeHeight(),
+          playerIn.getPosZ());
+      grenadeEntity.shootFromEntity(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0,
+          force, 1.0F);
       worldIn.addEntity(grenadeEntity);
     }
 
@@ -60,7 +62,7 @@ public class GrenadeItem extends Item {
       itemStack.shrink(1);
     }
 
-    return ActionResult.success(itemStack);
+    return ActionResult.resultSuccess(itemStack);
   }
 
   public static class Properties extends Item.Properties {

@@ -1,0 +1,9 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/attachment/eotech_sight.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "craftingdead:attachment/eotech_sight"
+	}
+}

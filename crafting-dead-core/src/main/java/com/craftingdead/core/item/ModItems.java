@@ -1,22 +1,20 @@
 package com.craftingdead.core.item;
 
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.actionprovider.DefaultActionProvider;
+import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.fire.PistolShootAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.fire.RifleShootAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.fire.SubmachineShootAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadACR;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadAK47;
 import com.craftingdead.core.client.renderer.item.ACRRenderer;
 import com.craftingdead.core.client.renderer.item.AK47Renderer;
-import com.craftingdead.core.client.renderer.item.gun.AnimationType;
-import com.craftingdead.core.client.renderer.item.gun.fire.PistolShootAnimation;
-import com.craftingdead.core.client.renderer.item.gun.fire.RifleShootAnimation;
-import com.craftingdead.core.client.renderer.item.gun.fire.SubmachineShootAnimation;
-import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReloadACR;
-import com.craftingdead.core.client.renderer.item.gun.reload.GunAnimationReloadAK47;
-import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentBipod;
-import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentGrip;
-import com.craftingdead.core.client.renderer.item.model.attachment.ModelAttachmentReddot;
-import com.craftingdead.core.client.renderer.item.model.magazine.ModelACRClip;
-import com.craftingdead.core.client.renderer.item.model.magazine.ModelAK4730Rnd;
+import com.craftingdead.core.client.renderer.item.AS50Renderer;
+import com.craftingdead.core.client.renderer.item.AWPRenderer;
+import com.craftingdead.core.client.renderer.item.DMRRenderer;
+import com.craftingdead.core.client.renderer.item.DesertEagleRenderer;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -33,7 +31,6 @@ import com.craftingdead.core.util.Text;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -191,7 +188,6 @@ public class ModItems {
       .register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
-              .setModel(Pair.of(() -> ModelAK4730Rnd::new, (ResourceLocation) null))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -208,7 +204,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.5F)
-              .setModel(Pair.of(() -> ModelACRClip::new, null))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -455,16 +450,13 @@ public class ModItems {
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.FOV, 1 / 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .setModel(Pair.of(() -> ModelAttachmentReddot::new,
-                  new ResourceLocation(CraftingDead.ID,
-                      "textures/models/attachments/red_dot_sight.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> ACOG_SIGHT = ITEMS
       .register("acog_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 3.25F)
+              .addMultiplier(MultiplierType.FOV, 1 / 3.25F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -472,16 +464,18 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> LP_SCOPE = ITEMS
       .register("lp_scope",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 5F)
+              .addMultiplier(MultiplierType.FOV, 1 / 5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .setScope(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 8F)
+              .addMultiplier(MultiplierType.FOV, 1 / 8F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
+              .setScope(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -489,7 +483,7 @@ public class ModItems {
       .register("suppressor",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
-              .setSuppressesSounds(true)
+              .setSoundSuppressor(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -498,9 +492,6 @@ public class ModItems {
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ACCURACY, 1.15F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .setModel(Pair.of(() -> ModelAttachmentGrip::new,
-                  new ResourceLocation(CraftingDead.ID,
-                      "textures/models/attachments/tactical_grip.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -509,16 +500,13 @@ public class ModItems {
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ACCURACY, 1.05F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .setModel(Pair.of(() -> ModelAttachmentBipod::new,
-                  new ResourceLocation(CraftingDead.ID,
-                      "textures/models/attachments/bipod.png")))
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 2.5F)
+              .addMultiplier(MultiplierType.FOV, 1 / 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -527,7 +515,7 @@ public class ModItems {
   // Assault Rifles
   // ================================================================================
 
-  public static final RegistryObject<Item> M4A1 = ITEMS
+  public static final RegistryObject<GunItem> M4A1 = ITEMS
       .register("m4a1",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
@@ -567,7 +555,7 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> SCARH = ITEMS
+  public static final RegistryObject<GunItem> SCARH = ITEMS
       .register("scarh",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(110)
@@ -603,7 +591,7 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> AK47 = ITEMS
+  public static final RegistryObject<GunItem> AK47 = ITEMS
       .register("ak47",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
@@ -633,7 +621,7 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> FNFAL = ITEMS
+  public static final RegistryObject<GunItem> FNFAL = ITEMS
       .register("fnfal",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
@@ -658,7 +646,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> ACR = ITEMS
+  public static final RegistryObject<GunItem> ACR = ITEMS
       .register("acr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
@@ -684,7 +672,7 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> HK417 = ITEMS
+  public static final RegistryObject<GunItem> HK417 = ITEMS
       .register("hk417",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
@@ -710,7 +698,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> MPT55 = ITEMS
+  public static final RegistryObject<GunItem> MPT55 = ITEMS
       .register("mpt55",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(70)
@@ -733,7 +721,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> M1GARAND = ITEMS
+  public static final RegistryObject<GunItem> M1GARAND = ITEMS
       .register("m1garand",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
@@ -756,7 +744,7 @@ public class ModItems {
 
   // TODO Reminder: Sporter22 uses two different iron sights at the same time.
   // See RenderSporter.java (1.6.4)
-  public static final RegistryObject<Item> SPORTER22 = ITEMS
+  public static final RegistryObject<GunItem> SPORTER22 = ITEMS
       .register("sporter22",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(200)
@@ -782,7 +770,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> G36C = ITEMS
+  public static final RegistryObject<GunItem> G36C = ITEMS
       .register("g36c",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
@@ -812,7 +800,7 @@ public class ModItems {
 
   // TODO Reminder: M240B uses two different iron sights at the same time.
   // See RenderM240B.java (1.6.4)
-  public static final RegistryObject<Item> M240B = ITEMS
+  public static final RegistryObject<GunItem> M240B = ITEMS
       .register("m240b",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
@@ -835,7 +823,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> RPK = ITEMS
+  public static final RegistryObject<GunItem> RPK = ITEMS
       .register("rpk",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
@@ -857,7 +845,7 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
-  public static final RegistryObject<Item> MINIGUN = ITEMS
+  public static final RegistryObject<GunItem> MINIGUN = ITEMS
       .register("minigun",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setAimable(false)
@@ -881,7 +869,7 @@ public class ModItems {
 
   // TODO Reminder: MK48MOD uses two different iron sights at the same time.
   // See RenderMK48Mod1.java (1.6.4)
-  public static final RegistryObject<Item> MK48MOD = ITEMS
+  public static final RegistryObject<GunItem> MK48MOD = ITEMS
       .register("mk48mod",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
@@ -908,7 +896,7 @@ public class ModItems {
   // Pistols
   // ================================================================================
 
-  public static final RegistryObject<Item> TASER = ITEMS
+  public static final RegistryObject<GunItem> TASER = ITEMS
       .register("taser",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(2000)
@@ -923,7 +911,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> M1911 = ITEMS
+  public static final RegistryObject<GunItem> M1911 = ITEMS
       .register("m1911",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
@@ -943,7 +931,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> G18 = ITEMS
+  public static final RegistryObject<GunItem> G18 = ITEMS
       .register("g18",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
@@ -965,7 +953,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> M9 = ITEMS
+  public static final RegistryObject<GunItem> M9 = ITEMS
       .register("m9",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
@@ -984,7 +972,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> DESERT_EAGLE = ITEMS
+  public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS
       .register("desert_eagle",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
@@ -998,12 +986,12 @@ public class ModItems {
               .setDefaultMagazine(DESERT_EAGLE_MAGAZINE)
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
-
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> DesertEagleRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> P250 = ITEMS
+  public static final RegistryObject<GunItem> P250 = ITEMS
       .register("p250",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
@@ -1023,7 +1011,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> MAGNUM = ITEMS
+  public static final RegistryObject<GunItem> MAGNUM = ITEMS
       .register("magnum",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
@@ -1040,7 +1028,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> FN57 = ITEMS
+  public static final RegistryObject<GunItem> FN57 = ITEMS
       .register("fn57",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(140)
@@ -1063,7 +1051,7 @@ public class ModItems {
   // Submachine Guns
   // ================================================================================
 
-  public static final RegistryObject<Item> MAC10 = ITEMS
+  public static final RegistryObject<GunItem> MAC10 = ITEMS
       .register("mac10",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
@@ -1089,7 +1077,7 @@ public class ModItems {
 
   // TODO Reminder: P90 uses two different iron sights at the same time.
   // See RenderP90.java (1.6.4)
-  public static final RegistryObject<Item> P90 = ITEMS
+  public static final RegistryObject<GunItem> P90 = ITEMS
       .register("p90",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
@@ -1112,7 +1100,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> VECTOR = ITEMS
+  public static final RegistryObject<GunItem> VECTOR = ITEMS
       .register("vector",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
@@ -1134,7 +1122,7 @@ public class ModItems {
               .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> MP5A5 = ITEMS
+  public static final RegistryObject<GunItem> MP5A5 = ITEMS
       .register("mp5a5",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
@@ -1163,7 +1151,7 @@ public class ModItems {
 
   // TODO Reminder: M107 uses two different iron sights at the same time.
   // See RenderM107.java (1.6.4)
-  public static final RegistryObject<Item> M107 = ITEMS
+  public static final RegistryObject<GunItem> M107 = ITEMS
       .register("m107",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(750)
@@ -1191,7 +1179,7 @@ public class ModItems {
 
   // TODO Reminder: AS50 uses two different iron sights at the same time.
   // See RenderAS50.java (1.6.4)
-  public static final RegistryObject<Item> AS50 = ITEMS
+  public static final RegistryObject<GunItem> AS50 = ITEMS
       .register("as50",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
@@ -1204,7 +1192,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AS50_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -1214,14 +1201,11 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> AS50Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-
-  // TODO Reminder: AWP uses two different iron sights at the same time.
-  // See RenderAWP.java (1.6.4)
-  public static final RegistryObject<Item> AWP = ITEMS
+  public static final RegistryObject<GunItem> AWP = ITEMS
       .register("awp",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(1200)
@@ -1235,7 +1219,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AWP_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(AWP_MAGAZINE)
-
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
@@ -1243,11 +1226,11 @@ public class ModItems {
               .addAcceptedPaint(DRAGON_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> AWPRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<Item> DMR = ITEMS
+  public static final RegistryObject<GunItem> DMR = ITEMS
       .register("dmr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
@@ -1261,7 +1244,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.DMR_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(DMR_MAGAZINE)
-
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
@@ -1270,7 +1252,7 @@ public class ModItems {
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> DMRRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1280,7 +1262,7 @@ public class ModItems {
 
   // TODO Reminder: Trenchgun uses only the front part of the iron sight model.
   // See RenderTrenchGun.java (1.6.4)
-  public static final RegistryObject<Item> TRENCHGUN = ITEMS
+  public static final RegistryObject<GunItem> TRENCHGUN = ITEMS
       .register("trenchgun",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(300)
@@ -1302,7 +1284,7 @@ public class ModItems {
 
   // TODO Reminder: Mossberg uses only the front part of the iron sight model.
   // See RenderMossberg.java (1.6.4)
-  public static final RegistryObject<Item> MOSSBERG = ITEMS
+  public static final RegistryObject<GunItem> MOSSBERG = ITEMS
       .register("mossberg",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setBulletAmountToFire(8)

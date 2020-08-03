@@ -65,7 +65,7 @@ public class GunModel implements IModelGeometry<GunModel> {
       Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
     IBakedModel bakedModel = this.baseModel
-        .bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, true);
+        .bakeModel(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, true);
     final Random random = new Random();
     random.setSeed(42L);
     return new BakedGunModel(bakedModel, ImmutableMap.of(),
@@ -76,7 +76,7 @@ public class GunModel implements IModelGeometry<GunModel> {
   public Collection<Material> getTextures(IModelConfiguration owner,
       Function<ResourceLocation, IUnbakedModel> modelGetter,
       Set<com.mojang.datafixers.util.Pair<String, String>> missingTextureErrors) {
-    return this.baseModel.getTextureDependencies(modelGetter, missingTextureErrors);
+    return this.baseModel.getTextures(modelGetter, missingTextureErrors);
   }
 
   public static class BakedGunModel implements IBakedModel {
@@ -166,8 +166,8 @@ public class GunModel implements IModelGeometry<GunModel> {
     }
 
     @Override
-    public boolean isSideLit() {
-      return this.baseModel.isSideLit();
+    public boolean func_230044_c_() {
+      return this.baseModel.func_230044_c_();
     }
   }
 
@@ -232,7 +232,7 @@ public class GunModel implements IModelGeometry<GunModel> {
                     false, null, ItemCameraTransforms.DEFAULT, new ArrayList<>());
                 paintedModel.parent = GunModel.this.baseModel;
                 return paintedModel
-                    .bake(this.bakery, paintedModel, ModelLoader.defaultTextureGetter(),
+                    .bakeModel(this.bakery, paintedModel, ModelLoader.defaultTextureGetter(),
                         gunModel.transform, new ResourceLocation(CraftingDead.ID, "generated"),
                         true);
               })

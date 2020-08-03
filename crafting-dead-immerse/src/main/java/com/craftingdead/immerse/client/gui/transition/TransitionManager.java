@@ -52,8 +52,9 @@ public class TransitionManager {
     if (screen != this.lastScreen) {
       this.transitionProgress = 0.0F;
       this.transitionBeginTime = Util.milliTime();
-      this.transitionFramebuffer = new Framebuffer(this.minecraft.getWindow().getFramebufferWidth(),
-          this.minecraft.getWindow().getFramebufferHeight(), true, Minecraft.IS_RUNNING_ON_MAC);
+      this.transitionFramebuffer = new Framebuffer(
+          this.minecraft.getMainWindow().getFramebufferWidth(),
+          this.minecraft.getMainWindow().getFramebufferHeight(), true, Minecraft.IS_RUNNING_ON_MAC);
       this.transitionFramebuffer.setFramebufferColor(0.0F, 0.0F, 0.0F, 0.0F);
       this.lastScreen = screen;
     } else {

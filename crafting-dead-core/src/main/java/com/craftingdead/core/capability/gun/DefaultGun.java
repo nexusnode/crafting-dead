@@ -11,13 +11,14 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
 import com.craftingdead.core.action.RemoveMagazineAction;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.animationprovider.DefaultAnimationProvider;
+import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.renderer.item.RenderGun;
-import com.craftingdead.core.client.renderer.item.gun.AnimationType;
-import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
@@ -79,7 +80,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class DefaultGun implements IGun {
+public class DefaultGun extends DefaultAnimationProvider<GunAnimationController> implements IGun {
 
   public static final float HEADSHOT_MULTIPLIER = 4;
 
@@ -103,6 +104,8 @@ public class DefaultGun implements IGun {
    */
   private int shotCount;
 
+  private int lastShotCount = this.shotCount;
+
   private Set<AttachmentItem> attachments;
 
   private ItemStack paintStack = ItemStack.EMPTY;
@@ -111,13 +114,12 @@ public class DefaultGun implements IGun {
 
   private boolean aiming;
 
-  private final RenderGun gunRenderer;
-
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
   }
 
   public DefaultGun(GunItem gunItem) {
+    super(() -> GunAnimationController::new);
     this.gunItem = gunItem;
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
@@ -125,7 +127,6 @@ public class DefaultGun implements IGun {
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
     // Empty magazine
     this.setMagazineSize(0);
-    this.gunRenderer = gunItem.getRenderer();
   }
 
   @Override
@@ -149,9 +150,10 @@ public class DefaultGun implements IGun {
     this.triggerPressed = triggerPressed;
 
     if (this.triggerPressed) {
-      // Resets the counter
-      this.shotCount = 0;
       this.tryShoot(living, itemStack);
+    } else {
+      // Resets the counter
+      this.shotCount = this.lastShotCount = 0;
     }
 
     if (sendUpdate) {
@@ -199,7 +201,15 @@ public class DefaultGun implements IGun {
   private void tryShoot(ILiving<?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
-    if (!this.triggerPressed || !this.canShoot(living)) {
+    // Update this here before any method returns to make sure it gets called
+    this.lastShotCount = this.shotCount;
+
+    if (!this.triggerPressed) {
+      return;
+    }
+
+    if (!this.canShoot(living)) {
+      this.triggerPressed = false;
       return;
     }
 
@@ -238,13 +248,13 @@ public class DefaultGun implements IGun {
 
     if (entity.world.isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
-        ((ClientDist) CraftingDead.getInstance().getModDist())
+        ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager()
             .joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
       }
 
-      this.gunRenderer.flash();
-      this.gunRenderer.removeCurrentAnimation();
-      this.gunRenderer.addAnimation(this.gunItem.getAnimations().get(AnimationType.SHOOT).get(),
+      this.getAnimationController().removeCurrentAnimation();
+      this.getAnimationController().addAnimation(
+          this.gunItem.getAnimations().get(AnimationType.SHOOT).get(),
           null);
     }
 
@@ -302,7 +312,7 @@ public class DefaultGun implements IGun {
       damage += reducedDamage * armorPenetration;
     }
 
-    double chinHeight = (entityHit.getY() + entityHit.getEyeHeight() - 0.2F);
+    double chinHeight = (entityHit.getPosY() + entityHit.getEyeHeight() - 0.2F);
     boolean headshot = (entityHit instanceof PlayerEntity || entityHit instanceof ZombieEntity
         || entityHit instanceof SkeletonEntity || entityHit instanceof CreeperEntity
         || entityHit instanceof EndermanEntity || entityHit instanceof WitchEntity
@@ -338,7 +348,8 @@ public class DefaultGun implements IGun {
             SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
 
     if (entityHit instanceof ClientPlayerEntity) {
-      ((ClientDist) CraftingDead.getInstance().getModDist()).joltCamera(1.5F, false);
+      ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager().joltCamera(1.5F,
+          false);
     }
 
     // Resets the temporary invincibility before causing the damage, preventing
@@ -431,21 +442,14 @@ public class DefaultGun implements IGun {
   @Override
   public float getAccuracy(ILiving<?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
-    float accuracy = 1.0F;
-    if (entity.getX() != entity.prevPosX || entity.getY() != entity.prevPosY
-        || entity.getZ() != entity.prevPosZ) {
-      accuracy = 0.5F;
-
-      if (entity.isSprinting()) {
-        accuracy = 0.25F;
-      }
-
-      if (entity.isSneaking() && entity.onGround) {
-        accuracy = 1.0F;
-      }
+    float accuracy =
+        this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
+    if (entity.getPosX() != entity.prevPosX || entity.getPosY() != entity.prevPosY
+        || entity.getPosZ() != entity.prevPosZ) {
+      accuracy -= 0.25F;
+    } else if (entity.isSneaking()) {
+      accuracy += 0.25F;
     }
-    accuracy = accuracy * this.gunItem.getAccuracy()
-        * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
     return accuracy > 1.0F ? 1.0F : accuracy;
   }
 
@@ -547,7 +551,7 @@ public class DefaultGun implements IGun {
     nbt.put("magazineStack", this.magazineStack.serializeNBT());
     ListNBT attachmentsTag = this.attachments
         .stream()
-        .map(attachment -> StringNBT.of(attachment.getRegistryName().toString()))
+        .map(attachment -> StringNBT.valueOf(attachment.getRegistryName().toString()))
         .collect(ListNBT::new, ListNBT::add, List::addAll);
     nbt.put("attachments", attachmentsTag);
     nbt.put("paintStack", this.paintStack.serializeNBT());
@@ -610,6 +614,12 @@ public class DefaultGun implements IGun {
 
   @Override
   public Optional<ResourceLocation> getOverlayTexture(Entity entity, ItemStack itemStack) {
+    for (AttachmentItem attachmentItem : this.attachments) {
+      if (attachmentItem.isScope()) {
+        return Optional.of(new ResourceLocation(attachmentItem.getRegistryName().getNamespace(),
+            "textures/scope/" + attachmentItem.getRegistryName().getPath() + ".png"));
+      }
+    }
     return Optional.empty();
   }
 
@@ -624,13 +634,13 @@ public class DefaultGun implements IGun {
   }
 
   @Override
-  public RenderGun getItemRenderer() {
-    return this.gunRenderer;
+  public GunAnimation getAnimation(AnimationType animationType) {
+    return this.gunItem.getAnimations().get(animationType).get();
   }
 
   @Override
-  public GunAnimation getAnimation(AnimationType animationType) {
-    return this.gunItem.getAnimations().get(animationType).get();
+  public boolean hasShotCountChanged() {
+    return this.shotCount != this.lastShotCount;
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {

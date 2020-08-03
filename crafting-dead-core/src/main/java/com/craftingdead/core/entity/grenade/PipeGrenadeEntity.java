@@ -37,7 +37,7 @@ public class PipeGrenadeEntity extends GrenadeEntity {
         this.remove();
         this.world.createExplosion(this,
             ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
-            this.getX(), this.getY() + this.getHeight(), this.getZ(), 4F, false,
+            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
             Explosion.Mode.NONE);
       }
     }
@@ -48,9 +48,10 @@ public class PipeGrenadeEntity extends GrenadeEntity {
     if (this.ticksExisted % 6 == 0) {
       if (this.world.isRemote()) {
         this.world.addParticle(RED_FLASH, true,
-            this.getX(), this.getY(), this.getZ(), 0D, 0D, 0D);
+            this.getPosX(), this.getPosY(), this.getPosZ(), 0D, 0D, 0D);
       } else {
-        float pitchProgress = this.ticksExisted / (float) (this.getMinimumTicksUntilAutoActivation());
+        float pitchProgress =
+            this.ticksExisted / (float) (this.getMinimumTicksUntilAutoActivation());
         float gradualPitch = MathHelper.lerp(pitchProgress, 1.0F, 2F);
         this.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BELL, 1.7F, gradualPitch);
       }

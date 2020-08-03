@@ -41,12 +41,13 @@ public class BinocularsItem extends Item {
       Minecraft mc = Minecraft.getInstance();
       mc.gameSettings.thirdPersonView = 0;
     }
-    return ActionResult.consume(itemstack);
+    return ActionResult.resultConsume(itemstack);
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(new DefaultScope(1 / 14, SCOPE_OVERLAY_TEXTURE, 2048, 512),
+    return new SimpleCapabilityProvider<>(
+        new DefaultScope(1 / 14, SCOPE_OVERLAY_TEXTURE, 2048, 512),
         () -> ModCapabilities.SCOPE);
   }
 }

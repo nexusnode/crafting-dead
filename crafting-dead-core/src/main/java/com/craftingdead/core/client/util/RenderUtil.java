@@ -28,9 +28,11 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderDefault;
 import net.minecraft.client.shader.ShaderGroup;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
@@ -68,29 +70,64 @@ public class RenderUtil {
     }
   }
 
-  public static ClippingHelperImpl createClippingHelper(float partialTicks, boolean considerF5) {
-    GameRenderer gameRenderer = minecraft.gameRenderer;
+  /**
+   * Checks whether the entity is inside the FOV of the game client. The size of the game window is
+   * also considered. Blocks in front of player's view are not considered.
+   *
+   * @param target - The entity to test from the player's view
+   * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
+   */
+  public static boolean isInsideGameFOV(Entity target, boolean firstPerson) {
     ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
-    Vec3d projectedViewVec3d = considerF5 ? activerenderinfo.getProjectedView()
-        : minecraft.player.getPositionVec().add(0, minecraft.player.getEyeHeight(), 0);
+    Vec3d projectedViewVec3d =
+        firstPerson ? target.getPositionVec().add(0, target.getEyeHeight(), 0)
+            : activerenderinfo.getProjectedView();
     double viewerX = projectedViewVec3d.getX();
     double viewerY = projectedViewVec3d.getY();
     double viewerZ = projectedViewVec3d.getZ();
-    float pitch = considerF5 ? activerenderinfo.getPitch() : minecraft.player.rotationPitch;
-    float yaw = considerF5 ? activerenderinfo.getYaw() : minecraft.player.rotationYaw;
+
+    if (!target.isInRangeToRender3d(viewerX, viewerY, viewerZ)) {
+      return false;
+    }
+
+    AxisAlignedBB renderBoundingBox = target.getRenderBoundingBox();
+
+    // Validation from Vanilla.
+    // Generates a render bounding box if it is needed.
+    if (renderBoundingBox.hasNaN() || renderBoundingBox.getAverageEdgeLength() == 0.0D) {
+      renderBoundingBox = new AxisAlignedBB(target.getPosX() - 2.0D, target.getPosY() - 2.0D,
+          target.getPosZ() - 2.0D, target.getPosX() + 2.0D, target.getPosY() + 2.0D,
+          target.getPosZ() + 2.0D);
+    }
+
+    return RenderUtil.createClippingHelper(1F, firstPerson)
+        .isBoundingBoxInFrustum(renderBoundingBox);
+  }
+
+  public static ClippingHelperImpl createClippingHelper(float partialTicks, boolean firstPerson) {
+    GameRenderer gameRenderer = minecraft.gameRenderer;
+    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    Vec3d projectedViewVec3d =
+        firstPerson ? minecraft.player.getPositionVec().add(0, minecraft.player.getEyeHeight(), 0)
+            : activerenderinfo.getProjectedView();
+    double viewerX = projectedViewVec3d.getX();
+    double viewerY = projectedViewVec3d.getY();
+    double viewerZ = projectedViewVec3d.getZ();
+    float pitch = firstPerson ? minecraft.player.rotationPitch : activerenderinfo.getPitch();
+    float yaw = firstPerson ? minecraft.player.rotationYaw : activerenderinfo.getYaw();
 
     MatrixStack cameraRotationStack = new MatrixStack();
     // Reminder: At 1.15.2, roll cannot be get from ActiveRenderInfo
     // cameraRotationStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rollHere));
-    cameraRotationStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
-    cameraRotationStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw + 180.0F));
+    cameraRotationStack.rotate(Vector3f.XP.rotationDegrees(pitch));
+    cameraRotationStack.rotate(Vector3f.YP.rotationDegrees(yaw + 180.0F));
 
-    Matrix4f fovAndWindowMatrix = new MatrixStack().peek().getModel();
-    fovAndWindowMatrix.multiply(gameRenderer.func_228382_a_(activerenderinfo, partialTicks, true));
+    Matrix4f fovAndWindowMatrix = new MatrixStack().getLast().getMatrix();
+    fovAndWindowMatrix.mul(gameRenderer.getProjectionMatrix(activerenderinfo, partialTicks, true));
 
     ClippingHelperImpl clippingHelper =
-        new ClippingHelperImpl(cameraRotationStack.peek().getModel(), fovAndWindowMatrix);
-    clippingHelper.setPosition(viewerX, viewerY, viewerZ);
+        new ClippingHelperImpl(cameraRotationStack.getLast().getMatrix(), fovAndWindowMatrix);
+    clippingHelper.setCameraPosition(viewerX, viewerY, viewerZ);
 
     return clippingHelper;
   }
@@ -117,10 +154,10 @@ public class RenderUtil {
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
 
-    buffer.vertex(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    buffer.vertex(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.vertex(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.vertex(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.pos(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.pos(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
     tessellator.draw();
 
     RenderSystem.shadeModel(GL11.GL_FLAT);
@@ -134,7 +171,7 @@ public class RenderUtil {
    */
   public static void applyPlayerCrouchRotation(MatrixStack matrix) {
     // Fix X rotation
-    matrix.multiply(Vector3f.POSITIVE_X.getRadialQuaternion(0.5F));
+    matrix.rotate(Vector3f.XP.rotation(0.5F));
 
     // Fix XYZ position
     matrix.translate(0F, 0.2F, -0.1F);
@@ -167,7 +204,7 @@ public class RenderUtil {
 
     return MODEL_GENERATOR
         .makeItemModel(spriteGetter, blockModel)
-        .bake(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
+        .bakeModel(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
   }
 
   public static void drawTexturedRectangle(double x, double y, float width, float height,
@@ -194,22 +231,22 @@ public class RenderUtil {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuffer();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.vertex(x, y2, 0.0D).texture(u, v).endVertex();
-    bufferbuilder.vertex(x2, y2, 0.0D).texture(u2, v).endVertex();
-    bufferbuilder.vertex(x2, y, 0.0D).texture(u2, v2).endVertex();
-    bufferbuilder.vertex(x, y, 0.0D).texture(u, v2).endVertex();
+    bufferbuilder.pos(x, y2, 0.0D).tex(u, v).endVertex();
+    bufferbuilder.pos(x2, y2, 0.0D).tex(u2, v).endVertex();
+    bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
+    bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
     tessellator.draw();
   }
 
   public static void renderModel(IBakedModel model, ItemStack itemStack, MatrixStack matrixStack,
       IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, 0xF000F0, OverlayTexture.DEFAULT_UV, matrixStack, vertexBuilder,
+    renderModel(model, itemStack, 0xF000F0, OverlayTexture.NO_OVERLAY, matrixStack, vertexBuilder,
         EmptyModelData.INSTANCE);
   }
 
   public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
       MatrixStack matrixStack, IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, lightmapCoord, OverlayTexture.DEFAULT_UV, matrixStack,
+    renderModel(model, itemStack, lightmapCoord, OverlayTexture.NO_OVERLAY, matrixStack,
         vertexBuilder, EmptyModelData.INSTANCE);
   }
 
@@ -221,14 +258,14 @@ public class RenderUtil {
       random.setSeed(42L);
       minecraft
           .getItemRenderer()
-          .renderBakedItemQuads(matrixStack, vertexBuilder,
+          .renderQuads(matrixStack, vertexBuilder,
               model.getQuads(null, direction, random, modelData), itemStack, lightmapCoord,
               overlayColour);
     }
     random.setSeed(42L);
     minecraft
         .getItemRenderer()
-        .renderBakedItemQuads(matrixStack, vertexBuilder,
+        .renderQuads(matrixStack, vertexBuilder,
             model.getQuads(null, null, random, modelData), itemStack, lightmapCoord, overlayColour);
   }
 
@@ -237,10 +274,10 @@ public class RenderUtil {
   }
 
   public static double getFitScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.getWindow().getWidth() / imageWidth;
-    double heightScale = minecraft.getWindow().getHeight() / imageHeight;
+    double widthScale = minecraft.getMainWindow().getWidth() / imageWidth;
+    double heightScale = minecraft.getMainWindow().getHeight() / imageHeight;
     final double scale =
-        imageHeight * widthScale < minecraft.getWindow().getHeight() ? heightScale : widthScale;
-    return scale / minecraft.getWindow().getGuiScaleFactor();
+        imageHeight * widthScale < minecraft.getMainWindow().getHeight() ? heightScale : widthScale;
+    return scale / minecraft.getMainWindow().getGuiScaleFactor();
   }
 }

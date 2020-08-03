@@ -39,7 +39,7 @@ public class EffectsManager {
     for (ChannelManager.Entry entry : this.soundEngine.playingSoundsChannel.values()) {
       entry
           .runOnSoundExecutor(
-              source -> this.setLevels(source.field_216441_b, highPassGain, highPassCutoff));
+              source -> this.setLevels(source.id, highPassGain, highPassCutoff));
     }
   }
 
@@ -48,7 +48,7 @@ public class EffectsManager {
     if (entry != null) {
       entry
           .runOnSoundExecutor(
-              source -> this.setLevels(source.field_216441_b, highPassGain, highPassCutoff));
+              source -> this.setLevels(source.id, highPassGain, highPassCutoff));
     }
   }
 

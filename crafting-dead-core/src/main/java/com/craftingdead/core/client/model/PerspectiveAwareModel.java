@@ -71,7 +71,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
                       modelLocation);
             }
           }
-          return model.bake(bakery, spriteGetter, modelTransform, modelLocation);
+          return model.bakeModel(bakery, spriteGetter, modelTransform, modelLocation);
         }, (u, v) -> {
           throw new IllegalStateException(String.format("Duplicate key %s", u));
         }, () -> new EnumMap<>(ItemCameraTransforms.TransformType.class)));
@@ -91,7 +91,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
             .values()
             .stream()
             .flatMap(
-                model -> model.getTextureDependencies(modelGetter, missingTextureErrors).stream())
+                model -> model.getTextures(modelGetter, missingTextureErrors).stream())
             .collect(Collectors.toSet()));
     return materials;
   }
@@ -135,7 +135,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     }
 
     @Override
-    public boolean isSideLit() {
+    public boolean func_230044_c_() {
       return false;
     }
 

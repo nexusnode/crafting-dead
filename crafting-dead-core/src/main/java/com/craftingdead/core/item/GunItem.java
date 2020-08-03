@@ -13,11 +13,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.client.renderer.item.RenderGun;
-import com.craftingdead.core.client.renderer.item.gun.AnimationType;
-import com.craftingdead.core.client.renderer.item.gun.GunAnimation;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -43,7 +44,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
 
-public class GunItem extends ShootableItem {
+public class GunItem extends ShootableItem implements IRendererProvider {
 
   /**
    * Time between shots in milliseconds.
@@ -199,6 +200,7 @@ public class GunItem extends ShootableItem {
     return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  @Override
   public RenderGun getRenderer() {
     return this.renderer;
   }
@@ -214,9 +216,8 @@ public class GunItem extends ShootableItem {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SerializableCapabilityProvider<>(new DefaultGun(this),
-        ImmutableSet
-            .of(() -> ModCapabilities.RENDERER_PROVIDER, () -> ModCapabilities.GUN,
-                () -> ModCapabilities.SCOPE));
+        ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN,
+            () -> ModCapabilities.SCOPE));
   }
 
   @Override

@@ -86,8 +86,8 @@ public class LookAtEntityGoal<T extends Entity> extends Goal {
 
   @Override
   public void tick() {
-    this.goalOwner.getLookController().setLookPosition(this.watchedEntity.getX(),
-        this.watchedEntity.getEyeY(), this.watchedEntity.getZ());
+    this.goalOwner.getLookController().setLookPosition(this.watchedEntity.getPosX(),
+        this.watchedEntity.getPosYEye(), this.watchedEntity.getPosZ());
     --this.lookDuration;
   }
 }

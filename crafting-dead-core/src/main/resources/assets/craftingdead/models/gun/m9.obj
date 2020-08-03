@@ -1,6 +1,6 @@
 # Converted with GloomyFolken's tcn2obj Converter
 #
-mtllib m9.mtl
+mtllib default_material.mtl
 usemtl ModelMaterial
 o Shape1
 v 0.000000 1.337500 0.000000

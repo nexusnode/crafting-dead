@@ -49,7 +49,7 @@ public class RemoteDetonatorItem extends Item {
             return isOwner && grenadeEntity.canBeRemotelyActivated();
           }).forEach(entity -> ((GrenadeEntity) entity).setActivated(true));
     }
-    return ActionResult.consume(itemstack);
+    return ActionResult.resultConsume(itemstack);
   }
 
   @Override

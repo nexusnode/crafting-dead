@@ -16,7 +16,7 @@ public class C4ExplosiveModel extends Model {
     this.textureHeight = 32;
 
     this.shape1 = new ModelRenderer(this, 0, 0);
-    this.shape1.addCuboid(0F, 0F, 0F, 10, 4, 10);
+    this.shape1.addBox(0F, 0F, 0F, 10, 4, 10);
     this.shape1.setRotationPoint(-5F, 0F, -5F);
     this.shape1.setTextureSize(64, 32);
     this.shape1.mirror = true;
@@ -24,10 +24,10 @@ public class C4ExplosiveModel extends Model {
   }
 
   @Override
-  public void render(MatrixStack matrix, IVertexBuilder vertexBuilder, int p_225598_3_,
-      int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
-    this.shape1.render(matrix, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_,
-        p_225598_7_, p_225598_8_);
+  public void render(MatrixStack matrix, IVertexBuilder vertexBuilder, int packedLight,
+      int packedOverlay, float red, float green, float blue, float alpha) {
+    this.shape1.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
+        blue, alpha);
   }
 
   private void setRotation(ModelRenderer model, float x, float y, float z) {

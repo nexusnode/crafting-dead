@@ -10,7 +10,7 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
 
   private static final int DOUBLE_CLICK_DURATION = 500;
 
-  private boolean wasHoldingSneakKey;
+  private boolean wasSneaking;
   private long lastSneakPressTime;
   private boolean crouching;
 
@@ -38,8 +38,8 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
   @Override
   public void tick() {
     super.tick();
-    if (this.getEntity().isHoldingSneakKey() != this.wasHoldingSneakKey) {
-      if (this.getEntity().isHoldingSneakKey()) {
+    if (this.getEntity().isSneaking() != this.wasSneaking) {
+      if (this.getEntity().isSneaking()) {
         final long currentTime = Util.milliTime();
         if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
           this.crouching = true;
@@ -48,7 +48,7 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
       } else {
         this.crouching = false;
       }
-      this.wasHoldingSneakKey = this.getEntity().isHoldingSneakKey();
+      this.wasSneaking = this.getEntity().isSneaking();
     }
 
     if (this.crouching) {

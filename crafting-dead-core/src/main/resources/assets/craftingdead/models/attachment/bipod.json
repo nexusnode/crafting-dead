@@ -1,0 +1,21 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/attachment/bipod.obj",
+	"flip-v": true,
+	"ambientToFullbright": false,
+	"textures": {
+		"base": "craftingdead:attachment/bipod"
+	},
+	"transform": {
+		"scale": [
+			0.7,
+			0.7,
+			0.7
+		],
+		"translation": [
+			-0.25,
+			0.125,
+			-0.25
+		]
+	}
+}

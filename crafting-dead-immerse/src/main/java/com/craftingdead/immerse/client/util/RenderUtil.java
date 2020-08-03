@@ -63,10 +63,10 @@ public class RenderUtil {
     RenderSystem.disableTexture();
     RenderSystem.defaultBlendFunc();
     buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-    buffer.vertex(x, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.vertex(x2, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.vertex(x2, y, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.vertex(x, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x, y2, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x2, y2, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x2, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x, y, 0.0D).color(f, f1, f2, f3).endVertex();
     tessellator.draw();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
@@ -94,10 +94,10 @@ public class RenderUtil {
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
 
-    buffer.vertex(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    buffer.vertex(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.vertex(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.vertex(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.pos(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.pos(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.pos(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
     tessellator.draw();
 
     RenderSystem.shadeModel(GL11.GL_FLAT);
@@ -130,10 +130,10 @@ public class RenderUtil {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuffer();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.vertex(x, y2, 0.0D).texture(u, v).endVertex();
-    bufferbuilder.vertex(x2, y2, 0.0D).texture(u2, v).endVertex();
-    bufferbuilder.vertex(x2, y, 0.0D).texture(u2, v2).endVertex();
-    bufferbuilder.vertex(x, y, 0.0D).texture(u, v2).endVertex();
+    bufferbuilder.pos(x, y2, 0.0D).tex(u, v).endVertex();
+    bufferbuilder.pos(x2, y2, 0.0D).tex(u2, v).endVertex();
+    bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
+    bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
     tessellator.draw();
   }
 
@@ -154,11 +154,11 @@ public class RenderUtil {
   }
 
   public static double getFitScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.getWindow().getWidth() / imageWidth;
-    double heightScale = minecraft.getWindow().getHeight() / imageHeight;
+    double widthScale = minecraft.getMainWindow().getWidth() / imageWidth;
+    double heightScale = minecraft.getMainWindow().getHeight() / imageHeight;
     final double scale =
-        imageHeight * widthScale < minecraft.getWindow().getHeight() ? heightScale : widthScale;
-    return scale / minecraft.getWindow().getGuiScaleFactor();
+        imageHeight * widthScale < minecraft.getMainWindow().getHeight() ? heightScale : widthScale;
+    return scale / minecraft.getMainWindow().getGuiScaleFactor();
   }
 
   public static float[] getColour4f(int[] colour4i) {

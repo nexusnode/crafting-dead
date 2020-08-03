@@ -78,8 +78,9 @@ public class FollowAttractiveGrenadeGoal extends Goal {
 
   @Override
   public void tick() {
-    this.goalOwner.getLookController().setLookPosition(this.grenade.getX(), this.grenade.getEyeY(),
-        this.grenade.getZ());
+    this.goalOwner.getLookController().setLookPosition(this.grenade.getPosX(),
+        this.grenade.getPosYEye(),
+        this.grenade.getPosZ());
     if (--this.delayCounter <= 0) {
       this.delayCounter = 5 + this.goalOwner.getRNG().nextInt(10);
       this.goalOwner.getNavigator().tryMoveToEntityLiving(this.grenade, this.moveSpeedMultiplier);

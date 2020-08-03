@@ -155,14 +155,12 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     }
 
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this, heldStack));
-
-    if (this.getEntity().getEntityWorld().isRemote()) {
-      heldStack.getCapability(ModCapabilities.RENDERER_PROVIDER)
-          .ifPresent(provider -> provider.getItemRenderer().tick(heldStack, this.getEntity()));
-    }
+    heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER)
+        .ifPresent(provider -> provider.getAnimationController().tick(this.getEntity(), heldStack));
 
     if (this.freezeMovement) {
-      this.entity.resetPosition(this.entity.prevPosX, this.entity.prevPosY, this.entity.prevPosZ);
+      this.entity.forceSetPosition(this.entity.prevPosX, this.entity.prevPosY,
+          this.entity.prevPosZ);
       this.freezeMovement = false;
     }
 
@@ -242,8 +240,8 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     if (!shouldKeepInventory) {
       // Adds items from CD inventory
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
-        ItemEntity itemEntity = new ItemEntity(this.getEntity().world, this.getEntity().getX(),
-            this.getEntity().getY(), this.getEntity().getZ(),
+        ItemEntity itemEntity = new ItemEntity(this.getEntity().world, this.getEntity().getPosX(),
+            this.getEntity().getPosY(), this.getEntity().getPosZ(),
             this.itemHandler.extractItem(i, this.itemHandler.getStackInSlot(i).getCount(), false));
         itemEntity.setDefaultPickupDelay();
         drops.add(itemEntity);

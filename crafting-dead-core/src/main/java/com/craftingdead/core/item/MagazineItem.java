@@ -3,42 +3,35 @@ package com.craftingdead.core.item;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.magazine.DefaultMagazine;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.util.Text;
-import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.DistExecutor;
 
 public class MagazineItem extends Item {
 
   private final float armorPenetration;
   private final int size;
   private final Supplier<? extends Item> nextTier;
-  private final Pair<Model, ResourceLocation> model;
+  private final boolean customTexture;
 
   public MagazineItem(Properties properties) {
     super(properties);
     this.size = properties.size;
     this.armorPenetration = properties.armorPenetration;
     this.nextTier = properties.nextTier;
-    this.model = properties.model == null ? null
-        : Pair.of(DistExecutor.safeCallWhenOn(Dist.CLIENT, properties.model.getLeft()),
-            properties.model.getRight());
+    this.customTexture = properties.customTexture;
   }
 
   public float getArmorPenetration() {
@@ -53,8 +46,8 @@ public class MagazineItem extends Item {
     return this.nextTier;
   }
 
-  public Pair<Model, ResourceLocation> getModel() {
-    return this.model;
+  public boolean hasCustomTexture() {
+    return this.customTexture;
   }
 
   @Override
@@ -151,7 +144,7 @@ public class MagazineItem extends Item {
     private float armorPenetration;
     private int size;
     private Supplier<? extends Item> nextTier;
-    private Pair<Supplier<DistExecutor.SafeCallable<Model>>, ResourceLocation> model;
+    private boolean customTexture;
 
     public Properties setArmorPenetration(float armorPenetration) {
       this.armorPenetration = armorPenetration;
@@ -168,9 +161,8 @@ public class MagazineItem extends Item {
       return this;
     }
 
-    public Properties setModel(
-        Pair<Supplier<DistExecutor.SafeCallable<Model>>, ResourceLocation> model) {
-      this.model = model;
+    public Properties setCustomTexture(boolean customTexture) {
+      this.customTexture = customTexture;
       return this;
     }
   }

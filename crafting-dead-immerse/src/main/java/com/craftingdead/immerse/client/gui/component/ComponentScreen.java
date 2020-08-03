@@ -21,9 +21,9 @@ public class ComponentScreen extends Screen implements IFramebufferResizeListene
   @Override
   protected void init() {
     double mouseX = this.minecraft.mouseHelper.getMouseX() * (double) this.width
-        / (double) this.minecraft.getWindow().getWidth();
+        / (double) this.minecraft.getMainWindow().getWidth();
     double mouseY = this.minecraft.mouseHelper.getMouseY() * (double) this.height
-        / (double) this.minecraft.getWindow().getHeight();
+        / (double) this.minecraft.getMainWindow().getHeight();
     this.root.mouseMoved(mouseX, mouseY);
   }
 

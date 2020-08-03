@@ -44,8 +44,8 @@ public class BlurComponent extends Component<BlurComponent> {
         RenderUtil.updateUniform("Radius", this.radius, this.blurShader);
       }
       this.blurShader
-          .createBindFramebuffers(this.minecraft.getWindow().getFramebufferWidth(),
-              this.minecraft.getWindow().getFramebufferHeight());
+          .createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
+              this.minecraft.getMainWindow().getFramebufferHeight());
     } catch (JsonSyntaxException | IOException ioexception) {
       logger.warn("Failed to load shader: {}", BLUR_SHADER, ioexception);
       this.blurShader = null;
@@ -67,15 +67,15 @@ public class BlurComponent extends Component<BlurComponent> {
   protected void resized() {
     if (this.blurShader != null) {
       this.blurShader
-          .createBindFramebuffers(this.minecraft.getWindow().getFramebufferWidth(),
-              this.minecraft.getWindow().getFramebufferHeight());
+          .createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
+              this.minecraft.getMainWindow().getFramebufferHeight());
     }
   }
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
-    final double scale = this.minecraft.getWindow().getGuiScaleFactor();
+    final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
     GL11
         .glScissor((int) (this.getX() * scale), (int) ((this.getY() * scale)),

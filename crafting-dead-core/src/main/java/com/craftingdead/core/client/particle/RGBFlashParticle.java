@@ -27,10 +27,10 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
   }
 
   @Override
-  public void buildGeometry(IVertexBuilder vertexBuilder, ActiveRenderInfo activeRenderInfo,
+  public void renderParticle(IVertexBuilder vertexBuilder, ActiveRenderInfo activeRenderInfo,
       float partialTicks) {
     this.setAlphaF(0.6F - ((float) this.age + partialTicks - 1.0F) * 0.25F * 0.5F);
-    super.buildGeometry(vertexBuilder, activeRenderInfo, partialTicks);
+    super.renderParticle(vertexBuilder, activeRenderInfo, partialTicks);
   }
 
   @Override

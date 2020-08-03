@@ -1,0 +1,6 @@
+{
+	"loader": "forge:obj",
+	"model": "craftingdead:models/magazine/ak47_30_round_magazine.obj",
+	"flip-v": true,
+	"ambientToFullbright": false
+}

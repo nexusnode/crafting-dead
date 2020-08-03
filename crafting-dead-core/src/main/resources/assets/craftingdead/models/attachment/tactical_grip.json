@@ -1,0 +1,162 @@
+{
+	"elements": [
+		{
+			"__comment": "Shape2",
+			"from": [
+				4,
+				16,
+				8
+			],
+			"to": [
+				6,
+				23,
+				10
+			],
+			"faces": {
+				"down": {
+					"uv": [
+						1.5,
+						0,
+						1,
+						0.5
+					],
+					"texture": "#all"
+				},
+				"up": {
+					"uv": [
+						1,
+						0.5,
+						0.5,
+						0
+					],
+					"texture": "#all"
+				},
+				"north": {
+					"uv": [
+						0.5,
+						0.5,
+						1,
+						2.25
+					],
+					"texture": "#all"
+				},
+				"south": {
+					"uv": [
+						1.5,
+						0.5,
+						2,
+						2.25
+					],
+					"texture": "#all"
+				},
+				"west": {
+					"uv": [
+						1,
+						0.5,
+						1.5,
+						2.25
+					],
+					"texture": "#all"
+				},
+				"east": {
+					"uv": [
+						0,
+						0.5,
+						0.5,
+						2.25
+					],
+					"texture": "#all"
+				}
+			}
+		},
+		{
+			"__comment": "Shape1",
+			"from": [
+				2,
+				23,
+				7.5
+			],
+			"to": [
+				8,
+				24,
+				10.5
+			],
+			"faces": {
+				"down": {
+					"uv": [
+						3.75,
+						0,
+						2.25,
+						0.75
+					],
+					"texture": "#all"
+				},
+				"up": {
+					"uv": [
+						2.25,
+						0.75,
+						0.75,
+						0
+					],
+					"texture": "#all"
+				},
+				"north": {
+					"uv": [
+						0.75,
+						0.75,
+						2.25,
+						1
+					],
+					"texture": "#all"
+				},
+				"south": {
+					"uv": [
+						3,
+						0.75,
+						4.5,
+						1
+					],
+					"texture": "#all"
+				},
+				"west": {
+					"uv": [
+						2.25,
+						0.75,
+						3,
+						1
+					],
+					"texture": "#all"
+				},
+				"east": {
+					"uv": [
+						0,
+						0.75,
+						0.75,
+						1
+					],
+					"texture": "#all"
+				}
+			}
+		}
+	],
+	"textures": {
+		"all": "craftingdead:attachment/tactical_grip"
+	},
+	"transform": {
+		"scale": [
+			0.8,
+			0.8,
+			0.8
+		],
+		"rotation": [
+			0,
+			180,
+			0
+		],
+		"translation": [
+			-1.4,
+			0.04,
+			-1.4
+		]
+	}
+}

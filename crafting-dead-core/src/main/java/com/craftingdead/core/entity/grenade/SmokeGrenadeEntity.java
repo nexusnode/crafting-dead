@@ -66,7 +66,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
             Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
                 / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
         float gradualPitch = MathHelper.lerp(1F - progress, 0.5F, 1.7F);
-        this.world.playSound(this.getX(), this.getY(), this.getZ(),
+        this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
             SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1.5F, gradualPitch, false);
       }
 
@@ -81,8 +81,8 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
               radius * Math.abs(Math.sin(phi) * Math.sin(theta)) * this.rand.nextDouble();
           double extraZ = radius * Math.cos(phi);
 
-          this.world.addParticle(LARGE_WHITE_SMOKE, true, this.getX() + extraX,
-              this.getY() + extraY, this.getZ() + extraZ, 0, 0, 0);
+          this.world.addParticle(LARGE_WHITE_SMOKE, true, this.getPosX() + extraX,
+              this.getPosY() + extraY, this.getPosZ() + extraZ, 0, 0, 0);
         }
       }
     } else {
@@ -94,8 +94,8 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
         BlockPos to = this.getPosition().add(detectionRadius, detectionRadius, detectionRadius);
         BlockPos.getAllInBox(from, to).forEach(blockPos -> {
 
-          double xDiff = this.getX() - blockPos.getX();
-          double zDiff = this.getZ() - blockPos.getZ();
+          double xDiff = this.getPosX() - blockPos.getX();
+          double zDiff = this.getPosZ() - blockPos.getZ();
           double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
 
           if (distance2D <= detectionRadius) {
