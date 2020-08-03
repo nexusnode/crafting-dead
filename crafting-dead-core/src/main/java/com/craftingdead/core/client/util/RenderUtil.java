@@ -1,13 +1,11 @@
 package com.craftingdead.core.client.util;
 
-import java.util.Random;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.CraftingDead;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -22,20 +20,15 @@ import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.ItemModelGenerator;
 import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderDefault;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
 
 public class RenderUtil {
 
@@ -236,37 +229,6 @@ public class RenderUtil {
     bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
     bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
     tessellator.draw();
-  }
-
-  public static void renderModel(IBakedModel model, ItemStack itemStack, MatrixStack matrixStack,
-      IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, 0xF000F0, OverlayTexture.NO_OVERLAY, matrixStack, vertexBuilder,
-        EmptyModelData.INSTANCE);
-  }
-
-  public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
-      MatrixStack matrixStack, IVertexBuilder vertexBuilder) {
-    renderModel(model, itemStack, lightmapCoord, OverlayTexture.NO_OVERLAY, matrixStack,
-        vertexBuilder, EmptyModelData.INSTANCE);
-  }
-
-  public static void renderModel(IBakedModel model, ItemStack itemStack, int lightmapCoord,
-      int overlayColour, MatrixStack matrixStack, IVertexBuilder vertexBuilder,
-      IModelData modelData) {
-    Random random = new Random();
-    for (Direction direction : Direction.values()) {
-      random.setSeed(42L);
-      minecraft
-          .getItemRenderer()
-          .renderQuads(matrixStack, vertexBuilder,
-              model.getQuads(null, direction, random, modelData), itemStack, lightmapCoord,
-              overlayColour);
-    }
-    random.setSeed(42L);
-    minecraft
-        .getItemRenderer()
-        .renderQuads(matrixStack, vertexBuilder,
-            model.getQuads(null, null, random, modelData), itemStack, lightmapCoord, overlayColour);
   }
 
   public static void bind(ResourceLocation resourceLocation) {

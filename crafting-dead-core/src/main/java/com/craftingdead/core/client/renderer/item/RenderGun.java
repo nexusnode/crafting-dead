@@ -164,7 +164,7 @@ public abstract class RenderGun implements IItemRenderer {
     matrixStack.translate(-0.5, -0.5F, -0.5F);
 
     if (thirdPerson) {
-      matrixStack.translate(-1F, 0, 0);
+      matrixStack.translate(-1F, 0, 0.5F);
       matrixStack.rotate(Vector3f.XP.rotationDegrees(50));
       matrixStack.rotate(Vector3f.YP.rotationDegrees(70));
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));

@@ -15,6 +15,10 @@ import com.craftingdead.core.client.renderer.item.AS50Renderer;
 import com.craftingdead.core.client.renderer.item.AWPRenderer;
 import com.craftingdead.core.client.renderer.item.DMRRenderer;
 import com.craftingdead.core.client.renderer.item.DesertEagleRenderer;
+import com.craftingdead.core.client.renderer.item.FNFALRenderer;
+import com.craftingdead.core.client.renderer.item.FiveSevenRenderer;
+import com.craftingdead.core.client.renderer.item.G18Renderer;
+import com.craftingdead.core.client.renderer.item.G36CRenderer;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -634,7 +638,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(FNFAL_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -643,7 +646,8 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> FNFALRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> ACR = ITEMS
@@ -784,13 +788,13 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(G36C_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> G36CRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
@@ -924,11 +928,11 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M1911_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> G18 = ITEMS
@@ -945,12 +949,12 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(G18_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> G18Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M9 = ITEMS
@@ -966,10 +970,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(M9_MAGAZINE)
-
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS
@@ -1004,11 +1008,11 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(P250_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MAGNUM = ITEMS
@@ -1023,9 +1027,9 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(MAGNUM_MAGAZINE)
-
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> FN57 = ITEMS
@@ -1041,10 +1045,10 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.FN57_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .setDefaultMagazine(FN57_MAGAZINE)
-
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> FiveSevenRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================

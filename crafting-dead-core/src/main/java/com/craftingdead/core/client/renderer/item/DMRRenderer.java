@@ -90,8 +90,7 @@ public class DMRRenderer extends RenderGun {
   }
 
   @Override
-  protected void renderIronSights(LivingEntity livingEntity, IGun gun,
-      MatrixStack matrixStack,
+  protected void renderIronSights(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
