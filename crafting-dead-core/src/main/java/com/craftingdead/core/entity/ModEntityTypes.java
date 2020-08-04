@@ -17,13 +17,16 @@ import com.craftingdead.core.entity.monster.GiantZombieEntity;
 import com.craftingdead.core.entity.monster.PoliceZombieEntity;
 import com.craftingdead.core.entity.monster.TankZombieEntity;
 import com.craftingdead.core.entity.monster.WeakZombieEntity;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModEntityTypes {
 
@@ -163,6 +166,15 @@ public class ModEntityTypes {
 
     supplyDrop = add("supply_drop", EntityType.Builder
         .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
+
+    ForgeRegistries.BIOMES.getValues().stream()
+        .filter(biome -> biome.getSpawns(EntityClassification.MONSTER).stream()
+            .anyMatch(spawnList -> spawnList.entityType == EntityType.ZOMBIE))
+        .forEach(biome -> biome.getSpawns(EntityClassification.MONSTER)
+            .addAll(ImmutableSet.of(new Biome.SpawnListEntry(advancedZombie, 400, 2, 8),
+                new Biome.SpawnListEntry(fastZombie, 150, 2, 4),
+                new Biome.SpawnListEntry(tankZombie, 50, 2, 4),
+                new Biome.SpawnListEntry(weakZombie, 300, 2, 12))));
 
     // Spawn placement rules
     EntitySpawnPlacementRegistry

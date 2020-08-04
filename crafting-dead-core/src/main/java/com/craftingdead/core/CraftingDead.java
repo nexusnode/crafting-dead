@@ -29,7 +29,6 @@ import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
-import com.craftingdead.core.world.biome.ModBiomes;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -130,7 +129,6 @@ public class CraftingDead {
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::registerAll);
 
-    ModBiomes.BIOMES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     ModContainerTypes.CONTAINERS.register(modEventBus);
