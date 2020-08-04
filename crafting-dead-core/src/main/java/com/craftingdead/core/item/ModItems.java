@@ -19,6 +19,10 @@ import com.craftingdead.core.client.renderer.item.FNFALRenderer;
 import com.craftingdead.core.client.renderer.item.FiveSevenRenderer;
 import com.craftingdead.core.client.renderer.item.G18Renderer;
 import com.craftingdead.core.client.renderer.item.G36CRenderer;
+import com.craftingdead.core.client.renderer.item.HK417Renderer;
+import com.craftingdead.core.client.renderer.item.M107Renderer;
+import com.craftingdead.core.client.renderer.item.M1911Renderer;
+import com.craftingdead.core.client.renderer.item.M1GarandRenderer;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -690,7 +694,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(HK417_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -699,7 +702,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> HK417Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MPT55 = ITEMS
@@ -738,16 +742,14 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M1GARAND_MAGAZINE)
-
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> M1GarandRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  // TODO Reminder: Sporter22 uses two different iron sights at the same time.
-  // See RenderSporter.java (1.6.4)
   public static final RegistryObject<GunItem> SPORTER22 = ITEMS
       .register("sporter22",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
@@ -762,7 +764,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(SPORTER22_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -771,7 +772,8 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> AK47Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> G36C = ITEMS
@@ -931,7 +933,7 @@ public class ModItems {
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> M1911Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1153,8 +1155,6 @@ public class ModItems {
   // Sniper Rifles
   // ================================================================================
 
-  // TODO Reminder: M107 uses two different iron sights at the same time.
-  // See RenderM107.java (1.6.4)
   public static final RegistryObject<GunItem> M107 = ITEMS
       .register("m107",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
@@ -1168,7 +1168,6 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .setDefaultMagazine(M107_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -1178,7 +1177,8 @@ public class ModItems {
               .addAcceptedPaint(CANDY_APPLE_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> M107Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // TODO Reminder: AS50 uses two different iron sights at the same time.
