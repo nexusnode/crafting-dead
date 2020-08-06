@@ -2,8 +2,7 @@ package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.client.renderer.item.model.ModelPistolIS2;
-import com.craftingdead.core.client.renderer.item.model.ModelScarhIS1;
+import com.craftingdead.core.client.renderer.item.model.ModelScarhIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -16,29 +15,28 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class M107Renderer extends GunRenderer {
+public class MossbergRenderer extends GunRenderer {
 
-  private final Model ironSight1 = new ModelScarhIS1();
-  private final Model ironSight2 = new ModelPistolIS2();
+  private final Model ironSight = new ModelScarhIS2();
 
-  public M107Renderer() {
-    super(ModItems.M107);
+  public MossbergRenderer() {
+    super(ModItems.MOSSBERG);
   }
 
   @Override
   protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
+
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(77));
 
-    matrixStack.translate(0.5F, -0.75F, 0.35F);
+    matrixStack.translate(0.2F, -0.7F, 0.4F);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
+    matrixStack.translate(-0.2F, 0.55F, 0.0F);
 
-    matrixStack.translate(-0.4F, 0.55F, 0.0F);
-
-    float scale = 1.1F;
+    float scale = 1.2F;
     matrixStack.scale(scale, scale, scale);
   }
 
@@ -47,17 +45,17 @@ public class M107Renderer extends GunRenderer {
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.5F;
-    this.muzzleFlashY = -0.25F;
-    this.muzzleFlashZ = -2.7F;
+    this.muzzleFlashY = -0.13F;
+    this.muzzleFlashZ = -2.5F;
     this.muzzleScale = 2F;
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-40.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(-3.0F));
 
-    matrixStack.translate(0.3F, -0.2F, 0.15F);
+    matrixStack.translate(0.4F, -0.15F, 0.17F);
 
-    float scale = 0.85F;
+    float scale = 1F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(3.0F));
@@ -66,61 +64,41 @@ public class M107Renderer extends GunRenderer {
   @Override
   protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
+
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0.1F, -0.685F, 0.952F);
+    matrixStack.translate(-0F, -0.68F, 0.972F);
 
     if (!gun.hasIronSight()) {
-      matrixStack.translate(0.0F, 0.022F, 0.0F);
+
+      matrixStack.translate(0.0F, 0.017F, 0.0F);
     }
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    matrixStack.translate(0F, 0F, 0.0F);
   }
 
   @Override
   protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-    this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+    this.renderIronSight(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
 
-  private void renderIronSight1(MatrixStack matrixStack,
+  private void renderIronSight(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
-
-      float scale = 0.5F;
+      matrixStack.translate(1.4F, -0.13F, 0.0315F);
+      float scale = 0.49F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(1.2F, -0.5F, -0.145F);
-      scale = 0.75F;
-      matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-2F, 0.6F, -0.12F);
-
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
-          new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is1.png")));
-      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
-          1.0F, 1.0F);
-    }
-    matrixStack.pop();
-  }
-
-  private void renderIronSight2(MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
-    {
-      matrixStack.translate(1.35F, -0.075F, 0.0867F);
-      float scale = 0.25F;
-      matrixStack.scale(scale, scale + 0.5F, scale);
-
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
-          new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is2.png")));
-      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.getRenderType(
+          new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is2.png")));
+      this.ironSight.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
     matrixStack.pop();
@@ -129,13 +107,13 @@ public class M107Renderer extends GunRenderer {
   @Override
   protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
+
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
     matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
-
-    float scale = 0.65F;
+    float scale = 0.7F;
     matrixStack.scale(scale, scale, scale);
-    matrixStack.translate(-0.7F, 0.2F, 0.3F);
+    matrixStack.translate(-0.9F, 0.32F, 0.23F);
   }
 
   @Override
@@ -145,52 +123,9 @@ public class M107Renderer extends GunRenderer {
   @Override
   protected void applyAttachmentTransforms(LivingEntity livingEntity, AttachmentItem attachmentItem,
       MatrixStack matrixStack) {
-
-    if (attachmentItem == ModItems.LP_SCOPE.get()) {
-      matrixStack.translate(2D, -1.5D, 0.55D);
-      float scale = 0.6F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
-    if (attachmentItem == ModItems.HP_SCOPE.get()) {
-      matrixStack.translate(2D, -1.5D, 0.55D);
-      float scale = 0.6F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
-    if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
-      matrixStack.translate(1.5D, -0.66D, 0.505D);
-      float scale = 0.7F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
-    if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
-      matrixStack.translate(2D, -0.66D, 0.805D);
-      float scale = 0.45F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
-    if (attachmentItem == ModItems.SUPPRESSOR.get()) {
-      matrixStack.translate(22D, -0.55D, 1.5D);
-      float scale = 0.8F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
     if (attachmentItem == ModItems.TACTICAL_GRIP.get()) {
-      matrixStack.translate(11D, 1.4D, 1.35D);
-      float scale = 0.8F;
-      matrixStack.scale(scale, scale, scale);
-      return;
-    }
-
-    if (attachmentItem == ModItems.BIPOD.get()) {
-      matrixStack.translate(11D, 1.5D, 0.4D);
-      float scale = 0.85F;
+      matrixStack.translate(9D, 1D, 1D);
+      float scale = 0.6F;
       matrixStack.scale(scale, scale, scale);
       return;
     }
@@ -208,7 +143,7 @@ public class M107Renderer extends GunRenderer {
 
   @Override
   protected void applySprintingTransforms(MatrixStack matrixStack) {
-    super.applySprintingTransforms(matrixStack);
-    matrixStack.translate(0.0F, 0.0F, -0.4F);
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
+    matrixStack.translate(0.5F, 0.0F, 0.1F);
   }
 }

@@ -6,6 +6,8 @@ import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.EntityComponent;
+import com.craftingdead.immerse.client.gui.component.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
 import com.craftingdead.immerse.client.gui.component.LabelComponent;
 import com.craftingdead.immerse.client.gui.component.PanoramaComponent;
@@ -13,6 +15,9 @@ import com.craftingdead.immerse.client.gui.component.RectangleComponent;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
@@ -134,6 +139,15 @@ public class MenuScreen extends ComponentScreen {
                 .setCentre(true)
                 .addHoverAnimation(Component.X_SCALE, new float[] {2.0F}, 150.0F)
                 .addHoverAnimation(Component.Y_SCALE, new float[] {2.0F}, 150.0F));
+
+    FakePlayerEntity fakePlayerEntity = new FakePlayerEntity(mc.getSession().getProfile());
+    fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.BOW));
+    this.getRoot().addChild(
+        new EntityComponent(fakePlayerEntity)
+            .setXPercent(0.75F)
+            .setYPercent(0.75F)
+            .setScale(10.0F)
+            .setCentre(true));
 
     this.getRoot().addChild(sideBar);
   }

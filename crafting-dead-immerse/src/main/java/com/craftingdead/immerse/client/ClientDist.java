@@ -9,7 +9,6 @@ import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.screen.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
-import com.craftingdead.immerse.client.util.IFramebufferResizeListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
@@ -18,6 +17,7 @@ import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -33,14 +33,23 @@ public class ClientDist implements IModDist {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private static final Minecraft minecraft = Minecraft.getInstance();
+  private final Minecraft minecraft;
 
-  private final TransitionManager transitionManager =
-      new TransitionManager(minecraft, Transitions.GROW);
+  private final TransitionManager transitionManager;
+
+  private float lastTime = 0F;
+
+  private float deltaTime;
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
+    this.minecraft = Minecraft.getInstance();
+    this.transitionManager = new TransitionManager(minecraft, Transitions.GROW);
+  }
+
+  public float getDeltaTime() {
+    return this.deltaTime;
   }
 
   // ================================================================================
@@ -122,13 +131,27 @@ public class ClientDist implements IModDist {
                 event.getRenderPartialTicks(), event.getGui()));
   }
 
-  // ================================================================================
-  // ASM Hooks
-  // ================================================================================
+  @SubscribeEvent
+  public void handleClientTick(TickEvent.ClientTickEvent event) {
+    switch (event.phase) {
+      case START:
+        this.lastTime = (float) Math.ceil(this.lastTime);
+        break;
+      default:
+        break;
+    }
+  }
 
-  public static void framebufferResized() {
-    if (minecraft.currentScreen instanceof IFramebufferResizeListener) {
-      ((IFramebufferResizeListener) minecraft.currentScreen).framebufferResized();
+  @SubscribeEvent
+  public void handleRenderTick(TickEvent.RenderTickEvent event) {
+    switch (event.phase) {
+      case START:
+        float currentTime = (float) Math.floor(this.lastTime) + event.renderTickTime;
+        this.deltaTime = (currentTime - this.lastTime) * 50;
+        this.lastTime = currentTime;
+        break;
+      default:
+        break;
     }
   }
 }

@@ -16,7 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class G18Renderer extends RenderGun {
+public class G18Renderer extends GunRenderer {
 
   private final Model ironSight1 = new ModelPistolIS1();
   private final Model ironSight2 = new ModelPistolIS2();
@@ -26,7 +26,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunThirdPerson(LivingEntity livingEntity, IGun gun,
+  protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.translate(0.0F, 0.0F, -0.05F);
@@ -44,7 +44,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunFirstPerson(PlayerEntity playerEntity, IGun gun,
+  protected void applyFirstPersonTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.5F;
@@ -62,7 +62,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunFirstPersonAiming(PlayerEntity playerEntity, IGun gun,
+  protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
@@ -80,7 +80,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderIronSights(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
@@ -123,7 +123,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunOnPlayerBack(LivingEntity livingEntity, IGun gun,
+  protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
@@ -136,7 +136,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunAmmo(LivingEntity livingEntity, ItemStack itemStack,
+  protected void applyMagazineTransforms(LivingEntity livingEntity, ItemStack itemStack,
       MatrixStack matrixStack) {
 
     if (itemStack.getItem() == ModItems.G18_MAGAZINE.get()) {
@@ -152,7 +152,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunAttachment(LivingEntity livingEntity, AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(LivingEntity livingEntity, AttachmentItem attachmentItem,
       MatrixStack matrixStack) {
 
     if (attachmentItem == ModItems.SUPPRESSOR.get()) {
@@ -169,7 +169,7 @@ public class G18Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderHandLocation(PlayerEntity playerEntity, IGun gun,
+  protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     matrixStack.translate(0.02F, 0.04F, -0.12F);
     if (rightHand) {

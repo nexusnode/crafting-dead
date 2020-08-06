@@ -21,16 +21,4 @@ public class RectangleComponent extends Component<RectangleComponent> {
         .fill(this.getX(), this.getY(), this.getX() + this.getWidth(),
             this.getY() + this.getHeight(), this.colour.getHexColour());
   }
-
-  @Override
-  protected void added() {}
-
-  @Override
-  protected void removed() {}
-
-  @Override
-  public void tick() {}
-
-  @Override
-  protected void resized() {}
 }

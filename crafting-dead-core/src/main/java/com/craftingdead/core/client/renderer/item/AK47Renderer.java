@@ -16,7 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class AK47Renderer extends RenderGun {
+public class AK47Renderer extends GunRenderer {
 
   private final Model ironSight1 = new ModelAKMIS1();
   private final Model ironSight2 = new ModelAKMIS2();
@@ -26,7 +26,7 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunThirdPerson(LivingEntity livingEntity, IGun gun,
+  protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15));
@@ -43,7 +43,7 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunFirstPerson(PlayerEntity entityplayer, IGun gun,
+  protected void applyFirstPersonTransforms(PlayerEntity entityplayer, IGun gun,
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.1F;
@@ -62,7 +62,7 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunFirstPersonAiming(PlayerEntity playerEntity, IGun gun,
+  protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.translate(0F, 0F, -0.002F);
@@ -93,15 +93,51 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderIronSights(LivingEntity livingEntity, IGun gun,
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
 
+  private void renderIronSight1(MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+    matrixStack.push();
+    {
+      float scale = 1.1F;
+      matrixStack.scale(scale, scale, scale);
+      matrixStack.translate(-3.2F, -0.48F, 0.02F);
+
+      IVertexBuilder vertexBuilder =
+          renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
+              new ResourceLocation(CraftingDead.ID, "textures/attachment/akm_is1.png")));
+      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+          1.0F, 1.0F);
+    }
+    matrixStack.pop();
+  }
+
+  private void renderIronSight2(MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+    matrixStack.push();
+    {
+      matrixStack.translate(0.7F, -0.6F, 0.01F);
+
+      float scale = 0.85F;
+      matrixStack.scale(scale, scale, scale);
+
+      IVertexBuilder vertexBuilder =
+          renderTypeBuffer
+              .getBuffer(this.ironSight2.getRenderType(new ResourceLocation(CraftingDead.ID,
+                  "textures/attachment/akm_is2.png")));
+      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+          1.0F, 1.0F);
+    }
+    matrixStack.pop();
+  }
+
   @Override
-  protected void renderGunOnPlayerBack(LivingEntity livingEntity, IGun gun,
+  protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
     matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
@@ -113,11 +149,11 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  protected void renderGunAmmo(LivingEntity livingEntity, ItemStack itemStack,
+  protected void applyMagazineTransforms(LivingEntity livingEntity, ItemStack itemStack,
       MatrixStack matrixStack) {}
 
   @Override
-  protected void renderGunAttachment(LivingEntity livingEntity, AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(LivingEntity livingEntity, AttachmentItem attachmentItem,
       MatrixStack matrixStack) {
 
     if (attachmentItem == ModItems.LP_SCOPE.get()) {
@@ -170,7 +206,7 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  public void renderHandLocation(PlayerEntity playerEntity, IGun gun,
+  public void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     if (rightHand) {
       matrixStack.translate(-0.1F, -0.23F, -0.3F);
@@ -180,46 +216,8 @@ public class AK47Renderer extends RenderGun {
   }
 
   @Override
-  public void renderWhileSprinting(MatrixStack matrixStack) {
+  public void applySprintingTransforms(MatrixStack matrixStack) {
     matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
     matrixStack.translate(4F, 0.8F, 2.5F);
-  }
-
-  private void renderIronSight1(MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
-    {
-      float scale = 1.1F;
-      matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-3.2F, -0.48F, 0.02F);
-
-      IVertexBuilder vertexBuilder =
-          renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
-              new ResourceLocation(CraftingDead.ID, "textures/attachment/akm_is1.png")));
-      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
-          1.0F,
-          1.0F);
-    }
-    matrixStack.pop();
-  }
-
-  private void renderIronSight2(MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
-    {
-      matrixStack.translate(0.7F, -0.6F, 0.01F);
-
-      float scale = 0.85F;
-      matrixStack.scale(scale, scale, scale);
-
-      IVertexBuilder vertexBuilder =
-          renderTypeBuffer
-              .getBuffer(this.ironSight2.getRenderType(new ResourceLocation(CraftingDead.ID,
-                  "textures/attachment/akm_is2.png")));
-      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
-          1.0F,
-          1.0F);
-    }
-    matrixStack.pop();
   }
 }

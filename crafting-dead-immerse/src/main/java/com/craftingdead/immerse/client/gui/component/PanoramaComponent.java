@@ -37,16 +37,4 @@ public class PanoramaComponent extends Component<PanoramaComponent> {
             128);
     RenderSystem.disableBlend();
   }
-
-  @Override
-  protected void added() {}
-
-  @Override
-  protected void removed() {}
-
-  @Override
-  protected void tick() {}
-
-  @Override
-  protected void resized() {}
 }

@@ -18,7 +18,7 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
-import com.craftingdead.core.client.renderer.item.RenderGun;
+import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -98,7 +98,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   private final Set<Supplier<AttachmentItem>> defaultAttachments;
 
-  private final RenderGun renderer;
+  private final GunRenderer renderer;
 
   public GunItem(Properties properties) {
     super(properties);
@@ -201,7 +201,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   }
 
   @Override
-  public RenderGun getRenderer() {
+  public GunRenderer getRenderer() {
     return this.renderer;
   }
 
@@ -387,7 +387,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
 
-    private Supplier<DistExecutor.SafeCallable<RenderGun>> rendererFactory;
+    private Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -478,7 +478,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     }
 
     public Properties setRendererFactory(
-        Supplier<DistExecutor.SafeCallable<RenderGun>> rendererFactory) {
+        Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory) {
       this.rendererFactory = rendererFactory;
       return this;
     }

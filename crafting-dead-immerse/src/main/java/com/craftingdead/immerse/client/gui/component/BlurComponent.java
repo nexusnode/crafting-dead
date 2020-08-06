@@ -60,10 +60,6 @@ public class BlurComponent extends Component<BlurComponent> {
   }
 
   @Override
-  protected void tick() {}
-
-
-  @Override
   protected void resized() {
     if (this.blurShader != null) {
       this.blurShader

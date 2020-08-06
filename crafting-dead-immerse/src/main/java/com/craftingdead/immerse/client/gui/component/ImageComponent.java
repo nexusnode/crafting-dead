@@ -37,16 +37,4 @@ public class ImageComponent extends Component<ImageComponent> {
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.disableBlend();
   }
-
-  @Override
-  protected void added() {}
-
-  @Override
-  protected void removed() {}
-
-  @Override
-  public void tick() {}
-
-  @Override
-  protected void resized() {}
 }

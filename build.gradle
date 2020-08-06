@@ -4,11 +4,15 @@ buildscript {
         	name 'forge'
         	url 'https://files.minecraftforge.net/maven'
 		}
+		maven {
+			name 'sponge'
+			url 'https://dist.creeper.host/Sponge/maven'
+		}
         jcenter()
-        mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 
@@ -17,9 +21,9 @@ plugins {
 	id 'eclipse'
 }
 
-
 subprojects {
     apply plugin: 'net.minecraftforge.gradle'
+    apply plugin: 'org.spongepowered.mixin'
 
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -31,8 +35,17 @@ subprojects {
     	mappings channel: "${mappings_channel}", version: "${mappings_version}"
     }
     
+    repositories {
+	    jcenter()
+	    maven {
+	    	name 'sponge'
+	    	url 'https://dist.creeper.host/Sponge/maven'
+		}
+	}
+    
     dependencies {
     	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
+		implementation group: 'org.spongepowered', name: 'mixin', version: '0.8.1-SNAPSHOT'
 	}
 	
 	jar.finalizedBy('reobfJar') 
@@ -46,12 +59,4 @@ subprojects {
 	        ])
 	    }
 	}
-}
-
-repositories {
-    jcenter()
-    maven {
-        name 'tterrag'
-        url 'https://maven.tterrag.com'
-    }
 }

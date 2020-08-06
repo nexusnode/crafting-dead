@@ -1,1 +1,0 @@
-MixinConnector: com.craftingdead.core.MixinConnector

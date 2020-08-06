@@ -54,16 +54,9 @@ public class LabelComponent extends Component<LabelComponent> {
     }
     RenderSystem.popMatrix();
   }
-
+  
   @Override
-  protected void added() {}
-
-  @Override
-  protected void removed() {}
-
-  @Override
-  public void tick() {}
-
-  @Override
-  protected void resized() {}
+  protected boolean overrideSize() {
+    return true;
+  }
 }

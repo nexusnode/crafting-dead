@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "package": "com.craftingdead.immerse.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "refmap": "craftingdeadimmerse.refmap.json",
+    "mixins": [
+        "GameRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

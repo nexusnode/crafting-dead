@@ -5,6 +5,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.ClientDist;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
 import io.noties.tumbleweed.TweenType;
@@ -24,15 +26,20 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     implements IRenderable, IGuiEventListener {
 
   public static final TweenType<Component<?>> X_SCALE =
-      new SimpleTweenType<Component<?>>(1, t -> new float[] {t.xScale}, (t, v) -> t.xScale = v[0]);
+      new SimpleTweenType<>(1, t -> new float[] {t.xScale}, (t, v) -> t.xScale = v[0]);
   public static final TweenType<Component<?>> Y_SCALE =
-      new SimpleTweenType<Component<?>>(1, t -> new float[] {t.yScale}, (t, v) -> t.yScale = v[0]);
-  public static final TweenType<Component<?>> X_TRANSLATION = new SimpleTweenType<Component<?>>(1,
+      new SimpleTweenType<>(1, t -> new float[] {t.yScale}, (t, v) -> t.yScale = v[0]);
+  public static final TweenType<Component<?>> X_TRANSLATION = new SimpleTweenType<>(1,
       t -> new float[] {t.xTranslation}, (t, v) -> t.xTranslation = v[0]);
-  public static final TweenType<Component<?>> Y_TRANSLATION = new SimpleTweenType<Component<?>>(1,
+  public static final TweenType<Component<?>> Y_TRANSLATION = new SimpleTweenType<>(1,
       t -> new float[] {t.yTranslation}, (t, v) -> t.yTranslation = v[0]);
 
-  private final MainWindow window = Minecraft.getInstance().getMainWindow();
+  protected final Minecraft minecraft = Minecraft.getInstance();
+
+  protected final MainWindow mainWindow = this.minecraft.getMainWindow();
+
+  protected final ClientDist clientDist =
+      (ClientDist) CraftingDeadImmerse.getInstance().getModDist();
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 
@@ -41,9 +48,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   private Supplier<Double> xFactory = () -> 0.0D;
   private Supplier<Double> yFactory = () -> 0.0D;
   private Supplier<Double> widthFactory =
-      () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth());
+      () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth());
   private Supplier<Double> heightFactory =
-      () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight());
+      () -> this.parent.map(Component::getHeight)
+          .orElse((double) this.mainWindow.getScaledHeight());
 
   private boolean centre;
 
@@ -60,18 +68,30 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private boolean wasMouseOver;
 
-  protected abstract void added();
+  private float lastTime = 0F;
 
-  protected abstract void removed();
+  protected void added() {
+    if (this.overrideSize()) {
+      if (!this.getBestWidth().isPresent() || !this.getBestHeight().isPresent()) {
+        throw new IllegalStateException(
+            "A preferred width and height must be specified for size override");
+      }
+      this.setAutoWidth().setAutoHeight();
+    }
+  }
 
-  protected abstract void tick();
+  protected void removed() {}
 
-  protected abstract void resized();
+  protected void tick() {}
+
+  protected void resized() {}
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
-    final float delta = partialTicks * 50;
-    this.tweenManager.update(delta);
+    float currentTime = this.lastTime + partialTicks;
+    float deltaTime = (currentTime - this.lastTime) * 50;
+    this.lastTime = currentTime;
+    this.tweenManager.update(deltaTime);
   }
 
   protected void mouseEntered() {
@@ -205,7 +225,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public SELF setXPercent(float xPercent) {
     this.xFactory =
-        () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth())
+        () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth())
             * xPercent;
     return this.self();
   }
@@ -223,24 +243,27 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public SELF setYPercent(float yPercent) {
     this.yFactory =
-        () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight())
+        () -> this.parent.map(Component::getHeight)
+            .orElse((double) this.mainWindow.getScaledHeight())
             * yPercent;
     return this.self();
   }
 
   public double getWidth() {
     double width = this.widthFactory.get() * this.xScale;
-    return this.scaleWidth ? width : width / this.window.getGuiScaleFactor();
+    return this.scaleWidth ? width : width / this.mainWindow.getGuiScaleFactor();
   }
 
   public SELF setWidth(int width) {
+    this.checkOverrideSize();
     this.widthFactory = () -> (double) width;
     return this.self();
   }
 
   public SELF setWidthPercent(float widthPercent) {
+    this.checkOverrideSize();
     this.widthFactory =
-        () -> this.parent.map(Component::getWidth).orElse((double) this.window.getScaledWidth())
+        () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth())
             * widthPercent;
     return this.self();
   }
@@ -252,17 +275,20 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public double getHeight() {
     double height = this.heightFactory.get() * this.yScale;
-    return this.scaleHeight ? height : height / this.window.getGuiScaleFactor();
+    return this.scaleHeight ? height : height / this.mainWindow.getGuiScaleFactor();
   }
 
   public SELF setHeight(int height) {
+    this.checkOverrideSize();
     this.heightFactory = () -> (double) height;
     return this.self();
   }
 
   public SELF setHeightPercent(float heightPercent) {
+    this.checkOverrideSize();
     this.heightFactory =
-        () -> this.parent.map(Component::getHeight).orElse((double) this.window.getScaledHeight())
+        () -> this.parent.map(Component::getHeight)
+            .orElse((double) this.mainWindow.getScaledHeight())
             * heightPercent;
     return this.self();
   }
@@ -291,8 +317,22 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.xScale;
   }
 
+  public SELF setXScale(float xScale) {
+    this.xScale = xScale;
+    return this.self();
+  }
+
   public float getYScale() {
     return this.yScale;
+  }
+
+  public SELF setYScale(float yScale) {
+    this.yScale = yScale;
+    return this.self();
+  }
+
+  public SELF setScale(float scale) {
+    return this.setXScale(scale).setYScale(scale);
   }
 
   protected Optional<Double> getBestWidth() {
@@ -301,6 +341,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   protected Optional<Double> getBestHeight() {
     return Optional.empty();
+  }
+
+  private void checkOverrideSize() {
+    if (this.overrideSize()) {
+      throw new UnsupportedOperationException("Component not resizable");
+    }
+  }
+
+  protected boolean overrideSize() {
+    return false;
   }
 
   public TweenManager getTweenManager() {
