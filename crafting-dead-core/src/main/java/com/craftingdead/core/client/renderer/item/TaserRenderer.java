@@ -10,9 +10,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-public class RenderTaser extends GunRenderer {
+public class TaserRenderer extends GunRenderer {
 
-  public RenderTaser() {
+  public TaserRenderer() {
     super(ModItems.TASER);
   }
 
@@ -63,8 +63,9 @@ public class RenderTaser extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {}
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {}
 
   @Override
   protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,

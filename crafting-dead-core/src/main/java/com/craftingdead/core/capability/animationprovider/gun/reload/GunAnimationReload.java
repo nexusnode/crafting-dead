@@ -4,6 +4,7 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
@@ -11,7 +12,7 @@ public class GunAnimationReload extends GunAnimation {
 
   protected float rotation1 = 0F;
   protected float lastRotation1 = 0F;
-  protected float maxRotation1 = 55;
+  protected float maxRotation1 = 20;
 
   protected float trans1 = -1F;
   protected float lastTrans1 = 0F;
@@ -41,14 +42,14 @@ public class GunAnimationReload extends GunAnimation {
 
   @Override
   public void onUpdate(Minecraft par1, LivingEntity par2, ItemStack par3, float progress) {
-    if (progress >= 2 / 3) {
+    if (progress >= 2.0F / 3.0F) {
       up = false;
     }
 
     lastRotation1 = rotation1;
     lastTrans1 = trans1;
 
-    float roation1Speed = 10F;
+    float roation1Speed = 5F;
     float transSpeed = 0.1F;
 
     if (this.ejectingClip) {
@@ -103,7 +104,8 @@ public class GunAnimationReload extends GunAnimation {
   }
 
   @Override
-  public void doRenderHand(ItemStack par1, float partialTicks, boolean rightHand, MatrixStack matrixStack) {
+  public void doRenderHand(ItemStack par1, float partialTicks, boolean rightHand,
+      MatrixStack matrixStack) {
     if (rightHand) {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * partialTicks);
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 0.4F));
@@ -111,5 +113,12 @@ public class GunAnimationReload extends GunAnimation {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * partialTicks;
       matrixStack.translate(-transprogress, transprogress, transprogress);
     }
+  }
+
+  @Override
+  protected boolean isAcceptedTransformType(ItemCameraTransforms.TransformType transformType) {
+    return (transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND
+        || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND) ? false
+            : super.isAcceptedTransformType(transformType);
   }
 }

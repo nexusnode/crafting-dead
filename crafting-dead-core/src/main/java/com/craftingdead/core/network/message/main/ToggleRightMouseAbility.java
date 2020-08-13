@@ -8,23 +8,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ToggleAimingMessage {
+public class ToggleRightMouseAbility {
 
   private final int entityId;
 
-  public ToggleAimingMessage(int entityId) {
+  public ToggleRightMouseAbility(int entityId) {
     this.entityId = entityId;
   }
 
-  public static void encode(ToggleAimingMessage msg, PacketBuffer out) {
+  public static void encode(ToggleRightMouseAbility msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
   }
 
-  public static ToggleAimingMessage decode(PacketBuffer in) {
-    return new ToggleAimingMessage(in.readVarInt());
+  public static ToggleRightMouseAbility decode(PacketBuffer in) {
+    return new ToggleRightMouseAbility(in.readVarInt());
   }
 
-  public static boolean handle(ToggleAimingMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ToggleRightMouseAbility msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
@@ -35,7 +35,7 @@ public class ToggleAimingMessage {
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
                   .ifPresent(gun -> gun
-                      .toggleAiming(living,
+                      .toggleRightMouseAction(living,
                           ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;

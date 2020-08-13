@@ -6,16 +6,11 @@
 	"textures": {
 		"base": "craftingdead:gun/acr"
 	},
-	"transform": {
-		"rotation": [
+	"transforms": {
+		"scale": [
+			-1,
 			0,
-			-180,
 			0
-		],
-		"translation": [
-			-2,
-			1.45,
-			-2
 		]
 	}
 }

@@ -16,12 +16,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderScarh extends GunRenderer {
+public class ScarhRenderer extends GunRenderer {
 
   private final Model ironSight1 = new ModelScarhIS1();
   private final Model ironSight2 = new ModelScarhIS2();
 
-  public RenderScarh() {
+  public ScarhRenderer() {
     super(ModItems.SCARH);
   }
 
@@ -85,8 +85,9 @@ public class RenderScarh extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }

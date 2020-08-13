@@ -27,9 +27,7 @@ subprojects {
 
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
-    group = 'com.craftingdead.mod'
-    version = '0.0.0.1'
-	archivesBaseName = project.name
+    group = 'com.craftingdead'
 	
 	minecraft {
     	mappings channel: "${mappings_channel}", version: "${mappings_version}"
@@ -58,5 +56,17 @@ subprojects {
 	            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 	        ])
 	    }
+	    baseName = project.name
+	    appendix = minecraft_version
+	}
+	
+	sourceSets {
+	    main {
+	        ext.refMap = "raftingdead.refmap.json"
+	    }
+	}
+	
+	mixin {
+    	add sourceSets.main, "craftingdead.refmap.json"
 	}
 }

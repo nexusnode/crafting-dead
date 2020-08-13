@@ -65,12 +65,12 @@ public class MAC10Renderer extends GunRenderer {
   @Override
   protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
-
+    
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-30));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0F, -0.695F, 0.9525F);
+    matrixStack.translate(0, -0.625F, 0.9585F);
 
     if (!gun.hasIronSight()) {
 
@@ -82,8 +82,9 @@ public class MAC10Renderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
@@ -97,7 +98,7 @@ public class MAC10Renderer extends GunRenderer {
       matrixStack.scale(scale, scale, scale);
       scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-0.45F, -0.14F, -0.375F);
+      matrixStack.translate(-0.45F, -0.55F, -0.375F);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is1.png")));
@@ -111,7 +112,7 @@ public class MAC10Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.755F, -0.05F, 0.102F);
+      matrixStack.translate(0.755F, -0.1F, 0.102F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));

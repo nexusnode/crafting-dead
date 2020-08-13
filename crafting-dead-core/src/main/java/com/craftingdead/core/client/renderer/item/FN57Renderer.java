@@ -16,13 +16,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderVector extends GunRenderer {
+public class FN57Renderer extends GunRenderer {
 
   private final Model ironSight1 = new ModelPistolIS1();
   private final Model ironSight2 = new ModelPistolIS2();
 
-  public RenderVector() {
-    super(ModItems.VECTOR);
+  public FN57Renderer() {
+    super(ModItems.FN57);
   }
 
   @Override
@@ -35,11 +35,11 @@ public class RenderVector extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(78));
 
-    matrixStack.translate(0.0F, -0.28F, 0.35F);
+    matrixStack.translate(0.4F, -0.22F, 0.45F);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
 
-    float scale = 1.10F;
+    float scale = 0.3F;
     matrixStack.scale(scale, scale, scale);
   }
 
@@ -47,18 +47,17 @@ public class RenderVector extends GunRenderer {
   protected void applyFirstPersonTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
 
-    this.muzzleFlashX = 0.1F;
-    this.muzzleFlashY = 0F;
-    this.muzzleFlashZ = -1.9F;
-    this.muzzleScale = 1.2F;
+    this.muzzleFlashX = 0.5F;
+    this.muzzleFlashY = -0.3F;
+    this.muzzleFlashZ = -1.7F;
+    this.muzzleScale = 2F;
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-2));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.0F));
 
-    matrixStack.translate(0.5F, -0.27F, 0.12F);
+    matrixStack.translate(0.9F, -0.27F, 0.40F);
 
-    float scale = 0.9F;
+    float scale = 0.2F;
     matrixStack.scale(scale, scale, scale);
   }
 
@@ -67,30 +66,23 @@ public class RenderVector extends GunRenderer {
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(1F, -0.9F, 0.94F);
+    matrixStack.translate(0.1F, -0.7F, 1.003F);
 
     if (!gun.hasIronSight()) {
-
       matrixStack.translate(0.0F, 0.03F, 0.0F);
     }
 
-    float scale = 1.3F;
+    float scale = 0.1F;
     matrixStack.scale(scale, scale, scale);
-
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.8F));
-    matrixStack.translate(-0.4F, 0F, 0.0F);
-    matrixStack.translate(0F, 0.355F, 0F);
-    matrixStack.translate(0F, 0F, 0.001F);
   }
 
-
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
@@ -100,15 +92,16 @@ public class RenderVector extends GunRenderer {
     matrixStack.push();
     {
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
-      float scale = 0.5F;
+
+      float scale = 1.6F;
       matrixStack.scale(scale, scale, scale);
       scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-0.4F, -0.3F, -0.25F);
+      matrixStack.translate(2F, -0.25F, -0.09F);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
-          new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is1.png")));
+          new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is1.png")));
       this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
@@ -119,12 +112,13 @@ public class RenderVector extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.92F, -0.09F, 0.07F);
-      float scale = 0.25F;
+      matrixStack.translate(0.7F, -0.25F, 0.099F);
+      float scale = 0.9F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));
+
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
-          new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is2.png")));
+          new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is2.png")));
       this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
@@ -137,16 +131,27 @@ public class RenderVector extends GunRenderer {
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
     matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
-    float scale = 0.45F;
+
+    float scale = 0.15F;
     matrixStack.scale(scale, scale, scale);
-    matrixStack.translate(-1.0F, 0.4F, 0.4F);
+
+    matrixStack.translate(6F, -1F, -2F);
   }
 
   @Override
   protected void applyMagazineTransforms(LivingEntity livingEntity, ItemStack itemStack,
       MatrixStack matrixStack) {
 
+    if (itemStack.getItem() == ModItems.FN57_MAGAZINE.get()) {
+
+      matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-8));
+
+      matrixStack.translate(24F, 1F, -2F);
+
+      float scale = 0.9F;
+      matrixStack.scale(scale, scale, scale);
+    }
   }
 
   @Override
@@ -154,21 +159,8 @@ public class RenderVector extends GunRenderer {
       MatrixStack matrixStack) {
 
     if (attachmentItem == ModItems.SUPPRESSOR.get()) {
-      matrixStack.translate(16.5F, 0.0F, 1.32F);
-      float scale = 1F;
-      matrixStack.scale(scale, scale, scale);
-    }
-
-    if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
-      matrixStack.translate(1D, -0.68D, 0.19D);
-      float scale = 0.7F;
-      matrixStack.scale(scale, scale, scale);
-    }
-
-    if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
-
-      matrixStack.translate(2D, -0.65D, 0.48D);
-      float scale = 0.5F;
+      matrixStack.translate(19F, -0.3F, 1.8F);
+      float scale = 1.7F;
       matrixStack.scale(scale, scale, scale);
     }
   }
@@ -176,17 +168,17 @@ public class RenderVector extends GunRenderer {
   @Override
   protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
+    matrixStack.translate(0F, 0.02F, -0.12F);
     if (rightHand) {
-      matrixStack.translate(-0.01F, -0.0F, -0.3F);
+      matrixStack.translate(0.0F, 0.0F, 0.0F);
     } else {
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(15));
-      matrixStack.translate(0.05F, 0.15F, -0.2F);
+      matrixStack.translate(0.0F, 0.04F, 0.0F);
     }
   }
 
   @Override
   protected void applySprintingTransforms(MatrixStack matrixStack) {
     matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.7F, 0.0F, 0.2F);
+    matrixStack.translate(3F, 0F, 2F);
   }
 }

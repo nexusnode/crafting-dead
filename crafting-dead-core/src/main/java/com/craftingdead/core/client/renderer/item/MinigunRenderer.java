@@ -7,7 +7,6 @@ import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.Model;
@@ -15,14 +14,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 
 public class MinigunRenderer extends GunRenderer {
 
   private final Model barrelModel = new ModelMinigunBarrel();
 
   private float rotation = 0F;
-  private float lastRotation = 0F;
 
   public MinigunRenderer() {
     super(ModItems.MINIGUN);
@@ -85,23 +82,26 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    this.renderBarrel(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
+    if (gun.isPerformingRightMouseAction()) {
+      this.rotation += 15.0F;
+      if (this.rotation >= 360.0F) {
+        this.rotation = 0.0F;
+      }
+    }
+    this.renderBarrel(partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
 
-  private void renderBarrel(MatrixStack matrixStack,
+  private void renderBarrel(float partialTicks, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    this.lastRotation = this.rotation;
-    this.rotation = this.lastRotation + 50.0F;
     matrixStack.push();
     {
       final float x = 0.155F;
       final float y = 0.035F;
       matrixStack.translate(0, x, -y);
-      final float progress = MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(),
-          this.lastRotation, this.rotation);
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(progress));
+      matrixStack.rotate(Vector3f.XP.rotationDegrees(this.rotation));
       matrixStack.translate(0, -x, y);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.barrelModel
           .getRenderType(new ResourceLocation(CraftingDead.ID, "textures/gun/minigun.png")));

@@ -2,6 +2,8 @@ plugins {
 	id 'com.wynprice.cursemaven' version '2.1.5'
 }
 
+project.version = '0.0.0.1'
+
 repositories {
 	maven {
         name 'curseforge'
@@ -10,10 +12,29 @@ repositories {
 	google()
 }
 
+
+configurations {
+	implementation.extendsFrom shade
+}
+
 dependencies {
-    implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
+    shade group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation fg.deobf("curse.maven:travelers-backpack:${travelers_backpack_id}")
 }
+
+jar {
+	classifier = 'alpha'
+	into 'dependencies', {
+		from configurations.shade
+	}
+	manifest {
+	        attributes([
+	            "MixinConfigs": 'craftingdead.mixins.json'
+	        ])
+	    }
+}
+
+def dependenciesDirectoryName = 'dependencies'
 
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')

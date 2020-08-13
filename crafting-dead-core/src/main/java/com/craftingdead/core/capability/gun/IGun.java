@@ -7,7 +7,6 @@ import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.item.AttachmentItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface IGun
-    extends IScope, IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
+    extends IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
 
   void tick(ILiving<?> living, ItemStack itemStack);
 
@@ -33,7 +32,7 @@ public interface IGun
 
   ItemStack getMagazineStack();
 
-  void setMagazineStack(ItemStack stack);
+  void setMagazineStack(ItemStack magazineStack);
 
   int getMagazineSize();
 
@@ -61,7 +60,11 @@ public interface IGun
 
   boolean hasCrosshair();
 
-  void toggleAiming(ILiving<?> living, boolean sendUpdate);
+  boolean isPerformingRightMouseAction();
+
+  void toggleRightMouseAction(ILiving<?> living, boolean sendUpdate);
+
+  RightMouseActionTriggerType getRightMouseActionTriggerType();
 
   Set<? extends Item> getAcceptedMagazines();
 
@@ -71,7 +74,11 @@ public interface IGun
 
   boolean hasIronSight();
 
-  GunAnimation getAnimation(AnimationType animationType);
+  Optional<GunAnimation> getAnimation(AnimationType animationType);
 
-  boolean hasShotCountChanged();
+  int getShotCount();
+
+  public static enum RightMouseActionTriggerType {
+    HOLD, CLICK;
+  }
 }

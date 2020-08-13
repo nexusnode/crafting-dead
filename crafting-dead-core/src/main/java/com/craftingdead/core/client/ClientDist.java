@@ -9,6 +9,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.living.player.SelfPlayer;
 import com.craftingdead.core.capability.paint.IPaint;
@@ -385,6 +386,17 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
+        if (this.minecraft.isGamePaused()) {
+          this.getPlayer().ifPresent(player -> {
+            ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+              gun.setTriggerPressed(player, heldStack, false, true);
+              if (gun.isPerformingRightMouseAction()) {
+                gun.toggleRightMouseAction(player, true);
+              }
+            });
+          });
+        }
         // TODO SoundLoadEvent is not called upon initial startup - see
         // https://github.com/MinecraftForge/MinecraftForge/pull/6777
         if (!this.effectsManagerLoaded) {
@@ -443,6 +455,16 @@ public class ClientDist implements IModDist {
               event.setCanceled(true);
               gun.setTriggerPressed(player, heldStack, triggerPressed, true);
             }));
+      } else if (this.minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())) {
+        ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
+        this.getPlayer()
+            .ifPresent(player -> heldStack.getCapability(ModCapabilities.GUN)
+                .filter(gun -> gun
+                    .getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD)
+                .ifPresent(gun -> {
+                  event.setCanceled(true);
+                  gun.toggleRightMouseAction(player, true);
+                }));
       }
     }
   }
@@ -499,9 +521,9 @@ public class ClientDist implements IModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
-        this.ingameGui
-            .renderGameOverlay(event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                event.getWindow().getScaledHeight());
+        this.getPlayer().ifPresent(player -> this.ingameGui
+            .renderGameOverlay(player, event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                event.getWindow().getScaledHeight()));
         break;
       case CROSSHAIRS:
         this.getPlayer().ifPresent(player -> {
@@ -513,8 +535,7 @@ public class ClientDist implements IModDist {
                   || heldStack
                       .getCapability(ModCapabilities.SCOPE)
                       .map(scope -> scope.isAiming(playerEntity, heldStack))
-                      .orElse(false)
-                  || player.getEntity().isSprinting());
+                      .orElse(false));
 
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {

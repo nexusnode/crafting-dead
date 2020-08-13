@@ -15,10 +15,12 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
+import com.craftingdead.core.capability.gun.AimableGun;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.client.renderer.item.IRendererProvider;
+import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
+import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -100,6 +102,14 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   private final GunRenderer renderer;
 
+  private final IGun.RightMouseActionTriggerType rightMouseActionTriggerType;
+
+  private final Predicate<IGun> triggerPredicate;
+
+  private final Supplier<SoundEvent> rightMouseActionSound;
+
+  private final long rightMouseActionSoundRepeatDelayMs;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireRateMs = properties.fireRate;
@@ -120,11 +130,16 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this.renderer = DistExecutor.safeCallWhenOn(Dist.CLIENT, properties.rendererFactory);
+    this.rightMouseActionTriggerType = properties.rightMouseActionTriggerType;
+    this.triggerPredicate = properties.triggerPredicate;
+    this.rightMouseActionSound = properties.rightMouseActionSound;
+    this.rightMouseActionSoundRepeatDelayMs = properties.rightMouseActionSoundRepeatDelayMs;
     this
         .addPropertyOverride(new ResourceLocation("aiming"),
             (itemStack, world, entity) -> entity != null ? itemStack
                 .getCapability(ModCapabilities.GUN)
-                .map(gun -> gun.isAiming(entity, itemStack) ? 1.0F : 0.0F)
+                .filter(gun -> gun instanceof IScope)
+                .map(gun -> ((IScope) gun).isAiming(entity, itemStack) ? 1.0F : 0.0F)
                 .orElse(0.0F) : 0.0F);
   }
 
@@ -150,10 +165,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public int getBulletAmountToFire() {
     return this.bulletAmountToFire;
-  }
-
-  public boolean isAimable() {
-    return this.aimable;
   }
 
   public boolean hasCrosshair() {
@@ -200,6 +211,22 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  public IGun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
+    return this.rightMouseActionTriggerType;
+  }
+
+  public Predicate<IGun> getTriggerPredicate() {
+    return this.triggerPredicate;
+  }
+
+  public Supplier<SoundEvent> getRightMouseActionSound() {
+    return this.rightMouseActionSound;
+  }
+
+  public long getRightMouseActionSoundRepeatDelayMs() {
+    return this.rightMouseActionSoundRepeatDelayMs;
+  }
+
   @Override
   public GunRenderer getRenderer() {
     return this.renderer;
@@ -215,9 +242,12 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(new DefaultGun(this),
-        ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN,
-            () -> ModCapabilities.SCOPE));
+    return this.aimable
+        ? new SerializableCapabilityProvider<>(new AimableGun(this),
+            ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN,
+                () -> ModCapabilities.SCOPE))
+        : new SerializableCapabilityProvider<>(new DefaultGun(this),
+            ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN));
   }
 
   @Override
@@ -238,7 +268,9 @@ public class GunItem extends ShootableItem implements IRendererProvider {
       playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> playerEntity
           .getHeldItem(hand)
           .getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.toggleAiming(living, false)));
+          .filter(
+              gun -> gun.getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.CLICK)
+          .ifPresent(gun -> gun.toggleRightMouseAction(living, false)));
     }
     return super.onItemRightClick(world, playerEntity, hand);
   }
@@ -362,7 +394,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private float accuracy;
 
-    private boolean aimable;
+    private boolean aimable = true;
 
     private boolean crosshair = true;
 
@@ -388,6 +420,15 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
 
     private Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
+
+    private IGun.RightMouseActionTriggerType rightMouseActionTriggerType =
+        IGun.RightMouseActionTriggerType.CLICK;
+
+    private Predicate<IGun> triggerPredicate = gun -> true;
+
+    private Supplier<SoundEvent> rightMouseActionSound = () -> null;
+
+    private long rightMouseActionSoundRepeatDelayMs = -1L;
 
     public Properties setFireRate(int fireRate) {
       this.fireRate = fireRate;
@@ -480,6 +521,28 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     public Properties setRendererFactory(
         Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory) {
       this.rendererFactory = rendererFactory;
+      return this;
+    }
+
+    public Properties setRightMouseActionTriggerType(
+        IGun.RightMouseActionTriggerType rightMouseActionTriggerType) {
+      this.rightMouseActionTriggerType = rightMouseActionTriggerType;
+      return this;
+    }
+
+    public Properties setTriggerPredicate(Predicate<IGun> triggerPredicate) {
+      this.triggerPredicate = triggerPredicate;
+      return this;
+    }
+
+    public Properties setRightMouseActionSound(Supplier<SoundEvent> rightMouseActionSound) {
+      this.rightMouseActionSound = rightMouseActionSound;
+      return this;
+    }
+
+    public Properties setRightMouseActionSoundRepeatDelayMs(
+        long rightMouseActionSoundRepeatDelayMs) {
+      this.rightMouseActionSoundRepeatDelayMs = rightMouseActionSoundRepeatDelayMs;
       return this;
     }
   }

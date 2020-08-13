@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
@@ -15,20 +16,23 @@ import com.craftingdead.core.capability.animationprovider.DefaultAnimationProvid
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
+import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.player.DefaultPlayer;
+import com.craftingdead.core.capability.living.player.SelfPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
+import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
-import com.craftingdead.core.network.message.main.ToggleAimingMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
+import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.main.TriggerPressedMessage;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
@@ -39,6 +43,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -67,6 +72,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -104,15 +110,15 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
    */
   private int shotCount;
 
-  private int lastShotCount = this.shotCount;
-
   private Set<AttachmentItem> attachments;
 
   private ItemStack paintStack = ItemStack.EMPTY;
 
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
-  private boolean aiming;
+  private boolean performingRightMouseAction;
+
+  private long rightMouseActionSoundStartTimeMs;
 
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
@@ -132,9 +138,17 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public void tick(ILiving<?> living, ItemStack itemStack) {
     this.tryShoot(living, itemStack);
-
-    if (this.aiming && living.getEntity().isSprinting()) {
-      this.toggleAiming(living, true);
+    if (this.isPerformingRightMouseAction() && living.getEntity().isSprinting()) {
+      this.toggleRightMouseAction(living, true);
+    }
+    SoundEvent rightMouseActionSound = this.gunItem.getRightMouseActionSound().get();
+    long rightMouseActionSoundDelta = Util.milliTime() - this.rightMouseActionSoundStartTimeMs + 50;
+    if (this.isPerformingRightMouseAction()
+        && this.gunItem.getRightMouseActionSoundRepeatDelayMs() > 0L
+        && rightMouseActionSoundDelta >= this.gunItem.getRightMouseActionSoundRepeatDelayMs()
+        && rightMouseActionSound != null) {
+      this.rightMouseActionSoundStartTimeMs = Util.milliTime();
+      living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
     }
   }
 
@@ -153,7 +167,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       this.tryShoot(living, itemStack);
     } else {
       // Resets the counter
-      this.shotCount = this.lastShotCount = 0;
+      this.shotCount = 0;
     }
 
     if (sendUpdate) {
@@ -195,14 +209,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   private boolean canShoot(ILiving<?> living) {
-    return !(living.getActionProgress().isPresent() || living.getEntity().isSprinting());
+    return !(living.getActionProgress().isPresent() || living.getEntity().isSprinting()
+        || !this.gunItem.getTriggerPredicate().test(this));
   }
 
   private void tryShoot(ILiving<?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
-
-    // Update this here before any method returns to make sure it gets called
-    this.lastShotCount = this.shotCount;
 
     if (!this.triggerPressed) {
       return;
@@ -246,16 +258,16 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
     }
 
-    if (entity.world.isRemote()) {
+    if (entity.getEntityWorld().isRemote()) {
       if (entity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager()
             .joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
       }
 
-      this.getAnimationController().removeCurrentAnimation();
-      this.getAnimationController().addAnimation(
-          this.gunItem.getAnimations().get(AnimationType.SHOOT).get(),
-          null);
+      this.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
+        this.getAnimationController().removeCurrentAnimation();
+        this.getAnimationController().addAnimation(animation, null);
+      });
     }
 
     SoundEvent shootSound = this.gunItem.getShootSound().get();
@@ -378,6 +390,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
     }
 
+    if (entityHit instanceof LivingEntity && living instanceof SelfPlayer) {
+      ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui()
+          .displayHitMarker(Vec3d.ZERO.add(hitVec3d),
+              ((LivingEntity) entityHit).getHealth() - damage > 0.0F ? 0xFFFFFFFF : 0xFFB30C00);
+    }
+
     checkCreateExplosion(itemStack, entity, rayTrace.getHitVec());
 
     if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, itemStack) > 0) {
@@ -386,8 +404,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     if (living instanceof DefaultPlayer) {
       ((DefaultPlayer<?>) living)
-          .infect(EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
-              / 255.0F);
+          .infect((EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
+              / 255.0F)
+              * living.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
+                  .getCapability(ModCapabilities.CLOTHING)
+                  .filter(IClothing::hasEnhancedProtection)
+                  .map(clothing -> 0.5F).orElse(1.0F));
     }
   }
 
@@ -420,7 +442,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
     }
 
-    world.playSound(null, blockPos, hitSound, SoundCategory.BLOCKS, 1.2F, 1.0F); // volume, pitch
+    world.playSound(null, blockPos, hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F); // volume, pitch
 
     // Runs at server side only
     if (world instanceof ServerWorld) {
@@ -529,20 +551,39 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void toggleAiming(ILiving<?> living, boolean sendUpdate) {
-    if (!this.aiming && living.getEntity().isSprinting()) {
+  public boolean isPerformingRightMouseAction() {
+    return this.performingRightMouseAction;
+  }
+
+  @Override
+  public void toggleRightMouseAction(ILiving<?> living, boolean sendUpdate) {
+    if (!this.performingRightMouseAction && living.getEntity().isSprinting()) {
       return;
     }
-    this.aiming = !this.aiming;
+    this.performingRightMouseAction = !this.performingRightMouseAction;
+    SoundEvent rightMouseActionSound = this.gunItem.getRightMouseActionSound().get();
+    if (rightMouseActionSound != null) {
+      if (this.performingRightMouseAction) {
+        this.rightMouseActionSoundStartTimeMs = Util.milliTime();
+        living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
+      } else if (living.getEntity().getEntityWorld().isRemote()) {
+        Minecraft.getInstance().getSoundHandler()
+            .stop(rightMouseActionSound.getRegistryName(), SoundCategory.PLAYERS);
+      }
+    }
     if (sendUpdate) {
       PacketTarget target =
           living.getEntity().getEntityWorld().isRemote()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
-      NetworkChannel.MAIN
-          .getSimpleChannel()
-          .send(target, new ToggleAimingMessage(living.getEntity().getEntityId()));
+      NetworkChannel.MAIN.getSimpleChannel().send(target,
+          new ToggleRightMouseAbility(living.getEntity().getEntityId()));
     }
+  }
+
+  @Override
+  public RightMouseActionTriggerType getRightMouseActionTriggerType() {
+    return this.gunItem.getRightMouseActionTriggerType();
   }
 
   @Override
@@ -602,45 +643,13 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public boolean isAiming(Entity entity, ItemStack itemStack) {
-    return this.aiming;
+  public Optional<GunAnimation> getAnimation(AnimationType animationType) {
+    return Optional.ofNullable(this.gunItem.getAnimations().get(animationType)).map(Supplier::get);
   }
 
   @Override
-  public float getFovModifier(Entity entity, ItemStack itemStack) {
-    return this.hasIronSight() ? 0.75F
-        : this.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV);
-  }
-
-  @Override
-  public Optional<ResourceLocation> getOverlayTexture(Entity entity, ItemStack itemStack) {
-    for (AttachmentItem attachmentItem : this.attachments) {
-      if (attachmentItem.isScope()) {
-        return Optional.of(new ResourceLocation(attachmentItem.getRegistryName().getNamespace(),
-            "textures/scope/" + attachmentItem.getRegistryName().getPath() + ".png"));
-      }
-    }
-    return Optional.empty();
-  }
-
-  @Override
-  public int getOverlayTextureWidth() {
-    return 2048;
-  }
-
-  @Override
-  public int getOverlayTextureHeight() {
-    return 512;
-  }
-
-  @Override
-  public GunAnimation getAnimation(AnimationType animationType) {
-    return this.gunItem.getAnimations().get(animationType).get();
-  }
-
-  @Override
-  public boolean hasShotCountChanged() {
-    return this.shotCount != this.lastShotCount;
+  public int getShotCount() {
+    return this.shotCount;
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {

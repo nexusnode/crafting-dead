@@ -1,11 +1,14 @@
 package com.craftingdead.core.capability.living.player;
 
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModInventoryContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
 import com.craftingdead.core.util.ModDamageSource;
+import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -57,7 +60,7 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
   }
 
   private void updateWater() {
-    if (this.getEntity().world.getDifficulty() != Difficulty.PEACEFUL
+    if (this.getEntity().getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
         && !this.getEntity().abilities.disableDamage) {
       this.waterTimer++;
       if (this.water <= 0) {
@@ -68,6 +71,15 @@ public class ServerPlayer extends DefaultPlayer<ServerPlayerEntity> {
       } else if (this.waterTimer >= WATER_DELAY_TICKS) {
         this.setWater(this.getWater() - 1);
         if (this.getEntity().isSprinting()) {
+          this.setWater(this.getWater() - 1);
+        }
+        if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
+            && CapabilityUtils.isWearingBackpack(this.getEntity())) {
+          this.setWater(this.getWater() - 1);
+        }
+        if (this.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
+            .getCapability(ModCapabilities.CLOTHING).map(IClothing::hasEnhancedProtection)
+            .orElse(false)) {
           this.setWater(this.getWater() - 1);
         }
         this.waterTimer = 0;

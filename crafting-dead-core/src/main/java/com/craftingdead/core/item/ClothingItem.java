@@ -27,15 +27,14 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ClothingItem extends Item {
 
-  private final int armorLevel;
+  private final boolean enhancedProtection;
   @Nullable
   private final Integer slownessAmplifier;
   private final boolean fireImmunity;
 
   public ClothingItem(Properties properties) {
     super(properties);
-
-    this.armorLevel = properties.armorLevel;
+    this.enhancedProtection = properties.enhancedProtection;
     this.slownessAmplifier = properties.slownessAmplifier;
     this.fireImmunity = properties.fireImmunity;
   }
@@ -65,7 +64,7 @@ public class ClothingItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
-        new DefaultClothing(this.armorLevel, Optional.ofNullable(this.slownessAmplifier),
+        new DefaultClothing(this.enhancedProtection, Optional.ofNullable(this.slownessAmplifier),
             this.fireImmunity,
             new ResourceLocation(this.getRegistryName().getNamespace(), "textures/models/clothing/"
                 + this.getRegistryName().getPath() + "_" + "default" + ".png")),
@@ -84,7 +83,8 @@ public class ClothingItem extends Item {
   public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
-    ITextComponent armorLevelText = Text.of(this.armorLevel).applyTextStyle(TextFormatting.RED);
+    ITextComponent armorLevelText =
+        Text.of(this.enhancedProtection).applyTextStyle(TextFormatting.RED);
 
     lines
         .add(Text
@@ -119,18 +119,15 @@ public class ClothingItem extends Item {
 
   public static class Properties extends Item.Properties {
 
-    private int armorLevel = 0;
-    private Integer slownessAmplifier = null;
-    private boolean fireImmunity = false;
+    private boolean enhancedProtection;
+    private Integer slownessAmplifier;
+    private boolean fireImmunity;
 
-    public Properties setArmorLevel(int armorLevel) {
-      this.armorLevel = armorLevel;
+    public Properties setEnhancedProtection(boolean enhancedProtection) {
+      this.enhancedProtection = enhancedProtection;
       return this;
     }
 
-    /**
-     * Potion levels starts at 0.
-     */
     public Properties setSlownessAmplifier(int slownessAmplifier) {
       this.slownessAmplifier = slownessAmplifier;
       return this;

@@ -7,22 +7,73 @@ import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.fire.PistolShootAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.fire.RifleShootAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.fire.SubmachineShootAnimation;
+import com.craftingdead.core.capability.animationprovider.gun.inspect.GunAnimationInspectPistol;
+import com.craftingdead.core.capability.animationprovider.gun.inspect.GunAnimationInspectRifle;
+import com.craftingdead.core.capability.animationprovider.gun.inspect.GunAnimationInspectSMG;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadACR;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadAK47;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadAS50;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadAWP;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadDMR;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadDeagle;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadFNFAL;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadFiveSeven;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadG18;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadG36C;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadHK417;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM107;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM1911;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM1Garand;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM240B;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM4A1;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadM9;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMAC10;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMK48;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMP5A5;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMPT55;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMagnum;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMinigun;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadMossberg;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadP250;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadP90;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadRPK;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadSCARH;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadSporter22;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadTrench;
+import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReloadVector;
+import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.ACRRenderer;
 import com.craftingdead.core.client.renderer.item.AK47Renderer;
 import com.craftingdead.core.client.renderer.item.AS50Renderer;
 import com.craftingdead.core.client.renderer.item.AWPRenderer;
 import com.craftingdead.core.client.renderer.item.DMRRenderer;
 import com.craftingdead.core.client.renderer.item.DesertEagleRenderer;
+import com.craftingdead.core.client.renderer.item.FN57Renderer;
 import com.craftingdead.core.client.renderer.item.FNFALRenderer;
-import com.craftingdead.core.client.renderer.item.FiveSevenRenderer;
 import com.craftingdead.core.client.renderer.item.G18Renderer;
 import com.craftingdead.core.client.renderer.item.G36CRenderer;
 import com.craftingdead.core.client.renderer.item.HK417Renderer;
 import com.craftingdead.core.client.renderer.item.M107Renderer;
 import com.craftingdead.core.client.renderer.item.M1911Renderer;
 import com.craftingdead.core.client.renderer.item.M1GarandRenderer;
+import com.craftingdead.core.client.renderer.item.M240BRenderer;
+import com.craftingdead.core.client.renderer.item.M4A1Renderer;
+import com.craftingdead.core.client.renderer.item.M9Renderer;
+import com.craftingdead.core.client.renderer.item.MAC10Renderer;
+import com.craftingdead.core.client.renderer.item.MK48ModRenderer;
+import com.craftingdead.core.client.renderer.item.MP5A5Renderer;
+import com.craftingdead.core.client.renderer.item.MPT55Renderer;
+import com.craftingdead.core.client.renderer.item.MagnumRenderer;
+import com.craftingdead.core.client.renderer.item.MinigunRenderer;
+import com.craftingdead.core.client.renderer.item.MossbergRenderer;
+import com.craftingdead.core.client.renderer.item.P250Renderer;
+import com.craftingdead.core.client.renderer.item.P90Renderer;
+import com.craftingdead.core.client.renderer.item.RPKRenderer;
+import com.craftingdead.core.client.renderer.item.ScarhRenderer;
+import com.craftingdead.core.client.renderer.item.Sporter22Renderer;
+import com.craftingdead.core.client.renderer.item.TaserRenderer;
+import com.craftingdead.core.client.renderer.item.TrenchgunRenderer;
+import com.craftingdead.core.client.renderer.item.VectorRenderer;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -154,6 +205,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(85)
               .setArmorPenetration(0.4F)
+              .setCustomTexture(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -163,6 +215,7 @@ public class ModItems {
               .setSize(45)
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_BOX_MAGAZINE)
+              .setCustomTexture(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -172,6 +225,7 @@ public class ModItems {
               .setSize(30)
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_DRUM_MAGAZINE)
+              .setCustomTexture(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -181,6 +235,7 @@ public class ModItems {
               .setSize(20)
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_30_ROUND_MAGAZINE)
+              .setCustomTexture(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -421,6 +476,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(100)
               .setArmorPenetration(0.5F)
+              .setCustomTexture(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -537,13 +593,12 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
-              // Magazines
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM4A1::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(STANAG_20_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_30_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_DRUM_MAGAZINE)
               .addAcceptedMagazine(STANAG_BOX_MAGAZINE)
-              // Attachments
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -552,14 +607,13 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
-              // Paints
               .addAcceptedPaint(CYREX_PAINT)
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> M4A1Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -577,13 +631,12 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
-              // Magazines
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadSCARH::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(STANAG_20_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_30_ROUND_MAGAZINE)
               .addAcceptedMagazine(STANAG_DRUM_MAGAZINE)
               .addAcceptedMagazine(STANAG_BOX_MAGAZINE)
-              // Attachments
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
@@ -592,10 +645,9 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
-              // Paints
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> ScarhRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -613,6 +665,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.AK47_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .addAnimation(AnimationType.RELOAD, GunAnimationReloadAK47::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(AK47_30_ROUND_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -622,7 +675,6 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
-              // Paints
               .addAcceptedPaint(VULCAN_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> AK47Renderer::new)
@@ -641,6 +693,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadFNFAL::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(FNFAL_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -668,6 +722,7 @@ public class ModItems {
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
               .addAnimation(AnimationType.RELOAD, GunAnimationReloadACR::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(ACR_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
@@ -685,7 +740,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
               .setDamage(8)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks((int) (20 * 2.1F))
               .setAccuracy(0.8F)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
@@ -693,6 +748,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadHK417::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(HK417_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
@@ -711,7 +768,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(70)
               .setDamage(6)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.8F)
               .addFireMode(FireMode.BURST)
               .addFireMode(FireMode.SEMI)
@@ -719,14 +776,16 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMPT55::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(MPT55_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> MPT55Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M1GARAND = ITEMS
@@ -734,13 +793,15 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
               .setDamage(10)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1GARAND_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM1Garand::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(M1GARAND_MAGAZINE)
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
@@ -755,7 +816,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(200)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
@@ -763,6 +824,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadSporter22::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(SPORTER22_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -772,7 +835,7 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> Sporter22Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -781,7 +844,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
               .setDamage(8)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.8F)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
@@ -789,6 +852,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadG36C::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(G36C_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
@@ -804,29 +869,29 @@ public class ModItems {
   // Machine Guns
   // ================================================================================
 
-  // TODO Reminder: M240B uses two different iron sights at the same time.
-  // See RenderM240B.java (1.6.4)
   public static final RegistryObject<GunItem> M240B = ITEMS
       .register("m240b",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.M240B_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM240B::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(M240B_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> M240BRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> RPK = ITEMS
@@ -834,22 +899,24 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
               .setDamage(6)
-              .setReloadDurationTicks((int) (20 * 3.75F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.RPK_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.RPK_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadRPK::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(RPK_MAGAZINE)
               .addAcceptedMagazine(RPK_DRUM_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> RPKRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
 
   public static final RegistryObject<GunItem> MINIGUN = ITEMS
       .register("minigun",
@@ -857,45 +924,47 @@ public class ModItems {
               .setAimable(false)
               .setFireRate(25)
               .setDamage(4)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MINIGUN_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
-
-              // TODO Create the following animation from legacy
-              // .addAnimation(AnimationType.SHOOT, MinigunShootAnimation::new)
-              .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
-
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMinigun::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(MINIGUN_MAGAZINE)
               .addAcceptedPaint(FURY_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> MinigunRenderer::new)
+              .setRightMouseActionTriggerType(IGun.RightMouseActionTriggerType.HOLD)
+              .setTriggerPredicate(IGun::isPerformingRightMouseAction)
+              .setRightMouseActionSound(ModSoundEvents.MINIGUN_BARREL)
+              .setRightMouseActionSoundRepeatDelayMs(177L)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  // TODO Reminder: MK48MOD uses two different iron sights at the same time.
-  // See RenderMK48Mod1.java (1.6.4)
   public static final RegistryObject<GunItem> MK48MOD = ITEMS
       .register("mk48mod",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(92)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MK48MOD_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_MK48MOD_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMK48::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(MK48MOD_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedAttachment(BIPOD)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> MK48ModRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -912,9 +981,11 @@ public class ModItems {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.TASER_SHOOT)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(TASER_CARTRIDGE)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> TaserRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M1911 = ITEMS
@@ -922,13 +993,15 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.25F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1911_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM1911::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(M1911_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
@@ -942,7 +1015,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.25F))
+              .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
@@ -950,6 +1023,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadG18::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(G18_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
@@ -964,17 +1039,19 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.25F))
+              .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M9_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM9::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(M9_MAGAZINE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> M9Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -983,12 +1060,14 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 2.25F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadDeagle::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(DESERT_EAGLE_MAGAZINE)
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
@@ -1002,18 +1081,20 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(120)
               .setDamage(6)
-              .setReloadDurationTicks((int) (20 * 2.25F))
+              .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.7F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.P250_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadP250::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(P250_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> P250Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1022,15 +1103,17 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(80)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
               .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMagnum::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(MAGNUM_MAGAZINE)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> MagnumRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1039,17 +1122,19 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(140)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.FN57_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.FN57_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadFiveSeven::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectPistol::new)
               .setDefaultMagazine(FN57_MAGAZINE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> FiveSevenRenderer::new)
+              .setRendererFactory(() -> FN57Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1062,48 +1147,50 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
               .setDamage(6)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks((int) (20 * 1.8F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MAC10_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMAC10::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectSMG::new)
               .setDefaultMagazine(MAC10_MAGAZINE)
               .addAcceptedMagazine(MAC10_EXTENDED_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(UV_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> MAC10Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  // TODO Reminder: P90 uses two different iron sights at the same time.
-  // See RenderP90.java (1.6.4)
   public static final RegistryObject<GunItem> P90 = ITEMS
       .register("p90",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(100)
               .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.P90_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_P90_SHOOT)
               .setReloadSound(ModSoundEvents.P90_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadP90::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectSMG::new)
               .setDefaultMagazine(P90_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(RUBY_PAINT)
               .addAcceptedPaint(GEM_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> P90Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> VECTOR = ITEMS
@@ -1111,21 +1198,23 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
               .setDamage(5)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks((int) (20 * 1.9F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.VECTOR_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadVector::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectSMG::new)
               .setDefaultMagazine(VECTOR_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(SLAUGHTER_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> VectorRenderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MP5A5 = ITEMS
@@ -1133,7 +1222,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(85)
               .setDamage(7)
-              .setReloadDurationTicks(20 * 1)
+              .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
@@ -1141,14 +1230,16 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_MP5A5_SHOOT)
               .setReloadSound(ModSoundEvents.MP5A5_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMP5A5::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectSMG::new)
               .setDefaultMagazine(MP5A5_21_ROUND_MAGAZINE)
               .addAcceptedMagazine(MP5A5_35_ROUND_MAGAZINE)
-
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new).maxStackSize(1)
+              .setRendererFactory(() -> MP5A5Renderer::new)
+              .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
@@ -1160,13 +1251,15 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(750)
               .setDamage(20)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M107_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadM107::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(M107_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -1181,20 +1274,20 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  // TODO Reminder: AS50 uses two different iron sights at the same time.
-  // See RenderAS50.java (1.6.4)
   public static final RegistryObject<GunItem> AS50 = ITEMS
       .register("as50",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
               .setDamage(14)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks((int) (20 * 3.5F))
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AS50_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadAS50::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(AS50_MAGAZINE)
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(ACOG_SIGHT)
@@ -1214,7 +1307,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(1200)
               .setDamage(20)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
@@ -1222,6 +1315,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.AWP_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadAWP::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(AWP_MAGAZINE)
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
@@ -1239,7 +1334,7 @@ public class ModItems {
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setFireRate(170)
               .setDamage(15)
-              .setReloadDurationTicks((int) (20 * 2.75F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
@@ -1247,6 +1342,8 @@ public class ModItems {
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.DMR_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadDMR::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(DMR_MAGAZINE)
               .addAcceptedAttachment(LP_SCOPE)
               .addAcceptedAttachment(HP_SCOPE)
@@ -1264,8 +1361,6 @@ public class ModItems {
   // Shotguns
   // ================================================================================
 
-  // TODO Reminder: Trenchgun uses only the front part of the iron sight model.
-  // See RenderTrenchGun.java (1.6.4)
   public static final RegistryObject<GunItem> TRENCHGUN = ITEMS
       .register("trenchgun",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
@@ -1278,32 +1373,33 @@ public class ModItems {
               .setShootSound(ModSoundEvents.TRENCHGUN_SHOOT)
               .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadTrench::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(TRENCHGUN_SHELLS)
-
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> TrenchgunRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  // TODO Reminder: Mossberg uses only the front part of the iron sight model.
-  // See RenderMossberg.java (1.6.4)
   public static final RegistryObject<GunItem> MOSSBERG = ITEMS
       .register("mossberg",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setBulletAmountToFire(8)
               .setFireRate(300)
               .setDamage(3)
-              .setReloadDurationTicks(20 * 1)
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MOSSBERG_SHOOT)
               .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
+              .addAnimation(AnimationType.RELOAD, GunAnimationReloadMossberg::new)
+              .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
               .setDefaultMagazine(MOSSBERG_SLUGS)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
-              .setRendererFactory(() -> AK47Renderer::new)
+              .setRendererFactory(() -> MossbergRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
@@ -1901,70 +1997,69 @@ public class ModItems {
   public static final RegistryObject<Item> ARMY_CLOTHING = ITEMS
       .register("army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SAS_CLOTHING = ITEMS
       .register("sas_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SPETSNAZ_CLOTHING = ITEMS
       .register("spetsnaz_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> POLICE_CLOTHING = ITEMS
       .register("police_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CAMO_CLOTHING = ITEMS
       .register("camo_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COMBAT_BDU_CLOTHING = ITEMS
       .register("combat_bdu_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> WINTER_ARMY_CLOTHING = ITEMS
       .register("winter_army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ARMY_DESERT_CLOTHING = ITEMS
       .register("army_desert_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PILOT_CLOTHING = ITEMS
       .register("pilot_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(1)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> HAZMAT_CLOTHING = ITEMS
       .register("hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
@@ -1972,35 +2067,35 @@ public class ModItems {
   public static final RegistryObject<Item> TAC_GHILLIE_CLOTHING = ITEMS
       .register("tac_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SWAT_CLOTHING = ITEMS
       .register("swat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SPACE_SUIT_CLOTHING = ITEMS
       .register("space_suit_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SHERIFF_CLOTHING = ITEMS
       .register("sheriff_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(1)
+              .setEnhancedProtection(false)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> JUGGERNAUT_CLOTHING = ITEMS
       .register("juggernaut_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .setFireImmunity(true)
               .setSlownessAmplifier(0)
               .maxStackSize(1)
@@ -2009,7 +2104,7 @@ public class ModItems {
   public static final RegistryObject<Item> FIREMAN_CLOTHING = ITEMS
       .register("fireman_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
@@ -2017,49 +2112,43 @@ public class ModItems {
   public static final RegistryObject<Item> DOCTOR_CLOTHING = ITEMS
       .register("doctor_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SMART_CLOTHING = ITEMS
       .register("smart_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CASUAL_GREEN_CLOTHING = ITEMS
       .register("casual_green_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BUILDER_CLOTHING = ITEMS
       .register("builder_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BUSINESS_CLOTHING = ITEMS
       .register("business_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SEC_GUARD_CLOTHING = ITEMS
       .register("sec_guard_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(1)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> MIL_HAZMAT_CLOTHING = ITEMS
       .register("mil_hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .setFireImmunity(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
@@ -2067,119 +2156,115 @@ public class ModItems {
   public static final RegistryObject<Item> FULL_GHILLIE_CLOTHING = ITEMS
       .register("full_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RED_DUSK_CLOTHING = ITEMS
       .register("red_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CLONE_CLOTHING = ITEMS
       .register("clone_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COOKIE_CLOTHING = ITEMS
       .register("cookie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DEADPOOL_CLOTHING = ITEMS
       .register("deadpool_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> NINJA_CLOTHING = ITEMS
       .register("ninja_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(1)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ARMY_MEDIC_CLOTHING = ITEMS
       .register("army_medic_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BLUE_DUSK_CLOTHING = ITEMS
       .register("blue_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PRESIDENT_CLOTHING = ITEMS
       .register("president_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(0)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> YELLOW_DUSK_CLOTHING = ITEMS
       .register("yellow_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ORANGE_DUSK_CLOTHING = ITEMS
       .register("orange_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_DUSK_CLOTHING = ITEMS
       .register("green_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> WHITE_DUSK_CLOTHING = ITEMS
       .register("white_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PURPLE_DUSK_CLOTHING = ITEMS
       .register("purple_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SCUBA_CLOTHING = ITEMS
       .register("scuba_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(1)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DDPAT_CLOTHING = ITEMS
       .register("ddpat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(2)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CONTRACTOR_CLOTHING = ITEMS
       .register("contractor_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .setArmorLevel(3)
+              .setEnhancedProtection(true)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 

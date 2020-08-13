@@ -4,11 +4,11 @@ import java.util.List;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
-import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -42,6 +42,11 @@ public class ReloadAction extends TimedAction {
   public boolean start() {
     ItemStack magazineStack = this.findAmmo(this.performer, true);
     if (!this.getPerformer().getEntity().isSprinting() && !magazineStack.isEmpty()) {
+      if (this.gun instanceof IScope
+          && ((IScope) this.gun).isAiming(this.getPerformer().getEntity(),
+              this.performer.getEntity().getHeldItemMainhand())) {
+        this.gun.toggleRightMouseAction(this.getPerformer(), false);
+      }
       this.oldMagazineStack = this.gun.getMagazineStack();
       // Some guns may not have a reload sound
       this.gun.getReloadSound()
@@ -49,12 +54,14 @@ public class ReloadAction extends TimedAction {
               this.performer.getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
       if (this.performer.getEntity().getEntityWorld().isRemote()) {
         if (!this.oldMagazineStack.isEmpty()) {
-          GunAnimation ejectAnimation = this.gun.getAnimation(AnimationType.RELOAD);
-          if (ejectAnimation instanceof GunAnimationReload) {
-            ((GunAnimationReload) ejectAnimation).setEjectingClip(true);
-            this.gun.getAnimationController().addAnimation(ejectAnimation,
-                () -> this.playLoadAnimation(magazineStack));
-          }
+          this.gun.getAnimation(AnimationType.RELOAD)
+              .filter(animation -> animation instanceof GunAnimationReload)
+              .map(animation -> (GunAnimationReload) animation)
+              .ifPresent(animation -> {
+                ((GunAnimationReload) animation).setEjectingClip(true);
+                this.gun.getAnimationController().addAnimation(animation,
+                    () -> this.playLoadAnimation(magazineStack));
+              });
         } else {
           this.playLoadAnimation(magazineStack);
         }
@@ -66,11 +73,13 @@ public class ReloadAction extends TimedAction {
 
   private void playLoadAnimation(ItemStack magazineStack) {
     this.gun.setMagazineStack(magazineStack);
-    GunAnimation loadAnimation = this.gun.getAnimation(AnimationType.RELOAD);
-    if (loadAnimation instanceof GunAnimationReload) {
-      ((GunAnimationReload) loadAnimation).setEjectingClip(false);
-      this.gun.getAnimationController().addAnimation(loadAnimation, null);
-    }
+    this.gun.getAnimation(AnimationType.RELOAD)
+        .filter(animation -> animation instanceof GunAnimationReload)
+        .map(animation -> (GunAnimationReload) animation)
+        .ifPresent(animation -> {
+          animation.setEjectingClip(false);
+          this.gun.getAnimationController().addAnimation(animation, null);
+        });
   }
 
   @Override
@@ -97,12 +106,12 @@ public class ReloadAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    if (this.gun.getReloadSound().isPresent()) {
-      // Stop reload sound
-      Minecraft.getInstance().getSoundHandler()
-          .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
-    }
     if (this.getPerformer().getEntity().getEntityWorld().isRemote()) {
+      if (this.gun.getReloadSound().isPresent()) {
+        // Stop reload sound
+        Minecraft.getInstance().getSoundHandler()
+            .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
+      }
       this.gun.getAnimationController().removeCurrentAnimation();
     }
     this.gun.setMagazineStack(this.oldMagazineStack);

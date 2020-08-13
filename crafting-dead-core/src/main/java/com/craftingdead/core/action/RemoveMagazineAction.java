@@ -2,10 +2,10 @@ package com.craftingdead.core.action;
 
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
-import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.capability.scope.IScope;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
@@ -30,13 +30,20 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public boolean start() {
     if (!this.getPerformer().getEntity().isSprinting() && !this.gun.getMagazineStack().isEmpty()) {
+      if (this.gun instanceof IScope
+          && ((IScope) this.gun).isAiming(this.getPerformer().getEntity(),
+              this.performer.getEntity().getHeldItemMainhand())) {
+        this.gun.toggleRightMouseAction(this.getPerformer(), false);
+      }
       if (this.performer.getEntity().getEntityWorld().isRemote()) {
-        GunAnimation ejectAnimation = this.gun.getAnimation(AnimationType.RELOAD);
-        if (ejectAnimation instanceof GunAnimationReload) {
-          ((GunAnimationReload) ejectAnimation).setEjectingClip(true);
-          this.gun.getAnimationController().addAnimation(ejectAnimation,
-              () -> this.gun.setMagazineStack(ItemStack.EMPTY));
-        }
+        this.gun.getAnimation(AnimationType.RELOAD)
+            .filter(animation -> animation instanceof GunAnimationReload)
+            .map(animation -> (GunAnimationReload) animation)
+            .ifPresent(animation -> {
+              animation.setEjectingClip(true);
+              this.gun.getAnimationController().addAnimation(animation,
+                  () -> this.gun.setMagazineStack(ItemStack.EMPTY));
+            });
       }
       return true;
     }

@@ -2,6 +2,7 @@ package com.craftingdead.core.capability.animationprovider.gun;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
@@ -48,13 +49,8 @@ public abstract class GunAnimation {
    */
   protected abstract float getMaxAnimationTick();
 
-  /**
-   * Get animation length in milliseconds.
-   * 
-   * @return length in milliseconds
-   */
-  public float getLength() {
-    return ((this.getMaxAnimationTick() / 20) * 1000) - 50;
+  protected boolean isAcceptedTransformType(ItemCameraTransforms.TransformType transformType) {
+    return true;
   }
 
   protected void applyTransforms(LivingEntity livingEntity, ItemStack itemStack, String part,

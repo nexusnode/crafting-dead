@@ -37,21 +37,21 @@ public class CameraManager {
     float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
     if (modifyLookPosition) {
-      this.lookRotationVelocity = new Vec2f(-randomAmount * 3.75F, randomNegativeAmount * 3.25F);
+      this.lookRotationVelocity = new Vec2f(-randomAmount * 3.75F, randomNegativeAmount * 3F);
     }
     this.joltStartTime = Util.milliTime();
-    this.rollMultiplier = randomNegativeAmount / 2.0F;
+    this.rollMultiplier = randomNegativeAmount / 1.5F;
     this.pitchMultiplier = randomAmount / 2.0F;
-    this.fovMultiplier = 0.03F;
-    this.rollDurationMs = (long) (500L * (amountPercent));
+    this.fovMultiplier = 0.035F;
+    this.rollDurationMs = (long) (550L * (amountPercent));
   }
 
   public Vec2f getLookRotationVelocity() {
     float pct = 1.0F - MathHelper
         .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
     Vec2f newRotationVelocity = new Vec2f(
-        MathHelper.lerp(0.15F, this.prevLookRotationVelocity.x, this.lookRotationVelocity.x * pct),
-        MathHelper.lerp(0.15F, this.prevLookRotationVelocity.y, this.lookRotationVelocity.y * pct));
+        MathHelper.lerp(0.5F, this.prevLookRotationVelocity.x, this.lookRotationVelocity.x * pct),
+        MathHelper.lerp(0.5F, this.prevLookRotationVelocity.y, this.lookRotationVelocity.y * pct));
     this.prevLookRotationVelocity = newRotationVelocity;
     return newRotationVelocity;
   }

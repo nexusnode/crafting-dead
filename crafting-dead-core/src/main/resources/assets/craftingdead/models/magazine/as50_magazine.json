@@ -1,9 +1,6 @@
 {
 	"loader": "forge:obj",
-	"model": "craftingdead:models/gun/as50_magazine.obj",
+	"model": "craftingdead:models/magazine/as50_magazine.obj",
 	"flip-v": true,
-	"ambientToFullbright": false,
-	"textures": {
-		"base": "craftingdead:gun/as50_magazine"
-	}
+	"ambientToFullbright": false
 }

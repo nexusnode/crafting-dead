@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.culling.ClippingHelperImpl;
@@ -26,8 +27,11 @@ import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderDefault;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 public class RenderUtil {
@@ -61,6 +65,55 @@ public class RenderUtil {
         }
       }
     }
+  }
+
+  public static Vec2f projectToPlayerView(double x, double y, double z, float partialTicks) {
+    final ActiveRenderInfo activeRenderInfo = minecraft.gameRenderer.getActiveRenderInfo();
+    final Vec3d cameraPos = activeRenderInfo.getProjectedView();
+    final Quaternion cameraRotation = activeRenderInfo.getRotation().copy();
+    cameraRotation.conjugate();
+
+    final Vector3f result = new Vector3f((float) (cameraPos.x - x),
+        (float) (cameraPos.y - y),
+        (float) (cameraPos.z - z));
+
+    result.transform(cameraRotation);
+
+    if (minecraft.gameSettings.viewBobbing) {
+      Entity renderViewEntity = minecraft.getRenderViewEntity();
+      if (renderViewEntity instanceof PlayerEntity) {
+        PlayerEntity playerentity = (PlayerEntity) renderViewEntity;
+        float distanceWalkedModified = playerentity.distanceWalkedModified;
+
+        float changeInDistance = distanceWalkedModified - playerentity.prevDistanceWalkedModified;
+        float lerpDistance = -(distanceWalkedModified + changeInDistance * partialTicks);
+        float lerpYaw =
+            MathHelper.lerp(partialTicks, playerentity.prevCameraYaw, playerentity.cameraYaw);
+        Quaternion q2 = new Quaternion(Vector3f.XP,
+            Math.abs(MathHelper.cos(lerpDistance * (float) Math.PI - 0.2F) * lerpYaw) * 5.0F, true);
+        q2.conjugate();
+        result.transform(q2);
+
+        Quaternion q1 =
+            new Quaternion(Vector3f.ZP,
+                MathHelper.sin(lerpDistance * (float) Math.PI) * lerpYaw * 3.0F,
+                true);
+        q1.conjugate();
+        result.transform(q1);
+
+        Vector3f bobTranslation =
+            new Vector3f((MathHelper.sin(lerpDistance * (float) Math.PI) * lerpYaw * 0.5F),
+                (-Math.abs(MathHelper.cos(lerpDistance * (float) Math.PI) * lerpYaw)), 0.0f);
+        bobTranslation.setY(-bobTranslation.getY()); // this is weird but hey, if it works
+        result.add(bobTranslation);
+      }
+    }
+
+    final double fov = minecraft.gameRenderer.getFOVModifier(activeRenderInfo, partialTicks, true);
+    final float halfHeight = (float) minecraft.getMainWindow().getScaledHeight() / 2;
+    final float scale =
+        halfHeight / (result.getZ() * (float) Math.tan(Math.toRadians(fov / 2.0D)));
+    return new Vec2f(-result.getX() * scale, result.getY() * scale);
   }
 
   /**

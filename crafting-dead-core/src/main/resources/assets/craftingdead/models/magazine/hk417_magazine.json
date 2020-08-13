@@ -2,8 +2,5 @@
 	"loader": "forge:obj",
 	"model": "craftingdead:models/magazine/hk417_magazine.obj",
 	"flip-v": true,
-	"ambientToFullbright": false,
-	"textures": {
-		"base": "#gun"
-	}
+	"ambientToFullbright": false
 }

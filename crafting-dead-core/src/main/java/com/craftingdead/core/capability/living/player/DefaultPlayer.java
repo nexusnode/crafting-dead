@@ -1,7 +1,10 @@
 package com.craftingdead.core.capability.living.player;
 
 import java.util.Random;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.DefaultLiving;
+import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.potion.ModEffects;
 import com.google.common.primitives.Ints;
 import net.minecraft.entity.Entity;
@@ -117,7 +120,11 @@ public class DefaultPlayer<E extends PlayerEntity> extends DefaultLiving<E> {
 
     boolean isValidSource = immediateAttacker != null || source.isExplosion();
     if (isValidSource) {
-      float bleedChance = 0.1F * amount;
+      float bleedChance = 0.1F * amount
+          * this.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
+              .getCapability(ModCapabilities.CLOTHING)
+              .filter(IClothing::hasEnhancedProtection)
+              .map(clothing -> 0.5F).orElse(1.0F);
       if (random.nextFloat() < bleedChance
           && !this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
         this.getEntity()

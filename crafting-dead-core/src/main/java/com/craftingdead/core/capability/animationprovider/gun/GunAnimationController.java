@@ -6,9 +6,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.capability.animationprovider.IAnimationController;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
 public class GunAnimationController implements IAnimationController {
@@ -17,19 +17,15 @@ public class GunAnimationController implements IAnimationController {
 
   private final Minecraft minecraft = Minecraft.getInstance();
 
-  private long animationStartTime = 0L;
+  private int ticks;
 
   @Override
   public void tick(LivingEntity livingEntity, ItemStack itemStack) {
     Pair<GunAnimation, Runnable> animation = this.animations.peek();
     if (animation != null) {
-      if (this.animationStartTime == 0L) {
-        this.animationStartTime = Util.milliTime();
-      }
+      this.ticks++;
       float progress =
-          MathHelper.clamp(
-              (Util.milliTime() - this.animationStartTime) / animation.getLeft().getLength(),
-              0.0F, 1.0F);
+          MathHelper.clamp(this.ticks / animation.getLeft().getMaxAnimationTick(), 0.0F, 1.0F);
       animation.getLeft().onUpdate(this.minecraft, livingEntity, itemStack, progress);
       if (progress >= 1.0F) {
         if (animation.getRight() != null) {
@@ -42,11 +38,12 @@ public class GunAnimationController implements IAnimationController {
 
   @Override
   public void applyTransforms(LivingEntity livingEntity, ItemStack itemStack, String part,
-      MatrixStack matrixStack) {
+      ItemCameraTransforms.TransformType transformType,
+      MatrixStack matrixStack, float partialTicks) {
     Pair<GunAnimation, Runnable> animationPair = this.animations.peek();
-    if (animationPair != null) {
+    if (animationPair != null && animationPair.getLeft().isAcceptedTransformType(transformType)) {
       animationPair.getLeft().applyTransforms(livingEntity, itemStack, part, matrixStack,
-          this.minecraft.getRenderPartialTicks());
+          partialTicks);
     }
   }
 
@@ -56,7 +53,7 @@ public class GunAnimationController implements IAnimationController {
 
   public void removeCurrentAnimation() {
     this.animations.poll();
-    this.animationStartTime = 0L;
+    this.ticks = 0;
   }
 
   public void clearAnimations() {

@@ -8,7 +8,7 @@ import com.craftingdead.core.network.message.main.PerformActionMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
-import com.craftingdead.core.network.message.main.ToggleAimingMessage;
+import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.main.TriggerPressedMessage;
 import net.minecraft.util.ResourceLocation;
@@ -37,10 +37,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(ToggleAimingMessage.class, ++id)
-          .encoder(ToggleAimingMessage::encode)
-          .decoder(ToggleAimingMessage::decode)
-          .consumer(ToggleAimingMessage::handle)
+          .messageBuilder(ToggleRightMouseAbility.class, ++id)
+          .encoder(ToggleRightMouseAbility::encode)
+          .decoder(ToggleRightMouseAbility::decode)
+          .consumer(ToggleRightMouseAbility::handle)
           .add();
 
       simpleChannel

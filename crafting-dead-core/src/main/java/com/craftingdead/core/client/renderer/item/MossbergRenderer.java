@@ -69,7 +69,7 @@ public class MossbergRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0F, -0.68F, 0.972F);
+    matrixStack.translate(-0F, -0.64F, 0.972F);
 
     if (!gun.hasIronSight()) {
 
@@ -84,8 +84,9 @@ public class MossbergRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
     this.renderIronSight(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
 
@@ -93,7 +94,7 @@ public class MossbergRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.4F, -0.13F, 0.0315F);
+      matrixStack.translate(1.4F, -0.175F, 0.0315F);
       float scale = 0.49F;
       matrixStack.scale(scale, scale, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.getRenderType(

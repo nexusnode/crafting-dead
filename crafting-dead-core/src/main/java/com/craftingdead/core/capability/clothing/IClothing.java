@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IClothing {
 
-  int getArmorLevel();
+  boolean hasEnhancedProtection();
 
   Optional<Integer> getSlownessAmplifier();
 

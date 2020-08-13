@@ -70,7 +70,7 @@ public class P90Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(-0.1F, -0.58F, 0.9525F);
+    matrixStack.translate(-0.1F, -0.55F, 0.9525F);
 
     if (!gun.hasIronSight()) {
 
@@ -82,8 +82,9 @@ public class P90Renderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
+      int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     this.renderIronSight2(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }

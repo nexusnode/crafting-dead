@@ -6,26 +6,26 @@ import net.minecraft.util.ResourceLocation;
 
 public class DefaultClothing implements IClothing {
 
-  private final int armorLevel;
+  private final boolean enhancedProtection;
   private final Optional<Integer> slownessAmplifier;
   private final boolean fireImmunity;
   private final ResourceLocation texture;
 
   public DefaultClothing() {
-    this(0, Optional.empty(), false, TextureManager.RESOURCE_LOCATION_EMPTY);
+    this(false, Optional.empty(), false, TextureManager.RESOURCE_LOCATION_EMPTY);
   }
 
-  public DefaultClothing(int armorLevel, Optional<Integer> slownessAmplifier, boolean fireImmunity,
-      ResourceLocation texture) {
-    this.armorLevel = armorLevel;
+  public DefaultClothing(boolean enhancedProtection, Optional<Integer> slownessAmplifier,
+      boolean fireImmunity, ResourceLocation texture) {
+    this.enhancedProtection = enhancedProtection;
     this.slownessAmplifier = slownessAmplifier;
     this.fireImmunity = fireImmunity;
     this.texture = texture;
   }
 
   @Override
-  public int getArmorLevel() {
-    return this.armorLevel;
+  public boolean hasEnhancedProtection() {
+    return this.enhancedProtection;
   }
 
   @Override
