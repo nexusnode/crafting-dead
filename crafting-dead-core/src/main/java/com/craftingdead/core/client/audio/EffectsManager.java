@@ -15,7 +15,7 @@ public class EffectsManager {
 
   private SoundEngine soundEngine;
 
-  private int highPassSend;
+  private int highpassSend;
 
   public void reload(SoundEngine soundEngine) {
     this.soundEngine = soundEngine;
@@ -30,32 +30,41 @@ public class EffectsManager {
       return;
     }
 
-    this.highPassSend = EXTEfx.alGenFilters();
-    EXTEfx.alFilteri(this.highPassSend, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_HIGHPASS);
-    checkLogError("Failed to generate high pass send");
+    this.highpassSend = EXTEfx.alGenFilters();
+    EXTEfx.alFilteri(this.highpassSend, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_HIGHPASS);
+    checkLogError("Failed to generate high-pass send");
   }
 
-  public void setAllLevels(float highPassGain, float highPassCutoff) {
+  public void setHighpassLevels(float highpassGain, float highpassCutoff) {
+    EXTEfx.alFilterf(this.highpassSend, EXTEfx.AL_HIGHPASS_GAIN, highpassGain);
+    EXTEfx.alFilterf(this.highpassSend, EXTEfx.AL_HIGHPASS_GAINLF, highpassCutoff);
+  }
+
+  public void setDirectHighpassForAll() {
     for (ChannelManager.Entry entry : this.soundEngine.playingSoundsChannel.values()) {
-      entry
-          .runOnSoundExecutor(
-              source -> this.setLevels(source.id, highPassGain, highPassCutoff));
+      entry.runOnSoundExecutor(source -> this.setDirectHighpass(source.id));
     }
   }
 
-  public void setLevels(ISound sound, float highPassGain, float highPassCutoff) {
+  public void setDirectHighpass(ISound sound) {
     ChannelManager.Entry entry = this.soundEngine.playingSoundsChannel.get(sound);
     if (entry != null) {
-      entry
-          .runOnSoundExecutor(
-              source -> this.setLevels(source.id, highPassGain, highPassCutoff));
+      entry.runOnSoundExecutor(source -> this.setDirectHighpass(source.id));
     }
   }
 
-  public void setLevels(int source, float highPassGain, float highPassCutoff) {
-    EXTEfx.alFilterf(this.highPassSend, EXTEfx.AL_HIGHPASS_GAIN, highPassGain);
-    EXTEfx.alFilterf(this.highPassSend, EXTEfx.AL_HIGHPASS_GAINLF, highPassCutoff);
-    AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, this.highPassSend);
+  public void setDirectHighpass(int source) {
+    AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, this.highpassSend);
+  }
+
+  public void removeFilterForAll() {
+    for (ChannelManager.Entry entry : this.soundEngine.playingSoundsChannel.values()) {
+      entry.runOnSoundExecutor(source -> this.removeFilter(source.id));
+    }
+  }
+
+  public void removeFilter(int source) {
+    AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, 0);
   }
 
   private static boolean checkLogError(final String errorMessage) {

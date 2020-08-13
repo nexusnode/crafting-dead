@@ -78,11 +78,7 @@ public class IngameGui {
     this.hitMarkerColour = colour;
   }
 
-  public void renderGameOverlay(SelfPlayer player, float partialTicks, int width, int height) {
-    // final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
-    // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
-    // - 1;
-
+  private void renderHitMarker(int width, int height, float partialTicks) {
     if (this.hitMarkerPos != null) {
       if (this.hitMarkerFadeStartTimeMs == 0L) {
         this.hitMarkerFadeStartTimeMs = Util.milliTime();
@@ -91,20 +87,28 @@ public class IngameGui {
           (float) (Util.milliTime() - this.hitMarkerFadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
           0.0F, 1.0F);
 
+      final Vec2f pos = RenderUtil.projectToPlayerView(this.hitMarkerPos.getX(),
+          this.hitMarkerPos.getY(), this.hitMarkerPos.getZ(), partialTicks);
+
+      if (fadePct == 1.0F) {
+        this.hitMarkerPos = null;
+      }
+
+      if (pos == null) {
+        return;
+      }
+
       float alpha = (float) (this.hitMarkerColour >> 24 & 255) / 255.0F;
       float red = (float) (this.hitMarkerColour >> 16 & 255) / 255.0F;
       float green = (float) (this.hitMarkerColour >> 8 & 255) / 255.0F;
       float blue = (float) (this.hitMarkerColour & 255) / 255.0F;
+
       RenderSystem.enableBlend();
       RenderSystem.color4f(red, green, blue, alpha * (1.0F - fadePct));
-
       RenderSystem.pushMatrix();
       {
-        final Vec2f pos = RenderUtil.projectToPlayerView(this.hitMarkerPos.getX(),
-            this.hitMarkerPos.getY(), this.hitMarkerPos.getZ(), partialTicks);
         RenderSystem.translatef((width / 2) + pos.x - 15, (height / 2) - pos.y - 15, 0);
-
-        RenderSystem.lineWidth(3.0F);
+        RenderSystem.lineWidth(5.0F);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
@@ -117,14 +121,17 @@ public class IngameGui {
         tessellator.draw();
       }
       RenderSystem.popMatrix();
-
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
       RenderSystem.disableBlend();
-
-      if (fadePct == 1.0F) {
-        this.hitMarkerPos = null;
-      }
     }
+  }
+
+  public void renderGameOverlay(SelfPlayer player, float partialTicks, int width, int height) {
+    // final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
+    // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
+    // - 1;
+
+    this.renderHitMarker(width, height, partialTicks);
 
     final ClientPlayerEntity playerEntity = player.getEntity();
 

@@ -97,7 +97,6 @@ import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -164,6 +163,8 @@ public class ClientDist implements IModDist {
   private TweenManager tweenManager = TweenManager.create();
 
   private float lastTime = 0F;
+
+  private boolean wasAdrenalineActive;
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -360,11 +361,6 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handlePlaySound(PlaySoundEvent event) {
-    this.effectsManager.setLevels(event.getSound(), 5.0F, 1.0F);
-  }
-
-  @SubscribeEvent
   public void handleTooltipEvent(ItemTooltipEvent event) {
     Collection<TooltipFunction> functions =
         ArbitraryTooltips.getFunctions(event.getItemStack().getItem());
@@ -435,7 +431,12 @@ public class ClientDist implements IModDist {
             this.lastTutorialStep = currentTutorialStep;
           }
           if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
-            this.effectsManager.setAllLevels(1.0F, 0.015F);
+            this.wasAdrenalineActive = true;
+            this.effectsManager.setHighpassLevels(1.0F, 0.015F);
+            this.effectsManager.setDirectHighpassForAll();
+          } else if (this.wasAdrenalineActive) {
+            this.wasAdrenalineActive = false;
+            this.effectsManager.removeFilterForAll();
           }
         }
         break;

@@ -43,6 +43,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -278,27 +279,41 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
     entity.playSound(shootSound, 0.25F, 1.0F);
 
+    // Used to avoid playing the same hit sound more than once.
+    RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
-      Optional<? extends RayTraceResult> rayTrace = RayTraceUtil
-          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random);
-
-      rayTrace.ifPresent(result -> {
-        switch (result.getType()) {
+      RayTraceResult rayTraceResult = RayTraceUtil
+          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random).orElse(null);
+      if (rayTraceResult != null) {
+        switch (rayTraceResult.getType()) {
           case BLOCK:
-            this.hitBlock(living, itemStack, (BlockRayTraceResult) result);
+            final BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) rayTraceResult;
+            boolean playSound = true;
+            if (lastRayTraceResult instanceof BlockRayTraceResult) {
+              playSound = entity.getEntityWorld()
+                  .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
+                      .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
+            }
+            this.hitBlock(living, itemStack, (BlockRayTraceResult) rayTraceResult, playSound);
             break;
           case ENTITY:
-            this.hitEntity(living, itemStack, (EntityRayTraceResult) result);
+            this.hitEntity(living, itemStack, (EntityRayTraceResult) rayTraceResult,
+                !(lastRayTraceResult instanceof EntityRayTraceResult)
+                    || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
+                        .getRegistryName()
+                        .equals(((EntityRayTraceResult) rayTraceResult).getEntity().getType()
+                            .getRegistryName()));
             break;
           default:
             break;
         }
-      });
+        lastRayTraceResult = rayTraceResult;
+      }
     }
   }
 
   private void hitEntity(ILiving<?> living, ItemStack itemStack,
-      EntityRayTraceResult rayTrace) {
+      EntityRayTraceResult rayTrace, boolean playSound) {
     final Entity entity = living.getEntity();
     Entity entityHit = rayTrace.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
@@ -331,10 +346,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         || entityHit instanceof VillagerEntity || entityHit instanceof VindicatorEntity
         || entityHit instanceof WanderingTraderEntity) && rayTrace.getHitVec().y >= chinHeight;
     if (headshot) {
-      // The sound is played at client side too
-      world
-          .playMovingSound(null, entity, SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F,
-              1.5F);
+      if (playSound) {
+        world.playMovingSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, entity,
+            SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F, 1.5F);
+      }
       damage *= HEADSHOT_MULTIPLIER;
 
       // Runs at server side only
@@ -354,10 +369,13 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
                         0.0D, 0.0D));
       }
     }
-    // The sound is played at client side too
-    world
-        .playMovingSound(null, entityHit, ModSoundEvents.BULLET_IMPACT_FLESH.get(),
-            SoundCategory.PLAYERS, 0.75F, (float) Math.random() + 0.7F);
+
+    if (playSound) {
+      world.playMovingSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
+          entityHit,
+          ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS, 0.75F,
+          (float) Math.random() + 0.7F);
+    }
 
     if (entityHit instanceof ClientPlayerEntity) {
       ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager().joltCamera(1.5F,
@@ -381,12 +399,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             .getPlayers()
             .stream()
             .filter(player -> player != entityHit)
-            .forEach(player -> serverWorld
-                .spawnParticle(player,
-                    new BlockParticleData(ParticleTypes.BLOCK,
-                        Blocks.REDSTONE_BLOCK.getDefaultState()),
-                    false, hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0.0D, 0.0D, 0.0D,
-                    0.0D));
+            .forEach(player -> serverWorld.spawnParticle(player,
+                new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
+                false, hitVec3d.getX(), hitVec3d.getY(), hitVec3d.getZ(), 12, 0.0D, 0.0D, 0.0D,
+                0.0D));
       }
     }
 
@@ -413,8 +429,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
   }
 
-  private void hitBlock(ILiving<?> living, ItemStack itemStack,
-      BlockRayTraceResult rayTrace) {
+  private void hitBlock(ILiving<?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
+      boolean playSound) {
     final Entity entity = living.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
     BlockPos blockPos = rayTrace.getPos();
@@ -430,19 +446,22 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     // Gets the hit sound to be played
     SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
-    net.minecraft.block.material.Material blockMaterial = blockState.getMaterial();
-    if (blockMaterial == net.minecraft.block.material.Material.WOOD) {
+    Material blockMaterial = blockState.getMaterial();
+    if (blockMaterial == Material.WOOD) {
       hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
-    } else if (blockMaterial == net.minecraft.block.material.Material.ROCK) {
+    } else if (blockMaterial == Material.ROCK) {
       hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
-    } else if (blockMaterial == net.minecraft.block.material.Material.IRON) {
+    } else if (blockMaterial == Material.IRON) {
       hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
           : ModSoundEvents.BULLET_IMPACT_METAL2.get();
-    } else if (blockMaterial == net.minecraft.block.material.Material.GLASS) {
+    } else if (blockMaterial == Material.GLASS) {
       hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
     }
 
-    world.playSound(null, blockPos, hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F); // volume, pitch
+    if (playSound) {
+      world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
+          hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+    }
 
     // Runs at server side only
     if (world instanceof ServerWorld) {

@@ -113,7 +113,7 @@ public class RenderUtil {
     final float halfHeight = (float) minecraft.getMainWindow().getScaledHeight() / 2;
     final float scale =
         halfHeight / (result.getZ() * (float) Math.tan(Math.toRadians(fov / 2.0D)));
-    return new Vec2f(-result.getX() * scale, result.getY() * scale);
+    return result.getZ() > 0.0D ? null : new Vec2f(-result.getX() * scale, result.getY() * scale);
   }
 
   /**
