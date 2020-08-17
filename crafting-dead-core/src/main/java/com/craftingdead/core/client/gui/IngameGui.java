@@ -245,7 +245,7 @@ public class IngameGui {
       }
       int y = height - 10 - fontRenderer.FONT_HEIGHT;
       fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
-      itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 15, y - 5);
+      itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 16, y - 5);
     }
   }
 

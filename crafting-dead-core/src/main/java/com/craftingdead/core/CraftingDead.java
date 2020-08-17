@@ -1,7 +1,5 @@
 package com.craftingdead.core;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,8 +102,6 @@ public class CraftingDead {
    * Logger.
    */
   private static final Logger logger = LogManager.getLogger();
-
-  private static final ExecutorService parallelExecutor = Executors.newWorkStealingPool();
 
   /**
    * Singleton.
@@ -210,8 +206,8 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
     if (!(event.getEntityLiving() instanceof PlayerEntity)) {
-      parallelExecutor.execute(() -> event.getEntityLiving().getCapability(ModCapabilities.LIVING)
-          .ifPresent(ILiving::tick));
+      event.getEntityLiving().getCapability(ModCapabilities.LIVING)
+          .ifPresent(ILiving::tick);
     }
   }
 
@@ -219,8 +215,7 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        parallelExecutor.execute(
-            () -> event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick));
+        event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
         break;
       default:
         break;
