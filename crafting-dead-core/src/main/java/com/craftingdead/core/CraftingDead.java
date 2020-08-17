@@ -222,7 +222,7 @@ public class CraftingDead {
     }
   }
 
-  @SubscribeEvent
+  @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
     if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
       MobEntity mobEntity = (MobEntity) event.getEntityLiving();
