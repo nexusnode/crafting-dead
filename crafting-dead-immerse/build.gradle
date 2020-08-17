@@ -9,6 +9,7 @@ repositories {
     flatDir {
        dirs 'lib'
    	}
+    google()
 }
 
 minecraft {    
