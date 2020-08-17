@@ -68,7 +68,7 @@ public class P250Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0.1F, -0.681F, 0.972F);
+    matrixStack.translate(0.1F, -0.7F, 0.972F);
 
     if (!gun.hasIronSight()) {
 

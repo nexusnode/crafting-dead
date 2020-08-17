@@ -9,7 +9,7 @@ public interface IScope {
 
   boolean isAiming(Entity entity, ItemStack itemStack);
 
-  float getFovModifier(Entity entity, ItemStack itemStack);
+  float getZoomMultiplier(Entity entity, ItemStack itemStack);
 
   Optional<ResourceLocation> getOverlayTexture(Entity entity, ItemStack itemStack);
   

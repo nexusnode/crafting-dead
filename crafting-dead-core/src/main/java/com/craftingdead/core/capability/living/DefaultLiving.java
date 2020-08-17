@@ -9,11 +9,16 @@ import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.CancelActionMessage;
+import com.craftingdead.core.network.message.main.CrouchMessage;
 import com.craftingdead.core.network.message.main.PerformActionMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -41,6 +46,9 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
   private List<Integer> dirtySlots = new IntArrayList();
 
+  private final Long2ObjectLinkedOpenHashMap<Snapshot> snapshots =
+      new Long2ObjectLinkedOpenHashMap<>();
+
   private final ItemStackHandler itemHandler =
       new ItemStackHandler(InventorySlotType.values().length) {
         @Override
@@ -56,6 +64,8 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
   private IActionProgress actionProgress;
 
   private boolean freezeMovement;
+
+  private boolean crouching;
 
   public DefaultLiving() {
     throw new IllegalStateException("No entity provided");
@@ -164,6 +174,10 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
       this.freezeMovement = false;
     }
 
+    if (this.crouching) {
+      this.getEntity().setPose(Pose.SWIMMING);
+    }
+
     this.updateGeneralClothingEffects();
     this.updateScubaClothing();
     this.updateScubaMask();
@@ -175,6 +189,14 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
               this.itemHandler.getStackInSlot(slot)));
     }
     this.dirtySlots.clear();
+
+    if (this.snapshots.size() >= 20) {
+      this.snapshots.removeFirst();
+    }
+    final long gameTime = this.getEntity().getEntityWorld().getGameTime();
+    this.snapshots.put(gameTime, new Snapshot(gameTime, this.getEntity().getPositionVector(),
+        this.getEntity().getBoundingBox().expand(0, 1.0D, 0), this.getEntity().getPitchYaw(),
+        this.getEntity().getEyeHeight()));
   }
 
   private void updateScubaClothing() {
@@ -217,7 +239,6 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     });
   }
 
-
   public float onDamaged(DamageSource source, float amount) {
     return amount;
   }
@@ -251,22 +272,60 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    return new CompoundNBT();
+  public IItemHandlerModifiable getItemHandler() {
+    return this.itemHandler;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {}
+  public Optional<Snapshot> getSnapshot(long gameTime) {
+    Snapshot snapshot = this.snapshots.get(gameTime);
+    if (snapshot == null && gameTime >= this.snapshots.firstLongKey()
+        && gameTime <= this.snapshots.lastLongKey()) {
+      ObjectBidirectionalIterator<Long2ObjectMap.Entry<Snapshot>> it =
+          this.snapshots.long2ObjectEntrySet().fastIterator();
+      while (it.hasNext()) {
+        Snapshot nextSnapshot = it.next().getValue();
+        if (nextSnapshot.getGameTime() > gameTime) {
+          if (snapshot == null) {
+            snapshot = nextSnapshot;
+          }
+          break;
+        }
+        snapshot = nextSnapshot;
+      }
+    }
+    return Optional.ofNullable(snapshot);
+  }
 
   @Override
-  public IItemHandlerModifiable getItemHandler() {
-    return this.itemHandler;
+  public boolean isCrouching() {
+    return this.crouching;
+  }
+
+  @Override
+  public void setCrouching(boolean crouching, boolean sendUpdate) {
+    this.crouching = crouching;
+    if (sendUpdate) {
+      PacketTarget target =
+          this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+              : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+      NetworkChannel.MAIN.getSimpleChannel().send(target,
+          new CrouchMessage(this.getEntity().getEntityId(), crouching));
+    }
   }
 
   @Override
   public E getEntity() {
     return this.entity;
   }
+
+  @Override
+  public CompoundNBT serializeNBT() {
+    return new CompoundNBT();
+  }
+
+  @Override
+  public void deserializeNBT(CompoundNBT nbt) {}
 
   @Override
   public int hashCode() {

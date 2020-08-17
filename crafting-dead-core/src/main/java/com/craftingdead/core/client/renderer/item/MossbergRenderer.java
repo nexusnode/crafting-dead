@@ -94,7 +94,7 @@ public class MossbergRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.4F, -0.175F, 0.0315F);
+      matrixStack.translate(1.4F, -0.185F, 0.0315F);
       float scale = 0.49F;
       matrixStack.scale(scale, scale, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.getRenderType(

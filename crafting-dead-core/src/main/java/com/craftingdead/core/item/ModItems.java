@@ -512,7 +512,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> RED_DOT_SIGHT = ITEMS
       .register("red_dot_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 1 / 2.5F)
+              .addMultiplier(MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -520,7 +520,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> ACOG_SIGHT = ITEMS
       .register("acog_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 1 / 3.25F)
+              .addMultiplier(MultiplierType.ZOOM, 3.25F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -528,7 +528,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> LP_SCOPE = ITEMS
       .register("lp_scope",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 1 / 5F)
+              .addMultiplier(MultiplierType.ZOOM, 5.0F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
               .maxStackSize(1)
@@ -537,7 +537,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 1 / 8F)
+              .addMultiplier(MultiplierType.ZOOM, 8.0F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
               .maxStackSize(1)
@@ -570,7 +570,7 @@ public class ModItems {
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
-              .addMultiplier(MultiplierType.FOV, 1 / 2.5F)
+              .addMultiplier(MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));

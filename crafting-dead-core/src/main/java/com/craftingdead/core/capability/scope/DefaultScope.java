@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class DefaultScope implements IScope {
 
-  private final float fovModifier;
+  private final float zoomMultiplier;
   private final Optional<ResourceLocation> overlayTexture;
   private final int overlayTextureWidth;
   private final int overlayTextureHeight;
@@ -17,9 +17,9 @@ public class DefaultScope implements IScope {
     this(1.0F, null, 0, 0);
   }
 
-  public DefaultScope(float fovModifier, ResourceLocation overlayTexture, int overlayTextureWidth,
-      int overlayTextureHeight) {
-    this.fovModifier = fovModifier;
+  public DefaultScope(float zoomMultiplier, ResourceLocation overlayTexture,
+      int overlayTextureWidth, int overlayTextureHeight) {
+    this.zoomMultiplier = zoomMultiplier;
     this.overlayTexture = Optional.ofNullable(overlayTexture);
     this.overlayTextureWidth = overlayTextureWidth;
     this.overlayTextureHeight = overlayTextureHeight;
@@ -33,8 +33,8 @@ public class DefaultScope implements IScope {
   }
 
   @Override
-  public float getFovModifier(Entity entity, ItemStack itemStack) {
-    return this.fovModifier;
+  public float getZoomMultiplier(Entity entity, ItemStack itemStack) {
+    return this.zoomMultiplier;
   }
 
   @Override

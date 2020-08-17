@@ -68,7 +68,7 @@ public class DesertEagleRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.0F));
 
-    matrixStack.translate(0.1F, -0.69F, 0.972F);
+    matrixStack.translate(0.1F, -0.7F, 0.972F);
 
     if (!gun.hasIronSight()) {
       matrixStack.translate(0.0F, 0.03F, 0.0F);
@@ -95,7 +95,7 @@ public class DesertEagleRenderer extends GunRenderer {
       matrixStack.scale(scale, scale, scale);
       scale = 0.48F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-0.4F, -0.2F, -0.26F);
+      matrixStack.translate(-0.4F, -0.1F, -0.26F);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
@@ -110,7 +110,7 @@ public class DesertEagleRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.85F, -0.058F, 0.07F);
+      matrixStack.translate(0.85F, -0.038F, 0.07F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90.0F));

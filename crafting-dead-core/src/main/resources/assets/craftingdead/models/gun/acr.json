@@ -5,12 +5,5 @@
 	"ambientToFullbright": false,
 	"textures": {
 		"base": "craftingdead:gun/acr"
-	},
-	"transforms": {
-		"scale": [
-			-1,
-			0,
-			0
-		]
 	}
 }

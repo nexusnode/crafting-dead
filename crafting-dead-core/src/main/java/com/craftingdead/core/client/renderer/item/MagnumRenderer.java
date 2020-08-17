@@ -70,7 +70,7 @@ public class MagnumRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0.4F, -0.685F, 0.972F);
+    matrixStack.translate(0.4F, -0.68F, 0.972F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
@@ -107,7 +107,7 @@ public class MagnumRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.5F, -0.07F, 0.07F);
+      matrixStack.translate(0.5F, -0.075F, 0.07F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));

@@ -57,7 +57,7 @@ public class AttachmentItem extends Item {
   }
 
   public static enum MultiplierType {
-    DAMAGE, ACCURACY, FOV;
+    DAMAGE, ACCURACY, ZOOM;
 
     private final String translationKey = "attachment_multiplier_type." + this.name().toLowerCase();
 

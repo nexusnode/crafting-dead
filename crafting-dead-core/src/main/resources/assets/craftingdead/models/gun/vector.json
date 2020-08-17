@@ -5,5 +5,12 @@
 	"ambientToFullbright": false,
 	"textures": {
 		"base": "craftingdead:gun/vector"
+	},
+	"transform": {
+		"translation": [
+			0,
+			0.05,
+			0
+		]
 	}
 }

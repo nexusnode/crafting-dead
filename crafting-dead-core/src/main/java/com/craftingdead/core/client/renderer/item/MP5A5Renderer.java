@@ -71,7 +71,7 @@ public class MP5A5Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(3.6F, 0.35F, 0.95F);
+    matrixStack.translate(3.6F, 0.3F, 0.95F);
 
     float scale = 1.0F;
     matrixStack.scale(scale, scale, scale);

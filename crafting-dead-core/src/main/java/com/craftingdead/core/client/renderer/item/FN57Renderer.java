@@ -66,8 +66,8 @@ public class FN57Renderer extends GunRenderer {
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-26.0F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.15F));
 
     matrixStack.translate(0.1F, -0.7F, 1.003F);
 
@@ -112,7 +112,7 @@ public class FN57Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.7F, -0.25F, 0.099F);
+      matrixStack.translate(0.7F, -0.2F, 0.099F);
       float scale = 0.9F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));

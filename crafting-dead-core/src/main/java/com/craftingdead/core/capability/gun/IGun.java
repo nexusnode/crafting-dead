@@ -2,11 +2,14 @@ package com.craftingdead.core.capability.gun;
 
 import java.util.Optional;
 import java.util.Set;
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.item.AttachmentItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,15 +31,27 @@ public interface IGun
 
   void removeMagazine(ILiving<?> living);
 
+  void validateLivingHit(ILiving<?> living, ItemStack itemStack, ILiving<?> hitLiving,
+      long gameTime);
+
   float getAccuracy(ILiving<?> living, ItemStack itemStack);
 
   ItemStack getMagazineStack();
 
   void setMagazineStack(ItemStack magazineStack);
 
-  int getMagazineSize();
+  default Optional<IMagazine> getMagazine() {
+    return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE).map(Optional::of)
+        .orElse(Optional.empty());
+  }
 
-  void setMagazineSize(int size);
+  default int getMagazineSize() {
+    return this.getMagazine().map(IMagazine::getSize).orElse(0);
+  }
+
+  default void setMagazineSize(int size) {
+    this.getMagazine().ifPresent(magazine -> magazine.setSize(size));
+  }
 
   Set<AttachmentItem> getAttachments();
 
@@ -51,6 +66,11 @@ public interface IGun
   void setAttachments(Set<AttachmentItem> attachments);
 
   ItemStack getPaintStack();
+
+  default Optional<IPaint> getPaint() {
+    return this.getMagazineStack().getCapability(ModCapabilities.PAINT).map(Optional::of)
+        .orElse(Optional.empty());
+  }
 
   void setPaintStack(ItemStack paintStack);
 

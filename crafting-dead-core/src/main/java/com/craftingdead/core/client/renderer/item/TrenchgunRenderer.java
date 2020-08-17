@@ -69,7 +69,7 @@ public class TrenchgunRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0F, -0.69F, 0.972F);
+    matrixStack.translate(0.21F, -0.69F, 0.972F);
 
     if (!gun.hasIronSight()) {
 

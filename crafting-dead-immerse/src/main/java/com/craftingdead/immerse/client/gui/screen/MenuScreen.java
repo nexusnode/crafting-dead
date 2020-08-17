@@ -33,7 +33,7 @@ public class MenuScreen extends ComponentScreen {
     this
         .getRoot()
         .addChild(
-            new PanoramaComponent(new ResourceLocation("textures/gui/title/background/panorama")));
+            new PanoramaComponent(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/title/background/panorama")));
 
     ContainerComponent sideBar =
         new ContainerComponent().setX(0).setY(0).setWidth(25).setHeightPercent(1.0F);
@@ -146,7 +146,7 @@ public class MenuScreen extends ComponentScreen {
         new EntityComponent(fakePlayerEntity)
             .setXPercent(0.75F)
             .setYPercent(0.75F)
-            .setScale(10.0F)
+            .setScale(5.0F)
             .setCentre(true));
 
     this.getRoot().addChild(sideBar);

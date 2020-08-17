@@ -20,9 +20,9 @@ public class AimableGun extends DefaultGun implements IScope {
   }
 
   @Override
-  public float getFovModifier(Entity entity, ItemStack itemStack) {
-    return this.hasIronSight() ? 0.75F
-        : this.getAttachmentMultiplier(AttachmentItem.MultiplierType.FOV);
+  public float getZoomMultiplier(Entity entity, ItemStack itemStack) {
+    return this.hasIronSight() ? 2.0F
+        : this.getAttachmentMultiplier(AttachmentItem.MultiplierType.ZOOM);
   }
 
   @Override

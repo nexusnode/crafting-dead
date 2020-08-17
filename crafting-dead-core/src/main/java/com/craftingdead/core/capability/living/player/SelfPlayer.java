@@ -3,7 +3,6 @@ package com.craftingdead.core.capability.living.player;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.Pose;
 import net.minecraft.util.Util;
 
 public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
@@ -12,7 +11,6 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
 
   private boolean wasSneaking;
   private long lastSneakPressTime;
-  private boolean crouching;
 
   public SelfPlayer(ClientPlayerEntity entity) {
     super(entity);
@@ -42,17 +40,13 @@ public class SelfPlayer extends DefaultPlayer<ClientPlayerEntity> {
       if (this.getEntity().isSneaking()) {
         final long currentTime = Util.milliTime();
         if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
-          this.crouching = true;
+          this.setCrouching(true, true);
         }
         this.lastSneakPressTime = Util.milliTime();
       } else {
-        this.crouching = false;
+        this.setCrouching(false, true);
       }
       this.wasSneaking = this.getEntity().isSneaking();
-    }
-
-    if (this.crouching) {
-      this.getEntity().setPose(Pose.SWIMMING);
     }
   }
 }

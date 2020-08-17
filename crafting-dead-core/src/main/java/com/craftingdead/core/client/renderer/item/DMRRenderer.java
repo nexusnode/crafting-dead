@@ -69,7 +69,7 @@ public class DMRRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.0F));
 
-    matrixStack.translate(1F, -0.22F, 0.94F);
+    matrixStack.translate(1F, -0.21F, 0.94F);
 
     float scale = 1.0F;
     matrixStack.scale(scale, scale, scale);

@@ -5,17 +5,5 @@
 	"ambientToFullbright": false,
 	"textures": {
 		"base": "craftingdead:gun/ak47"
-	},
-	"transform": {
-		"rotation": [
-			0,
-			-180,
-			0
-		],
-		"translation": [
-			-2,
-			1.45,
-			-2
-		]
 	}
 }

@@ -166,6 +166,10 @@ public class ClientDist implements IModDist {
 
   private boolean wasAdrenalineActive;
 
+  private float lastFov;
+
+  private float fov;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
@@ -463,8 +467,12 @@ public class ClientDist implements IModDist {
                 .filter(gun -> gun
                     .getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD)
                 .ifPresent(gun -> {
+                  if ((event.getAction() == GLFW.GLFW_PRESS && !gun.isPerformingRightMouseAction())
+                      || (event.getAction() == GLFW.GLFW_RELEASE
+                          && gun.isPerformingRightMouseAction())) {
+                    gun.toggleRightMouseAction(player, true);
+                  }
                   event.setCanceled(true);
-                  gun.toggleRightMouseAction(player, true);
                 }));
       }
     }
@@ -533,10 +541,8 @@ public class ClientDist implements IModDist {
 
           event
               .setCanceled(player.getActionProgress().isPresent()
-                  || heldStack
-                      .getCapability(ModCapabilities.SCOPE)
-                      .map(scope -> scope.isAiming(playerEntity, heldStack))
-                      .orElse(false));
+                  || heldStack.getCapability(ModCapabilities.SCOPE)
+                      .map(scope -> scope.isAiming(playerEntity, heldStack)).orElse(false));
 
           if (!event.isCanceled()) {
             heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
@@ -566,13 +572,22 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
-    event.setNewfov(event.getFov() + this.cameraManager.getFov());
+    event.setNewfov(event.getNewfov() + this.cameraManager.getFov());
+  }
+
+  @SubscribeEvent
+  public void handeFOVUpdate(EntityViewRenderEvent.FOVModifier event) {
+
     ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-    heldStack.getCapability(ModCapabilities.SCOPE).ifPresent(scope -> {
-      if (scope.isAiming(this.minecraft.player, heldStack)) {
-        event.setNewfov(event.getFov() * scope.getFovModifier(this.minecraft.player, heldStack));
-      }
-    });
+    float newFov = heldStack.getCapability(ModCapabilities.SCOPE)
+        .filter(scope -> scope.isAiming(this.minecraft.player, heldStack))
+        .map(scope -> 1 / scope.getZoomMultiplier(this.minecraft.player, heldStack)).orElse(1.0F);
+
+    this.lastFov = this.fov;
+    this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
+
+    event.setFOV(event.getFOV()
+        * MathHelper.lerp(this.minecraft.getRenderPartialTicks(), this.lastFov, this.fov));
   }
 
   @SubscribeEvent

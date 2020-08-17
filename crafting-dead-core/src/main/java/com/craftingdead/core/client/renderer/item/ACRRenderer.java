@@ -61,9 +61,9 @@ public class ACRRenderer extends GunRenderer {
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.0F));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-34.5F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.0F));
-    matrixStack.translate(1F, -0.22F, 0.94F);
+    matrixStack.translate(1F, -0.23F, 0.94F);
 
     float scale = 0.8F;
     matrixStack.scale(scale, scale, scale);

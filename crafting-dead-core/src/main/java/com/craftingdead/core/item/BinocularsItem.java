@@ -47,7 +47,6 @@ public class BinocularsItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
-        new DefaultScope(1 / 14, SCOPE_OVERLAY_TEXTURE, 2048, 512),
-        () -> ModCapabilities.SCOPE);
+        new DefaultScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512), () -> ModCapabilities.SCOPE);
   }
 }

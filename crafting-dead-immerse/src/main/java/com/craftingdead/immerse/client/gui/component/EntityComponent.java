@@ -15,7 +15,8 @@ public class EntityComponent extends Component<EntityComponent> {
   public static final TweenType<EntityComponent> X_ROTATION =
       new SimpleTweenType<>(1, t -> Arrays.copyOf(t.rotation, 1), (t, v) -> t.rotation[0] = v[0]);
   public static final TweenType<EntityComponent> Y_ROTATION =
-      new SimpleTweenType<>(1, t -> Arrays.copyOfRange(t.rotation, 1, 2), (t, v) -> t.rotation[0] = v[0]);
+      new SimpleTweenType<>(1, t -> Arrays.copyOfRange(t.rotation, 1, 2),
+          (t, v) -> t.rotation[0] = v[0]);
   public static final TweenType<EntityComponent> Z_ROTATION =
       new SimpleTweenType<>(1, t -> Arrays.copyOf(t.rotation, 1), (t, v) -> t.rotation[0] = v[0]);
 
@@ -59,7 +60,7 @@ public class EntityComponent extends Component<EntityComponent> {
       final float oldPrevHeadYaw = this.livingEntity.prevRotationYawHead;
       final float oldHeadYaw = this.livingEntity.rotationYawHead;
 
-      float headYaw = (float) Math.atan((this.getX() - mouseX) / 40.0F);
+      float headYaw = (float) Math.atan((this.getX() + (this.getWidth() / 2) - mouseX) / 40.0F);
       float headPitch = (float) Math.atan((this.getY() - mouseY) / 40.0F);
       this.livingEntity.renderYawOffset = 180.0F + headYaw * 20.0F;
       this.livingEntity.rotationYaw = 180.0F + headYaw * 40.0F;

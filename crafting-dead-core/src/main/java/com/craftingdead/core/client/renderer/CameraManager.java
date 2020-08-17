@@ -36,9 +36,8 @@ public class CameraManager {
     }
     float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
-    if (modifyLookPosition) {
-      this.lookRotationVelocity = new Vec2f(-randomAmount * 3.75F, randomNegativeAmount * 3F);
-    }
+    this.lookRotationVelocity =
+        modifyLookPosition ? new Vec2f(-randomAmount * 3.75F, randomNegativeAmount * 3F) : null;
     this.joltStartTime = Util.milliTime();
     this.rollMultiplier = randomNegativeAmount / 1.5F;
     this.pitchMultiplier = randomAmount / 2.0F;
@@ -47,6 +46,9 @@ public class CameraManager {
   }
 
   public Vec2f getLookRotationVelocity() {
+    if (this.lookRotationVelocity == null) {
+      return new Vec2f(0.0F, 0.0F);
+    }
     float pct = 1.0F - MathHelper
         .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
     Vec2f newRotationVelocity = new Vec2f(
@@ -71,6 +73,9 @@ public class CameraManager {
     float pct = MathHelper
         .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.rollDurationMs / 2.0F),
             0.0F, 1.0F);
+    if (pct == 1.0F) {
+      return 0.0F;
+    }
     return (float) Math.sin(Math.toRadians(180 * pct)) * this.fovMultiplier;
   }
 }

@@ -119,7 +119,7 @@ public class VectorRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.92F, -0.145F, 0.07F);
+      matrixStack.translate(0.92F, -0.14F, 0.07F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));

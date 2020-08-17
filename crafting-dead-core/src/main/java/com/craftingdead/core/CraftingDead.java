@@ -1,5 +1,7 @@
 package com.craftingdead.core;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +21,6 @@ import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
-import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
@@ -103,6 +104,8 @@ public class CraftingDead {
    * Logger.
    */
   private static final Logger logger = LogManager.getLogger();
+
+  private static final ExecutorService parallelExecutor = Executors.newWorkStealingPool();
 
   /**
    * Singleton.
@@ -207,8 +210,8 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
     if (!(event.getEntityLiving() instanceof PlayerEntity)) {
-      event.getEntityLiving().getCapability(ModCapabilities.LIVING)
-          .ifPresent(ILiving::tick);
+      parallelExecutor.execute(() -> event.getEntityLiving().getCapability(ModCapabilities.LIVING)
+          .ifPresent(ILiving::tick));
     }
   }
 
@@ -216,7 +219,8 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+        parallelExecutor.execute(
+            () -> event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick));
         break;
       default:
         break;
@@ -296,12 +300,11 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-    if (event.getObject() instanceof AdvancedZombieEntity) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableCapabilityProvider<>(
-                  new DefaultLiving<>((LivingEntity) event.getObject()),
-                  () -> ModCapabilities.LIVING));
+    if (!(event.getObject() instanceof PlayerEntity) && event.getObject() instanceof LivingEntity) {
+      event.addCapability(new ResourceLocation(CraftingDead.ID, "living"),
+          new SerializableCapabilityProvider<>(
+              new DefaultLiving<>((LivingEntity) event.getObject()),
+              () -> ModCapabilities.LIVING));
     } else if (event.getObject() instanceof ServerPlayerEntity) {
       ServerPlayer player = new ServerPlayer((ServerPlayerEntity) event.getObject());
       event

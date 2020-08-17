@@ -70,7 +70,8 @@ public class MAC10Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-30));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0, -0.625F, 0.9585F);
+    
+    matrixStack.translate(0.05, -0.645F, 0.9585F);
 
     if (!gun.hasIronSight()) {
 
@@ -98,7 +99,7 @@ public class MAC10Renderer extends GunRenderer {
       matrixStack.scale(scale, scale, scale);
       scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(-0.45F, -0.55F, -0.375F);
+      matrixStack.translate(-1.5F, -0.25F, -0.375F);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is1.png")));
@@ -112,7 +113,7 @@ public class MAC10Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.755F, -0.1F, 0.102F);
+      matrixStack.translate(0.755F, -0.05F, 0.102F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));

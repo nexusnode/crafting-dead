@@ -66,10 +66,10 @@ public class MPT55Renderer extends GunRenderer {
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.5F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(4.5F));
 
-    matrixStack.translate(3.6F, 0.3F, 0.95F);
+    matrixStack.translate(3.67F, 0.315F, 0.945F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);

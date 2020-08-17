@@ -71,10 +71,9 @@ public class Sporter22Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0.1F, -0.645F, 0.9515F);
+    matrixStack.translate(-0.1F, -0.677F, 0.9515F);
 
     if (!gun.hasIronSight()) {
-
       matrixStack.translate(0.0F, 0.03F, 0.0F);
     }
 
@@ -99,7 +98,7 @@ public class Sporter22Renderer extends GunRenderer {
       matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.translate(0.9F, -0.785F, -0.145F);
+      matrixStack.translate(0.9F, -0.7F, -0.145F);
       scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.translate(-2.3F, 1.24F, -0.025F);
@@ -116,7 +115,7 @@ public class Sporter22Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.625F, -0.145F, 0.104F);
+      matrixStack.translate(1.625F, -0.091F, 0.104F);
       float scale = 0.25F;
       matrixStack.scale(scale + 0.75F, scale, scale);
       matrixStack.rotate(Vector3f.YP.rotationDegrees(90));
