@@ -48,6 +48,8 @@ minecraft {
 
             property 'forge.logging.console.level', 'debug'
             
+            args '--mixin', 'craftingdead.mixins.json'
+            
             mods {
                 craftingdead {
                     source sourceSets.main
@@ -59,6 +61,8 @@ minecraft {
             workingDirectory project.file('server')
 
             property 'forge.logging.console.level', 'debug'
+            
+            args '--mixin', 'craftingdead.mixins.json'
             
             mods {
                 craftingdead {
