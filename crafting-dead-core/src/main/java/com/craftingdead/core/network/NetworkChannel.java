@@ -3,7 +3,7 @@ package com.craftingdead.core.network;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.network.message.main.CancelActionMessage;
 import com.craftingdead.core.network.message.main.CrouchMessage;
-import com.craftingdead.core.network.message.main.HitMarkerMessage;
+import com.craftingdead.core.network.message.main.HitMessage;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.main.OpenStorageMessage;
 import com.craftingdead.core.network.message.main.PerformActionMessage;
@@ -110,10 +110,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(HitMarkerMessage.class, ++id)
-          .encoder(HitMarkerMessage::encode)
-          .decoder(HitMarkerMessage::decode)
-          .consumer(HitMarkerMessage::handle)
+          .messageBuilder(HitMessage.class, ++id)
+          .encoder(HitMessage::encode)
+          .decoder(HitMessage::decode)
+          .consumer(HitMessage::handle)
           .add();
     }
   };

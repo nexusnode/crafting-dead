@@ -18,7 +18,6 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.player.DefaultPlayer;
 import com.craftingdead.core.capability.living.player.SelfPlayer;
 import com.craftingdead.core.capability.living.player.ServerPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
@@ -31,7 +30,7 @@ import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.HitMarkerMessage;
+import com.craftingdead.core.network.message.main.HitMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
@@ -77,7 +76,6 @@ import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -363,11 +361,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     final World world = hitEntity.getEntityWorld();
     float damage = this.gunItem.getDamage();
 
-    float armorPenetration = (1.0F
+    float armorPenetration = Math.min((1.0F
         + (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(), itemStack)
             / 255.0F))
-        * this.getMagazine().map(IMagazine::getArmorPenetration).orElse(0.0F);
-    armorPenetration = armorPenetration > 1.0F ? 1.0F : armorPenetration;
+        * this.getMagazine().map(IMagazine::getArmorPenetration).orElse(0.0F), 1.0F);
     if (armorPenetration > 0 && hitEntity instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) hitEntity;
       float reducedDamage = damage - CombatRules
@@ -388,11 +385,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     if (headshot) {
       damage *= HEADSHOT_MULTIPLIER;
 
-      // Client-side effects
+      // Simulated client-side effects
       if (world.isRemote()) {
-        world.playMovingSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, entity,
-            SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 2F, 1.5F);
-
         final int particleCount = 12;
         for (int i = 0; i < particleCount; ++i) {
           world.addParticle(
@@ -402,18 +396,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
     }
 
-    if (entity instanceof ServerPlayerEntity && hitEntity instanceof LivingEntity) {
-      NetworkChannel.MAIN.getSimpleChannel().send(
-          PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
-          new HitMarkerMessage(hitPos, ((LivingEntity) hitEntity).getHealth() - damage <= 0));
-    }
-
-    // Client-side effects
+    // Simulated client-side effects
     if (world.isRemote()) {
-      world.playMovingSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
-          hitEntity,
-          ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS, 0.75F,
-          (float) Math.random() + 0.7F);
+      world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
+          hitEntity.getPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
+          1.0F, 1.0F);
 
       if (hitEntity instanceof ClientPlayerEntity) {
         ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager().joltCamera(1.5F,
@@ -441,15 +428,29 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         hitEntity.setFire(100);
       }
 
-      if (living instanceof DefaultPlayer) {
-        ((DefaultPlayer<?>) living)
-            .infect(
+      if (hitEntity instanceof LivingEntity) {
+        final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
+
+        // Alert client of hit (real hit data compared to client simulation)
+        if (entity instanceof ServerPlayerEntity) {
+          boolean dead = hitLivingEntity.getHealth() <= 0;
+          NetworkChannel.MAIN.getSimpleChannel().send(
+              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
+              new HitMessage(hitPos, dead));
+        }
+
+        hitLivingEntity.getCapability(ModCapabilities.LIVING)
+            .filter(hitLiving -> hitLiving instanceof ServerPlayer)
+            .map(hitLiving -> (ServerPlayer) hitLiving)
+            .ifPresent(hitPlayer -> hitPlayer.infect(
                 (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
                     / 255.0F)
-                    * living.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
+                    * hitPlayer.getItemHandler()
+                        .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
                         .getCapability(ModCapabilities.CLOTHING)
                         .filter(IClothing::hasEnhancedProtection)
-                        .map(clothing -> 0.5F).orElse(1.0F));
+                        .map(clothing -> 0.5F).orElse(1.0F)));
+
       }
     }
   }
