@@ -44,7 +44,9 @@ minecraft {
 
     runs {
         client {
-            workingDirectory project.file('run')
+            taskName "${project.name} [client]"
+ 
+            workingDirectory project.file('client')
 
             property 'forge.logging.console.level', 'debug'
             
@@ -58,6 +60,8 @@ minecraft {
         }
 
         server {
+            taskName "${project.name} [server]"
+        
             workingDirectory project.file('server')
 
             property 'forge.logging.console.level', 'debug'
@@ -72,7 +76,9 @@ minecraft {
         }
         
         data {
-            workingDirectory project.file('run')
+            taskName "${project.name} [data]"
+      
+            workingDirectory project.file('data')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'

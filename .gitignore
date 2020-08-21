@@ -5,7 +5,7 @@ crafting-dead-core/bin/
 crafting-dead-core/.settings/
 crafting-dead-core/build/
 crafting-dead-core/server/
-crafting-dead-core/run/
+crafting-dead-core/client/
 crafting-dead-core/.idea/
 crafting-dead-core/src/generated/
 
@@ -16,7 +16,7 @@ crafting-dead-immerse/bin/
 crafting-dead-immerse/.settings/
 crafting-dead-immerse/build/
 crafting-dead-immerse/server/
-crafting-dead-immerse/run/
+crafting-dead-immerse/client/
 crafting-dead-immerse/.idea/
 
 # Launch configurations from Eclipse
