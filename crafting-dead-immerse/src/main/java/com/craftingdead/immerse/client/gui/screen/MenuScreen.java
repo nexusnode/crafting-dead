@@ -6,6 +6,7 @@ import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.DropdownComponent;
 import com.craftingdead.immerse.client.gui.component.EntityComponent;
 import com.craftingdead.immerse.client.gui.component.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
@@ -33,7 +34,8 @@ public class MenuScreen extends ComponentScreen {
     this
         .getRoot()
         .addChild(
-            new PanoramaComponent(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/title/background/panorama")));
+            new PanoramaComponent(new ResourceLocation(CraftingDeadImmerse.ID,
+                "textures/gui/title/background/panorama")));
 
     ContainerComponent sideBar =
         new ContainerComponent().setX(0).setY(0).setWidth(25).setHeightPercent(1.0F);
@@ -148,6 +150,16 @@ public class MenuScreen extends ComponentScreen {
             .setYPercent(0.75F)
             .setScale(5.0F)
             .setCentre(true));
+
+    this.getRoot().addChild(new DropdownComponent(0xFFFFFF)
+        .setXPercent(0.5F)
+        .setYPercent(0.5F)
+        .setWidth(100)
+        .setHeight(100)
+        .addItem(0, new StringTextComponent("test"))
+        .addItem(1, new StringTextComponent("test2"))
+        .addItem(2, new StringTextComponent("test3"))
+        .addItem(3, new StringTextComponent("test4")));
 
     this.getRoot().addChild(sideBar);
   }

@@ -85,9 +85,13 @@ abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Compo
     final boolean handled = this
         .getComponentForPos(mouseX, mouseY)
         .filter(component -> component.mouseClicked(mouseX, mouseY, button))
+        .filter(component -> component.changeFocus(true))
         .map(component -> {
-          this.setFocused(component);
+          if(this.)
           if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (component.changeFocus(true)) {
+              this.setFocused(component);
+            }
             this.setDragging(true);
           }
           return true;

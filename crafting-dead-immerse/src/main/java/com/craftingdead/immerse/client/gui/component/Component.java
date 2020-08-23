@@ -208,6 +208,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
+  /**
+   * Submit the event for dispatch to appropriate listeners.
+   *
+   * @param event - The event to dispatch to listeners
+   * @return true if the event was cancelled
+   */
   public boolean post(Event event) {
     return this.eventBus.post(event);
   }
