@@ -1,7 +1,5 @@
 package com.craftingdead.immerse.client.gui.component;
 
-import com.craftingdead.immerse.client.util.RenderUtil;
-
 public class RectangleComponent extends Component<RectangleComponent> {
 
   private final Colour colour;
@@ -10,15 +8,13 @@ public class RectangleComponent extends Component<RectangleComponent> {
     this.colour = colour;
   }
 
-  public Colour getColourProperty() {
-    return this.colour;
-  }
-
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
-    RenderUtil
-        .fill(this.getX(), this.getY(), this.getX() + this.getWidth(),
-            this.getY() + this.getHeight(), this.colour.getHexColour());
+    final int[] colour4i = this.colour.getColour4i();
+    this.canvas.setRGBA(colour4i[0], colour4i[0], colour4i[0], colour4i[0]);
+    this.canvas.drawRect(this.getXFloat(), this.getYFloat(),
+        this.getXFloat() + this.getWidthFloat(),
+        this.getYFloat() + this.getHeightFloat());
   }
 }

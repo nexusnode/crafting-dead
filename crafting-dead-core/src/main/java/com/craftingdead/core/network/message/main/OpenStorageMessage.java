@@ -1,8 +1,7 @@
 package com.craftingdead.core.network.message.main;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.player.ServerPlayer;
+import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.inventory.InventorySlotType;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -24,13 +23,7 @@ public class OpenStorageMessage {
   }
 
   public static boolean handle(OpenStorageMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx
-        .get()
-        .getSender()
-        .getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof ServerPlayer)
-        .map(living -> (ServerPlayer) living)
-        .ifPresent(player -> player.openStorage(msg.slotType));
+    Player.get(ctx.get().getSender()).openStorage(msg.slotType);
     return true;
   }
 }

@@ -7,9 +7,14 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
+import com.mojang.blaze3d.systems.RenderSystem;
+import icyllis.modernui.graphics.font.FontTools;
+import icyllis.modernui.gui.master.Canvas;
+import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
 import io.noties.tumbleweed.TweenType;
+import io.noties.tumbleweed.equations.Sine;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -17,6 +22,8 @@ import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -26,17 +33,19 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     implements IRenderable, IGuiEventListener {
 
   public static final TweenType<Component<?>> X_SCALE =
-      new SimpleTweenType<>(1, t -> new float[] {t.xScale}, (t, v) -> t.xScale = v[0]);
+      new SimpleTweenType<>(Component::getXScale, Component::setXScale);
   public static final TweenType<Component<?>> Y_SCALE =
-      new SimpleTweenType<>(1, t -> new float[] {t.yScale}, (t, v) -> t.yScale = v[0]);
-  public static final TweenType<Component<?>> X_TRANSLATION = new SimpleTweenType<>(1,
-      t -> new float[] {t.xTranslation}, (t, v) -> t.xTranslation = v[0]);
-  public static final TweenType<Component<?>> Y_TRANSLATION = new SimpleTweenType<>(1,
-      t -> new float[] {t.yTranslation}, (t, v) -> t.yTranslation = v[0]);
+      new SimpleTweenType<>(Component::getYScale, Component::setYScale);
+  public static final TweenType<Component<?>> X_TRANSLATION =
+      new SimpleTweenType<>(Component::getXTranslation, Component::setXTranslation);
+  public static final TweenType<Component<?>> Y_TRANSLATION =
+      new SimpleTweenType<>(Component::getYTranslation, Component::setYTranslation);
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
   protected final MainWindow mainWindow = this.minecraft.getMainWindow();
+
+  protected final Canvas canvas = new Canvas();
 
   protected final ClientDist clientDist =
       (ClientDist) CraftingDeadImmerse.getInstance().getModDist();
@@ -70,6 +79,71 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private float lastTime = 0F;
 
+  private Tooltip tooltip = new Tooltip(new StringTextComponent("Hello World!"));
+
+  public static class Tooltip {
+
+    private static final TweenType<Tooltip> ALPHA =
+        new SimpleTweenType<>(Tooltip::getAlpha, Tooltip::setAlpha);
+    private static final TweenType<Tooltip> TEXT_ALPHA =
+        new SimpleTweenType<>(Tooltip::getTextAlpha, Tooltip::setTextAlpha);
+
+    private final ITextComponent text;
+    private float alpha = 0;
+    private float textAlpha = 0;
+
+    public Tooltip(ITextComponent text) {
+      this.text = text;
+    }
+
+    public void render(Canvas canvas, float x, float y, float partialTicks) {
+      float width = 10.0F + FontTools.getStringWidth(this.text.getFormattedText());
+      float height = 14;
+      RenderSystem.enableBlend();
+      canvas.setRGBA(0.0F, 0.0F, 0.0F, 0.5F * this.alpha);
+      canvas.drawRoundedRect(x, y, x + width, y + height, 6);
+      canvas.setRGBA(0.5F, 0.5F, 0.5F, this.alpha);
+      canvas.drawRoundedRectFrame(x, y + 1, x + width, y + height, 6);
+      canvas.setRGBA(1.0F, 1.0F, 1.0F, textAlpha);
+      canvas.drawText(this.text.getFormattedText(), x + (width - FontTools.getStringWidth(this.text.getFormattedText())) / 2, y + 4);
+      RenderSystem.disableBlend();
+    }
+
+    public float getAlpha() {
+      return this.alpha;
+    }
+
+    public void setAlpha(float alpha) {
+      this.alpha = alpha;
+    }
+
+    public float getTextAlpha() {
+      return this.textAlpha;
+    }
+
+    public void setTextAlpha(float textAlpha) {
+      this.textAlpha = textAlpha;
+    }
+  }
+
+  public Component() {
+    this.addListener(MouseEnterEvent.class, (c, e) -> Timeline.createParallel(150)
+        .push(Tween.to(this.tooltip, Tooltip.ALPHA)
+            .target(1.0F))
+        .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
+            .delay(100.0F)
+            .target(1.0F)
+            .ease(Sine.INOUT))
+        .start(this.getTweenManager()));
+
+    this.addListener(MouseLeaveEvent.class, (c, e) -> Timeline.createParallel(250)
+        .push(Tween.to(this.tooltip, Tooltip.ALPHA)
+            .target(0.0F))
+        .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
+            .target(0.0F))
+        .start(this.getTweenManager()));
+  }
+
   protected void added() {
     if (this.overrideSize()) {
       if (!this.getBestWidth().isPresent() || !this.getBestHeight().isPresent()) {
@@ -92,6 +166,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
+    this.tooltip.render(this.canvas, 10.0F + this.getXFloat() + this.getWidthFloat(), this.getYFloat(), partialTicks);
   }
 
   protected void mouseEntered() {
@@ -218,6 +293,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.eventBus.post(event);
   }
 
+  public float getXFloat() {
+    return (float) this.getX();
+  }
+
   public double getX() {
     double x =
         (this.parent.map(Component::getX).orElse(0.0D) + this.xFactory.get()) * this.xTranslation;
@@ -234,6 +313,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
         () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth())
             * xPercent;
     return this.self();
+  }
+
+  public float getYFloat() {
+    return (float) this.getY();
   }
 
   public double getY() {
@@ -253,6 +336,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
             .orElse((double) this.mainWindow.getScaledHeight())
             * yPercent;
     return this.self();
+  }
+
+  public float getWidthFloat() {
+    return (float) this.getWidth();
   }
 
   public double getWidth() {
@@ -277,6 +364,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public SELF setAutoWidth() {
     this.widthFactory = () -> this.getBestWidth().orElseGet(this.heightFactory);
     return this.self();
+  }
+
+  public float getHeightFloat() {
+    return (float) this.getHeight();
   }
 
   public double getHeight() {
@@ -339,6 +430,24 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public SELF setScale(float scale) {
     return this.setXScale(scale).setYScale(scale);
+  }
+
+  public float getXTranslation() {
+    return this.xTranslation;
+  }
+
+  public SELF setXTranslation(float xTranslation) {
+    this.xTranslation = xTranslation;
+    return this.self();
+  }
+
+  public float getYTranslation() {
+    return this.yTranslation;
+  }
+
+  public SELF setYTranslation(float yTranslation) {
+    this.yTranslation = yTranslation;
+    return this.self();
   }
 
   protected Optional<Double> getBestWidth() {

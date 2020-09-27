@@ -37,7 +37,8 @@ public class HitMessage {
         ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui().displayHitMarker(
             msg.hitPos, msg.dead ? 0xFFB30C00 : 0xFFFFFFFF);
         if (msg.dead) {
-          Minecraft.getInstance().player.playSound(SoundEvents.BLOCK_ANVIL_PLACE, 5.0F, 1.0F);
+          final Minecraft minecraft = Minecraft.getInstance();
+          minecraft.player.playSound(SoundEvents.BLOCK_ANVIL_PLACE, 5.0F, 1.0F);
         }
       });
     }

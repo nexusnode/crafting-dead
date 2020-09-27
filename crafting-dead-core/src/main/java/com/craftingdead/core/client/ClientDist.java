@@ -4,14 +4,15 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.player.DefaultPlayer;
-import com.craftingdead.core.capability.living.player.SelfPlayer;
+import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.client.audio.EffectsManager;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
@@ -37,6 +38,9 @@ import com.craftingdead.core.client.tutorial.IModTutorialStep;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
+import com.craftingdead.core.game.GameType;
+import com.craftingdead.core.game.GameTypes;
+import com.craftingdead.core.game.IGameClient;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.GunItem;
@@ -46,6 +50,7 @@ import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
+import com.craftingdead.core.server.LogicalServer;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -78,6 +83,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -102,7 +108,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -127,9 +132,6 @@ public class ClientDist implements IModDist {
   public static final KeyBinding OPEN_MOD_INVENTORY =
       new KeyBinding("key.craftingdead.inventory", GLFW.GLFW_KEY_Z, "key.categories.inventory");
 
-  private static final ResourceLocation ADRENALINE_SHADER =
-      new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
-
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;
 
@@ -139,6 +141,13 @@ public class ClientDist implements IModDist {
     clientConfigSpec = clientConfigPair.getRight();
     clientConfig = clientConfigPair.getLeft();
   }
+
+  private static final ResourceLocation ADRENALINE_SHADER =
+      new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
+
+  private static final int DOUBLE_CLICK_DURATION = 500;
+
+  private static final Logger logger = LogManager.getLogger();
 
   private final Minecraft minecraft;
 
@@ -158,8 +167,6 @@ public class ClientDist implements IModDist {
 
   private long adrenalineShaderStartTime = 0L;
 
-  private boolean freezeMovementInput = false;
-
   private TweenManager tweenManager = TweenManager.create();
 
   private float lastTime = 0F;
@@ -169,6 +176,12 @@ public class ClientDist implements IModDist {
   private float lastFov;
 
   private float fov;
+
+  private IGameClient<?> gameClient;
+
+  private boolean wasSneaking;
+  private long lastSneakPressTime;
+
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -188,6 +201,16 @@ public class ClientDist implements IModDist {
     this.cameraManager = new CameraManager();
   }
 
+  @Override
+  public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {
+    return new LogicalServer(minecraftServer, GameTypes.SURVIVAL.get());
+  }
+
+  public void loadGame(GameType gameType) {
+    logger.info("Loading game: {}", gameType.getRegistryName().toString());
+    this.gameClient = gameType.createGameClient();
+  }
+
   public void setTutorialStep(ModTutorialSteps step) {
     clientConfig.tutorialStep.set(step);
     Tutorial tutorial = this.minecraft.getTutorial();
@@ -199,21 +222,8 @@ public class ClientDist implements IModDist {
     return this.crosshairManager;
   }
 
-  public LazyOptional<SelfPlayer> getPlayer() {
-    return this.minecraft.player != null
-        ? this.minecraft.player
-            .getCapability(ModCapabilities.LIVING)
-            .filter(living -> living instanceof SelfPlayer)
-            .cast()
-        : LazyOptional.empty();
-  }
-
   public IngameGui getIngameGui() {
     return this.ingameGui;
-  }
-
-  public void setFreezeMovementInput(boolean freezeMovementInput) {
-    this.freezeMovementInput = freezeMovementInput;
   }
 
   public TweenManager getTweenManager() {
@@ -386,15 +396,14 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        if (this.minecraft.isGamePaused()) {
-          this.getPlayer().ifPresent(player -> {
-            ItemStack heldStack = player.getEntity().getHeldItemMainhand();
-            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-              gun.setTriggerPressed(player, heldStack, false, true);
-              if (gun.isPerformingRightMouseAction()) {
-                gun.toggleRightMouseAction(player, true);
-              }
-            });
+        if (this.minecraft.player != null && this.minecraft.isGamePaused()) {
+          Player<ClientPlayerEntity> player = Player.get(this.minecraft.player);
+          ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
+          heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+            gun.setTriggerPressed(player, heldStack, false, true);
+            if (gun.isPerformingRightMouseAction()) {
+              gun.toggleRightMouseAction(player, true);
+            }
           });
         }
         // TODO SoundLoadEvent is not called upon initial startup - see
@@ -405,23 +414,34 @@ public class ClientDist implements IModDist {
         }
         if (this.minecraft.loadingGui == null
             && (this.minecraft.currentScreen == null || this.minecraft.currentScreen.passEvents)) {
+          Player<ClientPlayerEntity> player = Player.get(this.minecraft.player);
           final ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-          this.getPlayer().ifPresent(player -> {
-            while (TOGGLE_FIRE_MODE.isPressed()) {
-              heldStack
-                  .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun.toggleFireMode(player, true));
+          while (TOGGLE_FIRE_MODE.isPressed()) {
+            heldStack
+                .getCapability(ModCapabilities.GUN)
+                .ifPresent(gun -> gun.toggleFireMode(player, true));
+          }
+          while (RELOAD.isPressed()) {
+            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.reload(player));
+          }
+          while (REMOVE_MAGAZINE.isPressed()) {
+            heldStack.getCapability(ModCapabilities.GUN)
+                .ifPresent(gun -> gun.removeMagazine(player));
+          }
+          if (this.minecraft.player.isSneaking() != this.wasSneaking) {
+            if (this.minecraft.player.isSneaking()) {
+              final long currentTime = Util.milliTime();
+              if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
+                player.setCrouching(true, true);
+              }
+              this.lastSneakPressTime = Util.milliTime();
+            } else {
+              player.setCrouching(false, true);
             }
-            while (RELOAD.isPressed()) {
-              heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.reload(player));
-            }
-            while (REMOVE_MAGAZINE.isPressed()) {
-              heldStack.getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun.removeMagazine(player));
-            }
-          });
+            this.wasSneaking = this.minecraft.player.isSneaking();
+          }
           while (OPEN_MOD_INVENTORY.isPressed()) {
-            NetworkChannel.MAIN.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
+            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
             if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
               ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
             }
@@ -455,55 +475,45 @@ public class ClientDist implements IModDist {
       if (this.minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-        this.getPlayer()
-            .ifPresent(player -> heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-              event.setCanceled(true);
-              gun.setTriggerPressed(player, heldStack, triggerPressed, true);
-            }));
+        heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+          event.setCanceled(true);
+          gun.setTriggerPressed(Player.get(this.minecraft.player), heldStack, triggerPressed, true);
+        });
       } else if (this.minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())) {
         ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-        this.getPlayer()
-            .ifPresent(player -> heldStack.getCapability(ModCapabilities.GUN)
-                .filter(gun -> gun
-                    .getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD)
-                .ifPresent(gun -> {
-                  if ((event.getAction() == GLFW.GLFW_PRESS && !gun.isPerformingRightMouseAction())
-                      || (event.getAction() == GLFW.GLFW_RELEASE
-                          && gun.isPerformingRightMouseAction())) {
-                    gun.toggleRightMouseAction(player, true);
-                  }
-                  event.setCanceled(true);
-                }));
+        heldStack.getCapability(ModCapabilities.GUN)
+            .filter(gun -> gun
+                .getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD)
+            .ifPresent(gun -> {
+              if ((event.getAction() == GLFW.GLFW_PRESS && !gun.isPerformingRightMouseAction())
+                  || (event.getAction() == GLFW.GLFW_RELEASE
+                      && gun.isPerformingRightMouseAction())) {
+                gun.toggleRightMouseAction(Player.get(this.minecraft.player), true);
+              }
+              event.setCanceled(true);
+            });
       }
     }
   }
 
   @SubscribeEvent
   public void handleInputUpdate(InputUpdateEvent event) {
-    if (this.freezeMovementInput) {
+    if (Player.get(this.minecraft.player).getFreezeMovement()) {
       final MovementInput input = event.getMovementInput();
       input.forwardKeyDown = input.backKeyDown =
           input.leftKeyDown = input.rightKeyDown = input.jump = input.sneaking = false;
       input.moveForward = 0.0F;
       input.moveStrafe = 0.0F;
-      this.freezeMovementInput = false;
     }
   }
 
   @SubscribeEvent
   public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-    if (event.getObject() instanceof ClientPlayerEntity) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableCapabilityProvider<>(
-                  new SelfPlayer((ClientPlayerEntity) event.getObject()),
-                  () -> ModCapabilities.LIVING));
-    } else if (event.getObject() instanceof AbstractClientPlayerEntity) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-              new SerializableCapabilityProvider<>(
-                  new DefaultPlayer<>((AbstractClientPlayerEntity) event.getObject()),
-                  () -> ModCapabilities.LIVING));
+    if (event.getObject() instanceof AbstractClientPlayerEntity) {
+      event.addCapability(this.gameClient.getGameType().getRegistryName(),
+          new SerializableCapabilityProvider<>(
+              this.gameClient.createPlayer((AbstractClientPlayerEntity) event.getObject()),
+              () -> ModCapabilities.LIVING));
     }
   }
 
@@ -530,32 +540,31 @@ public class ClientDist implements IModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     switch (event.getType()) {
       case ALL:
-        this.getPlayer().ifPresent(player -> this.ingameGui
-            .renderGameOverlay(player, event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                event.getWindow().getScaledHeight()));
+        this.ingameGui.renderGameOverlay(Player.get(this.minecraft.player),
+            event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
+            event.getPartialTicks());
+        this.gameClient.renderHud(this.minecraft, this.minecraft.player,
+            event.getWindow().getScaledWidth(),
+            event.getWindow().getScaledHeight(), event.getPartialTicks());
         break;
       case CROSSHAIRS:
-        this.getPlayer().ifPresent(player -> {
-          ClientPlayerEntity playerEntity = player.getEntity();
-          ItemStack heldStack = playerEntity.getHeldItemMainhand();
+        ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
+        event
+            .setCanceled(Player.get(this.minecraft.player).getActionProgress().isPresent()
+                || heldStack.getCapability(ModCapabilities.SCOPE)
+                    .map(scope -> scope.isAiming(this.minecraft.player, heldStack)).orElse(false));
 
-          event
-              .setCanceled(player.getActionProgress().isPresent()
-                  || heldStack.getCapability(ModCapabilities.SCOPE)
-                      .map(scope -> scope.isAiming(playerEntity, heldStack)).orElse(false));
-
-          if (!event.isCanceled()) {
-            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-              event.setCanceled(true);
-              if (gun.hasCrosshair()) {
-                this.ingameGui
-                    .renderCrosshairs(gun.getAccuracy(player, heldStack),
-                        event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                        event.getWindow().getScaledHeight());
-              }
-            });
-          }
-        });
+        if (!event.isCanceled()) {
+          heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+            event.setCanceled(true);
+            if (gun.hasCrosshair()) {
+              this.ingameGui
+                  .renderCrosshairs(gun.getAccuracy(Player.get(this.minecraft.player), heldStack),
+                      event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                      event.getWindow().getScaledHeight());
+            }
+          });
+        }
         break;
       default:
         break;
@@ -577,17 +586,18 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handeFOVUpdate(EntityViewRenderEvent.FOVModifier event) {
+    if (this.minecraft.player != null) {
+      ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
+      float newFov = heldStack.getCapability(ModCapabilities.SCOPE)
+          .filter(scope -> scope.isAiming(this.minecraft.player, heldStack))
+          .map(scope -> 1 / scope.getZoomMultiplier(this.minecraft.player, heldStack)).orElse(1.0F);
 
-    ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-    float newFov = heldStack.getCapability(ModCapabilities.SCOPE)
-        .filter(scope -> scope.isAiming(this.minecraft.player, heldStack))
-        .map(scope -> 1 / scope.getZoomMultiplier(this.minecraft.player, heldStack)).orElse(1.0F);
+      this.lastFov = this.fov;
+      this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
 
-    this.lastFov = this.fov;
-    this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
-
-    event.setFOV(event.getFOV()
-        * MathHelper.lerp(this.minecraft.getRenderPartialTicks(), this.lastFov, this.fov));
+      event.setFOV(event.getFOV()
+          * MathHelper.lerp(this.minecraft.getRenderPartialTicks(), this.lastFov, this.fov));
+    }
   }
 
   @SubscribeEvent

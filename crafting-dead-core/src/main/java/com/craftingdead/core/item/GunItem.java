@@ -43,7 +43,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
 
 public class GunItem extends ShootableItem implements IRendererProvider {
@@ -338,26 +337,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
               .applyTextStyle(TextFormatting.GRAY)
               .appendSibling(accuracyText));
     });
-  }
-
-  @Override
-  public CompoundNBT getShareTag(ItemStack stack) {
-    CompoundNBT nbt = super.getShareTag(stack);
-    if (nbt == null) {
-      nbt = new CompoundNBT();
-    }
-    nbt.put("gun", stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null));
-    return nbt;
-  }
-
-  @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    super.readShareTag(stack, nbt);
-    if (nbt != null && nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
-      stack
-          .getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("gun")));
-    }
   }
 
   @Override

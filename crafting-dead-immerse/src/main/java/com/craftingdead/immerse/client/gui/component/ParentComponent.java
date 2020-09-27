@@ -87,7 +87,6 @@ abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Compo
         .filter(component -> component.mouseClicked(mouseX, mouseY, button))
         .filter(component -> component.changeFocus(true))
         .map(component -> {
-          if(this.)
           if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (component.changeFocus(true)) {
               this.setFocused(component);

@@ -10,19 +10,11 @@ public class CameraManager {
 
   private static final Random random = new Random();
 
-  /**
-   * Current look rotation velocity.
-   */
-  private Vec2f lookRotationVelocity = Vec2f.ZERO;
+  private Vec2f lookRotationVelocity;
 
-  /**
-   * Look rotation velocity of last tick.
-   */
-  private Vec2f prevLookRotationVelocity = this.lookRotationVelocity;
+  private long joltDurationMs;
 
-  private long rollDurationMs = 250L;
-
-  private long joltStartTime = 0;
+  private long joltStartTime;
 
   private float pitchMultiplier;
 
@@ -34,15 +26,15 @@ public class CameraManager {
     if (amountPercent == 0.0F) {
       return;
     }
-    float randomAmount = amountPercent * (random.nextFloat() + 1.0F);
+    float randomAmount = amountPercent * (random.nextFloat() + 1.0F) / 2.0F;
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
     this.lookRotationVelocity =
-        modifyLookPosition ? new Vec2f(-randomAmount * 3.75F, randomNegativeAmount * 3F) : null;
+        modifyLookPosition ? new Vec2f(-randomAmount * 3F, randomNegativeAmount * 3.25F) : null;
     this.joltStartTime = Util.milliTime();
-    this.rollMultiplier = randomNegativeAmount / 1.5F;
+    this.rollMultiplier = randomNegativeAmount * 0.75F;
     this.pitchMultiplier = randomAmount / 2.0F;
     this.fovMultiplier = 0.035F;
-    this.rollDurationMs = (long) (550L * (amountPercent));
+    this.joltDurationMs = (long) (450L * (randomAmount * 2.15F));
   }
 
   public Vec2f getLookRotationVelocity() {
@@ -50,17 +42,17 @@ public class CameraManager {
       return new Vec2f(0.0F, 0.0F);
     }
     float pct = 1.0F - MathHelper
-        .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
-    Vec2f newRotationVelocity = new Vec2f(
-        MathHelper.lerp(0.5F, this.prevLookRotationVelocity.x, this.lookRotationVelocity.x * pct),
-        MathHelper.lerp(0.5F, this.prevLookRotationVelocity.y, this.lookRotationVelocity.y * pct));
-    this.prevLookRotationVelocity = newRotationVelocity;
+        .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.joltDurationMs / 2.0F), 0.0F,
+            1.0F);
+    Vec2f newRotationVelocity =
+        new Vec2f(this.lookRotationVelocity.x * pct, this.lookRotationVelocity.y * pct);
     return newRotationVelocity;
   }
 
   public Vector3f getCameraRotation() {
     float pct = MathHelper
-        .clamp((float) (Util.milliTime() - this.joltStartTime) / this.rollDurationMs, 0.0F, 1.0F);
+        .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.joltDurationMs * 1.15F),
+            0.0F, 1.0F);
     if (pct == 1.0F) {
       return new Vector3f(0.0F, 0.0F, 0.0F);
     }
@@ -71,7 +63,7 @@ public class CameraManager {
 
   public float getFov() {
     float pct = MathHelper
-        .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.rollDurationMs / 2.0F),
+        .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.joltDurationMs / 2.0F),
             0.0F, 1.0F);
     if (pct == 1.0F) {
       return 0.0F;

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
@@ -18,10 +17,10 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.player.SelfPlayer;
-import com.craftingdead.core.capability.living.player.ServerPlayer;
+import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.gui.KillFeedEntry;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.inventory.InventorySlotType;
@@ -31,6 +30,7 @@ import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.main.HitMessage;
+import com.craftingdead.core.network.message.main.KillFeedMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
@@ -104,7 +104,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   /**
    * Time of the last shot.
    */
-  private long lastShotNanos = Integer.MIN_VALUE;
+  private long lastShotMs = Integer.MIN_VALUE;
 
   private FireMode fireMode;
 
@@ -153,7 +153,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         && ++this.hitValidationTicks >= HIT_VALIDATION_DELAY_TICKS
         && this.livingHitValidationBuffer.size() > 0) {
       this.hitValidationTicks = 0;
-      NetworkChannel.MAIN.getSimpleChannel()
+      NetworkChannel.PLAY.getSimpleChannel()
           .sendToServer(new ValidateLivingHitMessage(this.livingHitValidationBuffer.clone()));
       this.livingHitValidationBuffer.clear();
     }
@@ -195,7 +195,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
           living.getEntity().getEntityWorld().isRemote()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
-      NetworkChannel.MAIN
+      NetworkChannel.PLAY
           .getSimpleChannel()
           .send(target,
               new TriggerPressedMessage(living.getEntity().getEntityId(),
@@ -204,7 +204,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     // Sync magazine size before/after shooting as due to network latency this can get out of sync
     if (!living.getEntity().getEntityWorld().isRemote()) {
-      NetworkChannel.MAIN
+      NetworkChannel.PLAY
           .getSimpleChannel()
           .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
               new SyncGunMessage(
@@ -251,6 +251,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
 
     if (!this.canShoot(living)) {
+
       this.triggerPressed = false;
       return;
     }
@@ -262,14 +263,14 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       return;
     }
 
-    long fireRateNanoseconds =
-        TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRateMs(), TimeUnit.MILLISECONDS);
-    long time = System.nanoTime();
-    long timeDelta = time - this.lastShotNanos;
-    if (timeDelta < fireRateNanoseconds) {
+
+    long time = Util.milliTime();
+    long timeDelta = time - this.lastShotMs;
+    if (timeDelta < this.gunItem.getFireRateMs()) {
       return;
     }
-    this.lastShotNanos = time;
+
+    this.lastShotMs = time;
 
     boolean isMaxShotsReached =
         this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
@@ -310,7 +311,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random).orElse(null);
+          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack) * 1.5F, random)
+          .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
@@ -331,9 +333,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             }
 
             if (entityRayTraceResult.getEntity() instanceof LivingEntity) {
-              if (living instanceof ServerPlayer) {
+              if (entity instanceof ServerPlayerEntity) {
                 break;
-              } else if (living instanceof SelfPlayer) {
+              } else if (entity instanceof ClientPlayerEntity) {
                 this.livingHitValidationBuffer.put(entity.getEntityWorld().getGameTime(),
                     entityRayTraceResult.getEntity().getEntityId());
               }
@@ -431,26 +433,30 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       if (hitEntity instanceof LivingEntity) {
         final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
 
-        // Alert client of hit (real hit data compared to client simulation)
+        // Alert client of hit (real hit data as opposed to client simulation)
         if (entity instanceof ServerPlayerEntity) {
           boolean dead = hitLivingEntity.getHealth() <= 0;
-          NetworkChannel.MAIN.getSimpleChannel().send(
+          NetworkChannel.PLAY.getSimpleChannel().send(
               PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
               new HitMessage(hitPos, dead));
+
+          if (dead && hitLivingEntity instanceof PlayerEntity) {
+            NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+                new KillFeedMessage(entity.getEntityId(), hitLivingEntity.getEntityId(), itemStack,
+                    headshot ? KillFeedEntry.Type.HEADSHOT : KillFeedEntry.Type.NONE));
+          }
         }
 
-        hitLivingEntity.getCapability(ModCapabilities.LIVING)
-            .filter(hitLiving -> hitLiving instanceof ServerPlayer)
-            .map(hitLiving -> (ServerPlayer) hitLiving)
-            .ifPresent(hitPlayer -> hitPlayer.infect(
-                (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
-                    / 255.0F)
-                    * hitPlayer.getItemHandler()
-                        .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
-                        .getCapability(ModCapabilities.CLOTHING)
-                        .filter(IClothing::hasEnhancedProtection)
-                        .map(clothing -> 0.5F).orElse(1.0F)));
-
+        if (hitLivingEntity instanceof PlayerEntity) {
+          Player<?> hitPlayer = Player.get((ServerPlayerEntity) hitLivingEntity);
+          hitPlayer.infect(
+              (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
+                  / 255.0F) * hitPlayer.getItemHandler()
+                      .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
+                      .getCapability(ModCapabilities.CLOTHING)
+                      .filter(IClothing::hasEnhancedProtection)
+                      .map(clothing -> 0.5F).orElse(1.0F));
+        }
       }
     }
   }
@@ -515,11 +521,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
     if (entity.getPosX() != entity.prevPosX || entity.getPosY() != entity.prevPosY
         || entity.getPosZ() != entity.prevPosZ) {
-      accuracy -= 0.25F;
+      accuracy -= 0.15F;
     } else if (living.isCrouching()) {
-      accuracy += 0.25F;
+      accuracy += 0.15F;
     }
-    return accuracy > 1.0F ? 1.0F : accuracy;
+    return Math.min(accuracy, 1.0F);
   }
 
   @Override
@@ -571,7 +577,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
           living.getEntity().getEntityWorld().isRemote()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
-      NetworkChannel.MAIN
+      NetworkChannel.PLAY
           .getSimpleChannel()
           .send(target, new ToggleFireModeMessage(living.getEntity().getEntityId()));
     }
@@ -608,7 +614,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
           living.getEntity().getEntityWorld().isRemote()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
-      NetworkChannel.MAIN.getSimpleChannel().send(target,
+      NetworkChannel.PLAY.getSimpleChannel().send(target,
           new ToggleRightMouseAbility(living.getEntity().getEntityId()));
     }
   }

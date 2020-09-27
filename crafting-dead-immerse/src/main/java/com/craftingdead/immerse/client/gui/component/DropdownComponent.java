@@ -2,7 +2,6 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -14,17 +13,17 @@ public class DropdownComponent extends Component<DropdownComponent> {
 
   private final int itemHeight;
 
-  private final int itemColour;
+  private final Colour itemColour;
 
   private boolean expanded;
 
   private int selectedItemIndex = 0;
 
-  public DropdownComponent(int itemColour) {
+  public DropdownComponent(Colour itemColour) {
     this(DEFAULT_ITEM_HEIGHT, itemColour);
   }
 
-  public DropdownComponent(int itemHeight, int itemColour) {
+  public DropdownComponent(int itemHeight, Colour itemColour) {
     this.itemHeight = itemHeight;
     this.itemColour = itemColour;
   }
@@ -64,18 +63,20 @@ public class DropdownComponent extends Component<DropdownComponent> {
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
-    this.renderItem(this.getY(), this.items.get(this.selectedItemIndex), false);
+    this.renderItem(this.getYFloat(), this.items.get(this.selectedItemIndex), false);
     if (this.expanded) {
       for (int i = 0; i < this.items.size(); i++) {
-        final double itemY = this.getY() + (this.itemHeight * (i + 1));
+        final float itemY = this.getYFloat() + (this.itemHeight * (i + 1));
         this.renderItem(itemY, this.items.get(i), i == this.selectedItemIndex);
       }
     }
   }
 
-  private void renderItem(double y, Item item, boolean selected) {
-    RenderUtil.fill(this.getX(), y, this.getX() + this.getWidth(), y + this.itemHeight,
-        this.itemColour);
+  private void renderItem(float y, Item item, boolean selected) {
+    final int[] colour4i = this.itemColour.getColour4i();
+    this.canvas.setRGBA(colour4i[0], colour4i[0], colour4i[0], colour4i[0]);
+    this.canvas.drawRect(this.getXFloat(), y, this.getXFloat() + this.getWidthFloat(),
+        y + this.itemHeight);
     this.minecraft.fontRenderer.drawStringWithShadow(item.text.getFormattedText(),
         (float) this.getX(), (float) (y + this.itemHeight / 2.0D),
         selected ? TextFormatting.GRAY.getColor() : TextFormatting.WHITE.getColor());

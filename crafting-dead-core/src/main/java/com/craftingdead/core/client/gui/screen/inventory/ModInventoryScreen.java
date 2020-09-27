@@ -38,7 +38,7 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
     super.init();
     this.vestButton =
         new SimpleButton(this.guiLeft + 83, this.guiTop + 48, 10, 16, ">", (button) -> {
-          NetworkChannel.MAIN
+          NetworkChannel.PLAY
               .getSimpleChannel()
               .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));
           this.transitioning = true;

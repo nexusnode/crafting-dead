@@ -1,119 +1,162 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.network.message.login.AcknowledgeGameMessage;
+import com.craftingdead.core.network.message.login.LoginIndexedMessage;
+import com.craftingdead.core.network.message.login.SetupGameMessage;
 import com.craftingdead.core.network.message.main.CancelActionMessage;
 import com.craftingdead.core.network.message.main.CrouchMessage;
 import com.craftingdead.core.network.message.main.HitMessage;
+import com.craftingdead.core.network.message.main.KillFeedMessage;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.main.OpenStorageMessage;
 import com.craftingdead.core.network.message.main.PerformActionMessage;
+import com.craftingdead.core.network.message.main.SelectTeamMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
-import com.craftingdead.core.network.message.main.SyncStatisticsMessage;
+import com.craftingdead.core.network.message.main.SyncPlayerMessage;
 import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.main.TriggerPressedMessage;
 import com.craftingdead.core.network.message.main.ValidateLivingHitMessage;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.FMLHandshakeHandler;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 
-  MAIN(new ResourceLocation(CraftingDead.ID, "main")) {
+  LOGIN(new ResourceLocation(CraftingDead.ID, "login")) {
     @Override
-    public void registerMessages(SimpleChannel simpleChannel) {
-      int id = 0;
-
+    protected void registerMessages(SimpleChannel simpleChannel) {
       simpleChannel
-          .messageBuilder(SyncStatisticsMessage.class, ++id)
-          .encoder(SyncStatisticsMessage::encode)
-          .decoder(SyncStatisticsMessage::decode)
-          .consumer(SyncStatisticsMessage::handle)
+          .messageBuilder(SetupGameMessage.class, 0x00, NetworkDirection.LOGIN_TO_CLIENT)
+          .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
+          .encoder(SetupGameMessage::encode)
+          .decoder(SetupGameMessage::decode)
+          .consumer(FMLHandshakeHandler
+              .biConsumerFor((handler, msg, ctx) -> SetupGameMessage.handle(msg, ctx)))
+          .buildLoginPacketList(isLocal -> CraftingDead.getInstance().getLogicalServer()
+              .generateSetupGameMessage(isLocal))
           .add();
 
       simpleChannel
-          .messageBuilder(OpenModInventoryMessage.class, ++id)
+          .messageBuilder(AcknowledgeGameMessage.class, 0x01, NetworkDirection.LOGIN_TO_SERVER)
+          .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
+          .encoder(AcknowledgeGameMessage::encode)
+          .decoder(AcknowledgeGameMessage::decode)
+          .consumer(FMLHandshakeHandler
+              .indexFirst((handler, msg, ctx) -> AcknowledgeGameMessage.handle(msg, ctx)))
+          .add();
+    }
+  },
+  PLAY(new ResourceLocation(CraftingDead.ID, "play")) {
+    @Override
+    public void registerMessages(SimpleChannel simpleChannel) {
+      simpleChannel
+          .messageBuilder(SyncPlayerMessage.class, 0x00, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncPlayerMessage::encode)
+          .decoder(SyncPlayerMessage::decode)
+          .consumer(SyncPlayerMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(OpenModInventoryMessage.class, 0x01, NetworkDirection.PLAY_TO_SERVER)
           .encoder(OpenModInventoryMessage::encode)
           .decoder(OpenModInventoryMessage::decode)
           .consumer(OpenModInventoryMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(ToggleRightMouseAbility.class, ++id)
+          .messageBuilder(ToggleRightMouseAbility.class, 0x02, NetworkDirection.PLAY_TO_SERVER)
           .encoder(ToggleRightMouseAbility::encode)
           .decoder(ToggleRightMouseAbility::decode)
           .consumer(ToggleRightMouseAbility::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(ToggleFireModeMessage.class, ++id)
+          .messageBuilder(ToggleFireModeMessage.class, 0x03)
           .encoder(ToggleFireModeMessage::encode)
           .decoder(ToggleFireModeMessage::decode)
           .consumer(ToggleFireModeMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(TriggerPressedMessage.class, ++id)
+          .messageBuilder(TriggerPressedMessage.class, 0x04)
           .encoder(TriggerPressedMessage::encode)
           .decoder(TriggerPressedMessage::decode)
           .consumer(TriggerPressedMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(SyncGunMessage.class, ++id)
+          .messageBuilder(SyncGunMessage.class, 0x05, NetworkDirection.PLAY_TO_CLIENT)
           .encoder(SyncGunMessage::encode)
           .decoder(SyncGunMessage::decode)
           .consumer(SyncGunMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(SetSlotMessage.class, ++id)
+          .messageBuilder(SetSlotMessage.class, 0x06, NetworkDirection.PLAY_TO_CLIENT)
           .encoder(SetSlotMessage::encode)
           .decoder(SetSlotMessage::decode)
           .consumer(SetSlotMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(OpenStorageMessage.class, ++id)
+          .messageBuilder(OpenStorageMessage.class, 0x07, NetworkDirection.PLAY_TO_SERVER)
           .encoder(OpenStorageMessage::encode)
           .decoder(OpenStorageMessage::decode)
           .consumer(OpenStorageMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(PerformActionMessage.class, ++id)
+          .messageBuilder(PerformActionMessage.class, 0x08)
           .encoder(PerformActionMessage::encode)
           .decoder(PerformActionMessage::decode)
           .consumer(PerformActionMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(CancelActionMessage.class, ++id)
+          .messageBuilder(CancelActionMessage.class, 0x09)
           .encoder(CancelActionMessage::encode)
           .decoder(CancelActionMessage::decode)
           .consumer(CancelActionMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(ValidateLivingHitMessage.class, ++id)
+          .messageBuilder(ValidateLivingHitMessage.class, 0x0A, NetworkDirection.PLAY_TO_SERVER)
           .encoder(ValidateLivingHitMessage::encode)
           .decoder(ValidateLivingHitMessage::decode)
           .consumer(ValidateLivingHitMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(CrouchMessage.class, ++id)
+          .messageBuilder(CrouchMessage.class, 0x0B)
           .encoder(CrouchMessage::encode)
           .decoder(CrouchMessage::decode)
           .consumer(CrouchMessage::handle)
           .add();
 
       simpleChannel
-          .messageBuilder(HitMessage.class, ++id)
+          .messageBuilder(HitMessage.class, 0x0C, NetworkDirection.PLAY_TO_CLIENT)
           .encoder(HitMessage::encode)
           .decoder(HitMessage::decode)
           .consumer(HitMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(KillFeedMessage.class, 0x0D, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(KillFeedMessage::encode)
+          .decoder(KillFeedMessage::decode)
+          .consumer(KillFeedMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(SelectTeamMessage.class, 0x0E, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SelectTeamMessage::encode)
+          .decoder(SelectTeamMessage::decode)
+          .consumer(SelectTeamMessage::handle)
           .add();
     }
   };

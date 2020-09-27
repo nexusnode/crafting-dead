@@ -330,7 +330,7 @@
   
   "attachment_multiplier_type.damage": "Dano",
   "attachment_multiplier_type.accuracy": "Precisão",
-  "attachment_multiplier_type.fov": "Zoom",
+  "attachment_multiplier_type.zoom": "Zoom",
   
   "biome.craftingdead.zombie_forest": "Floresta de Zumbis"
 }

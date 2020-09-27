@@ -99,7 +99,7 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
       PacketTarget target =
           this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
-      NetworkChannel.MAIN.getSimpleChannel().send(target,
+      NetworkChannel.PLAY.getSimpleChannel().send(target,
           new PerformActionMessage(action.getActionType(), this.getEntity().getEntityId(),
               action.getTarget().map(ILiving::getEntity).map(Entity::getEntityId).orElse(-1)));
     }
@@ -117,7 +117,7 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
       PacketTarget target =
           this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
-      NetworkChannel.MAIN.getSimpleChannel().send(target,
+      NetworkChannel.PLAY.getSimpleChannel().send(target,
           new CancelActionMessage(this.getEntity().getEntityId()));
     }
   }
@@ -182,21 +182,23 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     this.updateScubaClothing();
     this.updateScubaMask();
 
-    for (int slot : this.dirtySlots) {
-      NetworkChannel.MAIN.getSimpleChannel().send(
-          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-          new SetSlotMessage(this.entity.getEntityId(), slot,
-              this.itemHandler.getStackInSlot(slot)));
-    }
-    this.dirtySlots.clear();
+    if (!this.entity.getEntityWorld().isRemote()) {
+      for (int slot : this.dirtySlots) {
+        NetworkChannel.PLAY.getSimpleChannel().send(
+            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+            new SetSlotMessage(this.entity.getEntityId(), slot,
+                this.itemHandler.getStackInSlot(slot)));
+      }
+      this.dirtySlots.clear();
 
-    if (this.snapshots.size() >= 20) {
-      this.snapshots.removeFirst();
+      if (this.snapshots.size() >= 20) {
+        this.snapshots.removeFirst();
+      }
+      final long gameTime = this.getEntity().getEntityWorld().getGameTime();
+      this.snapshots.put(gameTime, new Snapshot(gameTime, this.getEntity().getPositionVector(),
+          this.getEntity().getBoundingBox().expand(0, 1.0D, 0), this.getEntity().getPitchYaw(),
+          this.getEntity().getEyeHeight()));
     }
-    final long gameTime = this.getEntity().getEntityWorld().getGameTime();
-    this.snapshots.put(gameTime, new Snapshot(gameTime, this.getEntity().getPositionVector(),
-        this.getEntity().getBoundingBox().expand(0, 1.0D, 0), this.getEntity().getPitchYaw(),
-        this.getEntity().getEyeHeight()));
   }
 
   private void updateScubaClothing() {
@@ -309,7 +311,7 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
       PacketTarget target =
           this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
-      NetworkChannel.MAIN.getSimpleChannel().send(target,
+      NetworkChannel.PLAY.getSimpleChannel().send(target,
           new CrouchMessage(this.getEntity().getEntityId(), crouching));
     }
   }

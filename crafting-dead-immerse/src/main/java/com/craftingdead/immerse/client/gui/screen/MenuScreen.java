@@ -151,7 +151,7 @@ public class MenuScreen extends ComponentScreen {
             .setScale(5.0F)
             .setCentre(true));
 
-    this.getRoot().addChild(new DropdownComponent(0xFFFFFF)
+    this.getRoot().addChild(new DropdownComponent(new Colour(0xFFFFFFFF))
         .setXPercent(0.5F)
         .setYPercent(0.5F)
         .setWidth(100)

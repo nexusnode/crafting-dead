@@ -1,12 +1,14 @@
 package com.craftingdead.core.client.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.player.SelfPlayer;
+import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.crosshair.Crosshair;
@@ -36,13 +38,6 @@ public class IngameGui {
 
   private static final Random random = new Random();
 
-  private static final ResourceLocation DAYS_SURVIVED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/days_survived.png");
-  private static final ResourceLocation ZOMBIES_KILLED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/zombies_killed.png");
-  private static final ResourceLocation PLAYERS_KILLED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/players_killed.png");
-
   private static final ResourceLocation BLOOD =
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
   private static final ResourceLocation BLOOD_2 =
@@ -50,9 +45,13 @@ public class IngameGui {
 
   private static final int HIT_MARKER_FADE_TIME_MS = 3000;
 
+  private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
+
   private final Minecraft minecraft;
 
   private final ClientDist client;
+
+  private final List<KillFeedEntry> killFeedMessages = new ArrayList<>();
 
   private ResourceLocation crosshairLocation;
 
@@ -66,10 +65,20 @@ public class IngameGui {
   private Vec3d hitMarkerPos;
   private int hitMarkerColour;
 
+  private long killFeedVisibleTimeMs;
+  private long killFeedAnimationTimeMs;
+
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
     this.crosshairLocation = crosshairLocation;
+  }
+
+  public void addKillFeedMessage(KillFeedEntry killFeedMessage) {
+    if (this.killFeedMessages.isEmpty()) {
+      this.killFeedVisibleTimeMs = 0L;
+    }
+    this.killFeedMessages.add(killFeedMessage);
   }
 
   public void displayHitMarker(Vec3d pos, int colour) {
@@ -126,69 +135,75 @@ public class IngameGui {
     }
   }
 
-  public void renderGameOverlay(SelfPlayer player, float partialTicks, int width, int height) {
-    // final int mouseX = Mouse.getX() * width / this.client.getMinecraft().displayWidth;
-    // final int mouseY = height - Mouse.getY() * height / this.client.getMinecraft().displayHeight
-    // - 1;
+  private void renderGunFlash(ClientPlayerEntity playerEntity, IGun gun, int width, int height,
+      float partialTicks) {
+    final boolean aiming =
+        gun instanceof IScope
+            && ((IScope) gun).isAiming(playerEntity, playerEntity.getHeldItemMainhand());
+    final boolean flash =
+        gun.getShotCount() != this.lastShotCount && !aiming && gun.getShotCount() > 0;
+    this.lastShotCount = gun.getShotCount();
 
+    if (flash) {
+      RenderSystem.pushMatrix();
+      {
+        final float flashIntensity = (random.nextInt(3) + 5) / 10.0F;
+        final float scale = this.lastFlashScale =
+            MathHelper.lerp(partialTicks, this.lastFlashScale, flashIntensity);
+        this.minecraft.getTextureManager()
+            .bindTexture(
+                new ResourceLocation(CraftingDead.ID, "textures/flash/white_flash.png"));
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, flashIntensity - 0.15F);
+        final float x = width * 0.625F;
+        final float y = height * 0.625F;
+        final float flashWidth = 300;
+        final float flashHeight = 300;
+        RenderSystem.translatef((x - x * scale), y - y * scale, 0.0F);
+        RenderSystem.scalef(scale, scale, 1.0F);
+        RenderUtil.drawTexturedRectangle(x - flashWidth / 2, y - flashHeight / 2, flashWidth,
+            flashHeight);
+        RenderSystem.disableBlend();
+      }
+      RenderSystem.popMatrix();
+    }
+  }
+
+  private static void renderScopeOverlay(ClientPlayerEntity playerEntity, IScope scope, int width,
+      int height) {
+    scope.getOverlayTexture(playerEntity, playerEntity.getHeldItemMainhand())
+        .ifPresent(overlayTexture -> {
+          RenderUtil.bind(overlayTexture);
+          double overlayTextureWidth = scope.getOverlayTextureWidth();
+          double overlayTextureHeight = scope.getOverlayTextureHeight();
+          double scale = RenderUtil.getFitScale(overlayTextureWidth, overlayTextureHeight);
+          overlayTextureWidth *= scale;
+          overlayTextureHeight *= scale;
+          RenderSystem.enableBlend();
+          RenderUtil
+              .drawTexturedRectangle(width / 2 - overlayTextureWidth / 2,
+                  height / 2 - overlayTextureHeight / 2, overlayTextureWidth,
+                  overlayTextureHeight);
+          RenderSystem.disableBlend();
+        });
+  }
+
+  public void renderGameOverlay(Player<ClientPlayerEntity> player, int width, int height, float partialTicks) {
     this.renderHitMarker(width, height, partialTicks);
+    this.renderKillFeed(partialTicks);
 
     final ClientPlayerEntity playerEntity = player.getEntity();
+    final ItemStack heldStack = playerEntity.getHeldItemMainhand();
+    final IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
 
-    final IGun gun = this.minecraft.player.getHeldItemMainhand().getCapability(ModCapabilities.GUN)
-        .orElse(null);
     if (gun != null) {
-      final boolean aiming = gun instanceof IScope && ((IScope) gun).isAiming(this.minecraft.player,
-          this.minecraft.player.getHeldItemMainhand());
-      final boolean flash =
-          gun.getShotCount() != this.lastShotCount && !aiming && gun.getShotCount() > 0;
-      this.lastShotCount = gun.getShotCount();
-
-      if (flash) {
-        RenderSystem.pushMatrix();
-        {
-          final float flashIntensity = (random.nextInt(3) + 5) / 10.0F;
-          final float scale = this.lastFlashScale =
-              MathHelper.lerp(partialTicks, this.lastFlashScale, flashIntensity);
-          this.minecraft.getTextureManager()
-              .bindTexture(
-                  new ResourceLocation(CraftingDead.ID, "textures/flash/white_flash.png"));
-          RenderSystem.enableBlend();
-          RenderSystem.defaultBlendFunc();
-          RenderSystem.color4f(1.0F, 1.0F, 1.0F, flashIntensity - 0.15F);
-          final float x = width * 0.625F;
-          final float y = height * 0.625F;
-          final float flashWidth = 300;
-          final float flashHeight = 300;
-          RenderSystem.translatef((x - x * scale), y - y * scale, 0.0F);
-          RenderSystem.scalef(scale, scale, 1.0F);
-          RenderUtil.drawTexturedRectangle(x - flashWidth / 2, y - flashHeight / 2, flashWidth,
-              flashHeight);
-          RenderSystem.disableBlend();
-        }
-        RenderSystem.popMatrix();
-      }
+      this.renderGunFlash(playerEntity, gun, width, height, partialTicks);
     }
 
-    ItemStack heldStack = playerEntity
-        .getHeldItemMainhand();
     heldStack.getCapability(ModCapabilities.SCOPE)
-        .filter(scope -> scope.isAiming(playerEntity, heldStack)).ifPresent(scope -> {
-          scope.getOverlayTexture(playerEntity, heldStack).ifPresent(overlayTexture -> {
-            RenderUtil.bind(overlayTexture);
-            double overlayTextureWidth = scope.getOverlayTextureWidth();
-            double overlayTextureHeight = scope.getOverlayTextureHeight();
-            double scale = RenderUtil.getFitScale(overlayTextureWidth, overlayTextureHeight);
-            overlayTextureWidth *= scale;
-            overlayTextureHeight *= scale;
-            RenderSystem.enableBlend();
-            RenderUtil
-                .drawTexturedRectangle(width / 2 - overlayTextureWidth / 2,
-                    height / 2 - overlayTextureHeight / 2, overlayTextureWidth,
-                    overlayTextureHeight);
-            RenderSystem.disableBlend();
-          });
-        });
+        .filter(scope -> scope.isAiming(playerEntity, heldStack))
+        .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
 
     // Draws Flashbang effect
     EffectInstance flashEffect =
@@ -201,11 +216,10 @@ public class IngameGui {
       RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
     }
 
-    player.getActionProgress().ifPresent(observer ->
-
-    renderActionProgress(this.minecraft.fontRenderer, width, height,
-        observer.getMessage(), observer.getSubMessage(),
-        observer.getProgress(partialTicks)));
+    player.getActionProgress()
+        .ifPresent(observer -> renderActionProgress(this.minecraft.fontRenderer, width, height,
+            observer.getMessage(), observer.getSubMessage(),
+            observer.getProgress(partialTicks)));
 
     // Only draw in survival
     if (this.minecraft.playerController.shouldDrawHUD()) {
@@ -221,15 +235,46 @@ public class IngameGui {
         renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
             RenderUtil.ICONS);
       }
-
-      renderPlayerStats(this.minecraft.fontRenderer, width, height, player.getDaysSurvived(),
-          player.getZombiesKilled(), player.getPlayersKilled());
     }
 
     // Needs to render after blood or else it causes Z level issues
     if (gun != null) {
       renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
           width, height, gun.getMagazineSize(), gun.getMagazineStack());
+    }
+  }
+
+  private void renderKillFeed(float partialTicks) {
+    if (this.killFeedVisibleTimeMs == 0L) {
+      this.killFeedVisibleTimeMs = Util.milliTime();
+      this.killFeedAnimationTimeMs = 0L;
+    }
+
+    final long currentTime = Util.milliTime();
+    float durationPct = MathHelper.clamp(
+        (float) (currentTime - this.killFeedVisibleTimeMs) / KILL_FEED_MESSAGE_LIFE_MS, 0.0F, 1.0F);
+    if (durationPct == 1.0F && !this.killFeedMessages.isEmpty()) {
+      this.killFeedMessages.remove(0);
+      if (!this.killFeedMessages.isEmpty()) {
+        this.killFeedVisibleTimeMs = Util.milliTime();
+        this.killFeedAnimationTimeMs = 0L;
+      }
+    } else if (durationPct >= 0.75F && this.killFeedAnimationTimeMs == 0L) {
+      this.killFeedAnimationTimeMs = Util.milliTime();
+    }
+
+    float animationPct =
+        this.killFeedAnimationTimeMs != 0L
+            ? MathHelper.clamp((float) (currentTime - this.killFeedAnimationTimeMs)
+                / ((KILL_FEED_MESSAGE_LIFE_MS / 4.0F) - partialTicks), 0.0F, 1.0F)
+            : 0.0F;
+
+    final int killFeedMessageX = 5;
+    for (int i = 0; i < this.killFeedMessages.size(); i++) {
+      final KillFeedEntry killFeedMessage = this.killFeedMessages.get(i);
+      float killFeedMessageY = 5.0F + ((i - (1.0F * animationPct)) * 12.0F);
+      killFeedMessage.render(killFeedMessageX, killFeedMessageY,
+          i == 0 ? 1.0F - animationPct : 1.0F);
     }
   }
 
@@ -278,28 +323,6 @@ public class IngameGui {
     RenderUtil.drawTexturedRectangle(0, 0, width, height);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.enableAlphaTest();
-    RenderSystem.disableBlend();
-  }
-
-  private static void renderPlayerStats(FontRenderer fontRenderer, int width, int height,
-      int daysSurvived, int zombiesKilled, int playersKilled) {
-    int y = height / 2;
-    int x = 4;
-
-    RenderSystem.enableBlend();
-
-    RenderUtil.bind(DAYS_SURVIVED);
-    RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
-    fontRenderer.drawStringWithShadow(String.valueOf(daysSurvived), x + 20, y - 16, 0xFFFFFF);
-
-    RenderUtil.bind(ZOMBIES_KILLED);
-    RenderUtil.drawTexturedRectangle(x, y, 16, 16);
-    fontRenderer.drawStringWithShadow(String.valueOf(zombiesKilled), x + 20, y + 4, 0xFFFFFF);
-
-    RenderUtil.bind(PLAYERS_KILLED);
-    RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
-    fontRenderer.drawStringWithShadow(String.valueOf(playersKilled), x + 20, y + 24, 0xFFFFFF);
-
     RenderSystem.disableBlend();
   }
 

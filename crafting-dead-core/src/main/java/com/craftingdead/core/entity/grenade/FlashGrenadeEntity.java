@@ -1,9 +1,7 @@
 package com.craftingdead.core.entity.grenade;
 
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.hat.IHat;
-import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
@@ -13,6 +11,8 @@ import com.craftingdead.core.particle.RGBFlashParticleData;
 import com.craftingdead.core.potion.FlashBlindnessEffect;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.EntityUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -63,7 +63,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   @Override
   public void onMotionStop(int stopsCount) {}
 
-  public void flash() {
+  private void flash() {
     if (this.world.isRemote()) {
       this.world
           .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(), this.getPosY(),
@@ -71,17 +71,15 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
       // Applies the flash effect at client side for a better delay compensation
       // and better FOV calculation
-
-      ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
-      clientDist.getPlayer().ifPresent(clientPlayer -> {
-        int duration = this
-            .calculateDuration(clientPlayer.getEntity(), RenderUtil.isInsideGameFOV(this, false));
-        if (duration > 0) {
-          EffectInstance flashEffect =
-              new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
-          ModEffects.applyOrOverrideIfLonger(clientPlayer.getEntity(), flashEffect);
-        }
-      });
+      final Minecraft mc = Minecraft.getInstance();
+      final ClientPlayerEntity clientPlayerEntity = mc.player;
+      int duration =
+          this.calculateDuration(clientPlayerEntity, RenderUtil.isInsideGameFOV(this, false));
+      if (duration > 0) {
+        EffectInstance flashEffect =
+            new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
+        ModEffects.applyOrOverrideIfLonger(clientPlayerEntity, flashEffect);
+      }
     } else {
       this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 3F, 1.2F);
 

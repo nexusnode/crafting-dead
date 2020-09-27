@@ -6,9 +6,10 @@ repositories {
 	maven {
       	url 'http://maven.ferenyr.info/artifactory/ourten'
     }
-    flatDir {
-       dirs 'lib'
-   	}
+    maven {
+        name 'cursemaven'
+        url 'https://www.cursemaven.com'
+    }
     google()
 }
 
@@ -51,4 +52,5 @@ minecraft {
 dependencies {
     implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'    
+	implementation fg.deobf("curse.maven:modern-ui:${modern_ui_id}")
 }

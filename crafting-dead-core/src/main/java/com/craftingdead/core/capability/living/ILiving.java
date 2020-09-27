@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.action.IAction;
+import com.craftingdead.core.capability.ModCapabilities;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -91,6 +92,11 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
   void setCrouching(boolean crouching, boolean sendUpdate);
 
   E getEntity();
+
+  public static <L extends ILiving<? extends E>, E extends LivingEntity> L get(E livingEntity) {
+    return livingEntity.getCapability(ModCapabilities.LIVING).<L>cast()
+        .orElseThrow(() -> new IllegalStateException("Missing living capability"));
+  }
 
   public static interface IActionProgress {
 

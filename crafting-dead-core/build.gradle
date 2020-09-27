@@ -1,13 +1,9 @@
-plugins {
-	id 'com.wynprice.cursemaven' version '2.1.5'
-}
-
 project.version = '0.0.0.2'
 
 repositories {
 	maven {
-        name 'curseforge'
-        url 'https://minecraft.curseforge.com/api/maven/'
+        name 'cursemaven'
+        url 'https://www.cursemaven.com'
     }
 	google()
 }
