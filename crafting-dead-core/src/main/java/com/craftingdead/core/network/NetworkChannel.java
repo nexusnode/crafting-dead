@@ -157,7 +157,7 @@ public enum NetworkChannel {
   /**
    * Network protocol version.
    */
-  private static final String NETWORK_VERSION = "0.0.0.1";
+  private static final String NETWORK_VERSION = "0.0.1.0";
   /**
    * Prevents re-registering messages.
    */
