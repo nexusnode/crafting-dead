@@ -39,7 +39,6 @@ import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.game.GameType;
-import com.craftingdead.core.game.GameTypes;
 import com.craftingdead.core.game.IGameClient;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
@@ -177,11 +176,10 @@ public class ClientDist implements IModDist {
 
   private float fov;
 
-  private IGameClient<?> gameClient;
+  private IGameClient<?, ?> gameClient;
 
   private boolean wasSneaking;
   private long lastSneakPressTime;
-
 
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -203,7 +201,7 @@ public class ClientDist implements IModDist {
 
   @Override
   public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {
-    return new LogicalServer(minecraftServer, GameTypes.SURVIVAL.get());
+    return new LogicalServer(minecraftServer);
   }
 
   public void loadGame(GameType gameType) {

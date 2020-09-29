@@ -2,6 +2,7 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.craftingdead.immerse.client.util.RenderUtil;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -73,10 +74,8 @@ public class DropdownComponent extends Component<DropdownComponent> {
   }
 
   private void renderItem(float y, Item item, boolean selected) {
-    final int[] colour4i = this.itemColour.getColour4i();
-    this.canvas.setRGBA(colour4i[0], colour4i[0], colour4i[0], colour4i[0]);
-    this.canvas.drawRect(this.getXFloat(), y, this.getXFloat() + this.getWidthFloat(),
-        y + this.itemHeight);
+    RenderUtil.fill(this.getX(), y, this.getX() + this.getWidth(), y + this.itemHeight,
+        this.itemColour.getHexColour());
     this.minecraft.fontRenderer.drawStringWithShadow(item.text.getFormattedText(),
         (float) this.getX(), (float) (y + this.itemHeight / 2.0D),
         selected ? TextFormatting.GRAY.getColor() : TextFormatting.WHITE.getColor());

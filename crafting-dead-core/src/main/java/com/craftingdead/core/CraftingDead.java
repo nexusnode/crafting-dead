@@ -185,6 +185,7 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleServerAboutToStart(FMLServerStartingEvent event) {
     this.logicalServer = this.modDist.createLogicalServer(event.getServer());
+    this.logicalServer.init();
     MinecraftForge.EVENT_BUS.register(this.logicalServer);
   }
 

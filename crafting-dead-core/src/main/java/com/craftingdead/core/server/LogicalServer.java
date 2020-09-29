@@ -1,12 +1,5 @@
 package com.craftingdead.core.server;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
@@ -16,19 +9,10 @@ import com.craftingdead.core.capability.hydration.PresetHydration;
 import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.Player;
-import com.craftingdead.core.game.GameManager;
 import com.craftingdead.core.game.GameType;
 import com.craftingdead.core.game.GameTypes;
-import com.craftingdead.core.game.IGameServer;
-import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.login.SetupGameMessage;
-import com.craftingdead.core.network.message.main.SelectTeamMessage;
 import com.craftingdead.core.potion.ModEffects;
-import com.mojang.authlib.GameProfile;
-import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,37 +21,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.ServerPlayNetHandler;
-import net.minecraft.network.play.server.SChangeGameStatePacket;
-import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
-import net.minecraft.network.play.server.SHeldItemChangePacket;
-import net.minecraft.network.play.server.SJoinGamePacket;
-import net.minecraft.network.play.server.SPlayEntityEffectPacket;
-import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
-import net.minecraft.network.play.server.SPlayerListItemPacket;
-import net.minecraft.network.play.server.SRespawnPacket;
-import net.minecraft.network.play.server.SServerDifficultyPacket;
-import net.minecraft.network.play.server.SSetExperiencePacket;
-import net.minecraft.network.play.server.SSpawnPositionPacket;
-import net.minecraft.network.play.server.STagsListPacket;
-import net.minecraft.network.play.server.SUpdateRecipesPacket;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.DemoplayerEntityteractionManager;
-import net.minecraft.server.management.playerEntityteractionManager;
-import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -83,14 +40,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.registries.ForgeRegistry;
 
 public class LogicalServer extends WorldSavedData {
 
   private final MinecraftServer minecraftServer;
-  private IGameServer<?, ?> gameServer;
-  private Set<ServerPlayerEntity> waitingForTeam = new ReferenceOpenHashSet<>();
+  private GameManager<?, ?> gameManager;
 
   public LogicalServer(MinecraftServer minecraftServer) {
     super(CraftingDead.ID);
@@ -100,115 +54,16 @@ public class LogicalServer extends WorldSavedData {
   public void init() {
     this.minecraftServer.getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(() -> this,
         CraftingDead.ID);
-  }
-
-  public boolean initializeConnectionToPlayer(NetworkManager networkManager,
-      ServerPlayerEntity playerEntity) {
-    if (!this.gameServer.getDefaultTeam().isPresent()) {
-      NetworkChannel.PLAY.getSimpleChannel().sendTo(new SelectTeamMessage(), networkManager,
-          NetworkDirection.PLAY_TO_CLIENT);
-      this.waitingForTeam.add(playerEntity);
-      return true;
-    }
-    this.gameServer.setTeam(this.gameServer.get, team);
-    return false;
-  }
-
-  public void loadGame(GameType gameType, CompoundNBT nbt, boolean newGame) {
-    this.currentGame = gameType.createGameServer(this);
-    this.currentGame.deserializeNBT(nbt);
-    this.minecraftServer.getPlayerList().getPlayers().forEach(playerEntity -> {
-      this.currentGame.getTeam(playerEntity);
-      this.minecraftServer.getPlayerList().recreatePlayerEntity(playerEntity, this.currentGame.get,
-          newGame);
-    });
-  }
-
-
-  public ServerPlayerEntity loadPlayerEntity(ServerPlayerEntity oldPlayerEntity,
-      boolean keepEverything) {
-    this.minecraftServer.getPlayerList().removePlayer(oldPlayerEntity);
-    oldPlayerEntity.getServerWorld().removePlayer(oldPlayerEntity, true);
-    playerEntityteractionManager playerEntityteractionManager;
-    if (this.minecraftServer.isDemo()) {
-      playerEntityteractionManager =
-          new DemoplayerEntityteractionManager(
-              this.minecraftServer.getWorld(oldPlayerEntity.dimension));
-    } else {
-      playerEntityteractionManager =
-          new playerEntityteractionManager(this.minecraftServer.getWorld(oldPlayerEntity.dimension));
-    }
-
-    ServerPlayerEntity serverplayerentity =
-        new ServerPlayerEntity(this.minecraftServer, this.minecraftServer.getWorld(oldPlayerEntity.dimension),
-            oldPlayerEntity.getGameProfile(), playerEntityteractionManager);
-    serverplayerentity.connection = oldPlayerEntity.connection;
-    serverplayerentity.copyFrom(oldPlayerEntity, keepEverything);
-    oldPlayerEntity.remove(false); // Forge: clone event had a chance to see old data, now discard
-                                   // it
-    serverplayerentity.dimension = dimension;
-    serverplayerentity.setEntityId(oldPlayerEntity.getEntityId());
-    serverplayerentity.setPrimaryHand(oldPlayerEntity.getPrimaryHand());
-
-    for (String s : oldPlayerEntity.getTags()) {
-      serverplayerentity.addTag(s);
-    }
-
-    ServerWorld serverworld = this.minecraftServer.getWorld(oldPlayerEntity.dimension);
-    this.setPlayerGameTypeBasedOnOther(serverplayerentity, oldPlayerEntity, serverworld);
-    if (blockpos != null) {
-      Optional<Vec3d> optional = PlayerEntity.checkBedValidRespawnPosition(
-          this.minecraftServer.getWorld(oldPlayerEntity.dimension), blockpos, flag);
-      if (optional.isPresent()) {
-        Vec3d vec3d = optional.get();
-        serverplayerentity.setLocationAndAngles(vec3d.x, vec3d.y, vec3d.z, 0.0F, 0.0F);
-        serverplayerentity.setSpawnPoint(blockpos, flag, false, dimension);
-      } else {
-        serverplayerentity.connection.sendPacket(new SChangeGameStatePacket(0, 0.0F));
-      }
-    }
-
-    while (!serverworld.hasNoCollisions(serverplayerentity)
-        && serverplayerentity.getPosY() < 256.0D) {
-      serverplayerentity.setPosition(serverplayerentity.getPosX(),
-          serverplayerentity.getPosY() + 1.0D, serverplayerentity.getPosZ());
-    }
-
-    WorldInfo worldinfo = serverplayerentity.world.getWorldInfo();
-    net.minecraftforge.fml.network.NetworkHooks
-        .sendDimensionDataPacket(serverplayerentity.connection.netManager, serverplayerentity);
-    serverplayerentity.connection.sendPacket(
-        new SRespawnPacket(serverplayerentity.dimension, WorldInfo.byHashing(worldinfo.getSeed()),
-            worldinfo.getGenerator(), serverplayerentity.interactionManager.getGameType()));
-    BlockPos blockpos1 = serverworld.getSpawnPoint();
-    serverplayerentity.connection.setPlayerLocation(serverplayerentity.getPosX(),
-        serverplayerentity.getPosY(), serverplayerentity.getPosZ(), serverplayerentity.rotationYaw,
-        serverplayerentity.rotationPitch);
-    serverplayerentity.connection.sendPacket(new SSpawnPositionPacket(blockpos1));
-    serverplayerentity.connection.sendPacket(
-        new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
-    serverplayerentity.connection.sendPacket(new SSetExperiencePacket(serverplayerentity.experience,
-        serverplayerentity.experienceTotal, serverplayerentity.experienceLevel));
-    this.minecraftServer.getPlayerList().sendWorldInfo(serverplayerentity, serverworld);
-    this.minecraftServer.getPlayerList().updatePermissionLevel(serverplayerentity);
-    serverworld.addRespawnedPlayer(serverplayerentity);
-    this.minecraftServer.getPlayerList().addPlayer(serverplayerentity);
-    this.minecraftServer.getPlayerList().
-    this.minecraftServer.getPlayerList().uuidToPlayerMap.put(serverplayerentity.getUniqueID(), serverplayerentity);
-    serverplayerentity.addSelfToInternalCraftingInventory();
-    serverplayerentity.setHealth(serverplayerentity.getHealth());
-    net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerRespawnEvent(serverplayerentity,
-        keepEverything);
-    return serverplayerentity;
-  }
-
-  public List<Pair<String, SetupGameMessage>> generateSetupGameMessage(boolean isLocal) {
-    return Collections.singletonList(Pair.of(SetupGameMessage.class.getName(),
-        new SetupGameMessage(this.currentGame.getGameType())));
+    // Default to survival
+    this.gameManager = new GameManager<>(GameTypes.SURVIVAL.get().createGameServer(this));
   }
 
   public MinecraftServer getMinecraftServer() {
     return this.minecraftServer;
+  }
+
+  public GameManager<?, ?> getGameManager() {
+    return this.gameManager;
   }
 
   @Override
@@ -217,16 +72,18 @@ public class LogicalServer extends WorldSavedData {
       GameType gameType = GameRegistry.findRegistry(GameType.class)
           .getValue(new ResourceLocation(nbt.getString("gameType")));
       if (gameType != null) {
-        IGameServer<?, ?> gameServer = gameType.createGameServer(this);
-        this.loadGame(gameServer, gameServer);
+        this.gameManager = new GameManager<>(gameType.createGameServer(this));
+        this.gameManager.getGameServer().deserializeNBT(nbt.getCompound("game"));
       }
     }
-    String gameTypeId = nbt.getString("gameType");
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT compound) {
-    return null;
+  public CompoundNBT write(CompoundNBT nbt) {
+    nbt.putString("gameType",
+        this.gameManager.getGameServer().getGameType().getRegistryName().toString());
+    nbt.put("game", this.gameManager.getGameServer().serializeNBT());
+    return nbt;
   }
 
   // ================================================================================
@@ -330,9 +187,10 @@ public class LogicalServer extends WorldSavedData {
               () -> ModCapabilities.LIVING));
     } else if (event.getObject() instanceof ServerPlayerEntity) {
       event
-          .addCapability(this.currentGame.getGameType().getRegistryName(),
+          .addCapability(this.gameManager.getGameServer().getGameType().getRegistryName(),
               new SerializableCapabilityProvider<>(
-                  this.currentGame.createPlayer((ServerPlayerEntity) event.getObject()),
+                  this.gameManager.getGameServer()
+                      .createPlayer((ServerPlayerEntity) event.getObject()),
                   () -> ModCapabilities.LIVING));
     }
   }

@@ -11,7 +11,6 @@ import com.craftingdead.core.network.message.main.KillFeedMessage;
 import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.main.OpenStorageMessage;
 import com.craftingdead.core.network.message.main.PerformActionMessage;
-import com.craftingdead.core.network.message.main.SelectTeamMessage;
 import com.craftingdead.core.network.message.main.SetSlotMessage;
 import com.craftingdead.core.network.message.main.SyncGunMessage;
 import com.craftingdead.core.network.message.main.SyncPlayerMessage;
@@ -37,8 +36,9 @@ public enum NetworkChannel {
           .decoder(SetupGameMessage::decode)
           .consumer(FMLHandshakeHandler
               .biConsumerFor((handler, msg, ctx) -> SetupGameMessage.handle(msg, ctx)))
-          .buildLoginPacketList(isLocal -> CraftingDead.getInstance().getLogicalServer()
-              .generateSetupGameMessage(isLocal))
+          .buildLoginPacketList(
+              isLocal -> CraftingDead.getInstance().getLogicalServer().getGameManager()
+                  .generateSetupGameMessage(isLocal))
           .add();
 
       simpleChannel
@@ -150,13 +150,6 @@ public enum NetworkChannel {
           .encoder(KillFeedMessage::encode)
           .decoder(KillFeedMessage::decode)
           .consumer(KillFeedMessage::handle)
-          .add();
-
-      simpleChannel
-          .messageBuilder(SelectTeamMessage.class, 0x0E, NetworkDirection.PLAY_TO_CLIENT)
-          .encoder(SelectTeamMessage::encode)
-          .decoder(SelectTeamMessage::decode)
-          .consumer(SelectTeamMessage::handle)
           .add();
     }
   };

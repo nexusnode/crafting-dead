@@ -1,11 +1,9 @@
 package com.craftingdead.core.game.survival;
 
-import java.util.Set;
-import java.util.function.Supplier;
+import java.util.HashSet;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.game.AbstractGame;
-import com.craftingdead.core.game.GameType;
 import com.craftingdead.core.game.GameTypes;
 import com.craftingdead.core.game.IGameClient;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,9 +21,9 @@ public class SurvivalClient extends
       new ResourceLocation(CraftingDead.ID, "textures/gui/hud/zombies_killed.png");
   private static final ResourceLocation PLAYERS_KILLED =
       new ResourceLocation(CraftingDead.ID, "textures/gui/hud/players_killed.png");
-  
-  public SurvivalClient(Supplier<GameType> gameType, Set<SurvivorsTeam> teams) {
-    super(gameType, teams);
+
+  public SurvivalClient() {
+    super(GameTypes.SURVIVAL, new HashSet<>());
   }
 
   @Override
@@ -58,10 +56,5 @@ public class SurvivalClient extends
         y + 24, 0xFFFFFF);
 
     RenderSystem.disableBlend();
-  }
-
-  @Override
-  public GameType getGameType() {
-    return GameTypes.SURVIVAL.get();
   }
 }

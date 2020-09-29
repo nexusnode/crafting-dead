@@ -2,6 +2,7 @@ package com.craftingdead.core.game;
 
 import com.craftingdead.core.capability.living.Player;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 
 public interface IGame<T extends ITeam, P extends Player<? extends E>, E extends PlayerEntity> {
 
@@ -14,6 +15,10 @@ public interface IGame<T extends ITeam, P extends Player<? extends E>, E extends
   T getTeam(P player);
 
   void setTeam(P player, T team);
+
+  default DimensionType getSpawnDimension() {
+    return DimensionType.OVERWORLD;
+  }
 
   GameType getGameType();
 }

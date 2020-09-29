@@ -9,5 +9,5 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface IGameServer<T extends ITeam, P extends Player<? extends ServerPlayerEntity>>
     extends IGame<T, P, ServerPlayerEntity>, INBTSerializable<CompoundNBT> {
 
-  Optional<T> getForcedTeam();
+  Optional<T> getDefaultTeam();
 }

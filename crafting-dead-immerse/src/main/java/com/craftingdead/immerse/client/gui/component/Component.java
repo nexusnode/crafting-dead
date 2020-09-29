@@ -7,9 +7,8 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
+import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import icyllis.modernui.graphics.font.FontTools;
-import icyllis.modernui.gui.master.Canvas;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
@@ -19,6 +18,7 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraft.util.SoundEvent;
@@ -44,8 +44,6 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   protected final Minecraft minecraft = Minecraft.getInstance();
 
   protected final MainWindow mainWindow = this.minecraft.getMainWindow();
-
-  protected final Canvas canvas = new Canvas();
 
   protected final ClientDist clientDist =
       (ClientDist) CraftingDeadImmerse.getInstance().getModDist();
@@ -96,16 +94,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
       this.text = text;
     }
 
-    public void render(Canvas canvas, float x, float y, float partialTicks) {
-      float width = 10.0F + FontTools.getStringWidth(this.text.getFormattedText());
+    public void render(FontRenderer fontRenderer, float x, float y, float partialTicks) {
+      float width = 10.0F + fontRenderer.getStringWidth(this.text.getFormattedText());
       float height = 14;
       RenderSystem.enableBlend();
-      canvas.setRGBA(0.0F, 0.0F, 0.0F, 0.5F * this.alpha);
-      canvas.drawRoundedRect(x, y, x + width, y + height, 6);
-      canvas.setRGBA(0.5F, 0.5F, 0.5F, this.alpha);
-      canvas.drawRoundedRectFrame(x, y + 1, x + width, y + height, 6);
-      canvas.setRGBA(1.0F, 1.0F, 1.0F, textAlpha);
-      canvas.drawText(this.text.getFormattedText(), x + (width - FontTools.getStringWidth(this.text.getFormattedText())) / 2, y + 4);
+      RenderUtil.fill(x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24));
+      RenderUtil.fill(x, y + 1, x + width, y + height,
+          0x808080 + ((int) (this.alpha * 255.0F) << 24));
+      fontRenderer.drawString(this.text.getFormattedText(),
+          x + (width - fontRenderer.getStringWidth(this.text.getFormattedText())) / 2, y + 4,
+          0xFFFFFF + ((int) (this.textAlpha * 255.0F) << 24));
       RenderSystem.disableBlend();
     }
 
@@ -166,7 +164,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
-    this.tooltip.render(this.canvas, 10.0F + this.getXFloat() + this.getWidthFloat(), this.getYFloat(), partialTicks);
+    this.tooltip.render(this.minecraft.fontRenderer,
+        10.0F + this.getXFloat() + this.getWidthFloat(), this.getYFloat(), partialTicks);
   }
 
   protected void mouseEntered() {

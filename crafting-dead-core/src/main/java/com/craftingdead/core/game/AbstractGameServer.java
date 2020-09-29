@@ -32,7 +32,7 @@ public abstract class AbstractGameServer<T extends ITeam, P extends Player<? ext
   }
 
   @Override
-  public Optional<T> getForcedTeam() {
+  public Optional<T> getDefaultTeam() {
     return Optional.empty();
   }
 }

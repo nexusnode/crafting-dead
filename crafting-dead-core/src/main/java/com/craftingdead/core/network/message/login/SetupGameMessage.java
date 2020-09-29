@@ -14,17 +14,24 @@ public class SetupGameMessage extends LoginIndexedMessage {
 
   public SetupGameMessage(GameType gameType) {
     this.gameType = gameType;
+    System.out.println("test0");
+
   }
 
   public static void encode(SetupGameMessage msg, PacketBuffer out) {
+    System.out.println("test1");
+
     out.writeRegistryId(msg.gameType);
   }
 
   public static SetupGameMessage decode(PacketBuffer in) {
+    System.out.println("test2");
+
     return new SetupGameMessage(in.readRegistryId());
   }
 
   public static void handle(SetupGameMessage msg, Supplier<NetworkEvent.Context> ctx) {
+    System.out.println("test3");
     ctx.get().enqueueWork(
         () -> ((ClientDist) CraftingDead.getInstance().getModDist()).loadGame(msg.gameType));
     ctx.get().setPacketHandled(true);
