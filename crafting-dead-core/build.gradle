@@ -1,4 +1,6 @@
-project.version = '0.0.0.3'
+plugins {
+	id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
 
 repositories {
 	maven {
@@ -8,20 +10,12 @@ repositories {
 	google()
 }
 
-configurations {
-	implementation.extendsFrom shade
-}
-
 dependencies {
-    shade group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
+    shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation fg.deobf("curse.maven:travelers-backpack:${travelers_backpack_id}")
 }
 
 jar {
-	classifier = 'alpha'
-	into 'dependencies', {
-		from configurations.shade
-	}
 	manifest {
         attributes([
         	"Implementation-Title": project.name,
@@ -31,8 +25,6 @@ jar {
         ])
 	}
 }
-
-def dependenciesDirectoryName = 'dependencies'
 
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')

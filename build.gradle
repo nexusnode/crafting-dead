@@ -29,6 +29,7 @@ subprojects {
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
     group = 'com.craftingdead'
+    version = "${mod_version}"
 	
 	minecraft {
     	mappings channel: "${mappings_channel}", version: "${mappings_version}"
@@ -41,10 +42,15 @@ subprojects {
 	    	url 'https://dist.creeper.host/Sponge/maven'
 		}
 	}
-    
+
+	configurations {
+		implementation.extendsFrom shaded
+	}
+
     dependencies {
     	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
 		implementation group: 'org.spongepowered', name: 'mixin', version: '0.8.1-SNAPSHOT'
+		annotationProcessor('org.spongepowered:mixin:0.8.1-SNAPSHOT:processor')
 	}
 	
 	jar.finalizedBy('reobfJar') 
@@ -52,17 +58,12 @@ subprojects {
 	jar {
 	    baseName = project.name
 	    appendix = minecraft_version
+	    from {
+			configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
+		}
 	}
-	
-	sourceSets {
-	    main {
-	        ext.refMap = "raftingdead.refmap.json"
-	    }
-	}
-	
+
 	mixin {
     	add sourceSets.main, "craftingdead.refmap.json"
 	}
-	
-	annotationProcessor 
 }
