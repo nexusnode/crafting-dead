@@ -63,4 +63,6 @@ subprojects {
 	mixin {
     	add sourceSets.main, "craftingdead.refmap.json"
 	}
+	
+	annotationProcessor 
 }
