@@ -19,12 +19,14 @@ buildscript {
 plugins {
 	id 'java-library'
 	id 'eclipse'
+	id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 subprojects {
     apply plugin: 'net.minecraftforge.gradle'
     apply plugin: 'org.spongepowered.mixin'
 	apply plugin: 'eclipse'
+	apply plugin: 'com.github.hierynomus.license'
 	
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -61,9 +63,19 @@ subprojects {
 	    from {
 			configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
 		}
+		from rootProject.file('LICENSE.txt')
 	}
 
 	mixin {
     	add sourceSets.main, "craftingdead.refmap.json"
+	}
+	
+	license {
+		include '**/*.java'
+	    header rootProject.file('HEADER.txt')
+	    ext {
+	        organization = 'Nexus Node'
+	        year = 2020
+	    }
 	}
 }

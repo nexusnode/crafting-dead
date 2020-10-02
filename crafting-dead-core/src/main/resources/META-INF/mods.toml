@@ -1,5 +1,6 @@
 modLoader="javafml"
 loaderVersion="[27,)"
+license="GPL v3.0"
 
 [[mods]]
 modId="craftingdead" 
