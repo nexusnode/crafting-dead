@@ -112,7 +112,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
   public static <L extends ILiving<? extends E>, E extends LivingEntity> L get(E livingEntity) {
     return livingEntity.getCapability(ModCapabilities.LIVING).<L>cast()
-        .orElseThrow(() -> new IllegalStateException("Missing living capability"));
+        .orElseThrow(() -> new IllegalStateException("Missing living capability " + livingEntity));
   }
 
   public static interface IActionProgress {

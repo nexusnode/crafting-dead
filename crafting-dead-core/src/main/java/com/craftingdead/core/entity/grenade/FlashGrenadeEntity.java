@@ -1,25 +1,23 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.entity.grenade;
 
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.hat.IHat;
-import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.GrenadeItem;
@@ -28,8 +26,6 @@ import com.craftingdead.core.particle.RGBFlashParticleData;
 import com.craftingdead.core.potion.FlashBlindnessEffect;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.EntityUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -39,6 +35,8 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 public class FlashGrenadeEntity extends GrenadeEntity {
 
@@ -85,18 +83,9 @@ public class FlashGrenadeEntity extends GrenadeEntity {
       this.world
           .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(), this.getPosY(),
               this.getPosZ(), 0D, 0D, 0D);
-
-      // Applies the flash effect at client side for a better delay compensation
-      // and better FOV calculation
-      final Minecraft mc = Minecraft.getInstance();
-      final ClientPlayerEntity clientPlayerEntity = mc.player;
-      int duration =
-          this.calculateDuration(clientPlayerEntity, RenderUtil.isInsideGameFOV(this, false));
-      if (duration > 0) {
-        EffectInstance flashEffect =
-            new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
-        ModEffects.applyOrOverrideIfLonger(clientPlayerEntity, flashEffect);
-      }
+      DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+          () -> () -> ((ClientDist) CraftingDead.getInstance().getModDist())
+              .checkApplyFlashEffects(this));
     } else {
       this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 3F, 1.2F);
 

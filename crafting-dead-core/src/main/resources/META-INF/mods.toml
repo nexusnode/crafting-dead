@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[27,)"
 license="GPL v3.0"
+issueTrackerURL="https://github.com/nexusnode/crafting-dead/issues"
 
 [[mods]]
 modId="craftingdead" 

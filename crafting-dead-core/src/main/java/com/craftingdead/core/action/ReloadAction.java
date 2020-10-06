@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.action;
 
@@ -21,6 +18,7 @@ import java.util.List;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
+import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
@@ -76,8 +74,8 @@ public class ReloadAction extends TimedAction {
               .map(animation -> (GunAnimationReload) animation)
               .ifPresent(animation -> {
                 ((GunAnimationReload) animation).setEjectingClip(true);
-                this.gun.getAnimationController().addAnimation(animation,
-                    () -> this.playLoadAnimation(magazineStack));
+                this.gun.getAnimationController().ifPresent(c -> c.addAnimation(animation,
+                    () -> this.playLoadAnimation(magazineStack)));
               });
         } else {
           this.playLoadAnimation(magazineStack);
@@ -95,7 +93,7 @@ public class ReloadAction extends TimedAction {
         .map(animation -> (GunAnimationReload) animation)
         .ifPresent(animation -> {
           animation.setEjectingClip(false);
-          this.gun.getAnimationController().addAnimation(animation, null);
+          this.gun.getAnimationController().ifPresent(c -> c.addAnimation(animation, null));
         });
   }
 
@@ -129,7 +127,7 @@ public class ReloadAction extends TimedAction {
         Minecraft.getInstance().getSoundHandler()
             .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
       }
-      this.gun.getAnimationController().removeCurrentAnimation();
+      this.gun.getAnimationController().ifPresent(GunAnimationController::removeCurrentAnimation);
     }
     this.gun.setMagazineStack(this.oldMagazineStack);
   }

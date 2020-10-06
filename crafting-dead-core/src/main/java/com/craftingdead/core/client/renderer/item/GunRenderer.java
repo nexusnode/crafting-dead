@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.client.renderer.item;
 
@@ -95,6 +92,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
   public GunRenderer(Supplier<? extends GunItem> gunItem) {
     this.gunItem = gunItem;
+    System.out.println("test");
   }
 
   @Override
@@ -226,8 +224,9 @@ public abstract class GunRenderer implements IItemRenderer {
     // Right Hand
     matrixStack.push();
     {
-      gun.getAnimationController().applyTransforms(playerEntity, itemStack, GunAnimation.RIGHT_HAND,
-          transformType, matrixStack, partialTicks);
+      gun.getAnimationController()
+          .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.RIGHT_HAND,
+              transformType, matrixStack, partialTicks));
 
       this.minecraft.getTextureManager().bindTexture(playerEntity.getLocationSkin());
       matrixStack.translate(1F, 1F, 0F);
@@ -244,8 +243,9 @@ public abstract class GunRenderer implements IItemRenderer {
     // Left Hand
     matrixStack.push();
     {
-      gun.getAnimationController().applyTransforms(playerEntity, itemStack, GunAnimation.LEFT_HAND,
-          transformType, matrixStack, partialTicks);
+      gun.getAnimationController()
+          .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.LEFT_HAND,
+              transformType, matrixStack, partialTicks));
 
       this.minecraft.getTextureManager().bindTexture(playerEntity.getLocationSkin());
       matrixStack.translate(1.5F, 0.0F, 0.0F);
@@ -266,11 +266,11 @@ public abstract class GunRenderer implements IItemRenderer {
     {
       matrixStack.rotate(new Vector3f(-0.08F, 1.0F, 0.0F).rotationDegrees(-85));
       matrixStack.rotate(Vector3f.XP.rotationDegrees(30));
-      matrixStack.scale(muzzleScale, muzzleScale, muzzleScale);
+      matrixStack.scale(this.muzzleScale, this.muzzleScale, this.muzzleScale);
       if (gun.getAttachments().contains(ModItems.SUPPRESSOR.get())) {
-        muzzleFlashZ -= 0.4;
+        this.muzzleFlashZ -= 0.4;
       }
-      matrixStack.translate(muzzleFlashX, muzzleFlashY, muzzleFlashZ);
+      matrixStack.translate(this.muzzleFlashX, this.muzzleFlashY, this.muzzleFlashZ);
       IVertexBuilder flashVertexBuilder = renderTypeBuffer
           .getBuffer(this.muzzleFlashModel.getRenderType(new ResourceLocation(CraftingDead.ID,
               "textures/flash/flash"
@@ -317,16 +317,18 @@ public abstract class GunRenderer implements IItemRenderer {
         this.applySprintingTransforms(matrixStack);
       }
 
-      gun.getAnimationController().applyTransforms(playerEntity, itemStack, GunAnimation.BODY,
-          transformType, matrixStack, partialTicks);
+      gun.getAnimationController()
+          .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.BODY,
+              transformType, matrixStack, partialTicks));
 
       this.renderGunModel(itemStack.hasEffect(), gun, transformType, matrixStack, renderTypeBuffer,
           packedLight, packedOverlay);
 
       matrixStack.push();
       {
-        gun.getAnimationController().applyTransforms(playerEntity, itemStack, GunAnimation.MAGAZINE,
-            transformType, matrixStack, partialTicks);
+        gun.getAnimationController()
+            .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.MAGAZINE,
+                transformType, matrixStack, partialTicks));
 
         this.renderMainGunAmmo(playerEntity, gun, itemStack.hasEffect(), transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
@@ -346,8 +348,9 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.push();
     {
       this.applyThirdPersonTransforms(livingEntity, gun, matrixStack);
-      gun.getAnimationController().applyTransforms(livingEntity, itemStack, GunAnimation.BODY,
-          transformType, matrixStack, this.minecraft.getRenderPartialTicks());
+      gun.getAnimationController()
+          .ifPresent(c -> c.applyTransforms(livingEntity, itemStack, GunAnimation.BODY,
+              transformType, matrixStack, this.minecraft.getRenderPartialTicks()));
       this.renderGunModel(itemStack.hasEffect(), gun,
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
       this.renderMainGunAmmo(livingEntity, gun, itemStack.hasEffect(), transformType, matrixStack,

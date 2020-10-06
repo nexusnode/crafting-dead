@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.item;
 
@@ -101,13 +98,10 @@ import com.craftingdead.core.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
-import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
-import com.craftingdead.core.util.Text;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
 import net.minecraft.item.Item;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -1999,14 +1993,6 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
-  static {
-    ArbitraryTooltips
-        .registerTooltip(SCUBA_MASK,
-            (stack, world, tooltipFlags) -> Text
-                .translate("item_lore.clothing_item.water_breathing")
-                .applyTextStyle(TextFormatting.GRAY));
-  }
-
   // ================================================================================
   // Clothing
   // ================================================================================
@@ -2302,14 +2288,6 @@ public class ModItems {
               .setLootTable(ModLootTables.MILITARY_SUPPLY_DROP)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_MISC)));
-
-  static {
-    ArbitraryTooltips
-        .registerTooltip(SCUBA_CLOTHING,
-            (stack, world, tooltipFlags) -> Text
-                .translate("item_lore.clothing_item.water_speed")
-                .applyTextStyle(TextFormatting.GRAY));
-  }
 
   // ================================================================================
   // Spawn Eggs

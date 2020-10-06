@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.client;
 
@@ -55,6 +52,7 @@ import com.craftingdead.core.client.tutorial.IModTutorialStep;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
+import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.game.GameType;
 import com.craftingdead.core.game.IGameClient;
 import com.craftingdead.core.inventory.InventorySlotType;
@@ -69,6 +67,7 @@ import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.LogicalServer;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
+import com.craftingdead.core.util.Text;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import io.noties.tumbleweed.TweenManager;
@@ -76,6 +75,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -98,6 +99,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MovementInput;
@@ -106,6 +108,8 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -223,7 +227,12 @@ public class ClientDist implements IModDist {
 
   public void loadGame(GameType gameType) {
     logger.info("Loading game: {}", gameType.getRegistryName().toString());
-    this.gameClient = gameType.createGameClient();
+    try {
+      this.gameClient = gameType.createGameClient();
+    } catch (Exception e) {
+      this.minecraft.displayGuiScreen(new DisconnectedScreen(new MainMenuScreen(), "connect.failed",
+          new TranslationTextComponent("disconnect.genericReason", e.toString())));
+    }
   }
 
   public void setTutorialStep(ModTutorialSteps step) {
@@ -249,6 +258,10 @@ public class ClientDist implements IModDist {
     return this.cameraManager;
   }
 
+  public ItemRendererManager getItemRendererManager() {
+    return this.itemRendererManager;
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================
@@ -266,6 +279,18 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
+    StartupMessageManager.addModMessage("Registering tooltips");
+
+    ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
+        (stack, world, tooltipFlags) -> Text
+            .translate("item_lore.clothing_item.water_breathing")
+            .applyTextStyle(TextFormatting.GRAY));
+
+    ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
+        (stack, world, tooltipFlags) -> Text
+            .translate("item_lore.clothing_item.water_speed")
+            .applyTextStyle(TextFormatting.GRAY));
+
     StartupMessageManager.addModMessage("Registering container screen factories");
 
     ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
@@ -273,11 +298,10 @@ public class ClientDist implements IModDist {
 
     StartupMessageManager.addModMessage("Registering model loaders");
 
-    ModelLoaderRegistry
-        .registerLoader(new ResourceLocation(CraftingDead.ID, "gun"), GunModel.Loader.INSTANCE);
-    ModelLoaderRegistry
-        .registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
-            PerspectiveAwareModel.Loader.INSTANCE);
+    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "gun"),
+        GunModel.Loader.INSTANCE);
+    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
+        PerspectiveAwareModel.Loader.INSTANCE);
 
     StartupMessageManager.addModMessage("Registering key bindings");
 
@@ -288,72 +312,68 @@ public class ClientDist implements IModDist {
 
     StartupMessageManager.addModMessage("Registering entity renderers");
 
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.advancedZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.fastZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.tankZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.weakZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.policeZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.doctorZombie, AdvancedZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.giantZombie, GiantZombieRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.supplyDrop, SupplyDropRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.c4Explosive, C4ExplosiveRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.fireGrenade, CylinderGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.fragGrenade, FragGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.pipeGrenade, CylinderGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.decoyGrenade, SlimGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.smokeGrenade, CylinderGrenadeRenderer::new);
-    RenderingRegistry
-        .registerEntityRenderingHandler(ModEntityTypes.flashGrenade, SlimGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.advancedZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fastZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.tankZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.weakZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.policeZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.doctorZombie,
+        AdvancedZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.giantZombie,
+        GiantZombieRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.supplyDrop,
+        SupplyDropRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.c4Explosive,
+        C4ExplosiveRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fireGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fragGrenade,
+        FragGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.pipeGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.decoyGrenade,
+        SlimGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.smokeGrenade,
+        CylinderGrenadeRenderer::new);
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.flashGrenade,
+        SlimGrenadeRenderer::new);
 
     StartupMessageManager.addModMessage("Loading model layers");
 
     this.registerPlayerLayer(ClothingLayer::new);
-    this
-        .registerPlayerLayer(
-            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-                .withRenderer(renderer)
-                .withSlot(InventorySlotType.MELEE)
-                .withCrouchingOrientation(true)
-                .build());
-    this
-        .registerPlayerLayer(
-            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-                .withRenderer(renderer)
-                .withSlot(InventorySlotType.VEST)
-                .withCrouchingOrientation(true)
-                .build());
-    this
-        .registerPlayerLayer(
-            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-                .withRenderer(renderer)
-                .withSlot(InventorySlotType.HAT)
-                .withHeadOrientation(true)
-                // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
-                // TODO Find a reason to not remove this line. Also, if you remove it, you will
-                // need to change the json file of every helmet since the scale affects positions.
-                .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
-                .build());
-    this
-        .registerPlayerLayer(
-            renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-                .withRenderer(renderer)
-                .withSlot(InventorySlotType.GUN)
-                .withCrouchingOrientation(true)
-                .build());
+    this.registerPlayerLayer(
+        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+            .withRenderer(renderer)
+            .withSlot(InventorySlotType.MELEE)
+            .withCrouchingOrientation(true)
+            .build());
+    this.registerPlayerLayer(
+        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+            .withRenderer(renderer)
+            .withSlot(InventorySlotType.VEST)
+            .withCrouchingOrientation(true)
+            .build());
+    this.registerPlayerLayer(
+        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+            .withRenderer(renderer)
+            .withSlot(InventorySlotType.HAT)
+            .withHeadOrientation(true)
+            // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
+            // TODO Find a reason to not remove this line. Also, if you remove it, you will
+            // need to change the json file of every helmet since the scale affects positions.
+            .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
+            .build());
+    this.registerPlayerLayer(
+        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
+            .withRenderer(renderer)
+            .withSlot(InventorySlotType.GUN)
+            .withCrouchingOrientation(true)
+            .build());
   }
 
   /**
@@ -381,7 +401,7 @@ public class ClientDist implements IModDist {
   }
 
   // ================================================================================
-  // Forge Events
+  // Client Forge Events
   // ================================================================================
 
   @SubscribeEvent
@@ -525,9 +545,12 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof AbstractClientPlayerEntity) {
-      event.addCapability(this.gameClient.getGameType().getRegistryName(),
+      event.addCapability(
+          this.gameClient == null ? new ResourceLocation(CraftingDead.ID, "living")
+              : this.gameClient.getGameType().getRegistryName(),
           new SerializableCapabilityProvider<>(
-              this.gameClient.createPlayer((AbstractClientPlayerEntity) event.getObject()),
+              this.gameClient == null ? new Player<>((AbstractClientPlayerEntity) event.getObject())
+                  : this.gameClient.createPlayer((AbstractClientPlayerEntity) event.getObject()),
               () -> ModCapabilities.LIVING));
     }
   }
@@ -717,6 +740,21 @@ public class ClientDist implements IModDist {
     if (this.minecraft.currentScreen instanceof ModInventoryScreen && event.getGui() == null
         && ((ModInventoryScreen) this.minecraft.currentScreen).isTransitioning()) {
       event.setCanceled(true);
+    }
+  }
+
+  // ================================================================================
+  // Client-only helper methods
+  // ================================================================================
+
+  public void checkApplyFlashEffects(FlashGrenadeEntity flashGrenadeEntity) {
+    // Applies the flash effect at client side for a better delay compensation
+    // and better FOV calculation
+    int duration = flashGrenadeEntity.calculateDuration(this.minecraft.player,
+        RenderUtil.isInsideGameFOV(flashGrenadeEntity, false));
+    if (duration > 0) {
+      EffectInstance flashEffect = new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
+      ModEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);
     }
   }
 

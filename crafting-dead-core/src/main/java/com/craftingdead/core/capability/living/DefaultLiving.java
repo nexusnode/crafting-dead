@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.capability.living;
 
@@ -22,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.network.NetworkChannel;
@@ -182,8 +180,9 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     }
 
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this, heldStack));
-    heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER)
-        .ifPresent(provider -> provider.getAnimationController().tick(this.getEntity(), heldStack));
+    heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER).map(Optional::of)
+        .orElse(Optional.empty()).flatMap(IAnimationProvider::getAnimationController)
+        .ifPresent(c -> c.tick(this.getEntity(), heldStack));
 
     if (this.freezeMovement) {
       this.entity.forceSetPosition(this.entity.prevPosX, this.entity.prevPosY,

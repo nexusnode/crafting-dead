@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.item;
 
@@ -46,13 +43,11 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
@@ -116,7 +111,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   private final Set<Supplier<AttachmentItem>> defaultAttachments;
 
-  private final GunRenderer renderer;
+  private final Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
   private final IGun.RightMouseActionTriggerType rightMouseActionTriggerType;
 
@@ -145,7 +140,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.acceptedAttachments = properties.acceptedAttachments;
     this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
-    this.renderer = DistExecutor.safeCallWhenOn(Dist.CLIENT, properties.rendererFactory);
+    this.rendererFactory = properties.rendererFactory;
     this.rightMouseActionTriggerType = properties.rightMouseActionTriggerType;
     this.triggerPredicate = properties.triggerPredicate;
     this.rightMouseActionSound = properties.rightMouseActionSound;
@@ -245,7 +240,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   @Override
   public GunRenderer getRenderer() {
-    return this.renderer;
+    return DistExecutor.safeCallWhenOn(Dist.CLIENT, this.rendererFactory);
   }
 
   @Override
@@ -363,19 +358,13 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   }
 
   @Override
-  public void fillItemGroup(ItemGroup itemGroup, NonNullList<ItemStack> items) {
-    if (this.isInGroup(itemGroup)) {
-      ItemStack itemStack = new ItemStack(this);
-      // Fill magazine
-      itemStack.getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.getMagazineStack().setDamage(0));
-      items.add(itemStack);
-    }
+  public int getItemEnchantability() {
+    return 1;
   }
 
   @Override
-  public int getItemEnchantability() {
-    return 1;
+  public void onCreated(ItemStack itemStack, World world, PlayerEntity playerEntity) {
+    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setMagazineSize(0));
   }
 
   public static class Properties extends Item.Properties {
