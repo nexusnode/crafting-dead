@@ -27,7 +27,7 @@ subprojects {
     apply plugin: 'org.spongepowered.mixin'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.github.hierynomus.license'
-	
+
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
     group = 'com.craftingdead'
@@ -77,5 +77,7 @@ subprojects {
 	        organization = 'Nexus Node'
 	        year = 2020
 	    }
+	    // Buggy so ignore
+	 	ignoreFailures true
 	}
 }
