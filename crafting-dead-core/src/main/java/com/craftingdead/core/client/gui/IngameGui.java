@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.client.gui;
 
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
@@ -37,18 +33,13 @@ import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 
 public class IngameGui {
@@ -60,7 +51,6 @@ public class IngameGui {
   private static final ResourceLocation BLOOD_2 =
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
 
-  private static final int HIT_MARKER_FADE_TIME_MS = 3000;
 
   private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
 
@@ -78,9 +68,8 @@ public class IngameGui {
 
   private float lastFlashScale = 0;
 
-  private long hitMarkerFadeStartTimeMs;
-  private Vec3d hitMarkerPos;
-  private int hitMarkerColour;
+  @Nullable
+  private HitMarker hitMarker;
 
   private long killFeedVisibleTimeMs;
   private long killFeedAnimationTimeMs;
@@ -98,58 +87,8 @@ public class IngameGui {
     this.killFeedMessages.add(killFeedMessage);
   }
 
-  public void displayHitMarker(Vec3d pos, int colour) {
-    this.hitMarkerFadeStartTimeMs = 0L;
-    this.hitMarkerPos = pos;
-    this.hitMarkerColour = colour;
-  }
-
-  private void renderHitMarker(int width, int height, float partialTicks) {
-    if (this.hitMarkerPos != null) {
-      if (this.hitMarkerFadeStartTimeMs == 0L) {
-        this.hitMarkerFadeStartTimeMs = Util.milliTime();
-      }
-      float fadePct = MathHelper.clamp(
-          (float) (Util.milliTime() - this.hitMarkerFadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
-          0.0F, 1.0F);
-
-      final Vec2f pos = RenderUtil.projectToPlayerView(this.hitMarkerPos.getX(),
-          this.hitMarkerPos.getY(), this.hitMarkerPos.getZ(), partialTicks);
-
-      if (fadePct == 1.0F) {
-        this.hitMarkerPos = null;
-      }
-
-      if (pos == null) {
-        return;
-      }
-
-      float alpha = (float) (this.hitMarkerColour >> 24 & 255) / 255.0F;
-      float red = (float) (this.hitMarkerColour >> 16 & 255) / 255.0F;
-      float green = (float) (this.hitMarkerColour >> 8 & 255) / 255.0F;
-      float blue = (float) (this.hitMarkerColour & 255) / 255.0F;
-
-      RenderSystem.enableBlend();
-      RenderSystem.color4f(red, green, blue, alpha * (1.0F - fadePct));
-      RenderSystem.pushMatrix();
-      {
-        RenderSystem.translatef((width / 2) + pos.x - 15, (height / 2) - pos.y - 15, 0);
-        RenderSystem.lineWidth(5.0F);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(10, 20, 0.0D).endVertex();
-        bufferbuilder.pos(20, 10, 0.0D).endVertex();
-        tessellator.draw();
-        bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(10, 10, 0.0D).endVertex();
-        bufferbuilder.pos(20, 20, 0.0D).endVertex();
-        tessellator.draw();
-      }
-      RenderSystem.popMatrix();
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.disableBlend();
-    }
+  public void displayHitMarker(HitMarker hitMarker) {
+    this.hitMarker = hitMarker;
   }
 
   private void renderGunFlash(ClientPlayerEntity playerEntity, IGun gun, int width, int height,
@@ -209,7 +148,12 @@ public class IngameGui {
 
   public void renderGameOverlay(Player<ClientPlayerEntity> player, int width, int height,
       float partialTicks) {
-    this.renderHitMarker(width, height, partialTicks);
+    if (this.hitMarker != null) {
+      if (this.hitMarker.render(width, height, partialTicks)) {
+        this.hitMarker = null;
+      }
+    }
+
     this.renderKillFeed(partialTicks);
 
     final ClientPlayerEntity playerEntity = player.getEntity();

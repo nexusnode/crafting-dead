@@ -51,8 +51,8 @@ subprojects {
 
     dependencies {
     	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
-		implementation group: 'org.spongepowered', name: 'mixin', version: '0.8.1-SNAPSHOT'
-		annotationProcessor('org.spongepowered:mixin:0.8.1-SNAPSHOT:processor')
+		implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
+		annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
 	}
 	
 	jar.finalizedBy('reobfJar') 

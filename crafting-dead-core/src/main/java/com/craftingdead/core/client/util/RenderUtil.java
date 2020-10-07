@@ -1,24 +1,22 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.core.client.util;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
@@ -105,7 +103,8 @@ public class RenderUtil {
     }
   }
 
-  public static Vec2f projectToPlayerView(double x, double y, double z, float partialTicks) {
+  public static Optional<Vec2f> projectToPlayerView(double x, double y, double z,
+      float partialTicks) {
     final ActiveRenderInfo activeRenderInfo = minecraft.gameRenderer.getActiveRenderInfo();
     final Vec3d cameraPos = activeRenderInfo.getProjectedView();
     final Quaternion cameraRotation = activeRenderInfo.getRotation().copy();
@@ -151,7 +150,8 @@ public class RenderUtil {
     final float halfHeight = (float) minecraft.getMainWindow().getScaledHeight() / 2;
     final float scale =
         halfHeight / (result.getZ() * (float) Math.tan(Math.toRadians(fov / 2.0D)));
-    return result.getZ() > 0.0D ? null : new Vec2f(-result.getX() * scale, result.getY() * scale);
+    return result.getZ() > 0.0D ? Optional.empty()
+        : Optional.of(new Vec2f(-result.getX() * scale, result.getY() * scale));
   }
 
   /**

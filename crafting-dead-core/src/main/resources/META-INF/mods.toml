@@ -1,12 +1,22 @@
-modLoader="javafml"
-loaderVersion="[27,)"
-license="GPL v3.0"
-issueTrackerURL="https://github.com/nexusnode/crafting-dead/issues"
+issueTrackerURL = "https://github.com/nexusnode/crafting-dead/issues"
+license = "GPL v3.0"
+loaderVersion = "[27,)"
+modLoader = "javafml"
 
 [[mods]]
-modId="craftingdead" 
-version="${file.jarVersion}"
-displayName="Crafting Dead"
-description='''
-The Minecraft zombie survival mod.
-'''
+authors = "Sm0keySa1m0n, Arzio"
+credits = "Sm0keySa1m0n, Arzio, F3RULLO14"
+description = '''
+    The Minecraft zombie survival mod.
+    '''
+displayName = "Crafting Dead"
+displayURL = "www.craftingdead.com"
+modId = "craftingdead"
+version = "${file.jarVersion}"
+
+[[dependencies.craftingdead]]
+mandatory = true
+modId = "forge"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[31.2.45,)"

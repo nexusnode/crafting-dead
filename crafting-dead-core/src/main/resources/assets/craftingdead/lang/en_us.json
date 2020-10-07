@@ -13,9 +13,9 @@
   "death.attack.bullet.headshot": "%1$s was shot in the head",
 
   "options.craftingdead.client": "Client",
-  "options.craftingdead.client.apply_branding": "Apply Branding",
-  "options.craftingdead.client.enable_discord_rpc": "Enable Discord RPC",
   "options.craftingdead.client.display_blood": "Display Blood",
+  "options.craftingdead.client.hit_marker_mode": "Hit Marker Mode",
+  "options.craftingdead.client.play_kill_sound": "Play kill sound",
 
   "effect.craftingdead.broken_leg": "Broken Leg",
   "effect.craftingdead.dehydration": "Dehydration",

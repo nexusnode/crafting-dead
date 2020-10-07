@@ -12,23 +12,26 @@ repositories {
 minecraft {    
     runs {
         client {
-        	taskName "${project.name} [client]"
+        	taskName 'runImmerseClient'
         
             workingDirectory project.file('client')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             
-            args '--mixin', 'craftingdeadimmerse.mixins.json'
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
 
             mods {
                 craftingdeadimmerse {
                     source sourceSets.main
                 }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
             }
         }
 
         server {
-        	taskName "${project.name} [server]"
+        	taskName 'runImmerseServer'
         
             workingDirectory project.file('server')
 
@@ -40,6 +43,9 @@ minecraft {
                 craftingdeadimmerse {
                     source sourceSets.main
                 }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
             }
         }
     }
@@ -47,5 +53,13 @@ minecraft {
 
 dependencies {
     implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
-	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'    
+	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
+	compileOnly project(':crafting-dead-core')
+}
+
+eclipse {
+    classpath {
+    	// Temp hack - see https://github.com/eclipse/buildship/issues/939
+        plusConfigurations += [ configurations.compileOnly ]
+   	}
 }

@@ -27,7 +27,7 @@ minecraft {
 
     runs {
         client {
-            taskName "${project.name} [client]"
+            taskName 'runCoreClient'
  
             workingDirectory project.file('client')
 
@@ -43,7 +43,7 @@ minecraft {
         }
 
         server {
-            taskName "${project.name} [server]"
+            taskName 'runCoreServer'
         
             workingDirectory project.file('server')
 
@@ -59,7 +59,7 @@ minecraft {
         }
         
         data {
-            taskName "${project.name} [data]"
+            taskName 'runCoreData'
       
             workingDirectory project.file('data')
 
