@@ -29,9 +29,9 @@ import net.minecraft.util.math.BlockPos;
 public class DefaultActionProvider implements IActionProvider {
 
   @Nullable
-  private final BiFunction<ILiving<?>, BlockPos, IAction> blockFactory;
+  private final BiFunction<ILiving<?, ?>, BlockPos, IAction> blockFactory;
   @Nullable
-  private final BiFunction<ILiving<?>, ILiving<?>, IAction> entityFactory;
+  private final BiFunction<ILiving<?, ?>, ILiving<?, ?>, IAction> entityFactory;
 
   public DefaultActionProvider() {
     this(null, null);
@@ -41,20 +41,20 @@ public class DefaultActionProvider implements IActionProvider {
     this(null, (performer, target) -> actionType.get().createAction(performer, target));
   }
 
-  public DefaultActionProvider(@Nullable BiFunction<ILiving<?>, BlockPos, IAction> blockFactory,
-      @Nullable BiFunction<ILiving<?>, ILiving<?>, IAction> entityFactory) {
+  public DefaultActionProvider(@Nullable BiFunction<ILiving<?, ?>, BlockPos, IAction> blockFactory,
+      @Nullable BiFunction<ILiving<?, ?>, ILiving<?, ?>, IAction> entityFactory) {
     this.blockFactory = blockFactory;
     this.entityFactory = entityFactory;
   }
 
   @Override
-  public Optional<IAction> getBlockAction(ILiving<?> performer, BlockPos blockPos) {
+  public Optional<IAction> getBlockAction(ILiving<?, ?> performer, BlockPos blockPos) {
     return this.blockFactory == null ? Optional.empty()
         : Optional.of(this.blockFactory.apply(performer, blockPos));
   }
 
   @Override
-  public Optional<IAction> getEntityAction(ILiving<?> performer, ILiving<?> target) {
+  public Optional<IAction> getEntityAction(ILiving<?, ?> performer, ILiving<?, ?> target) {
     return this.entityFactory == null ? Optional.empty()
         : Optional.of(this.entityFactory.apply(performer, target));
   }

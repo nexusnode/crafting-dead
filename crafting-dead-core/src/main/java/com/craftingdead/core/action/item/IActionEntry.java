@@ -34,7 +34,7 @@ public interface IActionEntry {
    * @param heldStack - the current held stack
    * @return if the action should continue running
    */
-  boolean canPerform(ILiving<?> performer, @Nullable ILiving<?> target, ItemStack heldStack);
+  boolean canPerform(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target, ItemStack heldStack);
 
   /**
    * Complete the action.
@@ -44,7 +44,7 @@ public interface IActionEntry {
    * @param heldStack - the current held stack
    * @return if the action completed successfully
    */
-  boolean finish(ILiving<?> performer, @Nullable ILiving<?> target, ItemStack heldStack);
+  boolean finish(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target, ItemStack heldStack);
 
   /**
    * Determines if the held stack should be consumed upon completion.
@@ -52,7 +52,7 @@ public interface IActionEntry {
    * @param performer - the {@link ILiving} performing the {@link IAction}
    * @return if the stack should be consumed
    */
-  boolean shouldShrinkStack(ILiving<?> performer);
+  boolean shouldShrinkStack(ILiving<?, ?> performer);
 
   /**
    * Get the item that's returned upon completion.
@@ -61,7 +61,7 @@ public interface IActionEntry {
    * @return an {@link IItemProvider} or null if no return item
    */
   @Nullable
-  IItemProvider getReturnItem(ILiving<?> performer);
+  IItemProvider getReturnItem(ILiving<?, ?> performer);
 
   /**
    * Get the sound to be played upon completion.

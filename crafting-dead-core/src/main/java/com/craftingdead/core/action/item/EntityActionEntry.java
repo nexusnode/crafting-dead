@@ -34,12 +34,12 @@ import net.minecraft.util.math.EntityRayTraceResult;
 
 public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Properties> {
 
-  private BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> targetSelector = TargetSelector.SELF_ONLY;
+  private BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> targetSelector = TargetSelector.SELF_ONLY;
   private final List<Pair<EffectInstance, Float>> effects;
   @Nullable
-  private final Pair<Consumer<ILiving<?>>, Float> customAction;
+  private final Pair<Consumer<ILiving<?, ?>>, Float> customAction;
 
-  private ILiving<?> selectedTarget;
+  private ILiving<?, ?> selectedTarget;
 
   public EntityActionEntry(Properties properties) {
     super(properties);
@@ -49,7 +49,7 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
   }
 
   @Override
-  public boolean canPerform(ILiving<?> performer, @Nullable ILiving<?> target,
+  public boolean canPerform(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target,
       ItemStack heldStack) {
     if (this.selectedTarget == null) {
       this.selectedTarget = this.targetSelector.apply(performer, target);
@@ -72,7 +72,7 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
   }
 
   @Override
-  public boolean finish(ILiving<?> performer, @Nullable ILiving<?> target,
+  public boolean finish(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target,
       ItemStack heldStack) {
     if (this.customAction != null
         && UseItemAction.random.nextFloat() < this.customAction.getRight()) {
@@ -97,27 +97,27 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
     return true;
   }
 
-  public static enum TargetSelector implements BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> {
+  public static enum TargetSelector implements BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> {
     SELF_ONLY((performer, target) -> performer), OTHERS_ONLY(
         (performer, target) -> target), SELF_AND_OTHERS(
             (performer, target) -> target == null ? performer : target);
 
-    private final BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> targetGetter;
+    private final BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> targetGetter;
 
-    private TargetSelector(BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> targetGetter) {
+    private TargetSelector(BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> targetGetter) {
       this.targetGetter = targetGetter;
     }
 
     @Override
-    public ILiving<?> apply(ILiving<?> performer, @Nullable ILiving<?> target) {
+    public ILiving<?, ?> apply(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target) {
       return this.targetGetter.apply(performer, target);
     }
 
-    public BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> ofType(EntityType<?> entityType) {
+    public BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> ofType(EntityType<?> entityType) {
       return this.andThen(target -> target.getEntity().getType() == entityType ? target : null);
     }
 
-    public BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> ofType(
+    public BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> ofType(
         Class<? extends LivingEntity> entityType) {
       return this.andThen(
           target -> target != null && entityType.isAssignableFrom(target.getEntity().getClass())
@@ -127,14 +127,14 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
   }
 
   public static class Properties extends AbstractActionEntry.Properties<Properties> {
-    private BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> targetSelector =
+    private BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> targetSelector =
         TargetSelector.SELF_ONLY;
     private final List<Pair<EffectInstance, Float>> effects = new ArrayList<>();
     @Nullable
-    private Pair<Consumer<ILiving<?>>, Float> customAction;
+    private Pair<Consumer<ILiving<?, ?>>, Float> customAction;
 
     public Properties setTargetSelector(
-        BiFunction<ILiving<?>, ILiving<?>, ILiving<?>> targetSelector) {
+        BiFunction<ILiving<?, ?>, ILiving<?, ?>, ILiving<?, ?>> targetSelector) {
       this.targetSelector = targetSelector;
       return this;
     }
@@ -144,7 +144,7 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
       return this;
     }
 
-    public Properties setCustomAction(Pair<Consumer<ILiving<?>>, Float> customAction) {
+    public Properties setCustomAction(Pair<Consumer<ILiving<?, ?>>, Float> customAction) {
       this.customAction = customAction;
       return this;
     }

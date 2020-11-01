@@ -17,7 +17,6 @@
  */
 package com.craftingdead.core;
 
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,20 +28,20 @@ import com.craftingdead.core.capability.hydration.DefaultHydration;
 import com.craftingdead.core.capability.hydration.PresetHydration;
 import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
-import com.craftingdead.core.game.GameTypes;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
-import com.craftingdead.core.server.LogicalServer;
 import com.craftingdead.core.server.ServerDist;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
@@ -50,11 +49,14 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -62,7 +64,15 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -72,8 +82,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -123,9 +131,6 @@ public class CraftingDead {
 
   private boolean travelersBackpacksLoaded;
 
-  @Nullable
-  private LogicalServer logicalServer;
-
   public CraftingDead() {
     instance = this;
 
@@ -148,9 +153,6 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new);
     ActionTypes.ACTION_TYPES.register(modEventBus);
 
-    GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
-    GameTypes.GAME_TYPES.register(modEventBus);
-
     // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
@@ -165,11 +167,6 @@ public class CraftingDead {
 
   public boolean isTravelersBackpacksLoaded() {
     return this.travelersBackpacksLoaded;
-  }
-
-  @Nullable
-  public LogicalServer getLogicalServer() {
-    return this.logicalServer;
   }
 
   public static CraftingDead getInstance() {
@@ -212,28 +209,80 @@ public class CraftingDead {
     dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
   }
 
-  @SubscribeEvent
-  public void handleServerAboutToStart(FMLServerStartingEvent event) {
-    this.logicalServer = this.modDist.createLogicalServer(event.getServer());
-    this.logicalServer.init();
-    MinecraftForge.EVENT_BUS.register(this.logicalServer);
+  // ================================================================================
+  // Common Forge Events
+  // ================================================================================
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
+    if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
+      MobEntity mobEntity = (MobEntity) event.getEntityLiving();
+      if (mobEntity.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+        mobEntity.setAttackTarget(null);
+      }
+    }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingDeath(LivingDeathEvent event) {
+    if (event.getEntity()
+        .getCapability(ModCapabilities.LIVING)
+        .map(living -> living.onDeath(event.getSource()))
+        .orElse(false)
+        || (event.getSource().getTrueSource() != null && event
+            .getSource()
+            .getTrueSource()
+            .getCapability(ModCapabilities.LIVING)
+            .map(living -> living.onKill(event.getEntity()))
+            .orElse(false))) {
+      event.setCanceled(true);
+    }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingDrops(LivingDropsEvent event) {
+    event.getEntity()
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(
+            living -> event.setCanceled(living.onDeathDrops(event.getSource(), event.getDrops())));
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingAttack(LivingAttackEvent event) {
+    event.getEntity()
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(
+            living -> event.setCanceled(living.onAttacked(event.getSource(), event.getAmount())));
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleLivingDamage(LivingDamageEvent event) {
+    event.getEntity()
+        .getCapability(ModCapabilities.LIVING)
+        .ifPresent(
+            living -> event.setAmount(living.onDamaged(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent
-  public void handleServerStopping(FMLServerStoppingEvent event) {
-    MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
-    this.logicalServer = null;
+  public void handlePlayerClone(PlayerEvent.Clone event) {
+    IPlayer.getExpected(event.getPlayer()).copyFrom(IPlayer.getExpected(event.getOriginal()),
+        event.isWasDeath());
   }
 
-  // ================================================================================
-  // Common Forge Events (Occur on logical server and logical client)
-  // ================================================================================
+  @SubscribeEvent
+  public void handleUseItem(LivingEntityUseItemEvent.Finish event) {
+    event.getItem()
+        .getCapability(ModCapabilities.HYDRATION)
+        .map(hydration -> hydration.getHydration(event.getItem()))
+        .ifPresent(hydration -> event
+            .getEntityLiving()
+            .addPotionEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));
+  }
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
     if (!(event.getEntityLiving() instanceof PlayerEntity)) {
-      event.getEntityLiving().getCapability(ModCapabilities.LIVING)
-          .ifPresent(ILiving::tick);
+      event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
     }
   }
 
@@ -249,16 +298,18 @@ public class CraftingDead {
   }
 
   @SubscribeEvent
-  public void handleAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
+  public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (!(event.getObject() instanceof PlayerEntity) && event.getObject() instanceof LivingEntity) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "living"),
-          new SerializableCapabilityProvider<>(
-              new DefaultLiving<>((LivingEntity) event.getObject()), () -> ModCapabilities.LIVING));
+      event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
+          new DefaultLiving<>((LivingEntity) event.getObject()), () -> ModCapabilities.LIVING));
+    } else if (event.getObject() instanceof ServerPlayerEntity) {
+      event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
+          new Player<>((ServerPlayerEntity) event.getObject()), () -> ModCapabilities.LIVING));
     }
   }
 
   @SubscribeEvent
-  public void handleAttachCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event) {
+  public void handleAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
     final Item item = event.getObject().getItem();
     int hydration = -1;
     if (item == Items.APPLE || item == Items.RABBIT_STEW) {
@@ -275,15 +326,13 @@ public class CraftingDead {
       hydration = 6;
     }
     if (hydration != -1) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new PresetHydration(hydration),
-                  () -> ModCapabilities.HYDRATION));
+      event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+          new SimpleCapabilityProvider<>(new PresetHydration(hydration),
+              () -> ModCapabilities.HYDRATION));
     } else if (item == Items.POTION) {
-      event
-          .addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-              new SimpleCapabilityProvider<>(new DefaultHydration(),
-                  () -> ModCapabilities.HYDRATION));
+      event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
+          new SimpleCapabilityProvider<>(new DefaultHydration(),
+              () -> ModCapabilities.HYDRATION));
     }
   }
 }

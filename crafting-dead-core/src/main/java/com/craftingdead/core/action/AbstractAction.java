@@ -27,12 +27,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 public abstract class AbstractAction implements IAction {
 
   private final ActionType<?> actionType;
-  protected final ILiving<?> performer;
+  protected final ILiving<?, ?> performer;
   @Nullable
-  protected ILiving<?> target;
+  protected ILiving<?, ?> target;
 
-  public AbstractAction(ActionType<?> actionType, ILiving<?> performer,
-      @Nullable ILiving<?> target) {
+  public AbstractAction(ActionType<?> actionType, ILiving<?, ?> performer,
+      @Nullable ILiving<?, ?> target) {
     this.actionType = actionType;
     this.performer = performer;
     this.target = target;
@@ -44,7 +44,7 @@ public abstract class AbstractAction implements IAction {
   }
 
   @Override
-  public ILiving<?> getPerformer() {
+  public ILiving<?, ?> getPerformer() {
     return this.performer;
   }
 
@@ -54,7 +54,7 @@ public abstract class AbstractAction implements IAction {
   }
 
   @Override
-  public Optional<ILiving<?>> getTarget() {
+  public Optional<ILiving<?, ?>> getTarget() {
     return Optional.ofNullable(this.target);
   }
 

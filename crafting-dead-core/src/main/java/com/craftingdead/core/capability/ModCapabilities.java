@@ -48,7 +48,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 public class ModCapabilities {
 
   @CapabilityInject(ILiving.class)
-  public static final Capability<ILiving<?>> LIVING = null;
+  public static final Capability<ILiving<?, ?>> LIVING = null;
 
   @CapabilityInject(IGun.class)
   public static final Capability<IGun> GUN = null;

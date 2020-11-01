@@ -18,56 +18,27 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.network.message.login.AcknowledgeGameMessage;
-import com.craftingdead.core.network.message.login.LoginIndexedMessage;
-import com.craftingdead.core.network.message.login.SetupGameMessage;
-import com.craftingdead.core.network.message.main.CancelActionMessage;
-import com.craftingdead.core.network.message.main.CrouchMessage;
-import com.craftingdead.core.network.message.main.HitMessage;
-import com.craftingdead.core.network.message.main.KillFeedMessage;
-import com.craftingdead.core.network.message.main.OpenModInventoryMessage;
-import com.craftingdead.core.network.message.main.OpenStorageMessage;
-import com.craftingdead.core.network.message.main.PerformActionMessage;
-import com.craftingdead.core.network.message.main.SetSlotMessage;
-import com.craftingdead.core.network.message.main.SyncGunMessage;
-import com.craftingdead.core.network.message.main.SyncPlayerMessage;
-import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
-import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
-import com.craftingdead.core.network.message.main.TriggerPressedMessage;
-import com.craftingdead.core.network.message.main.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.CancelActionMessage;
+import com.craftingdead.core.network.message.play.CrouchMessage;
+import com.craftingdead.core.network.message.play.HitMessage;
+import com.craftingdead.core.network.message.play.KillFeedMessage;
+import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
+import com.craftingdead.core.network.message.play.OpenStorageMessage;
+import com.craftingdead.core.network.message.play.PerformActionMessage;
+import com.craftingdead.core.network.message.play.SetSlotMessage;
+import com.craftingdead.core.network.message.play.SyncGunMessage;
+import com.craftingdead.core.network.message.play.SyncPlayerMessage;
+import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
+import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
+import com.craftingdead.core.network.message.play.TriggerPressedMessage;
+import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 
-  LOGIN(new ResourceLocation(CraftingDead.ID, "login")) {
-    @Override
-    protected void registerMessages(SimpleChannel simpleChannel) {
-      simpleChannel
-          .messageBuilder(SetupGameMessage.class, 0x00, NetworkDirection.LOGIN_TO_CLIENT)
-          .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
-          .encoder(SetupGameMessage::encode)
-          .decoder(SetupGameMessage::decode)
-          .consumer(FMLHandshakeHandler
-              .biConsumerFor((handler, msg, ctx) -> SetupGameMessage.handle(msg, ctx)))
-          .buildLoginPacketList(
-              isLocal -> CraftingDead.getInstance().getLogicalServer().getGameManager()
-                  .generateSetupGameMessage(isLocal))
-          .add();
-
-      simpleChannel
-          .messageBuilder(AcknowledgeGameMessage.class, 0x01, NetworkDirection.LOGIN_TO_SERVER)
-          .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
-          .encoder(AcknowledgeGameMessage::encode)
-          .decoder(AcknowledgeGameMessage::decode)
-          .consumer(FMLHandshakeHandler
-              .indexFirst((handler, msg, ctx) -> AcknowledgeGameMessage.handle(msg, ctx)))
-          .add();
-    }
-  },
   PLAY(new ResourceLocation(CraftingDead.ID, "play")) {
     @Override
     public void registerMessages(SimpleChannel simpleChannel) {

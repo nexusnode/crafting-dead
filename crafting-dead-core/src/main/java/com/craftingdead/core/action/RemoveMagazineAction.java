@@ -33,7 +33,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   private final ItemStack oldMagazineStack;
 
-  public RemoveMagazineAction(ILiving<?> performer) {
+  public RemoveMagazineAction(ILiving<?, ?> performer) {
     super(ActionTypes.REMOVE_MAGAZINE.get(), performer, null);
     this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));

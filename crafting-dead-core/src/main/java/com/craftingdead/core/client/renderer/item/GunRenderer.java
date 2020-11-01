@@ -95,7 +95,6 @@ public abstract class GunRenderer implements IItemRenderer {
 
   public GunRenderer(Supplier<? extends GunItem> gunItem) {
     this.gunItem = gunItem;
-    System.out.println("test");
   }
 
   @Override

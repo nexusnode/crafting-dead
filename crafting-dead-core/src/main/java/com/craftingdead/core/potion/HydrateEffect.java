@@ -18,10 +18,10 @@
 package com.craftingdead.core.potion;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.capability.living.IPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.InstantEffect;
@@ -34,11 +34,10 @@ public class HydrateEffect extends InstantEffect {
 
   @Override
   public void performEffect(LivingEntity livingEntity, int amplifier) {
-    livingEntity
-        .getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof Player)
-        .map(living -> (Player<?>) living)
-        .ifPresent(player -> player.setWater(player.getWater() + amplifier + 1));
+    if (livingEntity instanceof PlayerEntity) {
+      IPlayer.getOptional((PlayerEntity) livingEntity)
+          .ifPresent(player -> player.setWater(player.getWater() + amplifier + 1));
+    }
   }
 
   @Override

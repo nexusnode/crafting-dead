@@ -23,7 +23,7 @@ import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModInventoryContainer;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.OpenStorageMessage;
+import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;

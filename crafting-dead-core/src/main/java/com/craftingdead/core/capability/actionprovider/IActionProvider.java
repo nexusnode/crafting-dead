@@ -25,7 +25,7 @@ import net.minecraft.util.math.BlockPos;
 
 public interface IActionProvider {
 
-  Optional<IAction> getBlockAction(ILiving<?> performer, BlockPos blockPos);
+  Optional<IAction> getBlockAction(ILiving<?, ?> performer, BlockPos blockPos);
 
-  Optional<IAction> getEntityAction(ILiving<?> performer, @Nullable ILiving<?> target);
+  Optional<IAction> getEntityAction(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target);
 }

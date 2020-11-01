@@ -38,11 +38,11 @@ public interface IAction {
 
   void cancel();
 
-  ILiving<?> getPerformer();
+  ILiving<?, ?> getPerformer();
 
   ILiving.IActionProgress getPerformerProgress();
 
-  Optional<ILiving<?>> getTarget();
+  Optional<ILiving<?, ?>> getTarget();
 
   ILiving.IActionProgress getTargetProgress();
 

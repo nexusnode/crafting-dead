@@ -24,7 +24,8 @@ public abstract class TimedAction extends AbstractAction {
 
   private int durationTicks;
 
-  public TimedAction(ActionType<?> actionType, ILiving<?> performer, @Nullable ILiving<?> target) {
+  public TimedAction(ActionType<?> actionType, ILiving<?, ?> performer,
+      @Nullable ILiving<?, ?> target) {
     super(actionType, performer, target);
   }
 

@@ -19,6 +19,7 @@ package com.craftingdead.core.capability.living;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -26,13 +27,14 @@ import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.CancelActionMessage;
-import com.craftingdead.core.network.message.main.CrouchMessage;
-import com.craftingdead.core.network.message.main.PerformActionMessage;
-import com.craftingdead.core.network.message.main.SetSlotMessage;
+import com.craftingdead.core.network.message.play.CancelActionMessage;
+import com.craftingdead.core.network.message.play.CrouchMessage;
+import com.craftingdead.core.network.message.play.PerformActionMessage;
+import com.craftingdead.core.network.message.play.SetSlotMessage;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -44,18 +46,22 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
+public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
+    implements ILiving<E, L> {
 
   /**
    * The vanilla entity.
    */
   protected final E entity;
+
+  private final Map<ResourceLocation, L> extensions = new Object2ObjectOpenHashMap<>();
 
   /**
    * The last held {@link ItemStack} - used to check if the entity has switched item.
@@ -91,6 +97,20 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
   public DefaultLiving(E entity) {
     this.entity = entity;
+  }
+
+  @Override
+  public Optional<L> getExtension(ResourceLocation id) {
+    return Optional.ofNullable(this.extensions.get(id));
+  }
+
+  @Override
+  public void registerExtension(ResourceLocation id, L extension) {
+    if (this.extensions.containsKey(id)) {
+      throw new IllegalArgumentException(
+          "Extension with id " + id.toString() + " already registered");
+    }
+    this.extensions.put(id, extension);
   }
 
   @Override
@@ -218,6 +238,8 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
           this.getEntity().getBoundingBox().expand(0, 1.0D, 0), this.getEntity().getPitchYaw(),
           this.getEntity().getEyeHeight()));
     }
+
+    this.extensions.values().forEach(ILivingHandler::tick);
   }
 
   private void updateScubaClothing() {
@@ -260,23 +282,35 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
     });
   }
 
+
+  @Override
   public float onDamaged(DamageSource source, float amount) {
-    return amount;
+    return this.extensions.values().stream().reduce(amount,
+        (result, extension) -> extension.onDamaged(source, result), (u, t) -> t);
   }
 
+  @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    return false;
+    return this.extensions.values().stream().map(e -> e.onAttacked(source, amount))
+        .anyMatch(v -> v == true);
   }
 
+  @Override
   public boolean onKill(Entity target) {
-    return false;
+    return this.extensions.values().stream().map(e -> e.onKill(target)).anyMatch(v -> v == true);
   }
 
+  @Override
   public boolean onDeath(DamageSource cause) {
-    return false;
+    return this.extensions.values().stream().map(e -> e.onDeath(cause)).anyMatch(v -> v == true);
   }
 
+  @Override
   public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+    if (this.extensions.values().stream().map(e -> e.onDeathDrops(cause, drops))
+        .anyMatch(v -> v == true)) {
+      return true;
+    }
     boolean shouldKeepInventory =
         this.getEntity().getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
     if (!shouldKeepInventory) {
@@ -342,11 +376,22 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
 
   @Override
   public CompoundNBT serializeNBT() {
-    return new CompoundNBT();
+    CompoundNBT nbt = new CompoundNBT();
+    for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
+      nbt.put(entry.getKey().toString(), entry.getValue().serializeNBT());
+    }
+    return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {}
+  public void deserializeNBT(CompoundNBT nbt) {
+    for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
+      CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
+      if (!extensionNbt.isEmpty()) {
+        entry.getValue().deserializeNBT(extensionNbt);
+      }
+    }
+  }
 
   @Override
   public int hashCode() {
@@ -356,6 +401,6 @@ public class DefaultLiving<E extends LivingEntity> implements ILiving<E> {
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj)
-        || (obj instanceof DefaultLiving && ((DefaultLiving<?>) obj).entity.equals(this.entity));
+        || (obj instanceof DefaultLiving && ((DefaultLiving<?, ?>) obj).entity.equals(this.entity));
   }
 }

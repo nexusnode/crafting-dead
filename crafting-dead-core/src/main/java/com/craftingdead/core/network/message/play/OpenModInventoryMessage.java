@@ -15,24 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.login;
+package com.craftingdead.core.network.message.play;
 
-import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+import com.craftingdead.core.capability.living.IPlayer;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class LoginIndexedMessage implements IntSupplier {
+public class OpenModInventoryMessage {
 
-  private int loginIndex;
+  public static void encode(OpenModInventoryMessage msg, PacketBuffer out) {}
 
-  public void setLoginIndex(final int loginIndex) {
-    this.loginIndex = loginIndex;
+  public static OpenModInventoryMessage decode(PacketBuffer in) {
+    return new OpenModInventoryMessage();
   }
 
-  public int getLoginIndex() {
-    return loginIndex;
-  }
-
-  @Override
-  public int getAsInt() {
-    return getLoginIndex();
+  public static boolean handle(OpenModInventoryMessage msg, Supplier<NetworkEvent.Context> ctx) {
+    IPlayer.getExpected(ctx.get().getSender()).openInventory();
+    return true;
   }
 }

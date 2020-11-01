@@ -31,7 +31,7 @@ public class ActionType<T extends IAction> extends ForgeRegistryEntry<ActionType
     this.triggeredByClient = triggeredByClient;
   }
 
-  public T createAction(ILiving<?> performer, @Nullable ILiving<?> target) {
+  public T createAction(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target) {
     return this.factory.create(this, performer, target);
   }
 
@@ -40,6 +40,6 @@ public class ActionType<T extends IAction> extends ForgeRegistryEntry<ActionType
   }
 
   public interface IFactory<T extends IAction> {
-    T create(ActionType<T> actionType, ILiving<?> performer, @Nullable ILiving<?> target);
+    T create(ActionType<T> actionType, ILiving<?, ?> performer, @Nullable ILiving<?, ?> target);
   }
 }

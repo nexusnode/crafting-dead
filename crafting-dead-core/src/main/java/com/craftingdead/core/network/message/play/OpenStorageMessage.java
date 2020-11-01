@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.main;
+package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.inventory.InventorySlotType;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -40,7 +40,7 @@ public class OpenStorageMessage {
   }
 
   public static boolean handle(OpenStorageMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    Player.get(ctx.get().getSender()).openStorage(msg.slotType);
+    IPlayer.getExpected(ctx.get().getSender()).openStorage(msg.slotType);
     return true;
   }
 }

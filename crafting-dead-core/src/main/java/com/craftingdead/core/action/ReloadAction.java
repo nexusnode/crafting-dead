@@ -45,7 +45,7 @@ public class ReloadAction extends TimedAction {
 
   private ItemStack oldMagazineStack;
 
-  public ReloadAction(ILiving<?> performer) {
+  public ReloadAction(ILiving<?, ?> performer) {
     super(ActionTypes.RELOAD.get(), performer, null);
     this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
@@ -135,7 +135,7 @@ public class ReloadAction extends TimedAction {
     this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
-  private List<IItemHandler> collectAmmoProviders(ILiving<?> living) {
+  private List<IItemHandler> collectAmmoProviders(ILiving<?, ?> living) {
     ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
     // Vest - first
     living.getItemHandler().getStackInSlot(InventorySlotType.VEST.getIndex())
@@ -155,7 +155,7 @@ public class ReloadAction extends TimedAction {
     return builder.build();
   }
 
-  private ItemStack findAmmo(ILiving<?> living, boolean simulate) {
+  private ItemStack findAmmo(ILiving<?, ?> living, boolean simulate) {
     for (IItemHandler ammoProvider : this.collectAmmoProviders(living)) {
       for (int i = 0; i < ammoProvider.getSlots(); ++i) {
         ItemStack itemStack = ammoProvider.getStackInSlot(i);

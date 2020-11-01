@@ -41,7 +41,7 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
   }
 
   @Override
-  public boolean canPerform(ILiving<?> performer, @Nullable ILiving<?> target,
+  public boolean canPerform(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target,
       ItemStack heldStack) {
     IAttributeInstance reachDistanceAttribute =
         performer.getEntity().getAttribute(PlayerEntity.REACH_DISTANCE);
@@ -64,7 +64,7 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
   }
 
   @Override
-  public boolean finish(ILiving<?> performer, ILiving<?> target, ItemStack heldStack) {
+  public boolean finish(ILiving<?, ?> performer, ILiving<?, ?> target, ItemStack heldStack) {
     return true;
   }
 

@@ -43,7 +43,7 @@ public class UseItemAction extends TimedAction {
 
   private IActionEntry selectedEntry;
 
-  private UseItemAction(ActionType<?> actionType, ILiving<?> performer, ILiving<?> target,
+  private UseItemAction(ActionType<?> actionType, ILiving<?, ?> performer, ILiving<?, ?> target,
       List<IActionEntry> entries, boolean freezeMovement, int totalDurationTicks,
       Predicate<Item> heldItemPredicate) {
     super(actionType, performer, target);
@@ -53,7 +53,7 @@ public class UseItemAction extends TimedAction {
     this.heldItemPredicate = heldItemPredicate;
   }
 
-  public static Builder builder(ActionType<?> actionType, ILiving<?> performer, ILiving<?> target) {
+  public static Builder builder(ActionType<?> actionType, ILiving<?, ?> performer, ILiving<?, ?> target) {
     return new Builder(actionType, performer, target);
   }
 
@@ -128,14 +128,14 @@ public class UseItemAction extends TimedAction {
   public static class Builder {
 
     private final ActionType<?> actionType;
-    private final ILiving<?> performer;
-    private final ILiving<?> target;
+    private final ILiving<?, ?> performer;
+    private final ILiving<?, ?> target;
     private final List<IActionEntry> entries = new ArrayList<>();
     private boolean freezeMovement;
     private int totalDurationTicks = 32;
     private Predicate<Item> heldItemPredicate;
 
-    public Builder(ActionType<?> actionType, ILiving<?> performer, ILiving<?> target) {
+    public Builder(ActionType<?> actionType, ILiving<?, ?> performer, ILiving<?, ?> target) {
       this.actionType = actionType;
       this.performer = performer;
       this.target = target;

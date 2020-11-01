@@ -24,7 +24,7 @@ import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModInventoryContainer;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.SyncPlayerMessage;
+import com.craftingdead.core.network.message.play.SyncPlayerMessage;
 import com.craftingdead.core.network.util.GenericDataManager;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.ModDamageSource;
@@ -54,7 +54,8 @@ import net.minecraftforge.fml.network.PacketDistributor;
  * @param <E> - the associated {@link PlayerEntity}
  * @author Sm0keySa1m0n
  */
-public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
+public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHandler>
+    implements IPlayer<E> {
 
   /**
    * The % chance of getting infected by a zombie.
@@ -164,6 +165,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
     }
   }
 
+  @Override
   public void openInventory() {
     this.getEntity()
         .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
@@ -171,6 +173,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
             new TranslationTextComponent("container.player")));
   }
 
+  @Override
   public void openStorage(InventorySlotType slotType) {
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack
@@ -182,6 +185,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
 
   @Override
   public float onDamaged(DamageSource source, float amount) {
+    amount = super.onDamaged(source, amount);
     // Can be null
     Entity immediateAttacker = source.getImmediateSource();
 
@@ -205,12 +209,16 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
 
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    if (!source.isProjectile() && source.getTrueSource() instanceof ZombieEntity) {
-      this.infect(INFECTION_CHANCE);
+    if (!super.onAttacked(source, amount)) {
+      if (!source.isProjectile() && source.getTrueSource() instanceof ZombieEntity) {
+        this.infect(INFECTION_CHANCE);
+      }
+      return false;
     }
-    return false;
+    return true;
   }
 
+  @Override
   public void infect(float chance) {
     if (!this.getEntity().isCreative() && random.nextFloat() < chance
         && !this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
@@ -221,7 +229,8 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
     }
   }
 
-  public void copyFrom(Player<?> that, boolean wasDeath) {
+  @Override
+  public void copyFrom(IPlayer<?> that, boolean wasDeath) {
     // Copies the inventory. Doesn't actually matter if it was death or not.
     // Death drops from 'that' should be cleared on death drops to prevent item duplication.
     for (int i = 0; i < that.getItemHandler().getSlots() - 1; i++) {
@@ -229,18 +238,22 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
     }
   }
 
+  @Override
   public int getWater() {
-    return this.dataManager.get(water);
+    return this.dataManager.get(this.water);
   }
 
+  @Override
   public void setWater(int water) {
     this.dataManager.set(this.water, Ints.constrainToRange(water, 0, this.getMaxWater()));
   }
 
+  @Override
   public int getMaxWater() {
     return this.dataManager.get(this.maxWater);
   }
 
+  @Override
   public void setMaxWater(int maxWater) {
     this.dataManager.set(this.maxWater, maxWater);
   }
@@ -262,12 +275,5 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E> {
     super.deserializeNBT(nbt);
     this.setWater(nbt.getInt("water"));
     this.setMaxWater(nbt.getInt("maxWater"));
-  }
-
-  public static <L extends Player<? extends E>, E extends PlayerEntity> L get(E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof Player)
-        .<L>cast()
-        .orElseThrow(() -> new IllegalStateException("Missing living capability"));
   }
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.main;
+package com.craftingdead.core.network.message.play;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -54,7 +54,7 @@ public class SetSlotMessage {
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.flatMap(w -> Optional.ofNullable(w.getEntityByID(msg.entityId)))
         .filter(e -> e instanceof LivingEntity)
-        .ifPresent(e -> ILiving.get((LivingEntity) e).getItemHandler().setStackInSlot(msg.slot,
+        .ifPresent(e -> ILiving.getExpected((LivingEntity) e).getItemHandler().setStackInSlot(msg.slot,
             msg.itemStack));
     return true;
   }

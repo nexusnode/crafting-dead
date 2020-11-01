@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.main;
+package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.action.ActionType;
@@ -53,9 +53,9 @@ public class PerformActionMessage {
 
   public static boolean handle(PerformActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.performerEntityId).ifPresent(performerEntity -> {
-      ILiving<?> performer =
+      ILiving<?, ?> performer =
           performerEntity.getCapability(ModCapabilities.LIVING).orElse(null);
-      ILiving<?> target = msg.targetEntityId == -1 ? null
+      ILiving<?, ?> target = msg.targetEntityId == -1 ? null
           : performerEntity.getEntityWorld().getEntityByID(msg.targetEntityId)
               .getCapability(ModCapabilities.LIVING).orElse(null);
       final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();

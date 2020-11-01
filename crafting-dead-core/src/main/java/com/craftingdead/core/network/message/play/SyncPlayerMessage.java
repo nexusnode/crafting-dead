@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.main;
+package com.craftingdead.core.network.message.play;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.network.util.GenericDataManager;
 import com.craftingdead.core.network.util.GenericDataManager.DataEntry;
@@ -62,8 +63,9 @@ public class SyncPlayerMessage {
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.flatMap(w -> Optional.ofNullable(w.getEntityByID(msg.entityId)))
         .filter(e -> e instanceof PlayerEntity)
-        .ifPresent(e -> Player.get((PlayerEntity) e).getDataManager()
-            .setEntryValues(msg.dataManagerEntries));
+        .flatMap(e -> IPlayer.getOptional((PlayerEntity) e))
+        .filter(p -> p instanceof Player)
+        .ifPresent(p -> ((Player<?>) p).getDataManager().setEntryValues(msg.dataManagerEntries));
     return true;
   }
 }

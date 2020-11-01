@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.network.message.main;
+package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -25,23 +25,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ToggleFireModeMessage {
+public class ToggleRightMouseAbility {
 
   private final int entityId;
 
-  public ToggleFireModeMessage(int entityId) {
+  public ToggleRightMouseAbility(int entityId) {
     this.entityId = entityId;
   }
 
-  public static void encode(ToggleFireModeMessage msg, PacketBuffer out) {
+  public static void encode(ToggleRightMouseAbility msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
   }
 
-  public static ToggleFireModeMessage decode(PacketBuffer in) {
-    return new ToggleFireModeMessage(in.readVarInt());
+  public static ToggleRightMouseAbility decode(PacketBuffer in) {
+    return new ToggleRightMouseAbility(in.readVarInt());
   }
 
-  public static boolean handle(ToggleFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ToggleRightMouseAbility msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil
         .getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
@@ -52,7 +52,7 @@ public class ToggleFireModeMessage {
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
                   .ifPresent(gun -> gun
-                      .toggleFireMode(living,
+                      .toggleRightMouseAction(living,
                           ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;

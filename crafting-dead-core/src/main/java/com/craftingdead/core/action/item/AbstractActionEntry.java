@@ -47,13 +47,13 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
   }
 
   @Override
-  public boolean shouldShrinkStack(ILiving<?> performer) {
+  public boolean shouldShrinkStack(ILiving<?, ?> performer) {
     return (!this.shrinkStackInCreative && performer.getEntity() instanceof PlayerEntity
         && ((PlayerEntity) performer.getEntity()).isCreative()) ? false : this.shrinkStack;
   }
 
   @Override
-  public IItemProvider getReturnItem(ILiving<?> performer) {
+  public IItemProvider getReturnItem(ILiving<?, ?> performer) {
     return (!this.returnItemInCreative && performer.getEntity() instanceof PlayerEntity
         && ((PlayerEntity) performer.getEntity()).isCreative()) ? null : this.returnItem;
   }

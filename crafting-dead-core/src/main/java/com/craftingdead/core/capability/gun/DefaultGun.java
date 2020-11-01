@@ -34,7 +34,7 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.gui.KillFeedEntry;
@@ -46,13 +46,13 @@ import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.main.HitMessage;
-import com.craftingdead.core.network.message.main.KillFeedMessage;
-import com.craftingdead.core.network.message.main.SyncGunMessage;
-import com.craftingdead.core.network.message.main.ToggleFireModeMessage;
-import com.craftingdead.core.network.message.main.ToggleRightMouseAbility;
-import com.craftingdead.core.network.message.main.TriggerPressedMessage;
-import com.craftingdead.core.network.message.main.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.HitMessage;
+import com.craftingdead.core.network.message.play.KillFeedMessage;
+import com.craftingdead.core.network.message.play.SyncGunMessage;
+import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
+import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
+import com.craftingdead.core.network.message.play.TriggerPressedMessage;
+import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
@@ -161,7 +161,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void tick(ILiving<?> living, ItemStack itemStack) {
+  public void tick(ILiving<?, ?> living, ItemStack itemStack) {
     this.tryShoot(living, itemStack);
 
     if (living.getEntity().getEntityWorld().isRemote()
@@ -188,7 +188,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void setTriggerPressed(ILiving<?> living, ItemStack itemStack,
+  public void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack,
       boolean triggerPressed,
       boolean sendUpdate) {
 
@@ -234,17 +234,17 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void reload(ILiving<?> living) {
+  public void reload(ILiving<?, ?> living) {
     living.performAction(new ReloadAction(living), true);
   }
 
   @Override
-  public void removeMagazine(ILiving<?> living) {
+  public void removeMagazine(ILiving<?, ?> living) {
     living.performAction(new RemoveMagazineAction(living), true);
   }
 
   @Override
-  public void validateLivingHit(ILiving<?> living, ItemStack itemStack, ILiving<?> hitLiving,
+  public void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
       long gameTime) {
     if (this.triggerPressed) {
       hitLiving.getSnapshot(gameTime - 2).flatMap(snapshot -> snapshot.rayTrace(living, 100))
@@ -253,12 +253,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
   }
 
-  private boolean canShoot(ILiving<?> living) {
+  private boolean canShoot(ILiving<?, ?> living) {
     return !(living.getActionProgress().isPresent() || living.getEntity().isSprinting()
         || !this.gunItem.getTriggerPredicate().test(this));
   }
 
-  private void tryShoot(ILiving<?> living, ItemStack itemStack) {
+  private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
     if (!this.triggerPressed) {
@@ -372,7 +372,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
   }
 
-  private void hitEntity(ILiving<?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
+  private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
       boolean playSound) {
     final Entity entity = living.getEntity();
     final World world = hitEntity.getEntityWorld();
@@ -463,7 +463,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         }
 
         if (hitLivingEntity instanceof PlayerEntity) {
-          Player<?> hitPlayer = Player.get((ServerPlayerEntity) hitLivingEntity);
+          IPlayer<ServerPlayerEntity> hitPlayer =
+              IPlayer.getExpected((ServerPlayerEntity) hitLivingEntity);
           hitPlayer.infect(
               (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
                   / 255.0F) * hitPlayer.getItemHandler()
@@ -476,7 +477,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
   }
 
-  private void hitBlock(ILiving<?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
+  private void hitBlock(ILiving<?, ?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
       boolean playSound) {
     final Entity entity = living.getEntity();
     Vec3d hitVec3d = rayTrace.getHitVec();
@@ -530,7 +531,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public float getAccuracy(ILiving<?> living, ItemStack itemStack) {
+  public float getAccuracy(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
     float accuracy =
         this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
@@ -576,7 +577,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void toggleFireMode(ILiving<?> living, boolean sendUpdate) {
+  public void toggleFireMode(ILiving<?, ?> living, boolean sendUpdate) {
     if (this.fireModeInfiniteIterator.hasNext()) {
       this.fireMode = this.fireModeInfiniteIterator.next();
     }
@@ -609,7 +610,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void toggleRightMouseAction(ILiving<?> living, boolean sendUpdate) {
+  public void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate) {
     if (!this.performingRightMouseAction && living.getEntity().isSprinting()) {
       return;
     }

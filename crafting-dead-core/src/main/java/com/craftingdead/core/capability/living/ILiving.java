@@ -17,27 +17,30 @@
  */
 package com.craftingdead.core.capability.living;
 
-import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ILiving<E extends LivingEntity> extends INBTSerializable<CompoundNBT> {
+public interface ILiving<E extends LivingEntity, L extends ILivingHandler>
+    extends ILivingHandler {
+
+  public static final ResourceLocation ID = new ResourceLocation(CraftingDead.ID, "living");
+
+  Optional<L> getExtension(ResourceLocation id);
+
+  void registerExtension(ResourceLocation id, L extension);
 
   default boolean performAction(IAction action, boolean sendUpdate) {
     return this.performAction(action, false, sendUpdate);
@@ -55,51 +58,6 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
   boolean getFreezeMovement();
 
-  void tick();
-
-  /**
-   * When this entity is damaged; with potions and armour taken into account.
-   * 
-   * @param source - the source of damage
-   * @param amount - the amount of damage taken
-   * @return the new damage amount
-   */
-  float onDamaged(DamageSource source, float amount);
-
-  /**
-   * When this entity is attacked.
-   * 
-   * @param source - the source of damage
-   * @param amount - the amount of damage taken
-   * @return if the event should be cancelled
-   */
-  boolean onAttacked(DamageSource source, float amount);
-
-  /**
-   * When this entity kills another entity.
-   *
-   * @param target - the {@link Entity} killed
-   * @return if the event should be cancelled
-   */
-  boolean onKill(Entity target);
-
-  /**
-   * When this entity's health reaches 0.
-   *
-   * @param cause - the cause of death
-   * @return if the event should be cancelled
-   */
-  boolean onDeath(DamageSource cause);
-
-  /**
-   * When this entity's death causes dropped items to appear.
-   *
-   * @param cause - the DamageSource that caused the drop to occur
-   * @param drops - a collections of EntityItems that will be dropped
-   * @return if the event should be cancelled
-   */
-  boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops);
-
   IItemHandlerModifiable getItemHandler();
 
   Optional<Snapshot> getSnapshot(long gameTime);
@@ -110,9 +68,18 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
 
   E getEntity();
 
-  public static <L extends ILiving<? extends E>, E extends LivingEntity> L get(E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING).<L>cast()
+  public static <E extends LivingEntity> ILiving<E, ?> getExpected(E livingEntity) {
+    return livingEntity.getCapability(ModCapabilities.LIVING)
+        .<ILiving<E, ?>>cast()
         .orElseThrow(() -> new IllegalStateException("Missing living capability " + livingEntity));
+  }
+
+  public static <R extends ILiving<E, ?>, E extends LivingEntity> Optional<R> getOptional(
+      E livingEntity) {
+    return livingEntity.getCapability(ModCapabilities.LIVING)
+        .<R>cast()
+        .map(Optional::of)
+        .orElse(Optional.empty());
   }
 
   public static interface IActionProgress {
@@ -144,7 +111,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
       this.eyeHeight = eyeHeight;
     }
 
-    public Optional<Vec3d> rayTrace(ILiving<?> fromLiving) {
+    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving) {
       LivingEntity fromEntity = fromLiving.getEntity();
       IAttributeInstance reachDistanceAttribute =
           fromEntity instanceof PlayerEntity
@@ -154,7 +121,7 @@ public interface ILiving<E extends LivingEntity> extends INBTSerializable<Compou
           reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue());
     }
 
-    public Optional<Vec3d> rayTrace(ILiving<?> fromLiving, double distance) {
+    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving, double distance) {
       return fromLiving.getSnapshot(this.gameTime).flatMap(fromSnapshot -> {
         Vec3d start = new Vec3d(fromSnapshot.getPos().getX(),
             fromSnapshot.getPos().getY() + fromSnapshot.getEyeHeight(),

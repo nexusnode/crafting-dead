@@ -37,21 +37,21 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface IGun
     extends IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
 
-  void tick(ILiving<?> living, ItemStack itemStack);
+  void tick(ILiving<?, ?> living, ItemStack itemStack);
 
-  void setTriggerPressed(ILiving<?> living, ItemStack itemStack, boolean triggerPressed,
+  void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack, boolean triggerPressed,
       boolean sendUpdate);
 
   boolean isTriggerPressed();
 
-  void reload(ILiving<?> living);
+  void reload(ILiving<?, ?> living);
 
-  void removeMagazine(ILiving<?> living);
+  void removeMagazine(ILiving<?, ?> living);
 
-  void validateLivingHit(ILiving<?> living, ItemStack itemStack, ILiving<?> hitLiving,
+  void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
       long gameTime);
 
-  float getAccuracy(ILiving<?> living, ItemStack itemStack);
+  float getAccuracy(ILiving<?, ?> living, ItemStack itemStack);
 
   ItemStack getMagazineStack();
 
@@ -93,13 +93,13 @@ public interface IGun
 
   boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
 
-  void toggleFireMode(ILiving<?> living, boolean sendUpdate);
+  void toggleFireMode(ILiving<?, ?> living, boolean sendUpdate);
 
   boolean hasCrosshair();
 
   boolean isPerformingRightMouseAction();
 
-  void toggleRightMouseAction(ILiving<?> living, boolean sendUpdate);
+  void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate);
 
   RightMouseActionTriggerType getRightMouseActionTriggerType();
 
