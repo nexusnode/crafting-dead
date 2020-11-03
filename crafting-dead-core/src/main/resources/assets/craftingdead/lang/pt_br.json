@@ -332,5 +332,9 @@
   "attachment_multiplier_type.accuracy": "Precisão",
   "attachment_multiplier_type.zoom": "Zoom",
   
-  "biome.craftingdead.zombie_forest": "Floresta de Zumbis"
+  "biome.craftingdead.zombie_forest": "Floresta de Zumbis",
+
+  "commands.craftingdead.thirst.success.operator": "Sede saciada com sucesso.",
+  "commands.craftingdead.thirst.success.confirmation": "Você foi totalmente hidratado!",
+  "commands.craftingdead.thirst.failure.not_used": "Ninguém estava com sede."
 }
