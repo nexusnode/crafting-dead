@@ -17,36 +17,43 @@
  */
 package com.craftingdead.core.commands;
 
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.commands.impl.CommandThirst;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
+import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
-/**
- * This class is responsable to manage the registry and storage of custom-commands and it's instance.
- */
-public class CommandManager {
+public abstract class CommandManager {
 
-  private static final HashMap<String, CommandBase> command_map = new HashMap<>();
+  private static final HashMap<String, Class> COMMAND_MAP = new HashMap<>();
+  private static final Logger LOGGER = CraftingDead.getInstance().getLogger();
 
-  public CommandManager(CommandDispatcher<CommandSource> dispatcher) {
-    register(dispatcher);
-  }
-
-  private void register(CommandDispatcher<CommandSource> dispatcher) {
-    command_map.values().stream().forEach(commandBase -> {
-        commandBase.register(dispatcher);
+  public static void register(CommandDispatcher<CommandSource> dispatcher) {
+    COMMAND_MAP.keySet().stream().forEach(command -> {
+      Class source = COMMAND_MAP.get(command);
+      try {
+        Method register = source.getDeclaredMethod("register", new Class[]{dispatcher.getClass()});
+        if (!register.isAccessible()) {
+          register.setAccessible(true);
+        }
+        register.invoke(null, dispatcher);
+        LOGGER.info("Command registered: " + command);
+      } catch (Exception OK) {
+        LOGGER.error("Could not register command: " + command);
+      }
     });
   }
 
-  public static void registerCommand(CommandBase command) {
-    if (!command_map.containsKey(command.getName()) && !command_map.containsValue(command)) {
-      command_map.put(command.getName(), command);
+  private static void registerCommand(String command, Class source) {
+    if (!COMMAND_MAP.containsKey(command) && !COMMAND_MAP.containsValue(source)) {
+      COMMAND_MAP.put(command, source);
     }
   }
 
   static {
-    registerCommand(new CommandThirst());
+    registerCommand("thirst", CommandThirst.class);
   }
 }
