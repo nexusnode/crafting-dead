@@ -158,8 +158,6 @@ public class CraftingDead {
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonConfigSpec);
   }
 
-  public Logger getLogger() { return logger; }
-
   public IModDist getModDist() {
     return this.modDist;
   }
