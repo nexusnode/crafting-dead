@@ -17,9 +17,6 @@
  */
 package com.craftingdead.core;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
@@ -31,6 +28,7 @@ import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.commands.CommandManager;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
@@ -64,13 +62,8 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -82,9 +75,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.registries.RegistryBuilder;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -199,6 +196,11 @@ public class CraftingDead {
     if (this.travelersBackpacksLoaded) {
       logger.info("Adding integration for " + TRAVELERS_BACKPACK_ID);
     }
+  }
+
+  @SubscribeEvent
+  public void handleServerStart(FMLServerStartingEvent event) {
+    CommandManager.register(event.getCommandDispatcher());
   }
 
   @SubscribeEvent
