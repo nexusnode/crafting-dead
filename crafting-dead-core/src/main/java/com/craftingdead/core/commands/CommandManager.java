@@ -17,43 +17,13 @@
  */
 package com.craftingdead.core.commands;
 
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.commands.impl.CommandThirst;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
-import org.apache.logging.log4j.Logger;
-
-import java.lang.reflect.Method;
-import java.util.HashMap;
 
 public abstract class CommandManager {
 
-  private static final HashMap<String, Class> COMMAND_MAP = new HashMap<>();
-  private static final Logger LOGGER = CraftingDead.getInstance().getLogger();
-
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
-    COMMAND_MAP.keySet().stream().forEach(command -> {
-      Class source = COMMAND_MAP.get(command);
-      try {
-        Method register = source.getDeclaredMethod("register", new Class[]{dispatcher.getClass()});
-        if (!register.isAccessible()) {
-          register.setAccessible(true);
-        }
-        register.invoke(null, dispatcher);
-        LOGGER.info("Command registered: " + command);
-      } catch (Exception OK) {
-        LOGGER.error("Could not register command: " + command);
-      }
-    });
-  }
-
-  private static void registerCommand(String command, Class source) {
-    if (!COMMAND_MAP.containsKey(command) && !COMMAND_MAP.containsValue(source)) {
-      COMMAND_MAP.put(command, source);
-    }
-  }
-
-  static {
-    registerCommand("thirst", CommandThirst.class);
+    CommandThirst.register(dispatcher);
   }
 }

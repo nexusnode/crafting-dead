@@ -126,8 +126,6 @@ public class CraftingDead {
    */
   private final IModDist modDist;
 
-  private CommandManager commandManager;
-
   private boolean travelersBackpacksLoaded;
 
   public CraftingDead() {
