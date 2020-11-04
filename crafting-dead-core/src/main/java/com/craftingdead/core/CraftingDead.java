@@ -160,8 +160,6 @@ public class CraftingDead {
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonConfigSpec);
   }
 
-  public Logger getLogger() { return logger; }
-
   public IModDist getModDist() {
     return this.modDist;
   }
@@ -204,6 +202,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleServerStart(FMLServerStartingEvent event) {
+    logger.info("Registering commands");
     CommandManager.register(event.getCommandDispatcher());
   }
 
