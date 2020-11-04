@@ -441,7 +441,6 @@ public abstract class GunRenderer implements IItemRenderer {
 
   protected final IBakedModel getBakedModel(ResourceLocation modelLocation,
       @Nullable Map<String, Either<Material, String>> textures) {
-    this.cachedModels.clear();
     return this.cachedModels.computeIfAbsent(
         modelLocation.hashCode() + (textures == null ? 0 : textures.hashCode()), key -> {
           if (textures != null) {

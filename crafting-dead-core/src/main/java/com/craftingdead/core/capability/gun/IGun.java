@@ -85,7 +85,7 @@ public interface IGun
   ItemStack getPaintStack();
 
   default Optional<IPaint> getPaint() {
-    return this.getMagazineStack().getCapability(ModCapabilities.PAINT).map(Optional::of)
+    return this.getPaintStack().getCapability(ModCapabilities.PAINT).map(Optional::of)
         .orElse(Optional.empty());
   }
 
