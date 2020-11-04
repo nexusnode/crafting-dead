@@ -365,5 +365,9 @@
   "attachment_multiplier_type.accuracy": "Accuracy",
   "attachment_multiplier_type.zoom": "Zoom",
   
-  "biome.craftingdead.zombie_forest": "Zombie Forest"
+  "biome.craftingdead.zombie_forest": "Zombie Forest",
+
+  "commands.craftingdead.thirst.success.operator": "Thirst quenched.",
+  "commands.craftingdead.thirst.success.confirmation": "Your thirst was cured!",
+  "commands.craftingdead.thirst.failure.not_used": "Nobody was thirsty."
 }
