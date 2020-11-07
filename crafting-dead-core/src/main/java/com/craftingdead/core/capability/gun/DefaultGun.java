@@ -326,7 +326,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack) * 1.5F, random)
+          .rayTracePiercing(entity, 100, 1.0F, this.getAccuracy(living, itemStack) * 1.5F, random)
           .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
