@@ -1,19 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "iii",
-        "ibi",
-        "iii"
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ingot"
-        },
-        "b": {
-            "item": "craftingdead:small_stock"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "isi",
+    "iii"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
     },
-    "result": {
-        "item": "craftingdead:medium_stock"
+    "s": {
+      "item": "craftingdead:small_stock"
     }
+  },
+  "result": {
+    "item": "craftingdead:medium_stock"
+  }
 }

@@ -1,28 +1,28 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " d ",
-        "abc",
-        " e "
-    ],
-    "key": {
-        "a": {
-            "item": "craftingdead:small_stock"
-        },
-        "b": {
-            "item": "craftingdead:small_body"
-        },
-        "c": {
-            "item": "craftingdead:small_barrel"
-        },
-        "d": {
-            "item": "minecraft:gray_dye"
-        },
-        "e": {
-            "item": "craftingdead:small_handle"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    "abc",
+    " e "
+  ],
+  "key": {
+    "a": {
+      "item": "craftingdead:small_stock"
     },
-    "result": {
-        "item": "craftingdead:m9"
+    "b": {
+      "item": "craftingdead:small_body"
+    },
+    "c": {
+      "item": "craftingdead:small_barrel"
+    },
+    "d": {
+      "item": "minecraft:gray_dye"
+    },
+    "e": {
+      "item": "craftingdead:small_handle"
     }
+  },
+  "result": {
+    "item": "craftingdead:desert_eagle"
+  }
 }

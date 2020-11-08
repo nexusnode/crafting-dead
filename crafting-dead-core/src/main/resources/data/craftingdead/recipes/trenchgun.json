@@ -1,28 +1,28 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " d ",
-        "abc",
-        " e "
-    ],
-    "key": {
-        "a": {
-            "item": "craftingdead:medium_stock"
-        },
-        "b": {
-            "item": "craftingdead:heavy_body"
-        },
-        "c": {
-            "item": "craftingdead:heavy_barrel"
-        },
-        "d": {
-            "item": "minecraft:oak_planks"
-        },
-        "e": {
-            "item": "craftingdead:medium_handle"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    "abc",
+    " e "
+  ],
+  "key": {
+    "a": {
+      "item": "craftingdead:medium_stock"
     },
-    "result": {
-        "item": "craftingdead:trenchgun"
+    "b": {
+      "item": "craftingdead:heavy_body"
+    },
+    "c": {
+      "item": "craftingdead:heavy_barrel"
+    },
+    "d": {
+      "item": "minecraft:oak_planks"
+    },
+    "e": {
+      "item": "craftingdead:medium_handle"
     }
+  },
+  "result": {
+    "item": "craftingdead:trenchgun"
+  }
 }

@@ -1,19 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "iii",
-        "iri",
-        "ii "
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ingot"
-        },
-        "r": {
-            "item" :"minecraft:redstone"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "iri",
+    "ii "
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
     },
-    "result": {
-        "item": "craftingdead:small_body"
+    "r": {
+      "item": "minecraft:redstone"
     }
+  },
+  "result": {
+    "item": "craftingdead:small_body"
+  }
 }

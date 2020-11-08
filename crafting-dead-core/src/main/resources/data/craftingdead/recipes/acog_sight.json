@@ -1,18 +1,18 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "gig",
-        "iii"
-    ],
-    "key": {
-        "g": {
-            "item": "minecraft:glass"
-        },
-        "i": {
-            "item": "minecraft:iron_ore"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gig",
+    "iii"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
     },
-    "result": {
-        "item": "craftingdead:acog_sight"
+    "i": {
+      "item": "minecraft:iron_ore"
     }
+  },
+  "result": {
+    "item": "craftingdead:acog_sight"
+  }
 }

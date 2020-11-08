@@ -1,19 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "gag",
-        "g g",
-        "ggg"
-    ],
-    "key": {
-        "g": {
-            "item": "minecraft:glass"
-        },
-        "a": {
-            "item": "minecraft:arrow"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gag",
+    "g g",
+    "ggg"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
     },
-    "result": {
-        "item": "craftingdead:syringe"
+    "a": {
+      "item": "minecraft:arrow"
     }
+  },
+  "result": {
+    "item": "craftingdead:syringe"
+  }
 }

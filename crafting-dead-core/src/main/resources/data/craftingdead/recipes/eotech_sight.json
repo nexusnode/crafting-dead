@@ -1,21 +1,21 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "gr ",
-        "iri"
-    ],
-    "key": {
-        "g": {
-            "item": "minecraft:glass"
-        },
-        "i": {
-            "item": "minecraft:iron_ore"
-        },
-        "r": {
-            "item": "minecraft:redstone"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gr ",
+    "iri"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
     },
-    "result": {
-        "item": "craftingdead:eotech_sight"
+    "i": {
+      "item": "minecraft:iron_ore"
+    },
+    "r": {
+      "item": "minecraft:redstone"
     }
+  },
+  "result": {
+    "item": "craftingdead:eotech_sight"
+  }
 }

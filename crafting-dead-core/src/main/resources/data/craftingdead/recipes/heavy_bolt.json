@@ -1,19 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "iii",
-        "ibi",
-        "iii"
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ingot"
-        },
-        "b": {
-            "item": "craftingdead:medium_bolt"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "ibi",
+    "iii"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
     },
-    "result": {
-        "item": "craftingdead:heavy_bolt"
+    "b": {
+      "item": "craftingdead:medium_bolt"
     }
+  },
+  "result": {
+    "item": "craftingdead:heavy_bolt"
+  }
 }

@@ -1,16 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " i ",
-        " i ",
-        " i "
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ore"
-        }
-    },
-    "result": {
-        "item": "craftingdead:tactical_grip"
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " i ",
+    " i ",
+    " i "
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ore"
     }
+  },
+  "result": {
+    "item": "craftingdead:tactical_grip"
+  }
 }
