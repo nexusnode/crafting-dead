@@ -1,19 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "iii",
-        "ibi",
-        "iii"
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ingot"
-        },
-        "b": {
-            "item": "craftingdead:small_body"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "ibi",
+    "iii"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
     },
-    "result": {
-        "item": "craftingdead:medium_body"
+    "b": {
+      "item": "craftingdead:small_body"
     }
+  },
+  "result": {
+    "item": "craftingdead:medium_body"
+  }
 }

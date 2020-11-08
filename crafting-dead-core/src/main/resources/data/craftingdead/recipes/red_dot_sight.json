@@ -1,18 +1,18 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "g  ",
-        "iii"
-    ],
-    "key": {
-        "g": {
-            "item": "minecraft:glass"
-        },
-        "i": {
-            "item": "minecraft:iron_ore"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "g  ",
+    "iii"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
     },
-    "result": {
-        "item": "craftingdead:red_dot_sight"
+    "i": {
+      "item": "minecraft:iron_ore"
     }
+  },
+  "result": {
+    "item": "craftingdead:red_dot_sight"
+  }
 }

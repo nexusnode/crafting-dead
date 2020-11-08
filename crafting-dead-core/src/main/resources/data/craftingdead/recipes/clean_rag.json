@@ -1,16 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "###",
-        "###",
-        "###"
-    ],
-    "key": {
-        "#": {
-            "item": "minecraft:string"
-        }
-    },
-    "result": {
-        "item": "craftingdead:clean_rag"
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sss",
+    "sss",
+    "sss"
+  ],
+  "key": {
+    "s": {
+      "item": "minecraft:string"
     }
+  },
+  "result": {
+    "item": "craftingdead:clean_rag"
   }
+}

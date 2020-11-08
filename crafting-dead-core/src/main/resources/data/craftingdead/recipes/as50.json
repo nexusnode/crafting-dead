@@ -1,28 +1,28 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " d ",
-        "abc",
-        " e "
-    ],
-    "key": {
-        "a": {
-            "item": "craftingdead:medium_stock"
-        },
-        "b": {
-            "item": "craftingdead:medium_body"
-        },
-        "c": {
-            "item": "craftingdead:heavy_barrel"
-        },
-        "d": {
-            "item": "minecraft:lime_dye"
-        },
-        "e": {
-            "item": "craftingdead:heavy_handle"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    "abc",
+    " e "
+  ],
+  "key": {
+    "a": {
+      "item": "craftingdead:medium_stock"
     },
-    "result": {
-        "item": "craftingdead:as50"
+    "b": {
+      "item": "craftingdead:medium_body"
+    },
+    "c": {
+      "item": "craftingdead:heavy_barrel"
+    },
+    "d": {
+      "item": "minecraft:lime_dye"
+    },
+    "e": {
+      "item": "craftingdead:heavy_handle"
     }
+  },
+  "result": {
+    "item": "craftingdead:as50"
+  }
 }

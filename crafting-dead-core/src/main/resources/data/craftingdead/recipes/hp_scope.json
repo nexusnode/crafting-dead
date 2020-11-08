@@ -1,22 +1,22 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "iii",
-        "grg",
-        "iii"
-    ],
-    "key": {
-        "g": {
-            "item": "minecraft:glass"
-        },
-        "i": {
-            "item": "minecraft:iron_ore"
-        },
-        "r": {
-            "item": "minecraft:redstone"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "grg",
+    "iii"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
     },
-    "result": {
-        "item": "craftingdead:hp_scope"
+    "i": {
+      "item": "minecraft:iron_ore"
+    },
+    "r": {
+      "item": "minecraft:redstone"
     }
+  },
+  "result": {
+    "item": "craftingdead:hp_scope"
+  }
 }
