@@ -195,7 +195,6 @@ public class RayTraceUtil {
     Vec3d scaledLook = look.scale(distance);
     Vec3d originalStart = fromEntity.getEyePosition(partialTicks);
     Vec3d end = originalStart.add(scaledLook);
-    Vec3d oldStart = originalStart;
     Vec3d newStart = originalStart;
     boolean pierceableBlock;
     BlockRayTraceResult blockRayTraceResult = null;
@@ -211,7 +210,13 @@ public class RayTraceUtil {
               RayTraceContext.FluidMode.NONE, fromEntity);
       blockRayTraceResult = fromEntity.world.rayTraceBlocks(context);
 
-      if (blockRayTraceResult != null) {
+      final double sqrDistance = blockRayTraceResult != null
+              ? blockRayTraceResult.getHitVec().squareDistanceTo(newStart)
+              : distance * distance;
+      entityRayTraceResult = rayTraceEntities(fromEntity, newStart, end,
+              filterEntities(fromEntity, scaledLook), sqrDistance);
+
+      if (!entityRayTraceResult.isPresent() && blockRayTraceResult != null) {
         //Not sure about this one, but I have a concern about inaccuracy of Double which could lead to an endless loop
         BlockPos blockPos = blockRayTraceResult.getPos();
         if (lastBlockPos != null && lastBlockPos.equals(blockPos)) {
@@ -225,28 +230,20 @@ public class RayTraceUtil {
         if (pierceableBlock) {
           Vec3d hitVec = blockRayTraceResult.getHitVec();
           AxisAlignedBB bb = context.getBlockShape(blockState, fromEntity.getEntityWorld(), blockPos).getBoundingBox();
-          double xDist = look.getX() < 0 ? hitVec.getX() - bb.minX - blockPos.getX()
+          double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
                   : blockPos.getX() - hitVec.getX() + bb.maxX;
-          double yDist = look.getY() < 0 ? hitVec.getY() - bb.minY - blockPos.getY()
+          double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
                   : blockPos.getY() - hitVec.getY() + bb.maxY;
-          double zDist = look.getZ() < 0 ? hitVec.getZ() - bb.minZ- blockPos.getZ()
+          double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ- blockPos.getZ()
                   : blockPos.getZ() - hitVec.getZ() + bb.maxZ;
           double xRayDist =  Math.abs(look.getX()) != 0d ? xDist /  Math.abs(look.getX()) : Double.MAX_VALUE;
           double yRayDist = Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
           double zRayDist = Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
 
           double rayDist = Math.min(xRayDist, Math.min(zRayDist, yRayDist));
-          oldStart = newStart;
           newStart = hitVec.add(look.scale(rayDist));
         }
       }
-
-      final double sqrDistance = blockRayTraceResult != null
-              ? blockRayTraceResult.getHitVec().squareDistanceTo(oldStart)
-              : distance * distance;
-      entityRayTraceResult = rayTraceEntities(fromEntity, oldStart, end,
-              filterEntities(fromEntity, scaledLook), sqrDistance);
-
     } while (!entityRayTraceResult.isPresent() && pierceableBlock);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : Optional.ofNullable(blockRayTraceResult);
