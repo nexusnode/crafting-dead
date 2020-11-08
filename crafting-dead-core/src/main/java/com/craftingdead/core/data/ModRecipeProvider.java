@@ -22,12 +22,10 @@ import java.util.function.Consumer;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.item.ModItems;
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.data.*;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
@@ -764,8 +762,6 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('b', ModItems.MEDIUM_BOLT.get())
         .addCriterion("has_medium_bolt", this.hasItem(ModItems.MEDIUM_BOLT.get()))
         .build(consumer);
-
-
   }
 
   @Override
