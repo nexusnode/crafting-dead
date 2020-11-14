@@ -19,13 +19,16 @@ package com.craftingdead.core.util;
 
 import java.util.Optional;
 import java.util.Random;
-
-import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 
 public class RayTraceUtil {
 
@@ -43,7 +46,9 @@ public class RayTraceUtil {
                 LivingEntity livingEntity = (LivingEntity) entityTest;
 
                 // Ignores dead entities
-                return !(livingEntity.getHealth() <= 0F);
+                if (livingEntity.getHealth() <= 0F) {
+                  return false;
+                }
               }
               return true;
             });
@@ -170,91 +175,5 @@ public class RayTraceUtil {
         filterEntities(fromEntity, scaledLook), sqrDistance);
 
     return entityRayTraceResult.isPresent() ? entityRayTraceResult : blockRayTraceResult;
-  }
-
-  /**
-   * Perform a full ray trace from the parsed entity, excluding blocks from {@link RayTraceUtil#isBlockPierceable}.
-   *
-   * @param fromEntity - the entity performing the ray trace
-   * @param distance - the distance
-   * @param partialTicks - the partialTicks
-   * @return the {@link RayTraceResult} as an {@link Optional}
-   */
-  public static Optional<? extends RayTraceResult> rayTracePiercing(final Entity fromEntity,
-                                                            final double distance, final float partialTicks,
-                                                            final float accuracy, final Random random) {
-
-    Vec3d look = fromEntity.getLook(partialTicks);
-    if (accuracy < 1.0F) {
-      look = look
-              .add((1.0F - accuracy) / 7.5F * random.nextFloat() * (random.nextBoolean() ? -1.0F : 1.0F),
-                      0,
-                      (1.0F - accuracy) / 7.5F * random.nextFloat() * (random.nextBoolean() ? -1.0F : 1.0F));
-    }
-
-    Vec3d scaledLook = look.scale(distance);
-    Vec3d originalStart = fromEntity.getEyePosition(partialTicks);
-    Vec3d end = originalStart.add(scaledLook);
-    Vec3d newStart = originalStart;
-    boolean pierceableBlock;
-    BlockRayTraceResult blockRayTraceResult = null;
-    Optional<EntityRayTraceResult> entityRayTraceResult = Optional.empty();
-    BlockPos lastBlockPos = null;
-    do {
-      if (newStart.distanceTo(originalStart) >= distance) {
-        break;
-      }
-
-      pierceableBlock = false;
-      RayTraceContext context = new RayTraceContext(newStart, end, RayTraceContext.BlockMode.COLLIDER,
-              RayTraceContext.FluidMode.NONE, fromEntity);
-      blockRayTraceResult = fromEntity.world.rayTraceBlocks(context);
-
-      final double sqrDistance = blockRayTraceResult != null
-              ? blockRayTraceResult.getHitVec().squareDistanceTo(newStart)
-              : distance * distance;
-      entityRayTraceResult = rayTraceEntities(fromEntity, newStart, end,
-              filterEntities(fromEntity, scaledLook), sqrDistance);
-
-      if (!entityRayTraceResult.isPresent() && blockRayTraceResult != null) {
-        //Not sure about this one, but I have a concern about inaccuracy of Double which could lead to an endless loop
-        BlockPos blockPos = blockRayTraceResult.getPos();
-        if (lastBlockPos != null && lastBlockPos.equals(blockPos)) {
-          break;
-        }
-        lastBlockPos = blockPos;
-
-        BlockState blockState = fromEntity.getEntityWorld().getBlockState(blockPos);
-        Block block = blockState.getBlock();
-        pierceableBlock = isBlockPierceable(block);
-        if (pierceableBlock) {
-          Vec3d hitVec = blockRayTraceResult.getHitVec();
-          AxisAlignedBB bb = context.getBlockShape(blockState, fromEntity.getEntityWorld(), blockPos).getBoundingBox();
-          double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
-                  : blockPos.getX() - hitVec.getX() + bb.maxX;
-          double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
-                  : blockPos.getY() - hitVec.getY() + bb.maxY;
-          double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ- blockPos.getZ()
-                  : blockPos.getZ() - hitVec.getZ() + bb.maxZ;
-          double xRayDist =  Math.abs(look.getX()) != 0d ? xDist /  Math.abs(look.getX()) : Double.MAX_VALUE;
-          double yRayDist = Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
-          double zRayDist = Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
-
-          double rayDist = Math.min(xRayDist, Math.min(zRayDist, yRayDist));
-          newStart = hitVec.add(look.scale(rayDist));
-        }
-      }
-    } while (!entityRayTraceResult.isPresent() && pierceableBlock);
-
-    return entityRayTraceResult.isPresent() ? entityRayTraceResult : Optional.ofNullable(blockRayTraceResult);
-  }
-
-
-  public static boolean isBlockPierceable(Block block) {
-    return block instanceof FenceBlock
-            || block instanceof DoorBlock
-            || block instanceof AbstractGlassBlock
-            || block instanceof LeavesBlock
-            || block instanceof TrapDoorBlock;
   }
 }
