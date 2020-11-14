@@ -26,6 +26,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
+import net.minecraft.world.World;
 
 public class RayTraceUtil {
 
@@ -160,7 +161,7 @@ public class RayTraceUtil {
     Vec3d end = start.add(scaledLook);
 
     Optional<BlockRayTraceResult> blockRayTraceResult = rayTraceBlocksPiercing(start, distance, look,
-        RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, fromEntity);
+        fromEntity.getEntityWorld());
 
     final double sqrDistance = blockRayTraceResult.isPresent()
         ? blockRayTraceResult.get().getHitVec().squareDistanceTo(start)
@@ -174,13 +175,20 @@ public class RayTraceUtil {
 
   /**
    *  Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
-   * @param fromEntity can be {@code null} if {@link net.minecraft.util.math.RayTraceContext.BlockMode}
-   *                   is {@code BlockMode.COLLIDER}
+   */
+  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance, Vec3d look,
+                                                                     World world) {
+    return rayTraceBlocksPiercing(start, distance, look, RayTraceContext.BlockMode.COLLIDER,
+        RayTraceContext.FluidMode.NONE, world);
+  }
+
+  /**
+   *  Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
   public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance, Vec3d look,
                                                                      RayTraceContext.BlockMode blockMode,
                                                                      RayTraceContext.FluidMode fluidMode,
-                                                                     Entity fromEntity) {
+                                                                     World world) {
     Vec3d newStart = start;
     Vec3d end = start.add(look.scale(distance));
     boolean pierceableBlock;
@@ -192,8 +200,8 @@ public class RayTraceUtil {
       }
 
       pierceableBlock = false;
-      RayTraceContext context = new RayTraceContext(newStart, end, blockMode, fluidMode, fromEntity);
-      blockRayTraceResult = fromEntity.world.rayTraceBlocks(context);
+      RayTraceContext context = new RayTraceContext(newStart, end, blockMode, fluidMode, null);
+      blockRayTraceResult = world.rayTraceBlocks(context);
 
       if (blockRayTraceResult != null) {
         //Not sure about this one, but I have a concern about inaccuracy of Double which could lead to an endless loop
@@ -203,12 +211,12 @@ public class RayTraceUtil {
         }
         lastBlockPos = blockPos;
 
-        BlockState blockState = fromEntity.getEntityWorld().getBlockState(blockPos);
+        BlockState blockState = world.getBlockState(blockPos);
         Block block = blockState.getBlock();
         pierceableBlock = isBlockPierceable(block);
         if (pierceableBlock) {
           Vec3d hitVec = blockRayTraceResult.getHitVec();
-          AxisAlignedBB bb = context.getBlockShape(blockState, fromEntity.getEntityWorld(), blockPos).getBoundingBox();
+          AxisAlignedBB bb = context.getBlockShape(blockState, world, blockPos).getBoundingBox();
           double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
               : blockPos.getX() - hitVec.getX() + bb.maxX;
           double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
