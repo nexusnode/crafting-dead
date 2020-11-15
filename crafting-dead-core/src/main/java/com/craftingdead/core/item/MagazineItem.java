@@ -17,9 +17,6 @@
  */
 package com.craftingdead.core.item;
 
-import java.util.List;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.magazine.DefaultMagazine;
@@ -35,6 +32,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class MagazineItem extends Item {
 
@@ -130,7 +131,7 @@ public class MagazineItem extends Item {
               .translate("item_lore.magazine_item.armor_penetration")
               .applyTextStyle(TextFormatting.GRAY)
               .appendSibling(Text
-                  .of(String.format("%.0f%%", this.armorPenetration) + "%")
+                  .of(String.format("%.0f%%", this.armorPenetration))
                   .applyTextStyle(TextFormatting.RED)));
     }
   }
