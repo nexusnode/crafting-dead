@@ -38,6 +38,8 @@ import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.SyncLivingMessage;
+import com.craftingdead.core.network.message.play.SyncPlayerMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
@@ -78,10 +80,15 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.registries.RegistryBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -337,4 +344,67 @@ public class CraftingDead {
               () -> ModCapabilities.HYDRATION));
     }
   }
+
+  @SubscribeEvent
+  public void handlePlayerStartTrackingEvent(PlayerEvent.StartTracking event) {
+    if (!(event.getPlayer() instanceof ServerPlayerEntity)) {
+      return;
+    }
+    ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getPlayer();
+    Entity target = event.getTarget();
+    target.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+      IItemHandlerModifiable itemHandler = living.getItemHandler();
+      Map<Integer, ItemStack> slotMap = new HashMap<>(itemHandler.getSlots());
+      for (int i = 0; i < itemHandler.getSlots(); i++) {
+        ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+        if (!stackInSlot.isEmpty()) {
+          slotMap.put(i, stackInSlot);
+        }
+      }
+      if (!slotMap.isEmpty()) {
+        NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+            new SyncLivingMessage(target.getEntityId(), slotMap));
+      }
+    });
+    if (target instanceof PlayerEntity) {
+      PlayerEntity targetPlayer = (PlayerEntity) target;
+      IPlayer.getOptional(targetPlayer).ifPresent(iPlayer -> {
+        if (!(iPlayer instanceof Player)) {
+          return;
+        }
+        NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+            new SyncPlayerMessage(targetPlayer.getEntityId(), ((Player<?>) iPlayer).getDataManager().getAll()));
+      });
+    }
+  }
+
+  @SubscribeEvent
+  public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
+    if (!(event.getPlayer() instanceof ServerPlayerEntity)) {
+      return;
+    }
+    ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getPlayer();
+    playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+      IItemHandlerModifiable itemHandler = living.getItemHandler();
+      Map<Integer, ItemStack> slotMap = new HashMap<>(itemHandler.getSlots());
+      for (int i = 0; i < itemHandler.getSlots(); i++) {
+        ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+        if (!stackInSlot.isEmpty()) {
+          slotMap.put(i, stackInSlot);
+        }
+      }
+      if (!slotMap.isEmpty()) {
+        NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+            new SyncLivingMessage(playerEntity.getEntityId(), slotMap));
+      }
+    });
+    IPlayer.getOptional(playerEntity).ifPresent(iPlayer -> {
+      if (!(iPlayer instanceof Player)) {
+        return;
+      }
+      NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+          new SyncPlayerMessage(playerEntity.getEntityId(), ((Player<?>) iPlayer).getDataManager().getAll()));
+    });
+  }
+
 }

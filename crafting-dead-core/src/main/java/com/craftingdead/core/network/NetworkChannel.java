@@ -18,20 +18,7 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.network.message.play.CancelActionMessage;
-import com.craftingdead.core.network.message.play.CrouchMessage;
-import com.craftingdead.core.network.message.play.HitMessage;
-import com.craftingdead.core.network.message.play.KillFeedMessage;
-import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
-import com.craftingdead.core.network.message.play.OpenStorageMessage;
-import com.craftingdead.core.network.message.play.PerformActionMessage;
-import com.craftingdead.core.network.message.play.SetSlotMessage;
-import com.craftingdead.core.network.message.play.SyncGunMessage;
-import com.craftingdead.core.network.message.play.SyncPlayerMessage;
-import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
-import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
-import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -138,6 +125,13 @@ public enum NetworkChannel {
           .encoder(KillFeedMessage::encode)
           .decoder(KillFeedMessage::decode)
           .consumer(KillFeedMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(SyncLivingMessage.class, 0x0E, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLivingMessage::encode)
+          .decoder(SyncLivingMessage::decode)
+          .consumer(SyncLivingMessage::handle)
           .add();
     }
   };
