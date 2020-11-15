@@ -42,6 +42,7 @@ import net.minecraft.entity.Pose;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
@@ -380,6 +381,15 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
       nbt.put(entry.getKey().toString(), entry.getValue().serializeNBT());
     }
+    IItemHandlerModifiable itemHandler = this.getItemHandler();
+    ListNBT listNBT = new ListNBT();
+    for (int i = 0; i < itemHandler.getSlots(); i++) {
+      CompoundNBT stackNbt = new CompoundNBT();
+      ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+      stackInSlot.write(stackNbt);
+      listNBT.add(stackNbt);
+    }
+    nbt.put("cd_inventory", listNBT);
     return nbt;
   }
 
@@ -389,6 +399,14 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
       if (!extensionNbt.isEmpty()) {
         entry.getValue().deserializeNBT(extensionNbt);
+      }
+    }
+    if (nbt.contains("cd_inventory")) {
+      ListNBT items = nbt.getList("cd_inventory", 10);
+      IItemHandlerModifiable itemHandler = this.getItemHandler();
+      for (int i = 0; i < items.size(); i++) {
+        ItemStack itemStack = ItemStack.read(items.getCompound(i));
+        itemHandler.setStackInSlot(i, itemStack);
       }
     }
   }
