@@ -344,7 +344,7 @@
   "item_lore.hat_item.has_night_vision": "Has Night Vision ability",
   "item_lore.grenade": "Shift-click to throw close",
   "item_lore.remote_detonator": "Right click to remotely detonate explosives within %d meters",
-  "item_lore.clothing.protection_level": "Protection level: ",
+  "item_lore.clothing.enhanced_protection": "Enhanced protection: ",
   "item_lore.clothing.movement_speed": "Movement speed: ",
   "item_lore.clothing.immune_to_fire": "Immune to fire",
   "item_lore.magazine_item.armor_penetration": "Armor penetration: ",

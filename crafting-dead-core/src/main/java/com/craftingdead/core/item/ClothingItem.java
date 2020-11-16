@@ -102,25 +102,21 @@ public class ClothingItem extends Item {
     super.addInformation(stack, world, lines, tooltipFlag);
     ITextComponent armorLevelText =
         Text.of(this.enhancedProtection).applyTextStyle(TextFormatting.RED);
-
-    lines
-        .add(Text
-            .translate("item_lore.clothing.protection_level")
-            .applyTextStyle(TextFormatting.GRAY)
-            .appendSibling(armorLevelText));
+    lines.add(Text
+        .translate("item_lore.clothing.enhanced_protection")
+        .applyTextStyle(TextFormatting.GRAY)
+        .appendSibling(armorLevelText));
 
     if (this.slownessAmplifier != null) {
       String potionNameAndLevel = I18n.format(Effects.SLOWNESS.getName()) + " "
           + I18n.format("enchantment.level." + (this.slownessAmplifier + 1));
-
       lines.add(Text.of(potionNameAndLevel).applyTextStyle(TextFormatting.GRAY));
     }
 
     if (this.fireImmunity) {
-      lines
-          .add(Text
-              .translate("item_lore.clothing.immune_to_fire")
-              .applyTextStyle(TextFormatting.GRAY));
+      lines.add(Text
+          .translate("item_lore.clothing.immune_to_fire")
+          .applyTextStyle(TextFormatting.GRAY));
     }
   }
 

@@ -310,7 +310,7 @@
   "item_lore.hat_item.has_night_vision": "Tem Visão Noturna",
   "item_lore.grenade": "Shift-clique para arremessar próximo a ti",
   "item_lore.remote_detonator": "Clique direito para remotamente detonar explosivos em um raio de até %d metros",
-  "item_lore.clothing.protection_level": "Nível de proteção: ",
+  "item_lore.clothing.enhanced_protection": "Proteção aprimorada: ",
   "item_lore.clothing.movement_speed": "Velocidade de movimento: ",
   "item_lore.clothing.immune_to_fire": "Imune a fogo",
   "item_lore.magazine_item.amount": "Quantidade: ",
