@@ -17,13 +17,6 @@
  */
 package com.craftingdead.core.capability.gun;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
 import com.craftingdead.core.action.RemoveMagazineAction;
@@ -46,19 +39,12 @@ import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.play.HitMessage;
-import com.craftingdead.core.network.message.play.KillFeedMessage;
-import com.craftingdead.core.network.message.play.SyncGunMessage;
-import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
-import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
-import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.*;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -74,12 +60,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.merchant.villager.WanderingTraderEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.monster.EndermanEntity;
-import net.minecraft.entity.monster.SkeletonEntity;
-import net.minecraft.entity.monster.VindicatorEntity;
-import net.minecraft.entity.monster.WitchEntity;
-import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -89,22 +70,18 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class DefaultGun extends DefaultAnimationProvider<GunAnimationController> implements IGun {
 
@@ -142,8 +119,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private long rightMouseActionSoundStartTimeMs;
 
-  private final Long2IntLinkedOpenHashMap livingHitValidationBuffer =
-      new Long2IntLinkedOpenHashMap();
+  private final ArrayList<Hit> livingHitValidationBuffer = new ArrayList<>();
 
   private int hitValidationTicks = 0;
 
@@ -169,7 +145,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         && this.livingHitValidationBuffer.size() > 0) {
       this.hitValidationTicks = 0;
       NetworkChannel.PLAY.getSimpleChannel()
-          .sendToServer(new ValidateLivingHitMessage(this.livingHitValidationBuffer.clone()));
+          .sendToServer(new ValidateLivingHitMessage(new ArrayList<>(this.livingHitValidationBuffer)));
       this.livingHitValidationBuffer.clear();
     }
 
@@ -245,12 +221,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   @Override
   public void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
-      long gameTime) {
-    if (this.triggerPressed) {
-      hitLiving.getSnapshot(gameTime - 2).flatMap(snapshot -> snapshot.rayTrace(living, 100))
-          .ifPresent(
-              hitPos -> this.hitEntity(living, itemStack, hitLiving.getEntity(), hitPos, false));
-    }
+                                Hit hit) {
+    hitLiving.getSnapshot(hit.getGameTime() - 2)
+        .flatMap(snapshot -> snapshot.rayTrace(living, 100, hit))
+        .ifPresent(
+            hitPos -> this.hitEntity(living, itemStack, hitLiving.getEntity(), hitPos, false));
   }
 
   private boolean canShoot(ILiving<?, ?> living) {
@@ -351,8 +326,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
               if (entity instanceof ServerPlayerEntity) {
                 break;
               } else if (entity instanceof ClientPlayerEntity) {
-                this.livingHitValidationBuffer.put(entity.getEntityWorld().getGameTime(),
-                    entityRayTraceResult.getEntity().getEntityId());
+                Hit hit = new Hit(entity.getEntityWorld().getGameTime(),
+                    entityRayTraceResult.getEntity().getEntityId(),
+                    rayTraceResult.getHitVec());
+                this.livingHitValidationBuffer.add(hit);
               }
             }
 

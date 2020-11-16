@@ -17,21 +17,21 @@
  */
 package com.craftingdead.core.capability.living;
 
-import java.util.Optional;
-import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.gun.Hit;
+import com.craftingdead.core.util.RayTraceUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandlerModifiable;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 public interface ILiving<E extends LivingEntity, L extends ILivingHandler>
     extends ILivingHandler {
@@ -111,25 +111,29 @@ public interface ILiving<E extends LivingEntity, L extends ILivingHandler>
       this.eyeHeight = eyeHeight;
     }
 
-    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving) {
+    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving, Hit hit) {
       LivingEntity fromEntity = fromLiving.getEntity();
       IAttributeInstance reachDistanceAttribute =
           fromEntity instanceof PlayerEntity
               ? ((PlayerEntity) fromEntity).getAttribute(PlayerEntity.REACH_DISTANCE)
               : null;
       return this.rayTrace(fromLiving,
-          reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue());
+          reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue(),
+          hit);
     }
 
-    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving, double distance) {
+    public Optional<Vec3d> rayTrace(ILiving<?, ?> fromLiving, double distance, Hit hit) {
       return fromLiving.getSnapshot(this.gameTime).flatMap(fromSnapshot -> {
         Vec3d start = new Vec3d(fromSnapshot.getPos().getX(),
             fromSnapshot.getPos().getY() + fromSnapshot.getEyeHeight(),
             fromSnapshot.getPos().getZ());
-        Vec3d look =
-            this.getVectorForRotation(fromSnapshot.getPitchYaw().x, fromSnapshot.getPitchYaw().y);
-        Vec3d scaledLook = look.scale(distance);
-        Vec3d end = start.add(scaledLook);
+        Vec3d hitVec = hit.getHitVec();
+        Vec3d look = hitVec.subtract(start).normalize();
+        Optional<BlockRayTraceResult> blockRayTraceResult =
+            RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, fromLiving.getEntity().getEntityWorld());
+        Vec3d end = blockRayTraceResult
+            .map(RayTraceResult::getHitVec)
+            .orElse(hitVec.add(look.scale(1d)));
         return this.getBoundingBox().rayTrace(start, end);
       });
     }

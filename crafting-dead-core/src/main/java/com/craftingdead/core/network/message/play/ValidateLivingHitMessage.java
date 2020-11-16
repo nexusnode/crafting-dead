@@ -17,37 +17,47 @@
  */
 package com.craftingdead.core.network.message.play;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.gun.Hit;
+import com.craftingdead.core.util.BufUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class ValidateLivingHitMessage {
 
-  private final Map<Long, Integer> hits;
+  private final List<Hit> hits;
 
-  public ValidateLivingHitMessage(Map<Long, Integer> hits) {
+  public ValidateLivingHitMessage(List<Hit> hits) {
     this.hits = hits;
   }
 
   public static void encode(ValidateLivingHitMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.hits.size());
-    for (Map.Entry<Long, Integer> hit : msg.hits.entrySet()) {
-      out.writeVarLong(hit.getKey());
-      out.writeVarInt(hit.getValue());
+    ;
+    for (Hit hit : msg.hits) {
+      out.writeVarLong(hit.getGameTime());
+      out.writeVarInt(hit.getEntityId());
+      BufUtil.writeVec(out, hit.getHitVec());
     }
   }
 
   public static ValidateLivingHitMessage decode(PacketBuffer in) {
     final int hitsSize = in.readVarInt();
-    Map<Long, Integer> hits = new HashMap<>();
+    List<Hit> hits = new ArrayList<>();
     for (int i = 0; i < hitsSize; i++) {
-      hits.put(in.readVarLong(), in.readVarInt());
+      long gameTime = in.readVarLong();
+      int entityId = in.readVarInt();
+      Vec3d hitVec = BufUtil.readVec(in);
+      Hit hit = new Hit(gameTime, entityId, hitVec);
+      hits.add(hit);
     }
     return new ValidateLivingHitMessage(hits);
   }
@@ -57,10 +67,10 @@ public class ValidateLivingHitMessage {
     playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       ItemStack heldStack = playerEntity.getHeldItemMainhand();
       heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-        for (Map.Entry<Long, Integer> hit : msg.hits.entrySet()) {
-          Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getValue());
+        for (Hit hit : msg.hits) {
+          Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getEntityId());
           hitEntity.getCapability(ModCapabilities.LIVING).ifPresent(hitLiving -> {
-            gun.validateLivingHit(living, heldStack, hitLiving, hit.getKey());
+            gun.validateLivingHit(living, heldStack, hitLiving, hit);
           });
         }
       });

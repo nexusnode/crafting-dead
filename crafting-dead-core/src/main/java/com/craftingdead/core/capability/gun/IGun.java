@@ -17,8 +17,6 @@
  */
 package com.craftingdead.core.capability.gun;
 
-import java.util.Optional;
-import java.util.Set;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
@@ -33,6 +31,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
+
+import java.util.Optional;
+import java.util.Set;
 
 public interface IGun
     extends IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
@@ -49,7 +50,7 @@ public interface IGun
   void removeMagazine(ILiving<?, ?> living);
 
   void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
-      long gameTime);
+                         Hit hit);
 
   float getAccuracy(ILiving<?, ?> living, ItemStack itemStack);
 
