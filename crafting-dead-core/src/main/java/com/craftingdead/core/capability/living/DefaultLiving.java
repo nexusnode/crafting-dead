@@ -30,7 +30,8 @@ import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
-import com.craftingdead.core.network.message.play.SetSlotMessage;
+import com.craftingdead.core.network.message.play.SetSlotsMessage;
+import io.netty.util.collection.IntObjectHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -40,6 +41,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
@@ -222,12 +224,13 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     this.updateScubaMask();
 
     if (!this.entity.getEntityWorld().isRemote()) {
+      Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
       for (int slot : this.dirtySlots) {
-        NetworkChannel.PLAY.getSimpleChannel().send(
-            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-            new SetSlotMessage(this.entity.getEntityId(), slot,
-                this.itemHandler.getStackInSlot(slot)));
+        slots.put(slot, this.itemHandler.getStackInSlot(slot));
       }
+      NetworkChannel.PLAY.getSimpleChannel().send(
+          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+          new SetSlotsMessage(this.entity.getEntityId(), slots));
       this.dirtySlots.clear();
 
       if (this.snapshots.size() >= 20) {
@@ -327,6 +330,16 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   }
 
   @Override
+  public void onStartTracking(ServerPlayerEntity playerEntity) {
+    Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
+    for (int i = 0; i < this.itemHandler.getSlots(); i++) {
+      slots.put(i, this.itemHandler.getStackInSlot(i));
+    }
+    NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+        new SetSlotsMessage(this.entity.getEntityId(), slots));
+  }
+
+  @Override
   public IItemHandlerModifiable getItemHandler() {
     return this.itemHandler;
   }
@@ -377,6 +390,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
+    nbt.put("inventory", this.itemHandler.serializeNBT());
     for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
       nbt.put(entry.getKey().toString(), entry.getValue().serializeNBT());
     }
@@ -385,6 +399,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
+    this.itemHandler.deserializeNBT(nbt.getCompound("inventory"));
     for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
       CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
       if (!extensionNbt.isEmpty()) {

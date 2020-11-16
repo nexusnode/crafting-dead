@@ -33,6 +33,7 @@ import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -70,7 +71,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
 
   private static final Random random = new Random();
 
-  protected final GenericDataManager dataManager = new GenericDataManager();
+  private final GenericDataManager dataManager = new GenericDataManager();
 
   private final DataParameter<Integer> water;
 
@@ -216,6 +217,13 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
       return false;
     }
     return true;
+  }
+
+  @Override
+  public void onStartTracking(ServerPlayerEntity playerEntity) {
+    super.onStartTracking(playerEntity);
+    NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+        new SyncPlayerMessage(playerEntity.getEntityId(), this.dataManager.getAll()));
   }
 
   @Override

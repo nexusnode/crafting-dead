@@ -17,45 +17,58 @@
  */
 package com.craftingdead.core.network.message.play;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.living.ILiving;
+import io.netty.util.collection.IntObjectHashMap;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
-public class SetSlotMessage {
+public class SetSlotsMessage {
 
   private final int entityId;
-  private final int slot;
-  private final ItemStack itemStack;
+  private final Map<Integer, ItemStack> slots;
 
-  public SetSlotMessage(int entityId, int slot, ItemStack itemStack) {
+  public SetSlotsMessage(int entityId, Map<Integer, ItemStack> slots) {
     this.entityId = entityId;
-    this.slot = slot;
-    this.itemStack = itemStack.copy();
+    this.slots = slots;
   }
 
-  public static void encode(SetSlotMessage msg, PacketBuffer out) {
+  public static void encode(SetSlotsMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
-    out.writeVarInt(msg.slot);
-    out.writeItemStack(msg.itemStack);
+    out.writeVarInt(msg.slots.size());
+    for (Map.Entry<Integer, ItemStack> entry : msg.slots.entrySet()) {
+      out.writeVarInt(entry.getKey());
+      out.writeItemStack(entry.getValue());
+    }
   }
 
-  public static SetSlotMessage decode(PacketBuffer in) {
-    return new SetSlotMessage(in.readVarInt(), in.readVarInt(), in.readItemStack());
+  public static SetSlotsMessage decode(PacketBuffer in) {
+    int entityId = in.readVarInt();
+    int slotCount = in.readVarInt();
+    Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
+    for (int i = 0; i < slotCount; i++) {
+      slots.put(in.readVarInt(), in.readItemStack());
+    }
+    return new SetSlotsMessage(entityId, slots);
   }
 
-  public static boolean handle(SetSlotMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(SetSlotsMessage msg, Supplier<NetworkEvent.Context> ctx) {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.flatMap(w -> Optional.ofNullable(w.getEntityByID(msg.entityId)))
         .filter(e -> e instanceof LivingEntity)
-        .ifPresent(e -> ILiving.getExpected((LivingEntity) e).getItemHandler().setStackInSlot(msg.slot,
-            msg.itemStack));
+        .ifPresent(e -> {
+          IItemHandlerModifiable itemHandler =
+              ILiving.getExpected((LivingEntity) e).getItemHandler();
+          msg.slots.forEach(itemHandler::setStackInSlot);
+        });
     return true;
   }
 }

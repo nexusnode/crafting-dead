@@ -3,6 +3,7 @@ package com.craftingdead.core.capability.living;
 import java.util.Collection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -63,4 +64,12 @@ public interface ILivingHandler extends INBTSerializable<CompoundNBT> {
   default boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
     return false;
   }
+
+  /**
+   * When this entity has started to be "tracked" by the specified {@link ServerPlayerEntity} (the
+   * player receives updates about this entity, e.g. motion).
+   * 
+   * @param playerEntity - the player tracking us
+   */
+  default void onStartTracking(ServerPlayerEntity playerEntity) {}
 }
