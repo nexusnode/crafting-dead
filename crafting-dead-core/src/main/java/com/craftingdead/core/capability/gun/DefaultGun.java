@@ -436,7 +436,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       // Also, allows multiple bullets to hit the same target at the same time.
       hitEntity.hurtResistantTime = 0;
 
-      ModDamageSource.causeDamageWithoutKnockback(hitEntity,
+      boolean damageDealt = ModDamageSource.causeDamageWithoutKnockback(hitEntity,
           ModDamageSource.causeGunDamage(entity, headshot), damage);
 
       checkCreateExplosion(itemStack, entity, hitPos);
@@ -445,7 +445,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         hitEntity.setFire(100);
       }
 
-      if (hitEntity instanceof LivingEntity) {
+      if (hitEntity instanceof LivingEntity && damageDealt) {
         final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
 
         // Alert client of hit (real hit data as opposed to client simulation)
