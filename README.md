@@ -1,5 +1,8 @@
-# Crafting Dead
-Crafting Dead is a multiplayer based modpack that puts you into a zombie apocalypse. Explore, create a base and fend off endless hordes of zombies. The mod completely changes the way you look at Minecraft. Customize your character with backpacks, clothing, tactical vests and guns. Our guns are fully customizable with attachments and paints! Crafting Dead has been around for over six years now and is still constantly evolving.
+![Crafting Dead Logo](/crafting-dead-logo.png)
+
+Starting out as a mod for Minecraft 1.5, Crafting Dead has been around for many years now. It was built on F3RULLO's Gun Mod, one of the first gun mods on the Minecraft scene and has been growing ever since, constantly being enhanced with more content and features.
+
+Crafting Dead adds in a multitude of zombies and guns, along with cosmetics and medical supplies. The guns are fully customisable with attachments and paints; they are competitive ready with accurate hit detection, latency compensation and recoil. Medical supplies include first aid kits, adrenaline and bandages enabling you to quickly escape, attack and recover from combat situations.
 
 # Discord
 Crafting Dead has a community [discord](https://discord.gg/wHZeNGk) where you can come and chat with players, staff and developers. Come and join us!
@@ -25,6 +28,8 @@ if(foo)
 
 # License
 Crafting Dead is licensed under GPL v3.0, see LICENSE.txt for more information. You may use Crafting Dead in modpacks, reviews or any other medium as long as you obide by the terms of the license. Commercial use of the mod must be authorised by the senior leadership team.
+
+Please contact brad@nexusnode.com if you'd like authorisation. 
 
 # Credit
 - Sm0keySa1m0n

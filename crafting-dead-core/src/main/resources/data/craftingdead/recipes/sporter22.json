@@ -1,28 +1,28 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " d ",
-        "abc",
-        " e "
-    ],
-    "key": {
-        "a": {
-            "item": "craftingdead:small_stock"
-        },
-        "b": {
-            "item": "craftingdead:medium_body"
-        },
-        "c": {
-            "item": "craftingdead:medium_barrel"
-        },
-        "d": {
-            "item": "minecraft:light_blue_dye"
-        },
-        "e": {
-            "item": "craftingdead:medium_handle"
-        }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    "abc",
+    " e "
+  ],
+  "key": {
+    "a": {
+      "item": "craftingdead:small_stock"
     },
-    "result": {
-        "item": "craftingdead:ak47"
+    "b": {
+      "item": "craftingdead:medium_body"
+    },
+    "c": {
+      "item": "craftingdead:medium_barrel"
+    },
+    "d": {
+      "item": "minecraft:blue_dye"
+    },
+    "e": {
+      "item": "craftingdead:medium_handle"
     }
+  },
+  "result": {
+    "item": "craftingdead:sporter22"
+  }
 }

@@ -1,14 +1,14 @@
 {
-    "type": "minecraft:crafting_shapeless",
-    "ingredients": [
-        {
-            "item": "craftingdead:clean_rag"
-        },
-        {
-            "item": "craftingdead:clean_rag"
-        }
-    ],
-    "result": {
-        "item": "craftingdead:bandage"
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "craftingdead:clean_rag"
+    },
+    {
+      "item": "craftingdead:clean_rag"
     }
+  ],
+  "result": {
+    "item": "craftingdead:bandage"
   }
+}
