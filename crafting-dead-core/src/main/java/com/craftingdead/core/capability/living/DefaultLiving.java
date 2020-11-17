@@ -204,6 +204,10 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       this.removeAction();
     }
 
+    if (this.crouching) {
+      this.getEntity().setPose(Pose.SWIMMING);
+    }
+
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this, heldStack));
     heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER).map(Optional::of)
         .orElse(Optional.empty()).flatMap(IAnimationProvider::getAnimationController)
@@ -213,10 +217,6 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       this.entity.forceSetPosition(this.entity.prevPosX, this.entity.prevPosY,
           this.entity.prevPosZ);
       this.freezeMovement = false;
-    }
-
-    if (this.crouching) {
-      this.getEntity().setPose(Pose.SWIMMING);
     }
 
     this.updateGeneralClothingEffects();
