@@ -19,20 +19,35 @@ package com.craftingdead.immerse.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.screen.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
+import com.craftingdead.immerse.client.shader.RoundedFrameShader;
+import com.craftingdead.immerse.client.shader.RoundedRectShader;
+import com.craftingdead.immerse.game.GameType;
+import com.craftingdead.immerse.game.IGameClient;
+import com.craftingdead.immerse.server.LogicalServer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -40,8 +55,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
+import net.minecraftforge.resource.IResourceType;
+import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 
-public class ClientDist implements IModDist {
+public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
 
   public static final ResourceLocation BLUR_SHADER =
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
@@ -58,11 +75,40 @@ public class ClientDist implements IModDist {
 
   private float deltaTime;
 
+  @Nullable
+  private LogicalServer logicalServer;
+
+  private IGameClient<?> gameClient;
+
   public ClientDist() {
     FMLJavaModLoadingContext.get().getModEventBus().register(this);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
     this.transitionManager = new TransitionManager(minecraft, Transitions.GROW);
+    ((IReloadableResourceManager) this.minecraft.getResourceManager()).addReloadListener(this);
+  }
+
+
+  @Override
+  public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {
+    return new LogicalServer(minecraftServer);
+  }
+
+  public void loadGame(GameType gameType) {
+    logger.info("Loading game: {}", gameType.getRegistryName().toString());
+    try {
+      this.gameClient = gameType.createGameClient();
+    } catch (Exception e) {
+      this.minecraft.displayGuiScreen(new DisconnectedScreen(new MainMenuScreen(), "connect.failed",
+          new TranslationTextComponent("disconnect.genericReason", e.toString())));
+    }
+  }
+
+  @Override
+  public void onResourceManagerReload(IResourceManager resourceManager,
+      Predicate<IResourceType> resourcePredicate) {
+    RoundedRectShader.INSTANCE.compile(resourceManager);
+    RoundedFrameShader.INSTANCE.compile(resourceManager);
   }
 
   public float getDeltaTime() {
@@ -108,18 +154,35 @@ public class ClientDist implements IModDist {
   // ================================================================================
 
   @SubscribeEvent
+  public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
+    final IPlayer<ClientPlayerEntity> player =
+        IPlayer.getOptional(this.minecraft.player).orElse(null);
+    switch (event.getType()) {
+      case ALL:
+        if (player != null) {
+          this.gameClient.renderOverlay(this.minecraft, player,
+              event.getWindow().getScaledWidth(),
+              event.getWindow().getScaledHeight(), event.getPartialTicks());
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  @SubscribeEvent
   public void handleClientPlayerLoggedIn(ClientPlayerNetworkEvent.LoggedInEvent event) {
-    if (event.getPlayer() == minecraft.player) {
-      ClientPlayNetHandler connection = minecraft.getConnection();
+    if (event.getPlayer() == this.minecraft.player) {
+      ClientPlayNetHandler connection = this.minecraft.getConnection();
       if (connection != null && connection.getNetworkManager().isChannelOpen()) {
-        if (minecraft.getIntegratedServer() != null
-            && !minecraft.getIntegratedServer().getPublic()) {
+        if (this.minecraft.getIntegratedServer() != null
+            && !this.minecraft.getIntegratedServer().getPublic()) {
           DiscordPresence.updateState(DiscordPresence.GameState.SINGLEPLAYER, this);
-        } else if (minecraft.isConnectedToRealms()) {
+        } else if (this.minecraft.isConnectedToRealms()) {
           DiscordPresence.updateState(DiscordPresence.GameState.REALMS, this);
-        } else if (minecraft.getIntegratedServer() == null
-            && (minecraft.getCurrentServerData() == null
-                || !minecraft.getCurrentServerData().isOnLAN())) {
+        } else if (this.minecraft.getIntegratedServer() == null
+            && (this.minecraft.getCurrentServerData() == null
+                || !this.minecraft.getCurrentServerData().isOnLAN())) {
           DiscordPresence.updateState(DiscordPresence.GameState.MULTIPLAYER, this);
         } else {
           DiscordPresence.updateState(DiscordPresence.GameState.LAN, this);

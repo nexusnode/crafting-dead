@@ -20,6 +20,8 @@ package com.craftingdead.immerse.client.util;
 import java.lang.reflect.Field;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import com.craftingdead.immerse.client.shader.RoundedFrameShader;
+import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -28,6 +30,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderDefault;
 import net.minecraft.client.shader.ShaderGroup;
+import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -55,6 +58,26 @@ public class RenderUtil {
         throw new RuntimeException(e);
       }
     }
+  }
+
+  public static void drawRoundedFrame(double x, double y, double x2, double y2, int colour,
+      float radius) {
+    ShaderLinkHelper.func_227804_a_(RoundedFrameShader.INSTANCE.getProgram());
+    RoundedFrameShader.INSTANCE.setRadius(radius - 1);
+    RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
+        (float) x2 - radius, (float) y2 - radius);
+    fill(x, y, x2, y2, colour);
+    ShaderLinkHelper.func_227804_a_(0);
+  }
+
+  public static void roundedFill(double x, double y, double x2, double y2, int colour,
+      float radius) {
+    ShaderLinkHelper.func_227804_a_(RoundedRectShader.INSTANCE.getProgram());
+    RoundedRectShader.INSTANCE.setRadius(radius - 1); // we have feather radius 1px
+    RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
+        (float) x2 - radius, (float) y2 - radius);
+    fill(x, y, x2, y2, colour);
+    ShaderLinkHelper.func_227804_a_(0);
   }
 
   public static void fill(double x, double y, double x2, double y2, int colour) {
@@ -168,14 +191,6 @@ public class RenderUtil {
       rgba[i] = MathHelper.ceil(MathHelper.lerp(pct, colour1[i], colour2[i]));
     }
     return rgba;
-  }
-
-  public static double getFitScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.getMainWindow().getWidth() / imageWidth;
-    double heightScale = minecraft.getMainWindow().getHeight() / imageHeight;
-    final double scale =
-        imageHeight * widthScale < minecraft.getMainWindow().getHeight() ? heightScale : widthScale;
-    return scale / minecraft.getMainWindow().getGuiScaleFactor();
   }
 
   public static float[] getColour4f(int[] colour4i) {

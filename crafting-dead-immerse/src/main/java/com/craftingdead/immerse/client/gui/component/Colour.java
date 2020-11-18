@@ -17,9 +17,33 @@
  */
 package com.craftingdead.immerse.client.gui.component;
 
+import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.util.RenderUtil;
 
 public class Colour {
+
+  public static final Colour BLACK = new Colour(0, 0, 0);
+  public static final Colour DARK_BLUE = new Colour(0, 0, 170);
+  public static final Colour DARK_GREEN = new Colour(0, 170, 0);
+  public static final Colour DARK_AQUA = new Colour(0, 170, 170);
+  public static final Colour DARK_RED = new Colour(170, 0, 0);
+  public static final Colour DARK_PURPLE = new Colour(170, 0, 170);
+  public static final Colour GOLD = new Colour(255, 170, 0);
+  public static final Colour GRAY = new Colour(170, 170, 170);
+  public static final Colour DARK_GRAY = new Colour(85, 85, 85);
+  public static final Colour BLUE = new Colour(85, 85, 255);
+  public static final Colour GREEN = new Colour(85, 255, 85);
+  public static final Colour AQUA = new Colour(85, 255, 255);
+  public static final Colour RED = new Colour(255, 85, 85);
+  public static final Colour LIGHT_PURPLE = new Colour(255, 85, 255);
+  public static final Colour YELLOW = new Colour(255, 255, 85);
+  public static final Colour WHITE = new Colour(255, 255, 255);
+  public static final Colour BLUE_C = new Colour(170, 220, 240);
+  public static final Colour GRAY_224 = new Colour(224, 224, 224);
+
+  private static final Colour[] VANILLA_COLORS =
+      new Colour[] {BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY,
+          DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE};
 
   private int hexColour;
   private int[] colour4i = new int[4];
@@ -29,12 +53,28 @@ public class Colour {
     this(0xFFFFFFFF);
   }
 
+  public Colour(Colour colour) {
+    this(colour.hexColour);
+  }
+
   public Colour(int value) {
     this.setHexColour(value);
   }
 
+  public Colour(int r, int g, int b) {
+    this(r, g, b, 255);
+  }
+
+  public Colour(int r, int g, int b, int a) {
+    this(new int[] {r, g, b, a});
+  }
+
   public Colour(int[] value4i) {
     this.setColour4i(value4i);
+  }
+
+  public Colour(float r, float g, float b, float a) {
+    this(new float[] {r, g, b, a});
   }
 
   public Colour(float[] value4f) {
@@ -69,5 +109,13 @@ public class Colour {
     System.arraycopy(value4f, 0, this.colour4f, 0, 4);
     this.colour4i = RenderUtil.getColour4i(this.colour4f);
     this.hexColour = RenderUtil.getColour(this.colour4i);
+  }
+
+  @Nullable
+  public static Colour getFormattingColor(int code) {
+    if (code >= 0 && code <= 15) {
+      return VANILLA_COLORS[code];
+    }
+    return null;
   }
 }

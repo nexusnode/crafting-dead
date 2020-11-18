@@ -17,6 +17,10 @@
  */
 package com.craftingdead.immerse;
 
+import com.craftingdead.immerse.server.LogicalServer;
+import net.minecraft.server.MinecraftServer;
+
 public interface IModDist {
 
+  LogicalServer createLogicalServer(MinecraftServer minecraftServer);
 }

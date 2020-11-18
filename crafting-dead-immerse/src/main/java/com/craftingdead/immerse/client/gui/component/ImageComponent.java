@@ -1,46 +1,95 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.immerse.client.gui.component;
 
+import java.util.Optional;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec2f;
 
 public class ImageComponent extends Component<ImageComponent> {
 
   public static final TweenType<ImageComponent> COLOUR =
       new SimpleTweenType<>(4, t -> t.colour.getColour4f(), (t, v) -> t.colour.setColour4f(v));
 
-  private final ResourceLocation image;
-  private final Colour colour;
+  private ResourceLocation image;
+  private FitType fitType = FitType.FILL;
+  private Colour colour = new Colour();
 
-  public ImageComponent(ResourceLocation image) {
-    this(image, new Colour());
+  private Vec2f fittedImageSize;
+
+  public ImageComponent setImage(ResourceLocation image) {
+    this.image = image;
+    return this;
   }
 
-  public ImageComponent(ResourceLocation image, Colour colour) {
-    this.image = image;
+  public ImageComponent setFitType(FitType fitType) {
+    this.fitType = fitType;
+    return this;
+  }
+
+  public ImageComponent setColour(Colour colour) {
     this.colour = colour;
+    return this;
+  }
+
+  private Optional<Vec2f> getImageSize() {
+    if (this.bind()) {
+      return Optional.of(new Vec2f(
+          GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH),
+          GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT)));
+    }
+    return Optional.empty();
+  }
+
+  private Optional<Vec2f> getFittedImageSize() {
+    return this.getFittedImageSize(this.getWidth(), this.getHeight());
+  }
+
+  private Optional<Vec2f> getFittedImageSize(float containerWidth, float containerHeight) {
+    return this.getImageSize().map(imageSize -> this.fitType.getSize(imageSize.x,
+        imageSize.y, containerWidth, containerHeight));
+  }
+
+  @Override
+  public void layout() {
+    super.layout();
+    this.fittedImageSize = this.getFittedImageSize().orElse(null);
+  }
+
+  @Override
+  public Vec2f measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
+    return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
+        heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
+        .orElse(new Vec2f(width, height));
   }
 
   public Colour getColour() {
     return this.colour;
+  }
+
+  private boolean bind() {
+    if (this.image != null) {
+      RenderUtil.bind(this.image);
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -49,8 +98,14 @@ public class ImageComponent extends Component<ImageComponent> {
     RenderSystem.enableBlend();
     final float[] colour = this.colour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
-    RenderUtil.bind(this.image);
-    RenderUtil.blit(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    if (this.bind()) {
+      RenderUtil.blit(this.getScaledX(), this.getScaledY(),
+          this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
+    } else {
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+          0xFFFFFFFF);
+    }
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.disableBlend();
   }

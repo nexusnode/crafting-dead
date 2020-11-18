@@ -46,12 +46,9 @@ public class PanoramaComponent extends Component<PanoramaComponent> {
     this.panorama.render(partialTicks, 1.0F);
     RenderUtil.bind(PANORAMA_OVERLAY_TEXTURES);
     RenderSystem.enableBlend();
-    RenderSystem
-        .blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-    RenderUtil
-        .blit(this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0.0F, 0.0F, 16, 128, 16,
-            128);
+    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+    RenderUtil.blit(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     RenderSystem.disableBlend();
   }
 }

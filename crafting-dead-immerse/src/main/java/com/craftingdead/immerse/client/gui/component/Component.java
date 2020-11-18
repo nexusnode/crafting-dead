@@ -17,15 +17,16 @@
  */
 package com.craftingdead.immerse.client.gui.component;
 
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.util.yoga.YGMeasureFunc;
+import org.lwjgl.util.yoga.YGSize;
+import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
@@ -35,28 +36,35 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.math.Vec2f;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public abstract class Component<SELF extends Component<SELF>> extends AbstractGui
-    implements IRenderable, IGuiEventListener {
+    implements IRenderable, IGuiEventListener, IView {
 
   public static final TweenType<Component<?>> X_SCALE =
-      new SimpleTweenType<>(Component::getXScale, Component::setXScale);
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) Component::getXScale,
+          (SimpleTweenType.FloatSetter<Component<?>>) Component::setXScale);
   public static final TweenType<Component<?>> Y_SCALE =
-      new SimpleTweenType<>(Component::getYScale, Component::setYScale);
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) Component::getYScale,
+          (SimpleTweenType.FloatSetter<Component<?>>) Component::setYScale);
   public static final TweenType<Component<?>> X_TRANSLATION =
-      new SimpleTweenType<>(Component::getXTranslation, Component::setXTranslation);
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.xTranslation,
+          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.xTranslation = v);
   public static final TweenType<Component<?>> Y_TRANSLATION =
-      new SimpleTweenType<>(Component::getYTranslation, Component::setYTranslation);
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.yTranslation,
+          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.yTranslation = v);
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
@@ -69,111 +77,57 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private final TweenManager tweenManager = TweenManager.create();
 
-  private Supplier<Double> xFactory = () -> 0.0D;
-  private Supplier<Double> yFactory = () -> 0.0D;
-  private Supplier<Double> widthFactory =
-      () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth());
-  private Supplier<Double> heightFactory =
-      () -> this.parent.map(Component::getHeight)
-          .orElse((double) this.mainWindow.getScaledHeight());
-
-  private boolean centre;
-
-  private boolean scaleWidth = true;
-  private boolean scaleHeight = true;
-
   private float xScale = 1.0F;
   private float yScale = 1.0F;
+  private float xTranslation = 0.0F;
+  private float yTranslation = 0.0F;
 
-  private float xTranslation = 1.0F;
-  private float yTranslation = 1.0F;
+  protected final long node;
 
-  protected Optional<ParentComponent<?>> parent = Optional.empty();
+  @Nullable
+  private Tooltip tooltip;
+
+  @Nullable
+  private Colour backgroundColour;
+
+  protected IView parent;
 
   private boolean wasMouseOver;
 
   private float lastTime = 0F;
 
-  private Tooltip tooltip = new Tooltip(new StringTextComponent("Hello World!"));
+  protected boolean focused;
 
-  public static class Tooltip {
-
-    private static final TweenType<Tooltip> ALPHA =
-        new SimpleTweenType<>(Tooltip::getAlpha, Tooltip::setAlpha);
-    private static final TweenType<Tooltip> TEXT_ALPHA =
-        new SimpleTweenType<>(Tooltip::getTextAlpha, Tooltip::setTextAlpha);
-
-    private final ITextComponent text;
-    private float alpha = 0;
-    private float textAlpha = 0;
-
-    public Tooltip(ITextComponent text) {
-      this.text = text;
-    }
-
-    public void render(FontRenderer fontRenderer, float x, float y, float partialTicks) {
-      float width = 10.0F + fontRenderer.getStringWidth(this.text.getFormattedText());
-      float height = 14;
-      RenderSystem.enableBlend();
-      RenderUtil.fill(x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24));
-      RenderUtil.fill(x, y + 1, x + width, y + height,
-          0x808080 + ((int) (this.alpha * 255.0F) << 24));
-      fontRenderer.drawString(this.text.getFormattedText(),
-          x + (width - fontRenderer.getStringWidth(this.text.getFormattedText())) / 2, y + 4,
-          0xFFFFFF + ((int) (this.textAlpha * 255.0F) << 24));
-      RenderSystem.disableBlend();
-    }
-
-    public float getAlpha() {
-      return this.alpha;
-    }
-
-    public void setAlpha(float alpha) {
-      this.alpha = alpha;
-    }
-
-    public float getTextAlpha() {
-      return this.textAlpha;
-    }
-
-    public void setTextAlpha(float textAlpha) {
-      this.textAlpha = textAlpha;
-    }
-  }
+  private boolean unscaleWidth;
+  private boolean unscaleHeight;
 
   public Component() {
-    this.addListener(MouseEnterEvent.class, (c, e) -> Timeline.createParallel(150)
-        .push(Tween.to(this.tooltip, Tooltip.ALPHA)
-            .target(1.0F))
-        .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
-            .delay(100.0F)
-            .target(1.0F)
-            .ease(Sine.INOUT))
-        .start(this.getTweenManager()));
-
-    this.addListener(MouseLeaveEvent.class, (c, e) -> Timeline.createParallel(250)
-        .push(Tween.to(this.tooltip, Tooltip.ALPHA)
-            .target(0.0F))
-        .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
-            .target(0.0F))
-        .start(this.getTweenManager()));
+    this.node = Yoga.YGNodeNew();
+    Yoga.YGNodeSetMeasureFunc(this.node, (node, width, widthMode, height, heightMode) -> {
+      Vec2f size = this.measure(MeasureMode.fromYogaType(widthMode), width,
+          MeasureMode.fromYogaType(heightMode), height);
+      return YGMeasureFunc.toLong(YGSize.create().width(size.x).height(size.y));
+    });
   }
 
-  protected void added() {
-    if (this.overrideSize()) {
-      if (!this.getBestWidth().isPresent() || !this.getBestHeight().isPresent()) {
-        throw new IllegalStateException(
-            "A preferred width and height must be specified for size override");
-      }
-      this.setAutoWidth().setAutoHeight();
-    }
+  protected Vec2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+      float height) {
+    return new Vec2f(width, height);
   }
 
-  protected void removed() {}
+  protected void added() {}
 
-  protected void tick() {}
+  protected void removed() {
+    Yoga.YGNodeFree(this.node);
+  }
 
-  protected void resized() {}
+  protected void layout() {}
+
+  public void tick() {}
+
+  protected void focusChanged(boolean focused) {
+    this.focused = focused;
+  }
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
@@ -181,21 +135,47 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
-    this.tooltip.render(this.minecraft.fontRenderer,
-        10.0F + this.getXFloat() + this.getWidthFloat(), this.getYFloat(), partialTicks);
+
+    if (this.backgroundColour != null) {
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getX() + this.getScaledWidth(),
+          this.getY() + this.getScaledHeight(), this.backgroundColour.getHexColour());
+    }
+
+    if (this.tooltip != null && this.isMouseOver(mouseX, mouseY)) {
+      this.tooltip.render(this.minecraft.fontRenderer, 10.0D + this.getX() + this.getWidth(),
+          this.getY());
+    }
   }
 
   protected void mouseEntered() {
+    if (this.tooltip != null) {
+      Timeline.createParallel(150)
+          .push(Tween.to(this.tooltip, Tooltip.ALPHA)
+              .ease(Sine.INOUT)
+              .target(1.0F))
+          .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
+              .delay(100.0F)
+              .target(1.0F))
+          .start(this.getTweenManager());
+    }
     this.post(new MouseEnterEvent());
   }
 
   protected void mouseLeft() {
+    if (this.tooltip != null) {
+      Timeline.createParallel(250)
+          .push(Tween.to(this.tooltip, Tooltip.ALPHA)
+              .target(0.0F))
+          .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
+              .target(0.0F))
+          .start(this.getTweenManager());
+    }
     this.post(new MouseLeaveEvent());
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    boolean mouseOver = this.isMouseOver(mouseX, mouseY);
+    boolean mouseOver = this.isMouseOver((int) mouseX, (int) mouseY);
     if (mouseOver && !this.wasMouseOver) {
       this.mouseEntered();
     } else if (this.wasMouseOver && !mouseOver) {
@@ -242,9 +222,19 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   @Override
+  public boolean changeFocus(boolean forward) {
+    this.focusChanged(!this.focused);
+    return this.focused;
+  }
+
+  @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    return mouseX > this.getX() && mouseX < this.getX() + this.getWidth() && mouseY > this.getY()
-        && mouseY < this.getY() + this.getHeight();
+    return mouseX > this.getX() && mouseX < this.getX() + this.getWidth()
+        && mouseY > this.getY() && mouseY < this.getY() + this.getHeight();
+  }
+
+  public final TweenManager getTweenManager() {
+    return this.tweenManager;
   }
 
   /**
@@ -256,7 +246,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
    * @param fadeDuration - the duration of the animation
    * @return instance of self for easy construction
    */
-  public SELF addHoverAnimation(TweenType<? super SELF> tweenType, float[] to, float duration) {
+  public final SELF addHoverAnimation(TweenType<? super SELF> tweenType, float[] to,
+      float duration) {
     float[] from = new float[tweenType.getValuesSize()];
     tweenType.getValues(this.self(), from);
     this
@@ -273,7 +264,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
-  public SELF addClickSound(SoundEvent soundEvent) {
+  public final SELF addClickSound(SoundEvent soundEvent) {
     return this.addListener(MouseEvent.ButtonEvent.class, (component, event) -> {
       if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
           && event.getAction() == GLFW.GLFW_PRESS) {
@@ -282,7 +273,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     });
   }
 
-  public SELF addActionListener(Consumer<SELF> consumer) {
+  public final SELF addActionListener(Consumer<SELF> consumer) {
     this.addListener(MouseEvent.ButtonEvent.class, (component, event) -> {
       if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
           && event.getAction() == GLFW.GLFW_PRESS) {
@@ -292,7 +283,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
-  public <T extends Event> SELF addListener(Class<T> eventType, BiConsumer<SELF, T> consumer) {
+  public final <T extends Event> SELF addListener(Class<T> eventType,
+      BiConsumer<SELF, T> consumer) {
     this.eventBus
         .addListener(EventPriority.NORMAL, true, eventType,
             event -> consumer.accept(this.self(), event));
@@ -305,132 +297,53 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
    * @param event - The event to dispatch to listeners
    * @return true if the event was cancelled
    */
-  public boolean post(Event event) {
+  public final boolean post(Event event) {
     return this.eventBus.post(event);
   }
 
-  public float getXFloat() {
-    return (float) this.getX();
+  public final float getScaledX() {
+    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale)) / 2.0F;
   }
 
-  public double getX() {
-    double x =
-        (this.parent.map(Component::getX).orElse(0.0D) + this.xFactory.get()) * this.xTranslation;
-    return this.centre ? x - this.getWidth() / 2 : x;
+  public final float getX() {
+    return (float) (Yoga.YGNodeLayoutGetLeft(this.node) + this.xTranslation
+        + this.parent.getContentXOffset()
+        + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
-  public SELF setX(int x) {
-    this.xFactory = () -> (double) x;
-    return this.self();
+  public final float getScaledY() {
+    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale)) / 2.0F;
   }
 
-  public SELF setXPercent(float xPercent) {
-    this.xFactory =
-        () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth())
-            * xPercent;
-    return this.self();
+  public final float getY() {
+    return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
+        + this.parent.getContentYOffset()
+        + (this.unscaleHeight ? this.getHeight() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
-  public float getYFloat() {
-    return (float) this.getY();
+  public final float getScaledWidth() {
+    return this.getWidth() * this.xScale;
   }
 
-  public double getY() {
-    double y =
-        (this.parent.map(Component::getY).orElse(0.0D) + this.yFactory.get()) * this.yTranslation;
-    return this.centre ? y - this.getHeight() / 2 : y;
+  public final float getWidth() {
+    return (float) (Yoga.YGNodeLayoutGetWidth(this.node)
+        / (this.unscaleWidth ? this.mainWindow.getGuiScaleFactor() : 1.0F));
   }
 
-  public SELF setY(int y) {
-    this.yFactory = () -> (double) y;
-    return this.self();
+  public final float getScaledHeight() {
+    return this.getHeight() * this.yScale;
   }
 
-  public SELF setYPercent(float yPercent) {
-    this.yFactory =
-        () -> this.parent.map(Component::getHeight)
-            .orElse((double) this.mainWindow.getScaledHeight())
-            * yPercent;
-    return this.self();
+  public final float getHeight() {
+    return (float) (Yoga.YGNodeLayoutGetHeight(this.node)
+        / (this.unscaleHeight ? this.mainWindow.getGuiScaleFactor() : 1.0F));
   }
 
-  public float getWidthFloat() {
-    return (float) this.getWidth();
-  }
-
-  public double getWidth() {
-    double width = this.widthFactory.get() * this.xScale;
-    return this.scaleWidth ? width : width / this.mainWindow.getGuiScaleFactor();
-  }
-
-  public SELF setWidth(int width) {
-    this.checkOverrideSize();
-    this.widthFactory = () -> (double) width;
-    return this.self();
-  }
-
-  public SELF setWidthPercent(float widthPercent) {
-    this.checkOverrideSize();
-    this.widthFactory =
-        () -> this.parent.map(Component::getWidth).orElse((double) this.mainWindow.getScaledWidth())
-            * widthPercent;
-    return this.self();
-  }
-
-  public SELF setAutoWidth() {
-    this.widthFactory = () -> this.getBestWidth().orElseGet(this.heightFactory);
-    return this.self();
-  }
-
-  public float getHeightFloat() {
-    return (float) this.getHeight();
-  }
-
-  public double getHeight() {
-    double height = this.heightFactory.get() * this.yScale;
-    return this.scaleHeight ? height : height / this.mainWindow.getGuiScaleFactor();
-  }
-
-  public SELF setHeight(int height) {
-    this.checkOverrideSize();
-    this.heightFactory = () -> (double) height;
-    return this.self();
-  }
-
-  public SELF setHeightPercent(float heightPercent) {
-    this.checkOverrideSize();
-    this.heightFactory =
-        () -> this.parent.map(Component::getHeight)
-            .orElse((double) this.mainWindow.getScaledHeight())
-            * heightPercent;
-    return this.self();
-  }
-
-  public SELF setAutoHeight() {
-    this.heightFactory = () -> this.getBestHeight().orElseGet(this.widthFactory);
-    return this.self();
-  }
-
-  public SELF setCentre(boolean centre) {
-    this.centre = centre;
-    return this.self();
-  }
-
-  public SELF setScaleWidth(boolean scaleWidth) {
-    this.scaleWidth = scaleWidth;
-    return this.self();
-  }
-
-  public SELF setScaleHeight(boolean scaleHeight) {
-    this.scaleHeight = scaleHeight;
-    return this.self();
-  }
-
-  public float getXScale() {
+  public final float getXScale() {
     return this.xScale;
   }
 
-  public SELF setXScale(float xScale) {
+  public final SELF setXScale(float xScale) {
     this.xScale = xScale;
     return this.self();
   }
@@ -439,57 +352,213 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.yScale;
   }
 
-  public SELF setYScale(float yScale) {
+  public final SELF setYScale(float yScale) {
     this.yScale = yScale;
     return this.self();
   }
 
-  public SELF setScale(float scale) {
+  public final SELF setScale(float scale) {
     return this.setXScale(scale).setYScale(scale);
   }
 
-  public float getXTranslation() {
-    return this.xTranslation;
-  }
-
-  public SELF setXTranslation(float xTranslation) {
-    this.xTranslation = xTranslation;
+  public final SELF setWidth(float width) {
+    Yoga.YGNodeStyleSetWidth(this.node, width);
     return this.self();
   }
 
-  public float getYTranslation() {
-    return this.yTranslation;
-  }
-
-  public SELF setYTranslation(float yTranslation) {
-    this.yTranslation = yTranslation;
+  public final SELF setWidthPercent(float widthPercent) {
+    Yoga.YGNodeStyleSetWidthPercent(this.node, widthPercent);
     return this.self();
   }
 
-  protected Optional<Double> getBestWidth() {
-    return Optional.empty();
+  public final SELF setWidthAuto() {
+    Yoga.YGNodeStyleSetWidthAuto(this.node);
+    return this.self();
   }
 
-  protected Optional<Double> getBestHeight() {
-    return Optional.empty();
+  public final SELF setHeight(float height) {
+    Yoga.YGNodeStyleSetHeight(this.node, height);
+    return this.self();
   }
 
-  private void checkOverrideSize() {
-    if (this.overrideSize()) {
-      throw new UnsupportedOperationException("Component not resizable");
-    }
+  public final SELF setHeightPercent(float heightPercent) {
+    Yoga.YGNodeStyleSetHeightPercent(this.node, heightPercent);
+    return this.self();
   }
 
-  protected boolean overrideSize() {
-    return false;
+  public final SELF setHeightAuto() {
+    Yoga.YGNodeStyleSetHeightAuto(this.node);
+    return this.self();
   }
 
-  public TweenManager getTweenManager() {
-    return this.tweenManager;
+  public final SELF setLeft(float left) {
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeLeft, left);
+    return this.self();
+  }
+
+  public final SELF setLeftPercent(float leftPercent) {
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeLeft, leftPercent);
+    return this.self();
+  }
+
+  public final SELF setRight(float right) {
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, right);
+    return this.self();
+  }
+
+  public final SELF setRightPercent(float rightPercent) {
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, rightPercent);
+    return this.self();
+  }
+
+  public final SELF setTop(float top) {
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, top);
+    return this.self();
+  }
+
+  public final SELF setTopPercent(float topPercent) {
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, topPercent);
+    return this.self();
+  }
+
+  public final SELF setBottom(float bottom) {
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, bottom);
+    return this.self();
+  }
+
+  public final SELF setBottomPercent(float bottomPercent) {
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, bottomPercent);
+    return this.self();
+  }
+
+  public final SELF setLeftMargin(float leftMargin) {
+    Yoga.YGNodeStyleSetMargin(this.node, Yoga.YGEdgeLeft, leftMargin);
+    return this.self();
+  }
+
+  public final SELF setLeftMarginPercent(float leftMarginPercent) {
+    Yoga.YGNodeStyleSetMarginPercent(this.node, Yoga.YGEdgeLeft, leftMarginPercent);
+    return this.self();
+  }
+
+  public final SELF setRightMargin(float rightMargin) {
+    Yoga.YGNodeStyleSetMargin(this.node, Yoga.YGEdgeRight, rightMargin);
+    return this.self();
+  }
+
+  public final SELF setRightMarginPercent(float rightMarginPercent) {
+    Yoga.YGNodeStyleSetMarginPercent(this.node, Yoga.YGEdgeRight, rightMarginPercent);
+    return this.self();
+  }
+
+  public final SELF setTopMargin(float topMargin) {
+    Yoga.YGNodeStyleSetMargin(this.node, Yoga.YGEdgeTop, topMargin);
+    return this.self();
+  }
+
+  public final SELF setTopMarginPercent(float topMarginPercent) {
+    Yoga.YGNodeStyleSetMarginPercent(this.node, Yoga.YGEdgeTop, topMarginPercent);
+    return this.self();
+  }
+
+  public final SELF setBottomMargin(float bottomMargin) {
+    Yoga.YGNodeStyleSetMargin(this.node, Yoga.YGEdgeBottom, bottomMargin);
+    return this.self();
+  }
+
+  public final SELF setBottomMarginPercent(float bottomMarginPercent) {
+    Yoga.YGNodeStyleSetMarginPercent(this.node, Yoga.YGEdgeBottom, bottomMarginPercent);
+    return this.self();
+  }
+
+  public final SELF setMargin(float margin) {
+    Yoga.YGNodeStyleSetMargin(this.node, Yoga.YGEdgeAll, margin);
+    return this.self();
+  }
+
+  public final SELF setMarginPercent(float marginPercent) {
+    Yoga.YGNodeStyleSetMarginPercent(this.node, Yoga.YGEdgeAll, marginPercent);
+    return this.self();
+  }
+
+  public final SELF setLeftMarginAuto() {
+    Yoga.YGNodeStyleSetMarginAuto(this.node, Yoga.YGEdgeLeft);
+    return this.self();
+  }
+
+  public final SELF setRightMarginAuto() {
+    Yoga.YGNodeStyleSetMarginAuto(this.node, Yoga.YGEdgeRight);
+    return this.self();
+  }
+
+  public final SELF setTopMarginAuto() {
+    Yoga.YGNodeStyleSetMarginAuto(this.node, Yoga.YGEdgeTop);
+    return this.self();
+  }
+
+  public final SELF setBottomMarginAuto() {
+    Yoga.YGNodeStyleSetMarginAuto(this.node, Yoga.YGEdgeBottom);
+    return this.self();
+  }
+
+  public final SELF setMarginAuto() {
+    Yoga.YGNodeStyleSetMarginAuto(this.node, Yoga.YGEdgeAll);
+    return this.self();
+  }
+
+  public final SELF setPositionType(PositionType positionType) {
+    Yoga.YGNodeStyleSetPositionType(this.node,
+        positionType == PositionType.ABSOLUTE ? Yoga.YGPositionTypeAbsolute
+            : Yoga.YGPositionTypeRelative);
+    return this.self();
+  }
+
+  public final SELF setFlexGrow(float flexGrow) {
+    Yoga.YGNodeStyleSetFlexGrow(this.node, flexGrow);
+    return this.self();
+  }
+
+  public final SELF setFlexShrink(float flexShrink) {
+    Yoga.YGNodeStyleSetFlexShrink(this.node, flexShrink);
+    return this.self();
+  }
+
+  public final SELF setFlexBasis(float flexBasis) {
+    Yoga.YGNodeStyleSetFlexBasis(this.node, flexBasis);
+    return this.self();
+  }
+
+  public final SELF setFlex(float flex) {
+    Yoga.YGNodeStyleSetFlex(this.node, flex);
+    return this.self();
+  }
+
+  public final SELF setTooltip(@Nullable Tooltip tooltip) {
+    this.tooltip = tooltip;
+    return this.self();
+  }
+
+  public final SELF setBackgroundColour(@Nullable Colour backgroundColour) {
+    this.backgroundColour = backgroundColour;
+    return this.self();
+  }
+
+  public final SELF setUnscaleWidth() {
+    this.unscaleWidth = true;
+    return this.self();
+  }
+
+  public final SELF setUnscaleHeight() {
+    this.unscaleHeight = true;
+    return this.self();
+  }
+
+  public final Screen getScreen() {
+    return this.parent.getScreen();
   }
 
   @SuppressWarnings("unchecked")
-  protected SELF self() {
+  protected final SELF self() {
     return (SELF) this;
   }
 }

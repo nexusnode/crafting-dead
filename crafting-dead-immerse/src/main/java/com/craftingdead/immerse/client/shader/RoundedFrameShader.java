@@ -15,29 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.immerse.client.gui.screen;
+package com.craftingdead.immerse.client.shader;
 
-import net.minecraft.util.text.TranslationTextComponent;
+import org.lwjgl.opengl.GL20;
 
-public class HomeScreen extends MenuScreen {
+public class RoundedFrameShader extends ShaderProgram {
 
-  public HomeScreen() {
-    super(new TranslationTextComponent("narrator.screen.title"));
+  public static final RoundedFrameShader INSTANCE =
+      new RoundedFrameShader("rect", "rounded_rect_frame");
+
+  private RoundedFrameShader(String vert, String frag) {
+    super(vert, frag);
   }
 
-  @Override
-  protected void init() {
-    super.init();
+  public void setRadius(float radius) {
+    GL20.glUniform1f(0, radius);
   }
 
-  @Override
-  public void tick() {
-    super.tick();
-  }
-
-  @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.renderBackground();
-    super.render(mouseX, mouseY, partialTicks);
+  public void setInnerRect(float left, float top, float right, float bottom) {
+    GL20.glUniform4f(1, left, top, right, bottom);
   }
 }

@@ -20,12 +20,14 @@ package com.craftingdead.immerse.client.gui.screen;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
+import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.transition.ITransition;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.ITextComponent;
 
 public abstract class ModScreen extends ComponentScreen {
@@ -71,11 +73,9 @@ public abstract class ModScreen extends ComponentScreen {
       double scale = 1.25D + Math.cos(Math.toRadians(360 * pct)) * 1.5D / 100.0D;
       RenderSystem.scaled(scale, scale, scale);
 
-      double backgroundWidth = 2048;
-      double backgroundHeight = 1152;
-      double backgroundScale = RenderUtil.getFitScale(2048, 1152);
-      backgroundWidth *= backgroundScale;
-      backgroundHeight *= backgroundScale;
+      Vec2f backgroundSize = FitType.COVER.getSize(2048, 1152, this.width, this.height);
+      double backgroundWidth = backgroundSize.x;
+      double backgroundHeight = backgroundSize.y;
 
       RenderUtil.bind(BACKGROUND_TEXTURE);
       // Enable bilinear filtering
@@ -90,11 +90,9 @@ public abstract class ModScreen extends ComponentScreen {
   }
 
   private void renderFog() {
-    double fogWidth = 1920;
-    double fogHeight = 1080;
-    final double fogScale = RenderUtil.getFitScale(fogWidth, fogHeight);
-    fogWidth *= fogScale;
-    fogHeight *= fogScale;
+    Vec2f fogSize = FitType.COVER.getSize(1920, 1080, this.width, this.height);
+    double fogWidth = fogSize.x;
+    double fogHeight = fogSize.y;
 
     final double pct =
         MathHelper.clamp((Util.milliTime() - fogStartTime) / (1000.0D * 100.0D * 2.0D), 0.0D, 1.0D);

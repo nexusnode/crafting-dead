@@ -3,8 +3,8 @@
     "package": "com.craftingdead.immerse.mixin",
     "compatibilityLevel": "JAVA_8",
     "refmap": "craftingdeadimmerse.refmap.json",
-    "mixins": [
-        "GameRendererMixin"
+    "client": [
+        "MinecraftMixin"
     ],
     "injectors": {
         "defaultRequire": 1

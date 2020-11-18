@@ -1,19 +1,16 @@
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.immerse.client.gui.component;
 
@@ -40,6 +37,9 @@ public class BlurComponent extends Component<BlurComponent> {
 
   private ShaderGroup blurShader;
 
+  private float lastFramebufferWidth;
+  private float lastFramebufferHeight;
+
   public BlurComponent() {
     this(-1);
   }
@@ -49,7 +49,8 @@ public class BlurComponent extends Component<BlurComponent> {
   }
 
   @Override
-  protected void added() {
+  public void added() {
+    super.added();
     if (this.blurShader != null) {
       this.blurShader.close();
     }
@@ -60,9 +61,8 @@ public class BlurComponent extends Component<BlurComponent> {
       if (this.radius != -1) {
         RenderUtil.updateUniform("Radius", this.radius, this.blurShader);
       }
-      this.blurShader
-          .createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
-              this.minecraft.getMainWindow().getFramebufferHeight());
+      this.blurShader.createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
+          this.minecraft.getMainWindow().getFramebufferHeight());
     } catch (JsonSyntaxException | IOException ioexception) {
       logger.warn("Failed to load shader: {}", BLUR_SHADER, ioexception);
       this.blurShader = null;
@@ -70,18 +70,27 @@ public class BlurComponent extends Component<BlurComponent> {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
+    super.removed();
     if (this.blurShader != null) {
       this.blurShader.close();
     }
   }
 
   @Override
-  protected void resized() {
-    if (this.blurShader != null) {
-      this.blurShader
-          .createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
-              this.minecraft.getMainWindow().getFramebufferHeight());
+  public void tick() {
+    super.tick();
+    float framebufferWidth = this.minecraft.getFramebuffer().framebufferTextureWidth;
+    float framebufferHeight = this.minecraft.getFramebuffer().framebufferTextureHeight;
+    // Can't use #resized as it's called before the framebuffer is resized.
+    if (framebufferWidth != this.lastFramebufferWidth
+        || framebufferHeight != this.lastFramebufferHeight) {
+      if (this.blurShader != null) {
+        this.blurShader.createBindFramebuffers(this.mainWindow.getFramebufferWidth(),
+            this.mainWindow.getFramebufferHeight());
+      }
+      this.lastFramebufferWidth = framebufferWidth;
+      this.lastFramebufferHeight = framebufferHeight;
     }
   }
 
@@ -90,9 +99,9 @@ public class BlurComponent extends Component<BlurComponent> {
     super.render(mouseX, mouseY, partialTicks);
     final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
-    GL11
-        .glScissor((int) (this.getX() * scale), (int) ((this.getY() * scale)),
-            (int) (this.getWidth() * scale), (int) (this.getHeight() * scale));
+    GL11.glScissor((int) (this.getX() * scale),
+        (int) (this.mainWindow.getFramebufferHeight() - ((this.getY() + this.getHeight()) * scale)),
+        (int) (this.getWidth() * scale), (int) (this.getHeight() * scale));
     this.blurShader.render(partialTicks);
     GL11.glDisable(GL11.GL_SCISSOR_TEST);
     this.minecraft.getFramebuffer().bindFramebuffer(false);

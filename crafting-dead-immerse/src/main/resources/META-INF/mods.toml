@@ -1,8 +1,25 @@
-modLoader="javafml"
-loaderVersion="[27,)"
+issueTrackerURL = "https://github.com/nexusnode/crafting-dead/issues"
+license = "GPL v3.0"
+loaderVersion = "[27,)"
+modLoader = "javafml"
 
 [[mods]]
-modId="craftingdeadimmerse" 
-version="${file.jarVersion}"
-displayName="Crafting Dead Immerse"
-displayURL="http://craftingdead.com"
+authors = "Sm0keySa1m0n"
+credits = "Sm0keySa1m0n"
+displayName = "Crafting Dead Immerse"
+displayURL = "www.craftingdead.com"
+modId = "craftingdeadimmerse"
+version = "${file.jarVersion}"
+
+[[dependencies.craftingdeadimmerse]]
+mandatory = true
+modId = "craftingdead"
+side = "BOTH"
+versionRange = "[${file.jarVersion}]"
+
+[[dependencies.craftingdeadimmerse]]
+mandatory = true
+modId = "forge"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[31.2.45,)"

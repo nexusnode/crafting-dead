@@ -20,20 +20,17 @@ package com.craftingdead.immerse.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.craftingdead.immerse.client.util.IFramebufferResizeListener;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.craftingdead.core.CraftingDead;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.SharedConstants;
 
-@Mixin(GameRenderer.class)
-public abstract class GameRendererMixin {
+@Mixin(Minecraft.class)
+public abstract class MinecraftMixin {
 
-  @Inject(method = "updateShaderGroupSize", at = @At("RETURN"))
-  private void updateShaderGroupSize(int framebufferWidth, int framebufferHeight,
-      CallbackInfo callbackInfo) {
-    final Minecraft mc = Minecraft.getInstance();
-    if (mc.currentScreen instanceof IFramebufferResizeListener) {
-      ((IFramebufferResizeListener) mc.currentScreen).framebufferResized();
-    }
+  @Inject(method = "func_230149_ax_", at = @At("HEAD"), cancellable = true)
+  private void func_230149_ax_(CallbackInfoReturnable<String> callbackInfo) {
+    callbackInfo.setReturnValue("Minecraft " + SharedConstants.getVersion().getName() + " - "
+        + CraftingDead.DISPLAY_NAME + " " + CraftingDead.VERSION);
   }
 }

@@ -19,12 +19,16 @@ package com.craftingdead.immerse.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.component.FitType;
+import com.craftingdead.immerse.client.gui.screen.menu.MenuScreen;
+import com.craftingdead.immerse.client.gui.screen.menu.MenuScreen.Page;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class StartScreen extends ModScreen {
@@ -46,10 +50,9 @@ public class StartScreen extends ModScreen {
 
     float fadePct = MathHelper.clamp((Util.milliTime() - this.fadeStartTime) / 1000.0F, 0.0F, 1.0F);
 
-    double logoWidth = 1920;
-    double logoHeight = 1080;
-    logoWidth *= RenderUtil.getFitScale(1920, 1080);
-    logoHeight *= RenderUtil.getFitScale(1920, 1080);
+    Vec2f logoSize = FitType.CONTAIN.getSize(1920, 1080, this.width, this.height);
+    double logoWidth = logoSize.x;
+    double logoHeight = logoSize.y;
 
     RenderSystem.enableBlend();
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, fadePct);
@@ -68,7 +71,7 @@ public class StartScreen extends ModScreen {
   @Override
   public boolean keyPressed(int key, int scanCode, int modifiers) {
     if (key == GLFW.GLFW_KEY_SPACE) {
-      this.minecraft.displayGuiScreen(new HomeScreen());
+      this.minecraft.displayGuiScreen(new MenuScreen(Page.HOME));
     }
     return super.keyPressed(key, scanCode, modifiers);
   }

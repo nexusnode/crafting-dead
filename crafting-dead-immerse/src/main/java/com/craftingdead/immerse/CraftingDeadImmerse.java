@@ -17,11 +17,21 @@
  */
 package com.craftingdead.immerse;
 
+import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.ClientDist;
+import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerDist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {
@@ -51,9 +61,22 @@ public class CraftingDeadImmerse {
    */
   private final IModDist modDist;
 
+  @Nullable
+  private LogicalServer logicalServer;
+
   public CraftingDeadImmerse() {
     instance = this;
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
+
+    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+    GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
+    GameTypes.GAME_TYPES.register(modEventBus);
+  }
+
+  @Nullable
+  public LogicalServer getLogicalServer() {
+    return this.logicalServer;
   }
 
   public IModDist getModDist() {
@@ -62,5 +85,22 @@ public class CraftingDeadImmerse {
 
   public static CraftingDeadImmerse getInstance() {
     return instance;
+  }
+
+  // ================================================================================
+  // Mod Events
+  // ================================================================================
+
+  @SubscribeEvent
+  public void handleServerAboutToStart(FMLServerStartingEvent event) {
+    this.logicalServer = this.modDist.createLogicalServer(event.getServer());
+    this.logicalServer.init();
+    MinecraftForge.EVENT_BUS.register(this.logicalServer);
+  }
+
+  @SubscribeEvent
+  public void handleServerStopping(FMLServerStoppingEvent event) {
+    MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
+    this.logicalServer = null;
   }
 }

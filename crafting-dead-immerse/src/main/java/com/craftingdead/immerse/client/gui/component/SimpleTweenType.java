@@ -28,8 +28,8 @@ public class SimpleTweenType<T> implements TweenType<T> {
   private final Function<T, float[]> getter;
   private final BiConsumer<T, float[]> setter;
 
-  public SimpleTweenType(Function<T, Float> getter, BiConsumer<T, Float> setter) {
-    this(1, t -> new float[] {getter.apply(t)}, (t, v) -> setter.accept(t, v[0]));
+  public SimpleTweenType(FloatGetter<T> getter, FloatSetter<T> setter) {
+    this(1, t -> new float[] {getter.get(t)}, (t, v) -> setter.set(t, v[0]));
   }
 
   public SimpleTweenType(Vec2fGetter<T> getter, Vec2fSetter<T> setter) {
@@ -68,5 +68,15 @@ public class SimpleTweenType<T> implements TweenType<T> {
   @FunctionalInterface
   public static interface Vec2fSetter<T> {
     void set(T t, Vec2f v);
+  }
+
+  @FunctionalInterface
+  public static interface FloatGetter<T> {
+    float get(T t);
+  }
+
+  @FunctionalInterface
+  public static interface FloatSetter<T> {
+    void set(T t, float v);
   }
 }

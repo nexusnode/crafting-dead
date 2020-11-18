@@ -15,9 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.immerse.client.util;
+package com.craftingdead.immerse.game;
 
-public interface IFramebufferResizeListener {
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.immerse.game.survival.SurvivalClient;
+import com.craftingdead.immerse.game.survival.SurvivalServer;
+import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
 
-  void framebufferResized();
+public class GameTypes {
+
+  @SuppressWarnings("unchecked")
+  public static final DeferredRegister<GameType> GAME_TYPES =
+      DeferredRegister.create((Class<GameType>) (Class<?>) GameType.class, CraftingDead.ID);
+
+  public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("vanilla",
+      () -> new GameType(SurvivalServer::new, () -> SurvivalClient::new));
 }

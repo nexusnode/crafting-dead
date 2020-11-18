@@ -1,4 +1,5 @@
 repositories {
+	mavenCentral()
 	maven {
 		name 'jitpack'
 		url 'https://jitpack.io' 
@@ -55,6 +56,8 @@ dependencies {
     implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
 	compileOnly project(':crafting-dead-core')
+	implementation "org.lwjgl:lwjgl-yoga:${lwjgl_version}"
+	runtimeOnly "org.lwjgl:lwjgl-yoga::${lwjgl_natives}"
 }
 
 eclipse {

@@ -1,4 +1,5 @@
 {
-    "menu.start":"Press the space bar to start",
-    "menu.play":"Play Game"
+    "menu.start": "Press the space bar to start",
+    "menu.play": "Play Game",
+    "menu.home": "Home"
 }
