@@ -288,16 +288,14 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
-    if (!(event.getEntityLiving() instanceof PlayerEntity)) {
-      event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
-    }
+    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
   }
 
   @SubscribeEvent
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        event.player.getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+        IPlayer.getOptional(event.player).ifPresent(IPlayer::playerTick);
         break;
       default:
         break;

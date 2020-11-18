@@ -31,6 +31,7 @@ import com.craftingdead.core.util.ModDamageSource;
 import com.google.common.primitives.Ints;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -90,14 +91,17 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   }
 
   @Override
-  public void tick() {
-    super.tick();
+  public void playerTick() {
     if (!this.entity.getEntityWorld().isRemote()) {
       this.sync();
       this.updateWater();
       this.updateEffects();
       this.updateBrokenLeg();
     }
+    if (this.isCrouching()) {
+      this.getEntity().setPose(Pose.SWIMMING);
+    }
+    this.extensions.values().forEach(IPlayerHandler::playerTick);
   }
 
   private void sync() {

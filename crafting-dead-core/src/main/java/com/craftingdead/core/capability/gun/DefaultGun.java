@@ -17,6 +17,7 @@
  */
 package com.craftingdead.core.capability.gun;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
 import com.craftingdead.core.action.RemoveMagazineAction;
@@ -33,6 +36,7 @@ import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.clothing.IClothing;
+import com.craftingdead.core.capability.living.EntitySnapshot;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
@@ -58,7 +62,10 @@ import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -108,27 +115,49 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class DefaultGun extends DefaultAnimationProvider<GunAnimationController> implements IGun {
 
+  private static final Logger logger = LogManager.getLogger();
+
+  private static final int BASE_LATENCY = 3;
+
   public static final float HEADSHOT_MULTIPLIER = 4;
 
-  private static final int HIT_VALIDATION_DELAY_TICKS = 5;
+  private static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
   private static final Random random = new Random();
 
   private final GunItem gunItem;
 
+  /**
+   * If the gun trigger is pressed.
+   */
   private boolean triggerPressed;
+  private boolean wasTriggerPressed;
 
   /**
-   * Time of the last shot.
+   * The amount of ticks the trigger has been pressed for. Used to determine if a hit validation
+   * packet is valid.
+   */
+  private int triggerPressedTicks;
+
+  /**
+   * Time of the last shot in milliseconds.
    */
   private long lastShotMs = Integer.MIN_VALUE;
 
+  /**
+   * The current {@link FireMode} being used.
+   */
   private FireMode fireMode;
 
+  /**
+   * The current loaded magazine {@link ItemStack}. This is checked for {@link IMagazine}
+   * capabilities.
+   */
   private ItemStack magazineStack = ItemStack.EMPTY;
 
   /**
-   * The amount of shots since the last time the trigger was pressed.
+   * The amount of shots since the last time the trigger was pressed. Used to determine if the gun
+   * can continue firing using the current fire mode.
    */
   private int shotCount;
 
@@ -142,10 +171,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private long rightMouseActionSoundStartTimeMs;
 
-  private final Long2IntLinkedOpenHashMap livingHitValidationBuffer =
-      new Long2IntLinkedOpenHashMap();
+  private final Multimap<Integer, Byte> livingHitValidationBuffer =
+      Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ByteArrayList::new);
 
-  private int hitValidationTicks = 0;
+  private byte hitValidationTicks = 0;
 
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
@@ -162,14 +191,19 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   @Override
   public void tick(ILiving<?, ?> living, ItemStack itemStack) {
+    if (!living.getEntity().getEntityWorld().isRemote() && !this.triggerPressed
+        && this.wasTriggerPressed) {
+      this.triggerPressedTicks = living.getEntity().getServer().getTickCounter();
+    }
+    this.wasTriggerPressed = this.triggerPressed;
+
     this.tryShoot(living, itemStack);
 
-    if (living.getEntity().getEntityWorld().isRemote()
-        && ++this.hitValidationTicks >= HIT_VALIDATION_DELAY_TICKS
-        && this.livingHitValidationBuffer.size() > 0) {
+    if (living.getEntity().getEntityWorld().isRemote() && this.livingHitValidationBuffer.size() > 0
+        && this.hitValidationTicks++ >= HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
-      NetworkChannel.PLAY.getSimpleChannel()
-          .sendToServer(new ValidateLivingHitMessage(this.livingHitValidationBuffer.clone()));
+      NetworkChannel.PLAY.getSimpleChannel().sendToServer(
+          new ValidateLivingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
       this.livingHitValidationBuffer.clear();
     }
 
@@ -244,12 +278,27 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
-      long gameTime) {
-    if (this.triggerPressed) {
-      hitLiving.getSnapshot(gameTime - 2).flatMap(snapshot -> snapshot.rayTrace(living, 100))
-          .ifPresent(
-              hitPos -> this.hitEntity(living, itemStack, hitLiving.getEntity(), hitPos, false));
+  public void validateLivingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
+      ILiving<?, ?> hitLiving, byte tickOffset) {
+    if (tickOffset > HIT_VALIDATION_DELAY_TICKS) {
+      logger.warn("Bad living hit packet received, tick offset is too big!");
+      return;
+    }
+
+    int latencyTicks = player.getEntity().ping / 1000 / 20 + tickOffset + BASE_LATENCY;
+    int tick = player.getEntity().getServer().getTickCounter();
+
+    if (tick - latencyTicks > this.triggerPressedTicks && !this.triggerPressed) {
+      return;
+    }
+
+    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset).orElse(null);;
+    EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks).orElse(null);
+    if (playerSnapshot != null && hitSnapshot != null) {
+      random.setSeed(player.getEntity().getEntityId());
+      hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, 100.0D,
+          this.getAccuracy(player, itemStack), random).ifPresent(
+              hitPos -> this.hitEntity(player, itemStack, hitLiving.getEntity(), hitPos, false));
     }
   }
 
@@ -277,7 +326,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       this.triggerPressed = false;
       return;
     }
-
 
     long time = Util.milliTime();
     long timeDelta = time - this.lastShotMs;
@@ -325,6 +373,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     // Used to avoid playing the same hit sound more than once.
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
+      random.setSeed(entity.getEntityId());
       RayTraceResult rayTraceResult = RayTraceUtil
           .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random)
           .orElse(null);
@@ -351,8 +400,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
               if (entity instanceof ServerPlayerEntity) {
                 break;
               } else if (entity instanceof ClientPlayerEntity) {
-                this.livingHitValidationBuffer.put(entity.getEntityWorld().getGameTime(),
-                    entityRayTraceResult.getEntity().getEntityId());
+                this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
+                    (byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks));
               }
             }
 
@@ -532,11 +581,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   @Override
   public float getAccuracy(ILiving<?, ?> living, ItemStack itemStack) {
-    final Entity entity = living.getEntity();
     float accuracy =
         this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
-    if (entity.getPosX() != entity.prevPosX || entity.getPosY() != entity.prevPosY
-        || entity.getPosZ() != entity.prevPosZ) {
+    if (living.isMoving()) {
       accuracy -= 0.15F;
     } else if (living.isCrouching()) {
       accuracy += 0.15F;

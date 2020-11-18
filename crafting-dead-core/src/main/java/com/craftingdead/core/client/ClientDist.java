@@ -99,7 +99,6 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -112,7 +111,6 @@ import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
@@ -506,17 +504,6 @@ public class ClientDist implements IModDist {
               event.setCanceled(true);
             });
       }
-    }
-  }
-
-  @SubscribeEvent
-  public void handleInputUpdate(InputUpdateEvent event) {
-    if (IPlayer.getOptional(this.minecraft.player).map(IPlayer::getFreezeMovement).orElse(false)) {
-      final MovementInput input = event.getMovementInput();
-      input.forwardKeyDown = input.backKeyDown =
-          input.leftKeyDown = input.rightKeyDown = input.jump = input.sneaking = false;
-      input.moveForward = 0.0F;
-      input.moveStrafe = 0.0F;
     }
   }
 

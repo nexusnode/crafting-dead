@@ -137,7 +137,8 @@ public class RayTraceUtil {
   }
 
   /**
-   * Perform a full ray trace from the parsed entity, ignoring blocks that are {@link #isBlockPierceable}
+   * Perform a full ray trace from the parsed entity, ignoring blocks that are
+   * {@link #isBlockPierceable}
    *
    * @param fromEntity - the entity performing the ray trace
    * @param distance - the distance
@@ -145,7 +146,7 @@ public class RayTraceUtil {
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
-                                                            final double distance, final float partialTicks, final float accuracy, final Random random) {
+      final double distance, final float partialTicks, final float accuracy, final Random random) {
     Vec3d start = fromEntity.getEyePosition(partialTicks);
     Vec3d look = fromEntity.getLook(partialTicks);
 
@@ -157,8 +158,9 @@ public class RayTraceUtil {
     Vec3d scaledLook = look.scale(distance);
     Vec3d end = start.add(scaledLook);
 
-    Optional<BlockRayTraceResult> blockRayTraceResult = rayTraceBlocksPiercing(start, distance, look,
-        fromEntity.getEntityWorld());
+    Optional<BlockRayTraceResult> blockRayTraceResult =
+        rayTraceBlocksPiercing(start, distance, look,
+            fromEntity.getEntityWorld());
 
     final double sqrDistance = blockRayTraceResult.isPresent()
         ? blockRayTraceResult.get().getHitVec().squareDistanceTo(start)
@@ -171,21 +173,23 @@ public class RayTraceUtil {
   }
 
   /**
-   *  Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
+   * Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
-  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance, Vec3d look,
-                                                                     World world) {
+  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance,
+      Vec3d look,
+      World world) {
     return rayTraceBlocksPiercing(start, distance, look, RayTraceContext.BlockMode.COLLIDER,
         RayTraceContext.FluidMode.NONE, world);
   }
 
   /**
-   *  Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
+   * Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
-  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance, Vec3d look,
-                                                                     RayTraceContext.BlockMode blockMode,
-                                                                     RayTraceContext.FluidMode fluidMode,
-                                                                     World world) {
+  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance,
+      Vec3d look,
+      RayTraceContext.BlockMode blockMode,
+      RayTraceContext.FluidMode fluidMode,
+      World world) {
     Vec3d newStart = start;
     Vec3d end = start.add(look.scale(distance));
     boolean pierceableBlock;
@@ -201,7 +205,8 @@ public class RayTraceUtil {
       blockRayTraceResult = world.rayTraceBlocks(context);
 
       if (blockRayTraceResult != null) {
-        //Not sure about this one, but I have a concern about inaccuracy of Double which could lead to an endless loop
+        // Not sure about this one, but I have a concern about inaccuracy of Double which could lead
+        // to an endless loop
         BlockPos blockPos = blockRayTraceResult.getPos();
         if (lastBlockPos != null && lastBlockPos.equals(blockPos)) {
           break;
@@ -218,11 +223,14 @@ public class RayTraceUtil {
               : blockPos.getX() - hitVec.getX() + bb.maxX;
           double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
               : blockPos.getY() - hitVec.getY() + bb.maxY;
-          double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ- blockPos.getZ()
+          double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ - blockPos.getZ()
               : blockPos.getZ() - hitVec.getZ() + bb.maxZ;
-          double xRayDist =  Math.abs(look.getX()) != 0d ? xDist /  Math.abs(look.getX()) : Double.MAX_VALUE;
-          double yRayDist = Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
-          double zRayDist = Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
+          double xRayDist =
+              Math.abs(look.getX()) != 0d ? xDist / Math.abs(look.getX()) : Double.MAX_VALUE;
+          double yRayDist =
+              Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
+          double zRayDist =
+              Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
 
           double rayDist = Math.min(xRayDist, Math.min(zRayDist, yRayDist));
           newStart = hitVec.add(look.scale(rayDist));

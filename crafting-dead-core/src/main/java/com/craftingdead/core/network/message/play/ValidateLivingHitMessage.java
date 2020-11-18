@@ -17,10 +17,13 @@
  */
 package com.craftingdead.core.network.message.play;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.living.IPlayer;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -29,41 +32,51 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class ValidateLivingHitMessage {
 
-  private final Map<Long, Integer> hits;
+  private final Map<Integer, Collection<Byte>> hits;
 
-  public ValidateLivingHitMessage(Map<Long, Integer> hits) {
+  public ValidateLivingHitMessage(Map<Integer, Collection<Byte>> hits) {
     this.hits = hits;
   }
 
   public static void encode(ValidateLivingHitMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.hits.size());
-    for (Map.Entry<Long, Integer> hit : msg.hits.entrySet()) {
-      out.writeVarLong(hit.getKey());
-      out.writeVarInt(hit.getValue());
+    for (Map.Entry<Integer, Collection<Byte>> hit : msg.hits.entrySet()) {
+      out.writeVarInt(hit.getKey());
+      out.writeVarInt(hit.getValue().size());
+      for (byte value : hit.getValue()) {
+        out.writeByte(value);
+      }
     }
   }
 
   public static ValidateLivingHitMessage decode(PacketBuffer in) {
     final int hitsSize = in.readVarInt();
-    Map<Long, Integer> hits = new HashMap<>();
+    Map<Integer, Collection<Byte>> hits = new Int2ObjectLinkedOpenHashMap<>();
     for (int i = 0; i < hitsSize; i++) {
-      hits.put(in.readVarLong(), in.readVarInt());
+      int key = in.readVarInt();
+      int valueSize = in.readVarInt();
+      Collection<Byte> value = new ByteArrayList();
+      for (int j = 0; j < valueSize; j++) {
+        value.add(in.readByte());
+      }
+      hits.put(key, value);
     }
     return new ValidateLivingHitMessage(hits);
   }
 
   public static boolean handle(ValidateLivingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ServerPlayerEntity playerEntity = ctx.get().getSender();
-    playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
-      ItemStack heldStack = playerEntity.getHeldItemMainhand();
-      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-        for (Map.Entry<Long, Integer> hit : msg.hits.entrySet()) {
-          Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getValue());
-          hitEntity.getCapability(ModCapabilities.LIVING).ifPresent(hitLiving -> {
-            gun.validateLivingHit(living, heldStack, hitLiving, hit.getKey());
-          });
-        }
-      });
+    IPlayer<ServerPlayerEntity> player = IPlayer.getExpected(playerEntity);
+    ItemStack heldStack = playerEntity.getHeldItemMainhand();
+    heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      for (Map.Entry<Integer, Collection<Byte>> hit : msg.hits.entrySet()) {
+        Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getKey());
+        hitEntity.getCapability(ModCapabilities.LIVING).ifPresent(hitLiving -> {
+          for (byte value : hit.getValue()) {
+            gun.validateLivingHit(player, heldStack, hitLiving, value);
+          }
+        });
+      }
     });
     return true;
   }

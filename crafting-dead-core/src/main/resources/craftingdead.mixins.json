@@ -3,6 +3,9 @@
     "package": "com.craftingdead.core.mixin",
     "compatibilityLevel": "JAVA_8",
     "refmap": "craftingdead.refmap.json",
+    "mixins": [
+        "LivingEntityMixin"
+    ],
     "client": [
         "ItemRendererMixin",
         "PlayerRendererMixin"

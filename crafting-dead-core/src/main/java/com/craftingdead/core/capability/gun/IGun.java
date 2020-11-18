@@ -25,9 +25,11 @@ import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.item.AttachmentItem;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -48,8 +50,8 @@ public interface IGun
 
   void removeMagazine(ILiving<?, ?> living);
 
-  void validateLivingHit(ILiving<?, ?> living, ItemStack itemStack, ILiving<?, ?> hitLiving,
-      long gameTime);
+  void validateLivingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
+      ILiving<?, ?> hitLiving, byte tickOffset);
 
   float getAccuracy(ILiving<?, ?> living, ItemStack itemStack);
 

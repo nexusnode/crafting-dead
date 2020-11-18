@@ -112,9 +112,9 @@ public class UseItemAction extends TimedAction {
 
     if (this.freezeMovement) {
       if (this.target != null) {
-        this.target.setFreezeMovement(true);
+        this.target.setMovementBlocked(true);
       }
-      this.performer.setFreezeMovement(true);
+      this.performer.setMovementBlocked(true);
     }
 
     return finished;

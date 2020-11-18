@@ -39,7 +39,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -49,6 +48,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -63,7 +63,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
    */
   protected final E entity;
 
-  private final Map<ResourceLocation, L> extensions = new Object2ObjectOpenHashMap<>();
+  protected final Map<ResourceLocation, L> extensions = new Object2ObjectOpenHashMap<>();
 
   /**
    * The last held {@link ItemStack} - used to check if the entity has switched item.
@@ -72,7 +72,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   private List<Integer> dirtySlots = new IntArrayList();
 
-  private final Long2ObjectLinkedOpenHashMap<Snapshot> snapshots =
+  private final Long2ObjectLinkedOpenHashMap<EntitySnapshot> snapshots =
       new Long2ObjectLinkedOpenHashMap<>();
 
   private final ItemStackHandler itemHandler =
@@ -89,9 +89,13 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   private IActionProgress actionProgress;
 
-  private boolean freezeMovement;
+  private boolean movementBlocked;
 
   private boolean crouching;
+
+  private Vec3d lastPos;
+
+  private boolean moving;
 
   public DefaultLiving() {
     throw new IllegalStateException("No entity provided");
@@ -181,13 +185,18 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   }
 
   @Override
-  public void setFreezeMovement(boolean movementFrozen) {
-    this.freezeMovement = movementFrozen;
+  public void setMovementBlocked(boolean movementBlocked) {
+    this.movementBlocked = movementBlocked;
   }
 
   @Override
-  public boolean getFreezeMovement() {
-    return this.freezeMovement;
+  public boolean isMovementBlocked() {
+    return this.movementBlocked;
+  }
+
+  @Override
+  public boolean isMoving() {
+    return this.moving;
   }
 
   @Override
@@ -200,6 +209,9 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       this.lastHeldStack = heldStack;
     }
 
+    // Reset this every tick
+    this.movementBlocked = false;
+
     if (this.action != null && this.action.tick()) {
       this.removeAction();
     }
@@ -208,16 +220,6 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER).map(Optional::of)
         .orElse(Optional.empty()).flatMap(IAnimationProvider::getAnimationController)
         .ifPresent(c -> c.tick(this.getEntity(), heldStack));
-
-    if (this.freezeMovement) {
-      this.entity.forceSetPosition(this.entity.prevPosX, this.entity.prevPosY,
-          this.entity.prevPosZ);
-      this.freezeMovement = false;
-    }
-
-    if (this.crouching) {
-      this.getEntity().setPose(Pose.SWIMMING);
-    }
 
     this.updateGeneralClothingEffects();
     this.updateScubaClothing();
@@ -236,13 +238,17 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       if (this.snapshots.size() >= 20) {
         this.snapshots.removeFirst();
       }
-      final long gameTime = this.getEntity().getEntityWorld().getGameTime();
-      this.snapshots.put(gameTime, new Snapshot(gameTime, this.getEntity().getPositionVector(),
-          this.getEntity().getBoundingBox().expand(0, 1.0D, 0), this.getEntity().getPitchYaw(),
-          this.getEntity().getEyeHeight()));
+      this.snapshots.put(this.entity.getServer().getTickCounter(),
+          new EntitySnapshot(this.entity.getServer().getTickCounter(),
+              this.getEntity().getPositionVector(),
+              this.getEntity().getBoundingBox().grow(this.getEntity().getCollisionBorderSize()),
+              this.getEntity().getPitchYaw(),
+              this.getEntity().getEyeHeight()));
     }
 
     this.extensions.values().forEach(ILivingHandler::tick);
+    this.moving = !this.entity.getPositionVec().equals(this.lastPos);
+    this.lastPos = this.entity.getPositionVec();
   }
 
   private void updateScubaClothing() {
@@ -345,15 +351,15 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   }
 
   @Override
-  public Optional<Snapshot> getSnapshot(long gameTime) {
-    Snapshot snapshot = this.snapshots.get(gameTime);
-    if (snapshot == null && gameTime >= this.snapshots.firstLongKey()
-        && gameTime <= this.snapshots.lastLongKey()) {
-      ObjectBidirectionalIterator<Long2ObjectMap.Entry<Snapshot>> it =
+  public Optional<EntitySnapshot> getSnapshot(long tick) {
+    EntitySnapshot snapshot = this.snapshots.get(tick);
+    if (snapshot == null && tick >= this.snapshots.firstLongKey()
+        && tick <= this.snapshots.lastLongKey()) {
+      ObjectBidirectionalIterator<Long2ObjectMap.Entry<EntitySnapshot>> it =
           this.snapshots.long2ObjectEntrySet().fastIterator();
       while (it.hasNext()) {
-        Snapshot nextSnapshot = it.next().getValue();
-        if (nextSnapshot.getGameTime() > gameTime) {
+        EntitySnapshot nextSnapshot = it.next().getValue();
+        if (nextSnapshot.getTick() > tick) {
           if (snapshot == null) {
             snapshot = nextSnapshot;
           }
