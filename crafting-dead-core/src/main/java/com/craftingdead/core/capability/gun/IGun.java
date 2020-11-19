@@ -50,8 +50,8 @@ public interface IGun
 
   void removeMagazine(ILiving<?, ?> living);
 
-  void validateLivingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
-      ILiving<?, ?> hitLiving, byte tickOffset);
+  void validatePendingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
+      ILiving<?, ?> hitLiving, PendingHit pendingHit);
 
   float getAccuracy(ILiving<?, ?> living, ItemStack itemStack);
 

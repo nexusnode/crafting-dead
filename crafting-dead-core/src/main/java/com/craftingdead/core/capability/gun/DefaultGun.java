@@ -64,8 +64,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -117,7 +117,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private static final Logger logger = LogManager.getLogger();
 
-  private static final int BASE_LATENCY = 3;
+  private static final int BASE_LATENCY = 4;
 
   public static final float HEADSHOT_MULTIPLIER = 4;
 
@@ -171,8 +171,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private long rightMouseActionSoundStartTimeMs;
 
-  private final Multimap<Integer, Byte> livingHitValidationBuffer =
-      Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ByteArrayList::new);
+  private final Multimap<Integer, PendingHit> livingHitValidationBuffer =
+      Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ObjectArrayList::new);
 
   private byte hitValidationTicks = 0;
 
@@ -278,8 +278,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void validateLivingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
-      ILiving<?, ?> hitLiving, byte tickOffset) {
+  public void validatePendingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
+      ILiving<?, ?> hitLiving, PendingHit pendingHit) {
+    final byte tickOffset = pendingHit.getTickOffset();
     if (tickOffset > HIT_VALIDATION_DELAY_TICKS) {
       logger.warn("Bad living hit packet received, tick offset is too big!");
       return;
@@ -292,8 +293,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       return;
     }
 
-    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset).orElse(null);;
+    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset).orElse(null);
+    playerSnapshot = playerSnapshot.combineUntrustedSnapshot(pendingHit.getPlayerSnapshot());
+
     EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks).orElse(null);
+    hitSnapshot = hitSnapshot.combineUntrustedSnapshot(pendingHit.getHitSnapshot());
+
     if (playerSnapshot != null && hitSnapshot != null) {
       random.setSeed(player.getEntity().getEntityId());
       hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, 100.0D,
@@ -401,7 +406,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
                 break;
               } else if (entity instanceof ClientPlayerEntity) {
                 this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
-                    (byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks));
+                    new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+                        new EntitySnapshot(entity),
+                        new EntitySnapshot(entityRayTraceResult.getEntity())));
               }
             }
 

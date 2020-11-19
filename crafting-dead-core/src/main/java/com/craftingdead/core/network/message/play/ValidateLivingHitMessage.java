@@ -19,12 +19,17 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.gun.PendingHit;
+import com.craftingdead.core.capability.living.EntitySnapshot;
+import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
-import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -32,32 +37,34 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class ValidateLivingHitMessage {
 
-  private final Map<Integer, Collection<Byte>> hits;
+  private final Map<Integer, Collection<PendingHit>> hits;
 
-  public ValidateLivingHitMessage(Map<Integer, Collection<Byte>> hits) {
+  public ValidateLivingHitMessage(Map<Integer, Collection<PendingHit>> hits) {
     this.hits = hits;
   }
 
   public static void encode(ValidateLivingHitMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.hits.size());
-    for (Map.Entry<Integer, Collection<Byte>> hit : msg.hits.entrySet()) {
+    for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
       out.writeVarInt(hit.getKey());
       out.writeVarInt(hit.getValue().size());
-      for (byte value : hit.getValue()) {
-        out.writeByte(value);
+      for (PendingHit value : hit.getValue()) {
+        out.writeByte(value.getTickOffset());
+        value.getPlayerSnapshot().write(out);
+        value.getHitSnapshot().write(out);
       }
     }
   }
 
   public static ValidateLivingHitMessage decode(PacketBuffer in) {
     final int hitsSize = in.readVarInt();
-    Map<Integer, Collection<Byte>> hits = new Int2ObjectLinkedOpenHashMap<>();
+    Map<Integer, Collection<PendingHit>> hits = new Int2ObjectLinkedOpenHashMap<>();
     for (int i = 0; i < hitsSize; i++) {
       int key = in.readVarInt();
       int valueSize = in.readVarInt();
-      Collection<Byte> value = new ByteArrayList();
+      Collection<PendingHit> value = new ObjectArrayList<PendingHit>();
       for (int j = 0; j < valueSize; j++) {
-        value.add(in.readByte());
+        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in)));
       }
       hits.put(key, value);
     }
@@ -69,13 +76,14 @@ public class ValidateLivingHitMessage {
     IPlayer<ServerPlayerEntity> player = IPlayer.getExpected(playerEntity);
     ItemStack heldStack = playerEntity.getHeldItemMainhand();
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-      for (Map.Entry<Integer, Collection<Byte>> hit : msg.hits.entrySet()) {
-        Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getKey());
-        hitEntity.getCapability(ModCapabilities.LIVING).ifPresent(hitLiving -> {
-          for (byte value : hit.getValue()) {
-            gun.validateLivingHit(player, heldStack, hitLiving, value);
-          }
-        });
+      for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
+        final Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getKey());
+        Optional.ofNullable(hitEntity).filter(e -> e instanceof LivingEntity)
+            .map(e -> (LivingEntity) e).flatMap(ILiving::getOptional).ifPresent(hitLiving -> {
+              for (PendingHit value : hit.getValue()) {
+                gun.validatePendingHit(player, heldStack, hitLiving, value);
+              }
+            });
       }
     });
     return true;

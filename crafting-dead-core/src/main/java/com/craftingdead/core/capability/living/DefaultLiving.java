@@ -238,12 +238,9 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
       if (this.snapshots.size() >= 20) {
         this.snapshots.removeFirst();
       }
-      this.snapshots.put(this.entity.getServer().getTickCounter(),
-          new EntitySnapshot(this.entity.getServer().getTickCounter(),
-              this.getEntity().getPositionVector(),
-              this.getEntity().getBoundingBox().grow(this.getEntity().getCollisionBorderSize()),
-              this.getEntity().getPitchYaw(),
-              this.getEntity().getEyeHeight()));
+      // This is called at the start of the entity tick so it's equivalent of last tick's position.
+      this.snapshots.put(this.entity.getServer().getTickCounter() - 1,
+          new EntitySnapshot(this.entity));
     }
 
     this.extensions.values().forEach(ILivingHandler::tick);
@@ -352,14 +349,18 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   @Override
   public Optional<EntitySnapshot> getSnapshot(long tick) {
+    if (tick >= this.entity.getServer().getTickCounter()) {
+      return Optional.of(new EntitySnapshot(this.entity));
+    }
     EntitySnapshot snapshot = this.snapshots.get(tick);
     if (snapshot == null && tick >= this.snapshots.firstLongKey()
         && tick <= this.snapshots.lastLongKey()) {
       ObjectBidirectionalIterator<Long2ObjectMap.Entry<EntitySnapshot>> it =
           this.snapshots.long2ObjectEntrySet().fastIterator();
       while (it.hasNext()) {
-        EntitySnapshot nextSnapshot = it.next().getValue();
-        if (nextSnapshot.getTick() > tick) {
+        Long2ObjectMap.Entry<EntitySnapshot> entry = it.next();
+        EntitySnapshot nextSnapshot = entry.getValue();
+        if (entry.getLongKey() > tick) {
           if (snapshot == null) {
             snapshot = nextSnapshot;
           }
