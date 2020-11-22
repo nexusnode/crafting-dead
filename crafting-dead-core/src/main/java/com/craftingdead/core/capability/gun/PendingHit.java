@@ -7,11 +7,14 @@ public class PendingHit {
   private final byte tickOffset;
   private final EntitySnapshot playerSnapshot;
   private final EntitySnapshot hitSnapshot;
+  private final long randomSeed;
 
-  public PendingHit(byte tickOffset, EntitySnapshot playerSnapshot, EntitySnapshot hitSnapshot) {
+  public PendingHit(byte tickOffset, EntitySnapshot playerSnapshot, EntitySnapshot hitSnapshot,
+      long randomSeed) {
     this.tickOffset = tickOffset;
     this.playerSnapshot = playerSnapshot;
     this.hitSnapshot = hitSnapshot;
+    this.randomSeed = randomSeed;
   }
 
   public byte getTickOffset() {
@@ -24,5 +27,9 @@ public class PendingHit {
 
   public EntitySnapshot getHitSnapshot() {
     return this.hitSnapshot;
+  }
+
+  public long getRandomSeed() {
+    return this.randomSeed;
   }
 }

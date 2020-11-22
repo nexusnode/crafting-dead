@@ -31,7 +31,7 @@ import com.craftingdead.core.network.message.play.SyncPlayerMessage;
 import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -113,10 +113,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(ValidateLivingHitMessage.class, 0x0A, NetworkDirection.PLAY_TO_SERVER)
-          .encoder(ValidateLivingHitMessage::encode)
-          .decoder(ValidateLivingHitMessage::decode)
-          .consumer(ValidateLivingHitMessage::handle)
+          .messageBuilder(ValidatePendingHitMessage.class, 0x0A, NetworkDirection.PLAY_TO_SERVER)
+          .encoder(ValidatePendingHitMessage::encode)
+          .decoder(ValidatePendingHitMessage::decode)
+          .consumer(ValidatePendingHitMessage::handle)
           .add();
 
       simpleChannel

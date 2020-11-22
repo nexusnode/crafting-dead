@@ -35,15 +35,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ValidateLivingHitMessage {
+public class ValidatePendingHitMessage {
 
   private final Map<Integer, Collection<PendingHit>> hits;
 
-  public ValidateLivingHitMessage(Map<Integer, Collection<PendingHit>> hits) {
+  public ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hits) {
     this.hits = hits;
   }
 
-  public static void encode(ValidateLivingHitMessage msg, PacketBuffer out) {
+  public static void encode(ValidatePendingHitMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.hits.size());
     for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
       out.writeVarInt(hit.getKey());
@@ -52,11 +52,12 @@ public class ValidateLivingHitMessage {
         out.writeByte(value.getTickOffset());
         value.getPlayerSnapshot().write(out);
         value.getHitSnapshot().write(out);
+        out.writeVarLong(value.getRandomSeed());
       }
     }
   }
 
-  public static ValidateLivingHitMessage decode(PacketBuffer in) {
+  public static ValidatePendingHitMessage decode(PacketBuffer in) {
     final int hitsSize = in.readVarInt();
     Map<Integer, Collection<PendingHit>> hits = new Int2ObjectLinkedOpenHashMap<>();
     for (int i = 0; i < hitsSize; i++) {
@@ -64,14 +65,14 @@ public class ValidateLivingHitMessage {
       int valueSize = in.readVarInt();
       Collection<PendingHit> value = new ObjectArrayList<PendingHit>();
       for (int j = 0; j < valueSize; j++) {
-        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in)));
+        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in), in.readVarLong()));
       }
       hits.put(key, value);
     }
-    return new ValidateLivingHitMessage(hits);
+    return new ValidatePendingHitMessage(hits);
   }
 
-  public static boolean handle(ValidateLivingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(ValidatePendingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ServerPlayerEntity playerEntity = ctx.get().getSender();
     IPlayer<ServerPlayerEntity> player = IPlayer.getExpected(playerEntity);
     ItemStack heldStack = playerEntity.getHeldItemMainhand();

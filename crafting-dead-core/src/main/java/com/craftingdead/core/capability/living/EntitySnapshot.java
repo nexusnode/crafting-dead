@@ -49,8 +49,10 @@ public class EntitySnapshot {
     Vec3d look = fromSnapshot.getVectorForRotation(fromSnapshot.getPitchYaw().x,
         fromSnapshot.getPitchYaw().y);
 
-    look = look.add((1.0F - accuracy) / 7.5F * (random.nextBoolean() ? -1.0F : 1.0F),
-        0, (1.0F - accuracy) / 7.5F * (random.nextBoolean() ? -1.0F : 1.0F));
+    look = look.add(
+        (1.0F - accuracy) / (random.nextInt(5) + 3) * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F),
+        0,
+        (1.0F - accuracy) / (random.nextInt(5) + 3) * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
         RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);

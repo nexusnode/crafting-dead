@@ -56,7 +56,7 @@ import com.craftingdead.core.network.message.play.SyncGunMessage;
 import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.message.play.ValidateLivingHitMessage;
+import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
@@ -203,7 +203,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         && this.hitValidationTicks++ >= HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
       NetworkChannel.PLAY.getSimpleChannel().sendToServer(
-          new ValidateLivingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
+          new ValidatePendingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
       this.livingHitValidationBuffer.clear();
     }
 
@@ -300,7 +300,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     hitSnapshot = hitSnapshot.combineUntrustedSnapshot(pendingHit.getHitSnapshot());
 
     if (playerSnapshot != null && hitSnapshot != null) {
-      random.setSeed(player.getEntity().getEntityId());
+      random.setSeed(pendingHit.getRandomSeed());
       hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, 100.0D,
           this.getAccuracy(player, itemStack), random).ifPresent(
               hitPos -> this.hitEntity(player, itemStack, hitLiving.getEntity(), hitPos, false));
@@ -378,7 +378,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     // Used to avoid playing the same hit sound more than once.
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
-      random.setSeed(entity.getEntityId());
+      final long randomSeed = entity.getEntityWorld().getGameTime() + i;
+      random.setSeed(randomSeed);
       RayTraceResult rayTraceResult = RayTraceUtil
           .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random)
           .orElse(null);
@@ -408,7 +409,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
                 this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
                     new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
                         new EntitySnapshot(entity),
-                        new EntitySnapshot(entityRayTraceResult.getEntity())));
+                        new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
               }
             }
 
