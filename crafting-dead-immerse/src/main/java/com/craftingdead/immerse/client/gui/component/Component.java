@@ -121,7 +121,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     Yoga.YGNodeFree(this.node);
   }
 
-  protected void layout() {}
+  protected void layout() {
+    Yoga.YGNodeMarkDirty(this.node);
+  }
 
   public void tick() {}
 

@@ -51,9 +51,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private static final float SCROLL_CHUNK = 7.5F;
 
-  private static final float DAMPING = 0.5F;
-
-  private float lastScrollOffset;
+  private static final float SCROLL_MOMENTUM_DAMPING = 0.75F;
 
   private float scrollOffset;
 
@@ -62,8 +60,6 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   private boolean draggingScroller;
 
   private boolean calculateWidthWithScrollbar;
-
-  private float scrollVelocity;
 
   private float lastScrollMomentum;
 
@@ -76,17 +72,23 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   @Override
   public float getContentYOffset() {
-    return super.getY() + (float) (this.totalHeight > this.getHeight() ? -this.scrollOffset : 0.0D);
+    return super.getY() + (this.totalHeight > this.getHeight() ? -this.scrollOffset : 0.0F);
   }
 
   @Override
   public void layout() {
     super.layout();
     this.totalHeight =
-        (float) (this.children().stream().mapToDouble(c -> c.getY() + c.getHeight()).max()
+        (float) (this.children()
+            .stream()
+            .mapToDouble(c -> c.getY() + c.getHeight())
+            .max()
             .orElse(0.0F)
-            - this.children().stream().mapToDouble(Component::getY).min().orElse(0.0F)
-            - this.getHeight());
+            - this.children()
+                .stream()
+                .mapToDouble(Component::getY)
+                .min()
+                .orElse(0.0F));
     if (this.isScrollbarEnabled() != this.calculateWidthWithScrollbar) {
       this.calculateWidthWithScrollbar = this.isScrollbarEnabled();
       super.layout();
@@ -102,13 +104,12 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   }
 
   private final float clampScrollOffset(float scrollOffset) {
-    return MathHelper.clamp(scrollOffset, 0.0F, this.totalHeight);
+    return MathHelper.clamp(scrollOffset, 0.0F, this.totalHeight - this.getHeight());
   }
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled() && !this.draggingScroller) {
-      // this.scrollTo((int) (this.scrollOffset - (scrollDelta * SCROLL_CHUNK)), 100);
       this.scrollMomentum -= scrollDelta * SCROLL_CHUNK;
     }
     return super.mouseScrolled(mouseX, mouseY, scrollDelta);
@@ -138,7 +139,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     if (this.draggingScroller && mouseY >= this.getY()
         && mouseY <= this.getY() + this.getHeight()) {
       this.scrollOffset = this.clampScrollOffset((float) (this.scrollOffset
-          + deltaY * this.totalHeight / (this.getHeight() - this.getScrollbarHeight())));
+          + deltaY * this.totalHeight / (this.getHeight())));
     }
     return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
   }
@@ -157,27 +158,24 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     this.lastScrollMomentum = this.scrollMomentum;
 
     if (Math.abs(this.scrollMomentum) <= 0.1F) {
-      // this.scrollOffset += this.scrollMomentum;
+      this.scrollOffset += this.scrollMomentum;
       this.scrollMomentum = 0.0F;
     }
-    this.scrollMomentum *= (1 - DAMPING);
-    float scrollDelta = this.lastScrollMomentum - this.scrollMomentum;
-    if (this.scrollOffset + scrollDelta > this.totalHeight
-        || this.scrollOffset + scrollDelta < 0.0F) {
-      this.scrollMomentum = this.lastScrollMomentum = 0.0F;
-    } else {
+    this.scrollMomentum *= (1 - SCROLL_MOMENTUM_DAMPING);
 
-      this.scrollOffset += scrollDelta;
-      
-    }
   }
 
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
 
-    this.scrollOffset = MathHelper.lerp(partialTicks, this.lastScrollOffset, this.scrollOffset);
-    this.lastScrollOffset = this.scrollOffset;
+    float scrollDelta = MathHelper.lerp(partialTicks, this.lastScrollMomentum, this.scrollMomentum);
+    float newScrollOffset = this.scrollOffset + scrollDelta;
+    if (newScrollOffset < 0.0F || newScrollOffset > this.totalHeight - this.getHeight()) {
+      this.scrollMomentum = this.lastScrollMomentum = 0.0F;
+    }
+    this.scrollOffset =
+        Math.min(Math.max(newScrollOffset, 0.0F), this.totalHeight - this.getHeight());
 
     if (this.isScrollbarEnabled()) {
       RenderUtil.roundedFill(this.getScrollbarX(), this.getY(),
@@ -216,13 +214,12 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   }
 
   private final double getScrollbarY() {
-    return this.getY() + (this.scrollOffset / this.totalHeight)
-        * (this.getHeight() - this.getScrollbarHeight());
+    return this.getY() + (this.scrollOffset / this.totalHeight) * this.getHeight();
   }
 
   private final float getScrollbarHeight() {
     return MathHelper.clamp(this.getHeight() * (this.getHeight() / this.totalHeight), 10.0F,
-        this.getHeight() / 2.0F);
+        this.getHeight());
   }
 
   /**
