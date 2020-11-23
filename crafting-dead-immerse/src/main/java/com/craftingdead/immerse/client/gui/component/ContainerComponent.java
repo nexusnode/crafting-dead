@@ -66,13 +66,13 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   private float scrollMomentum;
 
   @Override
-  protected float getContentWidth() {
-    return this.getWidth() - (this.calculateWidthWithScrollbar ? SCROLLBAR_WIDTH : 0.0F);
+  public float getContentWidth() {
+    return super.getContentWidth() - (this.calculateWidthWithScrollbar ? SCROLLBAR_WIDTH : 0.0F);
   }
 
   @Override
-  public float getContentYOffset() {
-    return super.getY() + (this.totalHeight > this.getHeight() ? -this.scrollOffset : 0.0F);
+  public float getContentY() {
+    return super.getContentY() + (this.totalHeight > this.getHeight() ? -this.scrollOffset : 0.0F);
   }
 
   @Override
@@ -198,10 +198,10 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
     if (scissor) {
       GL11.glEnable(GL11.GL_SCISSOR_TEST);
-      GL11.glScissor((int) (this.getX() * scale),
+      GL11.glScissor((int) (this.getScaledX() * scale),
           (int) (this.mainWindow.getFramebufferHeight()
-              - ((this.getY() + this.getContentHeight()) * scale)),
-          (int) (this.getContentWidth() * scale), (int) (this.getContentHeight() * scale));
+              - ((this.getScaledY() + this.getScaledHeight()) * scale)),
+          (int) (this.getScaledWidth() * scale), (int) (this.getScaledHeight() * scale));
     }
     super.renderChildren(mouseX, mouseY, partialTicks);
     if (scissor) {
@@ -257,7 +257,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     }
 
     NodeList nodes = document.getDocumentElement().getChildNodes();
-    int nextIndex = 0;
+    int nextIndex = this.children().size();
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       switch (node.getNodeName()) {

@@ -48,7 +48,8 @@ public class PanoramaComponent extends Component<PanoramaComponent> {
     RenderSystem.enableBlend();
     RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-    RenderUtil.blit(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    RenderUtil.blit(this.getScaledContentX(), this.getScaledContentY(),
+        this.getScaledContentWidth(), this.getScaledContentHeight());
     RenderSystem.disableBlend();
   }
 }

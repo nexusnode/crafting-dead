@@ -52,11 +52,12 @@ public class EntityComponent extends Component<EntityComponent> {
         this.minecraft.gameRenderer.getActiveRenderInfo(), null);
     RenderSystem.pushMatrix();
     {
-      RenderSystem.translated(0, 10.0D * this.getYScale(), 1050.0F);
+      RenderSystem.translated(0, 0, 1050.0F);
       RenderSystem.scalef(1.0F, 1.0F, -1.0F);
       MatrixStack matrixStack = new MatrixStack();
-      matrixStack.translate(this.getX(), this.getY(), 1000.0D);
-      matrixStack.scale(this.getXScale(), this.getYScale() * 10, 50);
+      matrixStack.translate(this.getScaledContentX() + this.getScaledContentWidth() / 2,
+          this.getScaledContentY() + this.getScaledContentHeight(), 1000.0D);
+      matrixStack.scale(this.getScaledContentWidth() / 2, this.getScaledContentHeight() / 2, 50);
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
 
       final float oldYawOffset = this.livingEntity.renderYawOffset;
@@ -65,9 +66,10 @@ public class EntityComponent extends Component<EntityComponent> {
       final float oldPrevHeadYaw = this.livingEntity.prevRotationYawHead;
       final float oldHeadYaw = this.livingEntity.rotationYawHead;
 
-      float headYaw = (float) Math.atan((this.getX() - mouseX) / 40.0F);
-      float headPitch =
-          (float) Math.atan((this.getY() - (this.getHeight() * 3.5F) - mouseY) / 40.0F);
+      float headYaw = (float) Math
+          .atan((this.getScaledContentX() + this.getScaledContentWidth() / 2 - mouseX) / 40.0F);
+      float headPitch = (float) Math
+          .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4 - mouseY) / 40.0F);
       this.livingEntity.renderYawOffset = 180.0F + headYaw * 20.0F;
       this.livingEntity.rotationYaw = 180.0F + headYaw * 40.0F;
       this.livingEntity.rotationPitch = -headPitch * 20.0F;

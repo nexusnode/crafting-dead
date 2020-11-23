@@ -18,37 +18,54 @@
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.io.File;
+import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.util.Text;
+import com.craftingdead.immerse.client.gui.component.Align;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.EntityComponent;
+import com.craftingdead.immerse.client.gui.component.FakePlayerEntity;
+import com.craftingdead.immerse.client.gui.component.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.Justify;
 import com.craftingdead.immerse.client.gui.component.Overflow;
+import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.TextFormatting;
 
 public class HomeComponent extends ContainerComponent {
 
   public HomeComponent() {
-    // this.addChild(new TextBlockComponent(this.minecraft.fontRenderer,
-    // new StringTextComponent("Hello World!"), false)
-    // .setWidth(100)
-    // .setHeight(100)
-    // .addHoverAnimation(Component.X_SCALE, new float[] {2.0F}, 150.0F)
-    // .addHoverAnimation(Component.Y_SCALE, new float[] {2.0F}, 150.0F));
+    this.setFlexDirection(FlexDirection.ROW);
+    this.setAlignItems(Align.CENTER);
+    this.setJustifyContent(Justify.SPACE_AROUND);
 
-    // final FakePlayerEntity fakePlayerEntity =
-    // new FakePlayerEntity(this.minecraft.getSession().getProfile());
-    // fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(ModItems.AK47.get()));
-    // this.addChild(new EntityComponent(fakePlayerEntity)
-    // .setLeftMarginPercent(1.0F)
-    // .setTopMarginPercent(0.5F)
-    // .setRight(75)
-    // .setScale(5F)
-    // .setMarginAuto());
 
     this.addChild(new ContainerComponent()
-        .setLeftMargin(50)
-        .setTopMargin(50)
-        .setWidthPercent(50)
-        .setBottomMargin(50)
-        .setBackgroundColour(new Colour(0x40999999))
-        .setOverflow(Overflow.SCROLL)
-        .addAll(new File("news.xml")));
+        .setWidthPercent(50.0F)
+        .setHeightPercent(75.0F)
+        .setBackgroundColour(new Colour(0x70777777))
+        .setBackgroundBlur(50.0F)
+        .addChild(new ContainerComponent()
+            .setPadding(10.0F)
+            .setOverflow(Overflow.SCROLL)
+            .addAll(new File("news.xml"))));
+
+    final FakePlayerEntity fakePlayerEntity =
+        new FakePlayerEntity(this.minecraft.getSession().getProfile());
+    fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(ModItems.AK47.get()));
+
+
+    this.addChild(new ContainerComponent()
+        .setAlignItems(Align.CENTER)
+        .setWidthPercent(30.0F)
+        .setHeightPercent(45.0F)
+        .addChild(new TextBlockComponent(this.minecraft.fontRenderer,
+            Text.of("Sm0keySa1m0n").applyTextStyle(TextFormatting.BOLD), true)
+                .setWidth(80.0F))
+        .addChild(new EntityComponent(fakePlayerEntity)
+            .setWidthPercent(100.0F)
+            .setAspectRatio(0.9F)));
+
   }
 }

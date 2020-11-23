@@ -90,6 +90,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @Nullable
   private Colour backgroundColour;
 
+  @Nullable
+  private Blur backgroundBlur;
+
   protected IView parent;
 
   private boolean wasMouseOver;
@@ -118,6 +121,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   protected void added() {}
 
   protected void removed() {
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.close();
+    }
     Yoga.YGNodeFree(this.node);
   }
 
@@ -125,7 +131,11 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     Yoga.YGNodeMarkDirty(this.node);
   }
 
-  public void tick() {}
+  public void tick() {
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.tick();
+    }
+  }
 
   protected void focusChanged(boolean focused) {
     this.focused = focused;
@@ -138,9 +148,15 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
 
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.render(this.getScaledX(), this.getScaledY(), this.getScaledWidth(),
+          this.getScaledHeight(), partialTicks);
+    }
+
     if (this.backgroundColour != null) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getX() + this.getScaledWidth(),
-          this.getY() + this.getScaledHeight(), this.backgroundColour.getHexColour());
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.getScaledHeight(), this.backgroundColour.getHexColour());
     }
 
     if (this.tooltip != null && this.isMouseOver(mouseX, mouseY)) {
@@ -304,22 +320,42 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   public final float getScaledX() {
-    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale)) / 2.0F;
+    return this.getX() + (this.getWidth() - this.getScaledWidth()) / 2.0F;
+  }
+
+  public final float getScaledContentX() {
+    return this.getContentX()
+        + (this.getContentWidth() - this.getScaledContentWidth()) / 2.0F;
+  }
+
+  @Override
+  public float getContentX() {
+    return this.getX() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft);
   }
 
   public final float getX() {
     return (float) (Yoga.YGNodeLayoutGetLeft(this.node) + this.xTranslation
-        + this.parent.getContentXOffset()
+        + this.parent.getContentX()
         + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
+  public final float getScaledContentY() {
+    return this.getContentY()
+        + (this.getContentHeight() - this.getScaledContentHeight()) / 2.0F;
+  }
+
   public final float getScaledY() {
-    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale)) / 2.0F;
+    return this.getY() + (this.getHeight() - this.getScaledHeight()) / 2.0F;
+  }
+
+  @Override
+  public float getContentY() {
+    return this.getY() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop);
   }
 
   public final float getY() {
     return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
-        + this.parent.getContentYOffset()
+        + this.parent.getContentY()
         + (this.unscaleHeight ? this.getHeight() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
@@ -327,13 +363,29 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.getWidth() * this.xScale;
   }
 
+  public final float getScaledContentWidth() {
+    return this.getContentWidth() * this.xScale;
+  }
+
+  public float getContentWidth() {
+    return this.getWidth() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeRight);
+  }
+
   public final float getWidth() {
     return (float) (Yoga.YGNodeLayoutGetWidth(this.node)
         / (this.unscaleWidth ? this.mainWindow.getGuiScaleFactor() : 1.0F));
   }
 
-  public final float getScaledHeight() {
+  public float getScaledHeight() {
     return this.getHeight() * this.yScale;
+  }
+
+  public final float getScaledContentHeight() {
+    return this.getContentHeight() * this.yScale;
+  }
+
+  public final float getContentHeight() {
+    return this.getHeight() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeBottom);
   }
 
   public final float getHeight() {
@@ -414,22 +466,72 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   public final SELF setTop(float top) {
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, top);
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeTop, top);
     return this.self();
   }
 
   public final SELF setTopPercent(float topPercent) {
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, topPercent);
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeTop, topPercent);
     return this.self();
   }
 
   public final SELF setBottom(float bottom) {
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, bottom);
+    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeBottom, bottom);
     return this.self();
   }
 
   public final SELF setBottomPercent(float bottomPercent) {
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, bottomPercent);
+    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeBottom, bottomPercent);
+    return this.self();
+  }
+
+  public final SELF setLeftPadding(float leftPadding) {
+    Yoga.YGNodeStyleSetPadding(this.node, Yoga.YGEdgeLeft, leftPadding);
+    return this.self();
+  }
+
+  public final SELF setLeftPaddingPercent(float leftPaddingPercent) {
+    Yoga.YGNodeStyleSetPaddingPercent(this.node, Yoga.YGEdgeLeft, leftPaddingPercent);
+    return this.self();
+  }
+
+  public final SELF setRightPadding(float rightPadding) {
+    Yoga.YGNodeStyleSetPadding(this.node, Yoga.YGEdgeRight, rightPadding);
+    return this.self();
+  }
+
+  public final SELF setRightPaddingPercent(float rightPaddingPercent) {
+    Yoga.YGNodeStyleSetPaddingPercent(this.node, Yoga.YGEdgeRight, rightPaddingPercent);
+    return this.self();
+  }
+
+  public final SELF setTopPadding(float topPadding) {
+    Yoga.YGNodeStyleSetPadding(this.node, Yoga.YGEdgeTop, topPadding);
+    return this.self();
+  }
+
+  public final SELF setTopPaddingPercent(float topPaddingPercent) {
+    Yoga.YGNodeStyleSetPaddingPercent(this.node, Yoga.YGEdgeTop, topPaddingPercent);
+    return this.self();
+  }
+
+  public final SELF setBottomPadding(float bottomPadding) {
+    Yoga.YGNodeStyleSetPadding(this.node, Yoga.YGEdgeBottom, bottomPadding);
+    return this.self();
+  }
+
+  public final SELF setBottomPaddingPercent(float bottomPaddingPercent) {
+    Yoga.YGNodeStyleSetPaddingPercent(this.node, Yoga.YGEdgeBottom, bottomPaddingPercent);
+    return this.self();
+  }
+
+  public final SELF setPadding(float padding) {
+    Yoga.YGNodeStyleSetPadding(this.node, Yoga.YGEdgeAll, padding);
+    return this.self();
+  }
+
+  public final SELF setPaddingPercent(float paddingPercent) {
+    Yoga.YGNodeStyleSetPaddingPercent(this.node, Yoga.YGEdgeAll, paddingPercent);
     return this.self();
   }
 
@@ -535,6 +637,11 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
+  public final SELF setAspectRatio(float aspectRatio) {
+    Yoga.YGNodeStyleSetAspectRatio(this.node, aspectRatio);
+    return this.self();
+  }
+
   public final SELF setTooltip(@Nullable Tooltip tooltip) {
     this.tooltip = tooltip;
     return this.self();
@@ -542,6 +649,18 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF setBackgroundColour(@Nullable Colour backgroundColour) {
     this.backgroundColour = backgroundColour;
+    return this.self();
+  }
+
+  public final SELF setBackgroundBlur() {
+    return this.setBackgroundBlur(0);
+  }
+
+  public final SELF setBackgroundBlur(float blurRadius) {
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.close();
+    }
+    this.backgroundBlur = new Blur(blurRadius);
     return this.self();
   }
 

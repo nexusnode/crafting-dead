@@ -53,22 +53,6 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.children.forEach(Component::layout);
   }
 
-  protected float getContentWidth() {
-    return this.getWidth();
-  }
-
-  protected float getContentHeight() {
-    return this.getHeight();
-  }
-
-  public float getContentXOffset() {
-    return this.getX();
-  }
-
-  public float getContentYOffset() {
-    return this.getY();
-  }
-
   @Override
   public void tick() {
     super.tick();

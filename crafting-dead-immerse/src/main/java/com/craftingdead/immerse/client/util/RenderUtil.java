@@ -43,11 +43,10 @@ public class RenderUtil {
       ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148031_d");
 
   public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
-    ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
-    if (sg != null) {
+    if (shaderGroup != null) {
       try {
         @SuppressWarnings("unchecked")
-        List<Shader> shaders = (List<Shader>) listShaders.get(sg);
+        List<Shader> shaders = (List<Shader>) listShaders.get(shaderGroup);
         for (Shader shader : shaders) {
           ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
           if (variable != null) {

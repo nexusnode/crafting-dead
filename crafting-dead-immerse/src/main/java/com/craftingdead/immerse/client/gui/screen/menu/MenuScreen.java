@@ -17,18 +17,20 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.component.Align;
-import com.craftingdead.immerse.client.gui.component.BlurComponent;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.component.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
-import com.craftingdead.immerse.client.gui.component.PanoramaComponent;
 import com.craftingdead.immerse.client.gui.component.PositionType;
 import com.craftingdead.immerse.client.gui.component.RectangleComponent;
 import com.craftingdead.immerse.client.gui.component.Tooltip;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import io.noties.tumbleweed.Timeline;
+import io.noties.tumbleweed.Tween;
+import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.util.ResourceLocation;
@@ -44,26 +46,44 @@ public class MenuScreen extends ComponentScreen {
 
     final Minecraft mc = Minecraft.getInstance();
     this.font = mc.fontRenderer;
-    this.getRoot().addChild(new PanoramaComponent(new ResourceLocation(CraftingDeadImmerse.ID,
-        "textures/gui/title/background/panorama"))
-            .setPositionType(PositionType.ABSOLUTE)
-            .setWidthPercent(100.0F)
-            .setHeightPercent(100.0F));
+
+    ImageComponent backgroundComponent = new ImageComponent()
+        .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
+        .setPositionType(PositionType.ABSOLUTE)
+        .setFitType(FitType.COVER)
+        .setHeightPercent(100)
+        .setWidthPercent(100)
+        .setScale(1.25F);
+    this.getRoot().addChild(backgroundComponent);
+
+    // Background animation
+    Timeline.createParallel()
+        .push(Tween.to(backgroundComponent, Component.X_TRANSLATION, 20000)
+            .target(15)
+            .waypoint(5)
+            .waypoint(1)
+            .waypoint(3)
+            .path(CatmullRom.instance()))
+        .push(Tween.to(backgroundComponent, Component.Y_TRANSLATION, 20000)
+            .target(-10)
+            .waypoint(5)
+            .waypoint(1)
+            .waypoint(3))
+        .push(Tween.to(backgroundComponent, Component.X_SCALE, 20000)
+            .target(1.15F)
+            .waypoint(1.2F))
+        .push(Tween.to(backgroundComponent, Component.Y_SCALE, 20000)
+            .target(1.15F)
+            .waypoint(1.2F))
+        .repeatYoyo(-1, 0)
+        .start(backgroundComponent.getTweenManager());
 
     ContainerComponent sideBar = new ContainerComponent()
+        .setBackgroundColour(new Colour(0x70777777))
+        .setBackgroundBlur(50.0F)
         .setHeightPercent(100.0F)
         .setWidth(25.0F)
         .setAlignItems(Align.CENTER);
-
-    sideBar.addChild(new BlurComponent()
-        .setPositionType(PositionType.ABSOLUTE)
-        .setHeightPercent(100.0F)
-        .setWidthPercent(100.0F));
-    sideBar.addChild(new RectangleComponent()
-        .setPositionType(PositionType.ABSOLUTE)
-        .setHeightPercent(100.0F)
-        .setWidthPercent(100.0F)
-        .setBackgroundColour(new Colour(0x40999999)));
 
     sideBar.addChild(new RectangleComponent()
         .setUnscaleWidth()

@@ -49,7 +49,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   public void layout() {
     super.layout();
     if (this.lines == null) {
-      this.generateLines((int) this.getWidth());
+      this.generateLines((int) this.getContentWidth());
     }
   }
 
@@ -81,7 +81,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   public void render(int mouseX, int mouseY, float partialTicks) {
     super.render(mouseX, mouseY, partialTicks);
     MatrixStack matrixStack = new MatrixStack();
-    matrixStack.translate(this.getScaledX(), this.getScaledY(), 0.0D);
+    matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
     matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
     RenderSystem.pushMatrix();
     {
@@ -106,11 +106,11 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   public Optional<ITextComponent> getMouseOverText(double mouseX, double mouseY) {
-    int offsetMouseX = MathHelper.floor(mouseX - this.getX());
-    int offsetMouseY = MathHelper.floor(mouseY - this.getY());
+    int offsetMouseX = MathHelper.floor(mouseX - this.getScaledContentX());
+    int offsetMouseY = MathHelper.floor(mouseY - this.getScaledContentY());
     if (offsetMouseX >= 0 && offsetMouseY >= 0) {
       final int lines = this.lines.size();
-      if (offsetMouseX <= this.getWidth()
+      if (offsetMouseX <= this.getScaledContentWidth()
           && offsetMouseY < this.fontRenderer.FONT_HEIGHT * lines + lines) {
         int maxLines = offsetMouseY / this.fontRenderer.FONT_HEIGHT;
         if (maxLines >= 0 && maxLines < this.lines.size()) {

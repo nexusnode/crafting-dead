@@ -4,11 +4,11 @@ import net.minecraft.client.gui.screen.Screen;
 
 public interface IView {
 
-  default float getContentXOffset() {
+  default float getContentX() {
     return 0.0F;
   }
 
-  default float getContentYOffset() {
+  default float getContentY() {
     return 0.0F;
   }
 

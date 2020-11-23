@@ -59,7 +59,7 @@ public class ImageComponent extends Component<ImageComponent> {
   }
 
   private Optional<Vec2f> getFittedImageSize() {
-    return this.getFittedImageSize(this.getWidth(), this.getHeight());
+    return this.getFittedImageSize(this.getContentWidth(), this.getContentHeight());
   }
 
   private Optional<Vec2f> getFittedImageSize(float containerWidth, float containerHeight) {
@@ -99,11 +99,14 @@ public class ImageComponent extends Component<ImageComponent> {
     final float[] colour = this.colour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
     if (this.bind()) {
-      RenderUtil.blit(this.getScaledX(), this.getScaledY(),
+      // Enable bilinear filtering
+      RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+      RenderUtil.blit(this.getScaledContentX(), this.getScaledContentY(),
           this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
     } else {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+      RenderUtil.fill(this.getScaledContentX(), this.getScaledContentY(),
+          this.getScaledX() + this.getScaledContentWidth(),
+          this.getScaledContentY() + this.getScaledContentHeight(),
           0xFFFFFFFF);
     }
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
