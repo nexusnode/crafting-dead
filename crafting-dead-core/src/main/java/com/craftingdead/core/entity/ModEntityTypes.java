@@ -19,6 +19,7 @@ package com.craftingdead.core.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -34,7 +35,6 @@ import com.craftingdead.core.entity.monster.GiantZombieEntity;
 import com.craftingdead.core.entity.monster.PoliceZombieEntity;
 import com.craftingdead.core.entity.monster.TankZombieEntity;
 import com.craftingdead.core.entity.monster.WeakZombieEntity;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -184,32 +184,36 @@ public class ModEntityTypes {
     supplyDrop = add("supply_drop", EntityType.Builder
         .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
 
-    ForgeRegistries.BIOMES.getValues().stream()
-        .filter(biome -> biome.getSpawns(EntityClassification.MONSTER).stream()
-            .anyMatch(spawnList -> spawnList.entityType == EntityType.ZOMBIE))
-        .forEach(biome -> biome.getSpawns(EntityClassification.MONSTER)
-            .addAll(ImmutableSet.of(new Biome.SpawnListEntry(advancedZombie, 400, 2, 8),
-                new Biome.SpawnListEntry(fastZombie, 150, 2, 4),
-                new Biome.SpawnListEntry(tankZombie, 50, 2, 4),
-                new Biome.SpawnListEntry(weakZombie, 300, 2, 12))));
+    for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
+      ListIterator<Biome.SpawnListEntry> iterator =
+          biome.getSpawns(EntityClassification.MONSTER).listIterator();
+      while (iterator.hasNext()) {
+        Biome.SpawnListEntry spawnEntry = iterator.next();
+        if (spawnEntry.entityType == EntityType.ZOMBIE) {
+          iterator.add(new Biome.SpawnListEntry(advancedZombie, spawnEntry.itemWeight * 3, 2, 8));
+          iterator.add(new Biome.SpawnListEntry(fastZombie, spawnEntry.itemWeight / 2, 2, 4));
+          iterator.add(new Biome.SpawnListEntry(tankZombie, spawnEntry.itemWeight, 2, 4));
+          iterator.add(new Biome.SpawnListEntry(weakZombie, spawnEntry.itemWeight * 2, 2, 12));
+        }
+      }
+    }
 
     // Spawn placement rules
-    EntitySpawnPlacementRegistry
-        .register(ModEntityTypes.advancedZombie,
-            EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry
-        .register(ModEntityTypes.fastZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.fastZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry
-        .register(ModEntityTypes.tankZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.tankZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
 
-    EntitySpawnPlacementRegistry
-        .register(ModEntityTypes.weakZombie, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+    EntitySpawnPlacementRegistry.register(ModEntityTypes.weakZombie,
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
   }
 
   public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
