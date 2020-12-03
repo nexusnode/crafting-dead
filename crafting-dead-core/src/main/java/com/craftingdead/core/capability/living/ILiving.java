@@ -18,11 +18,13 @@
 package com.craftingdead.core.capability.living;
 
 import java.util.Optional;
+import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -50,7 +52,7 @@ public interface ILiving<E extends LivingEntity, L extends ILivingHandler> exten
   void setMovementBlocked(boolean movementFrozen);
 
   boolean isMovementBlocked();
-  
+
   boolean isMoving();
 
   IItemHandlerModifiable getItemHandler();
@@ -60,6 +62,21 @@ public interface ILiving<E extends LivingEntity, L extends ILivingHandler> exten
   boolean isCrouching();
 
   void setCrouching(boolean crouching, boolean sendUpdate);
+
+  default float getModifiedAccuracy(float accuracy, Random random) {
+    if (this.isMoving()) {
+      accuracy -= 0.15F;
+    } else if (this.isCrouching()) {
+      accuracy += 0.15F;
+    }
+
+    // Apply some random accuracy for non-players (bots)
+    if (!(this.getEntity() instanceof PlayerEntity)) {
+      accuracy -= random.nextFloat();
+    }
+
+    return accuracy;
+  }
 
   E getEntity();
 

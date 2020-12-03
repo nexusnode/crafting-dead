@@ -73,12 +73,21 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   protected void registerGoals() {
     super.registerGoals();
-    this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F);
-    this.goalSelector.addGoal(3, this.rangedAttackGoal);
+    this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F) {
+      @Override
+      public boolean shouldExecute() {
+        return super.shouldExecute()
+            && AdvancedZombieEntity.this.getCapability(ModCapabilities.LIVING)
+                .map(living -> AdvancedZombieEntity.this.getHeldItemMainhand()
+                    .getCapability(ModCapabilities.GUN)
+                    .isPresent())
+                .orElse(false);
+      }
+    };
+    this.goalSelector.addGoal(2, this.rangedAttackGoal);
     this.goalSelector.addGoal(1, new FollowAttractiveGrenadeGoal(this, 1.15F));
-    this.goalSelector
-        .addGoal(4,
-            new LookAtEntityGoal<FlashGrenadeEntity>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
+    this.goalSelector.addGoal(4,
+        new LookAtEntityGoal<FlashGrenadeEntity>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
   }
 
   @Override
@@ -189,9 +198,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
       this.getCapability(ModCapabilities.LIVING).ifPresent(
           living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
             if (gun.getMagazineSize() == 0) {
-              this
-                  .setHeldItem(Hand.OFF_HAND,
-                      new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
+              this.setHeldItem(Hand.OFF_HAND,
+                  new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
             }
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()

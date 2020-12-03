@@ -358,8 +358,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
       ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
+      Minecraft minecraft = clientDist.getMinecraft();
 
-      partialTicks = clientDist.getMinecraft().getRenderPartialTicks();
+      partialTicks = minecraft.getRenderPartialTicks();
       if (entity instanceof ClientPlayerEntity) {
         clientDist.getCameraManager().joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
       }
@@ -371,11 +372,15 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
       SoundEvent shootSound = this.gunItem.getShootSound().get();
       if (this.getAttachments().stream().anyMatch(AttachmentItem::isSoundSuppressor)) {
-        // Tries to get the silenced shoot sound.
-        // If it does not exists, the default shoot sound is used instead.
+        // Tries to get the silenced shoot sound, if it does not exist the default shoot sound is
+        // used instead.
         shootSound = this.gunItem.getSilencedShootSound().orElse(shootSound);
       }
-      entity.playSound(shootSound, 0.25F, 1.0F);
+
+      if (!entity.isSilent()) {
+        entity.getEntityWorld().playSound(minecraft.player, entity.getPosX(),
+            entity.getPosY(), entity.getPosZ(), shootSound, entity.getSoundCategory(), 0.25F, 1.0F);
+      }
     }
 
     // Used to avoid playing the same hit sound more than once.
@@ -565,7 +570,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
           hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
 
-
       final int particleCount = 12;
       for (int i = 0; i < particleCount; ++i) {
         world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.getX(),
@@ -573,9 +577,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
     } else {
       if (block instanceof TNTBlock) {
-        block
-            .catchFire(blockState, entity.getEntityWorld(), blockPos, null,
-                entity instanceof LivingEntity ? (LivingEntity) entity : null);
+        block.catchFire(blockState, entity.getEntityWorld(), blockPos, null,
+            entity instanceof LivingEntity ? (LivingEntity) entity : null);
         entity.getEntityWorld().removeBlock(blockPos, false);
       }
 
@@ -594,12 +597,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   public float getAccuracy(ILiving<?, ?> living, ItemStack itemStack) {
     float accuracy =
         this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
-    if (living.isMoving()) {
-      accuracy -= 0.15F;
-    } else if (living.isCrouching()) {
-      accuracy += 0.15F;
-    }
-    return Math.min(accuracy, 1.0F);
+    return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
   }
 
   @Override
