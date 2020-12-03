@@ -35,7 +35,6 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.AimableGun;
 import com.craftingdead.core.capability.gun.DefaultGun;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.util.Text;
@@ -51,7 +50,6 @@ import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -148,13 +146,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.triggerPredicate = properties.triggerPredicate;
     this.rightMouseActionSound = properties.rightMouseActionSound;
     this.rightMouseActionSoundRepeatDelayMs = properties.rightMouseActionSoundRepeatDelayMs;
-    this
-        .addPropertyOverride(new ResourceLocation("aiming"),
-            (itemStack, world, entity) -> entity != null ? itemStack
-                .getCapability(ModCapabilities.GUN)
-                .filter(gun -> gun instanceof IScope)
-                .map(gun -> ((IScope) gun).isAiming(entity, itemStack) ? 1.0F : 0.0F)
-                .orElse(0.0F) : 0.0F);
   }
 
   public int getFireRateMs() {

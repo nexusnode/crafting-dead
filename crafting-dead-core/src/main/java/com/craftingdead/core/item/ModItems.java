@@ -1322,7 +1322,7 @@ public class ModItems {
               .setFireRate(1200)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
-              .setAccuracy(0.9F)
+              .setAccuracy(0.95F)
               .setCrosshair(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AWP_SHOOT)

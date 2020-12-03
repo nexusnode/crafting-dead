@@ -63,13 +63,16 @@ public class EntitySnapshot {
     }
 
     Vec3d start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
-    Vec3d look = fromSnapshot.getVectorForRotation(fromSnapshot.getPitchYaw().x,
-        fromSnapshot.getPitchYaw().y);
 
-    look = look.add(
-        (1.0F - accuracy) / (random.nextInt(5) + 3) * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F),
-        0,
-        (1.0F - accuracy) / (random.nextInt(5) + 3) * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
+    float pitchOffset = 0.0F;
+    float yawOffset = 0.0F;
+    if (accuracy < 1.0F) {
+      pitchOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
+      yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
+    }
+
+    Vec3d look = RayTraceUtil.getVectorForRotation(fromSnapshot.getPitchYaw().x + pitchOffset,
+        fromSnapshot.getPitchYaw().y + yawOffset);
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
         RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);
@@ -88,15 +91,6 @@ public class EntitySnapshot {
     }
   }
 
-  protected final Vec3d getVectorForRotation(float pitch, float yaw) {
-    float f = pitch * ((float) Math.PI / 180F);
-    float f1 = -yaw * ((float) Math.PI / 180F);
-    float f2 = MathHelper.cos(f1);
-    float f3 = MathHelper.sin(f1);
-    float f4 = MathHelper.cos(f);
-    float f5 = MathHelper.sin(f);
-    return new Vec3d((double) (f3 * f4), (double) (-f5), (double) (f2 * f4));
-  }
 
   public Vec3d getPos() {
     return this.pos;

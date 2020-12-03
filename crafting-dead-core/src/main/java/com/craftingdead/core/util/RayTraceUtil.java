@@ -148,14 +148,16 @@ public class RayTraceUtil {
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
       final double distance, final float partialTicks, final float accuracy, final Random random) {
     Vec3d start = fromEntity.getEyePosition(partialTicks);
-    Vec3d look = fromEntity.getLook(partialTicks);
 
+    float pitchOffset = 0.0F;
+    float yawOffset = 0.0F;
     if (accuracy < 1.0F) {
-      look = look.add(
-          (1.0F - accuracy) / (random.nextInt(5) + 3) * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F),
-          0, (1.0F - accuracy) / (random.nextInt(5) + 3)
-              * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
+      pitchOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
+      yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
     }
+
+    Vec3d look = getVectorForRotation(fromEntity.getPitch(partialTicks) + pitchOffset,
+        fromEntity.getYaw(partialTicks) + yawOffset);
 
     Vec3d scaledLook = look.scale(distance);
     Vec3d end = start.add(scaledLook);
@@ -243,12 +245,21 @@ public class RayTraceUtil {
     return Optional.ofNullable(blockRayTraceResult);
   }
 
-
   public static boolean isBlockPierceable(Block block) {
     return block instanceof FenceBlock
         || block instanceof DoorBlock
         || block instanceof AbstractGlassBlock
         || block instanceof LeavesBlock
         || block instanceof TrapDoorBlock;
+  }
+
+  public static Vec3d getVectorForRotation(float pitch, float yaw) {
+    float pitchRad = pitch * ((float) Math.PI / 180F);
+    float yawRad = -yaw * ((float) Math.PI / 180F);
+    float yawCos = MathHelper.cos(yawRad);
+    float yawSin = MathHelper.sin(yawRad);
+    float pitchCos = MathHelper.cos(pitchRad);
+    float pitchSin = MathHelper.sin(pitchRad);
+    return new Vec3d((yawSin * pitchCos), (-pitchSin), (yawCos * pitchCos));
   }
 }

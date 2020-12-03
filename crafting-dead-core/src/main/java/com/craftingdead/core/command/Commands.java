@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.core.commands;
+package com.craftingdead.core.command;
 
-import com.craftingdead.core.commands.impl.CommandThirst;
+import com.craftingdead.core.command.impl.CommandThirst;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 
-public abstract class CommandManager {
+public class Commands {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
     CommandThirst.register(dispatcher);

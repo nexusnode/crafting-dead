@@ -355,10 +355,13 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
     }
 
+    float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
+      ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
+
+      partialTicks = clientDist.getMinecraft().getRenderPartialTicks();
       if (entity instanceof ClientPlayerEntity) {
-        ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager()
-            .joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
+        clientDist.getCameraManager().joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
       }
 
       this.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
@@ -381,7 +384,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       final long randomSeed = entity.getEntityWorld().getGameTime() + i;
       random.setSeed(randomSeed);
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, 100, 1.0F, this.getAccuracy(living, itemStack), random)
+          .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
           .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {

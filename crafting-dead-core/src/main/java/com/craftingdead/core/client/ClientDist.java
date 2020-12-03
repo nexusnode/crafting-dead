@@ -36,7 +36,6 @@ import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
 import com.craftingdead.core.client.gui.screen.inventory.ModInventoryScreen;
-import com.craftingdead.core.client.model.GunModel;
 import com.craftingdead.core.client.model.PerspectiveAwareModel;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
@@ -237,6 +236,10 @@ public class ClientDist implements IModDist {
     return this.itemRendererManager;
   }
 
+  public Minecraft getMinecraft() {
+    return this.minecraft;
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================
@@ -273,8 +276,6 @@ public class ClientDist implements IModDist {
 
     StartupMessageManager.addModMessage("Registering model loaders");
 
-    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "gun"),
-        GunModel.Loader.INSTANCE);
     ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
         PerspectiveAwareModel.Loader.INSTANCE);
 

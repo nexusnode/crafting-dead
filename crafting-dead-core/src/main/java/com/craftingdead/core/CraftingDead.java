@@ -31,7 +31,7 @@ import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.commands.CommandManager;
+import com.craftingdead.core.command.Commands;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
@@ -101,12 +101,12 @@ public class CraftingDead {
   public static final ForgeConfigSpec commonConfigSpec;
 
   static {
-    VERSION =
-        JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
-    assert VERSION != null;
-    DISPLAY_NAME =
-        JarVersionLookupHandler.getImplementationTitle(CraftingDead.class).orElse("[display_name]");
-    assert DISPLAY_NAME != null;
+    VERSION = JarVersionLookupHandler
+        .getImplementationVersion(CraftingDead.class)
+        .orElse("[version]");
+    DISPLAY_NAME = JarVersionLookupHandler
+        .getImplementationTitle(CraftingDead.class)
+        .orElse("[display_name]");
 
     final Pair<CommonConfig, ForgeConfigSpec> commonConfigPair =
         new ForgeConfigSpec.Builder().configure(CommonConfig::new);
@@ -205,7 +205,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleServerStart(FMLServerStartingEvent event) {
-    CommandManager.register(event.getCommandDispatcher());
+    Commands.register(event.getCommandDispatcher());
   }
 
   @SubscribeEvent
