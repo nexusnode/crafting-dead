@@ -15,16 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.craftingdead.immerse.game;
+package com.craftingdead.immerse.server;
 
-import com.craftingdead.core.capability.living.IPlayer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
+import net.minecraftforge.common.ForgeConfigSpec;
 
-public interface IGameClient<T extends ITeam> extends IGame<T> {
+public class ServerConfig {
 
-  default void load() {}
-  
-  void renderOverlay(Minecraft minecraft, IPlayer<? extends AbstractClientPlayerEntity> player,
-      int width, int height, float partialTicks);
+  public final ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotation;
+
+  public ServerConfig(ForgeConfigSpec.Builder builder) {
+    builder.push("server");
+    {
+      this.gameRotation = builder.translation("options.craftingdeadimmerse.server.game_rotation")
+          .defineList("game_rotation", ImmutableList.of("default"), gameName -> true);
+    }
+    builder.pop();
+  }
 }

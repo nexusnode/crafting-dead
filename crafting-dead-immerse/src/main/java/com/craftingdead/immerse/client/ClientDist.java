@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
-import com.craftingdead.immerse.client.gui.screen.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
@@ -122,20 +121,20 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleClientSetup(FMLClientSetupEvent event) {
     // GLFW code needs to run on main thread
-    minecraft.enqueue(() -> {
+    this.minecraft.enqueue(() -> {
       StartupMessageManager.addModMessage("Applying branding");
       try {
-        InputStream smallIcon = minecraft
+        InputStream smallIcon = this.minecraft
             .getResourceManager()
             .getResource(
                 new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icons/icon_16x16.png"))
             .getInputStream();
-        InputStream mediumIcon = minecraft
+        InputStream mediumIcon = this.minecraft
             .getResourceManager()
             .getResource(
                 new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icons/icon_32x32.png"))
             .getInputStream();
-        minecraft.getMainWindow().setWindowIcon(smallIcon, mediumIcon);
+        this.minecraft.getMainWindow().setWindowIcon(smallIcon, mediumIcon);
       } catch (IOException e) {
         logger.error("Couldn't set icon", e);
       }
@@ -159,7 +158,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
         IPlayer.getOptional(this.minecraft.player).orElse(null);
     switch (event.getType()) {
       case ALL:
-        if (player != null) {
+        if (player != null && this.gameClient != null) {
           this.gameClient.renderOverlay(this.minecraft, player,
               event.getWindow().getScaledWidth(),
               event.getWindow().getScaledHeight(), event.getPartialTicks());
@@ -199,16 +198,15 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     if (event.getGui() instanceof MainMenuScreen) {
-      event.setGui(new StartScreen());
+      // event.setGui(new StartScreen());
     }
   }
 
   @SubscribeEvent
   public void handleDrawScreenPre(DrawScreenEvent.Pre event) {
-    event
-        .setCanceled(this.transitionManager
-            .checkDrawTransition(event.getMouseX(), event.getMouseY(),
-                event.getRenderPartialTicks(), event.getGui()));
+    event.setCanceled(
+        this.transitionManager.checkDrawTransition(event.getMouseX(), event.getMouseY(),
+            event.getRenderPartialTicks(), event.getGui()));
   }
 
   @SubscribeEvent
@@ -216,6 +214,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
+        this.gameClient.tick();
         break;
       default:
         break;

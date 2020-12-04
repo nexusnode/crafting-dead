@@ -17,9 +17,10 @@
  */
 package com.craftingdead.immerse.game;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.server.LogicalServer;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.DistExecutor.SafeCallable;
@@ -27,24 +28,31 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GameType extends ForgeRegistryEntry<GameType> {
 
-  private final Function<LogicalServer, IGameServer<?>> gameServerFactory;
+  private final IGameServerFactory gameServerFactory;
   private final Supplier<SafeCallable<IGameClient<?>>> gameClientFactory;
 
-  public GameType(Function<LogicalServer, IGameServer<?>> gameServerFactory,
+  public GameType(IGameServerFactory gameServerFactory,
       Supplier<SafeCallable<IGameClient<?>>> gameClientFactory) {
     this.gameServerFactory = gameServerFactory;
     this.gameClientFactory = gameClientFactory;
   }
 
-  public IGameServer<?> createGameServer(LogicalServer logicalServer) {
-    return this.gameServerFactory.apply(logicalServer);
+  public IGameServer<?> createGameServer(LogicalServer logicalServer,
+      JsonDeserializationContext deserializationContext, JsonObject json) {
+    return this.gameServerFactory.create(logicalServer, deserializationContext, json);
   }
 
-  public IGameClient<?> createGameClient() throws Exception {
+  public IGameClient<?> createGameClient() {
     IGameClient<?> gameClient = DistExecutor.safeCallWhenOn(Dist.CLIENT, this.gameClientFactory);
     if (gameClient == null) {
       throw new IllegalStateException("Attempting to create game client on wrong dist");
     }
     return gameClient;
+  }
+
+  @FunctionalInterface
+  public static interface IGameServerFactory {
+    IGameServer<?> create(LogicalServer logicalServer,
+        JsonDeserializationContext deserializationContext, JsonObject json);
   }
 }

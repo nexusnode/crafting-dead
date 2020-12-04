@@ -30,7 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
 
   public SurvivalGame() {
-    super(GameTypes.SURVIVAL, ImmutableSet.of(new SurvivorsTeam()));
+    super(GameTypes.SURVIVAL, ImmutableSet.of(new SurvivorsTeam()), "Survival");
   }
 
   @Override

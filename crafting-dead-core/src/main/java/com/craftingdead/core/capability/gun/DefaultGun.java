@@ -378,8 +378,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
 
       if (!entity.isSilent()) {
-        entity.getEntityWorld().playSound(minecraft.player, entity.getPosX(),
-            entity.getPosY(), entity.getPosZ(), shootSound, entity.getSoundCategory(), 0.25F, 1.0F);
+        entity.getEntityWorld().playSound(
+            clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
+            entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
+            entity.getSoundCategory(), 0.25F, 1.0F);
       }
     }
 

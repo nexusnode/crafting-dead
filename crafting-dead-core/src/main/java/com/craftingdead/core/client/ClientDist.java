@@ -236,8 +236,20 @@ public class ClientDist implements IModDist {
     return this.itemRendererManager;
   }
 
+  /**
+   * Get the {@link Minecraft} instance. If accessing {@link Minecraft} from a common class
+   * (contains both client and server code) don't access fields directly from {@link Minecraft} as
+   * it will cause class loading problems. To safely access {@link ClientPlayerEntity} in a
+   * multi-sided environment, use {@link #getPlayer()}.
+   * 
+   * @return {@link Minecraft}
+   */
   public Minecraft getMinecraft() {
     return this.minecraft;
+  }
+
+  public Optional<IPlayer<ClientPlayerEntity>> getPlayer() {
+    return IPlayer.getOptional(this.minecraft.player);
   }
 
   // ================================================================================
@@ -539,8 +551,7 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    final IPlayer<ClientPlayerEntity> player =
-        IPlayer.getOptional(this.minecraft.player).orElse(null);
+    final IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
     switch (event.getType()) {
       case ALL:
         if (player != null) {

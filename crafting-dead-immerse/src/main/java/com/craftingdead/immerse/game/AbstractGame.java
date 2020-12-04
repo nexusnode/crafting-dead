@@ -17,16 +17,20 @@
  */
 package com.craftingdead.immerse.game;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.network.util.GenericDataManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 
 public abstract class AbstractGame<T extends ITeam> implements IGame<T> {
@@ -34,14 +38,40 @@ public abstract class AbstractGame<T extends ITeam> implements IGame<T> {
   private final Supplier<GameType> gameType;
   protected final Map<ResourceLocation, T> teams;
   private final Map<Player<?>, T> playerTeams;
+  protected final GenericDataManager dataManager;
+
+  private final DataParameter<String> displayName;
 
   public AbstractGame(Supplier<GameType> gameType, Set<T> teams) {
+    this(gameType, teams, "Untitled");
+  }
+
+  public AbstractGame(Supplier<GameType> gameType, Set<T> teams, String displayName) {
     this.gameType = gameType;
     this.teams = Object2ObjectMaps.unmodifiable(
         teams.stream().collect(Collectors.toMap(ITeam::getId, Function.identity(), (u, v) -> {
           throw new IllegalStateException(String.format("Duplicate key %s", u));
         }, Object2ObjectArrayMap::new)));
     this.playerTeams = new Object2ObjectOpenHashMap<>();
+    this.dataManager = new GenericDataManager();
+
+    this.displayName = this.dataManager.register(DataSerializers.STRING, displayName);
+  }
+
+  @Override
+  public void write(PacketBuffer packetBuffer, boolean writeAll) throws IOException {
+    GenericDataManager.writeEntries(
+        writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), packetBuffer);
+  }
+
+  @Override
+  public void read(PacketBuffer packetBuffer) throws IOException {
+    this.dataManager.setEntryValues(GenericDataManager.readEntries(packetBuffer));
+  }
+
+  @Override
+  public boolean isDirty() {
+    return this.dataManager.isDirty();
   }
 
   @Override
@@ -55,24 +85,12 @@ public abstract class AbstractGame<T extends ITeam> implements IGame<T> {
   }
 
   @Override
+  public String getDisplayName() {
+    return this.dataManager.get(this.displayName);
+  }
+
+  @Override
   public GameType getGameType() {
     return this.gameType.get();
-  }
-
-  @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
-    this.teams.forEach((k, v) -> nbt.put(k.toString(), v.serializeNBT()));
-    return nbt;
-  }
-
-  @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    this.teams.forEach((k, v) -> {
-      CompoundNBT teamNbt = nbt.getCompound(k.toString());
-      if (!teamNbt.isEmpty()) {
-        v.deserializeNBT(teamNbt);
-      }
-    });
   }
 }

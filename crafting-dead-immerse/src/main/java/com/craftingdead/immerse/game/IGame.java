@@ -17,24 +17,35 @@
  */
 package com.craftingdead.immerse.game;
 
+import java.io.IOException;
+import java.util.Optional;
 import com.craftingdead.core.capability.living.Player;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.craftingdead.immerse.world.map.IMap;
+import net.minecraft.network.PacketBuffer;
 
-public interface IGame<T extends ITeam> extends INBTSerializable<CompoundNBT> {
+public interface IGame<T extends ITeam> {
 
   default void load() {}
 
   default void unload() {}
 
+  default void tick() {}
+
+  void write(PacketBuffer packetBuffer, boolean writeAll) throws IOException;
+
+  void read(PacketBuffer packetBuffer) throws IOException;
+
+  boolean isDirty();
+
   T getTeam(Player<?> player);
 
   void setTeam(Player<?> player, T team);
 
-  default DimensionType getSpawnDimension() {
-    return DimensionType.OVERWORLD;
+  default Optional<IMap> getMap() {
+    return Optional.empty();
   }
+
+  String getDisplayName();
 
   GameType getGameType();
 }

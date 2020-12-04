@@ -17,12 +17,39 @@
  */
 package com.craftingdead.immerse.game;
 
-import com.craftingdead.core.capability.living.Player;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.NetworkManager;
+import java.lang.reflect.Type;
+import com.craftingdead.immerse.server.LogicalServer;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.registries.RegistryManager;
 
-public interface IGameServer<T extends ITeam> extends IGame<T> {
+public interface IGameServer<T extends ITeam> extends IGame<T>, INBTSerializable<CompoundNBT> {
 
-  void initializeConnectionToPlayer(NetworkManager networkManager,
-      Player<ServerPlayerEntity> player);
+  public static class Deserializer implements JsonDeserializer<IGameServer<?>> {
+
+    private final LogicalServer logicalServer;
+
+    public Deserializer(LogicalServer logicalServer) {
+      this.logicalServer = logicalServer;
+    }
+
+    @Override
+    public IGameServer<?> deserialize(JsonElement json, Type typeOfT,
+        JsonDeserializationContext context) throws JsonParseException {
+      JsonObject jsonObject = json.getAsJsonObject();
+      ResourceLocation gameTypeId = new ResourceLocation(jsonObject.get("gameType").getAsString());
+      GameType gameType = RegistryManager.ACTIVE.getRegistry(GameType.class).getValue(gameTypeId);
+      if (gameType == null) {
+        throw new IllegalStateException(
+            "Game type with id '" + gameTypeId.toString() + "' does not exist.");
+      }
+      return gameType.createGameServer(this.logicalServer, context, jsonObject);
+    }
+  }
 }

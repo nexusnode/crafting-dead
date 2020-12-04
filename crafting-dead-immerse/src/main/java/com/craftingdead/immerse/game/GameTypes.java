@@ -30,5 +30,6 @@ public class GameTypes {
       DeferredRegister.create((Class<GameType>) (Class<?>) GameType.class, CraftingDead.ID);
 
   public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("vanilla",
-      () -> new GameType(SurvivalServer::new, () -> SurvivalClient::new));
+      () -> new GameType((logicalServer, deserializationContext, json) -> new SurvivalServer(),
+          () -> SurvivalClient::new));
 }

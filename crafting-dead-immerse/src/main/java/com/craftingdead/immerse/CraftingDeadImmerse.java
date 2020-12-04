@@ -17,19 +17,32 @@
  */
 package com.craftingdead.immerse;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.server.LogicalServer;
+import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
+import com.craftingdead.immerse.world.ModDimensions;
+import com.craftingdead.immerse.world.map.MapFormats;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.registries.RegistryBuilder;
 
@@ -42,6 +55,9 @@ public class CraftingDeadImmerse {
 
   public static final String DISPLAY_NAME;
 
+  public static final ServerConfig serverConfig;
+  public static final ForgeConfigSpec serverConfigSpec;
+
   static {
     VERSION = JarVersionLookupHandler
         .getImplementationVersion(CraftingDeadImmerse.class)
@@ -49,6 +65,11 @@ public class CraftingDeadImmerse {
     DISPLAY_NAME = JarVersionLookupHandler
         .getImplementationTitle(CraftingDeadImmerse.class)
         .orElse("[display_name]");
+
+    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
+        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    serverConfigSpec = serverConfigPair.getRight();
+    serverConfig = serverConfigPair.getLeft();
   }
 
   /**
@@ -61,17 +82,38 @@ public class CraftingDeadImmerse {
    */
   private final IModDist modDist;
 
+  private final Path modDir;
+
   @Nullable
   private LogicalServer logicalServer;
 
   public CraftingDeadImmerse() {
     instance = this;
+
+    this.modDir = FMLPaths.CONFIGDIR.get().resolve(ID);
+    if (!Files.exists(this.modDir)) {
+      try {
+        Files.createDirectory(this.modDir);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
+
+    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
+
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
+
+    MinecraftForge.EVENT_BUS.register(this);
 
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
     GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
     GameTypes.GAME_TYPES.register(modEventBus);
+
+    MapFormats.MAP_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
+    MapFormats.MAP_FORMATS.register(modEventBus);
+
+    ModDimensions.MOD_DIMENSIONS.register(modEventBus);
   }
 
   @Nullable
@@ -83,6 +125,10 @@ public class CraftingDeadImmerse {
     return this.modDist;
   }
 
+  public Path getModDir() {
+    return this.modDir;
+  }
+
   public static CraftingDeadImmerse getInstance() {
     return instance;
   }
@@ -92,14 +138,19 @@ public class CraftingDeadImmerse {
   // ================================================================================
 
   @SubscribeEvent
-  public void handleServerAboutToStart(FMLServerStartingEvent event) {
+  public void handleServerAboutToStart(FMLServerAboutToStartEvent event) {
     this.logicalServer = this.modDist.createLogicalServer(event.getServer());
-    this.logicalServer.init();
+    this.logicalServer.startLoading();
     MinecraftForge.EVENT_BUS.register(this.logicalServer);
   }
 
   @SubscribeEvent
-  public void handleServerStopping(FMLServerStoppingEvent event) {
+  public void handleServerStarting(FMLServerStartingEvent event) {
+    this.logicalServer.finishLoading();
+  }
+
+  @SubscribeEvent
+  public void handleServerStopped(FMLServerStoppedEvent event) {
     MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
     this.logicalServer = null;
   }

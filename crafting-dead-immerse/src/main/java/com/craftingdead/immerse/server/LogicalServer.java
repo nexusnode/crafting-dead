@@ -17,33 +17,56 @@
  */
 package com.craftingdead.immerse.server;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.immerse.game.GameType;
-import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameServer;
+import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.ReportedException;
+import com.craftingdead.immerse.world.ModDimensions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class LogicalServer extends WorldSavedData {
 
+  private static final Logger logger = LogManager.getLogger();
+
+  private final Gson gson;
+
   private final MinecraftServer minecraftServer;
+
+  private static final String GAME_FOLDER_NAME = "game";
+
+  private final Path gamePath;
 
   private IGameServer<?> gameServer;
 
   public LogicalServer(MinecraftServer minecraftServer) {
     super(CraftingDead.ID);
     this.minecraftServer = minecraftServer;
+    this.gamePath = CraftingDeadImmerse.getInstance().getModDir().resolve(GAME_FOLDER_NAME);
+    this.gson = new GsonBuilder()
+        .registerTypeAdapter(IGameServer.class, new IGameServer.Deserializer(this))
+        .create();
   }
 
   public List<Pair<String, SetupGameMessage>> generateSetupGameMessage(boolean isLocal) {
@@ -51,14 +74,74 @@ public class LogicalServer extends WorldSavedData {
         new SetupGameMessage(this.gameServer.getGameType())));
   }
 
-  public void init() {
+  public void startLoading() {}
+
+  public void finishLoading() {
     this.minecraftServer.getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(() -> this,
         CraftingDead.ID);
-    // Default to survival
-    try {
-      this.gameServer = GameTypes.SURVIVAL.get().createGameServer(this);
-    } catch (Exception e) {
-      throw new ReportedException(CrashReport.makeCrashReport(e, "Exception loading game"));
+
+    // If there was no saved game in the world, load a new game
+    if (this.gameServer == null) {
+      this.loadNextGame();
+    }
+  }
+
+  private void loadNextGame() {
+    ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotation =
+        CraftingDeadImmerse.serverConfig.gameRotation;
+
+    if (gameRotation.get().isEmpty()) {
+      logger.info("Game rotation empty, defaulting to survival...");
+      this.loadGame(new SurvivalServer());
+      return;
+    }
+
+    final String nextGameName;
+    if (this.gameServer == null) {
+      nextGameName = gameRotation.get().get(0);
+    } else {
+      int nextGameIndex = gameRotation.get().indexOf(this.gameServer.getDisplayName()) + 1;
+      nextGameName =
+          gameRotation.get().get(nextGameIndex >= gameRotation.get().size() ? 0 : nextGameIndex);
+    }
+
+    if (!this.findAndLoadGame(nextGameName)) {
+      logger.info("Removing game '{}' from game rotation", gameRotation);
+      List<String> newGameRotation = new ArrayList<>(gameRotation.get());
+      newGameRotation.remove(nextGameName);
+      gameRotation.set(newGameRotation);
+      gameRotation.save();
+      this.loadNextGame();
+    }
+  }
+
+  private boolean findAndLoadGame(String gameName) {
+    File gameFile = new File(this.gamePath.toFile(), gameName + ".json");
+    if (!gameFile.exists()) {
+      logger.error("Game file with name '{}' does not exist");
+      return false;
+    }
+    try (FileReader fileReader = new FileReader(gameFile)) {
+      this.loadGame(this.gson.fromJson(fileReader, IGameServer.class));
+      return true;
+    } catch (IOException e) {
+      logger.error("Failed to load game file '{}'", e);
+      return false;
+    }
+  }
+
+  private void loadGame(IGameServer<?> gameServer) {
+    if (this.gameServer != null) {
+      logger.info("Unloading game '{}'", this.gameServer.getDisplayName());
+      this.gameServer.unload();
+    }
+    this.gameServer = gameServer;
+    logger.info("Loading game '{}'", this.gameServer.getDisplayName());
+    this.gameServer.load();
+
+    if (this.gameServer.getMap().isPresent()) {
+      DimensionManager.markForDeletion(DimensionManager.registerDimension(ModDimensions.MAP.getId(),
+          ModDimensions.MAP.get(), null, true));
     }
   }
 
@@ -72,19 +155,10 @@ public class LogicalServer extends WorldSavedData {
 
   @Override
   public void read(CompoundNBT nbt) {
-    if (nbt.contains("gameType", Constants.NBT.TAG_STRING)) {
-      GameType gameType = GameRegistry.findRegistry(GameType.class)
-          .getValue(new ResourceLocation(nbt.getString("gameType")));
-      if (gameType != null) {
-        try {
-          this.gameServer = gameType.createGameServer(this);
-        } catch (Exception e) {
-          CrashReport crashReport = CrashReport.makeCrashReport(e, "Exception loading game");
-          crashReport.makeCategory("Game").addDetail("Type", gameType.getRegistryName());
-          throw new ReportedException(crashReport);
-        }
-        this.gameServer.deserializeNBT(nbt.getCompound("game"));
-      }
+    String gameName = nbt.getString("gameName");
+    if (!gameName.isEmpty() && this.findAndLoadGame(gameName)) {
+      logger.info("Loading saved game ''", gameName);
+      this.gameServer.deserializeNBT(nbt.getCompound("game"));
     }
   }
 
@@ -93,5 +167,31 @@ public class LogicalServer extends WorldSavedData {
     nbt.putString("gameType", this.gameServer.getGameType().getRegistryName().toString());
     nbt.put("game", this.gameServer.serializeNBT());
     return nbt;
+  }
+
+  // ================================================================================
+  // Forge Events
+  // ================================================================================
+
+  @SubscribeEvent
+  public void handleEntityJoinWorldEvent(EntityJoinWorldEvent event) {
+    if (event.getEntity() instanceof ServerPlayerEntity
+        && event.getWorld().getDimension().getType() == DimensionType.OVERWORLD) {
+      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
+      playerEntity.teleport(
+          this.minecraftServer.getWorld(DimensionType.byName(ModDimensions.MAP.getId())),
+          0, 100, 0, playerEntity.rotationYaw, playerEntity.rotationPitch);
+    }
+  }
+
+  @SubscribeEvent
+  public void handleServerTick(TickEvent.ServerTickEvent event) {
+    switch (event.phase) {
+      case START:
+        this.gameServer.tick();
+        break;
+      default:
+        break;
+    }
   }
 }
