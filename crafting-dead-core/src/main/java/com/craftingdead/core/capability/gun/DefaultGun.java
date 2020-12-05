@@ -17,14 +17,13 @@
  */
 package com.craftingdead.core.capability.gun;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.Timer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import com.craftingdead.core.item.ModItems;
+import net.minecraft.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
@@ -96,11 +95,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -375,6 +369,20 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         // Tries to get the silenced shoot sound, if it does not exist the default shoot sound is
         // used instead.
         shootSound = this.gunItem.getSilencedShootSound().orElse(shootSound);
+      }
+
+      if(this instanceof AimableGun && ((AimableGun) this).isAiming(entity, new ItemStack(gunItem))
+              && (gunItem.equals(ModItems.AWP.get()) || gunItem.equals(ModItems.M107.get())) && this.attachments.stream()
+              .anyMatch(attachmentItem -> attachmentItem.equals(ModItems.HP_SCOPE.get()) || attachmentItem.equals(ModItems.LP_SCOPE.get()))) {
+        toggleRightMouseAction(living, false);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+          public void run() {
+            if(entity instanceof PlayerEntity && ((PlayerEntity)entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())){
+              toggleRightMouseAction(living, false);
+            }
+          }
+        }, gunItem.getFireRateMs());
       }
 
       if (!entity.isSilent()) {
