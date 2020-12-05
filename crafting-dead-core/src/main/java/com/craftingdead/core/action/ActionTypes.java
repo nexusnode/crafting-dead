@@ -45,62 +45,52 @@ public class ActionTypes {
   public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
       DeferredRegister.create((Class<ActionType<?>>) (Class<?>) ActionType.class, CraftingDead.ID);
 
-  public static final RegistryObject<ActionType<?>> RELOAD = ACTION_TYPES
-      .register("reload",
-          () -> new ActionType<>((actionType, performer, target) -> new ReloadAction(performer),
-              true));
+  public static final RegistryObject<ActionType<?>> RELOAD = ACTION_TYPES.register("reload",
+      () -> new ActionType<>((actionType, performer, target) -> new ReloadAction(performer), true));
 
   public static final RegistryObject<ActionType<?>> REMOVE_MAGAZINE =
-      ACTION_TYPES.register("remove_magazine",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> new RemoveMagazineAction(performer),
-              true));
+      ACTION_TYPES.register("remove_magazine", () -> new ActionType<>(
+          (actionType, performer, target) -> new RemoveMagazineAction(performer), true));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_CURE_SYRINGE = ACTION_TYPES
-      .register("use_cure_syringe",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.CURE_SYRINGE.get())
-                  .setTotalDurationTicks(16)
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                      .setReturnItem(ModItems.SYRINGE)))
-                  .build(),
-              false));
+  public static final RegistryObject<ActionType<UseItemAction>> USE_CURE_SYRINGE =
+      ACTION_TYPES.register("use_cure_syringe", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.CURE_SYRINGE.get())
+              .setTotalDurationTicks(16)
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+                  .setReturnItem(ModItems.SYRINGE)))
+              .build(),
+          false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_CLEAN_RAG = ACTION_TYPES
-      .register("use_clean_rag",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.CLEAN_RAG.get())
-                  .setTotalDurationTicks(16)
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
-                          .andThen(t -> (t == null
-                              || !t.getEntity().isPotionActive(ModEffects.BLEEDING.get())) ? null
-                                  : t))
-                      .setReturnItem(ModItems.BLOODY_RAG)))
-                  .build(),
-              false));
+  public static final RegistryObject<ActionType<UseItemAction>> USE_CLEAN_RAG =
+      ACTION_TYPES.register("use_clean_rag", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.CLEAN_RAG.get())
+              .setTotalDurationTicks(16)
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS.andThen(
+                      t -> (t == null || !t.getEntity().isPotionActive(ModEffects.BLEEDING.get()))
+                          ? null
+                          : t))
+                  .setReturnItem(ModItems.BLOODY_RAG)))
+              .build(),
+          false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_SPLINT = ACTION_TYPES
-      .register("use_splint",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.SPLINT.get())
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
-                          .andThen(t -> (t == null
-                              || !t.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())) ? null
-                                  : t))))
-                  .build(),
-              false));
+  public static final RegistryObject<ActionType<UseItemAction>> USE_SPLINT =
+      ACTION_TYPES.register("use_splint", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.SPLINT.get())
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS.andThen(
+                      t -> (t == null || !t.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get()))
+                          ? null
+                          : t))))
+              .build(),
+          false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_SYRINGE = ACTION_TYPES
-      .register("use_syringe", () -> new ActionType<>(
+  public static final RegistryObject<ActionType<UseItemAction>> USE_SYRINGE =
+      ACTION_TYPES.register("use_syringe", () -> new ActionType<>(
           (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
               .setHeldItemPredicate(item -> item == ModItems.SYRINGE.get())
               .setTotalDurationTicks(16)
@@ -108,9 +98,7 @@ public class ActionTypes {
                   .setTargetSelector(
                       EntityActionEntry.TargetSelector.OTHERS_ONLY.ofType(ZombieEntity.class))
                   .setCustomAction(Pair.of(
-                      t -> t.getEntity().attackEntityFrom(ModDamageSource.BLEEDING,
-                          2.0F),
-                      0.25F))
+                      t -> t.getEntity().attackEntityFrom(ModDamageSource.BLEEDING, 2.0F), 0.25F))
                   .setReturnItem(ModItems.RBI_SYRINGE)))
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector((p, t) -> {
@@ -125,8 +113,8 @@ public class ActionTypes {
                       } else if (p.getEntity() instanceof PlayerEntity) {
                         ((PlayerEntity) p.getEntity()).sendStatusMessage(
                             new TranslationTextComponent("message.low_health",
-                                targetEntity.getDisplayName())
-                                    .setStyle(new Style().setColor(TextFormatting.RED)),
+                                targetEntity.getDisplayName()).setStyle(
+                                    Style.EMPTY.createStyleFromFormattings(TextFormatting.RED)),
                             true);
                       }
                     }
@@ -138,77 +126,69 @@ public class ActionTypes {
               .build(),
           false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_RBI_SYRINGE = ACTION_TYPES
-      .register("use_rbi_syringe",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.RBI_SYRINGE.get())
-                  .setTotalDurationTicks(16)
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                      .addEffect(
-                          Pair.of(new EffectInstance(ModEffects.INFECTION.get(), 9999999),
-                              1.0F))
-                      .setReturnItem(ModItems.SYRINGE)))
-                  .build(),
-              false));
+  public static final RegistryObject<ActionType<UseItemAction>> USE_RBI_SYRINGE =
+      ACTION_TYPES.register("use_rbi_syringe", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.RBI_SYRINGE.get())
+              .setTotalDurationTicks(16)
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+                  .addEffect(Pair.of(new EffectInstance(ModEffects.INFECTION.get(), 9999999), 1.0F))
+                  .setReturnItem(ModItems.SYRINGE)))
+              .build(),
+          false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_FIRST_AID_KIT = ACTION_TYPES
-      .register("use_first_aid_kit",
-          () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.FIRST_AID_KIT.get())
-                  .setFreezeMovement(true)
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                      .addEffect(
-                          Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F))))
-                  .build(),
-              false));
+  public static final RegistryObject<ActionType<UseItemAction>> USE_FIRST_AID_KIT =
+      ACTION_TYPES.register("use_first_aid_kit", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction
+              .builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.FIRST_AID_KIT.get())
+              .setFreezeMovement(true)
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F))))
+              .build(),
+          false));
 
   public static final RegistryObject<ActionType<UseItemAction>> USE_ADRENALINE_SYRINGE =
-      ACTION_TYPES
-          .register("use_adrenaline_syringe", () -> new ActionType<>(
-              (actionType, performer, target) -> UseItemAction
-                  .builder(actionType, performer, target)
-                  .setHeldItemPredicate(item -> item == ModItems.ADRENALINE_SYRINGE.get())
-                  .setTotalDurationTicks(16)
-                  .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                      .setReturnItem(ModItems.SYRINGE)
-                      .addEffect(
-                          Pair.of(new EffectInstance(ModEffects.ADRENALINE.get(), (20 * 20), 1),
-                              1.0F))))
-                  .build(),
-              false));
+      ACTION_TYPES.register("use_adrenaline_syringe", () -> new ActionType<>(
+          (actionType, performer, target) -> UseItemAction
+              .builder(actionType, performer, target)
+              .setHeldItemPredicate(item -> item == ModItems.ADRENALINE_SYRINGE.get())
+              .setTotalDurationTicks(16)
+              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setReturnItem(ModItems.SYRINGE)
+                  .addEffect(
+                      Pair.of(new EffectInstance(ModEffects.ADRENALINE.get(), (20 * 20), 1),
+                          1.0F))))
+              .build(),
+          false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_BLOOD_SYRINGE = ACTION_TYPES
-      .register("use_blood_syringe", () -> new ActionType<>(
+  public static final RegistryObject<ActionType<UseItemAction>> USE_BLOOD_SYRINGE =
+      ACTION_TYPES.register("use_blood_syringe", () -> new ActionType<>(
           (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
               .setHeldItemPredicate(item -> item == ModItems.BLOOD_SYRINGE.get())
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setReturnItem(ModItems.SYRINGE)
-                  .addEffect(
-                      Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
+                  .setReturnItemInCreative(false)
+                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
               .build(),
           false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_BANDAGE = ACTION_TYPES
-      .register("use_bandage", () -> new ActionType<>(
+  public static final RegistryObject<ActionType<UseItemAction>> USE_BANDAGE =
+      ACTION_TYPES.register("use_bandage", () -> new ActionType<>(
           (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
               .setHeldItemPredicate(item -> item == ModItems.BANDAGE.get())
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .addEffect(
-                      Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
+                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
               .build(),
           false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> WASH_RAG = ACTION_TYPES
-      .register("wash_rag", () -> new ActionType<>(
+  public static final RegistryObject<ActionType<UseItemAction>> WASH_RAG =
+      ACTION_TYPES.register("wash_rag", () -> new ActionType<>(
           (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
               .setHeldItemPredicate(
                   item -> item == ModItems.DIRTY_RAG.get() || item == ModItems.BLOODY_RAG.get())

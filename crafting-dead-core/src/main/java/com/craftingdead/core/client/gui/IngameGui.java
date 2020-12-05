@@ -31,12 +31,14 @@ import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.item.MagazineItem;
 import com.craftingdead.core.potion.ModEffects;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.settings.PointOfView;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
@@ -53,7 +55,6 @@ public class IngameGui {
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
   private static final ResourceLocation BLOOD_2 =
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
-
 
   private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
 
@@ -94,14 +95,14 @@ public class IngameGui {
     this.hitMarker = hitMarker;
   }
 
+  @SuppressWarnings("deprecation")
   private void renderGunFlash(ClientPlayerEntity playerEntity, IGun gun, int width, int height,
       float partialTicks) {
     final boolean aiming =
         gun instanceof IScope
             && ((IScope) gun).isAiming(playerEntity, playerEntity.getHeldItemMainhand());
-    final boolean flash =
-        this.minecraft.gameSettings.thirdPersonView == 0 && gun.getShotCount() != this.lastShotCount
-            && !aiming && gun.getShotCount() > 0;
+    final boolean flash = this.minecraft.gameSettings.getPointOfView() == PointOfView.FIRST_PERSON
+        && gun.getShotCount() != this.lastShotCount && !aiming && gun.getShotCount() > 0;
     this.lastShotCount = gun.getShotCount();
 
     if (flash) {
@@ -149,15 +150,19 @@ public class IngameGui {
         });
   }
 
-  public void renderOverlay(IPlayer<ClientPlayerEntity> player, int width, int height,
-      float partialTicks) {
+  public void renderOverlay(IPlayer<ClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      int height, float partialTicks) {
+
+    // TODO Fixes Minecraft bug when using post-processing shaders.
+    RenderSystem.enableTexture();
+
     if (this.hitMarker != null) {
       if (this.hitMarker.render(width, height, partialTicks)) {
         this.hitMarker = null;
       }
     }
 
-    this.renderKillFeed(partialTicks);
+    this.renderKillFeed(matrixStack, partialTicks);
 
     final ClientPlayerEntity playerEntity = player.getEntity();
     final ItemStack heldStack = playerEntity.getHeldItemMainhand();
@@ -183,8 +188,8 @@ public class IngameGui {
     }
 
     player.getActionProgress()
-        .ifPresent(observer -> renderActionProgress(this.minecraft.fontRenderer, width, height,
-            observer.getMessage(), observer.getSubMessage(),
+        .ifPresent(observer -> renderActionProgress(matrixStack, this.minecraft.fontRenderer, width,
+            height, observer.getMessage(), observer.getSubMessage(),
             observer.getProgress(partialTicks)));
 
     // Only draw in survival
@@ -205,12 +210,12 @@ public class IngameGui {
 
     // Needs to render after blood or else it causes Z level issues
     if (gun != null) {
-      renderAmmo(this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
+      renderAmmo(matrixStack, this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
           width, height, gun.getMagazineSize(), gun.getMagazineStack());
     }
   }
 
-  private void renderKillFeed(float partialTicks) {
+  private void renderKillFeed(MatrixStack matrixStack, float partialTicks) {
     if (this.killFeedVisibleTimeMs == 0L) {
       this.killFeedVisibleTimeMs = Util.milliTime();
       this.killFeedAnimationTimeMs = 0L;
@@ -239,12 +244,13 @@ public class IngameGui {
     for (int i = 0; i < this.killFeedMessages.size(); i++) {
       final KillFeedEntry killFeedMessage = this.killFeedMessages.get(i);
       float killFeedMessageY = 5.0F + ((i - (1.0F * animationPct)) * 12.0F);
-      killFeedMessage.render(killFeedMessageX, killFeedMessageY,
+      killFeedMessage.render(matrixStack, killFeedMessageX, killFeedMessageY,
           i == 0 ? 1.0F - animationPct : 1.0F);
     }
   }
 
-  private static void renderAmmo(ItemRenderer itemRenderer, FontRenderer fontRenderer, int width,
+  private static void renderAmmo(MatrixStack matrixStack, ItemRenderer itemRenderer,
+      FontRenderer fontRenderer, int width,
       int height, int ammo, ItemStack magazineStack) {
     if (magazineStack.getItem() instanceof MagazineItem) {
       MagazineItem magazine = (MagazineItem) magazineStack.getItem();
@@ -255,29 +261,30 @@ public class IngameGui {
         x -= 25;
       }
       int y = height - 10 - fontRenderer.FONT_HEIGHT;
-      fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
+      fontRenderer.drawStringWithShadow(matrixStack, text, x, y, 0xFFFFFF);
       itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 16, y - 5);
     }
   }
 
-  private static void renderActionProgress(FontRenderer fontRenderer, int width, int height,
+  private static void renderActionProgress(MatrixStack matrixStack, FontRenderer fontRenderer,
+      int width, int height,
       ITextComponent message, @Nullable ITextComponent subMessage, float percent) {
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;
     final float x = width / 2 - barWidth / 2;
     final float y = height / 2;
-    fontRenderer.drawStringWithShadow(message.getFormattedText(), x,
+    fontRenderer.drawStringWithShadow(matrixStack, message.getString(), x,
         y - barHeight - ((fontRenderer.FONT_HEIGHT / 2) + 0.5F), 0xFFFFFF);
-    RenderUtil
-        .drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour, barColour);
+    RenderUtil.drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour,
+        barColour);
     if (subMessage != null) {
-      fontRenderer.drawStringWithShadow(subMessage.getFormattedText(), x,
-          y + barHeight + ((fontRenderer.FONT_HEIGHT / 2) + 0.5F),
-          0xFFFFFF);
+      fontRenderer.drawStringWithShadow(matrixStack, subMessage.getString(), x,
+          y + barHeight + ((fontRenderer.FONT_HEIGHT / 2) + 0.5F), 0xFFFFFF);
     }
   }
 
+  @SuppressWarnings("deprecation")
   private static void renderBlood(int width, int height, float healthPercentage) {
     ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
 
@@ -315,6 +322,7 @@ public class IngameGui {
     RenderSystem.disableBlend();
   }
 
+  @SuppressWarnings("deprecation")
   public void renderCrosshairs(float accuracy, float partialTicks, int width, int height) {
     final double imageWidth = 16.0D;
     final double imageHeight = 16.0D;

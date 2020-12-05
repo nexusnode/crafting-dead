@@ -116,23 +116,18 @@ public class MagazineItem extends Item {
           stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::getSize).orElse(0);
 
       ITextComponent amountText =
-          Text.of(currentAmount + "/" + this.getSize()).applyTextStyle(TextFormatting.RED);
+          Text.of(currentAmount + "/" + this.getSize()).mergeStyle(TextFormatting.RED);
 
-      lines
-          .add(Text
-              .translate("item_lore.magazine_item.amount")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(amountText));
+      lines.add(Text.translate("item_lore.magazine_item.amount")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(amountText));
     }
 
     if (this.armorPenetration > 0) {
-      lines
-          .add(Text
-              .translate("item_lore.magazine_item.armor_penetration")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(Text
-                  .of(String.format("%.0f%%", this.armorPenetration))
-                  .applyTextStyle(TextFormatting.RED)));
+      lines.add(Text.translate("item_lore.magazine_item.armor_penetration")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(Text.of(String.format("%.0f%%", this.armorPenetration))
+              .mergeStyle(TextFormatting.RED)));
     }
   }
 

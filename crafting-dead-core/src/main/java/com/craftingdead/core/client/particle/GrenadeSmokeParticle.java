@@ -23,8 +23,8 @@ import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.SpriteTexturedParticle;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 
 /**
  * Lightweight smoke particle for grenades.
@@ -33,7 +33,7 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
   private final IAnimatedSprite animatedSprite;
 
   private GrenadeSmokeParticle(GrenadeSmokeParticleData data, IAnimatedSprite animatedSprite,
-      World world, double x, double y, double z) {
+      ClientWorld world, double x, double y, double z) {
     super(world, x, y, z);
     this.animatedSprite = animatedSprite;
     float colorScale = 1.0F - (float) (Math.random() * (double) 0.3F);
@@ -81,7 +81,7 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public Particle makeParticle(GrenadeSmokeParticleData data, World world, double xPos,
+    public Particle makeParticle(GrenadeSmokeParticleData data, ClientWorld world, double xPos,
         double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
       return new GrenadeSmokeParticle(data, this.spriteSet, world, xPos, yPos, zPos);
     }

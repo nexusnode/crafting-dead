@@ -21,12 +21,12 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.living.ILiving;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.common.ForgeMod;
 
 public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Properties> {
 
@@ -43,8 +43,8 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
   @Override
   public boolean canPerform(ILiving<?, ?> performer, @Nullable ILiving<?, ?> target,
       ItemStack heldStack) {
-    IAttributeInstance reachDistanceAttribute =
-        performer.getEntity().getAttribute(PlayerEntity.REACH_DISTANCE);
+    ModifiableAttributeInstance reachDistanceAttribute =
+        performer.getEntity().getAttribute(ForgeMod.REACH_DISTANCE.get());
     RayTraceResult result = performer.getEntity().pick(
         reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue(), 1.0F, true);
     if (result instanceof BlockRayTraceResult) {

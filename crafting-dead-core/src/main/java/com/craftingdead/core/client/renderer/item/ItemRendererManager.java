@@ -38,7 +38,6 @@ public class ItemRendererManager {
       new Object2ObjectOpenHashMap<>();
 
   public void gatherItemRenderers() {
-    StartupMessageManager.addModMessage("Gathering item renderers");
     logger.debug("Gathering item renderers");
     this.itemRenderers.clear();
     for (Item item : ForgeRegistries.ITEMS.getValues()) {

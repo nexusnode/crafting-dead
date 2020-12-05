@@ -46,60 +46,69 @@ public class ModInventoryContainer extends Container {
         .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
     this.craftingInventory.addListener(this::onCraftMatrixChanged);
 
-    final int deltaY = 20;
+    final int slotSize = 18;
 
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 9; ++j) {
-        this.addSlot(new Slot(playerInventory, j + (i + 1) * 9, 8 + j * 18, 84 + i * 18 + deltaY));
+    for (int y = 0; y < 3; ++y) {
+      for (int x = 0; x < 9; ++x) {
+        this.addSlot(
+            new Slot(playerInventory, x + (y + 1) * 9, 8 + x * slotSize, 84 + y * slotSize));
       }
     }
 
-    for (int i = 0; i < 9; ++i) {
-      this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142 + deltaY));
+    for (int x = 0; x < 9; ++x) {
+      this.addSlot(new Slot(playerInventory, x, 8 + x * slotSize, 142));
     }
 
-    this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.MELEE.getIndex(),
-            26, 9, (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
-    this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.GUN.getIndex(),
-            44, 9, (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
-    this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler,
-            InventorySlotType.CLOTHING.getIndex(), 65, 9,
-            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.CLOTHING).isPresent()));
-    this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.HAT.getIndex(),
-            65, 30, (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
-    this
-        .addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.VEST.getIndex(),
-            65, 48,
-            (slot, itemStack) -> itemStack
-                .getCapability(ModCapabilities.STORAGE)
-                .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
-                .orElse(false)));
+    int equipmentColumnX = 8 + (slotSize * 3);
+    int equipmentColumnY = 8;
 
-    this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, 48, this.craftingInventory));
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.GUN.getIndex(),
+        equipmentColumnX, equipmentColumnY,
+        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.GUN).isPresent()));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.MELEE.getIndex(),
+        equipmentColumnX, equipmentColumnY += slotSize,
+        (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.HAT.getIndex(),
+        equipmentColumnX, equipmentColumnY += slotSize,
+        (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler,
+        InventorySlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
+        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.CLOTHING).isPresent()));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.VEST.getIndex(),
+        equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
+            .getCapability(ModCapabilities.STORAGE)
+            .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
+            .orElse(false)));
+
+    final int gunCraftSlotGap = 3;
+    final int gunCraftY = 8;
+
+    this.addSlot(
+        new GunCraftSlot(this.outputInventory, 0, 125, gunCraftY + slotSize + 3,
+            this.craftingInventory));
 
     final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
         (slot, itemStack) -> itemStack.getItem() instanceof AttachmentItem
             && ((AttachmentItem) itemStack.getItem()).getInventorySlot().getIndex() == slot
                 .getSlotIndex();
-    this
-        .addSlot(new PredicateSlot(this.craftingInventory,
-            CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104, 48, attachmentPredicate));
-    this
-        .addSlot(new PredicateSlot(this.craftingInventory,
-            CraftingInventorySlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125, 69,
-            attachmentPredicate));
-    this
-        .addSlot(new PredicateSlot(this.craftingInventory,
-            CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, 27,
-            attachmentPredicate));
-    this
-        .addSlot(new PredicateSlot(this.craftingInventory,
-            CraftingInventorySlotType.PAINT.getIndex(), 146, 48,
-            (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent()));
+    this.addSlot(new PredicateSlot(this.craftingInventory,
+        CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104,
+        gunCraftY + slotSize + gunCraftSlotGap,
+        attachmentPredicate));
+    this.addSlot(new PredicateSlot(this.craftingInventory,
+        CraftingInventorySlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125,
+        gunCraftY + slotSize * 2 + gunCraftSlotGap * 2,
+        attachmentPredicate));
+    this.addSlot(new PredicateSlot(this.craftingInventory,
+        CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, gunCraftY,
+        attachmentPredicate));
+    this.addSlot(new PredicateSlot(this.craftingInventory,
+        CraftingInventorySlotType.PAINT.getIndex(), 146, gunCraftY + slotSize + gunCraftSlotGap,
+        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent()));
   }
 
   @Override

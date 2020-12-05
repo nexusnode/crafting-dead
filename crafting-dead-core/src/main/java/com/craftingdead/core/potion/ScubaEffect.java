@@ -20,7 +20,7 @@ package com.craftingdead.core.potion;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class ScubaEffect extends Effect {
 
@@ -32,7 +32,7 @@ public class ScubaEffect extends Effect {
   public void performEffect(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.isInWater()) {
       livingEntity.setAir(livingEntity.getMaxAir());
-      livingEntity.moveRelative(0.1F, new Vec3d(0.0D, 0.0D, 0.2D));
+      livingEntity.moveRelative(0.1F, new Vector3d(0.0D, 0.0D, 0.2D));
     }
   }
 

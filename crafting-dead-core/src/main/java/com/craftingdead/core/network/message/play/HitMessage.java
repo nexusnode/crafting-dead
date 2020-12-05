@@ -23,15 +23,15 @@ import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class HitMessage {
 
-  private final Vec3d hitPos;
+  private final Vector3d hitPos;
   private final boolean dead;
 
-  public HitMessage(Vec3d hitPos, boolean dead) {
+  public HitMessage(Vector3d hitPos, boolean dead) {
     this.hitPos = hitPos;
     this.dead = dead;
   }
@@ -44,7 +44,7 @@ public class HitMessage {
   }
 
   public static HitMessage decode(PacketBuffer in) {
-    return new HitMessage(new Vec3d(in.readDouble(), in.readDouble(), in.readDouble()),
+    return new HitMessage(new Vector3d(in.readDouble(), in.readDouble(), in.readDouble()),
         in.readBoolean());
   }
 

@@ -17,6 +17,7 @@
  */
 package com.craftingdead.core;
 
+import java.util.ListIterator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,13 @@ import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
+import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.core.entity.monster.DoctorZombieEntity;
+import com.craftingdead.core.entity.monster.FastZombieEntity;
+import com.craftingdead.core.entity.monster.GiantZombieEntity;
+import com.craftingdead.core.entity.monster.PoliceZombieEntity;
+import com.craftingdead.core.entity.monster.TankZombieEntity;
+import com.craftingdead.core.entity.monster.WeakZombieEntity;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
@@ -48,9 +56,11 @@ import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -59,11 +69,14 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -73,6 +86,7 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -83,7 +97,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -139,7 +152,8 @@ public class CraftingDead {
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modEventBus.register(this);
+    modEventBus.addListener(this::handleCommonSetup);
+    modEventBus.addListener(this::handleGatherData);
 
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::registerAll);
@@ -179,22 +193,33 @@ public class CraftingDead {
   // Mod Events
   // ================================================================================
 
-  @SuppressWarnings("deprecation")
-  @SubscribeEvent
-  public void handleCommonSetup(FMLCommonSetupEvent event) {
+  private void handleCommonSetup(FMLCommonSetupEvent event) {
     logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
     NetworkChannel.loadChannels();
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
-    net.minecraftforge.fml.DeferredWorkQueue.runLater(() -> {
-      BrewingRecipeRegistry
-          .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
-              Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
-              new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
-      BrewingRecipeRegistry
-          .addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
-              Ingredient.fromItems(Items.ENCHANTED_GOLDEN_APPLE),
-              new ItemStack(ModItems.CURE_SYRINGE.get()));
+    event.enqueueWork(() -> {
+      GlobalEntityTypeAttributes.put(ModEntityTypes.advancedZombie,
+          AdvancedZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.doctorZombie,
+          DoctorZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.fastZombie,
+          FastZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.giantZombie,
+          GiantZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.policeZombie,
+          PoliceZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.tankZombie,
+          TankZombieEntity.registerAttributes().create());
+      GlobalEntityTypeAttributes.put(ModEntityTypes.weakZombie,
+          WeakZombieEntity.registerAttributes().create());
+
+      BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
+          Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+          new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
+      BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
+          Ingredient.fromItems(Items.ENCHANTED_GOLDEN_APPLE),
+          new ItemStack(ModItems.CURE_SYRINGE.get()));
     });
 
     this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
@@ -203,22 +228,44 @@ public class CraftingDead {
     }
   }
 
-  @SubscribeEvent
-  public void handleServerStart(FMLServerStartingEvent event) {
-    Commands.register(event.getCommandDispatcher());
-  }
-
-  @SubscribeEvent
-  public void handleGatherData(GatherDataEvent event) {
+  private void handleGatherData(GatherDataEvent event) {
     DataGenerator dataGenerator = event.getGenerator();
-    dataGenerator.addProvider(new ModItemTagsProvider(dataGenerator));
-    dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
-    dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
+    if (event.includeServer()) {
+      dataGenerator.addProvider(new ModItemTagsProvider(dataGenerator,
+          new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
+          event.getExistingFileHelper()));
+      dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
+      dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
+    }
   }
 
   // ================================================================================
   // Common Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleBiomeLoading(BiomeLoadingEvent event) {
+    ListIterator<MobSpawnInfo.Spawners> iterator =
+        event.getSpawns().getSpawner(EntityClassification.MONSTER).listIterator();
+    while (iterator.hasNext()) {
+      MobSpawnInfo.Spawners spawnEntry = iterator.next();
+      if (spawnEntry.type == EntityType.ZOMBIE) {
+        iterator.add(new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie,
+            spawnEntry.itemWeight * 3, 2, 8));
+        iterator.add(
+            new MobSpawnInfo.Spawners(ModEntityTypes.fastZombie, spawnEntry.itemWeight / 2, 2, 4));
+        iterator
+            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.itemWeight, 2, 4));
+        iterator.add(
+            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.itemWeight * 2, 2, 12));
+      }
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRegisterCommands(RegisterCommandsEvent event) {
+    Commands.register(event.getDispatcher());
+  }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
@@ -295,7 +342,10 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        IPlayer.getOptional(event.player).ifPresent(IPlayer::playerTick);
+        event.player.getCapability(ModCapabilities.LIVING)
+            .filter(living -> living instanceof IPlayer)
+            .map(living -> (IPlayer<?>) living)
+            .ifPresent(IPlayer::playerTick);
         break;
       default:
         break;

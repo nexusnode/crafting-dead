@@ -74,6 +74,6 @@ public class RemoteDetonatorItem extends Item {
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
     lines.add(Text.translate("item_lore." + this.getRegistryName().getPath(), RANGE)
-        .applyTextStyle(TextFormatting.GRAY));
+        .mergeStyle(TextFormatting.GRAY));
   }
 }

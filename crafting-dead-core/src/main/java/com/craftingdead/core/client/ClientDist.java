@@ -35,7 +35,7 @@ import com.craftingdead.core.client.audio.EffectsManager;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
-import com.craftingdead.core.client.gui.screen.inventory.ModInventoryScreen;
+import com.craftingdead.core.client.gui.screen.inventory.PlayerScreen;
 import com.craftingdead.core.client.model.PerspectiveAwareModel;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
@@ -58,6 +58,7 @@ import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.GunItem;
+import com.craftingdead.core.item.ModItemModelsProperties;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.PaintItem;
 import com.craftingdead.core.network.NetworkChannel;
@@ -78,7 +79,6 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -101,7 +101,8 @@ import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -124,6 +125,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
@@ -164,17 +166,15 @@ public class ClientDist implements IModDist {
 
   private final CrosshairManager crosshairManager;
 
-  private final EffectsManager effectsManager;
-
   private final IngameGui ingameGui;
 
   private final ItemRendererManager itemRendererManager;
 
   private final CameraManager cameraManager;
 
-  private TutorialSteps lastTutorialStep;
+  private EffectsManager effectsManager;
 
-  private boolean effectsManagerLoaded = false;
+  private TutorialSteps lastTutorialStep;
 
   private long adrenalineShaderStartTime = 0L;
 
@@ -192,7 +192,16 @@ public class ClientDist implements IModDist {
   private long lastSneakPressTime;
 
   public ClientDist() {
-    FMLJavaModLoadingContext.get().getModEventBus().register(this);
+    final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    // modBus.addListener(this::handleSoundLoad);
+    modBus.addListener(this::handleModelRegistry);
+    modBus.addListener(this::handleModelBake);
+    modBus.addListener(this::handleClientSetup);
+    modBus.addListener(this::handleParticleFactoryRegisterEvent);
+    modBus.addListener(this::handleItemColor);
+    modBus.addListener(this::handleTextureStitch);
+    modBus.addListener(this::handleSoundLoad);
+
     MinecraftForge.EVENT_BUS.register(this);
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
 
@@ -203,7 +212,6 @@ public class ClientDist implements IModDist {
       ((IReloadableResourceManager) this.minecraft.getResourceManager())
           .addReloadListener(this.crosshairManager);
     }
-    this.effectsManager = new EffectsManager();
     this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
     this.itemRendererManager = new ItemRendererManager();
     this.cameraManager = new CameraManager();
@@ -248,48 +256,58 @@ public class ClientDist implements IModDist {
     return this.minecraft;
   }
 
+  @SuppressWarnings("unchecked")
   public Optional<IPlayer<ClientPlayerEntity>> getPlayer() {
-    return IPlayer.getOptional(this.minecraft.player);
+    return this.minecraft.player.getCapability(ModCapabilities.LIVING)
+        .filter(living -> living instanceof IPlayer)
+        .map(living -> (IPlayer<ClientPlayerEntity>) living);
   }
 
   // ================================================================================
   // Mod Events
   // ================================================================================
 
+  /**
+   * This has to be handled on the mod bus and forge bus.
+   */
   @SubscribeEvent
-  public void handleModelRegistry(ModelRegistryEvent event) {
+  public void handleSoundLoad(SoundLoadEvent event) {
+    this.effectsManager = new EffectsManager(event.getManager());
+  }
+
+  private void handleModelRegistry(ModelRegistryEvent event) {
+    StartupMessageManager.addModMessage("Registering model loaders");
+    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
+        PerspectiveAwareModel.Loader.INSTANCE);
+    StartupMessageManager.addModMessage("Gathering item renderers");
     this.itemRendererManager.gatherItemRenderers();
+    StartupMessageManager.addModMessage("Registering special models");
     this.itemRendererManager.getModelDependencies().forEach(ModelLoader::addSpecialModel);
   }
 
-  @SubscribeEvent
-  public void handleModelBake(ModelBakeEvent event) {
+  private void handleModelBake(ModelBakeEvent event) {
     this.itemRendererManager.refreshCachedModels();
   }
 
-  @SubscribeEvent
-  public void handleClientSetup(FMLClientSetupEvent event) {
+  private void handleClientSetup(FMLClientSetupEvent event) {
+    ModItemModelsProperties.register();
+
     StartupMessageManager.addModMessage("Registering tooltips");
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
         (stack, world, tooltipFlags) -> Text
             .translate("item_lore.clothing_item.water_breathing")
-            .applyTextStyle(TextFormatting.GRAY));
+            .mergeStyle(TextFormatting.GRAY));
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
         (stack, world, tooltipFlags) -> Text
             .translate("item_lore.clothing_item.water_speed")
-            .applyTextStyle(TextFormatting.GRAY));
+            .mergeStyle(TextFormatting.GRAY));
 
     StartupMessageManager.addModMessage("Registering container screen factories");
 
-    ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), ModInventoryScreen::new);
+    ScreenManager.registerFactory(ModContainerTypes.PLAYER.get(), PlayerScreen::new);
     ScreenManager.registerFactory(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
-
-    StartupMessageManager.addModMessage("Registering model loaders");
-
-    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
-        PerspectiveAwareModel.Loader.INSTANCE);
 
     StartupMessageManager.addModMessage("Registering key bindings");
 
@@ -371,7 +389,7 @@ public class ClientDist implements IModDist {
    * @param function - {@link Function} with a {@link PlayerRenderer} as input and a
    *        {@link LayerRenderer} as output.
    */
-  public void registerPlayerLayer(
+  private void registerPlayerLayer(
       Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
     // A little dirty way, blame Mojang
     this.minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
@@ -379,8 +397,7 @@ public class ClientDist implements IModDist {
     });
   }
 
-  @SubscribeEvent
-  public void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
+  private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
     final ParticleManager particleManager = this.minecraft.particles;
     particleManager.registerFactory(ModParticleTypes.RGB_FLASH.get(),
         RGBFlashParticle.Factory::new);
@@ -388,14 +405,53 @@ public class ClientDist implements IModDist {
         GrenadeSmokeParticle.Factory::new);
   }
 
+  private void handleItemColor(ColorHandlerEvent.Item event) {
+    // Color for stacks with GUN_CONTROLLER capability
+    IItemColor gunColor = (stack,
+        tintIndex) -> stack
+            .getCapability(ModCapabilities.GUN)
+            .map(gunController -> gunController
+                .getPaintStack()
+                .getCapability(ModCapabilities.PAINT)
+                .map(IPaint::getColour)
+                .orElse(Optional.empty()))
+            .orElse(Optional.empty())
+            .orElse(0xFFFFFF) | 0xFF << 24;
+
+
+    // Registers the color for every matching CD item
+    ModItems.ITEMS
+        .getEntries()
+        .stream()
+        .map(RegistryObject::get)
+        .filter(item -> item instanceof GunItem)
+        .forEach(item -> event.getItemColors().register(gunColor, item));
+
+    // Color for stacks with PAINT_COLOR capability
+    IItemColor paintStackColor = (stack, tintIndex) -> stack
+        .getCapability(ModCapabilities.PAINT)
+        .map(IPaint::getColour)
+        .orElse(Optional.empty())
+        .orElse(Integer.MAX_VALUE);
+
+    // Registers the color for every matching CD item
+    ModItems.ITEMS
+        .getEntries()
+        .stream()
+        .map(RegistryObject::get)
+        .filter(item -> item instanceof PaintItem)
+        .forEach(item -> event.getItemColors().register(paintStackColor, () -> item));
+  }
+
+  private void handleTextureStitch(TextureStitchEvent.Pre event) {
+    if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
+      this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
+    }
+  }
+
   // ================================================================================
   // Client Forge Events
   // ================================================================================
-
-  @SubscribeEvent
-  public void handleSoundLoad(SoundLoadEvent event) {
-    this.effectsManager.reload(event.getManager());
-  }
 
   @SubscribeEvent
   public void handleTooltipEvent(ItemTooltipEvent event) {
@@ -428,12 +484,6 @@ public class ClientDist implements IModDist {
               gun.toggleRightMouseAction(player, true);
             }
           });
-        }
-        // TODO SoundLoadEvent is not called upon initial startup - see
-        // https://github.com/MinecraftForge/MinecraftForge/pull/6777
-        if (!this.effectsManagerLoaded) {
-          this.effectsManager.reload(this.minecraft.getSoundHandler().sndManager);
-          this.effectsManagerLoaded = true;
         }
         if (this.minecraft.loadingGui == null
             && (this.minecraft.currentScreen == null || this.minecraft.currentScreen.passEvents)) {
@@ -555,7 +605,7 @@ public class ClientDist implements IModDist {
     switch (event.getType()) {
       case ALL:
         if (player != null) {
-          this.ingameGui.renderOverlay(player,
+          this.ingameGui.renderOverlay(player, event.getMatrixStack(),
               event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
               event.getPartialTicks());
         }
@@ -623,7 +673,7 @@ public class ClientDist implements IModDist {
         this.tweenManager.update(deltaTime);
 
         if (this.minecraft.player != null) {
-          final Vec2f rotationVelocity = this.cameraManager.getLookRotationVelocity();
+          final Vector2f rotationVelocity = this.cameraManager.getLookRotationVelocity();
           this.minecraft.player.rotateTowards(rotationVelocity.y, rotationVelocity.x);
         }
         break;
@@ -647,9 +697,8 @@ public class ClientDist implements IModDist {
       if (this.adrenalineShaderStartTime == 0L) {
         this.adrenalineShaderStartTime = currentTime;
       }
-      float progress = MathHelper
-          .clamp(((currentTime - this.adrenalineShaderStartTime)
-              - partialTicks) / 5000.0F, 0.0F, 1.0F);
+      float progress = MathHelper.clamp(
+          ((currentTime - this.adrenalineShaderStartTime) - partialTicks) / 5000.0F, 0.0F, 1.0F);
       if (!shaderLoaded) {
         if (gameRenderer.getShaderGroup() != null) {
           gameRenderer.stopUseShader();
@@ -665,55 +714,10 @@ public class ClientDist implements IModDist {
   }
 
   @SubscribeEvent
-  public void handleItemColor(ColorHandlerEvent.Item event) {
-    // Color for stacks with GUN_CONTROLLER capability
-    IItemColor gunColor = (stack,
-        tintIndex) -> stack
-            .getCapability(ModCapabilities.GUN)
-            .map(gunController -> gunController
-                .getPaintStack()
-                .getCapability(ModCapabilities.PAINT)
-                .map(IPaint::getColour)
-                .orElse(Optional.empty()))
-            .orElse(Optional.empty())
-            .orElse(0xFFFFFF) | 0xFF << 24;
-
-
-    // Registers the color for every matching CD item
-    ModItems.ITEMS
-        .getEntries()
-        .stream()
-        .map(RegistryObject::get)
-        .filter(item -> item instanceof GunItem)
-        .forEach(item -> event.getItemColors().register(gunColor, item));
-
-    // Color for stacks with PAINT_COLOR capability
-    IItemColor paintStackColor = (stack, tintIndex) -> stack
-        .getCapability(ModCapabilities.PAINT)
-        .map(IPaint::getColour)
-        .orElse(Optional.empty())
-        .orElse(Integer.MAX_VALUE);
-
-    // Registers the color for every matching CD item
-    ModItems.ITEMS
-        .getEntries()
-        .stream()
-        .map(RegistryObject::get)
-        .filter(item -> item instanceof PaintItem)
-        .forEach(item -> event.getItemColors().register(paintStackColor, () -> item));
-  }
-
-  @SubscribeEvent
-  public void handleTextureStitch(TextureStitchEvent.Pre event) {
-    if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
-      this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
-    }
-  }
-
-  @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
-    if (this.minecraft.currentScreen instanceof ModInventoryScreen && event.getGui() == null
-        && ((ModInventoryScreen) this.minecraft.currentScreen).isTransitioning()) {
+    // Prevents current GUI being closed before new one opens.
+    if (this.minecraft.currentScreen instanceof PlayerScreen && event.getGui() == null
+        && ((PlayerScreen) this.minecraft.currentScreen).isTransitioning()) {
       event.setCanceled(true);
     }
   }

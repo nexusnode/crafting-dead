@@ -61,7 +61,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
       if (!this.world.isRemote()) {
         this.remove();
         this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
+            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 2F, true,
             Explosion.Mode.NONE);
 

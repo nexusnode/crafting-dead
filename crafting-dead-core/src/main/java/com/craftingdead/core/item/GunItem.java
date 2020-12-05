@@ -287,61 +287,48 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     stack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       ITextComponent magazineSizeText =
-          Text.of(gun.getMagazineSize()).applyTextStyle(TextFormatting.RED);
-      ITextComponent damageText = Text.of(this.damage).applyTextStyle(TextFormatting.RED);
+          Text.of(gun.getMagazineSize()).mergeStyle(TextFormatting.RED);
+      ITextComponent damageText = Text.of(this.damage).mergeStyle(TextFormatting.RED);
       ITextComponent headshotDamageText = Text
           .of((int) (this.damage * DefaultGun.HEADSHOT_MULTIPLIER))
-          .applyTextStyle(TextFormatting.RED);
+          .mergeStyle(TextFormatting.RED);
       ITextComponent accuracyText =
-          Text.of((int) (this.accuracy * 100D) + "%").applyTextStyle(TextFormatting.RED);
-      ITextComponent rpmText = Text.of(this.getFireRateRPM()).applyTextStyle(TextFormatting.RED);
+          Text.of((int) (this.accuracy * 100D) + "%").mergeStyle(TextFormatting.RED);
+      ITextComponent rpmText = Text.of(this.getFireRateRPM()).mergeStyle(TextFormatting.RED);
 
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.ammo_amount")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(magazineSizeText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.damage")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(damageText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.headshot_damage")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(headshotDamageText));
+      lines.add(Text.translate("item_lore.gun_item.ammo_amount")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(magazineSizeText));
+      lines.add(Text.translate("item_lore.gun_item.damage")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(damageText));
+      lines.add(Text.translate("item_lore.gun_item.headshot_damage")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(headshotDamageText));
 
       if (this.bulletAmountToFire > 1) {
         ITextComponent pelletsText =
-            Text.of(this.bulletAmountToFire).applyTextStyle(TextFormatting.RED);
+            Text.of(this.bulletAmountToFire).mergeStyle(TextFormatting.RED);
 
-        lines
-            .add(Text
-                .translate("item_lore.gun_item.pellets_shot")
-                .applyTextStyle(TextFormatting.GRAY)
-                .appendSibling(pelletsText));
+        lines.add(Text.translate("item_lore.gun_item.pellets_shot")
+            .mergeStyle(TextFormatting.GRAY)
+            .append(pelletsText));
       }
 
       for (AttachmentItem attachment : gun.getAttachments()) {
-        ITextComponent attachmentNameText = attachment.getName().applyTextStyle(TextFormatting.RED);
-        lines
-            .add(Text
-                .translate("item_lore.gun_item.attachment")
-                .applyTextStyle(TextFormatting.GRAY)
-                .appendSibling(attachmentNameText));
+        ITextComponent attachmentNameText =
+            attachment.getName().copyRaw().mergeStyle(TextFormatting.RED);
+        lines.add(Text.translate("item_lore.gun_item.attachment")
+            .mergeStyle(TextFormatting.GRAY)
+            .append(attachmentNameText));
       }
 
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.rpm")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(rpmText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.accuracy")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(accuracyText));
+      lines.add(Text.translate("item_lore.gun_item.rpm")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(rpmText));
+      lines.add(Text.translate("item_lore.gun_item.accuracy")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(accuracyText));
     });
   }
 
@@ -359,6 +346,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   @Override
   public void onCreated(ItemStack itemStack, World world, PlayerEntity playerEntity) {
     itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setMagazineSize(0));
+  }
+
+  @Override
+  public int func_230305_d_() {
+    return 0;
   }
 
   public static class Properties extends Item.Properties {

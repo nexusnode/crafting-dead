@@ -1,11 +1,12 @@
 {
-  "enchantment.craftingdead.armor_penetration":"Armor Penetration",
-  "enchantment.craftingdead.infection":"Infection",
+  "container.player": "Crafting Dead - Player",
+  "enchantment.craftingdead.armor_penetration": "Armor Penetration",
+  "enchantment.craftingdead.infection": "Infection",
 
   "key.reload": "Reload",
   "key.remove_magazine": "Remove Magazine",
   "key.toggle_fire_mode": "Toggle Fire Mode",
-  "key.craftingdead.inventory":"Open/Close Crafting Dead Inventory",
+  "key.craftingdead.inventory":"Open/Close Crafting Dead menu",
 
   "tutorial.craftingdead.open_inventory.title":"Open Crafting Dead menu",
 

@@ -20,17 +20,29 @@ package com.craftingdead.core.particle;
 import java.util.Locale;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 
 public class GrenadeSmokeParticleData implements IParticleData {
 
+  public static final Codec<GrenadeSmokeParticleData> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(Codec.FLOAT.fieldOf("red").forGetter(GrenadeSmokeParticleData::getRed),
+              Codec.FLOAT.fieldOf("green").forGetter(GrenadeSmokeParticleData::getGreen),
+              Codec.FLOAT.fieldOf("blue").forGetter(GrenadeSmokeParticleData::getBlue),
+              Codec.FLOAT.fieldOf("scale").forGetter(GrenadeSmokeParticleData::getScale))
+          .apply(instance, GrenadeSmokeParticleData::new));
+
+  @SuppressWarnings("deprecation")
   public static final IParticleData.IDeserializer<GrenadeSmokeParticleData> DESERIALIZER =
       new IParticleData.IDeserializer<GrenadeSmokeParticleData>() {
         @Override
-        public GrenadeSmokeParticleData deserialize(ParticleType<GrenadeSmokeParticleData> particleType,
-            StringReader stringReader) throws CommandSyntaxException {
+        public GrenadeSmokeParticleData deserialize(
+            ParticleType<GrenadeSmokeParticleData> particleType, StringReader stringReader)
+            throws CommandSyntaxException {
           stringReader.expect(' ');
           float red = stringReader.readFloat();
           stringReader.expect(' ');

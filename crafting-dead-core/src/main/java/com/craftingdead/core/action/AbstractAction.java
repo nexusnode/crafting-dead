@@ -87,9 +87,9 @@ public abstract class AbstractAction implements IAction {
       return this.performer
           ? AbstractAction.this.target == null ? null
               : new TranslationTextComponent("action.target",
-                  AbstractAction.this.target.getEntity().getDisplayName().getFormattedText())
+                  AbstractAction.this.target.getEntity().getDisplayName().getString())
           : new TranslationTextComponent("action.performer",
-              AbstractAction.this.performer.getEntity().getDisplayName().getFormattedText());
+              AbstractAction.this.performer.getEntity().getDisplayName().getString());
     }
 
     @Override

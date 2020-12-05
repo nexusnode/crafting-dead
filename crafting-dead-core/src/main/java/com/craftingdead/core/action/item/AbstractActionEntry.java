@@ -72,7 +72,7 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
 
     protected boolean shrinkStackInCreative;
 
-    protected boolean returnItemInCreative;
+    protected boolean returnItemInCreative = true;
 
     public SELF setShrinkStack(boolean shrinkStack) {
       this.shrinkStack = shrinkStack;

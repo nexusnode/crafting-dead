@@ -60,7 +60,7 @@ public class PaintItem extends Item {
         .map(IPaint::getColour)
         .orElse(Optional.empty())
         .ifPresent(colour -> lines
-            .add(Text.of("#" + Integer.toHexString(colour)).applyTextStyle(TextFormatting.GRAY)));
+            .add(Text.of("#" + Integer.toHexString(colour)).mergeStyle(TextFormatting.GRAY)));
   }
 
   @Override

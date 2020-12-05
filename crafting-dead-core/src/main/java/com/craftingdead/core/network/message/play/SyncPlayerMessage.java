@@ -21,11 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.core.network.util.GenericDataManager;
 import com.craftingdead.core.network.util.GenericDataManager.DataEntry;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSidedProvider;
@@ -62,9 +61,8 @@ public class SyncPlayerMessage {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.flatMap(w -> Optional.ofNullable(w.getEntityByID(msg.entityId)))
-        .filter(e -> e instanceof PlayerEntity)
-        .flatMap(e -> IPlayer.getOptional((PlayerEntity) e))
-        .filter(p -> p instanceof Player)
+        .flatMap(entity -> entity.getCapability(ModCapabilities.LIVING).resolve())
+        .filter(living -> living instanceof Player)
         .ifPresent(p -> ((Player<?>) p).getDataManager().setEntryValues(msg.dataManagerEntries));
     return true;
   }

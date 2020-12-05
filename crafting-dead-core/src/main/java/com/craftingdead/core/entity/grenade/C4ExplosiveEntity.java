@@ -65,7 +65,7 @@ public class C4ExplosiveEntity extends GrenadeEntity {
       if (!this.world.isRemote()) {
         this.remove();
         this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)),
+            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
             Explosion.Mode.NONE);
       }
@@ -79,8 +79,8 @@ public class C4ExplosiveEntity extends GrenadeEntity {
 
   @Override
   public Float getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
-    return blockRayTraceResult.getFace() == Direction.UP ?
-        null : super.getBounceFactor(blockRayTraceResult);
+    return blockRayTraceResult.getFace() == Direction.UP ? null
+        : super.getBounceFactor(blockRayTraceResult);
   }
 
   @Override

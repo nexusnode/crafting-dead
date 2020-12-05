@@ -28,12 +28,12 @@ import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.LootTableProvider;
+import net.minecraft.loot.LootParameterSet;
+import net.minecraft.loot.LootParameterSets;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableManager;
+import net.minecraft.loot.ValidationTracker;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootParameterSet;
-import net.minecraft.world.storage.loot.LootParameterSets;
-import net.minecraft.world.storage.loot.LootTable;
-import net.minecraft.world.storage.loot.LootTableManager;
-import net.minecraft.world.storage.loot.ValidationTracker;
 
 public class ModLootTableProvider extends LootTableProvider {
 
@@ -56,9 +56,8 @@ public class ModLootTableProvider extends LootTableProvider {
         map.keySet())) {
       validationTracker.addProblem("Missing built-in table: " + location);
     }
-    map.forEach(
-        (location, lootTable) -> LootTableManager.func_227508_a_(validationTracker, location,
-            lootTable));
+    map.forEach((location, lootTable) -> LootTableManager.validateLootTable(validationTracker,
+        location, lootTable));
   }
 
   @Override

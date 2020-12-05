@@ -20,7 +20,7 @@ package com.craftingdead.core.util;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class EntityUtil {
 
@@ -53,8 +53,8 @@ public class EntityUtil {
    * @return float array with yaw and pitch, respectively.
    */
   private static float[] getRotationsToTarget(LivingEntity viewer, Entity target) {
-    Vec3d entityVec = target.getPositionVec();
-    Vec3d livingVec = viewer.getPositionVec();
+    Vector3d entityVec = target.getPositionVec();
+    Vector3d livingVec = viewer.getPositionVec();
 
     double xDiff = livingVec.x - entityVec.x;
     double zDiff = entityVec.z - livingVec.z;

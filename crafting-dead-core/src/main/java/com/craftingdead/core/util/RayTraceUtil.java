@@ -19,18 +19,31 @@ package com.craftingdead.core.util;
 
 import java.util.Optional;
 import java.util.Random;
-
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractGlassBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.FenceBlock;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.TrapDoorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeMod;
 
 public class RayTraceUtil {
 
-  public static Iterable<Entity> filterEntities(Entity fromEntity, Vec3d scaledLook) {
+  public static Iterable<Entity> filterEntities(Entity fromEntity, Vector3d scaledLook) {
     return fromEntity
         .getEntityWorld()
         .getEntitiesInAABBexcluding(fromEntity,
@@ -53,15 +66,15 @@ public class RayTraceUtil {
   }
 
   public static Optional<EntityRayTraceResult> rayTraceEntities(Entity fromEntity) {
-    IAttributeInstance reachDistanceAttribute =
+    ModifiableAttributeInstance reachDistanceAttribute =
         fromEntity instanceof PlayerEntity
-            ? ((PlayerEntity) fromEntity).getAttribute(PlayerEntity.REACH_DISTANCE)
+            ? ((PlayerEntity) fromEntity).getAttribute(ForgeMod.REACH_DISTANCE.get())
             : null;
     double distance = reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue();
-    Vec3d start = fromEntity.getEyePosition(1.0F);
-    Vec3d look = fromEntity.getLook(1.0F);
-    Vec3d scaledLook = look.scale(distance);
-    Vec3d end = start.add(scaledLook);
+    Vector3d start = fromEntity.getEyePosition(1.0F);
+    Vector3d look = fromEntity.getLook(1.0F);
+    Vector3d scaledLook = look.scale(distance);
+    Vector3d end = start.add(scaledLook);
     return RayTraceUtil.rayTraceEntities(fromEntity, start, end,
         filterEntities(fromEntity, scaledLook), distance * distance);
   }
@@ -70,29 +83,29 @@ public class RayTraceUtil {
    * Ray trace the specified entities from the parsed entity.
    *
    * @param fromEntity - the entity performing the ray trace
-   * @param start - the start {@link Vec3d}
-   * @param end - the end {@link Vec3d}
+   * @param start - the start {@link Vector3d}
+   * @param end - the end {@link Vector3d}
    * @param entities - the entities to ray trace
    * @param sqrDistance - the square distance
    * @return the {@link EntityRayTraceResult} as an {@link Optional}
    */
-  public static Optional<EntityRayTraceResult> rayTraceEntities(Entity fromEntity, Vec3d start,
-      Vec3d end, Iterable<Entity> entities, double sqrDistance) {
+  public static Optional<EntityRayTraceResult> rayTraceEntities(Entity fromEntity, Vector3d start,
+      Vector3d end, Iterable<Entity> entities, double sqrDistance) {
     Entity finalHitEntity = null;
-    Vec3d finalHitVec = null;
+    Vector3d finalHitVec = null;
 
     double sqrDistanceToLastHit = sqrDistance;
     for (Entity otherEntity : entities) {
       AxisAlignedBB otherEntityCollisionBox =
           otherEntity.getBoundingBox().grow(otherEntity.getCollisionBorderSize());
-      Optional<Vec3d> potentialHit = otherEntityCollisionBox.rayTrace(start, end);
+      Optional<Vector3d> potentialHit = otherEntityCollisionBox.rayTrace(start, end);
 
       if (otherEntityCollisionBox.contains(start) && sqrDistanceToLastHit >= 0.0D) {
         finalHitEntity = otherEntity;
         finalHitVec = potentialHit.orElse(start);
         sqrDistanceToLastHit = 0.0D;
       } else if (potentialHit.isPresent()) {
-        Vec3d hitVec = potentialHit.get();
+        Vector3d hitVec = potentialHit.get();
         double sqrDistanceToHit = start.squareDistanceTo(hitVec);
         if (sqrDistanceToHit < sqrDistanceToLastHit || sqrDistanceToLastHit == 0.0D) {
           if (otherEntity.getLowestRidingEntity() == fromEntity.getLowestRidingEntity()) {
@@ -116,10 +129,10 @@ public class RayTraceUtil {
 
   public static Optional<BlockRayTraceResult> rayTraceBlocks(LivingEntity fromEntity,
       RayTraceContext.FluidMode fluidMode, double distance, float partialTicks) {
-    Vec3d start = fromEntity.getEyePosition(partialTicks);
-    Vec3d look = fromEntity.getLook(partialTicks);
-    Vec3d scaledLook = look.scale(distance);
-    Vec3d end = start.add(scaledLook);
+    Vector3d start = fromEntity.getEyePosition(partialTicks);
+    Vector3d look = fromEntity.getLook(partialTicks);
+    Vector3d scaledLook = look.scale(distance);
+    Vector3d end = start.add(scaledLook);
     return Optional.ofNullable(fromEntity.world.rayTraceBlocks(new RayTraceContext(start, end,
         RayTraceContext.BlockMode.COLLIDER, fluidMode, fromEntity)));
   }
@@ -147,7 +160,7 @@ public class RayTraceUtil {
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
       final double distance, final float partialTicks, final float accuracy, final Random random) {
-    Vec3d start = fromEntity.getEyePosition(partialTicks);
+    Vector3d start = fromEntity.getEyePosition(partialTicks);
 
     float pitchOffset = 0.0F;
     float yawOffset = 0.0F;
@@ -156,11 +169,11 @@ public class RayTraceUtil {
       yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
     }
 
-    Vec3d look = getVectorForRotation(fromEntity.getPitch(partialTicks) + pitchOffset,
+    Vector3d look = getVectorForRotation(fromEntity.getPitch(partialTicks) + pitchOffset,
         fromEntity.getYaw(partialTicks) + yawOffset);
 
-    Vec3d scaledLook = look.scale(distance);
-    Vec3d end = start.add(scaledLook);
+    Vector3d scaledLook = look.scale(distance);
+    Vector3d end = start.add(scaledLook);
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
         rayTraceBlocksPiercing(start, distance, look,
@@ -179,8 +192,9 @@ public class RayTraceUtil {
   /**
    * Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
-  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance,
-      Vec3d look,
+  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vector3d start,
+      double distance,
+      Vector3d look,
       World world) {
     return rayTraceBlocksPiercing(start, distance, look, RayTraceContext.BlockMode.COLLIDER,
         RayTraceContext.FluidMode.NONE, world);
@@ -189,13 +203,14 @@ public class RayTraceUtil {
   /**
    * Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
-  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vec3d start, double distance,
-      Vec3d look,
+  public static Optional<BlockRayTraceResult> rayTraceBlocksPiercing(Vector3d start,
+      double distance,
+      Vector3d look,
       RayTraceContext.BlockMode blockMode,
       RayTraceContext.FluidMode fluidMode,
       World world) {
-    Vec3d newStart = start;
-    Vec3d end = start.add(look.scale(distance));
+    Vector3d newStart = start;
+    Vector3d end = start.add(look.scale(distance));
     boolean pierceableBlock;
     BlockRayTraceResult blockRayTraceResult = null;
     BlockPos lastBlockPos = null;
@@ -221,7 +236,7 @@ public class RayTraceUtil {
         Block block = blockState.getBlock();
         pierceableBlock = isBlockPierceable(block);
         if (pierceableBlock) {
-          Vec3d hitVec = blockRayTraceResult.getHitVec();
+          Vector3d hitVec = blockRayTraceResult.getHitVec();
           AxisAlignedBB bb = context.getBlockShape(blockState, world, blockPos).getBoundingBox();
           double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
               : blockPos.getX() - hitVec.getX() + bb.maxX;
@@ -253,13 +268,13 @@ public class RayTraceUtil {
         || block instanceof TrapDoorBlock;
   }
 
-  public static Vec3d getVectorForRotation(float pitch, float yaw) {
+  public static Vector3d getVectorForRotation(float pitch, float yaw) {
     float pitchRad = pitch * ((float) Math.PI / 180F);
     float yawRad = -yaw * ((float) Math.PI / 180F);
     float yawCos = MathHelper.cos(yawRad);
     float yawSin = MathHelper.sin(yawRad);
     float pitchCos = MathHelper.cos(pitchRad);
     float pitchSin = MathHelper.sin(pitchRad);
-    return new Vec3d((yawSin * pitchCos), (-pitchSin), (yawCos * pitchCos));
+    return new Vector3d((yawSin * pitchCos), (-pitchSin), (yawCos * pitchCos));
   }
 }

@@ -23,7 +23,6 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -34,13 +33,13 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 public abstract class BounceableProjectileEntity extends Entity
-    implements IProjectile, IEntityAdditionalSpawnData {
+    implements IEntityAdditionalSpawnData {
 
   private UUID ownerId;
   private BlockState blockStanding;
@@ -70,7 +69,7 @@ public abstract class BounceableProjectileEntity extends Entity
   public void tick() {
     super.tick();
 
-    BlockPos currentBlockPos = new BlockPos(this);
+    BlockPos currentBlockPos = this.getPosition();
     BlockState currentBlockState = this.world.getBlockState(currentBlockPos);
 
     if (this.stoppedInGround) {
@@ -81,7 +80,7 @@ public abstract class BounceableProjectileEntity extends Entity
 
       boolean notCollided = (this.blockStanding != currentBlockState
           && this.world.hasNoCollisions(this.getBoundingBox().grow(0.0625D)));
-      boolean shouldMove = !this.getMotion().equals(Vec3d.ZERO) || notCollided;
+      boolean shouldMove = !this.getMotion().equals(Vector3d.ZERO) || notCollided;
 
       if (shouldMove) {
         this.stoppedInGround = false;
@@ -99,26 +98,26 @@ public abstract class BounceableProjectileEntity extends Entity
       }
 
       this.totalTicksInAir++;
-      Vec3d position = this.getPositionVec();
-      Vec3d motionBeforeHit = this.getMotion();
+      Vector3d position = this.getPositionVec();
+      Vector3d motionBeforeHit = this.getMotion();
 
       BlockRayTraceResult blockRayTraceResult =
           this.world.rayTraceBlocks(new RayTraceContext(position, position.add(motionBeforeHit),
               RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
 
-      Vec3d nextBounceMotion = null;
+      Vector3d nextBounceMotion = null;
 
       if (blockRayTraceResult.getType() != RayTraceResult.Type.MISS) {
         BlockState blockHitState = this.world.getBlockState(blockRayTraceResult.getPos());
 
-        Vec3d difference =
+        Vector3d difference =
             blockRayTraceResult.getHitVec().subtract(this.getPosX(), this.getPosY(),
                 this.getPosZ());
         this.setMotion(difference);
 
         // From vanilla's AbstractArrowEntity logic.
         // I didn't found a good name for the variable.
-        Vec3d vec = difference.normalize().scale(0.05D);
+        Vector3d vec = difference.normalize().scale(0.05D);
         this.setPosition(this.getPosX() - vec.x, this.getPosY() - vec.y, this.getPosZ() - vec.z);
 
         Float bounceFactor = this.getBounceFactor(blockRayTraceResult);
@@ -128,7 +127,7 @@ public abstract class BounceableProjectileEntity extends Entity
               // If the grenade is going up too slowly, set the next bounce to zero
               nextBounceMotion = Math.abs(motionBeforeHit.y) > 0.1D
                   ? motionBeforeHit.mul(0.9D * 0.7D, (-bounceFactor), 0.9D * 0.7D)
-                  : Vec3d.ZERO;
+                  : Vector3d.ZERO;
               break;
             case DOWN:
               nextBounceMotion = motionBeforeHit.mul(0.9D, -bounceFactor, 0.9D);
@@ -145,7 +144,7 @@ public abstract class BounceableProjectileEntity extends Entity
               break;
           }
         } else {
-          nextBounceMotion = Vec3d.ZERO;
+          nextBounceMotion = Vector3d.ZERO;
         }
 
         this.onSurfaceHit(blockRayTraceResult);
@@ -155,7 +154,7 @@ public abstract class BounceableProjectileEntity extends Entity
           if (nextBounceMotion != null && blockRayTraceResult.getFace() == Direction.UP) {
             // Stops if the next bounce is too slow
             if (nextBounceMotion.length() < 0.1D) {
-              nextBounceMotion = Vec3d.ZERO;
+              nextBounceMotion = Vector3d.ZERO;
               this.stoppedInGround = true;
               this.blockStanding = blockHitState;
               this.onMotionStop(++this.motionStopCount);
@@ -164,7 +163,7 @@ public abstract class BounceableProjectileEntity extends Entity
         }
       }
 
-      Vec3d currentMotion = this.getMotion();
+      Vector3d currentMotion = this.getMotion();
 
       double nextX = this.getPosX() + currentMotion.x;
       double nextY = this.getPosY() + currentMotion.y;
@@ -199,13 +198,12 @@ public abstract class BounceableProjectileEntity extends Entity
     float f2 =
         MathHelper.cos(y * ((float) Math.PI / 180F)) * MathHelper.cos(x * ((float) Math.PI / 180F));
     this.shoot((double) f, (double) f1, (double) f2, force, p_184538_6_);
-    Vec3d vec3d = entity.getMotion();
-    this.setMotion(this.getMotion().add(vec3d.x, entity.onGround ? 0.0D : vec3d.y, vec3d.z));
+    Vector3d vec3d = entity.getMotion();
+    this.setMotion(this.getMotion().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
   }
 
-  @Override
   public void shoot(double x, double y, double z, float force, float p_70186_8_) {
-    Vec3d vec = (new Vec3d(x, y, z)).normalize()
+    Vector3d vec = (new Vector3d(x, y, z)).normalize()
         .add(this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
             this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
             this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_)
@@ -258,7 +256,7 @@ public abstract class BounceableProjectileEntity extends Entity
   @Override
   protected void writeAdditional(CompoundNBT compound) {
     if (this.ownerId != null) {
-      compound.put("owner", NBTUtil.writeUniqueId(this.ownerId));
+      compound.put("owner", NBTUtil.func_240626_a_(this.ownerId));
     }
 
     compound.putBoolean("inGround", this.stoppedInGround);

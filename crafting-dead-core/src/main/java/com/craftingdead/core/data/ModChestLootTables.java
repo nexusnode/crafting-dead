@@ -21,13 +21,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
+import net.minecraft.loot.BinomialRange;
+import net.minecraft.loot.ConstantRange;
+import net.minecraft.loot.ItemLootEntry;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.functions.SetCount;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.BinomialRange;
-import net.minecraft.world.storage.loot.ConstantRange;
-import net.minecraft.world.storage.loot.ItemLootEntry;
-import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.LootTable;
-import net.minecraft.world.storage.loot.functions.SetCount;
 
 public class ModChestLootTables
     implements Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {

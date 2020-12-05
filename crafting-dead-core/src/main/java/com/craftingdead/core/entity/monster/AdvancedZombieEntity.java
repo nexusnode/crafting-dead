@@ -34,8 +34,9 @@ import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -95,11 +96,10 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     return true;
   }
 
-  @Override
-  protected void registerAttributes() {
-    super.registerAttributes();
-    this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
-    this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
+  public static AttributeModifierMap.MutableAttribute registerAttributes() {
+    return ZombieEntity.func_234342_eQ_()
+        .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
+        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
   }
 
   @Override

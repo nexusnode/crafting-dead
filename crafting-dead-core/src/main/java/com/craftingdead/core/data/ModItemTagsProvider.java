@@ -17,23 +17,27 @@
  */
 package com.craftingdead.core.data;
 
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.tags.ModItemTags;
+import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModItemTagsProvider extends ItemTagsProvider {
 
-  public ModItemTagsProvider(DataGenerator dataGenerator) {
-    super(dataGenerator);
+  public ModItemTagsProvider(DataGenerator dataGenerator, BlockTagsProvider blockTagProvider,
+      ExistingFileHelper existingFileHelper) {
+    super(dataGenerator, blockTagProvider, CraftingDead.ID, existingFileHelper);
   }
 
   @Override
   public void registerTags() {
-    this.getBuilder(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
+    this.getOrCreateBuilder(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
         ModItems.SYRINGE.get(), ModItems.BLOOD_SYRINGE.get(), ModItems.RBI_SYRINGE.get(),
         ModItems.CURE_SYRINGE.get());
-    this.getBuilder(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),
+    this.getOrCreateBuilder(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),
         ModItems.ARMY_DESERT_CLOTHING.get(), ModItems.ARMY_MEDIC_CLOTHING.get(),
         ModItems.BLUE_DUSK_CLOTHING.get(), ModItems.BUILDER_CLOTHING.get(),
         ModItems.BUSINESS_CLOTHING.get(), ModItems.CAMO_CLOTHING.get(),
@@ -54,7 +58,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         ModItems.SWAT_CLOTHING.get(), ModItems.TAC_GHILLIE_CLOTHING.get(),
         ModItems.WHITE_DUSK_CLOTHING.get(), ModItems.WINTER_ARMY_CLOTHING.get(),
         ModItems.YELLOW_DUSK_CLOTHING.get());
-    this.getBuilder(ModItemTags.MELEES).add(ModItems.BAT.get(), ModItems.BO_STAFF.get(),
+    this.getOrCreateBuilder(ModItemTags.MELEES).add(ModItems.BAT.get(), ModItems.BO_STAFF.get(),
         ModItems.BOLT_CUTTERS.get(), ModItems.BOWIE_KNIFE.get(), ModItems.BROADSWORD.get(),
         ModItems.BROKEN_BOTTLE.get(), ModItems.CHAINSAW.get(), ModItems.CLEAVER.get(),
         ModItems.COMBAT_KNIFE.get(), ModItems.CROWBAR.get(), ModItems.FIRE_AXE.get(),
@@ -64,7 +68,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         ModItems.RUSTY_PIPE.get(), ModItems.SCYTHE.get(), ModItems.SHOVEL.get(),
         ModItems.SLEDGEHAMMER.get(), ModItems.STEEL_BAT.get(), ModItems.WEAPONIZED_SCYTHE.get(),
         ModItems.WRENCH.get());
-    this.getBuilder(ModItemTags.HATS).add(ModItems.BEANIE_HAT.get(),
+    this.getOrCreateBuilder(ModItemTags.HATS).add(ModItems.BEANIE_HAT.get(),
         ModItems.BLACK_BALLISTIC_HAT.get(), ModItems.BLUE_HARD_HAT.get(), ModItems.BUNNY_HAT.get(),
         ModItems.CLONE_HAT.get(), ModItems.FIREMAN_CHIEF_HAT.get(), ModItems.FIREMAN_HAT.get(),
         ModItems.GHILLIE_HAT.get(), ModItems.GREEN_HARD_HAT.get(), ModItems.HAZMAT_HAT.get(),

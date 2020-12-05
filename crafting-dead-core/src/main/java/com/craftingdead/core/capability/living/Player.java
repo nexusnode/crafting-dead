@@ -48,6 +48,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
@@ -78,7 +79,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
 
   private final DataParameter<Integer> maxWater;
 
-  private boolean fullSync = true;
+  private boolean initialSyncToSelf = true;
 
   private int waterTicks;
 
@@ -105,11 +106,19 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   }
 
   private void sync() {
-    if ((++this.syncTicks >= SYNC_DELAY_TICKS && this.dataManager.isDirty()) || this.fullSync) {
+    if ((++this.syncTicks >= SYNC_DELAY_TICKS && this.dataManager.isDirty())) {
       NetworkChannel.PLAY.getSimpleChannel().send(
           PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
           new SyncPlayerMessage(this.getEntity().getEntityId(),
-              this.fullSync ? this.dataManager.getAll() : this.dataManager.getDirty()));
+              this.initialSyncToSelf ? this.dataManager.getAll() : this.dataManager.getDirty()));
+    }
+
+    if (this.initialSyncToSelf) {
+      PacketTarget self = PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.entity);
+      NetworkChannel.PLAY.getSimpleChannel().send(self,
+          new SyncPlayerMessage(this.getEntity().getEntityId(), this.dataManager.getAll()));
+      this.sendInventory(self);
+      this.initialSyncToSelf = false;
     }
   }
 
@@ -159,12 +168,13 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   private void updateBrokenLeg() {
     if (!this.getEntity().isCreative()
         && !this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())
-        && this.getEntity().onGround && !this.getEntity().isInWater()
+        && this.getEntity().isOnGround() && !this.getEntity().isInWater()
         && ((this.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
             || this.getEntity().fallDistance > 10F)) {
       this.getEntity()
           .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
-              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+              .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+              true);
       this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
       this.getEntity().addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
@@ -205,7 +215,8 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
           && !this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
         this.getEntity()
             .sendStatusMessage(new TranslationTextComponent("message.bleeding")
-                .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+                .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+                true);
         this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
       }
     }
@@ -236,7 +247,8 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
         && !this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
       this.getEntity()
           .sendStatusMessage(new TranslationTextComponent("message.infected")
-              .setStyle(new Style().setColor(TextFormatting.RED).setBold(true)), true);
+              .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+              true);
       this.getEntity().addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
     }
   }

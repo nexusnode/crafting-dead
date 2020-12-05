@@ -17,6 +17,7 @@
  */
 package com.craftingdead.core.util;
 
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -48,9 +49,9 @@ public class Text {
   }
 
   public static ITextComponent copyAndJoin(ITextComponent... texts) {
-    ITextComponent fullText = texts[0].deepCopy();
+    IFormattableTextComponent fullText = texts[0].deepCopy();
     for (int i = 1; i < texts.length; i++) {
-      fullText = fullText.appendSibling(texts[i].deepCopy());
+      fullText = fullText.append(texts[i].deepCopy());
     }
     return fullText;
   }

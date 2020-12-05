@@ -52,7 +52,7 @@ public class GrenadeItem extends Item {
   public void addInformation(ItemStack stack, @Nullable World world,
       List<ITextComponent> texts, ITooltipFlag tooltipFlag) {
     texts
-        .add(Text.translate("item_lore.grenade").applyTextStyle(TextFormatting.GRAY));
+        .add(Text.translate("item_lore.grenade").mergeStyle(TextFormatting.GRAY));
   }
 
   @Override
@@ -67,7 +67,7 @@ public class GrenadeItem extends Item {
       GrenadeEntity grenadeEntity = grenadeEntitySupplier.apply(playerIn, worldIn);
 
       float force = playerIn.isSneaking() ? 0.4F : this.throwSpeed;
-      grenadeEntity.setPosition(playerIn.getPosX(), playerIn.getPosY() + playerIn.getEyeHeight(),
+      grenadeEntity.setPositionAndUpdate(playerIn.getPosX(), playerIn.getPosY() + playerIn.getEyeHeight(),
           playerIn.getPosZ());
       grenadeEntity.shootFromEntity(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0,
           force, 1.0F);

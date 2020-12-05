@@ -100,23 +100,21 @@ public class ClothingItem extends Item {
   public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
-    ITextComponent armorLevelText =
-        Text.of(this.enhancedProtection).applyTextStyle(TextFormatting.RED);
+    ITextComponent armorLevelText = Text.of(this.enhancedProtection).mergeStyle(TextFormatting.RED);
     lines.add(Text
         .translate("item_lore.clothing.enhanced_protection")
-        .applyTextStyle(TextFormatting.GRAY)
-        .appendSibling(armorLevelText));
+        .mergeStyle(TextFormatting.GRAY)
+        .append(armorLevelText));
 
     if (this.slownessAmplifier != null) {
       String potionNameAndLevel = I18n.format(Effects.SLOWNESS.getName()) + " "
           + I18n.format("enchantment.level." + (this.slownessAmplifier + 1));
-      lines.add(Text.of(potionNameAndLevel).applyTextStyle(TextFormatting.GRAY));
+      lines.add(Text.of(potionNameAndLevel).mergeStyle(TextFormatting.GRAY));
     }
 
     if (this.fireImmunity) {
-      lines.add(Text
-          .translate("item_lore.clothing.immune_to_fire")
-          .applyTextStyle(TextFormatting.GRAY));
+      lines
+          .add(Text.translate("item_lore.clothing.immune_to_fire").mergeStyle(TextFormatting.GRAY));
     }
   }
 

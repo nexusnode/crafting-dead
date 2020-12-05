@@ -18,16 +18,16 @@
 package com.craftingdead.core.client.renderer;
 
 import java.util.Random;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class CameraManager {
 
   private static final Random random = new Random();
 
-  private Vec2f lookRotationVelocity;
+  private Vector2f lookRotationVelocity;
 
   private long joltDurationMs;
 
@@ -46,7 +46,7 @@ public class CameraManager {
     float randomAmount = amountPercent * (random.nextFloat() + 1.0F) / 2.0F;
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
     this.lookRotationVelocity =
-        modifyLookPosition ? new Vec2f(-randomAmount * 3F, randomNegativeAmount * 3.25F) : null;
+        modifyLookPosition ? new Vector2f(-randomAmount * 3F, randomNegativeAmount * 3.25F) : null;
     this.joltStartTime = Util.milliTime();
     this.rollMultiplier = randomNegativeAmount * 0.75F;
     this.pitchMultiplier = randomAmount / 2.0F;
@@ -54,15 +54,15 @@ public class CameraManager {
     this.joltDurationMs = (long) (450L * (randomAmount * 2.15F));
   }
 
-  public Vec2f getLookRotationVelocity() {
+  public Vector2f getLookRotationVelocity() {
     if (this.lookRotationVelocity == null) {
-      return new Vec2f(0.0F, 0.0F);
+      return new Vector2f(0.0F, 0.0F);
     }
     float pct = 1.0F - MathHelper
         .clamp((float) (Util.milliTime() - this.joltStartTime) / (this.joltDurationMs / 2.0F), 0.0F,
             1.0F);
-    Vec2f newRotationVelocity =
-        new Vec2f(this.lookRotationVelocity.x * pct, this.lookRotationVelocity.y * pct);
+    Vector2f newRotationVelocity =
+        new Vector2f(this.lookRotationVelocity.x * pct, this.lookRotationVelocity.y * pct);
     return newRotationVelocity;
   }
 

@@ -27,6 +27,7 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -42,20 +43,22 @@ public class CommandThirst {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
     dispatcher.register(Commands.literal("thirst").requires((source) -> {
-        return source.hasPermissionLevel(3);
+      return source.hasPermissionLevel(3);
     }).executes((source) -> {
-        return processCommand(source.getSource(), source.getSource().asPlayer().getGameProfile().getName());
+      return processCommand(source.getSource(),
+          source.getSource().asPlayer().getGameProfile().getName());
     }).then(Commands.argument("target", StringArgumentType.string()).suggests((source, builder) -> {
-        return ISuggestionProvider.suggest(source.getSource().getServer().getOnlinePlayerNames(), builder);
+      return ISuggestionProvider.suggest(source.getSource().getServer().getOnlinePlayerNames(),
+          builder);
     }).executes((source) -> {
-        return processCommand(source.getSource(), StringArgumentType.getString(source, "target"));
+      return processCommand(source.getSource(), StringArgumentType.getString(source, "target"));
     })));
   }
 
   /**
    * This method process how the command'll be performed by the server.
    *
-   * @param source      - Source of command
+   * @param source - Source of command
    * @param player_name - Name of player to be thirsted (nullable)
    * @return
    */
@@ -64,13 +67,14 @@ public class CommandThirst {
     if (player_name != null && !player_name.isEmpty()) {
       if (!player_name.equals("all") && !player_name.equals("*")) {
         source.getServer().getPlayerList().getPlayers().stream().filter(player -> {
-            return player.getGameProfile().getName().equalsIgnoreCase(player_name);
+          return player.getGameProfile().getName().equalsIgnoreCase(player_name);
         }).findFirst().ifPresent(player -> {
-            thirst(source, player);
-            utilized.set(true);
+          thirst(source, player);
+          utilized.set(true);
         });
       } else {
-        source.getServer().getPlayerList().getPlayers().stream().forEach(player -> thirst(source, player));
+        source.getServer().getPlayerList().getPlayers().stream()
+            .forEach(player -> thirst(source, player));
         utilized.set(true);
       }
     }
@@ -92,25 +96,27 @@ public class CommandThirst {
     try {
       if (serverPlayerEntity.isAlive()) {
         IPlayer.getExpected(serverPlayerEntity).setWater(20);
-        serverPlayerEntity.playSound(SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0f, 5.0f);
+        serverPlayerEntity.playSound(SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0f,
+            5.0f);
         if (source.asPlayer() != serverPlayerEntity) {
-          serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION);
+          serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION, Util.DUMMY_UUID);
         }
         return 1;
       }
-    } catch (CommandSyntaxException OK) {}
+    } catch (CommandSyntaxException OK) {
+    }
     return 0;
   }
 
   static {
     SUCCESS_MESSAGE_OPERATOR = new StringTextComponent(
         new TranslationTextComponent("commands.craftingdead.thirst.success.operator").getString())
-            .applyTextStyle(TextFormatting.GREEN);
+            .mergeStyle(TextFormatting.GREEN);
     SUCCESS_MESSAGE_CONFIRMATION = new StringTextComponent(
-        new TranslationTextComponent("commands.craftingdead.thirst.success.confirmation").getString())
-            .applyTextStyle(TextFormatting.GREEN);;
+        new TranslationTextComponent("commands.craftingdead.thirst.success.confirmation")
+            .getString()).mergeStyle(TextFormatting.GREEN);;
     FAILURE_MESSAGE_NOT_USED = new StringTextComponent(
         new TranslationTextComponent("commands.craftingdead.thirst.failure.not_used").getString())
-            .applyTextStyle(TextFormatting.GRAY);;
+            .mergeStyle(TextFormatting.GRAY);;
   }
 }

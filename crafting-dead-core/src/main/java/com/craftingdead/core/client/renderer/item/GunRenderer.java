@@ -52,15 +52,14 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.Model;
+import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -68,6 +67,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -390,7 +390,8 @@ public abstract class GunRenderer implements IItemRenderer {
 
       bakedModel = bakedModel.handlePerspective(transformType, matrixStack);
       IVertexBuilder vertexBuilder =
-          ItemRenderer.getBuffer(renderTypeBuffer, Atlases.getTranslucentBlockType(), true, glint);
+          ItemRenderer.getBuffer(renderTypeBuffer, Atlases.getTranslucentCullBlockType(), true,
+              glint);
       List<BakedQuad> bakedQuads = bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE);
       MatrixStack.Entry matrixStackEntry = matrixStack.getLast();
       for (BakedQuad bakedQuad : bakedQuads) {
@@ -412,7 +413,8 @@ public abstract class GunRenderer implements IItemRenderer {
       matrixStack.translate(0.0D, 0.05D, 0.0D);
       IBakedModel bakedModel = this.getBakedModel(this.getGunModelLocation(),
           gun.getPaint().flatMap(IPaint::getSkin).map(skin -> ImmutableMap.of("base",
-              Either.<Material, String>left(new Material(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+              Either.<RenderMaterial, String>left(new RenderMaterial(
+                  PlayerContainer.LOCATION_BLOCKS_TEXTURE,
                   new ResourceLocation(skin.getNamespace(), "gun/"
                       + this.gunItem.get().getRegistryName().getPath() + "_" + skin.getPath())))))
               .orElse(null));
@@ -422,25 +424,25 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.pop();
   }
 
-  protected final Material getGunMaterial(IGun gun) {
+  protected final RenderMaterial getGunMaterial(IGun gun) {
     IUnbakedModel unbakedModel =
         ModelLoader.instance().getModelOrMissing(this.getGunModelLocation());
     ResourceLocation skin = gun.getPaint().flatMap(IPaint::getSkin).orElse(null);
     if (unbakedModel instanceof BlockModel) {
       if (skin != null) {
-        return new Material(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+        return new RenderMaterial(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
             new ResourceLocation(skin.getNamespace(),
                 "gun/" + this.gunItem.get().getRegistryName().getPath() + "_"
                     + skin.getPath()));
       }
       return ((BlockModel) unbakedModel).resolveTextureName("base");
     }
-    return new Material(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+    return new RenderMaterial(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
         MissingTextureSprite.getLocation());
   }
 
   protected final IBakedModel getBakedModel(ResourceLocation modelLocation,
-      @Nullable Map<String, Either<Material, String>> textures) {
+      @Nullable Map<String, Either<RenderMaterial, String>> textures) {
     return this.cachedModels.computeIfAbsent(
         modelLocation.hashCode() + (textures == null ? 0 : textures.hashCode()), key -> {
           if (textures != null) {

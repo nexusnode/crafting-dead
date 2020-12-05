@@ -22,13 +22,12 @@ import com.craftingdead.core.client.renderer.entity.model.CylinderGrenadeModel;
 import com.craftingdead.core.entity.grenade.GrenadeEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class CylinderGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
 
@@ -50,13 +49,12 @@ public class CylinderGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
       totalTicks += partialTicks;
     }
 
-    matrixStack.rotate(Vector3f.XP
-        .rotationDegrees(totalTicks * 30F));
+    matrixStack.rotate(Vector3f.XP.rotationDegrees(totalTicks * 30F));
 
     IVertexBuilder vertexBuilder =
         renderTypeBuffer.getBuffer(model.getRenderType(this.getEntityTexture(entity)));
-    model.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
-        1.0F, 0.15F);
+    this.model.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F,
+        1.0F, 1.0F, 0.15F);
   }
 
   @Override
