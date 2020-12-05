@@ -22,6 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -56,7 +57,9 @@ public class HitMessage {
                 .getIngameGui()::displayHitMarker);
         if (msg.dead && ClientDist.clientConfig.playKillSound.get()) {
           final Minecraft minecraft = Minecraft.getInstance();
-          minecraft.player.playSound(SoundEvents.BLOCK_ANVIL_PLACE, 5.0F, 1.0F);
+          // Plays a sound that follows the player
+          minecraft.world.playMovingSound(minecraft.player, minecraft.player,
+              SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
         }
       });
     }
