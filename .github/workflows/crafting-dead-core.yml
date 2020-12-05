@@ -5,9 +5,9 @@ name: Crafting Dead Core
 
 on:
   push:
-    branches: [ 1.15.x ]
+    branches: [ 1.16.x ]
   pull_request:
-    branches: [ 1.15.x ]
+    branches: [ 1.16.x ]
 
 jobs:
   build:
