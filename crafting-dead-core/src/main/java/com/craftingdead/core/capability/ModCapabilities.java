@@ -44,6 +44,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ModCapabilities {
 
@@ -97,6 +98,16 @@ public class ModCapabilities {
         DefaultActionProvider::new);
     CapabilityManager.INSTANCE.register(IAnimationProvider.class, new EmptyStorage<>(),
         DefaultAnimationProvider::new);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R extends T> R getExpected(Capability<T> capability,
+      ICapabilityProvider provider, Class<R> clazz) {
+    return provider.getCapability(capability)
+        .filter(t -> t.getClass().isAssignableFrom(clazz))
+        .map(c -> (R) c)
+        .orElseThrow(
+            () -> new IllegalStateException("Expecting capability '" + capability.getName()));
   }
 
   private static class EmptyStorage<C> implements Capability.IStorage<C> {

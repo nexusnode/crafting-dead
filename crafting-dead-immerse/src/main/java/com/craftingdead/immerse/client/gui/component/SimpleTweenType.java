@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import io.noties.tumbleweed.TweenType;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 
 public class SimpleTweenType<T> implements TweenType<T> {
 
@@ -32,11 +32,11 @@ public class SimpleTweenType<T> implements TweenType<T> {
     this(1, t -> new float[] {getter.get(t)}, (t, v) -> setter.set(t, v[0]));
   }
 
-  public SimpleTweenType(Vec2fGetter<T> getter, Vec2fSetter<T> setter) {
+  public SimpleTweenType(Vector2fGetter<T> getter, Vector2fSetter<T> setter) {
     this(1, t -> {
-      Vec2f v = getter.get(t);
+      Vector2f v = getter.get(t);
       return new float[] {v.x, v.y};
-    }, (t, v) -> setter.set(t, new Vec2f(v[0], v[1])));
+    }, (t, v) -> setter.set(t, new Vector2f(v[0], v[1])));
   }
 
   public SimpleTweenType(int size, Function<T, float[]> getter, BiConsumer<T, float[]> setter) {
@@ -61,13 +61,13 @@ public class SimpleTweenType<T> implements TweenType<T> {
   }
 
   @FunctionalInterface
-  public static interface Vec2fGetter<T> {
-    Vec2f get(T t);
+  public static interface Vector2fGetter<T> {
+    Vector2f get(T t);
   }
 
   @FunctionalInterface
-  public static interface Vec2fSetter<T> {
-    void set(T t, Vec2f v);
+  public static interface Vector2fSetter<T> {
+    void set(T t, Vector2f v);
   }
 
   @FunctionalInterface

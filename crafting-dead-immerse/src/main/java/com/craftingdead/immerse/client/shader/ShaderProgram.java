@@ -27,6 +27,7 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.client.shader.IShaderManager;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.client.shader.ShaderLoader;
+import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -66,17 +67,16 @@ public class ShaderProgram implements IShaderManager {
       this.program = ShaderLinkHelper.createProgram();
       ShaderLinkHelper.linkProgram(this);
     } catch (IOException e) {
-      logger.fatal("Can't create program {}, please report this issue", getClass().getSimpleName(),
-          e);
+      logger.fatal("Can't create program {}", getClass().getSimpleName(), e);
     }
   }
 
   @Nonnull
   private static ShaderLoader createShader(IResourceManager manager,
       @Nonnull ResourceLocation location, ShaderLoader.ShaderType type) throws IOException {
-    try (InputStream stream =
-        new BufferedInputStream(manager.getResource(location).getInputStream())) {
-      return ShaderLoader.func_216534_a(type, location.toString(), stream);
+    IResource resource = manager.getResource(location);
+    try (InputStream stream = new BufferedInputStream(resource.getInputStream())) {
+      return ShaderLoader.func_216534_a(type, location.toString(), stream, resource.getPackName());
     }
   }
 

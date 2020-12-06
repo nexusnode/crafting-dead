@@ -19,6 +19,7 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Objects;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.RenderSkybox;
@@ -41,8 +42,8 @@ public class PanoramaComponent extends Component<PanoramaComponent> {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
     this.panorama.render(partialTicks, 1.0F);
     RenderUtil.bind(PANORAMA_OVERLAY_TEXTURES);
     RenderSystem.enableBlend();

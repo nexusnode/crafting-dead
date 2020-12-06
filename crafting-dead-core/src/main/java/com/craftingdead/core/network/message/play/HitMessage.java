@@ -20,7 +20,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -52,14 +52,14 @@ public class HitMessage {
   public static boolean handle(HitMessage msg, Supplier<NetworkEvent.Context> ctx) {
     if (ctx.get().getDirection().getReceptionSide().isClient()) {
       ctx.get().enqueueWork(() -> {
+        ClientDist clientDist = CraftingDead.getInstance().getClientDist();
         ClientDist.clientConfig.hitMarkerMode.get().createHitMarker(msg.hitPos, msg.dead)
-            .ifPresent(((ClientDist) CraftingDead.getInstance().getModDist())
-                .getIngameGui()::displayHitMarker);
+            .ifPresent(clientDist.getIngameGui()::displayHitMarker);
         if (msg.dead && ClientDist.clientConfig.playKillSound.get()) {
-          final Minecraft minecraft = Minecraft.getInstance();
           // Plays a sound that follows the player
-          minecraft.world.playMovingSound(minecraft.player, minecraft.player,
-              SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
+          ClientPlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
+          playerEntity.getEntityWorld().playMovingSound(clientDist.getExpectedPlayer().getEntity(),
+              playerEntity, SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
         }
       });
     }

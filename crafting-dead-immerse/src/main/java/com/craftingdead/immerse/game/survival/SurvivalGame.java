@@ -17,6 +17,7 @@
  */
 package com.craftingdead.immerse.game.survival;
 
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.Player;
 import com.craftingdead.immerse.game.AbstractGame;
@@ -46,9 +47,9 @@ public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     event.getCapabilities().get(ILiving.ID)
-        .getCapability(com.craftingdead.core.capability.ModCapabilities.LIVING)
+        .getCapability(ModCapabilities.LIVING)
         .filter(living -> living instanceof Player)
-        .<Player<?>>cast()
+        .map(living -> (Player<?>) living)
         .ifPresent(
             player -> player.registerExtension(SurvivalPlayer.ID, new SurvivalPlayer(player)));
   }

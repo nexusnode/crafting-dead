@@ -27,6 +27,7 @@ import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
@@ -40,7 +41,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -107,15 +108,15 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public Component() {
     this.node = Yoga.YGNodeNew();
     Yoga.YGNodeSetMeasureFunc(this.node, (node, width, widthMode, height, heightMode) -> {
-      Vec2f size = this.measure(MeasureMode.fromYogaType(widthMode), width,
+      Vector2f size = this.measure(MeasureMode.fromYogaType(widthMode), width,
           MeasureMode.fromYogaType(heightMode), height);
       return YGMeasureFunc.toLong(YGSize.create().width(size.x).height(size.y));
     });
   }
 
-  protected Vec2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
-    return new Vec2f(width, height);
+    return new Vector2f(width, height);
   }
 
   protected void added() {}
@@ -142,7 +143,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     float currentTime = this.lastTime + partialTicks;
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
@@ -160,8 +161,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     }
 
     if (this.tooltip != null && this.isMouseOver(mouseX, mouseY)) {
-      this.tooltip.render(this.minecraft.fontRenderer, 10.0D + this.getX() + this.getWidth(),
-          this.getY());
+      this.tooltip.render(this.minecraft.fontRenderer, matrixStack,
+          10.0D + this.getX() + this.getWidth(), this.getY());
     }
   }
 

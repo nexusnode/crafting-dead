@@ -357,7 +357,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
-      ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
+      ClientDist clientDist = CraftingDead.getInstance().getClientDist();
       Minecraft minecraft = clientDist.getMinecraft();
 
       partialTicks = minecraft.getRenderPartialTicks();
@@ -488,8 +488,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
           1.0F, 1.0F);
 
       if (hitEntity instanceof ClientPlayerEntity) {
-        ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager().joltCamera(1.5F,
-            false);
+        CraftingDead.getInstance().getClientDist().getCameraManager().joltCamera(1.5F, false);
       }
 
       final int particleCount = 12;

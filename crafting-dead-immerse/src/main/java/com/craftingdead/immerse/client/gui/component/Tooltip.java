@@ -18,6 +18,7 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.client.gui.FontRenderer;
@@ -40,18 +41,18 @@ public class Tooltip {
     this.text = text;
   }
 
-  public void render(FontRenderer fontRenderer, double x, double y) {
-    final double width = 10.0D + fontRenderer.getStringWidth(this.text.getFormattedText());
+  public void render(FontRenderer fontRenderer, MatrixStack matrixStack, double x, double y) {
+    final double width = 10.0D + fontRenderer.getStringPropertyWidth(this.text);
     final double height = 14;
     RenderSystem.enableBlend();
-    RenderUtil.roundedFill(x, y, x + width, y + height,
-        +((int) (this.alpha * 0.5F * 255.0F) << 24), 3.0F);
+    RenderUtil.roundedFill(x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24),
+        3.0F);
 
     final int textOpacity = Math.min((int) (this.textAlpha * 255.0F), 255);
     if (textOpacity >= 8) {
-      fontRenderer.drawString(this.text.getFormattedText(),
-          (float) (x + (width - fontRenderer.getStringWidth(this.text.getFormattedText())) / 2),
-          (float) y + 4, 0xFFFFFF + (textOpacity << 24));
+      fontRenderer.func_243246_a(matrixStack, this.text,
+          (float) (x + (width - fontRenderer.getStringPropertyWidth(this.text)) / 2), (float) y + 4,
+          0xFFFFFF + (textOpacity << 24));
     }
 
     RenderSystem.disableBlend();

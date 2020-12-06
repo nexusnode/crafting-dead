@@ -21,6 +21,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.immerse.game.IGameClient;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -37,8 +38,8 @@ public class SurvivalClient extends SurvivalGame implements IGameClient<Survivor
 
   @Override
   public void renderOverlay(Minecraft minecraft,
-      IPlayer<? extends AbstractClientPlayerEntity> player, int width, int height,
-      float partialTicks) {
+      IPlayer<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      int height, float partialTicks) {
     SurvivalPlayer survivalPlayer = SurvivalPlayer.getExpected(player);
     int y = height / 2;
     int x = 4;
@@ -47,18 +48,18 @@ public class SurvivalClient extends SurvivalGame implements IGameClient<Survivor
 
     RenderUtil.bind(DAYS_SURVIVED);
     RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
-    minecraft.fontRenderer.drawStringWithShadow(String.valueOf(survivalPlayer.getDaysSurvived()),
-        x + 20, y - 16, 0xFFFFFF);
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
     RenderUtil.bind(ZOMBIES_KILLED);
     RenderUtil.drawTexturedRectangle(x, y, 16, 16);
-    minecraft.fontRenderer.drawStringWithShadow(String.valueOf(survivalPlayer.getZombiesKilled()),
-        x + 20, y + 4, 0xFFFFFF);
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
     RenderUtil.bind(PLAYERS_KILLED);
     RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
-    minecraft.fontRenderer.drawStringWithShadow(String.valueOf(survivalPlayer.getPlayersKilled()),
-        x + 20, y + 24, 0xFFFFFF);
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 
     RenderSystem.disableBlend();
   }

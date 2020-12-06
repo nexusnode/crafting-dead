@@ -181,6 +181,13 @@ public class CraftingDead {
     return this.modDist;
   }
 
+  public ClientDist getClientDist() {
+    if (this.modDist instanceof ClientDist) {
+      return (ClientDist) this.modDist;
+    }
+    throw new IllegalStateException("Accessing client dist on wrong side");
+  }
+
   public boolean isTravelersBackpacksLoaded() {
     return this.travelersBackpacksLoaded;
   }

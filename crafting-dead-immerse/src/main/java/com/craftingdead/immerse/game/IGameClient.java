@@ -18,13 +18,14 @@
 package com.craftingdead.immerse.game;
 
 import com.craftingdead.core.capability.living.IPlayer;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 
 public interface IGameClient<T extends ITeam> extends IGame<T> {
 
   default void load() {}
-  
+
   void renderOverlay(Minecraft minecraft, IPlayer<? extends AbstractClientPlayerEntity> player,
-      int width, int height, float partialTicks);
+      MatrixStack matrixStack, int width, int height, float partialTicks);
 }

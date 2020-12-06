@@ -28,8 +28,8 @@ import net.minecraft.util.SharedConstants;
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
 
-  @Inject(method = "func_230149_ax_", at = @At("HEAD"), cancellable = true)
-  private void func_230149_ax_(CallbackInfoReturnable<String> callbackInfo) {
+  @Inject(method = "getWindowTitle", at = @At("HEAD"), cancellable = true)
+  private void getWindowTitle(CallbackInfoReturnable<String> callbackInfo) {
     callbackInfo.setReturnValue("Minecraft " + SharedConstants.getVersion().getName() + " - "
         + CraftingDead.DISPLAY_NAME + " " + CraftingDead.VERSION);
   }

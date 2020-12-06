@@ -263,6 +263,12 @@ public class ClientDist implements IModDist {
         .map(living -> (IPlayer<ClientPlayerEntity>) living);
   }
 
+  @SuppressWarnings("unchecked")
+  public IPlayer<ClientPlayerEntity> getExpectedPlayer() {
+    return ModCapabilities.getExpected(ModCapabilities.LIVING, this.minecraft.player,
+        IPlayer.class);
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================

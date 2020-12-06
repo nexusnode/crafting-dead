@@ -24,7 +24,9 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.util.ResourceLocation;
 
@@ -79,8 +81,12 @@ public class Blur implements Closeable {
 
   public void render(float x, float y, float width, float height, float partialTicks) {
     this.blurShader.render(partialTicks);
+    // TODO Fixes Minecraft bug when using post-processing shaders.
+    RenderSystem.enableTexture();
+
     this.minecraft.getFramebuffer().bindFramebuffer(false);
-    this.blurShader.getFramebufferRaw("output").bindFramebufferTexture();
+    Framebuffer framebuffer = this.blurShader.getFramebufferRaw("output");
+    framebuffer.bindFramebufferTexture();
     RenderUtil.blit(x, y, x + width, y + height, x, y, x + width, y + height,
         this.minecraft.getMainWindow().getScaledWidth(),
         this.minecraft.getMainWindow().getScaledHeight());
