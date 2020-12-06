@@ -65,8 +65,14 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final int fireRateMs;
 
+  /**
+   * Damage inflicted by a single shot from this gun.
+   */
   private final int damage;
 
+  /**
+   * The duration of time this gun takes to reload in ticks.
+   */
   private final int reloadDurationTicks;
 
   /**
@@ -80,12 +86,12 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   private final int bulletAmountToFire;
 
   /**
-   * Whether the player can aim with this gun or not
+   * Whether the player can aim with this gun or not.
    */
   private final boolean aimable;
 
   /**
-   * Whether the crosshair should be rendered or not while holding this item
+   * Whether the crosshair should be rendered or not while holding this item.
    */
   private final boolean crosshair;
 
@@ -94,32 +100,69 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final List<FireMode> fireModes;
 
+  /**
+   * Sound to play for each shot of the gun.
+   */
   private final Supplier<SoundEvent> shootSound;
 
+  /**
+   * A 'silenced' version of the shoot sound.
+   */
   private final Supplier<SoundEvent> silencedShootSound;
 
+  /**
+   * Sound to play whilst the gun is being reloaded.
+   */
   private final Supplier<SoundEvent> reloadSound;
 
+  /**
+   * All the animations used by this gun.
+   */
   private final Map<AnimationType, Supplier<GunAnimation>> animations;
 
+  /**
+   * A set of magazines that are supported by this gun.
+   */
   private final Set<Supplier<MagazineItem>> acceptedMagazines;
 
+  /**
+   * The default magazine that is supplied with this gun when crafted.
+   */
   private final Supplier<MagazineItem> defaultMagazine;
 
+  /**
+   * A set of attachments that are supported by this gun.
+   */
   private final Set<Supplier<AttachmentItem>> acceptedAttachments;
 
+  /**
+   * A set of paints that are supported by this gun.
+   */
   private final Set<Supplier<PaintItem>> acceptedPaints;
 
-  private final Set<Supplier<AttachmentItem>> defaultAttachments;
-
+  /**
+   * A factory that creates a {@link GunRenderer} instance for this gun.
+   */
   private final Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
+  /**
+   * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
+   */
   private final IGun.RightMouseActionTriggerType rightMouseActionTriggerType;
 
+  /**
+   * A {@link Predicate} used to determine if the gun can shoot or not.
+   */
   private final Predicate<IGun> triggerPredicate;
 
+  /**
+   * Sound to be played when performing the right mouse action.
+   */
   private final Supplier<SoundEvent> rightMouseActionSound;
 
+  /**
+   * A delay in milliseconds between repeating the right mouse action sound.
+   */
   private final long rightMouseActionSoundRepeatDelayMs;
 
   public GunItem(Properties properties) {
@@ -139,7 +182,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.acceptedMagazines = properties.acceptedMagazines;
     this.defaultMagazine = properties.defaultMagazine;
     this.acceptedAttachments = properties.acceptedAttachments;
-    this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this.rendererFactory = properties.rendererFactory;
     this.rightMouseActionTriggerType = properties.rightMouseActionTriggerType;
@@ -210,10 +252,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public Set<PaintItem> getAcceptedPaints() {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
-  }
-
-  public Set<AttachmentItem> getDefaultAttachments() {
-    return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public IGun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
@@ -388,8 +426,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
 
-    private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
-
     private Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
     private IGun.RightMouseActionTriggerType rightMouseActionTriggerType =
@@ -477,11 +513,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
       this.acceptedAttachments.add(acceptedAttachment);
       return this;
-    }
-
-    public Properties addDefaultAttachment(Supplier<AttachmentItem> defaultAttachment) {
-      this.defaultAttachments.add(defaultAttachment);
-      return this.addAcceptedAttachment(defaultAttachment);
     }
 
     public Properties addAcceptedPaint(Supplier<PaintItem> acceptedPaint) {

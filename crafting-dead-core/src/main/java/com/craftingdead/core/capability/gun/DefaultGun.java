@@ -18,6 +18,7 @@
 package com.craftingdead.core.capability.gun;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -161,7 +162,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
    */
   private int shotCount;
 
-  private Set<AttachmentItem> attachments;
+  private Set<AttachmentItem> attachments = new HashSet<>();
 
   private ItemStack paintStack = ItemStack.EMPTY;
 
@@ -185,7 +186,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     this.gunItem = gunItem;
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
-    this.attachments = gunItem.getDefaultAttachments();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
   }
 
