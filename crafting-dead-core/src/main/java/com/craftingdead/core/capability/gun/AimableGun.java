@@ -18,17 +18,35 @@
 package com.craftingdead.core.capability.gun;
 
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.GunItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 
 public class AimableGun extends DefaultGun implements IScope {
 
+  private boolean canAim = true;
+
   public AimableGun(GunItem gunItem) {
     super(gunItem);
+  }
+
+  public boolean canAim() {
+    return canAim;
+  }
+
+  public void setCanAim(boolean canAim) {
+    this.canAim = canAim;
   }
 
   @Override
@@ -51,6 +69,42 @@ public class AimableGun extends DefaultGun implements IScope {
       }
     }
     return Optional.empty();
+  }
+
+  @Override
+  public void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate) {
+    if(canAim) {
+      super.toggleRightMouseAction(living, sendUpdate);
+    }
+  }
+
+  @Override
+  public void tick(ILiving<?, ?> living, ItemStack itemStack) {
+    long passedTime = Util.milliTime() - super.getLastShotMs();
+
+    Entity entity = living.getEntity();
+    GunItem gunItem = super.getGunItem();
+
+    if(passedTime >= super.getGunItem().getFireRateMs() && !canAim) {
+      canAim = true;
+      toggleRightMouseAction(living, false);
+    }
+
+    super.tick(living, itemStack);
+  }
+
+  @Override
+  protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
+    Entity entity = living.getEntity();
+
+    GunItem gunItem = super.getGunItem();
+
+    super.processShot(living, itemStack);
+
+    if(this.isAiming(entity, itemStack) && gunItem.hasBoltAction()) {
+      toggleRightMouseAction(living, false);
+      canAim = false;
+    }
   }
 
   @Override
