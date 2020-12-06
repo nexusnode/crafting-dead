@@ -85,10 +85,7 @@ public class AimableGun extends DefaultGun implements IScope {
 
     super.processShoot(living, itemStack);
 
-    if(this.isAiming(entity, itemStack)
-            && gunItem.hasBoltAction()
-            && super.getAttachments().stream().anyMatch(AttachmentItem::isScope)) {
-
+    if(this.isAiming(entity, itemStack) && gunItem.hasBoltAction()) {
       toggleRightMouseAction(living, false);
       canAim = false;
 
