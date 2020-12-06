@@ -314,7 +314,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     }
 
     if (!this.canShoot(living)) {
-
       this.triggerPressed = false;
       return;
     }
@@ -372,8 +371,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       }
 
       if(this instanceof AimableGun && ((AimableGun) this).isAiming(entity, new ItemStack(gunItem))
-              && (gunItem.equals(ModItems.AWP.get()) || gunItem.equals(ModItems.M107.get())) && this.attachments.stream()
-              .anyMatch(attachmentItem -> attachmentItem.equals(ModItems.HP_SCOPE.get()) || attachmentItem.equals(ModItems.LP_SCOPE.get()))) {
+              && gunItem.hasBoltAction() && this.attachments.stream().anyMatch(attachmentItem -> attachmentItem.isScope())) {
+        AimableGun gun = (AimableGun) this;
         toggleRightMouseAction(living, false);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {

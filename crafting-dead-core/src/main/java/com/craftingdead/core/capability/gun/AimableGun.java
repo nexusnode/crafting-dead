@@ -27,6 +27,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class AimableGun extends DefaultGun implements IScope {
 
+
   public AimableGun(GunItem gunItem) {
     super(gunItem);
   }

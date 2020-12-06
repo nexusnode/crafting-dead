@@ -90,6 +90,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   private final boolean crosshair;
 
   /**
+   * Whether the gun has bolt action
+   * */
+  private final boolean boltAction;
+
+  /**
    * {@link FireMode}s the gun can cycle through.
    */
   private final List<FireMode> fireModes;
@@ -131,6 +136,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.bulletAmountToFire = properties.bulletAmountToFire;
     this.aimable = properties.aimable;
     this.crosshair = properties.crosshair;
+    this.boltAction = properties.boltAction;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
     this.silencedShootSound = properties.silencedShootSound;
@@ -174,6 +180,10 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public boolean hasCrosshair() {
     return this.crosshair;
+  }
+
+  public boolean hasBoltAction() {
+    return this.boltAction;
   }
 
   public List<FireMode> getFireModes() {
@@ -377,6 +387,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private boolean crosshair = true;
 
+    private boolean boltAction = false;
+
     private final List<FireMode> fireModes = new ArrayList<>();
 
     private Supplier<SoundEvent> shootSound;
@@ -436,6 +448,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     public Properties setCrosshair(boolean crosshair) {
       this.crosshair = crosshair;
+      return this;
+    }
+
+    public Properties setBoltAction(boolean boltAction) {
+      this.boltAction = boltAction;
       return this;
     }
 
