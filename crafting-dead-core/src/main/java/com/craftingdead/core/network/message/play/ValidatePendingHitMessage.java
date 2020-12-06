@@ -82,7 +82,7 @@ public class ValidatePendingHitMessage {
         Optional.ofNullable(hitEntity).filter(e -> e instanceof LivingEntity)
             .map(e -> (LivingEntity) e).flatMap(ILiving::getOptional).ifPresent(hitLiving -> {
               for (PendingHit value : hit.getValue()) {
-                gun.validatePendingHit(player, heldStack, hitLiving, value);
+                gun.validatePendingHit(player, heldStack, (ILiving<?, ?>) hitLiving, value);
               }
             });
       }
