@@ -24,16 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.Timer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import com.craftingdead.core.item.ModItems;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
@@ -105,6 +97,11 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.CombatRules;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -129,7 +126,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private static final Random random = new Random();
 
-  private final GunItem gunItem;
+  protected final GunItem gunItem;
 
   /**
    * If the gun trigger is pressed.
@@ -225,8 +222,15 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   @Override
-  public void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack,
-      boolean triggerPressed,
+  public void reset(ILiving<?, ?> living, ItemStack itemStack) {
+    this.setTriggerPressed(living, itemStack, false, false);
+    if (this.performingRightMouseAction) {
+      this.toggleRightMouseAction(living, false);
+    }
+  }
+
+  @Override
+  public void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack, boolean triggerPressed,
       boolean sendUpdate) {
 
     if (!this.canShoot(living)) {
@@ -374,7 +378,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
               playSound = entity.getEntityWorld()
                   .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
-                  .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
+                      .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
             }
             this.hitBlock(living, itemStack, (BlockRayTraceResult) rayTraceResult,
                 playSound && entity.getEntityWorld().isRemote());
@@ -438,7 +442,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     this.lastShotMs = time;
 
     boolean isMaxShotsReached =
-            this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
     if (isMaxShotsReached) {
       return;
     }
@@ -629,12 +633,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     return this.paintStack;
   }
 
-  public GunItem getGunItem() {
-    return gunItem;
-  }
-
   public long getLastShotMs() {
-    return lastShotMs;
+    return this.lastShotMs;
   }
 
   @Override
@@ -729,13 +729,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     this.setMagazineStack(ItemStack.read(nbt.getCompound("magazineStack")));
-    this
-        .setAttachments(nbt
-            .getList("attachments", 8)
-            .stream()
-            .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
-                .getValue(new ResourceLocation(tag.getString())))
-            .collect(Collectors.toSet()));
+    this.setAttachments(nbt.getList("attachments", 8)
+        .stream()
+        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
+            .getValue(new ResourceLocation(tag.getString())))
+        .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
   }
 
@@ -784,9 +782,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     float explosionSize = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, magazineStack)
         / Enchantments.POWER.getMaxLevel();
     if (explosionSize > 0) {
-      entity.getEntityWorld()
-          .createExplosion(entity, position.getX(), position.getY(), position.getZ(), explosionSize,
-              Explosion.Mode.NONE);
+      entity.getEntityWorld().createExplosion(entity, position.getX(), position.getY(),
+          position.getZ(), explosionSize, Explosion.Mode.NONE);
     }
   }
 }

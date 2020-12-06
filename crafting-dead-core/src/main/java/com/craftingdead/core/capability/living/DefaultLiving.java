@@ -204,8 +204,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     if (heldStack != this.lastHeldStack) {
       this.getActionProgress().ifPresent(IActionProgress::stop);
-      heldStack.getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.setTriggerPressed(this, heldStack, false, false));
+      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.reset(this, heldStack));
       this.lastHeldStack = heldStack;
     }
 

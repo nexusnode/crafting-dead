@@ -104,8 +104,8 @@ public class ModCapabilities {
   public static <T, R extends T> R getExpected(Capability<T> capability,
       ICapabilityProvider provider, Class<R> clazz) {
     return provider.getCapability(capability)
-        .filter(t -> t.getClass().isAssignableFrom(clazz))
-        .map(c -> (R) c)
+        .filter(t -> clazz.isInstance(t))
+        .map(t -> (R) t)
         .orElseThrow(
             () -> new IllegalStateException("Expecting capability '" + capability.getName()));
   }

@@ -40,6 +40,8 @@ public interface IGun
     extends IAnimationProvider<GunAnimationController>, INBTSerializable<CompoundNBT> {
 
   void tick(ILiving<?, ?> living, ItemStack itemStack);
+  
+  void reset(ILiving<?, ?> living, ItemStack itemStack);
 
   void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack, boolean triggerPressed,
       boolean sendUpdate);
