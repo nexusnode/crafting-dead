@@ -86,9 +86,9 @@ public class AimableGun extends DefaultGun implements IScope {
     GunItem gunItem = super.getGunItem();
 
     if(passedTime >= super.getGunItem().getFireRateMs() && !canAim) {
-        canAim = true;
-        if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())) {
-          toggleRightMouseAction(living, false);
+      canAim = true;
+      if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())) {
+        toggleRightMouseAction(living, false);
       }
     }
 
