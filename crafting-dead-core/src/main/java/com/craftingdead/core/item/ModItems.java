@@ -211,23 +211,22 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> ULTRA_BEAST_PAINT = ITEMS
-          .register("ultra_beast_paint",
-                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                          .maxStackSize(1)
-                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("ultra_beast_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> EMPEROR_DRAGON_PAINT = ITEMS
-          .register("emperor_dragon_paint",
-                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                          .maxStackSize(1)
-                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("emperor_dragon_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> NUCLEAR_WINTER_PAINT = ITEMS
-          .register("nuclear_winter_paint",
-                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                          .maxStackSize(1)
-                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
-
+      .register("nuclear_winter_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
   // ================================================================================
   // Magazines
   // ================================================================================
