@@ -31,6 +31,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 
 public class AimableGun extends DefaultGun implements IScope {
 
@@ -78,26 +79,33 @@ public class AimableGun extends DefaultGun implements IScope {
   }
 
   @Override
-  protected void processShoot(ILiving<?, ?> living, ItemStack itemStack) {
+  public void tick(ILiving<?, ?> living, ItemStack itemStack) {
+    long passedTime = Util.milliTime() - super.getLastShotMs();
+
+    Entity entity = living.getEntity();
+    GunItem gunItem = super.getGunItem();
+
+    if(passedTime >= super.getGunItem().getFireRateMs() && !canAim) {
+        canAim = true;
+        if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())) {
+          toggleRightMouseAction(living, false);
+      }
+    }
+
+    super.tick(living, itemStack);
+  }
+
+  @Override
+  protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
     Entity entity = living.getEntity();
 
     GunItem gunItem = super.getGunItem();
 
-    super.processShoot(living, itemStack);
+    super.processShot(living, itemStack);
 
     if(this.isAiming(entity, itemStack) && gunItem.hasBoltAction()) {
       toggleRightMouseAction(living, false);
       canAim = false;
-
-      Timer timer = new Timer();
-      timer.schedule(new TimerTask() {
-        public void run() {
-          canAim = true;
-          if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())) {
-            toggleRightMouseAction(living, false);
-          }
-        }
-      }, gunItem.getFireRateMs());
     }
   }
 

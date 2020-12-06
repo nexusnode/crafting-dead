@@ -17,13 +17,22 @@
  */
 package com.craftingdead.core.capability.gun;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.craftingdead.core.item.ModItems;
-import net.minecraft.util.*;
+import net.minecraft.util.CombatRules;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
@@ -306,7 +315,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         || !this.gunItem.getTriggerPredicate().test(this));
   }
 
-  protected void processShoot(ILiving<?, ?> living, ItemStack itemStack) {
+  protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
     this.shotCount++;
@@ -434,7 +443,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       return;
     }
 
-    this.processShoot(living, itemStack);
+    this.processShot(living, itemStack);
   }
 
   private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
@@ -622,6 +631,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   public GunItem getGunItem() {
     return gunItem;
+  }
+
+  public long getLastShotMs() {
+    return lastShotMs;
   }
 
   @Override
