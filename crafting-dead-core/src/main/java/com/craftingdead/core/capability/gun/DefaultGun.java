@@ -313,7 +313,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
       final int unbreakingLevel =
-              EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
+          EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
       if (!UnbreakingEnchantment.negateDamage(itemStack, unbreakingLevel, random)) {
         this.getMagazine().ifPresent(IMagazine::decrementSize);
       }
@@ -343,9 +343,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
       if (!entity.isSilent()) {
         entity.getEntityWorld().playSound(
-                clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
-                entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
-                entity.getSoundCategory(), 0.25F, 1.0F);
+            clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
+            entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
+            entity.getSoundCategory(), 0.25F, 1.0F);
       }
     }
 
@@ -355,8 +355,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       final long randomSeed = entity.getEntityWorld().getGameTime() + i;
       random.setSeed(randomSeed);
       RayTraceResult rayTraceResult = RayTraceUtil
-              .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
-              .orElse(null);
+          .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
+          .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
@@ -364,11 +364,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             boolean playSound = true;
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
               playSound = entity.getEntityWorld()
-                      .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
-                      .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
+                  .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
+                  .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
             }
             this.hitBlock(living, itemStack, (BlockRayTraceResult) rayTraceResult,
-                    playSound && entity.getEntityWorld().isRemote());
+                playSound && entity.getEntityWorld().isRemote());
             break;
           case ENTITY:
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
@@ -381,19 +381,19 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
                 break;
               } else if (entity instanceof ClientPlayerEntity) {
                 this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
-                        new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
-                                new EntitySnapshot(entity),
-                                new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
+                    new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+                        new EntitySnapshot(entity),
+                        new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
               }
             }
 
             this.hitEntity(living, itemStack, entityRayTraceResult.getEntity(),
-                    entityRayTraceResult.getHitVec(),
-                    !(lastRayTraceResult instanceof EntityRayTraceResult)
-                            || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
-                            .getRegistryName()
-                            .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
-                            && entity.getEntityWorld().isRemote());
+                entityRayTraceResult.getHitVec(),
+                !(lastRayTraceResult instanceof EntityRayTraceResult)
+                    || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
+                        .getRegistryName()
+                        .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
+                        && entity.getEntityWorld().isRemote());
             break;
           default:
             break;
