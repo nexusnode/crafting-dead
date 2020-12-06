@@ -374,12 +374,14 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
               && gunItem.hasBoltAction() && this.attachments.stream().anyMatch(attachmentItem -> attachmentItem.isScope())) {
         AimableGun gun = (AimableGun) this;
         toggleRightMouseAction(living, false);
+        gun.setCanAim(false);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
           public void run() {
             if(entity instanceof PlayerEntity && ((PlayerEntity)entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())){
               toggleRightMouseAction(living, false);
             }
+            gun.setCanAim(true);
           }
         }, gunItem.getFireRateMs());
       }
@@ -677,6 +679,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate) {
     if (!this.performingRightMouseAction && living.getEntity().isSprinting()) {
+      return;
+    }
+    if(this instanceof AimableGun && !((AimableGun) this).canAim()){
       return;
     }
     this.performingRightMouseAction = !this.performingRightMouseAction;

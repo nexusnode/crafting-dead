@@ -27,9 +27,18 @@ import net.minecraft.util.ResourceLocation;
 
 public class AimableGun extends DefaultGun implements IScope {
 
+  private boolean canAim = true;
 
   public AimableGun(GunItem gunItem) {
     super(gunItem);
+  }
+
+  public boolean canAim() {
+    return canAim;
+  }
+
+  public void setCanAim(boolean canAim) {
+    this.canAim = canAim;
   }
 
   @Override
