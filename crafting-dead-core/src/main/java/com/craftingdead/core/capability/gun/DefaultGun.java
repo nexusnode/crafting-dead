@@ -23,8 +23,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import com.craftingdead.core.item.ModItems;
+import net.minecraft.util.CombatRules;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
@@ -96,11 +104,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -312,39 +315,9 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         || !this.gunItem.getTriggerPredicate().test(this));
   }
 
-  private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
+  protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
-    if (!this.triggerPressed) {
-      return;
-    }
-
-    if (!this.canShoot(living)) {
-
-      this.triggerPressed = false;
-      return;
-    }
-
-    if (this.getMagazineSize() <= 0) {
-      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.reload(living);
-      this.triggerPressed = false;
-      return;
-    }
-
-    long time = Util.milliTime();
-    long timeDelta = time - this.lastShotMs;
-    if (timeDelta < this.gunItem.getFireRateMs()) {
-      return;
-    }
-
-    this.lastShotMs = time;
-
-    boolean isMaxShotsReached =
-        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
-    if (isMaxShotsReached) {
-      return;
-    }
     this.shotCount++;
 
     if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
@@ -401,7 +374,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
               playSound = entity.getEntityWorld()
                   .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
-                      .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
+                  .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
             }
             this.hitBlock(living, itemStack, (BlockRayTraceResult) rayTraceResult,
                 playSound && entity.getEntityWorld().isRemote());
@@ -437,6 +410,40 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         lastRayTraceResult = rayTraceResult;
       }
     }
+  }
+
+  private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
+    if (!this.triggerPressed) {
+      return;
+    }
+
+    if (!this.canShoot(living)) {
+      this.triggerPressed = false;
+      return;
+    }
+
+    if (this.getMagazineSize() <= 0) {
+      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      this.reload(living);
+      this.triggerPressed = false;
+      return;
+    }
+
+    long time = Util.milliTime();
+    long timeDelta = time - this.lastShotMs;
+    if (timeDelta < this.gunItem.getFireRateMs()) {
+      return;
+    }
+
+    this.lastShotMs = time;
+
+    boolean isMaxShotsReached =
+            this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+    if (isMaxShotsReached) {
+      return;
+    }
+
+    this.processShot(living, itemStack);
   }
 
   private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
@@ -620,6 +627,14 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public ItemStack getPaintStack() {
     return this.paintStack;
+  }
+
+  public GunItem getGunItem() {
+    return gunItem;
+  }
+
+  public long getLastShotMs() {
+    return lastShotMs;
   }
 
   @Override
