@@ -306,43 +306,14 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         || !this.gunItem.getTriggerPredicate().test(this));
   }
 
-  private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
+  protected void processShoot(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
-    if (!this.triggerPressed) {
-      return;
-    }
-
-    if (!this.canShoot(living)) {
-      this.triggerPressed = false;
-      return;
-    }
-
-    if (this.getMagazineSize() <= 0) {
-      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.reload(living);
-      this.triggerPressed = false;
-      return;
-    }
-
-    long time = Util.milliTime();
-    long timeDelta = time - this.lastShotMs;
-    if (timeDelta < this.gunItem.getFireRateMs()) {
-      return;
-    }
-
-    this.lastShotMs = time;
-
-    boolean isMaxShotsReached =
-        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
-    if (isMaxShotsReached) {
-      return;
-    }
     this.shotCount++;
 
     if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
       final int unbreakingLevel =
-          EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
+              EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
       if (!UnbreakingEnchantment.negateDamage(itemStack, unbreakingLevel, random)) {
         this.getMagazine().ifPresent(IMagazine::decrementSize);
       }
@@ -370,27 +341,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         shootSound = this.gunItem.getSilencedShootSound().orElse(shootSound);
       }
 
-      if(this instanceof AimableGun && ((AimableGun) this).isAiming(entity, new ItemStack(gunItem))
-              && gunItem.hasBoltAction() && this.attachments.stream().anyMatch(attachmentItem -> attachmentItem.isScope())) {
-        AimableGun gun = (AimableGun) this;
-        toggleRightMouseAction(living, false);
-        gun.setCanAim(false);
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-          public void run() {
-            if(entity instanceof PlayerEntity && ((PlayerEntity)entity).getHeldItem(Hand.MAIN_HAND).getItem().equals(gunItem.getItem())){
-              toggleRightMouseAction(living, false);
-            }
-            gun.setCanAim(true);
-          }
-        }, gunItem.getFireRateMs());
-      }
-
       if (!entity.isSilent()) {
         entity.getEntityWorld().playSound(
-            clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
-            entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
-            entity.getSoundCategory(), 0.25F, 1.0F);
+                clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
+                entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
+                entity.getSoundCategory(), 0.25F, 1.0F);
       }
     }
 
@@ -400,8 +355,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       final long randomSeed = entity.getEntityWorld().getGameTime() + i;
       random.setSeed(randomSeed);
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
-          .orElse(null);
+              .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
+              .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
@@ -409,11 +364,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
             boolean playSound = true;
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
               playSound = entity.getEntityWorld()
-                  .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
+                      .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
                       .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
             }
             this.hitBlock(living, itemStack, (BlockRayTraceResult) rayTraceResult,
-                playSound && entity.getEntityWorld().isRemote());
+                    playSound && entity.getEntityWorld().isRemote());
             break;
           case ENTITY:
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
@@ -426,19 +381,19 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
                 break;
               } else if (entity instanceof ClientPlayerEntity) {
                 this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
-                    new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
-                        new EntitySnapshot(entity),
-                        new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
+                        new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+                                new EntitySnapshot(entity),
+                                new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
               }
             }
 
             this.hitEntity(living, itemStack, entityRayTraceResult.getEntity(),
-                entityRayTraceResult.getHitVec(),
-                !(lastRayTraceResult instanceof EntityRayTraceResult)
-                    || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
-                        .getRegistryName()
-                        .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
-                        && entity.getEntityWorld().isRemote());
+                    entityRayTraceResult.getHitVec(),
+                    !(lastRayTraceResult instanceof EntityRayTraceResult)
+                            || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
+                            .getRegistryName()
+                            .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
+                            && entity.getEntityWorld().isRemote());
             break;
           default:
             break;
@@ -446,6 +401,40 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         lastRayTraceResult = rayTraceResult;
       }
     }
+  }
+
+  private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
+    if (!this.triggerPressed) {
+      return;
+    }
+
+    if (!this.canShoot(living)) {
+      this.triggerPressed = false;
+      return;
+    }
+
+    if (this.getMagazineSize() <= 0) {
+      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+      this.reload(living);
+      this.triggerPressed = false;
+      return;
+    }
+
+    long time = Util.milliTime();
+    long timeDelta = time - this.lastShotMs;
+    if (timeDelta < this.gunItem.getFireRateMs()) {
+      return;
+    }
+
+    this.lastShotMs = time;
+
+    boolean isMaxShotsReached =
+            this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+    if (isMaxShotsReached) {
+      return;
+    }
+
+    this.processShoot(living, itemStack);
   }
 
   private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
@@ -631,6 +620,10 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     return this.paintStack;
   }
 
+  public GunItem getGunItem() {
+    return gunItem;
+  }
+
   @Override
   public void setPaintStack(ItemStack paintStack) {
     this.paintStack = paintStack;
@@ -679,9 +672,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate) {
     if (!this.performingRightMouseAction && living.getEntity().isSprinting()) {
-      return;
-    }
-    if(this instanceof AimableGun && !((AimableGun) this).canAim()){
       return;
     }
     this.performingRightMouseAction = !this.performingRightMouseAction;
