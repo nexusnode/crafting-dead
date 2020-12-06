@@ -68,7 +68,7 @@
   "itemGroup.craftingdead.misc": "Crafting Dead Miscellaneous",
   "itemGroup.craftingdead.med": "Crafting Dead Medical",
   "itemGroup.craftingdead.combat": "Crafting Dead Combat",
-  
+
   "item.craftingdead.vulcan_paint": "Vulcan Paint",
   "item.craftingdead.asmo_paint": "Asmo Paint",
   "item.craftingdead.candy_apple_paint": "Candy Apple Paint",
@@ -84,6 +84,9 @@
   "item.craftingdead.scorched_paint": "Scorched Paint",
   "item.craftingdead.slaughter_paint": "Slaughter Paint",
   "item.craftingdead.uv_paint": "UV Paint",
+  "item.craftingdead.emperor_dragon_paint": "Emperor Dragon Paint",
+  "item.craftingdead.ultra_beast_paint": "Ultra Beast Paint",
+  "item.craftingdead.nuclear_winter_paint": "Nuclear Winter Paint",
 
   "item.craftingdead.stanag_20_round_magazine": "STANAG 20rnd Magazine",
   "item.craftingdead.stanag_30_round_magazine": "STANAG 30rnd Magazine",
@@ -122,7 +125,7 @@
   "item.craftingdead.rpk_drum_magazine": "RPK Drum Magazine",
   "item.craftingdead.minigun_magazine": "Minigun Magazine",
   "item.craftingdead.mk48mod_magazine": "MK48MOD Magazine",
-  
+
   "item.craftingdead.red_dot_sight": "Red Dot Sight",
   "item.craftingdead.acog_sight": "ACOG Sight",
   "item.craftingdead.lp_scope": "LP Scope",
@@ -170,7 +173,7 @@
   "item.craftingdead.minigun": "Minigun",
   "item.craftingdead.mossberg": "Mossberg",
   "item.craftingdead.mk48mod": "MK48 MOD",
-  
+
   "item.craftingdead.crowbar": "Crowbar",
   "item.craftingdead.katana": "Katana",
   "item.craftingdead.fire_axe": "Fireman's Axe",
@@ -209,7 +212,7 @@
   "item.craftingdead.cure_syringe": "RBI Cure Syringe",
   "item.craftingdead.dirty_rag": "Dirty Rag",
   "item.craftingdead.bloody_rag": "Bloody Rag",
-  
+
   "item.craftingdead.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",
   "item.craftingdead.fast_zombie_spawn_egg": "Fast Zombie Spawn Egg",
   "item.craftingdead.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",
@@ -330,7 +333,7 @@
   "item.craftingdead.medium_stock": "Medium Stock",
   "item.craftingdead.medium_bolt": "Medium Bolt",
   "item.craftingdead.heavy_bolt": "Heavy Bolt",
-  
+
   "item.craftingdead.black_tactical_vest": "Black Tactical Vest",
   "item.craftingdead.ghillie_tactical_vest": "Ghillie Tactical Vest",
   "item.craftingdead.green_tactical_vest": "Green Tactical Vest",
@@ -361,11 +364,11 @@
   "item_lore.gun_item.accuracy": "Accuracy: ",
   "item_lore.clothing_item.water_breathing": "Gives water breathing ability",
   "item_lore.clothing_item.water_speed": "Increases swimming speed",
-  
+
   "attachment_multiplier_type.damage": "Damage",
   "attachment_multiplier_type.accuracy": "Accuracy",
   "attachment_multiplier_type.zoom": "Zoom",
-  
+
   "biome.craftingdead.zombie_forest": "Zombie Forest",
 
   "commands.craftingdead.thirst.success.operator": "Thirst quenched.",
