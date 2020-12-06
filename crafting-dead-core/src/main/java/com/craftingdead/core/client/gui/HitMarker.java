@@ -31,7 +31,8 @@ import net.minecraft.util.math.Vec3d;
 
 public class HitMarker {
 
-  private static final int HIT_MARKER_FADE_TIME_MS = 3000;
+  private static final int HIT_MARKER_FADE_TIME_MS = 200;
+  private static final int HIT_MARKER_SIZE = 12;
 
   private final Vec3d pos;
   private final Type kill;
@@ -61,11 +62,12 @@ public class HitMarker {
     if (this.fadeStartTimeMs == 0L) {
       this.fadeStartTimeMs = Util.milliTime();
     }
-    float fadePct = MathHelper.clamp(
+    float zeroToOneFadePct = MathHelper.clamp(
         (float) (Util.milliTime() - this.fadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
         0.0F, 1.0F);
+    final float oneToZeroFadePct = 1.0F - zeroToOneFadePct;
 
-    if (fadePct == 1.0F) {
+    if (zeroToOneFadePct == 1.0F) {
       return true;
     }
 
@@ -77,20 +79,27 @@ public class HitMarker {
           float blue = (float) (this.kill.colour & 255) / 255.0F;
 
           RenderSystem.enableBlend();
-          RenderSystem.color4f(red, green, blue, alpha * (1.0F - fadePct));
+          RenderSystem.color4f(red, green, blue, alpha * oneToZeroFadePct);
           RenderSystem.pushMatrix();
           {
-            RenderSystem.translatef((width / 2) + pos.x - 15, (height / 2) - pos.y - 15, 0);
-            RenderSystem.lineWidth(5.0F);
+            // To draw a cross, it is needed only two values: the least and the higher positions
+            float leastCrossEndPos = HIT_MARKER_SIZE * oneToZeroFadePct;
+            float higherCrossEndPos = leastCrossEndPos * 2;
+            // Mean, useful to centralize
+            float markerSizeMean = (higherCrossEndPos + leastCrossEndPos) / 2F;
+
+            RenderSystem.translatef((width / 2) + pos.x - markerSizeMean,
+                (height / 2) - pos.y - markerSizeMean, 0);
+            RenderSystem.lineWidth(oneToZeroFadePct * 4.5F);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
             bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.pos(10, 20, 0.0D).endVertex();
-            bufferbuilder.pos(20, 10, 0.0D).endVertex();
+            bufferbuilder.pos(higherCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
+            bufferbuilder.pos(leastCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
             tessellator.draw();
             bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.pos(10, 10, 0.0D).endVertex();
-            bufferbuilder.pos(20, 20, 0.0D).endVertex();
+            bufferbuilder.pos(leastCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
+            bufferbuilder.pos(higherCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
             tessellator.draw();
           }
           RenderSystem.popMatrix();
