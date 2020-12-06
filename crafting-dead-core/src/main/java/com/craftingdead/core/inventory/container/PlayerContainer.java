@@ -33,14 +33,14 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-public class ModInventoryContainer extends Container {
+public class PlayerContainer extends Container {
 
   private final IItemHandler itemHandler;
 
   private final CraftResultInventory outputInventory = new CraftResultInventory();
   private final Inventory craftingInventory = new Inventory(4);
 
-  public ModInventoryContainer(int windowId, PlayerInventory playerInventory) {
+  public PlayerContainer(int windowId, PlayerInventory playerInventory) {
     super(ModContainerTypes.PLAYER.get(), windowId);
     this.itemHandler = playerInventory.player.getCapability(ModCapabilities.LIVING)
         .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
@@ -87,28 +87,35 @@ public class ModInventoryContainer extends Container {
     final int gunCraftSlotGap = 3;
     final int gunCraftY = 8;
 
-    this.addSlot(
-        new GunCraftSlot(this.outputInventory, 0, 125, gunCraftY + slotSize + 3,
-            this.craftingInventory));
+    this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, gunCraftY + slotSize + 3,
+        this.craftingInventory));
 
+    final BiPredicate<PredicateSlot, ItemStack> attachmentAndPaintPredicate =
+        (slot, itemStack) -> this.getGunStack().getCapability(ModCapabilities.GUN)
+            .map(gun -> gun.isAcceptedPaintOrAttachment(itemStack)).orElse(false);
     final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
         (slot, itemStack) -> itemStack.getItem() instanceof AttachmentItem
             && ((AttachmentItem) itemStack.getItem()).getInventorySlot().getIndex() == slot
                 .getSlotIndex();
+
     this.addSlot(new PredicateSlot(this.craftingInventory,
         CraftingInventorySlotType.MUZZLE_ATTACHMENT.getIndex(), 104,
         gunCraftY + slotSize + gunCraftSlotGap,
-        attachmentPredicate));
+        attachmentPredicate.and(attachmentAndPaintPredicate)));
     this.addSlot(new PredicateSlot(this.craftingInventory,
         CraftingInventorySlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125,
         gunCraftY + slotSize * 2 + gunCraftSlotGap * 2,
-        attachmentPredicate));
+        attachmentPredicate.and(attachmentAndPaintPredicate)));
     this.addSlot(new PredicateSlot(this.craftingInventory,
         CraftingInventorySlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, gunCraftY,
-        attachmentPredicate));
+        attachmentPredicate.and(attachmentAndPaintPredicate)));
+
+    final BiPredicate<PredicateSlot, ItemStack> paintPredicate =
+        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent();
+
     this.addSlot(new PredicateSlot(this.craftingInventory,
         CraftingInventorySlotType.PAINT.getIndex(), 146, gunCraftY + slotSize + gunCraftSlotGap,
-        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent()));
+        paintPredicate.and(attachmentAndPaintPredicate)));
   }
 
   @Override

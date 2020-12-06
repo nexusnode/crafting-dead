@@ -49,13 +49,11 @@ public class GunCraftSlot extends Slot {
   public void putStack(ItemStack itemStack) {
     itemStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
       gunController.getAttachments().forEach(attachment -> {
-        this.craftingInventory
-            .setInventorySlotContents(attachment.getInventorySlot().getIndex(),
-                new ItemStack(attachment));
+        this.craftingInventory.setInventorySlotContents(attachment.getInventorySlot().getIndex(),
+            new ItemStack(attachment));
       });
-      this.craftingInventory
-          .setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
-              gunController.getPaintStack());
+      this.craftingInventory.setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
+          gunController.getPaintStack());
     });
     super.putStack(itemStack);
   }

@@ -22,7 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.ModInventoryContainer;
+import com.craftingdead.core.inventory.container.PlayerContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncPlayerMessage;
 import com.craftingdead.core.network.util.GenericDataManager;
@@ -184,7 +184,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   public void openInventory() {
     this.getEntity()
         .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
-            playerEntity) -> new ModInventoryContainer(windowId, this.getEntity().inventory),
+            playerEntity) -> new PlayerContainer(windowId, this.getEntity().inventory),
             new TranslationTextComponent("container.player")));
   }
 

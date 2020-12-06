@@ -21,7 +21,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.ModInventoryContainer;
+import com.craftingdead.core.inventory.container.PlayerContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.util.Text;
@@ -34,7 +34,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class PlayerScreen extends DisplayEffectsScreen<ModInventoryContainer> {
+public class PlayerScreen extends DisplayEffectsScreen<PlayerContainer> {
 
   private static final ResourceLocation CONTAINER_BACKGROUND =
       new ResourceLocation(CraftingDead.ID, "textures/gui/container/inventory.png");
@@ -46,7 +46,7 @@ public class PlayerScreen extends DisplayEffectsScreen<ModInventoryContainer> {
 
   private boolean transitioning = false;
 
-  public PlayerScreen(ModInventoryContainer container, PlayerInventory playerInventory,
+  public PlayerScreen(PlayerContainer container, PlayerInventory playerInventory,
       ITextComponent title) {
     super(container, playerInventory, title);
   }
@@ -112,10 +112,13 @@ public class PlayerScreen extends DisplayEffectsScreen<ModInventoryContainer> {
 
       this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
 
+      final boolean draggingItemAccepted =
+          gunController.isAcceptedPaintOrAttachment(this.playerInventory.getItemStack());
+
       if ((!this.container.isCraftingInventoryEmpty() && this.container.isCraftable())
-          || gunController.isAcceptedPaintOrAttachment(this.playerInventory.getItemStack())) {
+          || draggingItemAccepted) {
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 22, 22, 22);
-      } else if (!this.container.isCraftingInventoryEmpty()) {
+      } else if (!this.playerInventory.getItemStack().isEmpty() && !draggingItemAccepted) {
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 44, 22, 22);
       }
     });
