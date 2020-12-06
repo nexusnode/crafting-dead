@@ -20,7 +20,6 @@ package com.craftingdead.core.entity.grenade;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.hat.IHat;
-import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.GrenadeItem;
@@ -38,8 +37,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 
 public class FlashGrenadeEntity extends GrenadeEntity {
 
@@ -83,18 +80,14 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
   private void flash() {
     if (this.world.isRemote()) {
-      this.world
-          .addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(), this.getPosY(),
-              this.getPosZ(), 0D, 0D, 0D);
-      DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-          () -> () -> ((ClientDist) CraftingDead.getInstance().getModDist())
-              .checkApplyFlashEffects(this));
+      this.world.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(),
+          this.getPosY(), this.getPosZ(), 0D, 0D, 0D);
+      CraftingDead.getInstance().getClientDist().checkApplyFlashEffects(this);
     } else {
       this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 3F, 1.2F);
 
-      this.world
-          .getEntitiesInAABBexcluding(this, this.getBoundingBox().grow(FLASH_MAX_RANGE),
-              (entity) -> entity instanceof LivingEntity && !(entity instanceof PlayerEntity))
+      this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox().grow(FLASH_MAX_RANGE),
+          (entity) -> entity instanceof LivingEntity && !(entity instanceof PlayerEntity))
           .stream()
           .map(entity -> (LivingEntity) entity)
           .forEach(livingEntity -> {

@@ -18,7 +18,8 @@
 package com.craftingdead.core.entity.monster;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.world.World;
 
 public class TankZombieEntity extends AdvancedZombieEntity {
@@ -27,12 +28,11 @@ public class TankZombieEntity extends AdvancedZombieEntity {
     super(type, world);
   }
 
-  @Override
-  protected void registerAttributes() {
-    super.registerAttributes();
-    this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(20.0D);
-    this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100D);
-    this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.19D);
-    this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
+  public static AttributeModifierMap.MutableAttribute registerAttributes() {
+    return AdvancedZombieEntity.registerAttributes()
+        .createMutableAttribute(Attributes.FOLLOW_RANGE, 20.0D)
+        .createMutableAttribute(Attributes.MAX_HEALTH, 100.0D)
+        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 15.0D)
+        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.19D);
   }
 }

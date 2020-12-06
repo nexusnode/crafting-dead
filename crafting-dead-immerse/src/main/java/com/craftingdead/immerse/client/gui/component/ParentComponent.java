@@ -23,6 +23,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.yoga.Yoga;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.INestedGuiEventHandler;
 
@@ -58,32 +59,33 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   @Override
   public void tick() {
     super.tick();
-    for (Component<?> child : this.children()) {
+    for (Component<?> child : this.getEventListeners()) {
       child.tick();
     }
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
-    this.renderChildren(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    this.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
   }
 
-  protected void renderChildren(int mouseX, int mouseY, float partialTicks) {
-    for (Component<?> child : this.children()) {
-      child.render(mouseX, mouseY, partialTicks);
+  protected void renderChildren(MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
+    for (Component<?> child : this.getEventListeners()) {
+      child.render(matrixStack, mouseX, mouseY, partialTicks);
     }
   }
 
   @Override
-  public List<Component<?>> children() {
+  public List<Component<?>> getEventListeners() {
     return this.children;
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     super.mouseMoved(mouseX, mouseY);
-    for (Component<?> child : this.children()) {
+    for (Component<?> child : this.getEventListeners()) {
       child.mouseMoved(mouseX, mouseY);
     }
   }
@@ -95,12 +97,13 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     }
 
     final Component<?> component = this.getComponentForPos(mouseX, mouseY)
-        .filter(c -> c.mouseClicked(mouseX, mouseY, button)).orElse(null);
+        .filter(c -> c.mouseClicked(mouseX, mouseY, button))
+        .orElse(null);
     if (component == null) {
-      this.setFocused(null);
+      this.setListener(null);
       return false;
     } else {
-      this.setFocused(component);
+      this.setListener(component);
       if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
         this.setDragging(true);
       }
@@ -152,15 +155,15 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   @Nullable
   @Override
-  public IGuiEventListener getFocused() {
+  public IGuiEventListener getListener() {
     return this.focused;
   }
 
   @Override
-  public void setFocused(@Nullable IGuiEventListener focused) {
-    if (this.getFocused() != focused) {
-      if (this.getFocused() instanceof Component) {
-        ((Component<?>) this.getFocused()).focusChanged(false);
+  public void setListener(@Nullable IGuiEventListener focused) {
+    if (this.getListener() != focused) {
+      if (this.getListener() instanceof Component) {
+        ((Component<?>) this.getListener()).focusChanged(false);
       }
       if (focused instanceof Component) {
         ((Component<?>) focused).focusChanged(true);
@@ -170,13 +173,13 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   public SELF addChild(int index, Component<?> child) {
-    this.children().add(index, child);
+    this.getEventListeners().add(index, child);
     this.childAdded(child, index);
     return this.self();
   }
 
   public SELF addChild(Component<?> child) {
-    this.children().add(child);
+    this.getEventListeners().add(child);
     this.childAdded(child, this.children.size() - 1);
     return this.self();
   }
@@ -189,7 +192,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   public SELF removeChild(Component<?> child) {
     this.childRemoved(child);
-    this.children().remove(child);
+    this.getEventListeners().remove(child);
     return this.self();
   }
 
@@ -213,8 +216,8 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
    * @return the {@link Component} if found
    */
   public Optional<Component<?>> getComponentForPos(double mouseX, double mouseY) {
-    for (int i = this.children().size() - 1; i >= 0; i--) {
-      Component<?> component = this.children().get(i);
+    for (int i = this.getEventListeners().size() - 1; i >= 0; i--) {
+      Component<?> component = this.getEventListeners().get(i);
       if (component.isMouseOver(mouseX, mouseY)) {
         return Optional.of(component);
       }
@@ -225,8 +228,8 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     this.setDragging(false);
-    if (this.getFocused() != null) {
-      this.getFocused().mouseReleased(mouseX, mouseY, button);
+    if (this.getListener() != null) {
+      this.getListener().mouseReleased(mouseX, mouseY, button);
     }
     return true;
   }

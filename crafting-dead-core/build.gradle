@@ -2,13 +2,16 @@ repositories {
 	maven {
         name 'cursemaven'
         url 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
     }
 	google()
 }
 
 dependencies {
     shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
-	implementation fg.deobf("curse.maven:travelers-backpack:${travelers_backpack_id}")
+	implementation fg.deobf("curse.maven:travelers-backpack-${travelers_backpack_project_id}:${travelers_backpack_file_id}")
 }
 
 jar {

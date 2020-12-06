@@ -18,7 +18,8 @@
 package com.craftingdead.core.entity.monster;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.world.World;
 
 public class WeakZombieEntity extends AdvancedZombieEntity {
@@ -27,11 +28,11 @@ public class WeakZombieEntity extends AdvancedZombieEntity {
     super(type, world);
   }
 
-  @Override
-  protected void registerAttributes() {
-    super.registerAttributes();
-    this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(25.0D);
-    this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5D);
-    this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+
+  public static AttributeModifierMap.MutableAttribute registerAttributes() {
+    return AdvancedZombieEntity.registerAttributes()
+        .createMutableAttribute(Attributes.FOLLOW_RANGE, 25.0D)
+        .createMutableAttribute(Attributes.MAX_HEALTH, 5.0D)
+        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D);
   }
 }

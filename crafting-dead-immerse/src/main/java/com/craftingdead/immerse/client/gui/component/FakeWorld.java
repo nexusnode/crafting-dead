@@ -29,16 +29,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.tags.NetworkTagManager;
+import net.minecraft.tags.ITagCollectionSupplier;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameType;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.ITickList;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.MapData;
 
 public class FakeWorld extends ClientWorld {
@@ -46,9 +46,9 @@ public class FakeWorld extends ClientWorld {
   private static FakeWorld instance;
 
   private FakeWorld(Minecraft mc) {
-    super(mc.getConnection(),
-        new WorldSettings(0L, GameType.ADVENTURE, false, false, WorldType.DEFAULT),
-        DimensionType.OVERWORLD, 3, mc.getProfiler(), mc.worldRenderer);
+    super(mc.getConnection(), new ClientWorld.ClientWorldInfo(Difficulty.NORMAL, false, false),
+        World.OVERWORLD, DimensionType.OVERWORLD_TYPE, 3, mc::getProfiler, mc.worldRenderer, false,
+        0L);
   }
 
   @Override
@@ -97,7 +97,7 @@ public class FakeWorld extends ClientWorld {
   }
 
   @Override
-  public NetworkTagManager getTags() {
+  public ITagCollectionSupplier getTags() {
     return null;
   }
 
@@ -123,6 +123,11 @@ public class FakeWorld extends ClientWorld {
   @Override
   public Biome getNoiseBiomeRaw(int x, int y, int z) {
     return null;
+  }
+
+  @Override
+  public DynamicRegistries func_241828_r() {
+    return DynamicRegistries.func_239770_b_();
   }
 
   public static FakeWorld getInstance() {

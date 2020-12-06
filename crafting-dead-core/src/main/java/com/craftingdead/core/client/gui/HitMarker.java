@@ -27,14 +27,14 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class HitMarker {
 
   private static final int HIT_MARKER_FADE_TIME_MS = 200;
   private static final int HIT_MARKER_SIZE = 12;
 
-  private final Vec3d pos;
+  private final Vector3d pos;
   private final Type kill;
 
   private long fadeStartTimeMs;
@@ -45,7 +45,7 @@ public class HitMarker {
    * @param pos
    * @param kill
    */
-  private HitMarker(Vec3d pos, Type kill) {
+  private HitMarker(Vector3d pos, Type kill) {
     this.pos = pos;
     this.kill = kill;
   }
@@ -58,6 +58,7 @@ public class HitMarker {
    * @param partialTicks
    * @return if the hit marker has fully faded
    */
+  @SuppressWarnings("deprecation")
   public boolean render(int width, int height, float partialTicks) {
     if (this.fadeStartTimeMs == 0L) {
       this.fadeStartTimeMs = Util.milliTime();
@@ -125,13 +126,13 @@ public class HitMarker {
             : Optional.empty()), HIT_AND_KILL(
                 (pos, kill) -> Optional.of(new HitMarker(pos, kill ? Type.KILL : Type.HIT)));
 
-    private final BiFunction<Vec3d, Boolean, Optional<HitMarker>> factory;
+    private final BiFunction<Vector3d, Boolean, Optional<HitMarker>> factory;
 
-    private Mode(BiFunction<Vec3d, Boolean, Optional<HitMarker>> factory) {
+    private Mode(BiFunction<Vector3d, Boolean, Optional<HitMarker>> factory) {
       this.factory = factory;
     }
 
-    public Optional<HitMarker> createHitMarker(Vec3d pos, boolean kill) {
+    public Optional<HitMarker> createHitMarker(Vector3d pos, boolean kill) {
       return this.factory.apply(pos, kill);
     }
   }

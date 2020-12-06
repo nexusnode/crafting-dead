@@ -28,8 +28,6 @@ import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
-import com.craftingdead.immerse.world.ModDimensions;
-import com.craftingdead.immerse.world.map.MapFormats;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -103,17 +101,15 @@ public class CraftingDeadImmerse {
 
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
-    MinecraftForge.EVENT_BUS.register(this);
-
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
     GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
     GameTypes.GAME_TYPES.register(modEventBus);
 
-    MapFormats.MAP_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
-    MapFormats.MAP_FORMATS.register(modEventBus);
-
-    ModDimensions.MOD_DIMENSIONS.register(modEventBus);
+    // SchematicFormats.SCHEMATIC_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
+    // SchematicFormats.SCHEMATIC_FORMATS.register(modEventBus);
+    //
+    // ModDimensions.MOD_DIMENSIONS.register(modEventBus);
   }
 
   @Nullable
@@ -134,7 +130,7 @@ public class CraftingDeadImmerse {
   }
 
   // ================================================================================
-  // Mod Events
+  // Forge Events
   // ================================================================================
 
   @SubscribeEvent

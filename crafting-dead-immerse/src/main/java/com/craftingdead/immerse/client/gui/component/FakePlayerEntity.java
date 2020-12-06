@@ -23,7 +23,7 @@ import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.play.server.SPlayerListItemPacket;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
 
 public class FakePlayerEntity extends AbstractClientPlayerEntity {
@@ -33,8 +33,8 @@ public class FakePlayerEntity extends AbstractClientPlayerEntity {
   }
 
   @Override
-  public Vec3d getPositionVec() {
-    return new Vec3d(99.0D, 99.0D, 99.0D);
+  public Vector3d getPositionVec() {
+    return new Vector3d(99.0D, 99.0D, 99.0D);
   }
 
   @Override

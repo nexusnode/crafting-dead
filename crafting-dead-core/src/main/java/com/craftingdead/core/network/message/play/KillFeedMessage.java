@@ -20,7 +20,6 @@ package com.craftingdead.core.network.message.play;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.gui.KillFeedEntry;
 import com.craftingdead.core.client.gui.KillFeedEntry.Type;
 import net.minecraft.entity.Entity;
@@ -66,7 +65,7 @@ public class KillFeedMessage {
         Entity playerEntity = w.getEntityByID(msg.playerEntityId);
         Entity deadEntity = w.getEntityByID(msg.deadEntityId);
         if (playerEntity instanceof PlayerEntity && deadEntity instanceof LivingEntity) {
-          ((ClientDist) CraftingDead.getInstance().getModDist()).getIngameGui()
+          CraftingDead.getInstance().getClientDist().getIngameGui()
               .addKillFeedMessage(new KillFeedEntry((PlayerEntity) playerEntity,
                   (LivingEntity) deadEntity, msg.weaponStack, msg.type));
         }

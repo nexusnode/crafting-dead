@@ -19,18 +19,16 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.RenderComponentsUtil;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraft.util.text.Style;
 
 public class TextBlockComponent extends Component<TextBlockComponent> {
 
@@ -40,7 +38,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
 
   private final boolean shadow;
 
-  private List<ITextComponent> lines;
+  private List<IReorderingProcessor> lines;
 
   public TextBlockComponent(FontRenderer fontRenderer, ITextComponent text, boolean shadow) {
     this.fontRenderer = fontRenderer;
@@ -57,21 +55,18 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   @Override
-  protected Vec2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     if (widthMode == MeasureMode.UNDEFINED) {
       width = this.fontRenderer.getStringWidth(this.text.getString());
     }
 
     this.generateLines((int) width);
-    return new Vec2f(width, this.lines.size() * this.fontRenderer.FONT_HEIGHT);
+    return new Vector2f(width, this.lines.size() * this.fontRenderer.FONT_HEIGHT);
   }
 
   private void generateLines(int width) {
-    this.lines = RenderComponentsUtil.splitText(this.text, width, this.fontRenderer, true, false)
-        .stream()
-        .map(line -> ForgeHooks.newChatWithLinks(line.getString()).setStyle(line.getStyle()))
-        .collect(Collectors.toList());
+    this.lines = RenderComponentsUtil.func_238505_a_(this.text, width, this.fontRenderer);
   }
 
   @Override
@@ -81,34 +76,30 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
-    MatrixStack matrixStack = new MatrixStack();
-    matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
-    matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
-    RenderSystem.pushMatrix();
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    matrixStack.push();
     {
-      RenderSystem.enableAlphaTest();
+      matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
+      matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
           IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
       for (int i = 0; i < this.lines.size(); i++) {
-        ITextComponent line = this.lines.get(i);
+        IReorderingProcessor line = this.lines.get(i);
         matrixStack.push();
         {
           matrixStack.translate(0.0D, i * this.fontRenderer.FONT_HEIGHT, 0.0D);
-          this.fontRenderer.renderString(line.getFormattedText(), 0, 0, 0xFFFFFFFF,
-              this.shadow, matrixStack.getLast().getMatrix(), renderTypeBuffer, false, 0,
-              0xF000F0);
+          this.fontRenderer.func_238416_a_(line, 0, 0, 0xFFFFFFFF, this.shadow,
+              matrixStack.getLast().getMatrix(), renderTypeBuffer, false, 0, 0xF000F0);
         }
         matrixStack.pop();
       }
       renderTypeBuffer.finish();
-      RenderSystem.disableAlphaTest();
     }
-    RenderSystem.popMatrix();
+    matrixStack.pop();
   }
 
-  public Optional<ITextComponent> getMouseOverText(double mouseX, double mouseY) {
+  public Optional<Style> getMouseOverText(double mouseX, double mouseY) {
     int offsetMouseX = MathHelper.floor(mouseX - this.getScaledContentX());
     int offsetMouseY = MathHelper.floor(mouseY - this.getScaledContentY());
     if (offsetMouseX >= 0 && offsetMouseY >= 0) {
@@ -117,16 +108,9 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
           && offsetMouseY < this.fontRenderer.FONT_HEIGHT * lines + lines) {
         int maxLines = offsetMouseY / this.fontRenderer.FONT_HEIGHT;
         if (maxLines >= 0 && maxLines < this.lines.size()) {
-          ITextComponent line = this.lines.get(maxLines);
-          int widthTotal = 0;
-          for (ITextComponent child : line) {
-            if (child instanceof StringTextComponent) {
-              widthTotal += this.minecraft.fontRenderer.getStringWidth(child.getFormattedText());
-              if (widthTotal > offsetMouseX) {
-                return Optional.of(child);
-              }
-            }
-          }
+          IReorderingProcessor line = this.lines.get(maxLines);
+          return Optional.ofNullable(
+              this.fontRenderer.getCharacterManager().func_243239_a(line, offsetMouseX));
         }
       }
     }

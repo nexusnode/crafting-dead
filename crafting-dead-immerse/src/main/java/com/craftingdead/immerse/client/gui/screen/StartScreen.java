@@ -23,12 +23,13 @@ import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.screen.menu.MenuScreen;
 import com.craftingdead.immerse.client.gui.screen.menu.MenuScreen.Page;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class StartScreen extends ModScreen {
@@ -40,9 +41,10 @@ public class StartScreen extends ModScreen {
     super(new TranslationTextComponent("narrator.screen.start"));
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.renderBackground();
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderBackground(matrixStack);
 
     if (this.fadeStartTime == 0L) {
       this.fadeStartTime = Util.milliTime();
@@ -50,22 +52,20 @@ public class StartScreen extends ModScreen {
 
     float fadePct = MathHelper.clamp((Util.milliTime() - this.fadeStartTime) / 1000.0F, 0.0F, 1.0F);
 
-    Vec2f logoSize = FitType.CONTAIN.getSize(1920, 1080, this.width, this.height);
+    Vector2f logoSize = FitType.CONTAIN.getSize(1920, 1080, this.width, this.height);
     double logoWidth = logoSize.x;
     double logoHeight = logoSize.y;
 
     RenderSystem.enableBlend();
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, fadePct);
     RenderUtil.bind(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/craftingdead.png"));
-    RenderUtil
-        .blit(this.width / 2 - logoWidth / 2, this.height / 2 - logoHeight / 2,
-            logoWidth, logoHeight);
+    RenderUtil.blit(this.width / 2 - logoWidth / 2, this.height / 2 - logoHeight / 2, logoWidth,
+        logoHeight);
     RenderSystem.disableBlend();
 
-    this.font
-        .drawString(I18n.format("menu.start"),
-            this.width / 2 - this.font.getStringWidth(I18n.format("menu.start")) / 2,
-            this.height / 2 + this.height / 4, 0xFFFFFF | MathHelper.ceil(fadePct * 255.0F) << 24);
+    this.font.drawString(matrixStack, I18n.format("menu.start"),
+        this.width / 2 - this.font.getStringWidth(I18n.format("menu.start")) / 2,
+        this.height / 2 + this.height / 4, 0xFFFFFF | MathHelper.ceil(fadePct * 255.0F) << 24);
   }
 
   @Override

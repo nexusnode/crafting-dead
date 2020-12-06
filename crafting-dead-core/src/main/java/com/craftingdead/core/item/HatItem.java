@@ -22,13 +22,11 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.capability.hat.DefaultHat;
-import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -50,43 +48,31 @@ public class HatItem extends Item {
     this.immuneToFlashes = properties.immuneToFlashes;
     this.immuneToGas = properties.immuneToGas;
     this.nightVision = properties.nightVision;
-    this.addPropertyOverride(new ResourceLocation("wearing"),
-        (itemStack, world, entity) -> entity.getCapability(ModCapabilities.LIVING)
-            .map(living -> living.getItemHandler()
-                .getStackInSlot(InventorySlotType.HAT.getIndex()) == itemStack
-                    ? 1.0F
-                    : 0.0F)
-            .orElse(0.0F));
+
   }
 
   @Override
   public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
       ITooltipFlag tooltipFlag) {
     if (this.headshotReductionPercentage > 0.0F) {
-      ITextComponent percentageText = Text
-          .of(String.format("%.1f", this.headshotReductionPercentage) + "%")
-          .applyTextStyle(TextFormatting.RED);
+      ITextComponent percentageText =
+          Text.of(String.format("%.1f", this.headshotReductionPercentage) + "%")
+              .mergeStyle(TextFormatting.RED);
 
-      lore
-          .add(Text
-              .translate("item_lore.hat_item.headshot_reduction")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(percentageText));
+      lore.add(Text.translate("item_lore.hat_item.headshot_reduction")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(percentageText));
     }
     if (this.immuneToFlashes) {
-      ITextComponent text = Text.translate("item_lore.hat_item.immune_to_flashes");
-      text.getStyle().setColor(TextFormatting.GRAY);
-      lore.add(text);
+      lore.add(
+          Text.translate("item_lore.hat_item.immune_to_flashes").mergeStyle(TextFormatting.GRAY));
     }
     if (this.immuneToGas) {
-      ITextComponent text = Text.translate("item_lore.hat_item.immune_to_gas");
-      text.getStyle().setColor(TextFormatting.GRAY);
-      lore.add(text);
+      lore.add(Text.translate("item_lore.hat_item.immune_to_gas").mergeStyle(TextFormatting.GRAY));
     }
     if (this.nightVision) {
-      ITextComponent text = Text.translate("item_lore.hat_item.has_night_vision");
-      text.getStyle().setColor(TextFormatting.GRAY);
-      lore.add(text);
+      lore.add(
+          Text.translate("item_lore.hat_item.has_night_vision").mergeStyle(TextFormatting.GRAY));
     }
   }
 

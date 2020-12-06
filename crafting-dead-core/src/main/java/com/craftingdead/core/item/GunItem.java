@@ -65,8 +65,14 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final int fireRateMs;
 
+  /**
+   * Damage inflicted by a single shot from this gun.
+   */
   private final int damage;
 
+  /**
+   * The duration of time this gun takes to reload in ticks.
+   */
   private final int reloadDurationTicks;
 
   /**
@@ -80,12 +86,12 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   private final int bulletAmountToFire;
 
   /**
-   * Whether the player can aim with this gun or not
+   * Whether the player can aim with this gun or not.
    */
   private final boolean aimable;
 
   /**
-   * Whether the crosshair should be rendered or not while holding this item
+   * Whether the crosshair should be rendered or not while holding this item.
    */
   private final boolean crosshair;
 
@@ -99,32 +105,69 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final List<FireMode> fireModes;
 
+  /**
+   * Sound to play for each shot of the gun.
+   */
   private final Supplier<SoundEvent> shootSound;
 
+  /**
+   * A 'silenced' version of the shoot sound.
+   */
   private final Supplier<SoundEvent> silencedShootSound;
 
+  /**
+   * Sound to play whilst the gun is being reloaded.
+   */
   private final Supplier<SoundEvent> reloadSound;
 
+  /**
+   * All the animations used by this gun.
+   */
   private final Map<AnimationType, Supplier<GunAnimation>> animations;
 
+  /**
+   * A set of magazines that are supported by this gun.
+   */
   private final Set<Supplier<MagazineItem>> acceptedMagazines;
 
+  /**
+   * The default magazine that is supplied with this gun when crafted.
+   */
   private final Supplier<MagazineItem> defaultMagazine;
 
+  /**
+   * A set of attachments that are supported by this gun.
+   */
   private final Set<Supplier<AttachmentItem>> acceptedAttachments;
 
+  /**
+   * A set of paints that are supported by this gun.
+   */
   private final Set<Supplier<PaintItem>> acceptedPaints;
 
-  private final Set<Supplier<AttachmentItem>> defaultAttachments;
-
+  /**
+   * A factory that creates a {@link GunRenderer} instance for this gun.
+   */
   private final Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
+  /**
+   * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
+   */
   private final IGun.RightMouseActionTriggerType rightMouseActionTriggerType;
 
+  /**
+   * A {@link Predicate} used to determine if the gun can shoot or not.
+   */
   private final Predicate<IGun> triggerPredicate;
 
+  /**
+   * Sound to be played when performing the right mouse action.
+   */
   private final Supplier<SoundEvent> rightMouseActionSound;
 
+  /**
+   * A delay in milliseconds between repeating the right mouse action sound.
+   */
   private final long rightMouseActionSoundRepeatDelayMs;
 
   public GunItem(Properties properties) {
@@ -145,7 +188,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.acceptedMagazines = properties.acceptedMagazines;
     this.defaultMagazine = properties.defaultMagazine;
     this.acceptedAttachments = properties.acceptedAttachments;
-    this.defaultAttachments = properties.defaultAttachments;
     this.acceptedPaints = properties.acceptedPaints;
     this.rendererFactory = properties.rendererFactory;
     this.rightMouseActionTriggerType = properties.rightMouseActionTriggerType;
@@ -222,10 +264,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
-  public Set<AttachmentItem> getDefaultAttachments() {
-    return this.defaultAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
-  }
-
   public IGun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
     return this.rightMouseActionTriggerType;
   }
@@ -297,61 +335,48 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     stack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       ITextComponent magazineSizeText =
-          Text.of(gun.getMagazineSize()).applyTextStyle(TextFormatting.RED);
-      ITextComponent damageText = Text.of(this.damage).applyTextStyle(TextFormatting.RED);
+          Text.of(gun.getMagazineSize()).mergeStyle(TextFormatting.RED);
+      ITextComponent damageText = Text.of(this.damage).mergeStyle(TextFormatting.RED);
       ITextComponent headshotDamageText = Text
           .of((int) (this.damage * DefaultGun.HEADSHOT_MULTIPLIER))
-          .applyTextStyle(TextFormatting.RED);
+          .mergeStyle(TextFormatting.RED);
       ITextComponent accuracyText =
-          Text.of((int) (this.accuracy * 100D) + "%").applyTextStyle(TextFormatting.RED);
-      ITextComponent rpmText = Text.of(this.getFireRateRPM()).applyTextStyle(TextFormatting.RED);
+          Text.of((int) (this.accuracy * 100D) + "%").mergeStyle(TextFormatting.RED);
+      ITextComponent rpmText = Text.of(this.getFireRateRPM()).mergeStyle(TextFormatting.RED);
 
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.ammo_amount")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(magazineSizeText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.damage")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(damageText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.headshot_damage")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(headshotDamageText));
+      lines.add(Text.translate("item_lore.gun_item.ammo_amount")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(magazineSizeText));
+      lines.add(Text.translate("item_lore.gun_item.damage")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(damageText));
+      lines.add(Text.translate("item_lore.gun_item.headshot_damage")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(headshotDamageText));
 
       if (this.bulletAmountToFire > 1) {
         ITextComponent pelletsText =
-            Text.of(this.bulletAmountToFire).applyTextStyle(TextFormatting.RED);
+            Text.of(this.bulletAmountToFire).mergeStyle(TextFormatting.RED);
 
-        lines
-            .add(Text
-                .translate("item_lore.gun_item.pellets_shot")
-                .applyTextStyle(TextFormatting.GRAY)
-                .appendSibling(pelletsText));
+        lines.add(Text.translate("item_lore.gun_item.pellets_shot")
+            .mergeStyle(TextFormatting.GRAY)
+            .append(pelletsText));
       }
 
       for (AttachmentItem attachment : gun.getAttachments()) {
-        ITextComponent attachmentNameText = attachment.getName().applyTextStyle(TextFormatting.RED);
-        lines
-            .add(Text
-                .translate("item_lore.gun_item.attachment")
-                .applyTextStyle(TextFormatting.GRAY)
-                .appendSibling(attachmentNameText));
+        ITextComponent attachmentNameText =
+            attachment.getName().copyRaw().mergeStyle(TextFormatting.RED);
+        lines.add(Text.translate("item_lore.gun_item.attachment")
+            .mergeStyle(TextFormatting.GRAY)
+            .append(attachmentNameText));
       }
 
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.rpm")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(rpmText));
-      lines
-          .add(Text
-              .translate("item_lore.gun_item.accuracy")
-              .applyTextStyle(TextFormatting.GRAY)
-              .appendSibling(accuracyText));
+      lines.add(Text.translate("item_lore.gun_item.rpm")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(rpmText));
+      lines.add(Text.translate("item_lore.gun_item.accuracy")
+          .mergeStyle(TextFormatting.GRAY)
+          .append(accuracyText));
     });
   }
 
@@ -369,6 +394,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   @Override
   public void onCreated(ItemStack itemStack, World world, PlayerEntity playerEntity) {
     itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setMagazineSize(0));
+  }
+
+  @Override
+  public int func_230305_d_() {
+    return 0;
   }
 
   public static class Properties extends Item.Properties {
@@ -407,8 +437,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     private final Set<Supplier<AttachmentItem>> acceptedAttachments = new HashSet<>();
 
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
-
-    private final Set<Supplier<AttachmentItem>> defaultAttachments = new HashSet<>();
 
     private Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
@@ -502,11 +530,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     public Properties addAcceptedAttachment(Supplier<AttachmentItem> acceptedAttachment) {
       this.acceptedAttachments.add(acceptedAttachment);
       return this;
-    }
-
-    public Properties addDefaultAttachment(Supplier<AttachmentItem> defaultAttachment) {
-      this.defaultAttachments.add(defaultAttachment);
-      return this.addAcceptedAttachment(defaultAttachment);
     }
 
     public Properties addAcceptedPaint(Supplier<PaintItem> acceptedPaint) {

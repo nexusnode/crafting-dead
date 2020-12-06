@@ -48,7 +48,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -93,7 +93,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   private boolean crouching;
 
-  private Vec3d lastPos;
+  private Vector3d lastPos;
 
   private boolean moving;
 
@@ -332,14 +332,18 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     return false;
   }
 
-  @Override
-  public void onStartTracking(ServerPlayerEntity playerEntity) {
+  protected void sendInventory(PacketTarget target) {
     Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
     for (int i = 0; i < this.itemHandler.getSlots(); i++) {
       slots.put(i, this.itemHandler.getStackInSlot(i));
     }
-    NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
+    NetworkChannel.PLAY.getSimpleChannel().send(target,
         new SetSlotsMessage(this.entity.getEntityId(), slots));
+  }
+
+  @Override
+  public void onStartTracking(ServerPlayerEntity playerEntity) {
+    this.sendInventory(PacketDistributor.PLAYER.with(() -> playerEntity));
   }
 
   @Override

@@ -42,12 +42,12 @@ public class ActionItem extends Item {
   }
 
   @Override
-  public boolean itemInteractionForEntity(ItemStack itemStack, PlayerEntity playerEntity,
+  public ActionResultType itemInteractionForEntity(ItemStack itemStack, PlayerEntity playerEntity,
       LivingEntity targetEntity, Hand hand) {
     if (!playerEntity.getEntityWorld().isRemote()) {
       this.performAction(playerEntity, targetEntity);
     }
-    return false;
+    return ActionResultType.PASS;
   }
 
   @Override
@@ -61,10 +61,11 @@ public class ActionItem extends Item {
 
   private void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
     if (this.actionProvider != null) {
-      performerEntity.getCapability(ModCapabilities.LIVING).ifPresent(
-          performer -> this.actionProvider.getEntityAction(performer,
-              targetEntity == null ? null
-                  : targetEntity.getCapability(ModCapabilities.LIVING).orElse(null))
+      performerEntity.getCapability(ModCapabilities.LIVING)
+          .ifPresent(performer -> this.actionProvider
+              .getEntityAction(performer,
+                  targetEntity == null ? null
+                      : targetEntity.getCapability(ModCapabilities.LIVING).orElse(null))
               .ifPresent(action -> performer.performAction(action, false, true)));
     }
   }

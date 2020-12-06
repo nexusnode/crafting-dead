@@ -28,8 +28,8 @@ public class ModContainerTypes {
   public static final DeferredRegister<ContainerType<?>> CONTAINERS =
       DeferredRegister.create(ForgeRegistries.CONTAINERS, CraftingDead.ID);
 
-  public static final RegistryObject<ContainerType<ModInventoryContainer>> PLAYER =
-      CONTAINERS.register("inventory", () -> new ContainerType<>(ModInventoryContainer::new));
+  public static final RegistryObject<ContainerType<PlayerContainer>> PLAYER =
+      CONTAINERS.register("player", () -> new ContainerType<>(PlayerContainer::new));
 
   public static final RegistryObject<ContainerType<GenericContainer>> VEST =
       CONTAINERS.register("vest", () -> new ContainerType<>(GenericContainer::createVest));

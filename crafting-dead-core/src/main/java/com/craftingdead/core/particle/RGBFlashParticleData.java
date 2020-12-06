@@ -20,11 +20,23 @@ package com.craftingdead.core.particle;
 import java.util.Locale;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 
 public class RGBFlashParticleData implements IParticleData {
+
+  public static final Codec<RGBFlashParticleData> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(Codec.FLOAT.fieldOf("red").forGetter(RGBFlashParticleData::getRed),
+              Codec.FLOAT.fieldOf("green").forGetter(RGBFlashParticleData::getGreen),
+              Codec.FLOAT.fieldOf("blue").forGetter(RGBFlashParticleData::getBlue),
+              Codec.FLOAT.fieldOf("scale").forGetter(RGBFlashParticleData::getScale))
+          .apply(instance, RGBFlashParticleData::new));
+
+  @SuppressWarnings("deprecation")
   public static final IParticleData.IDeserializer<RGBFlashParticleData> DESERIALIZER =
       new IParticleData.IDeserializer<RGBFlashParticleData>() {
         @Override

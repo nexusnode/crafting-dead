@@ -20,8 +20,8 @@ package com.craftingdead.core.util;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 
@@ -69,8 +69,8 @@ public class ModDamageSource {
       LivingEntity livingHit = (LivingEntity) victim;
 
       // Gets the KNOCKBACK RESISTANCE attribute of the victim
-      IAttributeInstance livingResistance =
-          livingHit.getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE);
+      ModifiableAttributeInstance livingResistance =
+          livingHit.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
       // Saves the previous resistance value to be used after applying the hit
       double previousResistance = livingResistance.getBaseValue();
 

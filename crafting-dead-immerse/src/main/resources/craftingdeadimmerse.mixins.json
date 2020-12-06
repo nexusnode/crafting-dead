@@ -4,8 +4,7 @@
     "compatibilityLevel": "JAVA_8",
     "refmap": "craftingdeadimmerse.refmap.json",
     "client": [
-        "MinecraftMixin",
-        "ClientWorldMixin"
+        "MinecraftMixin"
     ],
     "injectors": {
         "defaultRequire": 1

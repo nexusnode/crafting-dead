@@ -44,16 +44,16 @@ import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -73,7 +73,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
 
   @Override
   public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-      Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
+      Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
       ItemOverrideList overrides, ResourceLocation modelLocation) {
 
     Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels =
@@ -98,10 +98,10 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
   }
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner,
+  public Collection<RenderMaterial> getTextures(IModelConfiguration owner,
       Function<ResourceLocation, IUnbakedModel> modelGetter,
       Set<Pair<String, String>> missingTextureErrors) {
-    Set<Material> materials = new HashSet<>();
+    Set<RenderMaterial> materials = new HashSet<>();
     materials.add(owner.resolveTexture("particle"));
     materials
         .addAll(this.models
@@ -152,7 +152,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
     }
 
     @Override
-    public boolean func_230044_c_() {
+    public boolean isSideLit() {
       return false;
     }
 
@@ -195,8 +195,8 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
   private static final class ModelOverrideHandler extends ItemOverrideList {
 
     @Override
-    public IBakedModel getModelWithOverrides(IBakedModel originalModel, ItemStack itemStack,
-        @Nullable World world, @Nullable LivingEntity entity) {
+    public IBakedModel getOverrideModel(IBakedModel originalModel, ItemStack itemStack,
+        @Nullable ClientWorld world, @Nullable LivingEntity livingEntity) {
       BakedPerspectiveAwareModel perspectiveModel = (BakedPerspectiveAwareModel) originalModel;
       Map<ItemCameraTransforms.TransformType, IBakedModel> bakedModels =
           perspectiveModel.bakedModels
@@ -204,7 +204,7 @@ public class PerspectiveAwareModel implements IModelGeometry<PerspectiveAwareMod
               .stream()
               .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 IBakedModel model = entry.getValue();
-                return model.getOverrides().getModelWithOverrides(model, itemStack, world, entity);
+                return model.getOverrides().getOverrideModel(model, itemStack, world, livingEntity);
               }, (u, v) -> {
                 throw new IllegalStateException(String.format("Duplicate key %s", u));
               }, () -> new EnumMap<>(ItemCameraTransforms.TransformType.class)));

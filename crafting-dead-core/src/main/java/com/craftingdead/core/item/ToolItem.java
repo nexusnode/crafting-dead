@@ -26,7 +26,7 @@ import net.minecraft.util.text.TextFormatting;
 public class ToolItem extends Item {
 
   public static final ITextComponent CAN_OPEN_CANNED_ITEMS_TOOLTIP =
-      Text.translate("item_lore.tool_item.open_canned_items").applyTextStyle(TextFormatting.GRAY);
+      Text.translate("item_lore.tool_item.open_canned_items").mergeStyle(TextFormatting.GRAY);
 
   public ToolItem(Properties properties) {
     super(properties);

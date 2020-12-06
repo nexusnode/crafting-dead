@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.transition;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.gui.screen.ModScreen;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -57,7 +58,8 @@ public class TransitionManager {
     this.defaultTransition = defaultTransition;
   }
 
-  public boolean checkDrawTransition(int mouseX, int mouseY, float partialTicks, Screen screen) {
+  public boolean checkDrawTransition(MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks, Screen screen) {
     ITransition transition =
         screen instanceof ModScreen ? ((ModScreen) screen).getTransition() : null;
 
@@ -81,14 +83,16 @@ public class TransitionManager {
     }
 
     if (this.transitionProgress < 1.0F) {
-      this.renderTransition(mouseX, mouseY, partialTicks, screen, transition);
+      this.renderTransition(matrixStack, mouseX, mouseY, partialTicks, screen, transition);
       return true;
     }
 
     return false;
   }
 
-  private void renderTransition(int mouseX, int mouseY, float partialTicks, Screen screen,
+  @SuppressWarnings("deprecation")
+  private void renderTransition(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks,
+      Screen screen,
       ITransition transition) {
     RenderSystem.pushMatrix();
     {
@@ -99,7 +103,7 @@ public class TransitionManager {
 
       RenderSystem.pushMatrix();
       {
-        screen.render(mouseX, mouseY, partialTicks);
+        screen.render(matrixStack, mouseX, mouseY, partialTicks);
       }
       RenderSystem.popMatrix();
       this.transitionFramebuffer.unbindFramebuffer();

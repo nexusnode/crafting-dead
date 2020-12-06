@@ -18,9 +18,7 @@
 package com.craftingdead.immerse.game;
 
 import java.io.IOException;
-import java.util.Optional;
 import com.craftingdead.core.capability.living.Player;
-import com.craftingdead.immerse.world.map.IMap;
 import net.minecraft.network.PacketBuffer;
 
 public interface IGame<T extends ITeam> {
@@ -41,9 +39,9 @@ public interface IGame<T extends ITeam> {
 
   void setTeam(Player<?> player, T team);
 
-  default Optional<IMap> getMap() {
-    return Optional.empty();
-  }
+//  default Optional<ISchematic> getMap() {
+//    return Optional.empty();
+//  }
 
   String getDisplayName();
 

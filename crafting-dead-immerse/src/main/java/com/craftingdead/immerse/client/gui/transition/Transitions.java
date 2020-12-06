@@ -26,6 +26,7 @@ public enum Transitions implements ITransition {
 
     private static final float SCALE = 0.075F;
 
+    @SuppressWarnings("deprecation")
     @Override
     public void transform(double width, double height, float progress) {
       float scaleOffset = (1.0F - progress) * SCALE;

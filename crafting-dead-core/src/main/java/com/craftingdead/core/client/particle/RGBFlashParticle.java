@@ -25,11 +25,11 @@ import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.SpriteTexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 
 public class RGBFlashParticle extends SpriteTexturedParticle {
-  private RGBFlashParticle(RGBFlashParticleData data, World world, double x, double y, double z) {
+  private RGBFlashParticle(RGBFlashParticleData data, ClientWorld world, double x, double y, double z) {
     super(world, x, y, z);
     this.maxAge = 4;
     this.particleRed = data.getRed();
@@ -64,7 +64,7 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public Particle makeParticle(RGBFlashParticleData data, World world, double xPos, double yPos,
+    public Particle makeParticle(RGBFlashParticleData data, ClientWorld world, double xPos, double yPos,
         double zPos, double xVelocity, double yVelocity, double zVelocity) {
       RGBFlashParticle flashParticle = new RGBFlashParticle(data, world, xPos, yPos, zPos);
       flashParticle.selectSpriteRandomly(this.animatedSprite);

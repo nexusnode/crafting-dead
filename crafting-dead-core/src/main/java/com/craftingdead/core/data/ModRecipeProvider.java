@@ -86,14 +86,14 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('g', Items.GLASS)
         .key('i', Items.IRON_ORE)
-        .addCriterion("has_glass", this.hasItem(Items.GLASS))
+        .addCriterion("has_glass", hasItem(Items.GLASS))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.RED_DOT_SIGHT.get())
         .patternLine("g  ")
         .patternLine("iii")
         .key('g', Items.GLASS)
         .key('i', Items.IRON_ORE)
-        .addCriterion("has_glass", this.hasItem(Items.GLASS))
+        .addCriterion("has_glass", hasItem(Items.GLASS))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.EOTECH_SIGHT.get())
         .patternLine("gr ")
@@ -101,7 +101,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('g', Items.GLASS)
         .key('i', Items.IRON_ORE)
         .key('r', Items.REDSTONE)
-        .addCriterion("has_redstone", this.hasItem(Items.REDSTONE))
+        .addCriterion("has_redstone", hasItem(Items.REDSTONE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.LP_SCOPE.get())
         .patternLine("iii")
@@ -109,7 +109,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('g', Items.GLASS)
         .key('i', Items.IRON_ORE)
-        .addCriterion("has_glass", this.hasItem(Items.GLASS))
+        .addCriterion("has_glass", hasItem(Items.GLASS))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HP_SCOPE.get())
         .patternLine("iii")
@@ -118,7 +118,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('g', Items.GLASS)
         .key('i', Items.IRON_ORE)
         .key('r', Items.REDSTONE)
-        .addCriterion("has_redstone", this.hasItem(Items.REDSTONE))
+        .addCriterion("has_redstone", hasItem(Items.REDSTONE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SUPPRESSOR.get())
         .patternLine("isi")
@@ -126,21 +126,21 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("isi")
         .key('i', Items.IRON_ORE)
         .key('s', Items.STRING)
-        .addCriterion("has_iron_ore", this.hasItem(Items.IRON_ORE))
+        .addCriterion("has_iron_ore", hasItem(Items.IRON_ORE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.TACTICAL_GRIP.get())
         .patternLine(" i ")
         .patternLine(" i ")
         .patternLine(" i ")
         .key('i', Items.IRON_ORE)
-        .addCriterion("has_iron_ore", this.hasItem(Items.IRON_ORE))
+        .addCriterion("has_iron_ore", hasItem(Items.IRON_ORE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.BIPOD.get())
         .patternLine(" i ")
         .patternLine("i i")
         .patternLine("i i")
         .key('i', Items.IRON_ORE)
-        .addCriterion("has_iron_ore", this.hasItem(Items.IRON_ORE))
+        .addCriterion("has_iron_ore", hasItem(Items.IRON_ORE))
         .build(consumer);
 
     // ================================================================================
@@ -156,7 +156,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.LIGHT_GRAY_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_light_gray_dye", this.hasItem(Items.LIGHT_GRAY_DYE))
+        .addCriterion("has_light_gray_dye", hasItem(Items.LIGHT_GRAY_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SCARH.get())
         .patternLine(" d ")
@@ -167,7 +167,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.ORANGE_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_orange_dye", this.hasItem(Items.ORANGE_DYE))
+        .addCriterion("has_orange_dye", hasItem(Items.ORANGE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.AK47.get())
         .patternLine(" d ")
@@ -178,7 +178,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.BROWN_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_brown_dye", this.hasItem(Items.BROWN_DYE))
+        .addCriterion("has_brown_dye", hasItem(Items.BROWN_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.ACR.get())
         .patternLine(" d ")
@@ -189,7 +189,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.RED_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_red_dye", this.hasItem(Items.RED_DYE))
+        .addCriterion("has_red_dye", hasItem(Items.RED_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.FNFAL.get())
         .patternLine(" d ")
@@ -200,7 +200,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.INK_SAC)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_ink_sac", this.hasItem(Items.INK_SAC))
+        .addCriterion("has_ink_sac", hasItem(Items.INK_SAC))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HK417.get())
         .patternLine(" d ")
@@ -211,7 +211,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.MAGENTA_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_magenta_dye", this.hasItem(Items.MAGENTA_DYE))
+        .addCriterion("has_magenta_dye", hasItem(Items.MAGENTA_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MPT55.get())
         .patternLine(" d ")
@@ -222,7 +222,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.YELLOW_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_yellow_dye", this.hasItem(Items.YELLOW_DYE))
+        .addCriterion("has_yellow_dye", hasItem(Items.YELLOW_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.M1GARAND.get())
         .patternLine(" d ")
@@ -233,7 +233,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.LIME_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_lime_dye", this.hasItem(Items.LIME_DYE))
+        .addCriterion("has_lime_dye", hasItem(Items.LIME_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SPORTER22.get())
         .patternLine(" d ")
@@ -244,7 +244,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.BLUE_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_blue_dye", this.hasItem(Items.BLUE_DYE))
+        .addCriterion("has_blue_dye", hasItem(Items.BLUE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.G36C.get())
         .patternLine(" d ")
@@ -255,7 +255,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.BLUE_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_blue_dye", this.hasItem(Items.BLUE_DYE))
+        .addCriterion("has_blue_dye", hasItem(Items.BLUE_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -271,7 +271,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.RED_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_red_dye", this.hasItem(Items.RED_DYE))
+        .addCriterion("has_red_dye", hasItem(Items.RED_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.RPK.get())
         .patternLine(" d ")
@@ -282,7 +282,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.ORANGE_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_orange_dye", this.hasItem(Items.ORANGE_DYE))
+        .addCriterion("has_orange_dye", hasItem(Items.ORANGE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MINIGUN.get())
         .patternLine(" d ")
@@ -293,7 +293,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.LIME_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_lime_dye", this.hasItem(Items.LIME_DYE))
+        .addCriterion("has_lime_dye", hasItem(Items.LIME_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MK48MOD.get())
         .patternLine(" d ")
@@ -304,7 +304,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.MEDIUM_BARREL.get())
         .key('d', Items.BLUE_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_blue_dye", this.hasItem(Items.BLUE_DYE))
+        .addCriterion("has_blue_dye", hasItem(Items.BLUE_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -320,7 +320,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.RED_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_red_dye", this.hasItem(Items.RED_DYE))
+        .addCriterion("has_red_dye", hasItem(Items.RED_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.M1911.get())
         .patternLine(" d ")
@@ -331,7 +331,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.BLUE_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_blue_dye", this.hasItem(Items.BLUE_DYE))
+        .addCriterion("has_blue_dye", hasItem(Items.BLUE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.G18.get())
         .patternLine(" d ")
@@ -342,7 +342,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.LIME_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_lime_dye", this.hasItem(Items.LIME_DYE))
+        .addCriterion("has_lime_dye", hasItem(Items.LIME_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.M9.get())
         .patternLine(" d ")
@@ -353,7 +353,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.ORANGE_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_orange_dye", this.hasItem(Items.ORANGE_DYE))
+        .addCriterion("has_orange_dye", hasItem(Items.ORANGE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.DESERT_EAGLE.get())
         .patternLine(" d ")
@@ -364,7 +364,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.GRAY_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_gray_dye", this.hasItem(Items.GRAY_DYE))
+        .addCriterion("has_gray_dye", hasItem(Items.GRAY_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.P250.get())
         .patternLine(" d ")
@@ -375,7 +375,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.BROWN_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_brown_dye", this.hasItem(Items.BROWN_DYE))
+        .addCriterion("has_brown_dye", hasItem(Items.BROWN_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MAGNUM.get())
         .patternLine(" d ")
@@ -386,7 +386,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.LIGHT_GRAY_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_light_gray_dye", this.hasItem(Items.LIGHT_GRAY_DYE))
+        .addCriterion("has_light_gray_dye", hasItem(Items.LIGHT_GRAY_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.FN57.get())
         .patternLine(" d ")
@@ -397,7 +397,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.YELLOW_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_yellow_dye", this.hasItem(Items.YELLOW_DYE))
+        .addCriterion("has_yellow_dye", hasItem(Items.YELLOW_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -413,7 +413,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.GRAY_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_gray_dye", this.hasItem(Items.GRAY_DYE))
+        .addCriterion("has_gray_dye", hasItem(Items.GRAY_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.P90.get())
         .patternLine(" d ")
@@ -424,7 +424,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.LIGHT_GRAY_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_light_gray_dye", this.hasItem(Items.LIGHT_GRAY_DYE))
+        .addCriterion("has_light_gray_dye", hasItem(Items.LIGHT_GRAY_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.VECTOR.get())
         .patternLine(" d ")
@@ -435,7 +435,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.BLUE_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_blue_dye", this.hasItem(Items.BLUE_DYE))
+        .addCriterion("has_blue_dye", hasItem(Items.BLUE_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MP5A5.get())
         .patternLine(" d ")
@@ -446,7 +446,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.SMALL_BARREL.get())
         .key('d', Items.LIME_DYE)
         .key('e', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_lime_dye", this.hasItem(Items.LIME_DYE))
+        .addCriterion("has_lime_dye", hasItem(Items.LIME_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -462,7 +462,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.RED_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_red_dye", this.hasItem(Items.RED_DYE))
+        .addCriterion("has_red_dye", hasItem(Items.RED_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.AS50.get())
         .patternLine(" d ")
@@ -473,7 +473,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.LIME_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_lime_dye", this.hasItem(Items.LIME_DYE))
+        .addCriterion("has_lime_dye", hasItem(Items.LIME_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.AWP.get())
         .patternLine(" d ")
@@ -484,7 +484,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.GREEN_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_green_dye", this.hasItem(Items.GREEN_DYE))
+        .addCriterion("has_green_dye", hasItem(Items.GREEN_DYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.DMR.get())
         .patternLine(" d ")
@@ -495,7 +495,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.LIGHT_GRAY_DYE)
         .key('e', ModItems.HEAVY_HANDLE.get())
-        .addCriterion("has_light_gray_dye", this.hasItem(Items.LIGHT_GRAY_DYE))
+        .addCriterion("has_light_gray_dye", hasItem(Items.LIGHT_GRAY_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -511,7 +511,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.OAK_PLANKS)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_oak_planks", this.hasItem(Items.OAK_PLANKS))
+        .addCriterion("has_oak_planks", hasItem(Items.OAK_PLANKS))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MOSSBERG.get())
         .patternLine(" d ")
@@ -522,7 +522,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('c', ModItems.HEAVY_BARREL.get())
         .key('d', Items.BLACK_DYE)
         .key('e', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_black_dye", this.hasItem(Items.BLACK_DYE))
+        .addCriterion("has_black_dye", hasItem(Items.BLACK_DYE))
         .build(consumer);
 
     // ================================================================================
@@ -535,7 +535,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine(" i ")
         .key('i', Tags.Items.INGOTS_IRON)
         .key('f', Items.FIRE_CHARGE)
-        .addCriterion("has_fire_charge", this.hasItem(Items.FIRE_CHARGE))
+        .addCriterion("has_fire_charge", hasItem(Items.FIRE_CHARGE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SMOKE_GRENADE.get())
         .patternLine("wiw")
@@ -544,7 +544,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('i', Tags.Items.INGOTS_IRON)
         .key('w', ItemTags.WOOL)
         .key('g', Tags.Items.GUNPOWDER)
-        .addCriterion("has_gunpowder", this.hasItem(Tags.Items.GUNPOWDER))
+        .addCriterion("has_gunpowder", hasItem(Tags.Items.GUNPOWDER))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.FLASH_GRENADE.get())
         .patternLine("eie")
@@ -553,7 +553,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('i', Tags.Items.INGOTS_IRON)
         .key('e', Items.FERMENTED_SPIDER_EYE)
         .key('g', Tags.Items.GUNPOWDER)
-        .addCriterion("has_fermented_spider_eye", this.hasItem(Items.FERMENTED_SPIDER_EYE))
+        .addCriterion("has_fermented_spider_eye", hasItem(Items.FERMENTED_SPIDER_EYE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.DECOY_GRENADE.get())
         .patternLine("nin")
@@ -562,7 +562,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('i', Tags.Items.INGOTS_IRON)
         .key('n', Items.NOTE_BLOCK)
         .key('g', Tags.Items.GUNPOWDER)
-        .addCriterion("has_note_block", this.hasItem(Items.NOTE_BLOCK))
+        .addCriterion("has_note_block", hasItem(Items.NOTE_BLOCK))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.FRAG_GRENADE.get())
         .patternLine(" i ")
@@ -570,7 +570,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine(" i ")
         .key('i', Tags.Items.INGOTS_IRON)
         .key('g', Tags.Items.GUNPOWDER)
-        .addCriterion("has_gunpowder", this.hasItem(Tags.Items.GUNPOWDER))
+        .addCriterion("has_gunpowder", hasItem(Tags.Items.GUNPOWDER))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.PIPE_GRENADE.get())
         .patternLine("bib")
@@ -579,7 +579,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .key('i', Tags.Items.INGOTS_IRON)
         .key('b', ModItems.BLOODY_RAG.get())
         .key('g', Tags.Items.GUNPOWDER)
-        .addCriterion("has_bloody_rag", this.hasItem(ModItems.BLOODY_RAG.get()))
+        .addCriterion("has_bloody_rag", hasItem(ModItems.BLOODY_RAG.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.C4.get())
         .patternLine(" i ")
@@ -587,7 +587,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine(" i ")
         .key('i', Tags.Items.INGOTS_IRON)
         .key('t', Items.TNT)
-        .addCriterion("has_tnt", this.hasItem(Items.TNT))
+        .addCriterion("has_tnt", hasItem(Items.TNT))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.REMOTE_DETONATOR.get())
         .patternLine(" i ")
@@ -595,7 +595,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Tags.Items.INGOTS_IRON)
         .key('r', Tags.Items.DUSTS_REDSTONE)
-        .addCriterion("has_redstone", this.hasItem(Tags.Items.DUSTS_REDSTONE))
+        .addCriterion("has_redstone", hasItem(Tags.Items.DUSTS_REDSTONE))
         .build(consumer);
 
     // ================================================================================
@@ -608,7 +608,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("sss")
         .key('s', Items.STRING)
         .key('a', Items.APPLE)
-        .addCriterion("has_apple", this.hasItem(Items.APPLE))
+        .addCriterion("has_apple", hasItem(Items.APPLE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SYRINGE.get())
         .patternLine("gag")
@@ -616,19 +616,19 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("ggg")
         .key('g', Items.GLASS)
         .key('a', Items.ARROW)
-        .addCriterion("has_glass", this.hasItem(Items.GLASS))
+        .addCriterion("has_glass", hasItem(Items.GLASS))
         .build(consumer);
     ShapelessRecipeBuilder.shapelessRecipe(ModItems.BANDAGE.get())
         .addIngredient(ModItems.CLEAN_RAG.get())
         .addIngredient(ModItems.CLEAN_RAG.get())
-        .addCriterion("has_clean_rag", this.hasItem(Items.APPLE))
+        .addCriterion("has_clean_rag", hasItem(Items.APPLE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.CLEAN_RAG.get())
         .patternLine("sss")
         .patternLine("sss")
         .patternLine("sss")
         .key('s', Items.STRING)
-        .addCriterion("has_string", this.hasItem(Items.STRING))
+        .addCriterion("has_string", hasItem(Items.STRING))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SPLINT.get())
         .patternLine("rs ")
@@ -636,7 +636,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine(" sr")
         .key('s', Items.STICK)
         .key('r', Ingredient.fromItems(ModItems.CLEAN_RAG.get(), ModItems.DIRTY_RAG.get()))
-        .addCriterion("has_stick", this.hasItem(Items.STICK))
+        .addCriterion("has_stick", hasItem(Items.STICK))
         .build(consumer);
 
     // ================================================================================
@@ -648,7 +648,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("k  ")
         .key('s', Items.STICK)
         .key('k', ModItems.COMBAT_KNIFE.get())
-        .addCriterion("has_combat_knife", this.hasItem(ModItems.COMBAT_KNIFE.get()))
+        .addCriterion("has_combat_knife", hasItem(ModItems.COMBAT_KNIFE.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.COMBAT_KNIFE.get())
         .patternLine("  i")
@@ -656,7 +656,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("s  ")
         .key('s', Items.STICK)
         .key('i', Tags.Items.INGOTS_IRON)
-        .addCriterion("has_stick", this.hasItem(Items.STICK))
+        .addCriterion("has_stick", hasItem(Items.STICK))
         .build(consumer);
 
     // ================================================================================
@@ -668,7 +668,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine(" i ")
         .patternLine("i  ")
         .key('i', Items.IRON_INGOT)
-        .addCriterion("has_iron_ingot", this.hasItem(Items.IRON_INGOT))
+        .addCriterion("has_iron_ingot", hasItem(Items.IRON_INGOT))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SMALL_BODY.get())
         .patternLine("iii")
@@ -676,21 +676,21 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("ii ")
         .key('i', Items.IRON_INGOT)
         .key('r', Items.REDSTONE)
-        .addCriterion("has_redstone", this.hasItem(Items.REDSTONE))
+        .addCriterion("has_redstone", hasItem(Items.REDSTONE))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SMALL_HANDLE.get())
         .patternLine("iii")
         .patternLine("il ")
         .key('i', Items.IRON_INGOT)
         .key('l', Items.LEVER)
-        .addCriterion("has_lever", this.hasItem(Items.LEVER))
+        .addCriterion("has_lever", hasItem(Items.LEVER))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.SMALL_STOCK.get())
         .patternLine("iii")
         .patternLine("iii")
         .patternLine("ii ")
         .key('i', Items.IRON_INGOT)
-        .addCriterion("has_iron_ingot", this.hasItem(Items.IRON_INGOT))
+        .addCriterion("has_iron_ingot", hasItem(Items.IRON_INGOT))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MEDIUM_BARREL.get())
         .patternLine("iii")
@@ -698,7 +698,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('b', ModItems.SMALL_BARREL.get())
-        .addCriterion("has_small_barrel", this.hasItem(ModItems.SMALL_BARREL.get()))
+        .addCriterion("has_small_barrel", hasItem(ModItems.SMALL_BARREL.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MEDIUM_BODY.get())
         .patternLine("iii")
@@ -706,7 +706,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('b', ModItems.SMALL_BODY.get())
-        .addCriterion("has_small_body", this.hasItem(ModItems.SMALL_BODY.get()))
+        .addCriterion("has_small_body", hasItem(ModItems.SMALL_BODY.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MEDIUM_HANDLE.get())
         .patternLine("iii")
@@ -714,7 +714,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('h', ModItems.SMALL_HANDLE.get())
-        .addCriterion("has_small_handle", this.hasItem(ModItems.SMALL_HANDLE.get()))
+        .addCriterion("has_small_handle", hasItem(ModItems.SMALL_HANDLE.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MEDIUM_STOCK.get())
         .patternLine("iii")
@@ -722,7 +722,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('s', ModItems.SMALL_STOCK.get())
-        .addCriterion("has_small_stock", this.hasItem(ModItems.SMALL_STOCK.get()))
+        .addCriterion("has_small_stock", hasItem(ModItems.SMALL_STOCK.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HEAVY_BARREL.get())
         .patternLine("iii")
@@ -730,7 +730,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('b', ModItems.MEDIUM_BARREL.get())
-        .addCriterion("has_medium_barrel", this.hasItem(ModItems.MEDIUM_BARREL.get()))
+        .addCriterion("has_medium_barrel", hasItem(ModItems.MEDIUM_BARREL.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HEAVY_BODY.get())
         .patternLine("iii")
@@ -738,7 +738,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('b', ModItems.MEDIUM_BODY.get())
-        .addCriterion("has_medium_body", this.hasItem(ModItems.MEDIUM_BODY.get()))
+        .addCriterion("has_medium_body", hasItem(ModItems.MEDIUM_BODY.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HEAVY_HANDLE.get())
         .patternLine("iii")
@@ -746,13 +746,13 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('h', ModItems.MEDIUM_HANDLE.get())
-        .addCriterion("has_medium_handle", this.hasItem(ModItems.MEDIUM_HANDLE.get()))
+        .addCriterion("has_medium_handle", hasItem(ModItems.MEDIUM_HANDLE.get()))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.MEDIUM_BOLT.get())
         .patternLine("iii")
         .patternLine("ii ")
         .key('i', Items.IRON_INGOT)
-        .addCriterion("has_iron_ingot", this.hasItem(Items.IRON_INGOT))
+        .addCriterion("has_iron_ingot", hasItem(Items.IRON_INGOT))
         .build(consumer);
     ShapedRecipeBuilder.shapedRecipe(ModItems.HEAVY_BOLT.get())
         .patternLine("iii")
@@ -760,7 +760,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .patternLine("iii")
         .key('i', Items.IRON_INGOT)
         .key('b', ModItems.MEDIUM_BOLT.get())
-        .addCriterion("has_medium_bolt", this.hasItem(ModItems.MEDIUM_BOLT.get()))
+        .addCriterion("has_medium_bolt", hasItem(ModItems.MEDIUM_BOLT.get()))
         .build(consumer);
   }
 

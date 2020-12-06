@@ -111,6 +111,7 @@ public class RenderUtil {
     RenderSystem.disableBlend();
   }
 
+  @SuppressWarnings("deprecation")
   public static void fillGradient(double x, double y, double x2, double y2, int startColor,
       int endColor) {
     RenderSystem.disableTexture();

@@ -30,12 +30,20 @@ public class EffectsManager {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private SoundEngine soundEngine;
+  private boolean initialisied = false;
+
+  private final SoundEngine soundEngine;
 
   private int highpassSend;
 
-  public void reload(SoundEngine soundEngine) {
+  public EffectsManager(SoundEngine soundEngine) {
     this.soundEngine = soundEngine;
+  }
+
+  private void checkInit() {
+    if (this.initialisied) {
+      return;
+    }
 
     final long currentContext = ALC10.alcGetCurrentContext();
     final long currentDevice = ALC10.alcGetContextsDevice(currentContext);
@@ -50,9 +58,12 @@ public class EffectsManager {
     this.highpassSend = EXTEfx.alGenFilters();
     EXTEfx.alFilteri(this.highpassSend, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_HIGHPASS);
     checkLogError("Failed to generate high-pass send");
+
+    this.initialisied = true;
   }
 
   public void setHighpassLevels(float highpassGain, float highpassCutoff) {
+    checkInit();
     EXTEfx.alFilterf(this.highpassSend, EXTEfx.AL_HIGHPASS_GAIN, highpassGain);
     EXTEfx.alFilterf(this.highpassSend, EXTEfx.AL_HIGHPASS_GAINLF, highpassCutoff);
   }
@@ -81,6 +92,7 @@ public class EffectsManager {
   }
 
   public void removeFilter(int source) {
+    checkInit();
     AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, 0);
   }
 

@@ -23,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.ClientDist;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -65,7 +64,7 @@ public abstract class ItemRendererMixin {
       ItemStack itemStack,
       ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    return ((ClientDist) CraftingDead.getInstance().getModDist()).getItemRendererManager()
+    return CraftingDead.getInstance().getClientDist().getItemRendererManager()
         .getItemRenderer(itemStack.getItem())
         .filter(itemRenderer -> itemRenderer.handleRenderType(itemStack, transformType))
         .map(itemRenderer -> {

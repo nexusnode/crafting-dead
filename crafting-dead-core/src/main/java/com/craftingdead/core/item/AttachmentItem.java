@@ -35,7 +35,7 @@ public class AttachmentItem extends Item {
   private final Map<MultiplierType, Float> multipliers;
   private final CraftingInventorySlotType inventorySlot;
   private final boolean soundSuppressor;
-  private final boolean scope; 
+  private final boolean scope;
 
   public AttachmentItem(Properties properties) {
     super(properties);
@@ -56,11 +56,11 @@ public class AttachmentItem extends Item {
   public boolean isSoundSuppressor() {
     return this.soundSuppressor;
   }
-  
+
   public boolean isScope() {
     return this.scope;
   }
-  
+
   @Override
   public void addInformation(ItemStack stack, World world,
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
@@ -68,8 +68,8 @@ public class AttachmentItem extends Item {
 
     for (Entry<MultiplierType, Float> entry : this.multipliers.entrySet()) {
       lines.add(Text.translate(entry.getKey().getTranslationKey())
-          .applyTextStyle(TextFormatting.GRAY)
-          .appendSibling(Text.of(" " + entry.getValue() + "x").applyTextStyle(TextFormatting.RED)));
+          .mergeStyle(TextFormatting.GRAY)
+          .append(Text.of(" " + entry.getValue() + "x").mergeStyle(TextFormatting.RED)));
     }
   }
 
@@ -104,7 +104,7 @@ public class AttachmentItem extends Item {
       this.inventorySlot = inventorySlot;
       return this;
     }
-    
+
     public Properties setScope(boolean scope) {
       this.scope = scope;
       return this;

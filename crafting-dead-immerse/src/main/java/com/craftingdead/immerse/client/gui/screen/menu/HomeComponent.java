@@ -61,8 +61,8 @@ public class HomeComponent extends ContainerComponent {
         .setWidthPercent(30.0F)
         .setHeightPercent(45.0F)
         .addChild(new TextBlockComponent(this.minecraft.fontRenderer,
-            Text.of("Sm0keySa1m0n").applyTextStyle(TextFormatting.BOLD), true)
-                .setWidth(80.0F))
+            Text.of("Sm0keySa1m0n").mergeStyle(TextFormatting.BOLD),
+            true).setWidth(80.0F))
         .addChild(new EntityComponent(fakePlayerEntity)
             .setWidthPercent(100.0F)
             .setAspectRatio(0.9F)));

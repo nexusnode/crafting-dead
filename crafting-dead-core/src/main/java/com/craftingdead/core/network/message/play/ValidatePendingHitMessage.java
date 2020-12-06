@@ -24,12 +24,10 @@ import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.PendingHit;
 import com.craftingdead.core.capability.living.EntitySnapshot;
-import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -65,7 +63,8 @@ public class ValidatePendingHitMessage {
       int valueSize = in.readVarInt();
       Collection<PendingHit> value = new ObjectArrayList<PendingHit>();
       for (int j = 0; j < valueSize; j++) {
-        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in), in.readVarLong()));
+        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in),
+            in.readVarLong()));
       }
       hits.put(key, value);
     }
@@ -79,8 +78,9 @@ public class ValidatePendingHitMessage {
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
         final Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getKey());
-        Optional.ofNullable(hitEntity).filter(e -> e instanceof LivingEntity)
-            .map(e -> (LivingEntity) e).flatMap(ILiving::getOptional).ifPresent(hitLiving -> {
+        Optional.ofNullable(hitEntity)
+            .flatMap(e -> e.getCapability(ModCapabilities.LIVING).resolve())
+            .ifPresent(hitLiving -> {
               for (PendingHit value : hit.getValue()) {
                 gun.validatePendingHit(player, heldStack, hitLiving, value);
               }

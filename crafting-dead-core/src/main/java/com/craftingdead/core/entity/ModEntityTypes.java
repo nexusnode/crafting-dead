@@ -19,7 +19,6 @@ package com.craftingdead.core.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -39,12 +38,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.DeferredRegister;
 
+/**
+ * We don't use {@link DeferredRegister} here because of the way {@link SpawnEggItem}s are
+ * registered.
+ */
 public class ModEntityTypes {
 
   private static final List<EntityType<?>> toRegister = new ArrayList<>();
@@ -183,20 +186,6 @@ public class ModEntityTypes {
 
     supplyDrop = add("supply_drop", EntityType.Builder
         .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
-
-    for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
-      ListIterator<Biome.SpawnListEntry> iterator =
-          biome.getSpawns(EntityClassification.MONSTER).listIterator();
-      while (iterator.hasNext()) {
-        Biome.SpawnListEntry spawnEntry = iterator.next();
-        if (spawnEntry.entityType == EntityType.ZOMBIE) {
-          iterator.add(new Biome.SpawnListEntry(advancedZombie, spawnEntry.itemWeight * 3, 2, 8));
-          iterator.add(new Biome.SpawnListEntry(fastZombie, spawnEntry.itemWeight / 2, 2, 4));
-          iterator.add(new Biome.SpawnListEntry(tankZombie, spawnEntry.itemWeight, 2, 4));
-          iterator.add(new Biome.SpawnListEntry(weakZombie, spawnEntry.itemWeight * 2, 2, 12));
-        }
-      }
-    }
 
     // Spawn placement rules
     EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,

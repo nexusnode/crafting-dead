@@ -21,9 +21,11 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.ModInventoryContainer;
+import com.craftingdead.core.inventory.container.PlayerContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
+import com.craftingdead.core.util.Text;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -32,9 +34,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContainer> {
+public class PlayerScreen extends DisplayEffectsScreen<PlayerContainer> {
 
-  private static final ResourceLocation INVENTORY_BACKGROUND =
+  private static final ResourceLocation CONTAINER_BACKGROUND =
       new ResourceLocation(CraftingDead.ID, "textures/gui/container/inventory.png");
 
   private int oldMouseX;
@@ -44,19 +46,17 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
 
   private boolean transitioning = false;
 
-  public ModInventoryScreen(ModInventoryContainer container, PlayerInventory playerInventory,
+  public PlayerScreen(PlayerContainer container, PlayerInventory playerInventory,
       ITextComponent title) {
     super(container, playerInventory, title);
-    this.ySize = 186;
   }
 
   @Override
   public void init() {
     super.init();
     this.vestButton =
-        new SimpleButton(this.guiLeft + 83, this.guiTop + 48, 10, 16, ">", (button) -> {
-          NetworkChannel.PLAY
-              .getSimpleChannel()
+        new SimpleButton(this.guiLeft + 98, this.guiTop + 61, 10, 17, Text.of(">"), (button) -> {
+          NetworkChannel.PLAY.getSimpleChannel()
               .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));
           this.transitioning = true;
         });
@@ -65,9 +65,9 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
-    this.renderHoveredToolTip(mouseX, mouseY);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
     this.oldMouseX = mouseX;
     this.oldMouseY = mouseY;
   }
@@ -86,33 +86,45 @@ public class ModInventoryScreen extends DisplayEffectsScreen<ModInventoryContain
         .isPresent();
   }
 
+  /**
+   * If we are waiting for another container GUI to open.
+   */
   public boolean isTransitioning() {
     return this.transitioning;
   }
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-    this.renderBackground();
-    this.minecraft.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
+  protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int x, int y) {}
 
-    this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+  @Override
+  protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks,
+      int mouseX, int mouseY) {
+    this.renderBackground(matrixStack);
+    this.minecraft.getTextureManager().bindTexture(CONTAINER_BACKGROUND);
+
+    this.blit(matrixStack, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 
     ItemStack gunStack = this.container.getGunStack();
     gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
 
-      this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 0, 22, 22);
+      final int gunSlotX = this.guiLeft + 122;
+      final int gunSlotY = this.guiTop + 26;
+
+      this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
+
+      final boolean draggingItemAccepted =
+          gunController.isAcceptedPaintOrAttachment(this.playerInventory.getItemStack());
 
       if ((!this.container.isCraftingInventoryEmpty() && this.container.isCraftable())
-          || gunController.isAcceptedPaintOrAttachment(this.playerInventory.getItemStack())) {
-        this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 22, 22, 22);
-      } else if (!this.container.isCraftingInventoryEmpty()) {
-        this.blit(this.guiLeft + 122, this.guiTop + 45, 176, 44, 22, 22);
+          || draggingItemAccepted) {
+        this.blit(matrixStack, gunSlotX, gunSlotY, 176, 22, 22, 22);
+      } else if (!this.playerInventory.getItemStack().isEmpty() && !draggingItemAccepted) {
+        this.blit(matrixStack, gunSlotX, gunSlotY, 176, 44, 22, 22);
       }
     });
 
-    InventoryScreen
-        .drawEntityOnScreen(this.guiLeft + 33, this.guiTop + 97, 30,
-            (this.guiLeft + 51) - this.oldMouseX,
-            (this.guiTop + 75 - 50) - this.oldMouseY, this.minecraft.player);
+    InventoryScreen.drawEntityOnScreen(this.guiLeft + 33, this.guiTop + 72, 30,
+        (this.guiLeft + 51) - this.oldMouseX, (this.guiTop + 75 - 50) - this.oldMouseY,
+        this.minecraft.player);
   }
 }

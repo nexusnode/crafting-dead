@@ -19,9 +19,9 @@ package com.craftingdead.core.capability.animationprovider.gun.reload;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class GunAnimationReloadMinigun extends GunAnimationReload {
   private float rotation1 = 0F;

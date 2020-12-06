@@ -20,10 +20,10 @@ package com.craftingdead.core.capability.animationprovider.gun.inspect;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.Vector3f;
 
 public abstract class GunAnimationInspect extends GunAnimation {
 

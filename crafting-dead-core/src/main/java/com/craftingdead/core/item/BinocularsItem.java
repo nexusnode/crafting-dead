@@ -24,6 +24,7 @@ import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.capability.scope.DefaultScope;
 import com.craftingdead.core.util.ModSoundEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -56,7 +57,7 @@ public class BinocularsItem extends Item {
     playerEntity.playSound(ModSoundEvents.SCOPE_ZOOM.get(), 0.75F, 1.0F);
     if (world.isRemote()) {
       Minecraft mc = Minecraft.getInstance();
-      mc.gameSettings.thirdPersonView = 0;
+      mc.gameSettings.setPointOfView(PointOfView.FIRST_PERSON);
     }
     return ActionResult.resultConsume(itemstack);
   }

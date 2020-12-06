@@ -30,6 +30,10 @@ import net.minecraft.inventory.container.ChestContainer;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameterSets;
+import net.minecraft.loot.LootParameters;
+import net.minecraft.loot.LootTable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.util.ActionResultType;
@@ -37,15 +41,9 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameterSets;
-import net.minecraft.world.storage.loot.LootParameters;
-import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.network.FMLPlayMessages;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -68,7 +66,7 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
     this.lootTable = lootTable;
     this.lootTableSeed = lootTableSeed;
     this.setPosition(x, y, z);
-    this.setMotion(Vec3d.ZERO);
+    this.setMotion(Vector3d.ZERO);
     this.prevPosX = x;
     this.prevPosY = y;
     this.prevPosZ = z;
@@ -145,14 +143,8 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
     return NetworkHooks.getEntitySpawningPacket(this);
   }
 
-  @Nullable
   @Override
-  public AxisAlignedBB getCollisionBoundingBox() {
-    return this.getBoundingBox();
-  }
-
-  @Override
-  public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
+  public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
     player.openContainer(this);
     return ActionResultType.PASS;
   }
@@ -175,7 +167,7 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
           this.world.getServer().getLootTableManager().getLootTableFromLocation(this.lootTable);
       this.lootTable = null;
       LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.world)
-          .withParameter(LootParameters.POSITION, new BlockPos(this))
+          .withParameter(LootParameters.field_237457_g_, this.getPositionVec())
           .withSeed(this.lootTableSeed);
       builder.withParameter(LootParameters.KILLER_ENTITY, this);
       if (player != null) {

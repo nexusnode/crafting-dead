@@ -33,6 +33,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -67,10 +68,8 @@ public class StorageItem extends Item {
     backpackStack.getCapability(ModCapabilities.STORAGE).ifPresent(storage -> {
       if (!storage.isEmpty()) {
         lines.add(Text.of(" "));
-        lines
-            .add(Text
-                .translate("container.inventory")
-                .applyTextStyles(TextFormatting.RED, TextFormatting.BOLD));
+        lines.add(Text.translate("container.inventory")
+            .mergeStyle(TextFormatting.RED, TextFormatting.BOLD));
 
         int rowsBeyondLimit = 0;
 
@@ -80,16 +79,17 @@ public class StorageItem extends Item {
             if (i >= MAX_ROWS_TO_SHOW) {
               ++rowsBeyondLimit;
             } else {
-              ITextComponent amountText =
-                  Text.of(stack.getCount() + "x ").applyTextStyle(TextFormatting.DARK_GRAY);
-              ITextComponent itemText = stack.getDisplayName().applyTextStyle(TextFormatting.GRAY);
-              lines.add(amountText.appendSibling(itemText));
+              IFormattableTextComponent amountText =
+                  Text.of(stack.getCount() + "x ").mergeStyle(TextFormatting.DARK_GRAY);
+              ITextComponent itemText =
+                  stack.getDisplayName().copyRaw().mergeStyle(TextFormatting.GRAY);
+              lines.add(amountText.append(itemText));
             }
           }
         }
 
         if (rowsBeyondLimit > 0) {
-          lines.add(Text.of(". . . +" + rowsBeyondLimit).applyTextStyle(TextFormatting.RED));
+          lines.add(Text.of(". . . +" + rowsBeyondLimit).mergeStyle(TextFormatting.RED));
         }
       }
     });

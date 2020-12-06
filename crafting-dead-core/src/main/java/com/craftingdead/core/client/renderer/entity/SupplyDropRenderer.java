@@ -23,11 +23,11 @@ import com.craftingdead.core.entity.SupplyDropEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
 
@@ -44,13 +44,12 @@ public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
     matrixStack.translate(0, 1.51D, 0);
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
 
-    this.model.setRenderParachute(entity.fallDistance > 0 && !entity.onGround);
+    this.model.setRenderParachute(entity.fallDistance > 0 && !entity.isOnGround());
 
     IVertexBuilder vertexBuilder =
         renderTypeBuffer.getBuffer(this.model.getRenderType(this.getEntityTexture(entity)));
-    this.model
-        .render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
-            1.0F, 0.15F);
+    this.model.render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.NO_OVERLAY, 1.0F,
+        1.0F, 1.0F, 0.15F);
   }
 
   @Override

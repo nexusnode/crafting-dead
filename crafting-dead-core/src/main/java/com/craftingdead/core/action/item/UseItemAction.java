@@ -53,7 +53,8 @@ public class UseItemAction extends TimedAction {
     this.heldItemPredicate = heldItemPredicate;
   }
 
-  public static Builder builder(ActionType<?> actionType, ILiving<?, ?> performer, ILiving<?, ?> target) {
+  public static Builder builder(ActionType<?> actionType, ILiving<?, ?> performer,
+      ILiving<?, ?> target) {
     return new Builder(actionType, performer, target);
   }
 
@@ -84,13 +85,14 @@ public class UseItemAction extends TimedAction {
           : null;
       if (shrinkStack && !(playerEntity != null && playerEntity.isCreative())) {
         heldStack.shrink(1);
-        if (!resultStack.isEmpty()) {
-          if (heldStack.isEmpty()) {
-            this.performer.getEntity().setHeldItem(Hand.MAIN_HAND, resultStack);
-          } else if (playerEntity != null
-              && playerEntity.inventory.addItemStackToInventory(resultStack)) {
-            this.performer.getEntity().entityDropItem(resultStack);
-          }
+      }
+
+      if (!resultStack.isEmpty()) {
+        if (heldStack.isEmpty()) {
+          this.performer.getEntity().setHeldItem(Hand.MAIN_HAND, resultStack);
+        } else if (playerEntity != null
+            && playerEntity.inventory.addItemStackToInventory(resultStack)) {
+          this.performer.getEntity().entityDropItem(resultStack);
         }
       }
 

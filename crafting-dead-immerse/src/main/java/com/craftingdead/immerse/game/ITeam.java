@@ -26,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameType;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface ITeam extends INBTSerializable<CompoundNBT> {
@@ -37,7 +37,7 @@ public interface ITeam extends INBTSerializable<CompoundNBT> {
 
   ResourceLocation getId();
 
-  default Optional<Pair<DimensionType, BlockPos>> findSpawn() {
+  default Optional<Pair<World, BlockPos>> findSpawn() {
     return Optional.empty();
   }
 

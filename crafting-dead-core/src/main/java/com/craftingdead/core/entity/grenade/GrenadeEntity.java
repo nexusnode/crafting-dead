@@ -31,6 +31,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.Hand;
@@ -129,7 +130,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   @Override
-  public final boolean processInitialInteract(PlayerEntity playerEntity, Hand hand) {
+  public final ActionResultType processInitialInteract(PlayerEntity playerEntity, Hand hand) {
     boolean canPickup = !playerEntity.isSecondaryUseActive() && this.canBePickedUp(playerEntity);
     if (canPickup) {
       this.remove();
@@ -139,7 +140,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
           SoundCategory.PLAYERS, 0.2F,
           (this.rand.nextFloat() - this.rand.nextFloat()) * 1.4F + 2.0F, false);
     }
-    return canPickup;
+    return canPickup ? ActionResultType.SUCCESS : ActionResultType.PASS;
   }
 
   /**

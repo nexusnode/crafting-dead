@@ -19,4 +19,4 @@ mandatory = true
 modId = "forge"
 ordering = "NONE"
 side = "BOTH"
-versionRange = "[31.2.45,)"
+versionRange = "[35.1.7,)"

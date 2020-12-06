@@ -21,6 +21,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.GunItem;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
@@ -43,11 +44,12 @@ public class KillFeedEntry {
     this.type = type;
   }
 
-  public void render(float x, float y, float alpha) {
+  @SuppressWarnings("deprecation")
+  public void render(MatrixStack matrixStack, float x, float y, float alpha) {
     final Minecraft minecraft = Minecraft.getInstance();
 
-    final String playerEntityName = this.playerEntity.getDisplayName().getFormattedText();
-    final String deadEntityName = this.deadEntity.getDisplayName().getFormattedText();
+    final String playerEntityName = this.playerEntity.getDisplayName().getString();
+    final String deadEntityName = this.deadEntity.getDisplayName().getString();
     final int playerEntityNameWidth = minecraft.fontRenderer.getStringWidth(playerEntityName);
     final int deadEntityNameWidth = minecraft.fontRenderer.getStringWidth(deadEntityName);
 
@@ -75,10 +77,11 @@ public class KillFeedEntry {
     RenderUtil.drawGradientRectangle(x, y,
         x + playerEntityNameWidth + deadEntityNameWidth + spacing, y + 11, colour, colour);
 
-    minecraft.fontRenderer.drawStringWithShadow(
-        this.playerEntity.getDisplayName().getFormattedText(),
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        this.playerEntity.getDisplayName().getString(),
         x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    minecraft.fontRenderer.drawStringWithShadow(this.deadEntity.getDisplayName().getFormattedText(),
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        this.deadEntity.getDisplayName().getString(),
         x + playerEntityNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
 
     switch (this.type) {

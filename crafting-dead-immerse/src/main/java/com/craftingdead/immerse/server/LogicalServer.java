@@ -32,18 +32,14 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameServer;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
-import com.craftingdead.immerse.world.ModDimensions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class LogicalServer extends WorldSavedData {
@@ -77,7 +73,7 @@ public class LogicalServer extends WorldSavedData {
   public void startLoading() {}
 
   public void finishLoading() {
-    this.minecraftServer.getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(() -> this,
+    this.minecraftServer.getWorld(World.OVERWORLD).getSavedData().getOrCreate(() -> this,
         CraftingDead.ID);
 
     // If there was no saved game in the world, load a new game
@@ -138,11 +134,6 @@ public class LogicalServer extends WorldSavedData {
     this.gameServer = gameServer;
     logger.info("Loading game '{}'", this.gameServer.getDisplayName());
     this.gameServer.load();
-
-    if (this.gameServer.getMap().isPresent()) {
-      DimensionManager.markForDeletion(DimensionManager.registerDimension(ModDimensions.MAP.getId(),
-          ModDimensions.MAP.get(), null, true));
-    }
   }
 
   public MinecraftServer getMinecraftServer() {
@@ -173,16 +164,16 @@ public class LogicalServer extends WorldSavedData {
   // Forge Events
   // ================================================================================
 
-  @SubscribeEvent
-  public void handleEntityJoinWorldEvent(EntityJoinWorldEvent event) {
-    if (event.getEntity() instanceof ServerPlayerEntity
-        && event.getWorld().getDimension().getType() == DimensionType.OVERWORLD) {
-      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
-      playerEntity.teleport(
-          this.minecraftServer.getWorld(DimensionType.byName(ModDimensions.MAP.getId())),
-          0, 100, 0, playerEntity.rotationYaw, playerEntity.rotationPitch);
-    }
-  }
+//  @SubscribeEvent
+//  public void handleEntityJoinWorldEvent(EntityJoinWorldEvent event) {
+//    if (event.getEntity() instanceof ServerPlayerEntity
+//        && event.getWorld().getDimension().getType() == DimensionType.OVERWORLD) {
+//      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
+//      playerEntity.teleport(
+//          this.minecraftServer.getWorld(DimensionType.byName(ModDimensions.MAP.getId())),
+//          0, 100, 0, playerEntity.rotationYaw, playerEntity.rotationPitch);
+//    }
+//  }
 
   @SubscribeEvent
   public void handleServerTick(TickEvent.ServerTickEvent event) {

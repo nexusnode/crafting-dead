@@ -23,9 +23,11 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
+import com.craftingdead.immerse.client.gui.screen.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
@@ -80,7 +82,8 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   private IGameClient<?> gameClient;
 
   public ClientDist() {
-    FMLJavaModLoadingContext.get().getModEventBus().register(this);
+    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::handleClientSetup);
+    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::handleLoadComplete);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
     this.transitionManager = new TransitionManager(minecraft, Transitions.GROW);
@@ -98,7 +101,8 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     try {
       this.gameClient = gameType.createGameClient();
     } catch (Exception e) {
-      this.minecraft.displayGuiScreen(new DisconnectedScreen(new MainMenuScreen(), "connect.failed",
+      this.minecraft.displayGuiScreen(new DisconnectedScreen(new MainMenuScreen(),
+          new TranslationTextComponent("connect.failed"),
           new TranslationTextComponent("disconnect.genericReason", e.toString())));
     }
   }
@@ -118,8 +122,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   // Mod Events
   // ================================================================================
 
-  @SubscribeEvent
-  public void handleClientSetup(FMLClientSetupEvent event) {
+  private void handleClientSetup(FMLClientSetupEvent event) {
     // GLFW code needs to run on main thread
     this.minecraft.enqueue(() -> {
       StartupMessageManager.addModMessage("Applying branding");
@@ -141,8 +144,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     });
   }
 
-  @SubscribeEvent
-  public void handleLoadComplete(FMLLoadCompleteEvent event) {
+  private void handleLoadComplete(FMLLoadCompleteEvent event) {
     StartupMessageManager.addModMessage("Loading Discord integration");
     DiscordPresence.initialize(DISCORD_CLIENT_ID);
     DiscordPresence.updateState(DiscordPresence.GameState.IDLE, this);
@@ -155,11 +157,11 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     final IPlayer<ClientPlayerEntity> player =
-        IPlayer.getOptional(this.minecraft.player).orElse(null);
+        CraftingDead.getInstance().getClientDist().getPlayer().orElse(null);
     switch (event.getType()) {
       case ALL:
         if (player != null && this.gameClient != null) {
-          this.gameClient.renderOverlay(this.minecraft, player,
+          this.gameClient.renderOverlay(this.minecraft, player, event.getMatrixStack(),
               event.getWindow().getScaledWidth(),
               event.getWindow().getScaledHeight(), event.getPartialTicks());
         }
@@ -198,15 +200,15 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     if (event.getGui() instanceof MainMenuScreen) {
-      // event.setGui(new StartScreen());
+       event.setGui(new StartScreen());
     }
   }
 
   @SubscribeEvent
   public void handleDrawScreenPre(DrawScreenEvent.Pre event) {
     event.setCanceled(
-        this.transitionManager.checkDrawTransition(event.getMouseX(), event.getMouseY(),
-            event.getRenderPartialTicks(), event.getGui()));
+        this.transitionManager.checkDrawTransition(event.getMatrixStack(), event.getMouseX(),
+            event.getMouseY(), event.getRenderPartialTicks(), event.getGui()));
   }
 
   @SubscribeEvent
@@ -214,7 +216,9 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        this.gameClient.tick();
+        if (this.gameClient != null) {
+          this.gameClient.tick();
+        }
         break;
       default:
         break;

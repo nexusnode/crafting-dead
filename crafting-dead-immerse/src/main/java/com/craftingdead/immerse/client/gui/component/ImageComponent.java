@@ -20,11 +20,12 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.Optional;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 
 public class ImageComponent extends Component<ImageComponent> {
 
@@ -35,7 +36,7 @@ public class ImageComponent extends Component<ImageComponent> {
   private FitType fitType = FitType.FILL;
   private Colour colour = new Colour();
 
-  private Vec2f fittedImageSize;
+  private Vector2f fittedImageSize;
 
   public ImageComponent setImage(ResourceLocation image) {
     this.image = image;
@@ -52,20 +53,20 @@ public class ImageComponent extends Component<ImageComponent> {
     return this;
   }
 
-  private Optional<Vec2f> getImageSize() {
+  private Optional<Vector2f> getImageSize() {
     if (this.bind()) {
-      return Optional.of(new Vec2f(
+      return Optional.of(new Vector2f(
           GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH),
           GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT)));
     }
     return Optional.empty();
   }
 
-  private Optional<Vec2f> getFittedImageSize() {
+  private Optional<Vector2f> getFittedImageSize() {
     return this.getFittedImageSize(this.getContentWidth(), this.getContentHeight());
   }
 
-  private Optional<Vec2f> getFittedImageSize(float containerWidth, float containerHeight) {
+  private Optional<Vector2f> getFittedImageSize(float containerWidth, float containerHeight) {
     return this.getImageSize().map(imageSize -> this.fitType.getSize(imageSize.x,
         imageSize.y, containerWidth, containerHeight));
   }
@@ -77,10 +78,11 @@ public class ImageComponent extends Component<ImageComponent> {
   }
 
   @Override
-  public Vec2f measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
+  public Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+      float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
-        .orElse(new Vec2f(width, height));
+        .orElse(new Vector2f(width, height));
   }
 
   public Colour getColour() {
@@ -95,9 +97,10 @@ public class ImageComponent extends Component<ImageComponent> {
     return false;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
     RenderSystem.enableBlend();
     final float[] colour = this.colour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);

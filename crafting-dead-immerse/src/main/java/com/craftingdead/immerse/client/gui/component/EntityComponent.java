@@ -19,12 +19,11 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Arrays;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class EntityComponent extends Component<EntityComponent> {
 
@@ -45,19 +44,20 @@ public class EntityComponent extends Component<EntityComponent> {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
 
     this.minecraft.getRenderManager().cacheActiveRenderInfo(FakeWorld.getInstance(),
         this.minecraft.gameRenderer.getActiveRenderInfo(), null);
-    RenderSystem.pushMatrix();
+    matrixStack.push();
     {
-      RenderSystem.translated(0, 0, 1050.0F);
-      RenderSystem.scalef(1.0F, 1.0F, -1.0F);
-      MatrixStack matrixStack = new MatrixStack();
-      matrixStack.translate(this.getScaledContentX() + this.getScaledContentWidth() / 2,
+      matrixStack.translate(0, 0, 1050.0F);
+      matrixStack.scale(1.0F, 1.0F, -1.0F);
+
+      matrixStack.translate(this.getScaledContentX() + this.getScaledContentWidth() / 2.0F,
           this.getScaledContentY() + this.getScaledContentHeight(), 1000.0D);
-      matrixStack.scale(this.getScaledContentWidth() / 2, this.getScaledContentHeight() / 2, 50);
+      matrixStack.scale(this.getScaledContentWidth() / 2.0F, this.getScaledContentHeight() / 2.0F,
+          1.0F);
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
 
       final float oldYawOffset = this.livingEntity.renderYawOffset;
@@ -67,9 +67,9 @@ public class EntityComponent extends Component<EntityComponent> {
       final float oldHeadYaw = this.livingEntity.rotationYawHead;
 
       float headYaw = (float) Math
-          .atan((this.getScaledContentX() + this.getScaledContentWidth() / 2 - mouseX) / 40.0F);
+          .atan((this.getScaledContentX() + this.getScaledContentWidth() / 2.0F - mouseX) / 40.0F);
       float headPitch = (float) Math
-          .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4 - mouseY) / 40.0F);
+          .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4.0F - mouseY) / 40.0F);
       this.livingEntity.renderYawOffset = 180.0F + headYaw * 20.0F;
       this.livingEntity.rotationYaw = 180.0F + headYaw * 40.0F;
       this.livingEntity.rotationPitch = -headPitch * 20.0F;
@@ -91,6 +91,6 @@ public class EntityComponent extends Component<EntityComponent> {
       this.livingEntity.prevRotationYawHead = oldPrevHeadYaw;
       this.livingEntity.rotationYawHead = oldHeadYaw;
     }
-    RenderSystem.popMatrix();
+    matrixStack.pop();
   }
 }

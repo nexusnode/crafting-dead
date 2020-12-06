@@ -23,11 +23,12 @@ import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.transition.ITransition;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
 
 public abstract class ModScreen extends ComponentScreen {
@@ -47,15 +48,16 @@ public abstract class ModScreen extends ComponentScreen {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground();
-    super.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    this.renderBackground(matrixStack);
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public void renderBackground() {
+  public void renderBackground(MatrixStack matrixStack) {
     if (this.minecraft.world != null) {
-      this.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
+      this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
       return;
     }
 
@@ -67,30 +69,29 @@ public abstract class ModScreen extends ComponentScreen {
 
     RenderSystem.pushMatrix();
     {
-      RenderSystem
-          .translated(Math.sin(Math.toRadians(360 * pct)) * 2.5D,
-              Math.cos(Math.toRadians(360 * pct)) * 2.5D, 0);
+      RenderSystem.translated(Math.sin(Math.toRadians(360 * pct)) * 2.5D,
+          Math.cos(Math.toRadians(360 * pct)) * 2.5D, 0);
       double scale = 1.25D + Math.cos(Math.toRadians(360 * pct)) * 1.5D / 100.0D;
       RenderSystem.scaled(scale, scale, scale);
 
-      Vec2f backgroundSize = FitType.COVER.getSize(2048, 1152, this.width, this.height);
+      Vector2f backgroundSize = FitType.COVER.getSize(2048, 1152, this.width, this.height);
       double backgroundWidth = backgroundSize.x;
       double backgroundHeight = backgroundSize.y;
 
       RenderUtil.bind(BACKGROUND_TEXTURE);
       // Enable bilinear filtering
       RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-      RenderUtil
-          .blit((this.width / 2 - (backgroundWidth * scale) / 2),
-              this.height / 2 - (backgroundHeight * scale) / 2, backgroundWidth, backgroundHeight);
+      RenderUtil.blit((this.width / 2 - (backgroundWidth * scale) / 2),
+          this.height / 2 - (backgroundHeight * scale) / 2, backgroundWidth, backgroundHeight);
     }
     RenderSystem.popMatrix();
 
     this.renderFog();
   }
 
+  @SuppressWarnings("deprecation")
   private void renderFog() {
-    Vec2f fogSize = FitType.COVER.getSize(1920, 1080, this.width, this.height);
+    Vector2f fogSize = FitType.COVER.getSize(1920, 1080, this.width, this.height);
     double fogWidth = fogSize.x;
     double fogHeight = fogSize.y;
 

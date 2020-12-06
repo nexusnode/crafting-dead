@@ -18,6 +18,7 @@
 package com.craftingdead.core.capability.gun;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -86,7 +87,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.UnbreakingEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.merchant.villager.WanderingTraderEntity;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -108,7 +109,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
@@ -164,7 +165,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
    */
   private int shotCount;
 
-  private Set<AttachmentItem> attachments;
+  private Set<AttachmentItem> attachments = new HashSet<>();
 
   private ItemStack paintStack = ItemStack.EMPTY;
 
@@ -188,7 +189,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     this.gunItem = gunItem;
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
-    this.attachments = gunItem.getDefaultAttachments();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
   }
 
@@ -330,7 +330,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
-      ClientDist clientDist = (ClientDist) CraftingDead.getInstance().getModDist();
+      ClientDist clientDist = CraftingDead.getInstance().getClientDist();
       Minecraft minecraft = clientDist.getMinecraft();
 
       partialTicks = minecraft.getRenderPartialTicks();
@@ -446,7 +446,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     this.processShot(living, itemStack);
   }
 
-  private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity, Vec3d hitPos,
+  private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+      Vector3d hitPos,
       boolean playSound) {
     final Entity entity = living.getEntity();
     final World world = hitEntity.getEntityWorld();
@@ -461,7 +462,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       float reducedDamage = damage - CombatRules
           .getDamageAfterAbsorb(damage, livingEntityHit.getTotalArmorValue(),
               (float) livingEntityHit
-                  .getAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS)
+                  .getAttribute(Attributes.ARMOR_TOUGHNESS)
                   .getValue());
       // Apply armor penetration by adding to the damage lost by armor absorption
       damage += reducedDamage * armorPenetration;
@@ -494,8 +495,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
           1.0F, 1.0F);
 
       if (hitEntity instanceof ClientPlayerEntity) {
-        ((ClientDist) CraftingDead.getInstance().getModDist()).getCameraManager().joltCamera(1.5F,
-            false);
+        CraftingDead.getInstance().getClientDist().getCameraManager().joltCamera(1.5F, false);
       }
 
       final int particleCount = 12;
@@ -554,7 +554,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   private void hitBlock(ILiving<?, ?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
       boolean playSound) {
     final Entity entity = living.getEntity();
-    Vec3d hitVec3d = rayTrace.getHitVec();
+    Vector3d hitVec3d = rayTrace.getHitVec();
     BlockPos blockPos = rayTrace.getPos();
     BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
     Block block = blockState.getBlock();
@@ -779,12 +779,12 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     return this.shotCount;
   }
 
-  private static void checkCreateExplosion(ItemStack magazineStack, Entity entity, Vec3d position) {
+  private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
+      Vector3d position) {
     float explosionSize = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, magazineStack)
         / Enchantments.POWER.getMaxLevel();
     if (explosionSize > 0) {
-      entity
-          .getEntityWorld()
+      entity.getEntityWorld()
           .createExplosion(entity, position.getX(), position.getY(), position.getZ(), explosionSize,
               Explosion.Mode.NONE);
     }

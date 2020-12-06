@@ -34,12 +34,13 @@ import com.craftingdead.immerse.client.util.DownloadUtil;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.base.Strings;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Either;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenType;
 import io.noties.tumbleweed.equations.Sine;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.common.ForgeHooks;
 
 public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
@@ -82,12 +83,12 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   public void layout() {
     super.layout();
     this.totalHeight =
-        (float) (this.children()
+        (float) (this.getEventListeners()
             .stream()
             .mapToDouble(c -> c.getY() + c.getHeight())
             .max()
             .orElse(0.0F)
-            - this.children()
+            - this.getEventListeners()
                 .stream()
                 .mapToDouble(Component::getY)
                 .min()
@@ -169,8 +170,8 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    super.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
 
     float scrollDelta = MathHelper.lerp(partialTicks, this.lastScrollMomentum, this.scrollMomentum);
     float newScrollOffset = this.scrollOffset + scrollDelta;
@@ -195,7 +196,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   }
 
   @Override
-  public void renderChildren(int mouseX, int mouseY, float partialTicks) {
+  public void renderChildren(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
@@ -206,7 +207,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
               - ((this.getScaledY() + this.getScaledHeight()) * scale)),
           (int) (this.getScaledWidth() * scale), (int) (this.getScaledHeight() * scale));
     }
-    super.renderChildren(mouseX, mouseY, partialTicks);
+    super.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
       GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
@@ -260,7 +261,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     }
 
     NodeList nodes = document.getDocumentElement().getChildNodes();
-    int nextIndex = this.children().size();
+    int nextIndex = this.getEventListeners().size();
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       switch (node.getNodeName()) {
@@ -288,7 +289,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
           if (text != null) {
             Component<?> component = new TextBlockComponent(this.minecraft.fontRenderer,
-                new StringTextComponent(text), shadow).setScale(scale);
+                ForgeHooks.newChatWithLinks(text), shadow).setScale(scale);
             component.setWidthPercent(100.0F);
             this.addChild(component);
             nextIndex++;

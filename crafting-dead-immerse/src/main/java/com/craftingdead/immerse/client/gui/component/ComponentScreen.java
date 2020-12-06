@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.Collections;
 import java.util.List;
 import org.lwjgl.util.yoga.Yoga;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
@@ -66,12 +67,12 @@ public class ComponentScreen extends Screen implements IView {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
-    this.container.render(mouseX, mouseY, partialTicks);
+  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    this.container.render(matrixStack, mouseX, mouseY, partialTicks);
   }
 
   @Override
-  public List<Component<?>> children() {
+  public List<Component<?>> getEventListeners() {
     return Collections.singletonList(this.container);
   }
 

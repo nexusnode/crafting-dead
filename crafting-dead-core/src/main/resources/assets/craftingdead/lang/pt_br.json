@@ -82,7 +82,7 @@
   "item.craftingdead.blood_syringe": "Seringa de Sangue",
   "item.craftingdead.bandage": "Bandagem",
   "item.craftingdead.splint": "Tala Improvisada",
-  
+
   "item.craftingdead.advanced_zombie_spawn_egg": "Ovo gerador de Zumbi Avançado",
   "item.craftingdead.fast_zombie_spawn_egg": "Ovo gerador de Zumbi Rápido",
   "item.craftingdead.tank_zombie_spawn_egg": "Ovo gerador de Zumbi Tanque",
@@ -188,7 +188,7 @@
   "item.craftingdead.scrap_metal":"Sucata",
   "item.craftingdead.molten_scrap_metal":"Sucata Derretida",
   "item.craftingdead.incendiary_powder":"Pó Incendiário",
-  
+
   "item.craftingdead.vulcan_paint": "Tinta Vulcan",
   "item.craftingdead.asmo_paint": "Tinta Asmo",
   "item.craftingdead.candy_apple_paint": "Tinta Candy Apple",
@@ -204,6 +204,9 @@
   "item.craftingdead.scorched_paint": "Tinta Scorched",
   "item.craftingdead.slaughter_paint": "Tinta Slaughter",
   "item.craftingdead.uv_paint": "Tinta UV",
+  "item.craftingdead.emperor_dragon_paint": "Tinta Emperor Dragon",
+  "item.craftingdead.ultra_beast_paint": "Tinta Ultra Beast",
+  "item.craftingdead.nuclear_winter_paint": "Tinta Nuclear Winter",
 
   "item.craftingdead.stanag_20_round_magazine": "Pente STANAG x20",
   "item.craftingdead.explosive_stanag_20_round_magazine":"Pente STANAG Explosivo x20",
@@ -295,7 +298,7 @@
   "item.craftingdead.minigun": "Minigun",
   "item.craftingdead.mossberg": "Mossberg",
   "item.craftingdead.mk48mod": "MK48 MOD",
-  
+
   "item.craftingdead.black_tactical_vest": "Colete Tático Preto",
   "item.craftingdead.ghillie_tactical_vest": "Colete Tático Ghillie",
   "item.craftingdead.green_tactical_vest": "Colete Tático Verde",
@@ -327,11 +330,11 @@
   "item_lore.tool_item.open_canned_items": "Abre latas quando craftado com enlatados",
   "item_lore.clothing_item.water_breathing": "Provê respiração em baixo d'água",
   "item_lore.clothing_item.water_speed": "Aumenta velocidade do nado",
-  
+
   "attachment_multiplier_type.damage": "Dano",
   "attachment_multiplier_type.accuracy": "Precisão",
   "attachment_multiplier_type.zoom": "Zoom",
-  
+
   "biome.craftingdead.zombie_forest": "Floresta de Zumbis",
 
   "commands.craftingdead.thirst.success.operator": "Sede saciada com sucesso.",

@@ -210,6 +210,23 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
+  public static final RegistryObject<PaintItem> ULTRA_BEAST_PAINT = ITEMS
+      .register("ultra_beast_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<PaintItem> EMPEROR_DRAGON_PAINT = ITEMS
+      .register("emperor_dragon_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<PaintItem> NUCLEAR_WINTER_PAINT = ITEMS
+      .register("nuclear_winter_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
   // ================================================================================
   // Magazines
   // ================================================================================
@@ -627,6 +644,8 @@ public class ModItems {
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(EMPEROR_DRAGON_PAINT)
+              .addAcceptedPaint(ULTRA_BEAST_PAINT)
               .setRendererFactory(() -> M4A1Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1065,6 +1084,7 @@ public class ModItems {
               .setDefaultMagazine(M9_MAGAZINE)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(CYREX_PAINT)
               .setRendererFactory(() -> M9Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1086,6 +1106,7 @@ public class ModItems {
               .addAcceptedPaint(INFERNO_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(NUCLEAR_WINTER_PAINT)
               .setRendererFactory(() -> DesertEagleRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1108,6 +1129,7 @@ public class ModItems {
               .addAcceptedAttachment(RED_DOT_SIGHT)
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> P250Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1203,6 +1225,7 @@ public class ModItems {
               .addAcceptedPaint(RUBY_PAINT)
               .addAcceptedPaint(GEM_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> P90Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1341,6 +1364,7 @@ public class ModItems {
               .addAcceptedPaint(DRAGON_PAINT)
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> AWPRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));

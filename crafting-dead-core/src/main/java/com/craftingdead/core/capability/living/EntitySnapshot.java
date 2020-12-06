@@ -26,19 +26,19 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class EntitySnapshot {
 
   private boolean complete;
   private final AxisAlignedBB boundingBox;
-  private Vec3d pos;
-  private final Vec2f pitchYaw;
+  private Vector3d pos;
+  private final Vector2f pitchYaw;
   private final float eyeHeight;
 
-  public EntitySnapshot(AxisAlignedBB boundingBox, Vec2f pitchYaw) {
+  public EntitySnapshot(AxisAlignedBB boundingBox, Vector2f pitchYaw) {
     this(boundingBox, pitchYaw, -1);
     this.complete = false;
   }
@@ -47,8 +47,8 @@ public class EntitySnapshot {
     this(entity.getBoundingBox(), entity.getPitchYaw(), entity.getEyeHeight());
   }
 
-  public EntitySnapshot(AxisAlignedBB boundingBox, Vec2f pitchYaw, float eyeHeight) {
-    this.pos = new Vec3d((boundingBox.minX + boundingBox.maxX) / 2.0D, boundingBox.minY,
+  public EntitySnapshot(AxisAlignedBB boundingBox, Vector2f pitchYaw, float eyeHeight) {
+    this.pos = new Vector3d((boundingBox.minX + boundingBox.maxX) / 2.0D, boundingBox.minY,
         (boundingBox.minZ + boundingBox.maxZ) / 2.0D);
     this.boundingBox = boundingBox;
     this.pitchYaw = pitchYaw;
@@ -56,13 +56,13 @@ public class EntitySnapshot {
     this.complete = true;
   }
 
-  public Optional<Vec3d> rayTrace(World world, EntitySnapshot fromSnapshot, double distance,
+  public Optional<Vector3d> rayTrace(World world, EntitySnapshot fromSnapshot, double distance,
       float accuracy, Random random) {
     if (!fromSnapshot.complete || !this.complete) {
       return Optional.empty();
     }
 
-    Vec3d start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
+    Vector3d start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
 
     float pitchOffset = 0.0F;
     float yawOffset = 0.0F;
@@ -71,19 +71,19 @@ public class EntitySnapshot {
       yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
     }
 
-    Vec3d look = RayTraceUtil.getVectorForRotation(fromSnapshot.getPitchYaw().x + pitchOffset,
+    Vector3d look = RayTraceUtil.getVectorForRotation(fromSnapshot.getPitchYaw().x + pitchOffset,
         fromSnapshot.getPitchYaw().y + yawOffset);
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
         RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);
 
-    Vec3d scaledLook = look.scale(distance);
+    Vector3d scaledLook = look.scale(distance);
 
-    Vec3d end = blockRayTraceResult
+    Vector3d end = blockRayTraceResult
         .map(RayTraceResult::getHitVec)
         .orElse(start.add(scaledLook));
 
-    Optional<Vec3d> potentialHit = this.getCollisionBox().rayTrace(start, end);
+    Optional<Vector3d> potentialHit = this.getCollisionBox().rayTrace(start, end);
     if (this.getCollisionBox().contains(start)) {
       return Optional.of(potentialHit.orElse(start));
     } else {
@@ -92,7 +92,7 @@ public class EntitySnapshot {
   }
 
 
-  public Vec3d getPos() {
+  public Vector3d getPos() {
     return this.pos;
   }
 
@@ -100,7 +100,7 @@ public class EntitySnapshot {
     return this.boundingBox;
   }
 
-  public Vec2f getPitchYaw() {
+  public Vector2f getPitchYaw() {
     return this.pitchYaw;
   }
 
@@ -120,7 +120,7 @@ public class EntitySnapshot {
       boundingBox = this.boundingBox;
     }
 
-    Vec2f pitchYaw = snapshot.pitchYaw;
+    Vector2f pitchYaw = snapshot.pitchYaw;
     if (MathHelper.degreesDifferenceAbs(this.pitchYaw.x, snapshot.pitchYaw.x) > 10.0D
         || MathHelper.degreesDifferenceAbs(this.pitchYaw.y, snapshot.pitchYaw.y) > 10.0D) {
       pitchYaw = this.pitchYaw;
@@ -156,6 +156,6 @@ public class EntitySnapshot {
     float pitch = in.readFloat();
     float yaw = in.readFloat();
     return new EntitySnapshot(new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ),
-        new Vec2f(pitch, yaw));
+        new Vector2f(pitch, yaw));
   }
 }

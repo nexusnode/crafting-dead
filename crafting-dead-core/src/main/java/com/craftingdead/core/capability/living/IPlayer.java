@@ -17,7 +17,6 @@
  */
 package com.craftingdead.core.capability.living;
 
-import java.util.Optional;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.inventory.InventorySlotType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,19 +38,11 @@ public interface IPlayer<E extends PlayerEntity>
 
   void setMaxWater(int maxWater);
 
+  @SuppressWarnings("unchecked")
   public static <E extends PlayerEntity> IPlayer<E> getExpected(E livingEntity) {
     return livingEntity.getCapability(ModCapabilities.LIVING)
         .filter(living -> living instanceof IPlayer)
-        .<IPlayer<E>>cast()
+        .map(living -> (IPlayer<E>) living)
         .orElseThrow(() -> new IllegalStateException("Missing living capability"));
-  }
-
-  public static <R extends IPlayer<E>, E extends PlayerEntity> Optional<R> getOptional(
-      E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof IPlayer)
-        .<R>cast()
-        .map(Optional::of)
-        .orElse(Optional.empty());
   }
 }
