@@ -642,7 +642,7 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    final Vector3f rotations = this.cameraManager.getCameraRotation();
+    final Vector3f rotations = this.cameraManager.getCameraRotations();
     event.setPitch(event.getPitch() + rotations.getX());
     event.setYaw(event.getYaw() + rotations.getY());
     event.setRoll(event.getRoll() + rotations.getZ());
@@ -677,9 +677,8 @@ public class ClientDist implements IModDist {
         float deltaTime = (currentTime - this.lastTime) * 50;
         this.lastTime = currentTime;
         this.tweenManager.update(deltaTime);
-
         if (this.minecraft.player != null) {
-          final Vector2f rotationVelocity = this.cameraManager.getLookRotationVelocity();
+          final Vector2f rotationVelocity = this.cameraManager.getLookRotationDelta();
           this.minecraft.player.rotateTowards(rotationVelocity.y, rotationVelocity.x);
         }
         break;

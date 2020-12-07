@@ -225,14 +225,16 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     this.updateScubaMask();
 
     if (!this.entity.getEntityWorld().isRemote()) {
-      Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
-      for (int slot : this.dirtySlots) {
-        slots.put(slot, this.itemHandler.getStackInSlot(slot));
+      if (!this.dirtySlots.isEmpty()) {
+        Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
+        for (int slot : this.dirtySlots) {
+          slots.put(slot, this.itemHandler.getStackInSlot(slot));
+        }
+        NetworkChannel.PLAY.getSimpleChannel().send(
+            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
+            new SetSlotsMessage(this.entity.getEntityId(), slots));
+        this.dirtySlots.clear();
       }
-      NetworkChannel.PLAY.getSimpleChannel().send(
-          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-          new SetSlotsMessage(this.entity.getEntityId(), slots));
-      this.dirtySlots.clear();
 
       if (this.snapshots.size() >= 20) {
         this.snapshots.removeFirst();

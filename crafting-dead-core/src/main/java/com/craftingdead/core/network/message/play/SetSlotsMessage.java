@@ -42,19 +42,19 @@ public class SetSlotsMessage {
 
   public static void encode(SetSlotsMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
-    out.writeVarInt(msg.slots.size());
+    out.writeShort(msg.slots.size());
     for (Map.Entry<Integer, ItemStack> entry : msg.slots.entrySet()) {
-      out.writeVarInt(entry.getKey());
+      out.writeShort(entry.getKey());
       out.writeItemStack(entry.getValue());
     }
   }
 
   public static SetSlotsMessage decode(PacketBuffer in) {
     int entityId = in.readVarInt();
-    int slotCount = in.readVarInt();
+    int slotCount = in.readShort();
     Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
     for (int i = 0; i < slotCount; i++) {
-      slots.put(in.readVarInt(), in.readItemStack());
+      slots.put((int) in.readShort(), in.readItemStack());
     }
     return new SetSlotsMessage(entityId, slots);
   }
