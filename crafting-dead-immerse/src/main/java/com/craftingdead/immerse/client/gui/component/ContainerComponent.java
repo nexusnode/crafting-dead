@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import com.craftingdead.core.client.renderer.VelocitySmoother;
 import com.craftingdead.immerse.client.util.DownloadUtil;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
 import com.craftingdead.immerse.client.util.RenderUtil;
@@ -39,6 +40,7 @@ import com.mojang.datafixers.util.Either;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenType;
 import io.noties.tumbleweed.equations.Sine;
+import net.minecraft.client.util.NativeUtil;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.ForgeHooks;
 
@@ -53,9 +55,9 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private static final int SCROLLBAR_WIDTH = 4;
 
-  private static final float SCROLL_CHUNK = 7.5F;
+  private static final float SCROLL_CHUNK = 15F;
 
-  private static final float SCROLL_MOMENTUM_DAMPING = 0.75F;
+  private static final float SCROLL_MOMENTUM_DAMPING = 7.5F;
 
   private float scrollOffset;
 
@@ -65,9 +67,9 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private boolean calculateWidthWithScrollbar;
 
-  private float lastScrollMomentum;
+  private final VelocitySmoother scrollSmoother = new VelocitySmoother();
 
-  private float scrollMomentum;
+  private float lastRenderTime;
 
   @Override
   public float getContentWidth() {
@@ -114,7 +116,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled() && !this.draggingScroller) {
-      this.scrollMomentum -= scrollDelta * SCROLL_CHUNK;
+      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK));
     }
     return super.mouseScrolled(mouseX, mouseY, scrollDelta);
   }
@@ -158,25 +160,24 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   @Override
   public void tick() {
     super.tick();
-
-    this.lastScrollMomentum = this.scrollMomentum;
-
-    if (Math.abs(this.scrollMomentum) <= 0.1F) {
-      this.scrollOffset += this.scrollMomentum;
-      this.scrollMomentum = 0.0F;
-    }
-    this.scrollMomentum *= (1 - SCROLL_MOMENTUM_DAMPING);
-
   }
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-    float scrollDelta = MathHelper.lerp(partialTicks, this.lastScrollMomentum, this.scrollMomentum);
+    float currentTime = (float) NativeUtil.getTime();
+    float timeDelta = currentTime - this.lastRenderTime;
+    this.lastRenderTime = currentTime;
+
+    float scrollDelta = this.scrollSmoother.getAndDecelerate(timeDelta * SCROLL_MOMENTUM_DAMPING);
+    if (Math.abs(scrollDelta) < 0.4) {
+      scrollDelta = 0.0F;
+      this.scrollSmoother.reset();
+    }
     float newScrollOffset = this.scrollOffset + scrollDelta;
     if (newScrollOffset < 0.0F || newScrollOffset > this.totalHeight - this.getHeight()) {
-      this.scrollMomentum = this.lastScrollMomentum = 0.0F;
+      this.scrollSmoother.reset();
     }
     this.scrollOffset =
         Math.min(Math.max(newScrollOffset, 0.0F), this.totalHeight - this.getHeight());

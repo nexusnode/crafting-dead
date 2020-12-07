@@ -17,6 +17,12 @@ public class VelocitySmoother {
     this.targetVelocity += velocity;
   }
 
+  public void reset() {
+    this.targetVelocity = 0.0F;
+    this.remainingVelocity = 0.0F;
+    this.lastVelocity = 0.0F;
+  }
+
   public float getAndDecelerate(float deceleration) {
     float nextVelocity = this.targetVelocity - this.remainingVelocity;
     float currentVelocity = MathHelper.lerp(0.5F, this.lastVelocity, nextVelocity);
