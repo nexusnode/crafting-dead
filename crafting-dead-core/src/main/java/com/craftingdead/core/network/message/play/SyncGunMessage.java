@@ -60,16 +60,15 @@ public class SyncGunMessage {
   public static boolean handle(SyncGunMessage msg, Supplier<NetworkEvent.Context> ctx) {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-    world.map(w -> w.getEntityByID(msg.entityId)).ifPresent(entity -> {
-      if (entity instanceof LivingEntity) {
-        ItemStack heldStack = ((LivingEntity) entity).getHeldItemMainhand();
-        heldStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
-          gunController.setMagazineStack(msg.magazineStack);
-          gunController.setPaintStack(msg.paintStack);
-          gunController.setMagazineSize(msg.magazineSize);
+    world.map(w -> w.getEntityByID(msg.entityId))
+        .filter(e -> e instanceof LivingEntity)
+        .map(e -> ((LivingEntity) e).getHeldItemMainhand())
+        .flatMap(heldStack -> heldStack.getCapability(ModCapabilities.GUN).resolve())
+        .ifPresent(gun -> {
+          gun.setMagazineStack(msg.magazineStack);
+          gun.setPaintStack(msg.paintStack);
+          gun.setMagazineSize(msg.magazineSize);
         });
-      }
-    });
     return true;
   }
 }

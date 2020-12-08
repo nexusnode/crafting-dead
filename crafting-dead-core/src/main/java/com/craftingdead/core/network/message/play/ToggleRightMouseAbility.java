@@ -42,8 +42,7 @@ public class ToggleRightMouseAbility {
   }
 
   public static boolean handle(ToggleRightMouseAbility msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil
-        .getEntity(ctx.get(), msg.entityId)
+    NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
@@ -51,9 +50,8 @@ public class ToggleRightMouseAbility {
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun
-                      .toggleRightMouseAction(living,
-                          ctx.get().getDirection().getReceptionSide().isServer())));
+                  .ifPresent(gun -> gun.toggleRightMouseAction(living,
+                      ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

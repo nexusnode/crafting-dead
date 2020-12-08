@@ -42,8 +42,7 @@ public class ToggleFireModeMessage {
   }
 
   public static boolean handle(ToggleFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil
-        .getEntity(ctx.get(), msg.entityId)
+    NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
@@ -51,9 +50,8 @@ public class ToggleFireModeMessage {
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun
-                      .toggleFireMode(living,
-                          ctx.get().getDirection().getReceptionSide().isServer())));
+                  .ifPresent(gun -> gun.toggleFireMode(living,
+                      ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

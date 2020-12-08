@@ -20,7 +20,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -57,7 +57,7 @@ public class HitMessage {
             .ifPresent(clientDist.getIngameGui()::displayHitMarker);
         if (msg.dead && ClientDist.clientConfig.playKillSound.get()) {
           // Plays a sound that follows the player
-          ClientPlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
+          PlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
           playerEntity.getEntityWorld().playMovingSound(clientDist.getExpectedPlayer().getEntity(),
               playerEntity, SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
         }

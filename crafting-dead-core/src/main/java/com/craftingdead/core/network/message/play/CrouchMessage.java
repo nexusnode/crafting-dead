@@ -44,13 +44,11 @@ public class CrouchMessage {
   }
 
   public static boolean handle(CrouchMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil
-        .getEntity(ctx.get(), msg.entityId)
+    NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
-        .ifPresent(entity -> entity.getCapability(ModCapabilities.LIVING)
-            .ifPresent(living -> living
-                .setCrouching(msg.crouching,
-                    ctx.get().getDirection().getReceptionSide().isServer())));
+        .flatMap(entity -> entity.getCapability(ModCapabilities.LIVING).resolve())
+        .ifPresent(living -> living.setCrouching(msg.crouching,
+            ctx.get().getDirection().getReceptionSide().isServer()));
     return true;
   }
 }

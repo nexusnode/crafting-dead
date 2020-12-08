@@ -45,8 +45,7 @@ public class TriggerPressedMessage {
   }
 
   public static boolean handle(TriggerPressedMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil
-        .getEntity(ctx.get(), msg.entityId)
+    NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
@@ -54,9 +53,8 @@ public class TriggerPressedMessage {
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun
-                      .setTriggerPressed(living, heldStack, msg.triggerPressed,
-                          ctx.get().getDirection().getReceptionSide().isServer())));
+                  .ifPresent(gun -> gun.setTriggerPressed(living, heldStack, msg.triggerPressed,
+                      ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;
   }

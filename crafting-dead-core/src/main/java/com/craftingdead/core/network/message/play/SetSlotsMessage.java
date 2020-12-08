@@ -20,6 +20,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.living.ILiving;
 import io.netty.util.collection.IntObjectHashMap;
 import net.minecraft.entity.LivingEntity;
@@ -28,7 +29,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class SetSlotsMessage {
 
@@ -64,11 +64,9 @@ public class SetSlotsMessage {
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.flatMap(w -> Optional.ofNullable(w.getEntityByID(msg.entityId)))
         .filter(e -> e instanceof LivingEntity)
-        .ifPresent(e -> {
-          IItemHandlerModifiable itemHandler =
-              ILiving.getExpected((LivingEntity) e).getItemHandler();
-          msg.slots.forEach(itemHandler::setStackInSlot);
-        });
+        .flatMap(e -> ((LivingEntity) e).getCapability(ModCapabilities.LIVING).resolve())
+        .map(ILiving::getItemHandler)
+        .ifPresent(itemHandler -> msg.slots.forEach(itemHandler::setStackInSlot));
     return true;
   }
 }

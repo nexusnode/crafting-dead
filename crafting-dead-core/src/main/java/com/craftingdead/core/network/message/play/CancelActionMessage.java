@@ -41,12 +41,11 @@ public class CancelActionMessage {
   }
 
   public static boolean handle(CancelActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil
-        .getEntity(ctx.get(), msg.entityId)
+    NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
-        .ifPresent(entity -> entity.getCapability(ModCapabilities.LIVING)
-            .ifPresent(living -> living
-                .cancelAction(ctx.get().getDirection().getReceptionSide().isServer())));
+        .flatMap(entity -> entity.getCapability(ModCapabilities.LIVING).resolve())
+        .ifPresent(
+            living -> living.cancelAction(ctx.get().getDirection().getReceptionSide().isServer()));
     return true;
   }
 }
