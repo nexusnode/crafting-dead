@@ -49,6 +49,10 @@ public interface ILiving<E extends LivingEntity, L extends ILivingHandler> exten
 
   Optional<IActionProgress> getActionProgress();
 
+  default boolean isPerformingAction() {
+    return this.getActionProgress().isPresent();
+  }
+
   void setMovementBlocked(boolean movementFrozen);
 
   boolean isMovementBlocked();

@@ -193,7 +193,6 @@ public class ClientDist implements IModDist {
 
   public ClientDist() {
     final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-    // modBus.addListener(this::handleSoundLoad);
     modBus.addListener(this::handleModelRegistry);
     modBus.addListener(this::handleModelBake);
     modBus.addListener(this::handleClientSetup);
@@ -258,7 +257,8 @@ public class ClientDist implements IModDist {
 
   @SuppressWarnings("unchecked")
   public Optional<IPlayer<ClientPlayerEntity>> getPlayer() {
-    return this.minecraft.player.getCapability(ModCapabilities.LIVING)
+    return Optional.ofNullable(this.minecraft.player)
+        .flatMap(p -> p.getCapability(ModCapabilities.LIVING).resolve())
         .filter(living -> living instanceof IPlayer)
         .map(living -> (IPlayer<ClientPlayerEntity>) living);
   }
@@ -481,65 +481,72 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        if (this.minecraft.player != null && this.minecraft.isGamePaused()) {
-          IPlayer<ClientPlayerEntity> player = IPlayer.getExpected(this.minecraft.player);
-          ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-          heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+        IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+        if (player != null) {
+          ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+          IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
+
+          // Stop performing action if game is paused
+          if (this.minecraft.isGamePaused() && gun != null) {
             gun.setTriggerPressed(player, heldStack, false, true);
             if (gun.isPerformingRightMouseAction()) {
               gun.toggleRightMouseAction(player, true);
             }
-          });
-        }
-        if (this.minecraft.loadingGui == null
-            && (this.minecraft.currentScreen == null || this.minecraft.currentScreen.passEvents)) {
-          IPlayer<ClientPlayerEntity> player = IPlayer.getExpected(this.minecraft.player);
-          final ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-          while (TOGGLE_FIRE_MODE.isPressed()) {
-            heldStack
-                .getCapability(ModCapabilities.GUN)
-                .ifPresent(gun -> gun.toggleFireMode(player, true));
-          }
-          while (RELOAD.isPressed()) {
-            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.reload(player));
-          }
-          while (REMOVE_MAGAZINE.isPressed()) {
-            heldStack.getCapability(ModCapabilities.GUN)
-                .ifPresent(gun -> gun.removeMagazine(player));
-          }
-          if (this.minecraft.player.isSneaking() != this.wasSneaking) {
-            if (this.minecraft.player.isSneaking()) {
-              final long currentTime = Util.milliTime();
-              if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
-                player.setCrouching(true, true);
-              }
-              this.lastSneakPressTime = Util.milliTime();
-            } else {
-              player.setCrouching(false, true);
-            }
-            this.wasSneaking = this.minecraft.player.isSneaking();
-          }
-          while (OPEN_MOD_INVENTORY.isPressed()) {
-            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
-            if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
-              ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
-            }
           }
 
-          TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
-          if (this.lastTutorialStep != currentTutorialStep) {
-            if (currentTutorialStep == TutorialSteps.NONE) {
-              this.setTutorialStep(clientConfig.tutorialStep.get());
+          if (this.minecraft.loadingGui == null && (this.minecraft.currentScreen == null
+              || this.minecraft.currentScreen.passEvents)) {
+            // Update gun input
+            if (gun != null) {
+              while (TOGGLE_FIRE_MODE.isPressed()) {
+                gun.toggleFireMode(player, true);
+              }
+              while (RELOAD.isPressed()) {
+                gun.reload(player);
+              }
+              while (REMOVE_MAGAZINE.isPressed()) {
+                gun.removeMagazine(player);
+              }
             }
-            this.lastTutorialStep = currentTutorialStep;
-          }
-          if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
-            this.wasAdrenalineActive = true;
-            this.effectsManager.setHighpassLevels(1.0F, 0.015F);
-            this.effectsManager.setDirectHighpassForAll();
-          } else if (this.wasAdrenalineActive) {
-            this.wasAdrenalineActive = false;
-            this.effectsManager.removeFilterForAll();
+
+            // Update crouching
+            if (this.minecraft.player.isSneaking() != this.wasSneaking) {
+              if (this.minecraft.player.isSneaking()) {
+                final long currentTime = Util.milliTime();
+                if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
+                  player.setCrouching(true, true);
+                }
+                this.lastSneakPressTime = Util.milliTime();
+              } else {
+                player.setCrouching(false, true);
+              }
+              this.wasSneaking = this.minecraft.player.isSneaking();
+            }
+
+            // Update tutorial
+            while (OPEN_MOD_INVENTORY.isPressed()) {
+              NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
+              if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
+                ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
+              }
+            }
+            TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
+            if (this.lastTutorialStep != currentTutorialStep) {
+              if (currentTutorialStep == TutorialSteps.NONE) {
+                this.setTutorialStep(clientConfig.tutorialStep.get());
+              }
+              this.lastTutorialStep = currentTutorialStep;
+            }
+
+            // Update adrenaline effects
+            if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+              this.wasAdrenalineActive = true;
+              this.effectsManager.setHighpassLevels(1.0F, 0.015F);
+              this.effectsManager.setDirectHighpassForAll();
+            } else if (this.wasAdrenalineActive) {
+              this.wasAdrenalineActive = false;
+              this.effectsManager.removeFilterForAll();
+            }
           }
         }
         break;
@@ -550,28 +557,26 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    if (this.minecraft.getConnection() != null && this.minecraft.currentScreen == null) {
+    IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+    if (player != null && this.minecraft.loadingGui == null
+        && this.minecraft.currentScreen == null) {
+      ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+      IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
       if (this.minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
-        ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-        heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+        if (gun != null) {
           event.setCanceled(true);
-          gun.setTriggerPressed(IPlayer.getExpected(this.minecraft.player), heldStack,
-              triggerPressed, true);
-        });
+          gun.setTriggerPressed(player, heldStack, triggerPressed, true);
+        }
       } else if (this.minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())) {
-        ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-        heldStack.getCapability(ModCapabilities.GUN)
-            .filter(gun -> gun
-                .getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD)
-            .ifPresent(gun -> {
-              if ((event.getAction() == GLFW.GLFW_PRESS && !gun.isPerformingRightMouseAction())
-                  || (event.getAction() == GLFW.GLFW_RELEASE
-                      && gun.isPerformingRightMouseAction())) {
-                gun.toggleRightMouseAction(IPlayer.getExpected(this.minecraft.player), true);
-              }
-              event.setCanceled(true);
-            });
+        if (gun != null
+            && gun.getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.HOLD) {
+          if ((event.getAction() == GLFW.GLFW_PRESS && !gun.isPerformingRightMouseAction())
+              || (event.getAction() == GLFW.GLFW_RELEASE && gun.isPerformingRightMouseAction())) {
+            gun.toggleRightMouseAction(IPlayer.getExpected(this.minecraft.player), true);
+          }
+          event.setCanceled(true);
+        }
       }
     }
   }
@@ -589,6 +594,7 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
     ItemStack heldStack = event.getEntity().getHeldItemMainhand();
+    // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
     if (event.getRenderer().getEntityModel() instanceof BipedModel
         && heldStack.getItem() instanceof GunItem) {
       BipedModel<?> model = event.getRenderer().getEntityModel();
@@ -608,30 +614,33 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     final IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+    ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+    IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
     switch (event.getType()) {
       case ALL:
         if (player != null) {
-          this.ingameGui.renderOverlay(player, event.getMatrixStack(),
+          this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
               event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
               event.getPartialTicks());
         }
         break;
       case CROSSHAIRS:
         if (player != null) {
-          ItemStack heldStack = this.minecraft.player.getHeldItemMainhand();
-          event.setCanceled(player.getActionProgress().isPresent()
-              || heldStack.getCapability(ModCapabilities.SCOPE)
-                  .map(scope -> scope.isAiming(this.minecraft.player, heldStack))
-                  .orElse(false));
-          if (!event.isCanceled()) {
-            heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-              event.setCanceled(true);
-              if (gun.hasCrosshair()) {
-                this.ingameGui.renderCrosshairs(gun.getAccuracy(player, heldStack),
-                    event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                    event.getWindow().getScaledHeight());
-              }
-            });
+          boolean isAiming = heldStack.getCapability(ModCapabilities.SCOPE)
+              .map(scope -> scope.isAiming(this.minecraft.player, heldStack))
+              .orElse(false);
+          if (player.isPerformingAction() || isAiming) {
+            event.setCanceled(true);
+            break;
+          }
+
+          if (gun != null) {
+            event.setCanceled(true);
+            if (gun.hasCrosshair()) {
+              this.ingameGui.renderCrosshairs(gun.getAccuracy(player, heldStack),
+                  event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                  event.getWindow().getScaledHeight());
+            }
           }
         }
         break;

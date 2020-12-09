@@ -59,7 +59,7 @@ public class RemoveMagazineAction extends TimedAction {
             .map(animation -> (GunAnimationReload) animation)
             .ifPresent(animation -> {
               animation.setEjectingClip(true);
-              this.gun.getAnimationController().ifPresent(
+              this.gun.getClient().getAnimationController().ifPresent(
                   c -> c.addAnimation(animation, () -> this.gun.setMagazineStack(ItemStack.EMPTY)));
             });
       }
@@ -80,7 +80,8 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    this.gun.getAnimationController().ifPresent(GunAnimationController::removeCurrentAnimation);
+    this.gun.getClient().getAnimationController()
+        .ifPresent(GunAnimationController::removeCurrentAnimation);
     this.gun.setMagazineStack(this.oldMagazineStack);
   }
 

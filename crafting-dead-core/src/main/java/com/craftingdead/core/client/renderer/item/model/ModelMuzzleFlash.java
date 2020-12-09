@@ -17,6 +17,7 @@
  */
 package com.craftingdead.core.client.renderer.item.model;
 
+import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -79,7 +80,7 @@ public class ModelMuzzleFlash extends Model {
 
   private static RenderType getFlashRenderType(ResourceLocation texture) {
     return RenderType.makeType("flash",
-        DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, 7, 256, false,
+        DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 256, false,
         true, RenderType.State.getBuilder()
             .lightmap(new LightmapState(true))
             .texture(new RenderState.TextureState(texture,

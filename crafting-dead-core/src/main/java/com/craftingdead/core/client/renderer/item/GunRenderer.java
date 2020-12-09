@@ -67,6 +67,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.SimpleModelTransform;
@@ -75,6 +76,8 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 public abstract class GunRenderer implements IItemRenderer {
 
   private static final int FULL_LIGHT = 0xF000F0;
+
+  private static final int FLASH_TEXTURE_CHANGE_TIMEOUT_MS = 250;
 
   private static final Random random = new Random();
 
@@ -91,7 +94,7 @@ public abstract class GunRenderer implements IItemRenderer {
   protected float muzzleFlashZ = -1.8F;
   protected float muzzleScale = 2F;
 
-  private int lastShotCount;
+  private long lastFlashTime = 0;
 
   public GunRenderer(Supplier<? extends GunItem> gunItem) {
     this.gunItem = gunItem;
@@ -226,7 +229,7 @@ public abstract class GunRenderer implements IItemRenderer {
     // Right Hand
     matrixStack.push();
     {
-      gun.getAnimationController()
+      gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.RIGHT_HAND,
               transformType, matrixStack, partialTicks));
 
@@ -245,7 +248,7 @@ public abstract class GunRenderer implements IItemRenderer {
     // Left Hand
     matrixStack.push();
     {
-      gun.getAnimationController()
+      gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.LEFT_HAND,
               transformType, matrixStack, partialTicks));
 
@@ -266,19 +269,35 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedOverlay) {
     matrixStack.push();
     {
+      long currentTime = Util.milliTime();
+      long deltaTime = currentTime - this.lastFlashTime;
+
+      int texture;
+      if (deltaTime > FLASH_TEXTURE_CHANGE_TIMEOUT_MS) {
+        this.lastFlashTime = currentTime;
+        deltaTime = FLASH_TEXTURE_CHANGE_TIMEOUT_MS;
+      }
+
+      // Every x milliseconds, change the muzzle flash texture
+      texture = (int) ((deltaTime / 100) + 1);
+
+      float scale = (random.nextInt(5) + 3) / 10.0F;
       matrixStack.rotate(new Vector3f(-0.08F, 1.0F, 0.0F).rotationDegrees(-85));
       matrixStack.rotate(Vector3f.XP.rotationDegrees(30));
-      matrixStack.scale(this.muzzleScale, this.muzzleScale, this.muzzleScale);
+      matrixStack.scale(this.muzzleScale + scale, this.muzzleScale + scale,
+          this.muzzleScale + scale);
       if (gun.getAttachments().contains(ModItems.SUPPRESSOR.get())) {
         this.muzzleFlashZ -= 0.4;
       }
-      matrixStack.translate(this.muzzleFlashX, this.muzzleFlashY, this.muzzleFlashZ);
+      matrixStack.translate(this.muzzleFlashX - scale * this.muzzleFlashX / 2,
+          this.muzzleFlashY - scale * this.muzzleFlashY / 2,
+          this.muzzleFlashZ - scale * this.muzzleFlashZ / 2);
+
       IVertexBuilder flashVertexBuilder = renderTypeBuffer
           .getBuffer(this.muzzleFlashModel.getRenderType(new ResourceLocation(CraftingDead.ID,
-              "textures/flash/flash"
-                  + (random.nextInt(3) + 1) + ".png")));
+              "textures/flash/flash" + texture + ".png")));
       this.muzzleFlashModel.render(matrixStack, flashVertexBuilder, FULL_LIGHT,
-          packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+          packedOverlay, 1.0F, 1.0F, 1.0F, scale + 0.5F);
     }
     matrixStack.pop();
   }
@@ -291,9 +310,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
     final boolean aiming =
         gun instanceof IScope && ((IScope) gun).isAiming(playerEntity, itemStack);
-    final boolean flash =
-        gun.getShotCount() != this.lastShotCount && !aiming && gun.getShotCount() > 0;
-    this.lastShotCount = gun.getShotCount();
+    final boolean flash = gun.getClient().isFlashing();
     if (flash) {
       packedLight = FULL_LIGHT;
     }
@@ -319,7 +336,7 @@ public abstract class GunRenderer implements IItemRenderer {
         this.applySprintingTransforms(matrixStack);
       }
 
-      gun.getAnimationController()
+      gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.BODY,
               transformType, matrixStack, partialTicks));
 
@@ -328,7 +345,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
       matrixStack.push();
       {
-        gun.getAnimationController()
+        gun.getClient().getAnimationController()
             .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.MAGAZINE,
                 transformType, matrixStack, partialTicks));
 
@@ -350,7 +367,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.push();
     {
       this.applyThirdPersonTransforms(livingEntity, gun, matrixStack);
-      gun.getAnimationController()
+      gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(livingEntity, itemStack, GunAnimation.BODY,
               transformType, matrixStack, this.minecraft.getRenderPartialTicks()));
       this.renderGunModel(itemStack.hasEffect(), gun,

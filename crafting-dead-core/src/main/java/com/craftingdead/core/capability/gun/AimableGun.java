@@ -26,6 +26,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 public class AimableGun extends DefaultGun implements IScope {
 
@@ -33,6 +35,12 @@ public class AimableGun extends DefaultGun implements IScope {
 
   public AimableGun(GunItem gunItem) {
     super(gunItem);
+  }
+
+  @Override
+  protected IGunClient createClientHandler() {
+    return DistExecutor.unsafeCallWhenOn(Dist.CLIENT,
+        () -> () -> new AimableGunClient(this));
   }
 
   @Override

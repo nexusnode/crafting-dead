@@ -38,7 +38,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.settings.PointOfView;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
@@ -68,8 +67,6 @@ public class IngameGui {
 
   private float lastSpread;
 
-  private int lastShotCount;
-
   private float lastFlashScale = 0;
 
   @Nullable
@@ -98,14 +95,7 @@ public class IngameGui {
   @SuppressWarnings("deprecation")
   private void renderGunFlash(ClientPlayerEntity playerEntity, IGun gun, int width, int height,
       float partialTicks) {
-    final boolean aiming =
-        gun instanceof IScope
-            && ((IScope) gun).isAiming(playerEntity, playerEntity.getHeldItemMainhand());
-    final boolean flash = this.minecraft.gameSettings.getPointOfView() == PointOfView.FIRST_PERSON
-        && gun.getShotCount() != this.lastShotCount && !aiming && gun.getShotCount() > 0;
-    this.lastShotCount = gun.getShotCount();
-
-    if (flash) {
+    if (gun.getClient().isFlashing()) {
       RenderSystem.pushMatrix();
       {
         final float flashIntensity = (random.nextInt(3) + 5) / 10.0F;
@@ -150,8 +140,8 @@ public class IngameGui {
         });
   }
 
-  public void renderOverlay(IPlayer<ClientPlayerEntity> player, MatrixStack matrixStack, int width,
-      int height, float partialTicks) {
+  public void renderOverlay(IPlayer<ClientPlayerEntity> player, ItemStack heldStack,
+      @Nullable IGun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
 
     // TODO Fixes Minecraft bug when using post-processing shaders.
     RenderSystem.enableTexture();
@@ -165,8 +155,6 @@ public class IngameGui {
     this.renderKillFeed(matrixStack, partialTicks);
 
     final ClientPlayerEntity playerEntity = player.getEntity();
-    final ItemStack heldStack = playerEntity.getHeldItemMainhand();
-    final IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
 
     if (gun != null) {
       this.renderGunFlash(playerEntity, gun, width, height, partialTicks);

@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.AimableGun;
@@ -38,7 +37,6 @@ import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.util.Text;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -49,13 +47,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 
 public class GunItem extends ShootableItem implements IRendererProvider {
@@ -97,7 +99,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   /**
    * Whether the gun has bolt action
-   * */
+   */
   private final boolean boltAction;
 
   /**
@@ -295,12 +297,33 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return this.aimable
-        ? new SerializableCapabilityProvider<>(new AimableGun(this),
-            ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN,
-                () -> ModCapabilities.SCOPE))
-        : new SerializableCapabilityProvider<>(new DefaultGun(this),
-            ImmutableSet.of(() -> ModCapabilities.ANIMATION_PROVIDER, () -> ModCapabilities.GUN));
+    return new ICapabilitySerializable<CompoundNBT>() {
+
+      private final IGun gun =
+          GunItem.this.aimable ? new AimableGun(GunItem.this) : new DefaultGun(GunItem.this);
+
+      @Override
+      public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if ((GunItem.this.aimable && cap == ModCapabilities.SCOPE)
+            || (cap == ModCapabilities.GUN)) {
+          return LazyOptional.of(() -> this.gun).cast();
+        } else if (cap == ModCapabilities.ANIMATION_PROVIDER) {
+          return this.gun.getClient() == null ? LazyOptional.empty()
+              : LazyOptional.of(this.gun::getClient).cast();
+        }
+        return LazyOptional.empty();
+      }
+
+      @Override
+      public CompoundNBT serializeNBT() {
+        return this.gun.serializeNBT();
+      }
+
+      @Override
+      public void deserializeNBT(CompoundNBT nbt) {
+        this.gun.deserializeNBT(nbt);
+      }
+    };
   }
 
   @Override

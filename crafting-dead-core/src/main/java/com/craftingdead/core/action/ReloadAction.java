@@ -77,8 +77,9 @@ public class ReloadAction extends TimedAction {
               .map(animation -> (GunAnimationReload) animation)
               .ifPresent(animation -> {
                 ((GunAnimationReload) animation).setEjectingClip(true);
-                this.gun.getAnimationController().ifPresent(c -> c.addAnimation(animation,
-                    () -> this.playLoadAnimation(magazineStack)));
+                this.gun.getClient().getAnimationController()
+                    .ifPresent(c -> c.addAnimation(animation,
+                        () -> this.playLoadAnimation(magazineStack)));
               });
         } else {
           this.playLoadAnimation(magazineStack);
@@ -96,7 +97,8 @@ public class ReloadAction extends TimedAction {
         .map(animation -> (GunAnimationReload) animation)
         .ifPresent(animation -> {
           animation.setEjectingClip(false);
-          this.gun.getAnimationController().ifPresent(c -> c.addAnimation(animation, null));
+          this.gun.getClient()
+              .getAnimationController().ifPresent(c -> c.addAnimation(animation, null));
         });
   }
 
@@ -130,7 +132,8 @@ public class ReloadAction extends TimedAction {
         Minecraft.getInstance().getSoundHandler()
             .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
       }
-      this.gun.getAnimationController().ifPresent(GunAnimationController::removeCurrentAnimation);
+      this.gun.getClient().getAnimationController()
+          .ifPresent(GunAnimationController::removeCurrentAnimation);
     }
     this.gun.setMagazineStack(this.oldMagazineStack);
   }

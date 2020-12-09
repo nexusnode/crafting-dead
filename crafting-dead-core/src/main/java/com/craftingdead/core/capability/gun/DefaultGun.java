@@ -28,20 +28,16 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ReloadAction;
 import com.craftingdead.core.action.RemoveMagazineAction;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.animationprovider.DefaultAnimationProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
-import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.clothing.IClothing;
 import com.craftingdead.core.capability.living.EntitySnapshot;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
-import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.gui.KillFeedEntry;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
@@ -71,8 +67,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -95,11 +89,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
-import net.minecraft.particles.BlockParticleData;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -110,11 +101,13 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class DefaultGun extends DefaultAnimationProvider<GunAnimationController> implements IGun {
+public class DefaultGun implements IGun {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -170,23 +163,32 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
   private boolean performingRightMouseAction;
 
-  private long rightMouseActionSoundStartTimeMs;
-
   private final Multimap<Integer, PendingHit> livingHitValidationBuffer =
       Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ObjectArrayList::new);
 
   private byte hitValidationTicks = 0;
+
+  private final IGunClient clientHandler;
 
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
   }
 
   public DefaultGun(GunItem gunItem) {
-    super(() -> GunAnimationController::new);
     this.gunItem = gunItem;
     this.fireModeInfiniteIterator = Iterables.cycle(this.gunItem.getFireModes()).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
+    this.clientHandler = this.createClientHandler();
+  }
+
+  protected IGunClient createClientHandler() {
+    return DistExecutor.unsafeCallWhenOn(Dist.CLIENT,
+        () -> () -> new DefaultGunClient<>(this));
+  }
+
+  public GunItem getGunItem() {
+    return this.gunItem;
   }
 
   @Override
@@ -210,15 +212,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
     if (this.isPerformingRightMouseAction() && living.getEntity().isSprinting()) {
       this.toggleRightMouseAction(living, true);
     }
-    SoundEvent rightMouseActionSound = this.gunItem.getRightMouseActionSound().get();
-    long rightMouseActionSoundDelta = Util.milliTime() - this.rightMouseActionSoundStartTimeMs + 50;
-    if (this.isPerformingRightMouseAction()
-        && this.gunItem.getRightMouseActionSoundRepeatDelayMs() > 0L
-        && rightMouseActionSoundDelta >= this.gunItem.getRightMouseActionSoundRepeatDelayMs()
-        && rightMouseActionSound != null) {
-      this.rightMouseActionSoundStartTimeMs = Util.milliTime();
-      living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
-    }
+
+    this.clientHandler.handleTick(living, itemStack);
   }
 
   @Override
@@ -334,32 +329,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
-      ClientDist clientDist = CraftingDead.getInstance().getClientDist();
-      Minecraft minecraft = clientDist.getMinecraft();
-
-      partialTicks = minecraft.getRenderPartialTicks();
-      if (entity instanceof ClientPlayerEntity) {
-        clientDist.getCameraManager().joltCamera(1.15F - this.getAccuracy(living, itemStack), true);
-      }
-
-      this.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
-        this.getAnimationController().ifPresent(GunAnimationController::removeCurrentAnimation);
-        this.getAnimationController().ifPresent(c -> c.addAnimation(animation, null));
-      });
-
-      SoundEvent shootSound = this.gunItem.getShootSound().get();
-      if (this.getAttachments().stream().anyMatch(AttachmentItem::isSoundSuppressor)) {
-        // Tries to get the silenced shoot sound, if it does not exist the default shoot sound is
-        // used instead.
-        shootSound = this.gunItem.getSilencedShootSound().orElse(shootSound);
-      }
-
-      if (!entity.isSilent()) {
-        entity.getEntityWorld().playSound(
-            clientDist.getPlayer().map(IPlayer::getEntity).orElse(null),
-            entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
-            entity.getSoundCategory(), 0.25F, 1.0F);
-      }
+      partialTicks = this.clientHandler.getPartialTicks();
+      this.clientHandler.handleShoot(living, itemStack);
     }
 
     // Used to avoid playing the same hit sound more than once.
@@ -451,8 +422,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   }
 
   private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
-      Vector3d hitPos,
-      boolean playSound) {
+      Vector3d hitPos, boolean playSound) {
     final Entity entity = living.getEntity();
     final World world = hitEntity.getEntityWorld();
     float damage = this.gunItem.getDamage();
@@ -480,34 +450,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
         || hitEntity instanceof WanderingTraderEntity) && hitPos.y >= chinHeight;
     if (headshot) {
       damage *= HEADSHOT_MULTIPLIER;
-
-      // Simulated client-side effects
-      if (world.isRemote()) {
-        final int particleCount = 12;
-        for (int i = 0; i < particleCount; ++i) {
-          world.addParticle(
-              new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
-              hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0.0D, 0.0D, 0.0D);
-        }
-      }
     }
 
     // Simulated client-side effects
     if (world.isRemote()) {
-      world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
-          hitEntity.getPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
-          1.0F, 1.0F);
-
-      if (hitEntity instanceof ClientPlayerEntity) {
-        CraftingDead.getInstance().getClientDist().getCameraManager().joltCamera(1.5F, false);
-      }
-
-      final int particleCount = 12;
-      for (int i = 0; i < particleCount; ++i) {
-        world.addParticle(
-            new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-            hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0.0D, 0.0D, 0.0D);
-      }
+      this.clientHandler.handleHitEntity(living, itemStack, entity, hitPos, playSound, headshot);
     } else {
       // Resets the temporary invincibility before causing the damage, preventing
       // previous damages from blocking the gun damage.
@@ -558,7 +505,6 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   private void hitBlock(ILiving<?, ?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
       boolean playSound) {
     final Entity entity = living.getEntity();
-    Vector3d hitVec3d = rayTrace.getHitVec();
     BlockPos blockPos = rayTrace.getPos();
     BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
     Block block = blockState.getBlock();
@@ -566,28 +512,7 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
 
     // Client-side effects
     if (world.isRemote()) {
-      // Gets the hit sound to be played
-      SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
-      Material blockMaterial = blockState.getMaterial();
-      if (blockMaterial == Material.WOOD) {
-        hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
-      } else if (blockMaterial == Material.ROCK) {
-        hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
-      } else if (blockMaterial == Material.IRON) {
-        hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
-            : ModSoundEvents.BULLET_IMPACT_METAL2.get();
-      } else if (blockMaterial == Material.GLASS) {
-        hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
-      }
-
-      world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
-          hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-
-      final int particleCount = 12;
-      for (int i = 0; i < particleCount; ++i) {
-        world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.getX(),
-            hitVec3d.getY(), hitVec3d.getZ(), 0.0D, 0.0D, 0.0D);
-      }
+      this.clientHandler.handleHitBlock(living, itemStack, rayTrace, playSound);
     } else {
       if (block instanceof TNTBlock) {
         block.catchFire(blockState, entity.getEntityWorld(), blockPos, null,
@@ -688,15 +613,8 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
       return;
     }
     this.performingRightMouseAction = !this.performingRightMouseAction;
-    SoundEvent rightMouseActionSound = this.gunItem.getRightMouseActionSound().get();
-    if (rightMouseActionSound != null) {
-      if (this.performingRightMouseAction) {
-        this.rightMouseActionSoundStartTimeMs = Util.milliTime();
-        living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
-      } else if (living.getEntity().getEntityWorld().isRemote()) {
-        Minecraft.getInstance().getSoundHandler()
-            .stop(rightMouseActionSound.getRegistryName(), SoundCategory.PLAYERS);
-      }
+    if (living.getEntity().getEntityWorld().isRemote()) {
+      this.clientHandler.handleToggleRightMouseAction(living);
     }
     if (sendUpdate) {
       PacketTarget target =
@@ -775,6 +693,11 @@ public class DefaultGun extends DefaultAnimationProvider<GunAnimationController>
   @Override
   public int getShotCount() {
     return this.shotCount;
+  }
+
+  @Override
+  public IGunClient getClient() {
+    return this.clientHandler;
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
