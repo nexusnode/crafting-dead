@@ -213,7 +213,9 @@ public class DefaultGun implements IGun {
       this.toggleRightMouseAction(living, true);
     }
 
-    this.clientHandler.handleTick(living, itemStack);
+    if (living.getEntity().getEntityWorld().isRemote()) {
+      this.clientHandler.handleTick(living, itemStack);
+    }
   }
 
   @Override
