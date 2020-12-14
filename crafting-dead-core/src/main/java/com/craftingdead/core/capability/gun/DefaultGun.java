@@ -456,7 +456,7 @@ public class DefaultGun implements IGun {
 
     // Simulated client-side effects
     if (world.isRemote()) {
-      this.clientHandler.handleHitEntity(living, itemStack, entity, hitPos, playSound, headshot);
+      this.clientHandler.handleHitEntity(living, itemStack, hitEntity, hitPos, playSound, headshot);
     } else {
       // Resets the temporary invincibility before causing the damage, preventing
       // previous damages from blocking the gun damage.
