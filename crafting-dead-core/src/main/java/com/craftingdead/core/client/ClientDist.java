@@ -614,6 +614,9 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     final IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+    if (player == null) {
+      return;
+    }
     ItemStack heldStack = player.getEntity().getHeldItemMainhand();
     IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
     switch (event.getType()) {
