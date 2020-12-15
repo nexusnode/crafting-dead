@@ -210,8 +210,8 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<PaintItem> ULTRA_BEAST_PAINT = ITEMS
-      .register("ultra_beast_paint",
+  public static final RegistryObject<PaintItem> HYPER_BEAST_PAINT = ITEMS
+      .register("hyper_beast_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -645,7 +645,7 @@ public class ModItems {
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(EMPEROR_DRAGON_PAINT)
-              .addAcceptedPaint(ULTRA_BEAST_PAINT)
+              .addAcceptedPaint(HYPER_BEAST_PAINT)
               .setRendererFactory(() -> M4A1Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
