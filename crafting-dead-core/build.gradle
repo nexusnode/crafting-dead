@@ -6,23 +6,23 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
-	google()
+    google()
 }
 
 dependencies {
     shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
-	implementation fg.deobf("curse.maven:travelers_backpack-${travelers_backpack_project_id}:${travelers_backpack_file_id}")
+    implementation fg.deobf("curse.maven:travelers_backpack-${travelers_backpack_project_id}:${travelers_backpack_file_id}")
 }
 
 jar {
-	manifest {
+    manifest {
         attributes([
         	"Implementation-Title": project.name,
         	"Implementation-Version": project.version,
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
             "MixinConfigs": 'craftingdead.mixins.json'
         ])
-	}
+    }
 }
 
 minecraft {    
