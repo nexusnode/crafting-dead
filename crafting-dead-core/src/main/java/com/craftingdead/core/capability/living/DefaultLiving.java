@@ -298,13 +298,12 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
 
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    return this.extensions.values().stream().map(e -> e.onAttacked(source, amount))
-        .anyMatch(v -> v == true);
+    return this.extensions.values().stream().anyMatch(e -> e.onAttacked(source, amount));
   }
 
   @Override
   public boolean onKill(Entity target) {
-    return this.extensions.values().stream().map(e -> e.onKill(target)).anyMatch(v -> v == true);
+    return this.extensions.values().stream().anyMatch(e -> e.onKill(target));
   }
 
   @Override
