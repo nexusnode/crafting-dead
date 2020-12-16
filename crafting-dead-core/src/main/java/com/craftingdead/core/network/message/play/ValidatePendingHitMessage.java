@@ -17,10 +17,6 @@
  */
 package com.craftingdead.core.network.message.play;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.PendingHit;
 import com.craftingdead.core.capability.living.EntitySnapshot;
@@ -32,6 +28,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ValidatePendingHitMessage {
 
@@ -82,7 +83,7 @@ public class ValidatePendingHitMessage {
             .flatMap(e -> e.getCapability(ModCapabilities.LIVING).resolve())
             .ifPresent(hitLiving -> {
               for (PendingHit value : hit.getValue()) {
-                gun.validatePendingHit(player, heldStack, (ILiving<?, ?>) hitLiving, value);
+                gun.validatePendingHit(player, heldStack, hitLiving, value);
               }
             });
       }
