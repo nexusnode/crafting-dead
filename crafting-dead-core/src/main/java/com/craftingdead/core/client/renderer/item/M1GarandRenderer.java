@@ -89,7 +89,7 @@ public class M1GarandRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0F, -0.685F, 0.971F);
+    matrixStack.translate(-0F, -0.685F, 0.97125F);
 
     if (!gun.hasIronSight()) {
 
@@ -133,7 +133,7 @@ public class M1GarandRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.186F, -0.11F, 0.0315F);
+      matrixStack.translate(1.186F, -0.11F, 0.0335F);
       float scale = 0.49F;
       matrixStack.scale(scale, scale, scale);
 

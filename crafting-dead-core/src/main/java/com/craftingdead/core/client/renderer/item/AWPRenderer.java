@@ -144,7 +144,7 @@ public class AWPRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.7F, -0.09F, 0.056F);
+      matrixStack.translate(1.7F, -0.09F, 0.059F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale + 0.5F, scale);
 

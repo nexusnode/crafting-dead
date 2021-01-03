@@ -84,7 +84,6 @@ public class RPKRenderer extends GunRenderer {
   protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
 
-
     matrixStack.translate(0F, 0F, -0.002F);
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
@@ -100,8 +99,13 @@ public class RPKRenderer extends GunRenderer {
 
     matrixStack.rotate(Vector3f.YP.rotationDegrees(0.25F));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(1.25F));
-    matrixStack.translate(-0.3F, -0.2F, 0.005F);
-    matrixStack.translate(0F, 0F, 0F);
+    matrixStack.translate(-0.3F, -0.2F, 0.002F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.016F, 0.00375F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0073F, 0.0029F);
+    }
   }
 
   @Override

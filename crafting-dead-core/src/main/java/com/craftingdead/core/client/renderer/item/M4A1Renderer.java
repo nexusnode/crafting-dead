@@ -95,6 +95,15 @@ public class M4A1Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.033F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0135F, 0.00F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, 0.004F, 0.0007F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.012F, 0.00F);
+    }
+    
   }
 
   @Override

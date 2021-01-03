@@ -86,16 +86,20 @@ public class AS50Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5F));
 
-    matrixStack.translate(-0.1F, -0.67F, 0.9725F);
-
-    if (!gun.hasIronSight()) {
-      matrixStack.translate(0.0F, 0.017F, 0.0F);
-    }
+    matrixStack.translate(-0.1F, -0.672F, 0.9725F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(0.2F));
+    matrixStack.translate(0F, 0F, -0.00075F);
+
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0367F, 0.0005F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.035F, 0.0005F);
+    }
   }
 
   @Override
@@ -129,7 +133,7 @@ public class AS50Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.05F, -0.08F, 0.057F);
+      matrixStack.translate(1.05F, -0.074F, 0.058F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale + 0.5F, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(

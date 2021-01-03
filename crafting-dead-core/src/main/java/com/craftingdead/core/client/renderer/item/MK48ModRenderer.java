@@ -86,14 +86,20 @@ public class MK48ModRenderer extends GunRenderer {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.3F));
 
-    matrixStack.translate(0.1F, -0.61F, 1F);
+    matrixStack.translate(0.1F, -0.61F, 0.9985F);
 
     float scale = 0.2F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0275F, 0.00F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, -0.0075F, -0.003F);
+    }
   }
 
   @Override

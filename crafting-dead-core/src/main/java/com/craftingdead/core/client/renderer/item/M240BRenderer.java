@@ -88,17 +88,18 @@ public class M240BRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(-0.1F, -0.665F, 0.952F);
-
-    if (!gun.hasIronSight()) {
-
-      matrixStack.translate(0.0F, 0.007F, 0.0F);
-    }
+    matrixStack.translate(-0.1F, -0.666F, 0.952F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.025F, 0.0004F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, 0.016F, -0.0015F);
+    }
   }
 
   @Override
@@ -133,7 +134,7 @@ public class M240BRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.75F, -0.1F, 0.087F);
+      matrixStack.translate(1.75F, -0.105F, 0.087F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale + 0.5F, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(

@@ -73,7 +73,7 @@ public class TaserRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0.63F, -0.65F, 0.958F);
+    matrixStack.translate(0.63F, -0.655F, 0.955F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);

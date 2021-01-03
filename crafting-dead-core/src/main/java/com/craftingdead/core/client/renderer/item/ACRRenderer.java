@@ -95,6 +95,12 @@ public class ACRRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.05F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.003F, 0F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0007F, 0.0005F);
+    }
   }
 
   @Override
@@ -141,7 +147,7 @@ public class ACRRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.09F, -0.41F, 0.0625F);
+      matrixStack.translate(1.09F, -0.406F, 0.0625F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(

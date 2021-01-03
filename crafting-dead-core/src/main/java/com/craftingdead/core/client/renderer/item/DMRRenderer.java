@@ -100,7 +100,7 @@ public class DMRRenderer extends GunRenderer {
     matrixStack.translate(0F, 0F, 0F);
 
     if (!gun.hasIronSight()) {
-      matrixStack.translate(0.0F, 0.017F, 0.0F);
+      matrixStack.translate(0.0F, 0.016F, -0.0002F);
     } else {
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(-1.25F));
     }
@@ -151,7 +151,7 @@ public class DMRRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(1.11F, -0.09F, 0.032F);
+      matrixStack.translate(1.11F, -0.082F, 0.032F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
 

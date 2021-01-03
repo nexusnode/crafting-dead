@@ -87,7 +87,7 @@ public class HK417Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(1.6F, -0.3F, 0.99F);
+    matrixStack.translate(1.6F, -0.3025F, 0.9855F);
 
     float scale = 1.1F;
     matrixStack.scale(scale, scale, scale);
@@ -97,6 +97,14 @@ public class HK417Renderer extends GunRenderer {
 
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.033F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0115F, -0.002F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.00835F, -0.00075F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, 0.002F, -0.0015F);
+    }
   }
 
   @Override
@@ -132,7 +140,7 @@ public class HK417Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.65F, -0.105F, 0.0F);
+      matrixStack.translate(0.65F, -0.1075F, -0.002F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
 

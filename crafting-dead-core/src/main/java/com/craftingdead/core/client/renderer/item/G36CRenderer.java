@@ -86,7 +86,7 @@ public class G36CRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(1.2F, -0.34F, 0.95F);
+    matrixStack.translate(1.2F, -0.335F, 0.949F);
 
     float scale = 1.1F;
     matrixStack.scale(scale, scale, scale);
@@ -96,6 +96,14 @@ public class G36CRenderer extends GunRenderer {
 
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.033F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.007F, -0.001F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0058F, -0.001F);
+    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+      matrixStack.translate(0F, -0.0045F, 0.001F);
+    }
   }
 
   @Override
@@ -144,7 +152,7 @@ public class G36CRenderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.63F, -0.15F, 0.041F);
+      matrixStack.translate(0.63F, -0.151F, 0.0375F);
       float scale = 0.2F;
       matrixStack.scale(scale, scale, scale);
 
