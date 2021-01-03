@@ -1,6 +1,0 @@
-{
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/mk48_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
-}
