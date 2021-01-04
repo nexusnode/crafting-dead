@@ -57,7 +57,7 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(ToggleRightMouseAbility.class, 0x02, NetworkDirection.PLAY_TO_SERVER)
+          .messageBuilder(ToggleRightMouseAbility.class, 0x02)
           .encoder(ToggleRightMouseAbility::encode)
           .decoder(ToggleRightMouseAbility::decode)
           .consumer(ToggleRightMouseAbility::handle)
