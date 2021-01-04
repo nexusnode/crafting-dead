@@ -95,17 +95,17 @@ public class AK47Renderer extends GunRenderer {
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-1));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(0.25F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(0.575F));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(1.25F));
 
-    matrixStack.translate(-0.3F, -0.2F, 0.005F);
+    matrixStack.translate(-0.3F, -0.2F, -0.02F);
 
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
-      matrixStack.translate(0F, 0.075F, 0.00625F);
+      matrixStack.translate(0F, 0.057F, 0.0125F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
-      matrixStack.translate(0F, 0.075F, 0.00625F);
+      matrixStack.translate(0F, 0.059F, 0.016F);
     } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
-      matrixStack.translate(0F, 0.0625F, 0.00625F);
+      matrixStack.translate(0F, 0.0440F, 0.014F);
     }
   }
 
@@ -138,7 +138,7 @@ public class AK47Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.7F, -0.6F, 0.01F);
+      matrixStack.translate(0.7F, -0.59F, 0.02F);
 
       float scale = 0.85F;
       matrixStack.scale(scale, scale, scale);

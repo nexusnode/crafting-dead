@@ -87,15 +87,16 @@ public class P90Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(-0.1F, -0.575F, 0.9525F);
-
-    if (!gun.hasIronSight()) {
-
-      matrixStack.translate(0.0F, 0.03F, 0.0F);
-    }
+    matrixStack.translate(-0.1F, -0.576F, 0.9525F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0585F, 0.00F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0555F, 0.00F);
+    }	
   }
 
   @Override
@@ -129,7 +130,7 @@ public class P90Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.85F, -0.28F, 0.064F);
+      matrixStack.translate(0.85F, -0.283F, 0.064F);
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
 

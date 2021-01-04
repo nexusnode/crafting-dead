@@ -98,10 +98,15 @@ public class VectorRenderer extends GunRenderer {
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.8F));
+    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.4F, 0F, 0.0F);
-    matrixStack.translate(0F, 0.355F, 0F);
-    matrixStack.translate(0F, 0F, 0.001F);
+    matrixStack.translate(0F, 0.352F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, -0.006F, -0.0006F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, -0.0012F, -0.0015F);
+    }
   }
 
   @Override
@@ -177,14 +182,13 @@ public class VectorRenderer extends GunRenderer {
     }
 
     if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
-      matrixStack.translate(1D, -0.68D, 0.19D);
+      matrixStack.translate(1.2D, -1.04D, 0.19D);
       float scale = 0.7F;
       matrixStack.scale(scale, scale, scale);
     }
 
     if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
-
-      matrixStack.translate(2D, -0.65D, 0.48D);
+      matrixStack.translate(2D, -1.08D, 0.48D);
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
     }

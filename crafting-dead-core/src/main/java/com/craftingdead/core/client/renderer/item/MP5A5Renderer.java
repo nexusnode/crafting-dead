@@ -96,7 +96,13 @@ public class MP5A5Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
-    matrixStack.translate(0F, 0.033F, 0F);
+    matrixStack.translate(0F, 0.028F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.08F, 0.00F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0795F, -0.0025F);
+    }
   }
 
 
@@ -131,7 +137,7 @@ public class MP5A5Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(0.5F, -0.4F, 0.025F);
+      matrixStack.translate(0.5F, -0.405F, 0.025F);
       float scale = 1F;
       matrixStack.scale(scale, scale + 0.5F, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
