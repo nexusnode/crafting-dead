@@ -441,7 +441,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   @Override
   public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    if (nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
+    if (nbt != null && nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
       stack.getCapability(ModCapabilities.GUN)
           .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("gun")));
     }
