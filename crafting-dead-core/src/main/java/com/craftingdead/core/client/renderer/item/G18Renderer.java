@@ -89,7 +89,7 @@ public class G18Renderer extends GunRenderer {
     matrixStack.translate(0.2F, -0.695F, 0.9525F);
 
     if (!gun.hasIronSight()) {
-      matrixStack.translate(0.0F, 0.02F, 0.0F);
+      matrixStack.translate(0.0F, 0.034F, 0.0F);
     }
 
     float scale = 0.6F;

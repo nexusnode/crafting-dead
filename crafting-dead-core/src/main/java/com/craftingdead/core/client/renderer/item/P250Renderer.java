@@ -94,6 +94,10 @@ public class P250Renderer extends GunRenderer {
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.01F, 0.00F);
+  }
   }
 
   @Override

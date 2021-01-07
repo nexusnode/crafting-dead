@@ -97,6 +97,13 @@ public class MAC10Renderer extends GunRenderer {
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, -0.025F, 0.00F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+    	matrixStack.rotate(Vector3f.ZP.rotationDegrees(5));
+      matrixStack.translate(0F, -0.036F, 0.00F);
+    }
   }
 
   @Override
@@ -176,8 +183,7 @@ public class MAC10Renderer extends GunRenderer {
     }
 
     if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
-
-      matrixStack.translate(2D, -0.58D, 0.795D);
+      matrixStack.translate(2D, -0.78D, 0.795D);
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
     }

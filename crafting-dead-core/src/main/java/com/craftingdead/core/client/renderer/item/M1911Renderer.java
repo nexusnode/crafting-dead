@@ -86,7 +86,7 @@ public class M1911Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25.0F));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    matrixStack.translate(0.1F, -0.701F, 0.972F);
+    matrixStack.translate(0.1F, -0.701F, 0.9725F);
 
     if (!gun.hasIronSight()) {
       matrixStack.translate(0.0F, 0.03F, 0.0F);
@@ -94,6 +94,10 @@ public class M1911Renderer extends GunRenderer {
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
+    
+    if (!gun.hasIronSight()) {
+      matrixStack.translate(0F, 0.0165F, -0.0005F);
+    }
   }
 
   @Override

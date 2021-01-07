@@ -84,17 +84,23 @@ public class MPT55Renderer extends GunRenderer {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35.5F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(4.5F));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
 
-    matrixStack.translate(3.67F, 0.315F, 0.945F);
+    matrixStack.translate(3.67F, 0.315F, 0.952F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
+    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.8F));
     matrixStack.translate(-0.6F, 0F, 0F);
-    matrixStack.translate(0F, 0.033F, 0F);
+    matrixStack.translate(0F, 0.034F, 0F);
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.05F, -0.007F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.026F, -0.002F);
+    }
   }
 
   @Override
@@ -140,7 +146,7 @@ public class MPT55Renderer extends GunRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      matrixStack.translate(-0.6F, -0.46F, -0.056F);
+      matrixStack.translate(-0.6F, -0.445F, -0.032F);
       float scale = 1F;
       matrixStack.scale(scale, scale, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
@@ -173,7 +179,7 @@ public class MPT55Renderer extends GunRenderer {
 
     if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
 
-      matrixStack.translate(-38D, -5D, 0.7D);
+      matrixStack.translate(-38D, -5D, 0.52D);
       float scale = 1.7F;
       matrixStack.scale(scale, scale, scale);
     }

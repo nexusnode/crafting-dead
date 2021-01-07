@@ -98,6 +98,12 @@ public class Sporter22Renderer extends GunRenderer {
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    
+    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+      matrixStack.translate(0F, 0.012F, 0.0005F);
+    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+      matrixStack.translate(0F, 0.0095F, 0.0004F);
+    }
   }
 
   @Override
