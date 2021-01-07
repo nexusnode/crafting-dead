@@ -57,6 +57,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 
@@ -422,6 +423,29 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   @Override
   public int func_230305_d_() {
     return 0;
+  }
+
+  @Override
+  public CompoundNBT getShareTag(ItemStack stack) {
+    CompoundNBT shareTag = stack.getTag();
+    if (shareTag == null) {
+      shareTag = new CompoundNBT();
+    }
+    CompoundNBT gunTag =
+        stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null);
+    if (gunTag != null) {
+      shareTag.put("gun", gunTag);
+    }
+    return shareTag;
+  }
+
+  @Override
+  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    if (nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
+      stack.getCapability(ModCapabilities.GUN)
+          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("gun")));
+    }
+    super.readShareTag(stack, nbt);
   }
 
   public static class Properties extends Item.Properties {

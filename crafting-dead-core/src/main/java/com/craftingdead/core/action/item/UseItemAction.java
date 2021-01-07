@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionType;
 import com.craftingdead.core.action.TimedAction;
 import com.craftingdead.core.capability.living.ILiving;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -107,7 +107,7 @@ public class UseItemAction extends TimedAction {
     boolean finished = super.tick();
     final ItemStack heldStack = this.performer.getEntity().getHeldItemMainhand();
     final boolean usingItem = !(this.performer.getEntity() instanceof ClientPlayerEntity)
-        || Minecraft.getInstance().gameSettings.keyBindUseItem.isKeyDown();
+        || CraftingDead.getInstance().getClientDist().isRightMouseDown();
     if (!this.selectedEntry.canPerform(this.performer, this.target, heldStack) || !usingItem) {
       this.performer.cancelAction(true);
     }

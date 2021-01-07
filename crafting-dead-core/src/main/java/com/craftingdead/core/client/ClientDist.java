@@ -269,6 +269,10 @@ public class ClientDist implements IModDist {
         IPlayer.class);
   }
 
+  public boolean isRightMouseDown() {
+    return this.minecraft.gameSettings.keyBindUseItem.isKeyDown();
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================
