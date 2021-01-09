@@ -35,6 +35,7 @@ import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.MultiplayerScreen;
 import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
@@ -124,6 +125,8 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addClickSound(SoundEvents.UI_BUTTON_CLICK)
+        .addActionListener(c -> this.minecraft
+            .displayGuiScreen(new MultiplayerScreen(this)))
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.play"))));
 
     sideBar.addChild(new RectangleComponent()

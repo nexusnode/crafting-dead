@@ -100,6 +100,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     logger.info("Loading game: {}", gameType.getRegistryName().toString());
     try {
       this.gameClient = gameType.createGameClient();
+      this.gameClient.load();
     } catch (Exception e) {
       this.minecraft.displayGuiScreen(new DisconnectedScreen(new MainMenuScreen(),
           new TranslationTextComponent("connect.failed"),

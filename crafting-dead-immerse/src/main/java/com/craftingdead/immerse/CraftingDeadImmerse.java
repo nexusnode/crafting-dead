@@ -22,9 +22,12 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
+
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
@@ -106,6 +109,9 @@ public class CraftingDeadImmerse {
     GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
     GameTypes.GAME_TYPES.register(modEventBus);
 
+    modEventBus.addListener(this::handleCommonSetup);
+    MinecraftForge.EVENT_BUS.register(this);
+
     // SchematicFormats.SCHEMATIC_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
     // SchematicFormats.SCHEMATIC_FORMATS.register(modEventBus);
     //
@@ -132,6 +138,10 @@ public class CraftingDeadImmerse {
   // ================================================================================
   // Forge Events
   // ================================================================================
+
+  public void handleCommonSetup(FMLCommonSetupEvent event) {
+    NetworkChannel.loadChannels();
+  }
 
   @SubscribeEvent
   public void handleServerAboutToStart(FMLServerAboutToStartEvent event) {
