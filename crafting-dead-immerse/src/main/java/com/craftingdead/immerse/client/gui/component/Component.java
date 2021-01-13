@@ -121,12 +121,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   protected void added() {}
 
-  protected void removed() {
-    if (this.backgroundBlur != null) {
-      this.backgroundBlur.close();
-    }
-    Yoga.YGNodeFree(this.node);
-  }
+  protected void removed() {}
 
   protected void layout() {
     Yoga.YGNodeMarkDirty(this.node);
@@ -150,8 +145,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.tweenManager.update(deltaTime);
 
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.render(this.getScaledX(), this.getScaledY(), this.getScaledWidth(),
-          this.getScaledHeight(), partialTicks);
+      this.backgroundBlur.render(this.getScaledContentX(), this.getScaledContentY(),
+          this.getScaledWidth(), this.getScaledHeight(), partialTicks);
     }
 
     if (this.backgroundColour != null) {
@@ -640,6 +635,11 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF setAspectRatio(float aspectRatio) {
     Yoga.YGNodeStyleSetAspectRatio(this.node, aspectRatio);
+    return this.self();
+  }
+
+  public final SELF setAlignSelf(Align align) {
+    Yoga.YGNodeStyleSetAlignSelf(this.node, align.getYogaType());
     return this.self();
   }
 

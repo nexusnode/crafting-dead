@@ -18,7 +18,10 @@
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.io.File;
-import com.craftingdead.core.item.ModItems;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.Align;
 import com.craftingdead.immerse.client.gui.component.Colour;
@@ -29,17 +32,20 @@ import com.craftingdead.immerse.client.gui.component.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.Justify;
 import com.craftingdead.immerse.client.gui.component.Overflow;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class HomeComponent extends ContainerComponent {
+
+  private static final Random random = new Random();
 
   public HomeComponent() {
     this.setFlexDirection(FlexDirection.ROW);
     this.setAlignItems(Align.CENTER);
     this.setJustifyContent(Justify.SPACE_AROUND);
-
 
     this.addChild(new ContainerComponent()
         .setWidthPercent(50.0F)
@@ -53,19 +59,26 @@ public class HomeComponent extends ContainerComponent {
 
     final FakePlayerEntity fakePlayerEntity =
         new FakePlayerEntity(this.minecraft.getSession().getProfile());
-    fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(ModItems.AK47.get()));
 
+
+    List<Item> gunItems = ForgeRegistries.ITEMS.getValues()
+        .stream()
+        .filter(item -> item instanceof GunItem)
+        .collect(Collectors.toList());
+    Item randomGunItem = gunItems.get(random.nextInt(gunItems.size()));
+    fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(randomGunItem));
 
     this.addChild(new ContainerComponent()
         .setAlignItems(Align.CENTER)
         .setWidthPercent(30.0F)
         .setHeightPercent(45.0F)
         .addChild(new TextBlockComponent(this.minecraft.fontRenderer,
-            Text.of("Sm0keySa1m0n").mergeStyle(TextFormatting.BOLD),
-            true).setWidth(80.0F))
+            Text.of(this.minecraft.getSession().getUsername()).mergeStyle(TextFormatting.BOLD,
+                TextFormatting.DARK_RED),
+            true))
         .addChild(new EntityComponent(fakePlayerEntity)
             .setWidthPercent(100.0F)
-            .setAspectRatio(0.9F)));
+            .setAspectRatio(0.95F)));
 
   }
 }

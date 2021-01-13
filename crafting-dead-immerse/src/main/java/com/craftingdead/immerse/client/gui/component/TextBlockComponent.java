@@ -44,6 +44,8 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
     this.fontRenderer = fontRenderer;
     this.text = text;
     this.shadow = shadow;
+    // Auto adjust width to size of text
+    this.setWidth(this.fontRenderer.getStringPropertyWidth(text));
   }
 
   @Override
@@ -80,7 +82,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
     matrixStack.push();
     {
-      matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
+      matrixStack.translate(this.getContentX(), this.getContentY(), 0.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
           IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());

@@ -18,6 +18,7 @@
 package com.craftingdead.immerse.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.screen.menu.MenuScreen;
@@ -52,13 +53,14 @@ public class StartScreen extends ModScreen {
 
     float fadePct = MathHelper.clamp((Util.milliTime() - this.fadeStartTime) / 1000.0F, 0.0F, 1.0F);
 
-    Vector2f logoSize = FitType.CONTAIN.getSize(1920, 1080, this.width, this.height);
-    double logoWidth = logoSize.x;
-    double logoHeight = logoSize.y;
+    Vector2f logoSize = FitType.CONTAIN.getSize(2000, 440, this.width, this.height);
+    double logoWidth = logoSize.x / 1.5F;
+    double logoHeight = logoSize.y / 1.5F;
 
     RenderSystem.enableBlend();
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, fadePct);
-    RenderUtil.bind(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/craftingdead.png"));
+    RenderUtil.bind(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/banner_4x.png"));
+    RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
     RenderUtil.blit(this.width / 2 - logoWidth / 2, this.height / 2 - logoHeight / 2, logoWidth,
         logoHeight);
     RenderSystem.disableBlend();

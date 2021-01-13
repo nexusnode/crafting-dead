@@ -203,7 +203,8 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   public SELF clearChildren() {
-    this.children.forEach(this::removeChild);
+    this.children.forEach(this::childRemoved);
+    this.children.clear();
     return this.self();
   }
 

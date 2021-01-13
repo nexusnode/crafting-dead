@@ -18,6 +18,7 @@
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.component.Align;
 import com.craftingdead.immerse.client.gui.component.Colour;
@@ -26,6 +27,7 @@ import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
 import com.craftingdead.immerse.client.gui.component.FitType;
 import com.craftingdead.immerse.client.gui.component.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.FogComponent;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
 import com.craftingdead.immerse.client.gui.component.PositionType;
 import com.craftingdead.immerse.client.gui.component.RectangleComponent;
@@ -35,7 +37,6 @@ import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.MultiplayerScreen;
 import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
@@ -45,9 +46,12 @@ public class MenuScreen extends ComponentScreen {
 
   private final ContainerComponent contentContainer = new ContainerComponent().setFlex(1);
 
+  private Page currentPage;
+
   public MenuScreen(Page page) {
     super(new TranslationTextComponent("narrator.screen.title"));
 
+    // Fix null font field in constructor
     final Minecraft mc = Minecraft.getInstance();
     this.font = mc.fontRenderer;
 
@@ -82,6 +86,11 @@ public class MenuScreen extends ComponentScreen {
         .repeatYoyo(-1, 0)
         .start(backgroundComponent.getTweenManager());
 
+    this.getRoot().addChild(new FogComponent()
+        .setPositionType(PositionType.ABSOLUTE)
+        .setHeightPercent(100)
+        .setWidthPercent(100));
+
     ContainerComponent sideBar = new ContainerComponent()
         .setBackgroundColour(new Colour(0x70777777))
         .setBackgroundBlur(50.0F)
@@ -107,6 +116,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addClickSound(SoundEvents.UI_BUTTON_CLICK)
+        .addActionListener(c -> this.displayPage(Page.HOME))
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.home"))));
 
     sideBar.addChild(new RectangleComponent()
@@ -125,8 +135,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addClickSound(SoundEvents.UI_BUTTON_CLICK)
-        .addActionListener(c -> this.minecraft
-            .displayGuiScreen(new MultiplayerScreen(this)))
+        .addActionListener(c -> this.displayPage(Page.PLAY))
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.play"))));
 
     sideBar.addChild(new RectangleComponent()
@@ -163,22 +172,28 @@ public class MenuScreen extends ComponentScreen {
         .addActionListener(c -> this.minecraft.shutdown())
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));
 
-    this.getRoot().addChild(sideBar);
 
     this.getRoot().addChild(this.contentContainer);
 
-    this.getRoot().setFlexDirection(FlexDirection.ROW);
+    this.getRoot().addChild(sideBar);
+
+    this.getRoot().setFlexDirection(FlexDirection.ROW_REVERSE);
 
     this.displayPage(page);
   }
 
-  public void displayPage(Page page) {
+  public void displayPage(@Nonnull Page page) {
+    if (this.currentPage == page) {
+      return;
+    }
+    this.currentPage = page;
     this.contentContainer.clearChildren();
     this.contentContainer.addChild(page.create().setFlex(1));
+    this.contentContainer.layout();
   }
 
   public static enum Page {
-    HOME(HomeComponent::new);
+    HOME(HomeComponent::new), PLAY(PlayComponent::new);
 
     private final Supplier<ContainerComponent> factory;
 
