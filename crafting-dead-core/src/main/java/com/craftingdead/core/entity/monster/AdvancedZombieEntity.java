@@ -99,7 +99,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   public static AttributeModifierMap.MutableAttribute registerAttributes() {
     return ZombieEntity.func_234342_eQ_()
         .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
-        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
+        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
+        .createMutableAttribute(Attributes.FOLLOW_RANGE, 16.0D);
   }
 
   @Override
