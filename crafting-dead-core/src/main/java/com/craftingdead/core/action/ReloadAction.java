@@ -23,10 +23,10 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
+import com.craftingdead.core.capability.gun.AimableGun;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.magazine.IMagazine;
-import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -59,9 +59,8 @@ public class ReloadAction extends TimedAction {
   public boolean start() {
     ItemStack magazineStack = this.findAmmo(this.performer, true);
     if (!this.getPerformer().getEntity().isSprinting() && !magazineStack.isEmpty()) {
-      if (this.gun instanceof IScope
-          && ((IScope) this.gun).isAiming(this.getPerformer().getEntity(),
-              this.performer.getEntity().getHeldItemMainhand())) {
+      if (this.gun instanceof AimableGun && ((AimableGun) this.gun)
+          .isAiming(this.performer.getEntity(), this.performer.getEntity().getHeldItemMainhand())) {
         this.gun.toggleRightMouseAction(this.getPerformer(), false);
       }
       this.oldMagazineStack = this.gun.getMagazineStack();

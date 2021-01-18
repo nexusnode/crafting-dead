@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:first_aid_kit"
+    ]
+  },
+  "criteria": {
+    "has_apple": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:apple"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:first_aid_kit"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_apple",
+      "has_the_recipe"
+    ]
+  ]
+}

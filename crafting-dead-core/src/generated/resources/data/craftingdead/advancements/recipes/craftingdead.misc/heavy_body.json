@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:heavy_body"
+    ]
+  },
+  "criteria": {
+    "has_medium_body": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:medium_body"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:heavy_body"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_medium_body",
+      "has_the_recipe"
+    ]
+  ]
+}

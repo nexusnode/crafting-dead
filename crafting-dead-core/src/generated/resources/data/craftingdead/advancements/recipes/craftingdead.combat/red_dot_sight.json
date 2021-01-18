@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:red_dot_sight"
+    ]
+  },
+  "criteria": {
+    "has_glass": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:glass"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:red_dot_sight"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_glass",
+      "has_the_recipe"
+    ]
+  ]
+}

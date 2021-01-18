@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:p250"
+    ]
+  },
+  "criteria": {
+    "has_brown_dye": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:brown_dye"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:p250"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_brown_dye",
+      "has_the_recipe"
+    ]
+  ]
+}

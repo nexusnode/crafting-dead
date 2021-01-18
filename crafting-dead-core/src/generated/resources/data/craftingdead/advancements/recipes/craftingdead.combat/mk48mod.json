@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:mk48mod"
+    ]
+  },
+  "criteria": {
+    "has_blue_dye": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:blue_dye"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:mk48mod"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_blue_dye",
+      "has_the_recipe"
+    ]
+  ]
+}

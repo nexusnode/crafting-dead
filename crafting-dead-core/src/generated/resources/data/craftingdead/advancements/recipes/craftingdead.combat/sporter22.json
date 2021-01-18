@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:sporter22"
+    ]
+  },
+  "criteria": {
+    "has_blue_dye": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:blue_dye"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:sporter22"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_blue_dye",
+      "has_the_recipe"
+    ]
+  ]
+}

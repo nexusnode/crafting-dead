@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:medium_handle"
+    ]
+  },
+  "criteria": {
+    "has_small_handle": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:small_handle"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:medium_handle"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_small_handle",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:heavy_bolt"
+    ]
+  },
+  "criteria": {
+    "has_medium_bolt": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:medium_bolt"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:heavy_bolt"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_medium_bolt",
+      "has_the_recipe"
+    ]
+  ]
+}

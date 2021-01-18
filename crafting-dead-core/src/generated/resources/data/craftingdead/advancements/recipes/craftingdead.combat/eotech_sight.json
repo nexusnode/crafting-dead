@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:eotech_sight"
+    ]
+  },
+  "criteria": {
+    "has_redstone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:redstone"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:eotech_sight"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_redstone",
+      "has_the_recipe"
+    ]
+  ]
+}

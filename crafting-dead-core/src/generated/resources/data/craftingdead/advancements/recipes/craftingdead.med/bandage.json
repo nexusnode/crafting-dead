@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:bandage"
+    ]
+  },
+  "criteria": {
+    "has_clean_rag": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:apple"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:bandage"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_clean_rag",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:heavy_barrel"
+    ]
+  },
+  "criteria": {
+    "has_medium_barrel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:medium_barrel"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:heavy_barrel"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_medium_barrel",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:hp_scope"
+    ]
+  },
+  "criteria": {
+    "has_redstone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:redstone"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:hp_scope"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_redstone",
+      "has_the_recipe"
+    ]
+  ]
+}

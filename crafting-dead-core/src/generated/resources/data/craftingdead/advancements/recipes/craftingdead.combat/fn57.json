@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:fn57"
+    ]
+  },
+  "criteria": {
+    "has_yellow_dye": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:yellow_dye"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:fn57"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_yellow_dye",
+      "has_the_recipe"
+    ]
+  ]
+}

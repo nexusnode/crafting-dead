@@ -25,6 +25,8 @@ jar {
     }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:medium_body"
+    ]
+  },
+  "criteria": {
+    "has_small_body": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:small_body"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:medium_body"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_small_body",
+      "has_the_recipe"
+    ]
+  ]
+}
