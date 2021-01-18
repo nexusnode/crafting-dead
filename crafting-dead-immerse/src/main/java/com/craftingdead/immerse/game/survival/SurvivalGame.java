@@ -25,6 +25,7 @@ import com.craftingdead.immerse.game.GameTypes;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -46,11 +47,14 @@ public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
 
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-    event.getCapabilities().get(ILiving.ID)
-        .getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof Player)
-        .map(living -> (Player<?>) living)
-        .ifPresent(
-            player -> player.registerExtension(SurvivalPlayer.ID, new SurvivalPlayer(player)));
+    ICapabilityProvider capabilityProvider = event.getCapabilities().get(ILiving.ID);
+    if (capabilityProvider != null) {
+      capabilityProvider
+          .getCapability(ModCapabilities.LIVING)
+          .filter(living -> living instanceof Player)
+          .map(living -> (Player<?>) living)
+          .ifPresent(
+              player -> player.registerExtension(SurvivalPlayer.ID, new SurvivalPlayer(player)));
+    }
   }
 }
