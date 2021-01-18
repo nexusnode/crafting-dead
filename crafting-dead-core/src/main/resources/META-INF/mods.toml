@@ -20,3 +20,10 @@ modId = "forge"
 ordering = "NONE"
 side = "BOTH"
 versionRange = "[35.1.7,)"
+
+[[dependencies.craftingdead]]
+mandatory = false
+modId = "travelersbackpack"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[5.3.8,)"

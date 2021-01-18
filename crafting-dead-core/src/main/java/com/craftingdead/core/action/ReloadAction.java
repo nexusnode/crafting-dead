@@ -37,7 +37,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class ReloadAction extends TimedAction {
 
@@ -149,7 +148,7 @@ public class ReloadAction extends TimedAction {
       PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
       TravelersBackpackInventory backpackInventory = CapabilityUtils.getBackpackInv(playerEntity);
       if (backpackInventory != null) {
-        builder.add(new InvWrapper(backpackInventory));
+        builder.add(backpackInventory.getInventory());
       }
     }
     // Inventory - third
