@@ -17,6 +17,9 @@
  */
 package com.craftingdead.core.item;
 
+import java.util.List;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.magazine.DefaultMagazine;
@@ -31,11 +34,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.function.Supplier;
 
 public class MagazineItem extends Item {
 
@@ -128,27 +126,6 @@ public class MagazineItem extends Item {
           .mergeStyle(TextFormatting.GRAY)
           .append(Text.of(String.format("%.0f%%", this.armorPenetration))
               .mergeStyle(TextFormatting.RED)));
-    }
-  }
-
-  @Override
-  public CompoundNBT getShareTag(ItemStack stack) {
-    CompoundNBT nbt = super.getShareTag(stack);
-    if (nbt == null) {
-      nbt = new CompoundNBT();
-    }
-    nbt.put("magazine",
-        stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::serializeNBT).orElse(null));
-    return nbt;
-  }
-
-  @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    super.readShareTag(stack, nbt);
-    if (nbt != null && nbt.contains("magazine", Constants.NBT.TAG_COMPOUND)) {
-      stack
-          .getCapability(ModCapabilities.MAGAZINE)
-          .ifPresent(magazine -> magazine.deserializeNBT(nbt.getCompound("magazine")));
     }
   }
 

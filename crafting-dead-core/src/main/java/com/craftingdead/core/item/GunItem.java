@@ -431,8 +431,9 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     if (shareTag == null) {
       shareTag = new CompoundNBT();
     }
-    CompoundNBT gunTag =
-        stack.getCapability(ModCapabilities.GUN).map(IGun::serializeNBT).orElse(null);
+    CompoundNBT gunTag = stack.getCapability(ModCapabilities.GUN)
+        .map(IGun::getShareTag)
+        .orElse(null);
     if (gunTag != null) {
       shareTag.put("gun", gunTag);
     }
@@ -443,7 +444,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
     if (nbt != null && nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
       stack.getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("gun")));
+          .ifPresent(gun -> gun.readShareTag(nbt.getCompound("gun")));
     }
     super.readShareTag(stack, nbt);
   }

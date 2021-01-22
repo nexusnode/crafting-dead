@@ -118,6 +118,10 @@ public interface IGun extends INBTSerializable<CompoundNBT> {
 
   IGunClient getClient();
 
+  CompoundNBT getShareTag();
+
+  void readShareTag(CompoundNBT nbt);
+
   public static enum RightMouseActionTriggerType {
     HOLD, CLICK;
   }

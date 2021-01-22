@@ -102,6 +102,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -655,6 +656,38 @@ public class DefaultGun implements IGun {
             .getValue(new ResourceLocation(tag.getString())))
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
+  }
+
+  @Override
+  public CompoundNBT getShareTag() {
+    CompoundNBT nbt = new CompoundNBT();
+    if (this.magazineStack.getShareTag() != null) {
+      nbt.put("magazineStack", this.magazineStack.getShareTag());
+    }
+    ListNBT attachmentsTag = this.attachments
+        .stream()
+        .map(attachment -> StringNBT.valueOf(attachment.getRegistryName().toString()))
+        .collect(ListNBT::new, ListNBT::add, List::addAll);
+    nbt.put("attachments", attachmentsTag);
+    if (this.paintStack.getShareTag() != null) {
+      nbt.put("paintStack", this.paintStack.getShareTag());
+    }
+    return nbt;
+  }
+
+  @Override
+  public void readShareTag(CompoundNBT nbt) {
+    if (nbt.contains("magazineStack", Constants.NBT.TAG_COMPOUND)) {
+      this.magazineStack.readShareTag(nbt.getCompound("magazineStack"));
+    }
+    this.setAttachments(nbt.getList("attachments", 8)
+        .stream()
+        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
+            .getValue(new ResourceLocation(tag.getString())))
+        .collect(Collectors.toSet()));
+    if (nbt.contains("paintStack", Constants.NBT.TAG_COMPOUND)) {
+      this.paintStack.readShareTag(nbt.getCompound("paintStack"));
+    }
   }
 
   @Override

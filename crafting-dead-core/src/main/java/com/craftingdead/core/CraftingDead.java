@@ -399,7 +399,7 @@ public class CraftingDead {
   }
 
   @SubscribeEvent
-  public void handlePlayerStartTrackingEvent(PlayerEvent.StartTracking event) {
+  public void handlePlayerStartTracking(PlayerEvent.StartTracking event) {
     event.getTarget().getCapability(ModCapabilities.LIVING)
         .ifPresent(living -> living.onStartTracking((ServerPlayerEntity) event.getPlayer()));
   }
