@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/knight_hat.obj",
+	"model":"craftingdead:models/hats/fireman_hat.obj",
 	"flip-v":true,
 	"ambientToFullbright": false
 }

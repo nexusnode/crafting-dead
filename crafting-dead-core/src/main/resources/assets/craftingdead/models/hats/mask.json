@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/mask.obj",
+	"model":"craftingdead:models/hats/mask.obj",
 	"flip-v":true,
 	"ambientToFullbright": false,
 	"transform": {

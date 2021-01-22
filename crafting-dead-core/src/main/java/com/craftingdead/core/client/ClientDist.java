@@ -20,6 +20,8 @@ package com.craftingdead.core.client;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
+
+import net.minecraftforge.client.model.SeparatePerspectiveModel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
@@ -289,6 +291,8 @@ public class ClientDist implements IModDist {
     StartupMessageManager.addModMessage("Registering model loaders");
     ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
         PerspectiveAwareModel.Loader.INSTANCE);
+    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "separate-perspective"),
+            SeparatePerspectiveModel.Loader.INSTANCE);
     StartupMessageManager.addModMessage("Gathering item renderers");
     this.itemRendererManager.gatherItemRenderers();
     StartupMessageManager.addModMessage("Registering special models");
