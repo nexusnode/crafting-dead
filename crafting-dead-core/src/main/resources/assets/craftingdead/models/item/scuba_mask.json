@@ -1,25 +1,23 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/scuba_mask"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/scuba_mask",
-				"textures": {
-					"base":"craftingdead:models/hats/scuba_mask"
-				},
-				"transform": {
-					"rotation":  [ 0, 90, 0 ],
-					"translation":  [ 0.325, -0.5, -1.85 ],
-					"scale":  [ 1.1, 1.1, 1.1 ]
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "craftingdead:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/scuba_mask"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/scuba_mask",
+      "textures": {
+        "base": "craftingdead:models/hats/scuba_mask"
+      },
+      "transform": {
+        "rotation": [0, 90, 0],
+        "translation": [0.325, -0.5, -1.85],
+        "scale": [1.1, 1.1, 1.1]
+      }
+    }
+  }
 }

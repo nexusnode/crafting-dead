@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/ballistic_helmet.obj",
+	"model":"craftingdead:models/hats/ballistic_helmet.obj",
 	"flip-v":true,
 	"ambientToFullbright": false,
 	"transform": {

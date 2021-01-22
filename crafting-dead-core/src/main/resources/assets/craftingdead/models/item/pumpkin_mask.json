@@ -1,20 +1,18 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/pumpkin_mask"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/mask",
-				"textures": {
-					"base":"craftingdead:models/hats/pumpkin_mask"
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "craftingdead:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/pumpkin_mask"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/mask",
+      "textures": {
+        "base": "craftingdead:models/hats/pumpkin_mask"
+      }
+    }
+  }
 }

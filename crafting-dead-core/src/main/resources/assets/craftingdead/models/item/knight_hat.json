@@ -1,25 +1,23 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/knight_hat"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/knight_hat",
-				"textures": {
-					"base":"craftingdead:models/hats/knight_hat"
-				},
-				"transform": {
-					"rotation":  [ 0, 180, 0 ],
-					"translation":  [ -1.65, -0.825, -1.65 ],
-					"scale":  [ 1.15, 1.15, 1.15 ]
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "craftingdead:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/knight_hat"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/knight_hat",
+      "textures": {
+        "base": "craftingdead:models/hats/knight_hat"
+      },
+      "transform": {
+        "rotation": [0, 180, 0],
+        "translation": [-1.65, -0.825, -1.65],
+        "scale": [1.15, 1.15, 1.15]
+      }
+    }
+  }
 }
