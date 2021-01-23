@@ -14,7 +14,10 @@ public interface IGunClient extends IAnimationProvider<GunAnimationController> {
 
   void handleShoot(ILiving<?, ?> living, ItemStack itemStack);
 
-  void handleHitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  void handleHitEntityPre(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+      Vector3d hitPos, long randomSeed);
+
+  void handleHitEntityPost(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot);
 
   void handleHitBlock(ILiving<?, ?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,

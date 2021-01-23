@@ -17,7 +17,6 @@
  */
 package com.craftingdead.core.capability.gun;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -53,21 +52,15 @@ import com.craftingdead.core.network.message.play.SyncGunMessage;
 import com.craftingdead.core.network.message.play.ToggleFireModeMessage;
 import com.craftingdead.core.network.message.play.ToggleRightMouseAbility;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
 import com.craftingdead.core.util.ModDamageSource;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.UnbreakingEnchantment;
@@ -116,7 +109,7 @@ public class DefaultGun implements IGun {
 
   public static final float HEADSHOT_MULTIPLIER = 4;
 
-  private static final byte HIT_VALIDATION_DELAY_TICKS = 3;
+  static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
   private static final Random random = new Random();
 
@@ -164,11 +157,6 @@ public class DefaultGun implements IGun {
 
   private boolean performingRightMouseAction;
 
-  private final Multimap<Integer, PendingHit> livingHitValidationBuffer =
-      Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ObjectArrayList::new);
-
-  private byte hitValidationTicks = 0;
-
   private final IGunClient clientHandler;
 
   public DefaultGun() {
@@ -201,14 +189,6 @@ public class DefaultGun implements IGun {
     this.wasTriggerPressed = this.triggerPressed;
 
     this.tryShoot(living, itemStack);
-
-    if (living.getEntity().getEntityWorld().isRemote() && this.livingHitValidationBuffer.size() > 0
-        && this.hitValidationTicks++ >= HIT_VALIDATION_DELAY_TICKS) {
-      this.hitValidationTicks = 0;
-      NetworkChannel.PLAY.getSimpleChannel().sendToServer(
-          new ValidatePendingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
-      this.livingHitValidationBuffer.clear();
-    }
 
     if (this.isPerformingRightMouseAction() && living.getEntity().isSprinting()) {
       this.toggleRightMouseAction(living, true);
@@ -304,7 +284,7 @@ public class DefaultGun implements IGun {
     EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks).orElse(null);
     hitSnapshot = hitSnapshot.combineUntrustedSnapshot(pendingHit.getHitSnapshot());
 
-    if (playerSnapshot != null && hitSnapshot != null) {
+    if (playerSnapshot != null && hitSnapshot != null && !hitLiving.getEntity().getShouldBeDead()) {
       random.setSeed(pendingHit.getRandomSeed());
       hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, 100.0D,
           this.getAccuracy(player, itemStack), random).ifPresent(
@@ -363,15 +343,13 @@ public class DefaultGun implements IGun {
               break;
             }
 
-            if (entityRayTraceResult.getEntity() instanceof LivingEntity) {
-              if (entity instanceof ServerPlayerEntity) {
-                break;
-              } else if (entity instanceof ClientPlayerEntity) {
-                this.livingHitValidationBuffer.put(entityRayTraceResult.getEntity().getEntityId(),
-                    new PendingHit((byte) (HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
-                        new EntitySnapshot(entity),
-                        new EntitySnapshot(entityRayTraceResult.getEntity()), randomSeed));
-              }
+            // Handled by validatePendingHit
+            if (entityRayTraceResult.getEntity() instanceof ServerPlayerEntity && entity instanceof ServerPlayerEntity) {
+              break;
+            } else if (entity.getEntityWorld().isRemote()) {
+              this.clientHandler.handleHitEntityPre(living, itemStack,
+                  entityRayTraceResult.getEntity(),
+                  entityRayTraceResult.getHitVec(), randomSeed);
             }
 
             this.hitEntity(living, itemStack, entityRayTraceResult.getEntity(),
@@ -457,7 +435,8 @@ public class DefaultGun implements IGun {
 
     // Simulated client-side effects
     if (world.isRemote()) {
-      this.clientHandler.handleHitEntity(living, itemStack, hitEntity, hitPos, playSound, headshot);
+      this.clientHandler.handleHitEntityPost(living, itemStack, hitEntity, hitPos, playSound,
+          headshot);
     } else {
       // Resets the temporary invincibility before causing the damage, preventing
       // previous damages from blocking the gun damage.
@@ -476,9 +455,9 @@ public class DefaultGun implements IGun {
       if (hitEntity instanceof LivingEntity) {
         final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
 
-        // Alert client of hit (real hit data as opposed to client simulation)
+        // Alert client of hit (real hit data as opposed to client prediction)
         if (entity instanceof ServerPlayerEntity) {
-          boolean dead = hitLivingEntity.getHealth() <= 0;
+          boolean dead = hitLivingEntity.getShouldBeDead();
           NetworkChannel.PLAY.getSimpleChannel().send(
               PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
               new HitMessage(hitPos, dead));

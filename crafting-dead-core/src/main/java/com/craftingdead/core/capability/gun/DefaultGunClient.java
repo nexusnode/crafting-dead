@@ -1,14 +1,22 @@
 package com.craftingdead.core.capability.gun;
 
+import java.util.HashMap;
 import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
+import com.craftingdead.core.capability.living.EntitySnapshot;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.item.AttachmentItem;
+import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
 import com.craftingdead.core.util.ModSoundEvents;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -46,12 +54,25 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
 
   private long rightMouseActionSoundStartTimeMs;
 
+  private final Multimap<Integer, PendingHit> livingHitValidationBuffer =
+      Multimaps.newMultimap(new Int2ObjectLinkedOpenHashMap<>(), ObjectArrayList::new);
+
+  private byte hitValidationTicks = 0;
+
   public DefaultGunClient(G gun) {
     this.gun = gun;
   }
 
   @Override
   public void handleTick(ILiving<?, ?> living, ItemStack itemStack) {
+    if (this.livingHitValidationBuffer.size() > 0
+        && this.hitValidationTicks++ >= DefaultGun.HIT_VALIDATION_DELAY_TICKS) {
+      this.hitValidationTicks = 0;
+      NetworkChannel.PLAY.getSimpleChannel().sendToServer(
+          new ValidatePendingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
+      this.livingHitValidationBuffer.clear();
+    }
+
     SoundEvent rightMouseActionSound = this.gun.getGunItem().getRightMouseActionSound().get();
     long rightMouseActionSoundDelta = Util.milliTime() - this.rightMouseActionSoundStartTimeMs + 50;
     if (this.gun.isPerformingRightMouseAction()
@@ -105,7 +126,18 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
   }
 
   @Override
-  public void handleHitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  public void handleHitEntityPre(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+      Vector3d hitPos, long randomSeed) {
+    if (living.getEntity() instanceof ClientPlayerEntity) {
+      this.livingHitValidationBuffer.put(hitEntity.getEntityId(),
+          new PendingHit((byte) (DefaultGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+              new EntitySnapshot(living.getEntity()),
+              new EntitySnapshot(hitEntity), randomSeed));
+    }
+  }
+
+  @Override
+  public void handleHitEntityPost(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot) {
     World world = hitEntity.getEntityWorld();
     Entity entity = living.getEntity();
@@ -176,7 +208,7 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
       if (this.gun.isPerformingRightMouseAction()) {
         this.rightMouseActionSoundStartTimeMs = Util.milliTime();
         living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
-      } else if (living.getEntity().getEntityWorld().isRemote()) {
+      } else {
         Minecraft.getInstance().getSoundHandler()
             .stop(rightMouseActionSound.getRegistryName(), SoundCategory.PLAYERS);
       }

@@ -57,7 +57,7 @@ public class RayTraceUtil {
                 LivingEntity livingEntity = (LivingEntity) entityTest;
 
                 // Ignores dead entities
-                if (livingEntity.getHealth() <= 0F) {
+                if (livingEntity.getShouldBeDead()) {
                   return false;
                 }
               }
