@@ -26,7 +26,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionType;
 import com.craftingdead.core.action.TimedAction;
 import com.craftingdead.core.capability.living.ILiving;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import com.craftingdead.core.client.ClientDist;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -106,8 +106,16 @@ public class UseItemAction extends TimedAction {
   public boolean tick() {
     boolean finished = super.tick();
     final ItemStack heldStack = this.performer.getEntity().getHeldItemMainhand();
-    final boolean usingItem = !(this.performer.getEntity() instanceof ClientPlayerEntity)
-        || CraftingDead.getInstance().getClientDist().isRightMouseDown();
+
+    final boolean usingItem;
+    if (this.performer.getEntity().getEntityWorld().isRemote()) {
+      ClientDist clientDist = CraftingDead.getInstance().getClientDist();
+      usingItem =
+          clientDist.isLocalPlayer(this.performer.getEntity()) && clientDist.isRightMouseDown();
+    } else {
+      usingItem = true;
+    }
+
     if (!this.selectedEntry.canPerform(this.performer, this.target, heldStack) || !usingItem) {
       this.performer.cancelAction(true);
     }

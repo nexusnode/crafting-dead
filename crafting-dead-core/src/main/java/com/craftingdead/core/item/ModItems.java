@@ -470,8 +470,8 @@ public class ModItems {
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
-  public static final RegistryObject<MagazineItem> MOSSBERG_SLUGS = ITEMS
-      .register("mossberg_slugs",
+  public static final RegistryObject<MagazineItem> MOSSBERG_SHELLS = ITEMS
+      .register("mossberg_shells",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.3F)
@@ -1436,7 +1436,7 @@ public class ModItems {
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .addAnimation(AnimationType.RELOAD, GunAnimationReloadMossberg::new)
               .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
-              .setDefaultMagazine(MOSSBERG_SLUGS)
+              .setDefaultMagazine(MOSSBERG_SHELLS)
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MossbergRenderer::new)

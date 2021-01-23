@@ -273,6 +273,10 @@ public class ClientDist implements IModDist {
     return this.minecraft.gameSettings.keyBindUseItem.isKeyDown();
   }
 
+  public boolean isLocalPlayer(Entity entity) {
+    return entity == this.minecraft.player;
+  }
+
   // ================================================================================
   // Mod Events
   // ================================================================================
