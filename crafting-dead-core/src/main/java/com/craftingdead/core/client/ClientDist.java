@@ -295,8 +295,6 @@ public class ClientDist implements IModDist {
     StartupMessageManager.addModMessage("Registering model loaders");
     ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
         PerspectiveAwareModel.Loader.INSTANCE);
-    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "separate-perspective"),
-            SeparatePerspectiveModel.Loader.INSTANCE);
     StartupMessageManager.addModMessage("Gathering item renderers");
     this.itemRendererManager.gatherItemRenderers();
     StartupMessageManager.addModMessage("Registering special models");
