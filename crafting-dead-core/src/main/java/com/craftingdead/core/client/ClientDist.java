@@ -17,13 +17,6 @@
  */
 package com.craftingdead.core.client;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
-
-import net.minecraftforge.client.model.SeparatePerspectiveModel;
-import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -38,7 +31,6 @@ import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
 import com.craftingdead.core.client.gui.screen.inventory.PlayerScreen;
-import com.craftingdead.core.client.model.PerspectiveAwareModel;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
@@ -108,20 +100,9 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.FOVUpdateEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -137,6 +118,12 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class ClientDist implements IModDist {
 
@@ -289,8 +276,6 @@ public class ClientDist implements IModDist {
 
   private void handleModelRegistry(ModelRegistryEvent event) {
     StartupMessageManager.addModMessage("Registering model loaders");
-    ModelLoaderRegistry.registerLoader(new ResourceLocation(CraftingDead.ID, "perspective_aware"),
-        PerspectiveAwareModel.Loader.INSTANCE);
     StartupMessageManager.addModMessage("Gathering item renderers");
     this.itemRendererManager.gatherItemRenderers();
     StartupMessageManager.addModMessage("Registering special models");
