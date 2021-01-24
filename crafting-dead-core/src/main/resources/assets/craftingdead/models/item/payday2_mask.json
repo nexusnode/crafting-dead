@@ -1,6 +1,6 @@
 {
   "parent": "forge:item/default",
-  "loader": "craftingdead:separate-perspective",
+  "loader": "forge:separate-perspective",
   "base": {
     "parent": "item/generated",
     "textures": {

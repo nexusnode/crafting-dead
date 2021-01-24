@@ -1,25 +1,64 @@
 {
-    "loader":"craftingdead:perspective_aware",
-    "model": {
-        "parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/pistol_iron_sight"
-		}
-    },
-    "perspective_overrides" : [
-        {
-            "perspectives":["thirdperson_righthand", "thirdperson_lefthand", "firstperson_righthand", "firstperson_lefthand", "head"],
-			"model":{
-                "loader":"forge:composite",
-                "parts" : {
-                    "pistol_is1": {
-                        "parent":"craftingdead:item/attachments/pistol_is1/pistol_is1"
-                    },
-                    "pistol_is2" : {
-                        "parent":"craftingdead:item/attachments/pistol_is2/pistol_is2"
-                    }
-                }
-			}
+  "parent": "item/generated",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/pistol_iron_sight"
+    }
+  },
+  "perspectives": {
+    "thirdperson_righthand": {
+      "model": {
+        "loader": "forge:composite",
+        "parts": {
+          "pistol_is1": {
+            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+          },
+          "pistol_is2": {
+            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+          }
         }
-    ]
+      }
+    },
+    "thirdperson_lefthand": {
+      "model": {
+        "loader": "forge:composite",
+        "parts": {
+          "pistol_is1": {
+            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+          },
+          "pistol_is2": {
+            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+          }
+        }
+      }
+    },
+    "firsperson_righthand": {
+      "model": {
+        "loader": "forge:composite",
+        "parts": {
+          "pistol_is1": {
+            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+          },
+          "pistol_is2": {
+            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+          }
+        }
+      }
+    },
+    "firsperson_lefthand": {
+      "model": {
+        "loader": "forge:composite",
+        "parts": {
+          "pistol_is1": {
+            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+          },
+          "pistol_is2": {
+            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+          }
+        }
+      }
+    }
+  }
 }
