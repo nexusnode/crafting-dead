@@ -1,6 +1,6 @@
 {
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "craftingdead:item/trenchgun_shells"
-    }
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "craftingdead:item/trenchgun_shells"
+  }
 }

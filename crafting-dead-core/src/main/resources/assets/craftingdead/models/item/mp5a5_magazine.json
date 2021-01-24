@@ -1,6 +1,6 @@
 {
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "craftingdead:item/mp5a5_magazine"
-    }
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "craftingdead:item/mp5a5_magazine"
+  }
 }
