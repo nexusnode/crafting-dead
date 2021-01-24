@@ -8,7 +8,29 @@
     }
   },
   "perspectives": {
-    "thirdperson_righthand": {
+    "third_person_right_hand": {
+      "loader": "forge:composite",
+      "parts": {
+        "pistol_is1": {
+          "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+        },
+        "pistol_is2": {
+          "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+        }
+      }
+    },
+    "third_person_left_hand": {
+      "loader": "forge:composite",
+      "parts": {
+        "pistol_is1": {
+          "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+        },
+        "pistol_is2": {
+          "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
+        }
+      }
+    },
+    "first_person_right_hand": {
       "model": {
         "loader": "forge:composite",
         "parts": {
@@ -21,42 +43,14 @@
         }
       }
     },
-    "thirdperson_lefthand": {
-      "model": {
-        "loader": "forge:composite",
-        "parts": {
-          "pistol_is1": {
-            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
-          },
-          "pistol_is2": {
-            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
-          }
-        }
-      }
-    },
-    "firsperson_righthand": {
-      "model": {
-        "loader": "forge:composite",
-        "parts": {
-          "pistol_is1": {
-            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
-          },
-          "pistol_is2": {
-            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
-          }
-        }
-      }
-    },
-    "firsperson_lefthand": {
-      "model": {
-        "loader": "forge:composite",
-        "parts": {
-          "pistol_is1": {
-            "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
-          },
-          "pistol_is2": {
-            "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
-          }
+    "firs_person_left_hand": {
+      "loader": "forge:composite",
+      "parts": {
+        "pistol_is1": {
+          "parent": "craftingdead:item/attachments/pistol_is1/pistol_is1"
+        },
+        "pistol_is2": {
+          "parent": "craftingdead:item/attachments/pistol_is2/pistol_is2"
         }
       }
     }
