@@ -322,11 +322,14 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     if (!shouldKeepInventory) {
       // Adds items from CD inventory
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
-        ItemEntity itemEntity = new ItemEntity(this.getEntity().world, this.getEntity().getPosX(),
-            this.getEntity().getPosY(), this.getEntity().getPosZ(),
-            this.itemHandler.extractItem(i, this.itemHandler.getStackInSlot(i).getCount(), false));
-        itemEntity.setDefaultPickupDelay();
-        drops.add(itemEntity);
+        ItemStack itemStack =
+            this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
+        if (!itemStack.isEmpty()) {
+          ItemEntity itemEntity = new ItemEntity(this.getEntity().world, this.getEntity().getPosX(),
+              this.getEntity().getPosY(), this.getEntity().getPosZ(), itemStack);
+          itemEntity.setDefaultPickupDelay();
+          drops.add(itemEntity);
+        }
       }
     }
     return false;

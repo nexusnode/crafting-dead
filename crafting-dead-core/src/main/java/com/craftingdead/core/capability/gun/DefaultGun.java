@@ -278,11 +278,13 @@ public class DefaultGun implements IGun {
       return;
     }
 
-    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset).orElse(null);
-    playerSnapshot = playerSnapshot.combineUntrustedSnapshot(pendingHit.getPlayerSnapshot());
+    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset)
+        .map(s -> s.combineUntrustedSnapshot(pendingHit.getPlayerSnapshot()))
+        .orElse(null);
 
-    EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks).orElse(null);
-    hitSnapshot = hitSnapshot.combineUntrustedSnapshot(pendingHit.getHitSnapshot());
+    EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks)
+        .map(s -> s.combineUntrustedSnapshot(pendingHit.getHitSnapshot()))
+        .orElse(null);
 
     if (playerSnapshot != null && hitSnapshot != null && !hitLiving.getEntity().getShouldBeDead()) {
       random.setSeed(pendingHit.getRandomSeed());
@@ -344,7 +346,8 @@ public class DefaultGun implements IGun {
             }
 
             // Handled by validatePendingHit
-            if (entityRayTraceResult.getEntity() instanceof ServerPlayerEntity && entity instanceof ServerPlayerEntity) {
+            if (entityRayTraceResult.getEntity() instanceof ServerPlayerEntity
+                && entity instanceof ServerPlayerEntity) {
               break;
             } else if (entity.getEntityWorld().isRemote()) {
               this.clientHandler.handleHitEntityPre(living, itemStack,
