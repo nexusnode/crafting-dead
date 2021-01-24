@@ -1,6 +1,6 @@
 {
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "craftingdead:item/as50"
-	}
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "craftingdead:item/as50"
+  }
 }

@@ -1,25 +1,23 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/top_hat"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/top_hat",
-				"textures": {
-					"base":"craftingdead:models/hats/top_hat"
-				},
-				"transform": {
-					"rotation":  [ 0, 0, 0 ],
-					"translation":  [ 0.5, -0.15, 0.5 ],
-					"scale":  [ 1, 1, 1 ]
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/top_hat"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/top_hat",
+      "textures": {
+        "base": "craftingdead:models/hats/top_hat"
+      },
+      "transform": {
+        "rotation": [0, 0, 0],
+        "translation": [0.5, -0.15, 0.5],
+        "scale": [1, 1, 1]
+      }
+    }
+  }
 }

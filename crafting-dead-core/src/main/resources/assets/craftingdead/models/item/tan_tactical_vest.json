@@ -1,22 +1,18 @@
 {
-	"loader": "craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/tan_tactical_vest"
-		}
-	},
-	"perspective_overrides": [
-		{
-			"perspectives": [
-				"head"
-			],
-			"model": {
-				"parent": "craftingdead:vest/tactical_vest",
-				"textures": {
-					"base": "craftingdead:vest/tan_tactical_vest"
-				}
-			}
-		}
-	]
+  "parent": "item/generated",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/tan_tactical_vest"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:vest/tactical_vest",
+      "textures": {
+        "base": "craftingdead:vest/tan_tactical_vest"
+      }
+    }
+  }
 }

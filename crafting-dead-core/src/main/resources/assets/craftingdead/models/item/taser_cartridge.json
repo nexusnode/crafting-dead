@@ -1,6 +1,6 @@
 {
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "craftingdead:item/taser_cartridge"
-    }
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "craftingdead:item/taser_cartridge"
+  }
 }
