@@ -80,8 +80,10 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    this.gun.getClient().getAnimationController()
-        .ifPresent(GunAnimationController::removeCurrentAnimation);
+    if (this.gun.getClient() != null) {
+      this.gun.getClient().getAnimationController()
+          .ifPresent(GunAnimationController::removeCurrentAnimation);
+    }
     this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
