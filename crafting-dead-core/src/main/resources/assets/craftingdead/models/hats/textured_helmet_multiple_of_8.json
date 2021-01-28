@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/textured_helmet_multiple_of_8.obj",
+	"model":"craftingdead:models/hats/textured_helmet_multiple_of_8.obj",
 	"flip-v":true,
 	"ambientToFullbright": false,
 	"transform": {

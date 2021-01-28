@@ -1,20 +1,18 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/ninja_hat"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_8",
-				"textures": {
-					"base":"craftingdead:models/hats/ninja_hat"
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/ninja_hat"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/textured_helmet_multiple_of_8",
+      "textures": {
+        "base": "craftingdead:models/hats/ninja_hat"
+      }
+    }
+  }
 }

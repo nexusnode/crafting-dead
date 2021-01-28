@@ -1,25 +1,23 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/nv_goggles_hat"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/nv_goggles_hat",
-				"textures": {
-					"base":"craftingdead:models/hats/nv_goggles_hat"
-				},
-				"transform": {
-					"rotation":  [ 0, 180, 0 ],
-					"translation":  [ -1.55, -0.485, -1.55 ],
-					"scale":  [ 1.05, 1.05, 1.05]
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/nv_goggles_hat"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/nv_goggles_hat",
+      "textures": {
+        "base": "craftingdead:models/hats/nv_goggles_hat"
+      },
+      "transform": {
+        "rotation": [0, 180, 0],
+        "translation": [-1.55, -0.485, -1.55],
+        "scale": [1.05, 1.05, 1.05]
+      }
+    }
+  }
 }

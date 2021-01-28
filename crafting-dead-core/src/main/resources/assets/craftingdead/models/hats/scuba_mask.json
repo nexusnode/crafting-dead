@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/bunny_hat.obj",
+	"model":"craftingdead:models/hats/scuba_mask.obj",
 	"flip-v":true,
 	"ambientToFullbright": false
 }

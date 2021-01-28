@@ -1,20 +1,18 @@
 {
-	"loader":"craftingdead:perspective_aware",
-	"model": {
-		"parent": "item/generated",
-		"textures": {
-			"layer0": "craftingdead:item/winter_military_helmet"
-		}
-	},
-	"perspective_overrides":[
-		{
-			"perspectives":["head"],
-			"model":{
-				"parent":"craftingdead:item/hats/textured_helmet_multiple_of_9",
-				"textures": {
-					"base":"craftingdead:models/hats/winter_military_helmet"
-				}
-			}
-		}
-	]
+  "parent": "forge:item/default",
+  "loader": "forge:separate-perspective",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "craftingdead:item/winter_military_helmet"
+    }
+  },
+  "perspectives": {
+    "head": {
+      "parent": "craftingdead:hats/textured_helmet_multiple_of_9",
+      "textures": {
+        "base": "craftingdead:models/hats/winter_military_helmet"
+      }
+    }
+  }
 }

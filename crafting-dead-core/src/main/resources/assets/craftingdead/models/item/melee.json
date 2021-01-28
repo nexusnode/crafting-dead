@@ -1,9 +1,9 @@
 {
-    "parent": "item/handheld",
-    "display": {
-        "head":{
-            "translation":[3, 5, 2.5],
-            "rotation":[0, 0, 45]
-        }
+  "parent": "item/handheld",
+  "display": {
+    "head": {
+      "translation": [3, 5, 2.5],
+      "rotation": [0, 0, 45]
     }
+  }
 }	

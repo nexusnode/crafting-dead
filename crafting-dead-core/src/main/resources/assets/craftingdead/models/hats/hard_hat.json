@@ -1,6 +1,6 @@
 {
 	"loader":"forge:obj",
-	"model":"craftingdead:models/item/hats/hard_hat.obj",
+	"model":"craftingdead:models/hats/hard_hat.obj",
 	"flip-v":true,
 	"ambientToFullbright": false,
 	"transform": {
