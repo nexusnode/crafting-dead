@@ -34,7 +34,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 
 public class MagazineItem extends Item {
 
@@ -129,31 +128,6 @@ public class MagazineItem extends Item {
               .mergeStyle(TextFormatting.RED)));
     }
   }
-
-  @Override
-  public CompoundNBT getShareTag(ItemStack stack) {
-    CompoundNBT shareTag = stack.getTag();
-    if (shareTag == null) {
-      shareTag = new CompoundNBT();
-    }
-    CompoundNBT magazineTag = stack.getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::serializeNBT)
-        .orElse(null);
-    if (magazineTag != null && !magazineTag.isEmpty()) {
-      shareTag.put("magazine", magazineTag);
-    }
-    return shareTag;
-  }
-
-  @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    if (nbt != null && nbt.contains("magazine", Constants.NBT.TAG_COMPOUND)) {
-      stack.getCapability(ModCapabilities.MAGAZINE)
-          .ifPresent(magazine -> magazine.deserializeNBT(nbt.getCompound("gun")));
-    }
-    super.readShareTag(stack, nbt);
-  }
-
 
   public static class Properties extends Item.Properties {
 
