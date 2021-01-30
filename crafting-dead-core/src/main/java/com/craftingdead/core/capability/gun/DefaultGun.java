@@ -479,7 +479,8 @@ public class DefaultGun implements IGun {
               IPlayer.getExpected((ServerPlayerEntity) hitLivingEntity);
           hitPlayer.infect(
               (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
-                  / 255.0F) * hitPlayer.getItemHandler()
+                  / (float) ModEnchantments.INFECTION.get().getMaxLevel())
+                  * hitPlayer.getItemHandler()
                       .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
                       .getCapability(ModCapabilities.CLOTHING)
                       .filter(IClothing::hasEnhancedProtection)

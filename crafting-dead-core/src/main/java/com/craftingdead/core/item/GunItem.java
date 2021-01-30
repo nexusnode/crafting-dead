@@ -412,6 +412,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   @Override
   public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
     return enchantment == Enchantments.FLAME || enchantment == Enchantments.POWER
+        || enchantment == Enchantments.UNBREAKING
         || super.canApplyAtEnchantingTable(stack, enchantment);
   }
 
