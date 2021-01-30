@@ -24,6 +24,7 @@ import java.util.Optional;
 import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
+import com.craftingdead.core.event.LivingEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.network.NetworkChannel;
@@ -50,20 +51,21 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
-    implements ILiving<E, L> {
+public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
+    implements ILiving<T, E> {
 
   /**
    * The vanilla entity.
    */
-  protected final E entity;
+  protected final T entity;
 
-  protected final Map<ResourceLocation, L> extensions = new Object2ObjectOpenHashMap<>();
+  protected final Map<ResourceLocation, E> extensions = new Object2ObjectOpenHashMap<>();
 
   /**
    * The last held {@link ItemStack} - used to check if the entity has switched item.
@@ -101,22 +103,27 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
     throw new IllegalStateException("No entity provided");
   }
 
-  public DefaultLiving(E entity) {
+  public DefaultLiving(T entity) {
     this.entity = entity;
   }
 
   @Override
-  public Optional<L> getExtension(ResourceLocation id) {
-    return Optional.ofNullable(this.extensions.get(id));
+  public void load() {
+    MinecraftForge.EVENT_BUS.post(new LivingEvent.Load(this));
   }
 
   @Override
-  public void registerExtension(ResourceLocation id, L extension) {
+  public void registerExtension(ResourceLocation id, E extension) {
     if (this.extensions.containsKey(id)) {
       throw new IllegalArgumentException(
           "Extension with id " + id.toString() + " already registered");
     }
     this.extensions.put(id, extension);
+  }
+
+  @Override
+  public Optional<E> getExtension(ResourceLocation id) {
+    return Optional.ofNullable(this.extensions.get(id));
   }
 
   @Override
@@ -397,7 +404,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   }
 
   @Override
-  public E getEntity() {
+  public T getEntity() {
     return this.entity;
   }
 
@@ -405,7 +412,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("inventory", this.itemHandler.serializeNBT());
-    for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
+    for (Map.Entry<ResourceLocation, E> entry : this.extensions.entrySet()) {
       nbt.put(entry.getKey().toString(), entry.getValue().serializeNBT());
     }
     return nbt;
@@ -414,7 +421,7 @@ public class DefaultLiving<E extends LivingEntity, L extends ILivingHandler>
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     this.itemHandler.deserializeNBT(nbt.getCompound("inventory"));
-    for (Map.Entry<ResourceLocation, L> entry : this.extensions.entrySet()) {
+    for (Map.Entry<ResourceLocation, E> entry : this.extensions.entrySet()) {
       CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
       if (!extensionNbt.isEmpty()) {
         entry.getValue().deserializeNBT(extensionNbt);

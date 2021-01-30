@@ -405,6 +405,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   }
 
   @Override
+  public boolean isEnchantable(ItemStack stack) {
+    return true;
+  }
+
+  @Override
   public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
     return enchantment == Enchantments.FLAME || enchantment == Enchantments.POWER
         || super.canApplyAtEnchantingTable(stack, enchantment);
@@ -434,7 +439,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     CompoundNBT gunTag = stack.getCapability(ModCapabilities.GUN)
         .map(IGun::getShareTag)
         .orElse(null);
-    if (gunTag != null) {
+    if (gunTag != null && !gunTag.isEmpty()) {
       shareTag.put("gun", gunTag);
     }
     return shareTag;

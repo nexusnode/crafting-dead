@@ -58,7 +58,7 @@ public class FollowAttractiveGrenadeGoal extends Goal {
       }
     }
 
-    if (nearestGrenade == null) {
+    if (nearestGrenade == null || !nearestGrenade.isAlive()) {
       return false;
     }
 

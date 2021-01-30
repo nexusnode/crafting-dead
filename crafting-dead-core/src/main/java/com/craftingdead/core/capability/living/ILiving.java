@@ -29,13 +29,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ILiving<E extends LivingEntity, L extends ILivingHandler> extends ILivingHandler {
+public interface ILiving<T extends LivingEntity, E extends ILivingHandler> extends ILivingHandler {
 
-  public static final ResourceLocation ID = new ResourceLocation(CraftingDead.ID, "living");
+  static final ResourceLocation ID = new ResourceLocation(CraftingDead.ID, "living");
+  
+  void load();
 
-  Optional<L> getExtension(ResourceLocation id);
+  Optional<E> getExtension(ResourceLocation id);
 
-  void registerExtension(ResourceLocation id, L extension);
+  void registerExtension(ResourceLocation id, E extension);
 
   default boolean performAction(IAction action, boolean sendUpdate) {
     return this.performAction(action, false, sendUpdate);
@@ -82,7 +84,7 @@ public interface ILiving<E extends LivingEntity, L extends ILivingHandler> exten
     return accuracy;
   }
 
-  E getEntity();
+  T getEntity();
 
   public static <E extends LivingEntity> ILiving<E, ?> getExpected(E livingEntity) {
     return livingEntity.getCapability(ModCapabilities.LIVING)

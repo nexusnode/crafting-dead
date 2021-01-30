@@ -18,9 +18,8 @@
 package com.craftingdead.core.item;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
-import net.minecraft.entity.LivingEntity;
+import com.google.common.collect.Multimap;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -49,18 +48,9 @@ public class MeleeWeaponItem extends ToolItem {
   }
 
   @Override
-  public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-    stack.damageItem(this.attackDamage, attacker, (entity) -> {
-      entity.sendBreakAnimation(EquipmentSlotType.MAINHAND);
-    });
-    return true;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
-      EquipmentSlotType equipmentSlot) {
+      EquipmentSlotType equipmentSlot, ItemStack itemStack) {
     return equipmentSlot == EquipmentSlotType.MAINHAND ? this.attributeModifiers
-        : super.getAttributeModifiers(equipmentSlot);
+        : super.getAttributeModifiers(equipmentSlot, itemStack);
   }
 }

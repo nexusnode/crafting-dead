@@ -491,68 +491,72 @@ public class ClientDist implements IModDist {
           ItemStack heldStack = player.getEntity().getHeldItemMainhand();
           IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
 
-          // Stop performing action if game is paused
-          if (this.minecraft.isGamePaused() && gun != null) {
-            gun.setTriggerPressed(player, heldStack, false, true);
-            if (gun.isPerformingRightMouseAction()) {
-              gun.toggleRightMouseAction(player, true);
-            }
-          }
+          boolean worldFocused = !this.minecraft.isGamePaused() && this.minecraft.loadingGui == null
+              && (this.minecraft.currentScreen == null);
 
-          if (this.minecraft.loadingGui == null && (this.minecraft.currentScreen == null
-              || this.minecraft.currentScreen.passEvents)) {
-            // Update gun input
+          if (!worldFocused) {
+            // Stop gun actions if world not focused.
             if (gun != null) {
-              while (TOGGLE_FIRE_MODE.isPressed()) {
-                gun.toggleFireMode(player, true);
-              }
-              while (RELOAD.isPressed()) {
-                gun.reload(player);
-              }
-              while (REMOVE_MAGAZINE.isPressed()) {
-                gun.removeMagazine(player);
+              gun.setTriggerPressed(player, heldStack, false, true);
+              if (gun.isPerformingRightMouseAction()) {
+                gun.toggleRightMouseAction(player, true);
               }
             }
+            return;
+          }
 
-            // Update crouching
-            if (this.minecraft.player.isSneaking() != this.wasSneaking) {
-              if (this.minecraft.player.isSneaking()) {
-                final long currentTime = Util.milliTime();
-                if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
-                  player.setCrouching(true, true);
-                }
-                this.lastSneakPressTime = Util.milliTime();
-              } else {
-                player.setCrouching(false, true);
-              }
-              this.wasSneaking = this.minecraft.player.isSneaking();
+          // Update gun input
+          if (gun != null) {
+            while (TOGGLE_FIRE_MODE.isPressed()) {
+              gun.toggleFireMode(player, true);
             }
-
-            // Update tutorial
-            while (OPEN_MOD_INVENTORY.isPressed()) {
-              NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
-              if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
-                ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
-              }
+            while (RELOAD.isPressed()) {
+              gun.reload(player);
             }
-            TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
-            if (this.lastTutorialStep != currentTutorialStep) {
-              if (currentTutorialStep == TutorialSteps.NONE) {
-                this.setTutorialStep(clientConfig.tutorialStep.get());
-              }
-              this.lastTutorialStep = currentTutorialStep;
-            }
-
-            // Update adrenaline effects
-            if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
-              this.wasAdrenalineActive = true;
-              this.effectsManager.setHighpassLevels(1.0F, 0.015F);
-              this.effectsManager.setDirectHighpassForAll();
-            } else if (this.wasAdrenalineActive) {
-              this.wasAdrenalineActive = false;
-              this.effectsManager.removeFilterForAll();
+            while (REMOVE_MAGAZINE.isPressed()) {
+              gun.removeMagazine(player);
             }
           }
+
+          // Update crouching
+          if (this.minecraft.player.isSneaking() != this.wasSneaking) {
+            if (this.minecraft.player.isSneaking()) {
+              final long currentTime = Util.milliTime();
+              if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
+                player.setCrouching(true, true);
+              }
+              this.lastSneakPressTime = Util.milliTime();
+            } else {
+              player.setCrouching(false, true);
+            }
+            this.wasSneaking = this.minecraft.player.isSneaking();
+          }
+
+          // Update tutorial
+          while (OPEN_MOD_INVENTORY.isPressed()) {
+            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
+            if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
+              ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
+            }
+          }
+          TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
+          if (this.lastTutorialStep != currentTutorialStep) {
+            if (currentTutorialStep == TutorialSteps.NONE) {
+              this.setTutorialStep(clientConfig.tutorialStep.get());
+            }
+            this.lastTutorialStep = currentTutorialStep;
+          }
+
+          // Update adrenaline effects
+          if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+            this.wasAdrenalineActive = true;
+            this.effectsManager.setHighpassLevels(1.0F, 0.015F);
+            this.effectsManager.setDirectHighpassForAll();
+          } else if (this.wasAdrenalineActive) {
+            this.wasAdrenalineActive = false;
+            this.effectsManager.removeFilterForAll();
+          }
+
         }
         break;
       default:

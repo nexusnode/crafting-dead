@@ -18,10 +18,19 @@
 package com.craftingdead.core.item;
 
 import com.craftingdead.core.util.Text;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 
 public class ToolItem extends Item {
 
@@ -33,6 +42,47 @@ public class ToolItem extends Item {
   }
 
   @Override
+  public boolean canPlayerBreakBlockWhileHolding(BlockState blockState, World world,
+      BlockPos blockPos, PlayerEntity playerEntity) {
+    return !playerEntity.isCreative();
+  }
+
+  @Override
+  public float getDestroySpeed(ItemStack itemStack, BlockState blockState) {
+    if (blockState.isIn(Blocks.COBWEB)) {
+      return 15.0F;
+    } else {
+      Material material = blockState.getMaterial();
+      return material != Material.PLANTS && material != Material.TALL_PLANTS
+          && material != Material.CORAL && !blockState.isIn(BlockTags.LEAVES)
+          && material != Material.GOURD ? 1.0F : 1.5F;
+    }
+  }
+
+  @Override
+  public boolean hitEntity(ItemStack itemStack, LivingEntity targetEntity,
+      LivingEntity attackerEntity) {
+    itemStack.damageItem(1, attackerEntity,
+        (entity) -> entity.sendBreakAnimation(EquipmentSlotType.MAINHAND));
+    return true;
+  }
+
+  @Override
+  public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos,
+      LivingEntity entityLiving) {
+    if (state.getBlockHardness(worldIn, pos) != 0.0F) {
+      stack.damageItem(2, entityLiving,
+          (entity) -> entity.sendBreakAnimation(EquipmentSlotType.MAINHAND));
+    }
+    return true;
+  }
+
+  @Override
+  public boolean canHarvestBlock(BlockState blockIn) {
+    return blockIn.isIn(Blocks.COBWEB);
+  }
+
+  @Override
   public ItemStack getContainerItem(ItemStack itemStack) {
     ItemStack damagedStack = itemStack.copy();
     damagedStack.setDamage(damagedStack.getDamage() + 1);
@@ -40,7 +90,7 @@ public class ToolItem extends Item {
   }
 
   @Override
-  public boolean hasContainerItem(ItemStack stack) {
+  public boolean hasContainerItem(ItemStack itemStack) {
     return true;
   }
 }
