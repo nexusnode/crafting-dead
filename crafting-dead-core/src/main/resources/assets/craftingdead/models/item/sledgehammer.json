@@ -1,6 +1,6 @@
 {
   "parent": "craftingdead:item/melee",
   "textures": {
-    "layer0": "craftingdead:item/sledge_hammer"
+    "layer0": "craftingdead:item/sledgehammer"
   }
 }
