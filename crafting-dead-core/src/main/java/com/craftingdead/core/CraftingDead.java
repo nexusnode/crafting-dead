@@ -18,8 +18,6 @@
 package com.craftingdead.core;
 
 import java.util.ListIterator;
-
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -266,6 +264,9 @@ public class CraftingDead {
         iterator
             .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.itemWeight, 2, 4));
         iterator.add(
+            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.itemWeight * 2, 2,
+                8));
+        iterator.add(
             new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.itemWeight * 2, 2, 12));
       }
     }
@@ -364,11 +365,15 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (!(event.getObject() instanceof PlayerEntity) && event.getObject() instanceof LivingEntity) {
+      ILiving<?, ?> living = new DefaultLiving<>((LivingEntity) event.getObject());
       event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
-          new DefaultLiving<>((LivingEntity) event.getObject()), () -> ModCapabilities.LIVING));
+          living, () -> ModCapabilities.LIVING));
+      living.load();
     } else if (event.getObject() instanceof ServerPlayerEntity) {
+      ILiving<?, ?> living = new Player<>((ServerPlayerEntity) event.getObject());
       event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
-          new Player<>((ServerPlayerEntity) event.getObject()), () -> ModCapabilities.LIVING));
+          living, () -> ModCapabilities.LIVING));
+      living.load();
     }
   }
 

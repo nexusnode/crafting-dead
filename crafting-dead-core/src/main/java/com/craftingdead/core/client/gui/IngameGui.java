@@ -156,10 +156,6 @@ public class IngameGui {
 
     final ClientPlayerEntity playerEntity = player.getEntity();
 
-    if (gun != null) {
-      this.renderGunFlash(playerEntity, gun, width, height, partialTicks);
-    }
-
     heldStack.getCapability(ModCapabilities.SCOPE)
         .filter(scope -> scope.isAiming(playerEntity, heldStack))
         .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
@@ -194,6 +190,10 @@ public class IngameGui {
         renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
             RenderUtil.ICONS);
       }
+    }
+
+    if (gun != null) {
+      this.renderGunFlash(playerEntity, gun, width, height, partialTicks);
     }
 
     // Needs to render after blood or else it causes Z level issues

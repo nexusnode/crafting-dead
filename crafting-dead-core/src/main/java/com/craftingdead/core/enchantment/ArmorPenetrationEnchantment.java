@@ -23,6 +23,6 @@ import net.minecraft.inventory.EquipmentSlotType;
 public class ArmorPenetrationEnchantment extends Enchantment {
 
   protected ArmorPenetrationEnchantment(Rarity rarity, EquipmentSlotType... slotType) {
-    super(rarity, ModEnchantmentTypes.MAGAZINE, slotType);
+    super(rarity, ModEnchantmentTypes.GUN, slotType);
   }
 }

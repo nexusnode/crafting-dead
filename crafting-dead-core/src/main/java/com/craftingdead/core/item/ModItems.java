@@ -103,7 +103,11 @@ import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.PickaxeItem;
+import net.minecraft.item.ShovelItem;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -1584,112 +1588,140 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> CROWBAR = ITEMS
-      .register("crowbar", () -> new MeleeWeaponItem(3, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("crowbar", () -> new MeleeWeaponItem(7, -2.4F, new Item.Properties()
+          .maxDamage(100)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BAT = ITEMS
-      .register("bat", () -> new MeleeWeaponItem(5, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bat", () -> new MeleeWeaponItem(5, -2.4F, new Item.Properties()
+          .maxDamage(55)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> KATANA = ITEMS
-      .register("katana", () -> new MeleeWeaponItem(18, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("katana", () -> new MeleeWeaponItem(18, -2.4F, new Item.Properties()
+          .maxDamage(40)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> PIPE = ITEMS
-      .register("pipe", () -> new MeleeWeaponItem(9, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("pipe", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
+          .maxDamage(60)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> RUSTY_PIPE = ITEMS
-      .register("rusty_pipe", () -> new MeleeWeaponItem(9, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("rusty_pipe", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
+          .maxDamage(20)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FIRE_AXE = ITEMS
-      .register("fire_axe", () -> new MeleeWeaponItem(14, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("fire_axe", () -> new AxeItem(ItemTier.IRON, 14, -2.4F, new Item.Properties()
+          .maxDamage(100)
+          .group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> CHAINSAW = ITEMS
-      .register("chainsaw", () -> new MeleeWeaponItem(8, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("chainsaw", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
+          .maxDamage(75)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BOWIE_KNIFE = ITEMS
-      .register("bowie_knife", () -> new MeleeWeaponItem(15, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bowie_knife", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
+          .maxDamage(20)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> GOLF_CLUB = ITEMS
-      .register("golf_club", () -> new MeleeWeaponItem(6, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("golf_club", () -> new MeleeWeaponItem(6, -2.4F, new Item.Properties()
+          .maxDamage(40)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> NIGHT_STICK = ITEMS
-      .register("night_stick", () -> new MeleeWeaponItem(4, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("night_stick", () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
+          .maxDamage(70)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SLEDGEHAMMER = ITEMS
-      .register("sledge_hammer", () -> new MeleeWeaponItem(10, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("sledgehammer", () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F,
+          new Item.Properties()
+              .maxDamage(110)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> NAIL_BAT = ITEMS
-      .register("nail_bat", () -> new MeleeWeaponItem(8, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("nail_bat", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
+          .maxDamage(55)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SHOVEL = ITEMS
-      .register("shovel", () -> new MeleeWeaponItem(8, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("shovel", () -> new ShovelItem(ItemTier.IRON, 8, -2.4F, new Item.Properties()
+          .maxDamage(70)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> HATCHET = ITEMS
-      .register("hatchet", () -> new MeleeWeaponItem(16, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("hatchet", () -> new AxeItem(ItemTier.IRON, 16, -2.4F, new Item.Properties()
+          .maxDamage(40)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BROADSWORD = ITEMS
-      .register("broad_sword", () -> new MeleeWeaponItem(14, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("broad_sword", () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
+          .maxDamage(55)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MACHETE = ITEMS
-      .register("machete", () -> new MeleeWeaponItem(14, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("machete", () -> new MeleeWeaponItem(12, -2.4F, new Item.Properties()
+          .maxDamage(70)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> WEAPONIZED_SCYTHE = ITEMS
-      .register("weaponized_scythe", () -> new MeleeWeaponItem(15, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("weaponized_scythe", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
+          .maxDamage(40)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SCYTHE = ITEMS
-      .register("scythe", () -> new MeleeWeaponItem(20, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("scythe", () -> new MeleeWeaponItem(20, -2.4F, new Item.Properties()
+          .maxDamage(20)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> PICKAXE = ITEMS
-      .register("pickaxe", () -> new MeleeWeaponItem(10, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("pickaxe", () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F, new Item.Properties()
+          .maxDamage(210)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BO_STAFF = ITEMS
-      .register("bo_staff", () -> new MeleeWeaponItem(4, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bo_staff", () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
+          .maxDamage(70)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> WRENCH = ITEMS
-      .register("wrench", () -> new MeleeWeaponItem(4, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("wrench", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
+          .maxDamage(120)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FRYING_PAN = ITEMS
-      .register("frying_pan", () -> new MeleeWeaponItem(8, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("frying_pan", () -> new MeleeWeaponItem(6, -2.4F, new Item.Properties()
+          .maxDamage(80)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BOLT_CUTTERS = ITEMS
-      .register("bolt_cutters", () -> new MeleeWeaponItem(9, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("bolt_cutters", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
+          .maxDamage(50)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> COMBAT_KNIFE = ITEMS
-      .register("combat_knife", () -> new MeleeWeaponItem(14, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("combat_knife", () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
+          .maxDamage(100)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> STEEL_BAT = ITEMS
-      .register("steel_bat", () -> new MeleeWeaponItem(7, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("steel_bat", () -> new MeleeWeaponItem(7, -2.4F, new Item.Properties()
+          .maxDamage(180)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> CLEAVER = ITEMS
-      .register("cleaver", () -> new MeleeWeaponItem(10, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("cleaver", () -> new MeleeWeaponItem(10, -2.4F, new Item.Properties()
+          .maxDamage(80)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BROKEN_BOTTLE = ITEMS
-      .register("broken_bottle", () -> new MeleeWeaponItem(15, -2.4F,
-          new Item.Properties().maxStackSize(1).group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+      .register("broken_bottle", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
+          .maxDamage(10)
+          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Vests

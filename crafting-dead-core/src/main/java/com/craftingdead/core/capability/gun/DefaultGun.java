@@ -57,9 +57,10 @@ import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.TNTBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -82,6 +83,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -477,7 +479,8 @@ public class DefaultGun implements IGun {
               IPlayer.getExpected((ServerPlayerEntity) hitLivingEntity);
           hitPlayer.infect(
               (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), itemStack)
-                  / 255.0F) * hitPlayer.getItemHandler()
+                  / (float) ModEnchantments.INFECTION.get().getMaxLevel())
+                  * hitPlayer.getItemHandler()
                       .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
                       .getCapability(ModCapabilities.CLOTHING)
                       .filter(IClothing::hasEnhancedProtection)
@@ -508,9 +511,15 @@ public class DefaultGun implements IGun {
       checkCreateExplosion(itemStack, entity, rayTrace.getHitVec());
 
       if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, itemStack) > 0) {
-        BlockPos blockAbove = rayTrace.getPos().add(0, 1, 0);
-        if (!world.isAirBlock(rayTrace.getPos()) && world.isAirBlock(blockAbove)) {
-          world.setBlockState(blockAbove, Blocks.FIRE.getDefaultState());
+        if (CampfireBlock.canBeLit(blockState)) {
+          world.setBlockState(blockPos,
+              blockState.with(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
+        } else {
+          BlockPos faceBlockPos = blockPos.offset(rayTrace.getFace());
+          if (AbstractFireBlock.canLightBlock(world, faceBlockPos, entity.getHorizontalFacing())) {
+            BlockState blockstate1 = AbstractFireBlock.getFireForPlacement(world, faceBlockPos);
+            world.setBlockState(faceBlockPos, blockstate1, 11);
+          }
         }
       }
     }
@@ -720,7 +729,7 @@ public class DefaultGun implements IGun {
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
       Vector3d position) {
     float explosionSize = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, magazineStack)
-        / Enchantments.POWER.getMaxLevel();
+        / (float) Enchantments.POWER.getMaxLevel();
     if (explosionSize > 0) {
       entity.getEntityWorld().createExplosion(entity, position.getX(), position.getY(),
           position.getZ(), explosionSize, Explosion.Mode.NONE);
