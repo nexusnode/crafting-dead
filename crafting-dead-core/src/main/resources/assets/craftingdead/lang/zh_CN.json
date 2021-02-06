@@ -64,10 +64,10 @@
   "action.craftingdead.use_bandage.message":"使用绷带",
   "action.craftingdead.wash_rag.message":"清洗绷带",
 
-  "itemGroup.craftingdead.clothing": "Crafting Dead 衣物",
-  "itemGroup.craftingdead.misc": "Crafting Dead 杂项",
-  "itemGroup.craftingdead.med": "Crafting Dead 药品",
-  "itemGroup.craftingdead.combat": "Crafting Dead 战斗物品",
+  "itemGroup.craftingdead.clothing": "行尸走肉衣物",
+  "itemGroup.craftingdead.misc": "行尸走肉杂项",
+  "itemGroup.craftingdead.med": "行尸走肉药品",
+  "itemGroup.craftingdead.combat": "行尸走肉战斗物品",
 
   "item.craftingdead.vulcan_paint": "火神喷漆",
   "item.craftingdead.asmo_paint": "Asmo喷漆",
