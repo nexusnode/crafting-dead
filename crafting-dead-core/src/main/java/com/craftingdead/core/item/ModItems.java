@@ -231,6 +231,18 @@ public class ModItems {
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<PaintItem> MONARCH_PAINT = ITEMS
+          .register("monarch_paint",
+                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+                          .maxStackSize(1)
+                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+
+  public static final RegistryObject<PaintItem> LOVELACE_PAINT = ITEMS
+          .register("lovelace_paint",
+                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+                          .maxStackSize(1)
+                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
   // ================================================================================
   // Magazines
   // ================================================================================
@@ -650,6 +662,7 @@ public class ModItems {
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(EMPEROR_DRAGON_PAINT)
               .addAcceptedPaint(HYPER_BEAST_PAINT)
+              .addAcceptedPaint(LOVELACE_PAINT)
               .setRendererFactory(() -> M4A1Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -714,6 +727,7 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(VULCAN_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
+              .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> AK47Renderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1111,6 +1125,7 @@ public class ModItems {
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(NUCLEAR_WINTER_PAINT)
+              .addAcceptedPaint(LOVELACE_PAINT)
               .setRendererFactory(() -> DesertEagleRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
@@ -1369,6 +1384,7 @@ public class ModItems {
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(ASMO_PAINT)
+              .addAcceptedPaint(MONARCH_PAINT)
               .setRendererFactory(() -> AWPRenderer::new)
               .maxStackSize(1)
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
