@@ -362,6 +362,7 @@
   "item_lore.gun_item.attachment": "已装备: ",
   "item_lore.gun_item.rpm": "每分钟射速: ",
   "item_lore.gun_item.accuracy": "精准度: ",
+  "item_lore.gun_item.range": "范围: ",
   "item_lore.clothing_item.water_breathing": "赋予水下呼吸能力",
   "item_lore.clothing_item.water_speed": "赋予水呼吸能力",
 

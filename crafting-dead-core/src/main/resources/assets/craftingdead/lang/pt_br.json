@@ -329,6 +329,7 @@
   "item_lore.gun_item.attachment": "Equipado: ",
   "item_lore.gun_item.rpm": "Disparos por minuto: ",
   "item_lore.gun_item.accuracy": "Precisão: ",
+  "item_lore.gun_item.range": "Alcance: ",
   "item_lore.tool_item.open_canned_items": "Abre latas quando craftado com enlatados",
   "item_lore.clothing_item.water_breathing": "Provê respiração em baixo d'água",
   "item_lore.clothing_item.water_speed": "Aumenta velocidade do nado",

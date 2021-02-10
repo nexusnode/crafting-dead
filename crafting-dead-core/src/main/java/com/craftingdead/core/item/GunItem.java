@@ -174,6 +174,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final long rightMouseActionSoundRepeatDelayMs;
 
+  /**
+   * Decides how long the raycast of the shot will be.
+   */
+  private final double fireDistance;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireRateMs = properties.fireRate;
@@ -198,6 +203,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.triggerPredicate = properties.triggerPredicate;
     this.rightMouseActionSound = properties.rightMouseActionSound;
     this.rightMouseActionSoundRepeatDelayMs = properties.rightMouseActionSoundRepeatDelayMs;
+    this.fireDistance = properties.fireDistance;
   }
 
   public int getFireRateMs() {
@@ -218,6 +224,10 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public float getAccuracy() {
     return this.accuracy;
+  }
+
+  public double getFireDistance() {
+    return this.fireDistance;
   }
 
   public int getBulletAmountToFire() {
@@ -368,6 +378,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
       ITextComponent accuracyText =
           Text.of((int) (this.accuracy * 100D) + "%").mergeStyle(TextFormatting.RED);
       ITextComponent rpmText = Text.of(this.getFireRateRPM()).mergeStyle(TextFormatting.RED);
+      ITextComponent rangeText = Text.of(this.getFireDistance() + "m").mergeStyle(TextFormatting.RED);
 
       lines.add(Text.translate("item_lore.gun_item.ammo_amount")
           .mergeStyle(TextFormatting.GRAY)
@@ -402,6 +413,9 @@ public class GunItem extends ShootableItem implements IRendererProvider {
       lines.add(Text.translate("item_lore.gun_item.accuracy")
           .mergeStyle(TextFormatting.GRAY)
           .append(accuracyText));
+      lines.add(Text.translate("item_lore.gun_item.range")
+              .mergeStyle(TextFormatting.GRAY)
+              .append(rangeText));
     });
   }
 
@@ -467,6 +481,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     private int bulletAmountToFire = 1;
 
     private float accuracy;
+
+    private double fireDistance;
 
     private boolean aimable = true;
 
@@ -541,6 +557,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     public Properties setAccuracy(float accuracy) {
       this.accuracy = accuracy;
+      return this;
+    }
+
+    public Properties setFireDistance(double fireDistance) {
+      this.fireDistance = fireDistance;
       return this;
     }
 

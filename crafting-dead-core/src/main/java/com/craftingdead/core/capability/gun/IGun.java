@@ -126,4 +126,6 @@ public interface IGun extends INBTSerializable<CompoundNBT> {
   public static enum RightMouseActionTriggerType {
     HOLD, CLICK;
   }
+
+  double getFireDistance();
 }

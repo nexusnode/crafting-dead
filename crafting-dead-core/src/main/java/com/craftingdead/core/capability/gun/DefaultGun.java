@@ -152,6 +152,11 @@ public class DefaultGun implements IGun {
    */
   private int shotCount;
 
+  /**
+   * Determines how far the bullet will be raycasted.
+   */
+  private double fireDistance;
+
   private Set<AttachmentItem> attachments = new HashSet<>();
 
   private ItemStack paintStack = ItemStack.EMPTY;
@@ -172,6 +177,7 @@ public class DefaultGun implements IGun {
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
     this.clientHandler = this.createClientHandler();
+    this.fireDistance = gunItem.getFireDistance();
   }
 
   protected IGunClient createClientHandler() {
@@ -291,7 +297,7 @@ public class DefaultGun implements IGun {
 
     if (playerSnapshot != null && hitSnapshot != null && !hitLiving.getEntity().getShouldBeDead()) {
       random.setSeed(pendingHit.getRandomSeed());
-      hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, 100.0D,
+      hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, fireDistance,
           this.getAccuracy(player, itemStack), random).ifPresent(
               hitPos -> this.hitEntity(player, itemStack, hitLiving.getEntity(), hitPos, false));
     }
@@ -327,7 +333,7 @@ public class DefaultGun implements IGun {
       final long randomSeed = entity.getEntityWorld().getGameTime() + i;
       random.setSeed(randomSeed);
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, 100.0D, partialTicks, this.getAccuracy(living, itemStack), random)
+          .rayTrace(entity, fireDistance, partialTicks, this.getAccuracy(living, itemStack), random)
           .orElse(null);
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
@@ -735,5 +741,10 @@ public class DefaultGun implements IGun {
       entity.getEntityWorld().createExplosion(entity, position.getX(), position.getY(),
           position.getZ(), explosionSize, Explosion.Mode.NONE);
     }
+  }
+
+  @Override
+  public double getFireDistance() {
+    return this.fireDistance;
   }
 }
