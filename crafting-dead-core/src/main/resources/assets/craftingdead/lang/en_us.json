@@ -364,6 +364,7 @@
   "item_lore.gun_item.attachment": "Equipped: ",
   "item_lore.gun_item.rpm": "Rounds per minute: ",
   "item_lore.gun_item.accuracy": "Accuracy: ",
+  "item_lore.gun_item.range": "Range: ",
   "item_lore.clothing_item.water_breathing": "Gives water breathing ability",
   "item_lore.clothing_item.water_speed": "Increases swimming speed",
 
