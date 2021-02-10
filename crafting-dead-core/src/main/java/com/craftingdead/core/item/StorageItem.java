@@ -38,6 +38,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class StorageItem extends Item {
@@ -94,4 +95,29 @@ public class StorageItem extends Item {
       }
     });
   }
+
+  @Override
+  public CompoundNBT getShareTag(ItemStack stack) {
+    CompoundNBT shareTag = stack.getTag();
+    if (shareTag == null) {
+      shareTag = new CompoundNBT();
+    }
+    CompoundNBT storageTag = stack.getCapability(ModCapabilities.STORAGE)
+        .map(IStorage::serializeNBT)
+        .orElse(null);
+    if (storageTag != null && !storageTag.isEmpty()) {
+      shareTag.put("storage", storageTag);
+    }
+    return shareTag;
+  }
+
+  @Override
+  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    if (nbt != null && nbt.contains("storage", Constants.NBT.TAG_COMPOUND)) {
+      stack.getCapability(ModCapabilities.STORAGE)
+          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("storage")));
+    }
+    super.readShareTag(stack, nbt);
+  }
+
 }

@@ -81,16 +81,4 @@ public class ToolItem extends Item {
   public boolean canHarvestBlock(BlockState blockIn) {
     return blockIn.isIn(Blocks.COBWEB);
   }
-
-  @Override
-  public ItemStack getContainerItem(ItemStack itemStack) {
-    ItemStack damagedStack = itemStack.copy();
-    damagedStack.setDamage(damagedStack.getDamage() + 1);
-    return damagedStack.getDamage() >= damagedStack.getMaxDamage() ? ItemStack.EMPTY : damagedStack;
-  }
-
-  @Override
-  public boolean hasContainerItem(ItemStack itemStack) {
-    return true;
-  }
 }
