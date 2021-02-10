@@ -262,12 +262,12 @@ public class CraftingDead {
         iterator.add(
             new MobSpawnInfo.Spawners(ModEntityTypes.fastZombie, spawnEntry.itemWeight / 2, 2, 4));
         iterator
-            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.itemWeight, 2, 4));
+            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.itemWeight / 2, 2,
+                4));
         iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.itemWeight * 2, 2,
-                8));
+            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.itemWeight, 3, 8));
         iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.itemWeight * 2, 2, 12));
+            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.itemWeight, 3, 12));
       }
     }
   }
