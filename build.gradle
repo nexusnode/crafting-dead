@@ -19,14 +19,14 @@ buildscript {
 plugins {
 	id 'java-library'
 	id 'eclipse'
-	id 'com.github.hierynomus.license' version '0.15.0'
+	id 'org.cadixdev.licenser' version '0.5.0'
 }
 
 subprojects {
     apply plugin: 'net.minecraftforge.gradle'
     apply plugin: 'org.spongepowered.mixin'
 	apply plugin: 'eclipse'
-	apply plugin: 'com.github.hierynomus.license'
+	apply plugin: 'org.cadixdev.licenser'
 
 	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -72,12 +72,12 @@ subprojects {
 	
 	license {
 		include '**/*.java'
-	    header rootProject.file('HEADER.txt')
+		
+	    header = rootProject.file('HEADER.txt')
+
 	    ext {
-	        organization = 'Nexus Node'
-	        year = 2020
+	        organization = 'NexusNode LTD'
+	        year = 2021
 	    }
-	    // Buggy so ignore
-	 	ignoreFailures true
 	}
 }
