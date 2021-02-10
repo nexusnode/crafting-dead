@@ -25,5 +25,5 @@ import net.minecraftforge.items.IItemHandler;
 @FunctionalInterface
 public interface IItemHandlerContainerProvider {
   @Nullable
-  Container createMenu(int windowId, PlayerInventory playerInventory, IItemHandler backpack);
+  Container createMenu(int windowId, PlayerInventory playerInventory, IItemHandler itemHandler);
 }
