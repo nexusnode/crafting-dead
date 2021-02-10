@@ -152,11 +152,6 @@ public class DefaultGun implements IGun {
    */
   private int shotCount;
 
-  /**
-   * Determines how far the bullet will be raycasted.
-   */
-  private double fireDistance;
-
   private Set<AttachmentItem> attachments = new HashSet<>();
 
   private ItemStack paintStack = ItemStack.EMPTY;
@@ -177,7 +172,6 @@ public class DefaultGun implements IGun {
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.magazineStack = new ItemStack(gunItem.getDefaultMagazine().get());
     this.clientHandler = this.createClientHandler();
-    this.fireDistance = gunItem.getFireDistance();
   }
 
   protected IGunClient createClientHandler() {
@@ -297,9 +291,15 @@ public class DefaultGun implements IGun {
 
     if (playerSnapshot != null && hitSnapshot != null && !hitLiving.getEntity().getShouldBeDead()) {
       random.setSeed(pendingHit.getRandomSeed());
-      hitSnapshot.rayTrace(player.getEntity().getEntityWorld(), playerSnapshot, fireDistance,
-          this.getAccuracy(player, itemStack), random).ifPresent(
-              hitPos -> this.hitEntity(player, itemStack, hitLiving.getEntity(), hitPos, false));
+      // @formatter:off
+      hitSnapshot
+          .rayTrace(player.getEntity().getEntityWorld(),
+              playerSnapshot,
+              this.gunItem.getRange(),
+              this.getAccuracy(player, itemStack),
+              random)
+          .ifPresent(hitPos -> this.hitEntity(player, itemStack, hitLiving.getEntity(), hitPos, false));
+      // @formatter:on
     }
   }
 
@@ -332,9 +332,15 @@ public class DefaultGun implements IGun {
     for (int i = 0; i < this.gunItem.getBulletAmountToFire(); i++) {
       final long randomSeed = entity.getEntityWorld().getGameTime() + i;
       random.setSeed(randomSeed);
+      // @formatter:off
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity, fireDistance, partialTicks, this.getAccuracy(living, itemStack), random)
+          .rayTrace(entity,
+              this.gunItem.getRange(),
+              partialTicks,
+              this.getAccuracy(living, itemStack),
+              random)
           .orElse(null);
+      // @formatter:on
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
@@ -535,7 +541,7 @@ public class DefaultGun implements IGun {
   @Override
   public float getAccuracy(ILiving<?, ?> living, ItemStack itemStack) {
     float accuracy =
-        this.gunItem.getAccuracy() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
+        this.gunItem.getAccuracyPct() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
     return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
   }
 
@@ -741,10 +747,5 @@ public class DefaultGun implements IGun {
       entity.getEntityWorld().createExplosion(entity, position.getX(), position.getY(),
           position.getZ(), explosionSize, Explosion.Mode.NONE);
     }
-  }
-
-  @Override
-  public double getFireDistance() {
-    return this.fireDistance;
   }
 }

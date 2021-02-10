@@ -82,7 +82,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   /**
    * Accuracy as percentage.
    */
-  private final float accuracy;
+  private final float accuracyPct;
 
   /**
    * Amount of "pellets" to be fired in a single shot. It is used by shotguns.
@@ -175,16 +175,16 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   private final long rightMouseActionSoundRepeatDelayMs;
 
   /**
-   * Decides how long the raycast of the shot will be.
+   * Range in blocks.
    */
-  private final double fireDistance;
+  private final double range;
 
   public GunItem(Properties properties) {
     super(properties);
     this.fireRateMs = properties.fireRate;
     this.damage = properties.damage;
     this.reloadDurationTicks = properties.reloadDurationTicks;
-    this.accuracy = properties.accuracy;
+    this.accuracyPct = properties.accuracy;
     this.bulletAmountToFire = properties.bulletAmountToFire;
     this.aimable = properties.aimable;
     this.crosshair = properties.crosshair;
@@ -203,7 +203,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.triggerPredicate = properties.triggerPredicate;
     this.rightMouseActionSound = properties.rightMouseActionSound;
     this.rightMouseActionSoundRepeatDelayMs = properties.rightMouseActionSoundRepeatDelayMs;
-    this.fireDistance = properties.fireDistance;
+    this.range = properties.range;
   }
 
   public int getFireRateMs() {
@@ -222,12 +222,12 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     return this.reloadDurationTicks;
   }
 
-  public float getAccuracy() {
-    return this.accuracy;
+  public float getAccuracyPct() {
+    return this.accuracyPct;
   }
 
-  public double getFireDistance() {
-    return this.fireDistance;
+  public double getRange() {
+    return this.range;
   }
 
   public int getBulletAmountToFire() {
@@ -376,9 +376,10 @@ public class GunItem extends ShootableItem implements IRendererProvider {
           .of((int) (this.damage * DefaultGun.HEADSHOT_MULTIPLIER))
           .mergeStyle(TextFormatting.RED);
       ITextComponent accuracyText =
-          Text.of((int) (this.accuracy * 100D) + "%").mergeStyle(TextFormatting.RED);
+          Text.of((int) (this.accuracyPct * 100D) + "%").mergeStyle(TextFormatting.RED);
       ITextComponent rpmText = Text.of(this.getFireRateRPM()).mergeStyle(TextFormatting.RED);
-      ITextComponent rangeText = Text.of(this.getFireDistance() + "m").mergeStyle(TextFormatting.RED);
+      ITextComponent rangeText =
+          Text.of(this.getRange() + " blocks").mergeStyle(TextFormatting.RED);
 
       lines.add(Text.translate("item_lore.gun_item.ammo_amount")
           .mergeStyle(TextFormatting.GRAY)
@@ -414,8 +415,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
           .mergeStyle(TextFormatting.GRAY)
           .append(accuracyText));
       lines.add(Text.translate("item_lore.gun_item.range")
-              .mergeStyle(TextFormatting.GRAY)
-              .append(rangeText));
+          .mergeStyle(TextFormatting.GRAY)
+          .append(rangeText));
     });
   }
 
@@ -482,7 +483,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private float accuracy;
 
-    private double fireDistance;
+    private double range;
 
     private boolean aimable = true;
 
@@ -560,8 +561,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
       return this;
     }
 
-    public Properties setFireDistance(double fireDistance) {
-      this.fireDistance = fireDistance;
+    public Properties setRange(double range) {
+      this.range = range;
       return this;
     }
 
