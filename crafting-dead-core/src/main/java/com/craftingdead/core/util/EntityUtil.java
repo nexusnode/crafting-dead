@@ -25,18 +25,20 @@ import net.minecraft.util.math.vector.Vector3d;
 
 public class EntityUtil {
 
+  private static final MutableVector2f ROTATIONS_TO_TARGET = new MutableVector2f();
+
   /**
-   * Whether the target is inside the field of view of the viewer entity. Blocks in front of
-   * view are ignored.
+   * Whether the target is inside the field of view of the viewer entity. Blocks in front of view
+   * are ignored.
    *
    * @param viewer
    * @param target
    * @param fov - In degrees (e.g. 90F)
    */
   public static boolean isInsideFOV(LivingEntity viewer, Entity target, float fov) {
-    float[] rotationsToTarget = getRotationsToTarget(viewer, target);
-    float yawToTarget = rotationsToTarget[0];
-    float pitchToTarget = rotationsToTarget[1];
+    getRotationsToTarget(viewer, target, ROTATIONS_TO_TARGET);
+    float yawToTarget = ROTATIONS_TO_TARGET.getX();
+    float pitchToTarget = ROTATIONS_TO_TARGET.getY();
 
     float currentYaw = MathHelper.wrapDegrees(viewer.rotationYawHead);
     float currentPitch = MathHelper.wrapDegrees(viewer.rotationPitch);
@@ -51,9 +53,11 @@ public class EntityUtil {
 
   /**
    * Gets how much yaw and pitch, respectively, the target's eye is from the viewer's eye.
+   * 
    * @return float array with yaw and pitch, respectively.
    */
-  private static float[] getRotationsToTarget(LivingEntity viewer, Entity target) {
+  public static void getRotationsToTarget(LivingEntity viewer, Entity target,
+      MutableVector2f result) {
     Vector3d entityVec = target.getPositionVec();
     Vector3d livingVec = viewer.getPositionVec();
 
@@ -65,9 +69,6 @@ public class EntityUtil {
     float yawToTarget = (float) (Math.atan2(xDiff, zDiff) * 180.0D / Math.PI);
     float pitchToTarget = (float) (-(Math.atan2(yDiff, distance2D) * 180.0D / Math.PI));
 
-    return new float[] {
-        MathHelper.wrapDegrees(yawToTarget),
-        MathHelper.wrapDegrees(pitchToTarget)
-    };
+    result.set(MathHelper.wrapDegrees(yawToTarget), MathHelper.wrapDegrees(pitchToTarget));
   }
 }

@@ -79,6 +79,8 @@ public class M107Renderer extends GunRenderer {
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(3.0F));
+    
+    matrixStack.translate(0.0F, 0.0F, 0.5F);
   }
 
   @Override
@@ -98,7 +100,7 @@ public class M107Renderer extends GunRenderer {
     matrixStack.scale(scale, scale, scale);
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.0115F, 0.0004F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -232,8 +234,8 @@ public class M107Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    super.applySprintingTransforms(matrixStack);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    super.applySprintingTransforms(matrixStack, pct);
     matrixStack.translate(0.0F, 0.0F, -0.4F);
   }
 }

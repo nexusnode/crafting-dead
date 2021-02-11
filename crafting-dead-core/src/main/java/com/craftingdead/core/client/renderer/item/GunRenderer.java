@@ -39,6 +39,7 @@ import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
+import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.item.MagazineItem;
@@ -69,6 +70,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.SimpleModelTransform;
@@ -79,6 +81,8 @@ public abstract class GunRenderer implements IItemRenderer {
   private static final int FULL_LIGHT = 0xF000F0;
 
   private static final int FLASH_TEXTURE_CHANGE_TIMEOUT_MS = 250;
+
+  private static final int SPRINT_TRANSITION_MS = 200;
 
   private static final Random random = new Random();
 
@@ -96,6 +100,10 @@ public abstract class GunRenderer implements IItemRenderer {
   protected float muzzleScale = 2F;
 
   private long lastFlashTime = 0;
+
+  private long sprintStartTimeMs;
+
+  private boolean wasSprinting;
 
   public GunRenderer(Supplier<? extends GunItem> gunItem) {
     this.gunItem = gunItem;
@@ -333,9 +341,18 @@ public abstract class GunRenderer implements IItemRenderer {
         this.applyFirstPersonTransforms(playerEntity, gun, matrixStack);
       }
 
-      if (playerEntity.isSprinting()) {
-        this.applySprintingTransforms(matrixStack);
+      if (this.wasSprinting != playerEntity.isSprinting()) {
+        this.sprintStartTimeMs = Util.milliTime();
+        this.wasSprinting = playerEntity.isSprinting();
       }
+
+      float zeroToOneFadePct = MathHelper.clamp(
+          (float) (Util.milliTime() - this.sprintStartTimeMs) / SPRINT_TRANSITION_MS,
+          0.0F, 1.0F);
+      if (!playerEntity.isSprinting()) {
+        zeroToOneFadePct = 1.0F - zeroToOneFadePct;
+      }
+      this.applySprintingTransforms(matrixStack, RenderUtil.easeInOutSine(zeroToOneFadePct));
 
       gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.BODY,
@@ -573,9 +590,9 @@ public abstract class GunRenderer implements IItemRenderer {
   protected abstract void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHanded, MatrixStack matrixStack);
 
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.7F, 0.0F, 0.2F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.3F, 0.0F, pct * 0.3F);
   }
 
   protected ResourceLocation getGunModelLocation() {

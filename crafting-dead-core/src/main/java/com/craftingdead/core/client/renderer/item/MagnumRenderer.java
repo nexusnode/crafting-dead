@@ -170,8 +170,8 @@ public class MagnumRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(1F, 0.0F, 1F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.5F, 0.0F, pct * 1.3F);
   }
 }

@@ -83,12 +83,12 @@ public class MAC10Renderer extends GunRenderer {
   @Override
   protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
       MatrixStack matrixStack) {
-    
+
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(-30));
     matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
 
-    
+
     matrixStack.translate(0.05, -0.645F, 0.9585F);
 
     if (!gun.hasIronSight()) {
@@ -98,11 +98,11 @@ public class MAC10Renderer extends GunRenderer {
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, -0.025F, 0.00F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
-    	matrixStack.rotate(Vector3f.ZP.rotationDegrees(5));
+      matrixStack.rotate(Vector3f.ZP.rotationDegrees(5));
       matrixStack.translate(0F, -0.036F, 0.00F);
     }
   }
@@ -201,8 +201,8 @@ public class MAC10Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.5F, 0.0F, 0.2F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.5F, 0.0F, pct * 0.2F);
   }
 }

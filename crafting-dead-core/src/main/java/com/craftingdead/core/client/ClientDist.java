@@ -18,6 +18,11 @@
 
 package com.craftingdead.core.client;
 
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
+import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -62,6 +67,7 @@ import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
+import com.craftingdead.core.util.MutableVector2f;
 import com.craftingdead.core.util.Text;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -96,7 +102,6 @@ import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -129,12 +134,6 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
 
 public class ClientDist implements IModDist {
 
@@ -159,6 +158,9 @@ public class ClientDist implements IModDist {
 
   private static final ResourceLocation ADRENALINE_SHADER =
       new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
+
+  private static final Vector3f CAMERA_ROTATIONS = new Vector3f();
+  private static final MutableVector2f FOV = new MutableVector2f();
 
   private static final int DOUBLE_CLICK_DURATION = 500;
 
@@ -495,6 +497,8 @@ public class ClientDist implements IModDist {
           boolean worldFocused = !this.minecraft.isGamePaused() && this.minecraft.loadingGui == null
               && (this.minecraft.currentScreen == null);
 
+          this.cameraManager.tick();
+
           if (!worldFocused) {
             // Stop gun actions if world not focused.
             if (gun != null) {
@@ -664,15 +668,16 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    final Vector3f rotations = this.cameraManager.getCameraRotations();
-    event.setPitch(event.getPitch() + rotations.getX());
-    event.setYaw(event.getYaw() + rotations.getY());
-    event.setRoll(event.getRoll() + rotations.getZ());
+    this.cameraManager.getCameraRotations((float) event.getRenderPartialTicks(), CAMERA_ROTATIONS);
+    event.setPitch(event.getPitch() + CAMERA_ROTATIONS.getX());
+    event.setYaw(event.getYaw() + CAMERA_ROTATIONS.getY());
+    event.setRoll(event.getRoll() + CAMERA_ROTATIONS.getZ());
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
-    event.setNewfov(event.getNewfov() + this.cameraManager.getFov());
+    event.setNewfov(event.getNewfov()
+        + this.cameraManager.getFov(Minecraft.getInstance().getRenderPartialTicks()));
   }
 
   @SubscribeEvent
@@ -700,8 +705,8 @@ public class ClientDist implements IModDist {
         this.lastTime = currentTime;
         this.tweenManager.update(deltaTime);
         if (this.minecraft.player != null) {
-          final Vector2f rotationVelocity = this.cameraManager.getLookRotationDelta();
-          this.minecraft.player.rotateTowards(rotationVelocity.y, rotationVelocity.x);
+          this.cameraManager.getLookRotationDelta(FOV);
+          this.minecraft.player.rotateTowards(FOV.getY(), FOV.getX());
         }
         break;
       case END:

@@ -177,10 +177,5 @@ public class M9Renderer extends GunRenderer {
   protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     matrixStack.translate(0.02F, 0.04F, -0.12F);
-    if (rightHand) {
-      matrixStack.translate(0.0F, 0.0F, 0.0F);
-    } else {
-      matrixStack.translate(0.0F, 0.0F, 0.0F);
-    }
   }
 }

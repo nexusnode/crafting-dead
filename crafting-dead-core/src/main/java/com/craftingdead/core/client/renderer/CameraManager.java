@@ -19,10 +19,9 @@
 package com.craftingdead.core.client.renderer;
 
 import java.util.Random;
+import com.craftingdead.core.util.MutableVector2f;
 import net.minecraft.client.util.NativeUtil;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class CameraManager {
@@ -31,20 +30,20 @@ public class CameraManager {
 
   private static final float LOOK_ROTATION_DECELERATION = 10.0F;
 
-  private long joltDurationMs;
-
-  private long joltStartTimeMs;
-
-  private float pitchMultiplier;
-
-  private float rollMultiplier;
-
-  private float fovMultiplier;
-
-  private VelocitySmoother pitchSmoother = new VelocitySmoother();
-  private VelocitySmoother yawSmoother = new VelocitySmoother();
+  private VelocitySmoother lookPitchSmoother = new VelocitySmoother(0.5F);
+  private VelocitySmoother lookYawSmoother = new VelocitySmoother(0.5F);
 
   private float lastLookTime = Float.MIN_VALUE;
+
+  private VelocitySmoother pitchSmoother = new VelocitySmoother(1F);
+
+  private float pitch;
+  private float lastPitch;
+
+  private VelocitySmoother rollSmoother = new VelocitySmoother(1F);
+
+  private float roll;
+  private float lastRoll;
 
   public void joltCamera(float amountPercent, boolean modifyLookPosition) {
     if (amountPercent == 0.0F) {
@@ -53,44 +52,44 @@ public class CameraManager {
     float randomAmount = amountPercent * (random.nextFloat() + 1.0F) / 2.0F;
     float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
     if (modifyLookPosition) {
-      this.pitchSmoother.add(-randomAmount * 25.0F);
-      this.yawSmoother.add(randomNegativeAmount * 12.5F);
+      this.lookPitchSmoother.add(-randomAmount * 25.0F);
+      this.lookYawSmoother.add(randomNegativeAmount * 12.5F);
     }
-    this.joltStartTimeMs = Util.milliTime();
-    this.rollMultiplier = randomNegativeAmount * 0.75F;
-    this.pitchMultiplier = randomAmount / 2.0F;
-    this.fovMultiplier = 0.1F * amountPercent;
-    this.joltDurationMs = (long) (150L);
+
+    this.pitchSmoother.add(-randomAmount * 12.0F);
+    this.rollSmoother.add(randomNegativeAmount * 7.5F);
   }
 
-  public Vector2f getLookRotationDelta() {
+  public void tick() {
+    this.lastPitch = this.pitch;
+    this.pitch = this.pitchSmoother.getAndDecelerate(0.5F);
+
+    this.lastRoll = this.roll;
+    this.roll = this.rollSmoother.getAndDecelerate(0.5F);
+  }
+
+  public void getLookRotationDelta(MutableVector2f result) {
     float currentTime = (float) NativeUtil.getTime();
     float timeDelta = currentTime - this.lastLookTime;
     this.lastLookTime = currentTime;
     final float deceleration = timeDelta * LOOK_ROTATION_DECELERATION;
-    return new Vector2f(this.pitchSmoother.getAndDecelerate(deceleration),
-        this.yawSmoother.getAndDecelerate(deceleration));
+    result.set(this.lookPitchSmoother.getAndDecelerate(deceleration),
+        this.lookYawSmoother.getAndDecelerate(deceleration));
   }
 
-  public Vector3f getCameraRotations() {
-    float pct = MathHelper.clamp(
-        (float) (Util.milliTime() - this.joltStartTimeMs) / (this.joltDurationMs * 1.15F),
-        0.0F, 1.0F);
-    if (pct == 1.0F) {
-      return new Vector3f(0.0F, 0.0F, 0.0F);
-    }
-    float roll = (float) Math.sin(Math.toRadians(180 * pct)) * this.rollMultiplier;
-    float pitch = (float) Math.sin(Math.toRadians(360 * pct)) * this.pitchMultiplier;
-    return new Vector3f(pitch, 0, roll);
+  public void getCameraRotations(float partialTicks, Vector3f result) {
+    result.set(this.lerpPitch(partialTicks), 0, this.lerpRoll(partialTicks));
   }
 
-  public float getFov() {
-    float pct = MathHelper.clamp(
-        (float) (Util.milliTime() - this.joltStartTimeMs) / (this.joltDurationMs / 2.0F), 0.0F,
-        1.0F);
-    if (pct == 1.0F) {
-      return 0.0F;
-    }
-    return (float) Math.sin(Math.toRadians(180 * pct)) * this.fovMultiplier;
+  public float getFov(float partialTicks) {
+    return -this.lerpPitch(partialTicks) * 0.015F;
+  }
+
+  private float lerpPitch(float partialTicks) {
+    return MathHelper.lerp(partialTicks, this.lastPitch, this.pitch);
+  }
+
+  private float lerpRoll(float partialTicks) {
+    return MathHelper.lerp(partialTicks, this.lastRoll, this.roll);
   }
 }

@@ -234,8 +234,8 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  public void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(4F, 0.8F, 2.5F);
+  public void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 1.75F, 0, pct * 3.5F);
   }
 }

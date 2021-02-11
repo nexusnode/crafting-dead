@@ -92,12 +92,12 @@ public class P90Renderer extends GunRenderer {
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.0585F, 0.00F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
       matrixStack.translate(0F, 0.0555F, 0.00F);
-    }	
+    }
   }
 
   @Override
@@ -195,8 +195,8 @@ public class P90Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.7F, 0.0F, 0.2F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.7F, 0.0F, pct * 0.3F);
   }
 }

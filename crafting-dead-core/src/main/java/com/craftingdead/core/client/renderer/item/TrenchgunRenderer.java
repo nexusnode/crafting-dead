@@ -162,8 +162,9 @@ public class TrenchgunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(1.6F, 0.0F, 0.6F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -40));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(pct * 10));
+    matrixStack.translate(pct * 1F, 0.0F, pct * 0.75F);
   }
 }

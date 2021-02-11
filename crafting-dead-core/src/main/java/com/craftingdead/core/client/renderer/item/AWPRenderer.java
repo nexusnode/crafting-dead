@@ -204,8 +204,8 @@ public class AWPRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70.0F));
-    matrixStack.translate(0.6F, 0.0F, -0.1F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50.0F));
+    matrixStack.translate(pct * 0.6F, 0.0F, pct * 0.1F);
   }
 }

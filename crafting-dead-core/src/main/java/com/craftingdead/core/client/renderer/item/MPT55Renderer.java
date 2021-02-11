@@ -96,7 +96,7 @@ public class MPT55Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.8F));
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.034F, 0F);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.05F, -0.007F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -215,9 +215,9 @@ public class MPT55Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(4.3F, 0.0F, 3F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 3F, 0.0F, pct * 5F);
   }
 }
 

@@ -101,7 +101,7 @@ public class RPKRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.YP.rotationDegrees(0.25F));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(1.25F));
     matrixStack.translate(-0.3F, -0.2F, 0.002F);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.016F, 0.00375F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -202,8 +202,8 @@ public class RPKRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.9F, 0.0F, 0.6F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.9F, 0.0F, pct * 0.6F);
   }
 }

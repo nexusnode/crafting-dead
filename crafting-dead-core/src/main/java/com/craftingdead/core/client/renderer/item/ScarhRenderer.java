@@ -99,7 +99,7 @@ public class ScarhRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.YP.rotationDegrees(0.18F));
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(1.2F));
     matrixStack.translate(-0.8F, -0.17F, 0.01F);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.0072F, -0.001F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -253,11 +253,5 @@ public class ScarhRenderer extends GunRenderer {
     } else {
       matrixStack.translate(0.03F, 0.15F, -0.05F);
     }
-  }
-
-  @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.7F, 0.0F, 0.2F);
   }
 }

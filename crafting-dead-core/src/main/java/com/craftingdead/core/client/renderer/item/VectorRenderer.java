@@ -102,7 +102,7 @@ public class VectorRenderer extends GunRenderer {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.4F, 0F, 0.0F);
     matrixStack.translate(0F, 0.352F, 0F);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, -0.006F, -0.0006F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -207,8 +207,8 @@ public class VectorRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.7F, 0.0F, 0.2F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -70));
+    matrixStack.translate(pct * 0.7F, 0.0F, pct * 0.2F);
   }
 }

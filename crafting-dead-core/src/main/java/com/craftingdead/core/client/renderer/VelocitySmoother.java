@@ -22,9 +22,15 @@ import net.minecraft.util.math.MathHelper;
 
 public class VelocitySmoother {
 
+  private final float acceleration;
+
   private float targetVelocity;
   private float remainingVelocity;
   private float lastVelocity;
+
+  public VelocitySmoother(float acceleration) {
+    this.acceleration = acceleration;
+  }
 
   /**
    * Accumulate velocity.
@@ -43,7 +49,7 @@ public class VelocitySmoother {
 
   public float getAndDecelerate(float deceleration) {
     float nextVelocity = this.targetVelocity - this.remainingVelocity;
-    float currentVelocity = MathHelper.lerp(0.5F, this.lastVelocity, nextVelocity);
+    float currentVelocity = MathHelper.lerp(this.acceleration, this.lastVelocity, nextVelocity);
     float signum = Math.signum(nextVelocity);
     if (signum * nextVelocity > signum * this.lastVelocity) {
       nextVelocity = currentVelocity;
@@ -51,6 +57,12 @@ public class VelocitySmoother {
 
     this.lastVelocity = currentVelocity;
     this.remainingVelocity += nextVelocity * deceleration;
-    return nextVelocity * deceleration;
+
+    float result = nextVelocity * deceleration;
+    if (Math.abs(result) < 0.01F) {
+      result = 0.0F;
+      this.reset();
+    }
+    return result;
   }
 }

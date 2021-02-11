@@ -99,9 +99,10 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(1.4F, 0.0F, 0.86F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(pct * 10));
+    matrixStack.translate(pct * 0.5F, 0.0F, pct * 1F);
   }
 
   @Override
@@ -116,10 +117,5 @@ public class TaserRenderer extends GunRenderer {
   protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     matrixStack.translate(0.02F, 0.04F, -0.12F);
-    if (rightHand) {
-      matrixStack.translate(0.0F, 0.0F, 0.0F);
-    } else {
-      matrixStack.translate(0.0F, 0.0F, 0.0F);
-    }
   }
 }

@@ -47,15 +47,13 @@ public class MinigunRenderer extends GunRenderer {
   protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(77));
+    matrixStack.rotate(Vector3f.XP.rotationDegrees(190));
+    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15));
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(80));
 
-    matrixStack.translate(0.5F, -0.75F, 0.5F);
+    matrixStack.translate(0F, 0.25F, 0.25F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-55));
     matrixStack.translate(-0.8F, -0.1F, 0.0F);
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
     matrixStack.translate(0.3F, 0.3F, 0.2F);
 
     float scale = 1.4F;
@@ -160,8 +158,8 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-70));
-    matrixStack.translate(0.3F, -0.3F, 0.2F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.translate(pct * 0.3F, 0.0F, pct * 0.1F);
   }
 }

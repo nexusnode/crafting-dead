@@ -494,4 +494,11 @@ public class RenderUtil {
           packedOverlay);
     }
   }
+
+  /**
+   * @see <a href="https://easings.net/#easeInOutSine">https://easings.net/#easeInOutSine</a>
+   */
+  public static float easeInOutSine(float value) {
+    return -(MathHelper.cos((float) Math.PI * value) - 1) / 2;
+  }
 }

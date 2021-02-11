@@ -98,7 +98,7 @@ public class MP5A5Renderer extends GunRenderer {
     matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.028F, 0F);
-    
+
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.08F, 0.00F);
     } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
@@ -200,8 +200,8 @@ public class MP5A5Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applySprintingTransforms(MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-40));
-    matrixStack.translate(0.7F, 0.0F, 1.8F);
+  protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
+    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -40));
+    matrixStack.translate(pct * 1F, 0.0F, pct * 2F);
   }
 }
