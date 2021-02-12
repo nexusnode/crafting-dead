@@ -2,7 +2,10 @@
   "acr_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:acr_shoot"
+      {
+        "name": "craftingdead:acr_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "ak47_reload": {
@@ -11,10 +14,22 @@
       "craftingdead:ak47_reload"
     ]
   },
+  "ak47_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:ak47_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "ak47_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:ak47_shoot"
+      {
+        "name": "craftingdead:ak47_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "as50_reload": {
@@ -26,7 +41,10 @@
   "as50_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:as50_shoot"
+      {
+        "name": "craftingdead:as50_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "awp_reload": {
@@ -35,10 +53,22 @@
       "craftingdead:awp_reload"
     ]
   },
+  "awp_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:awp_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "awp_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:awp_shoot"
+      {
+        "name": "craftingdead:awp_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "bullet_impact_dirt": {
@@ -86,13 +116,28 @@
   "crossbow_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:crossbow_shoot"
+      {
+        "name": "craftingdead:crossbow_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "desert_eagle_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:desert_eagle_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "desert_eagle_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:desert_eagle_shoot"
+      {
+        "name": "craftingdead:desert_eagle_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "dmr_reload": {
@@ -104,13 +149,28 @@
   "dmr_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:dmr_shoot"
+      {
+        "name": "craftingdead:dmr_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "dragunov_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:dragunov_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "dragunov_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:dragunov_shoot"
+      {
+        "name": "craftingdead:dragunov_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "dry_fire": {
@@ -128,31 +188,64 @@
   "fn57_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:fn57_shoot"
+      {
+        "name": "craftingdead:fn57_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "fnfal_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:fnfal_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "fnfal_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:fnfal_shoot"
+      {
+        "name": "craftingdead:fnfal_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "g18_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:g18_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "g18_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:g18_shoot"
+      {
+        "name": "craftingdead:g18_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "g36c_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:g36c_shoot"
+      {
+        "name": "craftingdead:g36c_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "hk417_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:hk417_shoot"
+      {
+        "name": "craftingdead:hk417_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m107_reload": {
@@ -164,7 +257,10 @@
   "m107_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m107_shoot"
+      {
+        "name": "craftingdead:m107_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m1911_reload": {
@@ -173,16 +269,31 @@
       "craftingdead:m1911_reload"
     ]
   },
+  "m1911_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:m1911_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "m1911_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m1911_shoot"
+      {
+        "name": "craftingdead:m1911_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m1garand_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m1garand_shoot"
+      {
+        "name": "craftingdead:m1garand_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m240b_reload": {
@@ -191,10 +302,22 @@
       "craftingdead:m240b_reload"
     ]
   },
+  "m240b_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:m240b_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "m240b_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m240b_shoot"
+      {
+        "name": "craftingdead:m240b_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m4a1_reload": {
@@ -203,10 +326,22 @@
       "craftingdead:m4a1_reload"
     ]
   },
+  "m4a1_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:m4a1_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "m4a1_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m4a1_shoot"
+      {
+        "name": "craftingdead:m4a1_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "m9_reload": {
@@ -218,13 +353,28 @@
   "m9_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:m9_shoot"
+      {
+        "name": "craftingdead:m9_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "mac10_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:mac10_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "mac10_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:mac10_shoot"
+      {
+        "name": "craftingdead:mac10_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "magnum_reload": {
@@ -236,7 +386,10 @@
   "magnum_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:magnum_shoot"
+      {
+        "name": "craftingdead:magnum_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "minigun_barrel": {
@@ -248,13 +401,19 @@
   "minigun_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:minigun_shoot"
+      {
+        "name": "craftingdead:minigun_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "mk48mod_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:mk48mod_shoot"
+      {
+        "name": "craftingdead:mk48mod_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "mossberg_reload": {
@@ -266,7 +425,10 @@
   "mossberg_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:mossberg_shoot"
+      {
+        "name": "craftingdead:mossberg_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "mp5a5_reload": {
@@ -278,19 +440,37 @@
   "mp5a5_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:mp5a5_shoot"
+      {
+        "name": "craftingdead:mp5a5_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "mpt_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:mpt_shoot"
+      {
+        "name": "craftingdead:mpt_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "p250_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:p250_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "p250_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:p250_shoot"
+      {
+        "name": "craftingdead:p250_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "p90_reload": {
@@ -299,10 +479,22 @@
       "craftingdead:p90_reload"
     ]
   },
+  "p90_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:p90_distant_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
   "p90_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:p90_shoot"
+      {
+        "name": "craftingdead:p90_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "rpk_reload": {
@@ -314,13 +506,19 @@
   "rpk_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:rpk_shoot"
+      {
+        "name": "craftingdead:rpk_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "scarh_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:scarh_shoot"
+      {
+        "name": "craftingdead:scarh_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "shotgun_reload": {
@@ -332,61 +530,91 @@
   "silenced_ak47_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_ak47_shoot"
+      {
+        "name": "craftingdead:silenced_ak47_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_m240b_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_m240b_shoot"
+      {
+        "name": "craftingdead:silenced_m240b_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_m4a1_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_m4a1_shoot"
+      {
+        "name": "craftingdead:silenced_m4a1_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_m9_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_m9_shoot"
+      {
+        "name": "craftingdead:silenced_m9_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_mk48mod_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_mk48mod_shoot"
+      {
+        "name": "craftingdead:silenced_mk48mod_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_mp5a5_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_mp5a5_shoot"
+      {
+        "name": "craftingdead:silenced_mp5a5_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_p90_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_p90_shoot"
+      {
+        "name": "craftingdead:silenced_p90_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "silenced_rpk_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:silenced_rpk_shoot"
+      {
+        "name": "craftingdead:silenced_rpk_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "sporter22_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:sporter22_shoot"
+      {
+        "name": "craftingdead:sporter22_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "taser_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:taser_shoot"
+      {
+        "name": "craftingdead:taser_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "toggle_fire_mode": {
@@ -398,13 +626,28 @@
   "trenchgun_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:trenchgun_shoot"
+      {
+        "name": "craftingdead:trenchgun_shoot",
+        "attenuation_distance": 65
+      }
+    ]
+  },
+  "vector_distant_shoot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "craftingdead:vector_distant_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "vector_shoot": {
     "category": "master",
     "sounds": [
-      "craftingdead:vector_shoot"
+      {
+        "name": "craftingdead:vector_shoot",
+        "attenuation_distance": 65
+      }
     ]
   },
   "scope_zoom": {

@@ -53,7 +53,7 @@ public class AimableGun extends DefaultGun implements IScope {
   @Override
   public void tick(ILiving<?, ?> living, ItemStack itemStack) {
     long timeDelta = Util.milliTime() - super.getLastShotMs();
-    if (timeDelta >= this.gunItem.getFireRateMs() && this.waitingForBoltAction) {
+    if (timeDelta >= this.gunItem.getFireDelayMs() && this.waitingForBoltAction) {
       this.waitingForBoltAction = false;
       if (!this.isPerformingRightMouseAction()) {
         this.toggleRightMouseAction(living, false);

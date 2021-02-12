@@ -43,7 +43,8 @@ public class GunAnimationController implements IAnimationController {
     if (animation != null) {
       this.ticks++;
       float progress =
-          MathHelper.clamp(this.ticks / animation.getLeft().getMaxAnimationTick(), 0.0F, 1.0F);
+          MathHelper.clamp(this.ticks / (animation.getLeft().getMaxAnimationTick() * 1.5F), 0.0F,
+              1.0F);
       animation.getLeft().onUpdate(this.minecraft, livingEntity, itemStack, progress);
       if (progress >= 1.0F) {
         if (animation.getRight() != null) {

@@ -108,16 +108,13 @@ public class GenericDataManager {
     return this.dirty;
   }
 
-  public static void writeEntries(List<GenericDataManager.DataEntry<?>> entriesIn, PacketBuffer buf)
+  public static void writeEntries(List<GenericDataManager.DataEntry<?>> entries, PacketBuffer buf)
       throws IOException {
-    if (entriesIn != null) {
-      int i = 0;
-
-      for (int j = entriesIn.size(); i < j; ++i) {
-        writeEntry(buf, entriesIn.get(i));
+    if (entries != null) {
+      for (GenericDataManager.DataEntry<?> entry : entries) {
+        writeEntry(buf, entry);
       }
     }
-
     buf.writeByte(255);
   }
 
@@ -180,8 +177,8 @@ public class GenericDataManager {
       throws IOException {
     List<GenericDataManager.DataEntry<?>> list = null;
 
-    int i;
-    while ((i = buf.readUnsignedByte()) != 255) {
+    int id;
+    while ((id = buf.readUnsignedByte()) != 255) {
       if (list == null) {
         list = Lists.newArrayList();
       }
@@ -192,7 +189,7 @@ public class GenericDataManager {
         throw new DecoderException("Unknown serializer type " + j);
       }
 
-      list.add(makeDataEntry(buf, i, idataserializer));
+      list.add(makeDataEntry(buf, id, idataserializer));
     }
 
     return list;

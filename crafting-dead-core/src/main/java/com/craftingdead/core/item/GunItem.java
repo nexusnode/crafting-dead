@@ -67,7 +67,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   /**
    * Time between shots in milliseconds.
    */
-  private final int fireRateMs;
+  private final int fireDelayMs;
 
   /**
    * Damage inflicted by a single shot from this gun.
@@ -113,6 +113,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    * Sound to play for each shot of the gun.
    */
   private final Supplier<SoundEvent> shootSound;
+
+  /**
+   * Sound to play for each shot of the gun when far away.
+   */
+  private final Supplier<SoundEvent> distantShootSound;
 
   /**
    * A 'silenced' version of the shoot sound.
@@ -181,7 +186,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public GunItem(Properties properties) {
     super(properties);
-    this.fireRateMs = properties.fireRate;
+    this.fireDelayMs = properties.fireDelayMs;
     this.damage = properties.damage;
     this.reloadDurationTicks = properties.reloadDurationTicks;
     this.accuracyPct = properties.accuracy;
@@ -191,6 +196,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.boltAction = properties.boltAction;
     this.fireModes = properties.fireModes;
     this.shootSound = properties.shootSound;
+    this.distantShootSound = properties.distantShootSound;
     this.silencedShootSound = properties.silencedShootSound;
     this.reloadSound = properties.reloadSound;
     this.animations = properties.animations;
@@ -206,12 +212,12 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.range = properties.range;
   }
 
-  public int getFireRateMs() {
-    return this.fireRateMs;
+  public int getFireDelayMs() {
+    return this.fireDelayMs;
   }
 
   public int getFireRateRPM() {
-    return 60000 / this.getFireRateMs();
+    return 60000 / this.getFireDelayMs();
   }
 
   public int getDamage() {
@@ -248,6 +254,10 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public Supplier<SoundEvent> getShootSound() {
     return this.shootSound;
+  }
+
+  public Optional<SoundEvent> getDistantShootSound() {
+    return Optional.ofNullable(this.distantShootSound.get());
   }
 
   public Optional<SoundEvent> getSilencedShootSound() {
@@ -473,7 +483,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public static class Properties extends Item.Properties {
 
-    private int fireRate;
+    private int fireDelayMs;
 
     private int damage;
 
@@ -494,6 +504,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     private final List<FireMode> fireModes = new ArrayList<>();
 
     private Supplier<SoundEvent> shootSound;
+
+    private Supplier<SoundEvent> distantShootSound = () -> null;
 
     private Supplier<SoundEvent> silencedShootSound = () -> null;
 
@@ -521,8 +533,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private long rightMouseActionSoundRepeatDelayMs = -1L;
 
-    public Properties setFireRate(int fireRate) {
-      this.fireRate = fireRate;
+    public Properties setFireDelayMs(int fireDelayMs) {
+      this.fireDelayMs = fireDelayMs;
       return this;
     }
 
@@ -573,6 +585,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     public Properties setShootSound(Supplier<SoundEvent> shootSound) {
       this.shootSound = shootSound;
+      return this;
+    }
+
+    public Properties setDistantShootSound(Supplier<SoundEvent> distantShootSound) {
+      this.distantShootSound = distantShootSound;
       return this;
     }
 

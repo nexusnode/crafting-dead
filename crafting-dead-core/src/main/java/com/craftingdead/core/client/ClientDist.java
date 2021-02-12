@@ -502,7 +502,9 @@ public class ClientDist implements IModDist {
           if (!worldFocused) {
             // Stop gun actions if world not focused.
             if (gun != null) {
-              gun.setTriggerPressed(player, heldStack, false, true);
+              if (gun.isTriggerPressed()) {
+                gun.setTriggerPressed(player, heldStack, false, true);
+              }
               if (gun.isPerformingRightMouseAction()) {
                 gun.toggleRightMouseAction(player, true);
               }

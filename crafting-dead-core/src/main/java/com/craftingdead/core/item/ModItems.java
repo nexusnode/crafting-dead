@@ -234,16 +234,16 @@ public class ModItems {
               .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> MONARCH_PAINT = ITEMS
-          .register("monarch_paint",
-                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                          .maxStackSize(1)
-                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("monarch_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> LOVELACE_PAINT = ITEMS
-          .register("lovelace_paint",
-                  () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-                          .maxStackSize(1)
-                          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+      .register("lovelace_paint",
+          () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
+              .maxStackSize(1)
+              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
   // ================================================================================
   // Magazines
   // ================================================================================
@@ -630,7 +630,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M4A1 = ITEMS
       .register("m4a1",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(80)
+              .setFireDelayMs(100)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
@@ -639,6 +639,7 @@ public class ModItems {
               .addFireMode(FireMode.BURST)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M4A1_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M4A1_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
@@ -672,7 +673,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> SCARH = ITEMS
       .register("scarh",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(110)
+              .setFireDelayMs(110)
               .setDamage(6)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
@@ -707,7 +708,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> AK47 = ITEMS
       .register("ak47",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(80)
+              .setFireDelayMs(100)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
@@ -715,6 +716,7 @@ public class ModItems {
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AK47_SHOOT)
+              .setDistantShootSound(ModSoundEvents.AK47_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_AK47_SHOOT)
               .setReloadSound(ModSoundEvents.AK47_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
@@ -739,13 +741,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> FNFAL = ITEMS
       .register("fnfal",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(100)
+              .setFireDelayMs(80)
               .setDamage(9)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
               .setRange(300.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.FNFAL_SHOOT)
+              .setDistantShootSound(ModSoundEvents.FNFAL_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
@@ -767,7 +770,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> ACR = ITEMS
       .register("acr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(92)
+              .setFireDelayMs(92)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
@@ -795,7 +798,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> HK417 = ITEMS
       .register("hk417",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(100)
+              .setFireDelayMs(100)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 2.1F))
               .setAccuracy(0.8F)
@@ -824,7 +827,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> MPT55 = ITEMS
       .register("mpt55",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(70)
+              .setFireDelayMs(70)
               .setDamage(6)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.8F)
@@ -850,7 +853,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M1GARAND = ITEMS
       .register("m1garand",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(170)
+              .setFireDelayMs(170)
               .setDamage(10)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
@@ -874,7 +877,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> SPORTER22 = ITEMS
       .register("sporter22",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(200)
+              .setFireDelayMs(200)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
@@ -903,7 +906,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> G36C = ITEMS
       .register("g36c",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(92)
+              .setFireDelayMs(92)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.8F)
@@ -934,13 +937,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> M240B = ITEMS
       .register("m240b",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(85)
+              .setFireDelayMs(85)
               .setDamage(8)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
               .setRange(260.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.M240B_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M240B_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
@@ -960,7 +964,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> RPK = ITEMS
       .register("rpk",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(92)
+              .setFireDelayMs(92)
               .setDamage(6)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
@@ -986,7 +990,7 @@ public class ModItems {
       .register("minigun",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setAimable(false)
-              .setFireRate(25)
+              .setFireDelayMs(25)
               .setDamage(4)
               .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.9F)
@@ -1010,7 +1014,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> MK48MOD = ITEMS
       .register("mk48mod",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(92)
+              .setFireDelayMs(92)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
@@ -1040,7 +1044,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> TASER = ITEMS
       .register("taser",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(2000)
+              .setFireDelayMs(2000)
               .setDamage(7)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
@@ -1058,13 +1062,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> M1911 = ITEMS
       .register("m1911",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(120)
+              .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
               .setRange(50.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1911_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M1911_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
@@ -1081,7 +1086,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> G18 = ITEMS
       .register("g18",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(120)
+              .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
@@ -1089,6 +1094,7 @@ public class ModItems {
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.G18_SHOOT)
+              .setDistantShootSound(ModSoundEvents.G18_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.M1911_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
@@ -1106,7 +1112,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M9 = ITEMS
       .register("m9",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(120)
+              .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
@@ -1129,13 +1135,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS
       .register("desert_eagle",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(120)
+              .setFireDelayMs(120)
               .setDamage(8)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRange(80.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
+              .setDistantShootSound(ModSoundEvents.DESERT_EAGLE_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
               .addAnimation(AnimationType.RELOAD, GunAnimationReloadDeagle::new)
@@ -1153,13 +1160,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> P250 = ITEMS
       .register("p250",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(120)
+              .setFireDelayMs(120)
               .setDamage(6)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.7F)
               .setRange(60.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.P250_SHOOT)
+              .setDistantShootSound(ModSoundEvents.P250_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
@@ -1177,7 +1185,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> MAGNUM = ITEMS
       .register("magnum",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(80)
+              .setFireDelayMs(80)
               .setDamage(7)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
@@ -1197,7 +1205,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> FN57 = ITEMS
       .register("fn57",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(140)
+              .setFireDelayMs(140)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 1.5F))
               .setAccuracy(0.9F)
@@ -1223,13 +1231,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> MAC10 = ITEMS
       .register("mac10",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(100)
+              .setFireDelayMs(80)
               .setDamage(6)
               .setReloadDurationTicks((int) (20 * 1.8F))
               .setAccuracy(0.9F)
               .setRange(70.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MAC10_SHOOT)
+              .setDistantShootSound(ModSoundEvents.MAC10_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
@@ -1250,13 +1259,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> P90 = ITEMS
       .register("p90",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(100)
+              .setFireDelayMs(80)
               .setDamage(5)
               .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
               .setRange(100.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.P90_SHOOT)
+              .setDistantShootSound(ModSoundEvents.P90_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_P90_SHOOT)
               .setReloadSound(ModSoundEvents.P90_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
@@ -1277,13 +1287,14 @@ public class ModItems {
   public static final RegistryObject<GunItem> VECTOR = ITEMS
       .register("vector",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(85)
+              .setFireDelayMs(90)
               .setDamage(5)
               .setReloadDurationTicks((int) (20 * 1.9F))
               .setAccuracy(0.9F)
               .setRange(80.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.VECTOR_SHOOT)
+              .setDistantShootSound(ModSoundEvents.VECTOR_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.M4A1_RELOAD)
               .addAnimation(AnimationType.SHOOT, SubmachineShootAnimation::new)
@@ -1302,7 +1313,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> MP5A5 = ITEMS
       .register("mp5a5",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(85)
+              .setFireDelayMs(85)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 2.2F))
               .setAccuracy(0.9F)
@@ -1332,7 +1343,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M107 = ITEMS
       .register("m107",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(750)
+              .setFireDelayMs(750)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
@@ -1362,7 +1373,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> AS50 = ITEMS
       .register("as50",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(170)
+              .setFireDelayMs(170)
               .setDamage(14)
               .setReloadDurationTicks((int) (20 * 3.5F))
               .setAccuracy(0.9F)
@@ -1391,7 +1402,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> AWP = ITEMS
       .register("awp",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(1200)
+              .setFireDelayMs(1200)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.95F)
@@ -1400,6 +1411,7 @@ public class ModItems {
               .setBoltAction(true)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AWP_SHOOT)
+              .setDistantShootSound(ModSoundEvents.AWP_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.AWP_RELOAD)
               .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
@@ -1422,7 +1434,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> DMR = ITEMS
       .register("dmr",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(170)
+              .setFireDelayMs(170)
               .setDamage(15)
               .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.9F)
@@ -1455,12 +1467,13 @@ public class ModItems {
   public static final RegistryObject<GunItem> TRENCHGUN = ITEMS
       .register("trenchgun",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-              .setFireRate(300)
+              .setFireDelayMs(1200)
               .setDamage(2)
               .setBulletAmountToFire(8)
               .setReloadDurationTicks(20 * 1)
               .setAccuracy(0.9F)
               .setRange(25.0D)
+              .setBoltAction(true)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.TRENCHGUN_SHOOT)
               .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
@@ -1478,12 +1491,13 @@ public class ModItems {
       .register("mossberg",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
               .setBulletAmountToFire(8)
-              .setFireRate(300)
+              .setFireDelayMs(1200)
               .setDamage(3)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.9F)
               .setRange(40.0D)
               .addFireMode(FireMode.SEMI)
+              .setBoltAction(true)
               .setShootSound(ModSoundEvents.MOSSBERG_SHOOT)
               .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
               .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)

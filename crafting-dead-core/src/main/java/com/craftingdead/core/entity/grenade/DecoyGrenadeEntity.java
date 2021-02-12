@@ -20,7 +20,6 @@ package com.craftingdead.core.entity.grenade;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.item.GrenadeItem;
@@ -30,13 +29,14 @@ import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.Util;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.RegistryObject;
 
 public class DecoyGrenadeEntity extends GrenadeEntity {
 
-  private long lastSoundNanos;
+  private long lastShotMs;
   private final GunItem gunItem = getRandomGun(this.rand);
 
   public DecoyGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
@@ -81,10 +81,8 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
     }
 
     if (!this.world.isRemote()) {
-      if (this.rand.nextInt(20) == 0) {
-        if (!this.isInFireDelay()) {
-          this.playFakeShoot();
-        }
+      if (this.rand.nextInt(20) == 0 && this.canShoot()) {
+        this.playFakeShoot();
       }
     } else {
       this.world.addParticle(ParticleTypes.SMOKE, true, this.getPosX(),
@@ -92,18 +90,14 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
     }
   }
 
-  public boolean isInFireDelay() {
-    long currentNanos = System.nanoTime();
-    long fireRateNanos =
-        TimeUnit.NANOSECONDS.convert(this.gunItem.getFireRateMs(), TimeUnit.MILLISECONDS);
-
-    return (currentNanos - this.lastSoundNanos) < fireRateNanos;
+  public boolean canShoot() {
+    final long fireDelayMs = this.gunItem.getFireDelayMs();
+    return (Util.milliTime() - this.lastShotMs) >= fireDelayMs;
   }
 
   public void playFakeShoot() {
-    long currentNanos = System.nanoTime();
     this.playSound(this.gunItem.getShootSound().get(), 1.5F, 1F);
-    this.lastSoundNanos = currentNanos;
+    this.lastShotMs = Util.milliTime();
   }
 
   @Override

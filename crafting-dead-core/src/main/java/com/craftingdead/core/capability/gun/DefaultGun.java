@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +62,9 @@ import com.craftingdead.core.util.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.block.AbstractFireBlock;
+import net.minecraft.block.BellBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
@@ -100,6 +106,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -107,6 +115,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class DefaultGun implements IGun {
 
   private static final Logger logger = LogManager.getLogger();
+
+  private static final AtomicIntegerFieldUpdater<DefaultGun> triggerPressedUpdater =
+      AtomicIntegerFieldUpdater.newUpdater(DefaultGun.class, "triggerPressed");
 
   private static final int BASE_LATENCY = 4;
 
@@ -120,8 +131,12 @@ public class DefaultGun implements IGun {
 
   /**
    * If the gun trigger is pressed.
+   * 
+   * @see #triggerPressedUpdater
    */
-  private boolean triggerPressed;
+  @SuppressWarnings("unused")
+  @Deprecated
+  private volatile int triggerPressed;
   private boolean wasTriggerPressed;
 
   /**
@@ -162,6 +177,13 @@ public class DefaultGun implements IGun {
 
   private final IGunClient clientHandler;
 
+  // @formatter:off
+  private static final ExecutorService executorSerivce = Executors.newCachedThreadPool(
+      new ThreadFactoryBuilder()
+          .setNameFormat("gun-pool-%s")
+          .build());
+  // @formatter:on  
+
   public DefaultGun() {
     throw new UnsupportedOperationException("Specify gun item");
   }
@@ -185,13 +207,12 @@ public class DefaultGun implements IGun {
 
   @Override
   public void tick(ILiving<?, ?> living, ItemStack itemStack) {
-    if (!living.getEntity().getEntityWorld().isRemote() && !this.triggerPressed
+    if (!living.getEntity().getEntityWorld().isRemote() && !this.isTriggerPressed()
         && this.wasTriggerPressed) {
       this.triggerPressedTicks = living.getEntity().getServer().getTickCounter();
     }
-    this.wasTriggerPressed = this.triggerPressed;
+    this.wasTriggerPressed = this.isTriggerPressed();
 
-    this.tryShoot(living, itemStack);
 
     if (this.isPerformingRightMouseAction() && living.getEntity().isSprinting()) {
       this.toggleRightMouseAction(living, true);
@@ -213,15 +234,22 @@ public class DefaultGun implements IGun {
   @Override
   public void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack, boolean triggerPressed,
       boolean sendUpdate) {
-
-    if (!this.canShoot(living)) {
+    if (triggerPressed && !this.canShoot(living)) {
       return;
     }
 
-    this.triggerPressed = triggerPressed;
+    this.setTriggerPressed(triggerPressed);
 
-    if (this.triggerPressed) {
-      this.tryShoot(living, itemStack);
+    if (this.isTriggerPressed()) {
+      executorSerivce.execute(() -> {
+        while (this.isTriggerPressed()) {
+          if (itemStack != living.getEntity().getHeldItemMainhand()) {
+            logger.info("Killing ghost gun thread");
+            break;
+          }
+          this.tryShoot(living, itemStack);
+        }
+      });
     } else {
       // Resets the counter
       this.shotCount = 0;
@@ -252,7 +280,11 @@ public class DefaultGun implements IGun {
 
   @Override
   public boolean isTriggerPressed() {
-    return this.triggerPressed;
+    return triggerPressedUpdater.get(this) != 0;
+  }
+
+  private void setTriggerPressed(boolean triggerPressed) {
+    triggerPressedUpdater.set(this, triggerPressed ? 1 : 0);
   }
 
   @Override
@@ -277,7 +309,7 @@ public class DefaultGun implements IGun {
     int latencyTicks = player.getEntity().ping / 1000 / 20 + tickOffset + BASE_LATENCY;
     int tick = player.getEntity().getServer().getTickCounter();
 
-    if (tick - latencyTicks > this.triggerPressedTicks && !this.triggerPressed) {
+    if (tick - latencyTicks > this.triggerPressedTicks && !this.isTriggerPressed()) {
       return;
     }
 
@@ -311,8 +343,6 @@ public class DefaultGun implements IGun {
   protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
     final Entity entity = living.getEntity();
 
-    this.shotCount++;
-
     if (!(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, itemStack);
@@ -324,7 +354,6 @@ public class DefaultGun implements IGun {
     float partialTicks = 1.0F;
     if (entity.getEntityWorld().isRemote()) {
       partialTicks = this.clientHandler.getPartialTicks();
-      this.clientHandler.handleShoot(living, itemStack);
     }
 
     // Used to avoid playing the same hit sound more than once.
@@ -387,25 +416,33 @@ public class DefaultGun implements IGun {
   }
 
   private void tryShoot(ILiving<?, ?> living, ItemStack itemStack) {
-    if (!this.triggerPressed) {
+    if (!this.isTriggerPressed()) {
       return;
     }
 
     if (!this.canShoot(living)) {
-      this.triggerPressed = false;
+      this.setTriggerPressed(false);
       return;
     }
 
+    LogicalSide side =
+        living.getEntity().getEntityWorld().isRemote() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+    Executor executor = LogicalSidedProvider.WORKQUEUE.get(side);
+
     if (this.getMagazineSize() <= 0) {
-      living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-      this.reload(living);
-      this.triggerPressed = false;
+      if (side.isServer()) {
+        executor.execute(() -> {
+          living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+          this.reload(living);
+        });
+      }
+      this.setTriggerPressed(false);
       return;
     }
 
     long time = Util.milliTime();
     long timeDelta = time - this.lastShotMs;
-    if (timeDelta < this.gunItem.getFireRateMs()) {
+    if (timeDelta < this.gunItem.getFireDelayMs()) {
       return;
     }
 
@@ -417,7 +454,13 @@ public class DefaultGun implements IGun {
       return;
     }
 
-    this.processShot(living, itemStack);
+    this.shotCount++;
+
+    executor.execute(() -> this.processShot(living, itemStack));
+
+    if (side == LogicalSide.CLIENT) {
+      this.clientHandler.handleShoot(living, itemStack);
+    }
   }
 
   private void hitEntity(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
@@ -515,6 +558,11 @@ public class DefaultGun implements IGun {
     if (world.isRemote()) {
       this.clientHandler.handleHitBlock(living, itemStack, rayTrace, playSound);
     } else {
+      if (blockState.getBlock() instanceof BellBlock) {
+        ((BellBlock) blockState.getBlock()).attemptRing(world, blockState, rayTrace,
+            entity instanceof PlayerEntity ? (PlayerEntity) entity : null, playSound);
+      }
+
       if (block instanceof TNTBlock) {
         block.catchFire(blockState, entity.getEntityWorld(), blockPos, null,
             entity instanceof LivingEntity ? (LivingEntity) entity : null);

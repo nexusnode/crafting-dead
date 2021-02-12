@@ -20,12 +20,13 @@ package com.craftingdead.core.capability.gun;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.EntitySnapshot;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.network.NetworkChannel;
@@ -83,7 +84,8 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
 
   @Override
   public void handleTick(ILiving<?, ?> living, ItemStack itemStack) {
-    if (this.livingHitValidationBuffer.size() > 0
+    if (living.getEntity() instanceof ClientPlayerEntity
+        && this.livingHitValidationBuffer.size() > 0
         && this.hitValidationTicks++ >= DefaultGun.HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
       NetworkChannel.PLAY.getSimpleChannel().sendToServer(
@@ -102,10 +104,9 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
       living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
     }
 
-    if (this.canFlash(living, itemStack)) {
-      this.remainingFlashTicks = MUZZLE_FLASH_DURATION_TICKS;
+    if (!this.gun.isTriggerPressed()) {
+      this.lastShotCount = 0;
     }
-    this.lastShotCount = this.gun.getShotCount();
 
     if (this.remainingFlashTicks > 0) {
       this.remainingFlashTicks--;
@@ -120,9 +121,17 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
   @Override
   public void handleShoot(ILiving<?, ?> living, ItemStack itemStack) {
     Entity entity = living.getEntity();
+
+    if (this.canFlash(living, itemStack)) {
+      this.remainingFlashTicks = MUZZLE_FLASH_DURATION_TICKS;
+    }
+
+    this.lastShotCount = this.gun.getShotCount();
+
     if (entity instanceof ClientPlayerEntity) {
-      this.client.getCameraManager().joltCamera(1.15F - this.gun.getAccuracy(living, itemStack),
-          true);
+      final float baseJolt = 0.05F;
+      this.client.getCameraManager()
+          .joltCamera(1.0F - this.gun.getAccuracy(living, itemStack) + baseJolt, true);
     }
 
     this.gun.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
@@ -130,16 +139,30 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
       this.animationController.addAnimation(animation, null);
     });
 
-    SoundEvent shootSound = this.gun.getGunItem().getShootSound().get();
+    double sqrDistance = this.minecraft.gameRenderer.getActiveRenderInfo().getProjectedView()
+        .squareDistanceTo(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+
+    boolean distant = sqrDistance > 1600.0D;
+
+    final Supplier<SoundEvent> defaultShootSound = this.gun.getGunItem().getShootSound();
+
+    @Nullable
+    final SoundEvent shootSound;
+    boolean amplifyDistantSound = this.gun.gunItem.getDistantShootSound().isPresent();
     if (this.gun.getAttachments().stream().anyMatch(AttachmentItem::isSoundSuppressor)) {
-      shootSound = this.gun.getGunItem().getSilencedShootSound().orElse(shootSound);
+      shootSound = distant ? null
+          : this.gun.getGunItem().getSilencedShootSound().orElseGet(defaultShootSound);
+    } else {
+      shootSound =
+          distant ? this.gun.getGunItem().getDistantShootSound().orElseGet(defaultShootSound)
+              : defaultShootSound.get();
     }
 
-    if (!entity.isSilent()) {
-      entity.getEntityWorld().playSound(
-          this.client.getPlayer().map(IPlayer::getEntity).orElse(null),
+    if (!entity.isSilent() && shootSound != null) {
+      // Sounds have to be played on the main thread (unfortunately)
+      this.minecraft.execute(() -> entity.getEntityWorld().playSound(
           entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
-          entity.getSoundCategory(), 0.25F, 1.0F);
+          entity.getSoundCategory(), distant && amplifyDistantSound ? 8.0F : 1.0F, 1.0F, true));
     }
   }
 
