@@ -22,7 +22,6 @@ import java.util.Optional;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.item.AttachmentItem;
-import com.craftingdead.core.item.GunItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -30,12 +29,12 @@ import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
-public class AimableGun extends DefaultGun implements IScope {
+public class AimableGun extends GunImpl implements IScope {
 
   private boolean waitingForBoltAction;
 
-  public AimableGun(GunItem gunItem) {
-    super(gunItem);
+  public AimableGun(IGunProvider gunProvider, ItemStack gunStack) {
+    super(gunProvider, gunStack);
   }
 
   @Override
@@ -45,45 +44,45 @@ public class AimableGun extends DefaultGun implements IScope {
   }
 
   @Override
-  public void reset(ILiving<?, ?> living, ItemStack itemStack) {
-    super.reset(living, itemStack);
+  public void reset(ILiving<?, ?> living) {
+    super.reset(living);
     this.waitingForBoltAction = false;
   }
 
   @Override
-  public void tick(ILiving<?, ?> living, ItemStack itemStack) {
-    long timeDelta = Util.milliTime() - super.getLastShotMs();
-    if (timeDelta >= this.gunItem.getFireDelayMs() && this.waitingForBoltAction) {
+  public void tick(ILiving<?, ?> living) {
+    long timeDelta = Util.milliTime() - this.lastShotMs;
+    if (timeDelta >= this.gunProvider.getFireDelayMs() && this.waitingForBoltAction) {
       this.waitingForBoltAction = false;
       if (!this.isPerformingRightMouseAction()) {
-        this.toggleRightMouseAction(living, false);
+        this.setPerformingRightMouseAction(living, true, false);
       }
     }
-    super.tick(living, itemStack);
+    super.tick(living);
   }
 
   @Override
-  protected void processShot(ILiving<?, ?> living, ItemStack itemStack) {
-    super.processShot(living, itemStack);
-    if (this.isPerformingRightMouseAction() && this.gunItem.hasBoltAction()) {
-      this.toggleRightMouseAction(living, false);
+  protected void processShot(ILiving<?, ?> living) {
+    super.processShot(living);
+    if (this.isPerformingRightMouseAction() && this.gunProvider.hasBoltAction()) {
+      this.setPerformingRightMouseAction(living, false, false);
       this.waitingForBoltAction = true;
     }
   }
 
   @Override
-  public boolean isAiming(Entity entity, ItemStack itemStack) {
+  public boolean isAiming(Entity entity) {
     return this.isPerformingRightMouseAction();
   }
 
   @Override
-  public float getZoomMultiplier(Entity entity, ItemStack itemStack) {
+  public float getZoomMultiplier(Entity entity) {
     return this.hasIronSight() ? 2.0F
         : this.getAttachmentMultiplier(AttachmentItem.MultiplierType.ZOOM);
   }
 
   @Override
-  public Optional<ResourceLocation> getOverlayTexture(Entity entity, ItemStack itemStack) {
+  public Optional<ResourceLocation> getOverlayTexture(Entity entity) {
     for (AttachmentItem attachmentItem : this.getAttachments()) {
       if (attachmentItem.isScope()) {
         return Optional.of(new ResourceLocation(attachmentItem.getRegistryName().getNamespace(),
@@ -94,9 +93,10 @@ public class AimableGun extends DefaultGun implements IScope {
   }
 
   @Override
-  public void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate) {
+  public void setPerformingRightMouseAction(ILiving<?, ?> living,
+      boolean performingRightMouseAction, boolean sendUpdate) {
     if (!this.waitingForBoltAction) {
-      super.toggleRightMouseAction(living, sendUpdate);
+      super.setPerformingRightMouseAction(living, performingRightMouseAction, sendUpdate);
     }
   }
 

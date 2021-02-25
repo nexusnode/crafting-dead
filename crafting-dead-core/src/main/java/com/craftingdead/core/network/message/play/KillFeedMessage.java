@@ -21,10 +21,9 @@ package com.craftingdead.core.network.message.play;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.gui.KillFeedEntry;
-import com.craftingdead.core.client.gui.KillFeedEntry.Type;
+import com.craftingdead.core.util.KillFeedEntry;
+import com.craftingdead.core.util.KillFeedEntry.Type;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -38,6 +37,11 @@ public class KillFeedMessage {
   private final int deadEntityId;
   private final ItemStack weaponStack;
   private final KillFeedEntry.Type type;
+
+  public KillFeedMessage(KillFeedEntry entry) {
+    this(entry.getKillerEntity().getEntityId(), entry.getDeadEntity().getEntityId(),
+        entry.getWeaponStack(), entry.getType());
+  }
 
   public KillFeedMessage(int playerEntityId, int deadEntityId, ItemStack weaponStack, Type type) {
     this.playerEntityId = playerEntityId;
@@ -65,10 +69,10 @@ public class KillFeedMessage {
       ctx.get().enqueueWork(() -> {
         Entity playerEntity = w.getEntityByID(msg.playerEntityId);
         Entity deadEntity = w.getEntityByID(msg.deadEntityId);
-        if (playerEntity instanceof PlayerEntity && deadEntity instanceof LivingEntity) {
+        if (playerEntity instanceof PlayerEntity && deadEntity instanceof PlayerEntity) {
           CraftingDead.getInstance().getClientDist().getIngameGui()
               .addKillFeedMessage(new KillFeedEntry((PlayerEntity) playerEntity,
-                  (LivingEntity) deadEntity, msg.weaponStack, msg.type));
+                  (PlayerEntity) deadEntity, msg.weaponStack, msg.type));
         }
       });
     });

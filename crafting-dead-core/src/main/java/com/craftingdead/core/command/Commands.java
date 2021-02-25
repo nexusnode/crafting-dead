@@ -18,13 +18,13 @@
 
 package com.craftingdead.core.command;
 
-import com.craftingdead.core.command.impl.CommandThirst;
+import com.craftingdead.core.command.impl.HydrateCommand;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 
 public class Commands {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
-    CommandThirst.register(dispatcher);
+    HydrateCommand.register(dispatcher);
   }
 }

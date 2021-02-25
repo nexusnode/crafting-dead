@@ -28,8 +28,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.Model;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
@@ -42,9 +40,15 @@ public class M240BRenderer extends GunRenderer {
   public M240BRenderer() {
     super(ModItems.M240B);
   }
+  
+  @Override
+  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+    matrixStack.scale(1.4F, 1.4F, 1.4F);
+    matrixStack.translate(-0.8, -0.2, 0);       
+  }
 
   @Override
-  protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
+  protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
@@ -61,7 +65,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyFirstPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.5F;
@@ -82,7 +86,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
@@ -104,7 +108,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+  protected void renderAdditionalParts(IGun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
@@ -147,7 +151,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
+  protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
@@ -160,11 +164,11 @@ public class M240BRenderer extends GunRenderer {
 
 
   @Override
-  protected void applyMagazineTransforms(LivingEntity livingEntity, ItemStack itemStack,
+  protected void applyMagazineTransforms(ItemStack itemStack,
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyAttachmentTransforms(LivingEntity livingEntity, AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
       MatrixStack matrixStack) {
 
     if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
@@ -201,7 +205,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyHandTransforms(IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     if (rightHand) {
       matrixStack.translate(-0.1F, -0.15F, -0.3F);

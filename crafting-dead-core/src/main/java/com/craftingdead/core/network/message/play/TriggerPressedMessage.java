@@ -54,7 +54,7 @@ public class TriggerPressedMessage {
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun.setTriggerPressed(living, heldStack, msg.triggerPressed,
+                  .ifPresent(gun -> gun.setTriggerPressed(living, msg.triggerPressed,
                       ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;

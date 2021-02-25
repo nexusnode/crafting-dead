@@ -22,13 +22,18 @@ package com.craftingdead.core.item;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.combatitem.CombatItemImpl;
 import com.craftingdead.core.entity.grenade.GrenadeEntity;
+import com.craftingdead.core.inventory.CombatSlotType;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -37,6 +42,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class GrenadeItem extends Item {
 
@@ -65,10 +71,11 @@ public class GrenadeItem extends Item {
             SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
             0.4F / (random.nextFloat() * 0.4F + 0.8F));
     if (!worldIn.isRemote) {
-      GrenadeEntity grenadeEntity = grenadeEntitySupplier.apply(playerIn, worldIn);
+      GrenadeEntity grenadeEntity = this.grenadeEntitySupplier.apply(playerIn, worldIn);
 
       float force = playerIn.isSneaking() ? 0.4F : this.throwSpeed;
-      grenadeEntity.setPositionAndUpdate(playerIn.getPosX(), playerIn.getPosY() + playerIn.getEyeHeight(),
+      grenadeEntity.setPositionAndUpdate(playerIn.getPosX(),
+          playerIn.getPosY() + playerIn.getEyeHeight(),
           playerIn.getPosZ());
       grenadeEntity.shootFromEntity(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0,
           force, 1.0F);
@@ -81,6 +88,13 @@ public class GrenadeItem extends Item {
     }
 
     return ActionResult.resultSuccess(itemStack);
+  }
+
+
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SimpleCapabilityProvider<>(new CombatItemImpl(CombatSlotType.GRENADE),
+        () -> ModCapabilities.COMBAT_ITEM);
   }
 
   public static class Properties extends Item.Properties {

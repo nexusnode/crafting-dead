@@ -1,14 +1,14 @@
 {
-  "container.player": "行尸走肉 - 玩家",
+  "container.equipment": "行尸走肉 - 玩家",
   "enchantment.craftingdead.armor_penetration": "护甲穿透",
   "enchantment.craftingdead.infection": "尸毒",
 
   "key.reload": "装填弹药",
   "key.remove_magazine": "移除弹夹",
   "key.toggle_fire_mode": "喷火模式",
-  "key.craftingdead.inventory":"打开/关闭行尸走肉菜单",
+  "key.equipment_menu":"打开/关闭行尸走肉菜单",
 
-  "tutorial.craftingdead.open_inventory.title":"打开行尸走肉菜单",
+  "tutorial.open_equipment_menu.title":"打开行尸走肉菜单",
 
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
@@ -40,9 +40,10 @@
   "entity.craftingdead.pipe_grenade": "黏土炸弹",
   "entity.craftingdead.smoke_grenade": "烟雾弹",
 
-  "message.fire_mode.auto":"切换到自动模式",
-  "message.fire_mode.semi":"切换到半自动模式",
-  "message.fire_mode.burst":"切换到三连发模式",
+  "message.switch_fire_mode": "切换到%s",
+  "fire_mode.auto":"自动模式",
+  "fire_mode.semi":"半自动模式",
+  "fire_mode.burst":"三连发模式",
   "message.broken_leg": "他妈的! 你骨折了.",
   "message.bleeding": "狗日的你他妈流血了!",
   "message.infected": "你已被丧尸病毒感染.",
@@ -370,9 +371,7 @@
   "attachment_multiplier_type.accuracy": "精确度",
   "attachment_multiplier_type.zoom": "放大",
 
-  "biome.craftingdead.zombie_forest": "丧尸丛林",
-
-  "commands.craftingdead.thirst.success.operator": "已解渴.",
-  "commands.craftingdead.thirst.success.confirmation": "饥渴值已回复!",
-  "commands.craftingdead.thirst.failure.not_used": "没有人饥渴."
+  "commands.craftingdead.hydrate.success.operator": "已解渴",
+  "commands.craftingdead.hydrate.success.confirmation": "饥渴值已回复",
+  "commands.craftingdead.hydrate.failure.not_used": "没有人饥渴"
 }

@@ -18,6 +18,11 @@
 
 package com.craftingdead.core.item;
 
+import javax.annotation.Nullable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.combatitem.CombatItemImpl;
+import com.craftingdead.core.inventory.CombatSlotType;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
@@ -27,6 +32,8 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class MeleeWeaponItem extends ToolItem {
 
@@ -53,5 +60,11 @@ public class MeleeWeaponItem extends ToolItem {
       EquipmentSlotType equipmentSlot, ItemStack itemStack) {
     return equipmentSlot == EquipmentSlotType.MAINHAND ? this.attributeModifiers
         : super.getAttributeModifiers(equipmentSlot, itemStack);
+  }
+
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    return new SimpleCapabilityProvider<>(new CombatItemImpl(CombatSlotType.MELEE),
+        () -> ModCapabilities.COMBAT_ITEM);
   }
 }

@@ -66,7 +66,8 @@ public class C4ExplosiveEntity extends GrenadeEntity {
       if (!this.world.isRemote()) {
         this.remove();
         this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
+            this.createDamageSource(),
+            null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
             Explosion.Mode.NONE);
       }

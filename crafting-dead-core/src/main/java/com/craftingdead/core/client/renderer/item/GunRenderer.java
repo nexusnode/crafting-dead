@@ -19,7 +19,6 @@
 package com.craftingdead.core.client.renderer.item;
 
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,7 +63,6 @@ import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -77,8 +75,6 @@ import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public abstract class GunRenderer implements IItemRenderer {
-
-  private static final int FULL_LIGHT = 0xF000F0;
 
   private static final int FLASH_TEXTURE_CHANGE_TIMEOUT_MS = 250;
 
@@ -125,6 +121,36 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   @Override
+  public void renderGeneric(ItemStack itemStack, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
+
+    final float partialTicks =
+        this.minecraft.isGamePaused() ? 1.0F : this.minecraft.getRenderPartialTicks();
+
+    final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
+        .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
+
+    matrixStack.push();
+    {
+      matrixStack.scale(1.25F, 1.25F, 1.25F);
+      matrixStack.rotate(Vector3f.XP.rotation(3.1F));
+      matrixStack.rotate(Vector3f.YP.rotation(3.14F));
+
+      this.applyGenericTransforms(gun, matrixStack);
+
+      this.renderGunModel(itemStack.hasEffect(), gun, ItemCameraTransforms.TransformType.FIXED,
+          matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+      this.renderMainGunAmmo(gun, itemStack.hasEffect(),
+          ItemCameraTransforms.TransformType.FIXED,
+          matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+      this.renderMainGunAttachments(gun, itemStack.hasEffect(),
+          ItemCameraTransforms.TransformType.FIXED,
+          partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+    }
+    matrixStack.pop();
+  }
+
+  @Override
   public void renderItem(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
       LivingEntity entity, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
@@ -133,11 +159,11 @@ public abstract class GunRenderer implements IItemRenderer {
         this.minecraft.isGamePaused() ? 1.0F : this.minecraft.getRenderPartialTicks();
 
     final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
-        .orElseThrow(() -> new InvalidParameterException("Gun expected"));
+        .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
     final boolean scopeOverlayActive =
-        gun instanceof IScope && ((IScope) gun).isAiming(entity, itemStack)
-            && ((IScope) gun).getOverlayTexture(entity, itemStack).isPresent();
+        gun instanceof IScope && ((IScope) gun).isAiming(entity)
+            && ((IScope) gun).getOverlayTexture(entity).isPresent();
     if (scopeOverlayActive) {
       return;
     }
@@ -247,7 +273,7 @@ public abstract class GunRenderer implements IItemRenderer {
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(125.0F));
       matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
       matrixStack.translate(0.19F, -1.4F, 0.5F);
-      this.applyHandTransforms(playerEntity, gun, true, matrixStack);
+      this.applyHandTransforms(gun, true, matrixStack);
       playerRenderer.renderRightArm(matrixStack, renderTypeBuffer, packedLight,
           playerEntity);
 
@@ -266,7 +292,7 @@ public abstract class GunRenderer implements IItemRenderer {
       matrixStack.rotate(Vector3f.ZP.rotationDegrees(120.0F));
       matrixStack.rotate(Vector3f.XP.rotationDegrees(120.0F));
       matrixStack.translate(0.3F, -1.5F, -0.12F);
-      this.applyHandTransforms(playerEntity, gun, false, matrixStack);
+      this.applyHandTransforms(gun, false, matrixStack);
       matrixStack.scale(1.0F, 1.2F, 1.0F);
       playerRenderer.renderLeftArm(matrixStack, renderTypeBuffer, packedLight,
           playerEntity);
@@ -305,7 +331,7 @@ public abstract class GunRenderer implements IItemRenderer {
       IVertexBuilder flashVertexBuilder = renderTypeBuffer
           .getBuffer(this.muzzleFlashModel.getRenderType(new ResourceLocation(CraftingDead.ID,
               "textures/flash/flash" + texture + ".png")));
-      this.muzzleFlashModel.render(matrixStack, flashVertexBuilder, FULL_LIGHT,
+      this.muzzleFlashModel.render(matrixStack, flashVertexBuilder, RenderUtil.FULL_LIGHT,
           packedOverlay, 1.0F, 1.0F, 1.0F, scale + 0.5F);
     }
     matrixStack.pop();
@@ -318,16 +344,16 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedOverlay) {
 
     final boolean aiming =
-        gun instanceof IScope && ((IScope) gun).isAiming(playerEntity, itemStack);
+        gun instanceof IScope && ((IScope) gun).isAiming(playerEntity);
     final boolean flash = gun.getClient().isFlashing();
     if (flash) {
-      packedLight = FULL_LIGHT;
+      packedLight = RenderUtil.FULL_LIGHT;
     }
 
     matrixStack.push();
     {
       if (aiming) {
-        this.applyAimingTransforms(playerEntity, gun, matrixStack);
+        this.applyAimingTransforms(gun, matrixStack);
       } else {
         if (!playerEntity.isSprinting()) {
           this.renderFirstPersonArms(playerEntity, itemStack, gun, transformType, partialTicks,
@@ -338,7 +364,7 @@ public abstract class GunRenderer implements IItemRenderer {
           this.renderFlash(gun, matrixStack, renderTypeBuffer, packedOverlay);
         }
 
-        this.applyFirstPersonTransforms(playerEntity, gun, matrixStack);
+        this.applyFirstPersonTransforms(gun, matrixStack);
       }
 
       if (this.wasSprinting != playerEntity.isSprinting()) {
@@ -367,12 +393,12 @@ public abstract class GunRenderer implements IItemRenderer {
             .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.MAGAZINE,
                 transformType, matrixStack, partialTicks));
 
-        this.renderMainGunAmmo(playerEntity, gun, itemStack.hasEffect(), transformType, matrixStack,
+        this.renderMainGunAmmo(gun, itemStack.hasEffect(), transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
       }
       matrixStack.pop();
 
-      this.renderMainGunAttachments(playerEntity, gun, itemStack.hasEffect(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasEffect(), transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.pop();
@@ -384,15 +410,15 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedOverlay) {
     matrixStack.push();
     {
-      this.applyThirdPersonTransforms(livingEntity, gun, matrixStack);
+      this.applyThirdPersonTransforms(gun, matrixStack);
       gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(livingEntity, itemStack, GunAnimation.BODY,
               transformType, matrixStack, this.minecraft.getRenderPartialTicks()));
       this.renderGunModel(itemStack.hasEffect(), gun,
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(livingEntity, gun, itemStack.hasEffect(), transformType, matrixStack,
+      this.renderMainGunAmmo(gun, itemStack.hasEffect(), transformType, matrixStack,
           renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(livingEntity, gun, itemStack.hasEffect(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasEffect(), transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.pop();
@@ -403,12 +429,12 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedLight, int packedOverlay) {
     matrixStack.push();
     {
-      this.applyWearingTransforms(entity, gun, matrixStack);
+      this.applyWearingTransforms(gun, matrixStack);
       this.renderGunModel(glint, gun, ItemCameraTransforms.TransformType.HEAD,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(entity, gun, glint, ItemCameraTransforms.TransformType.HEAD,
+      this.renderMainGunAmmo(gun, glint, ItemCameraTransforms.TransformType.HEAD,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(entity, gun, glint, ItemCameraTransforms.TransformType.HEAD,
+      this.renderMainGunAttachments(gun, glint, ItemCameraTransforms.TransformType.HEAD,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.pop();
@@ -496,14 +522,14 @@ public abstract class GunRenderer implements IItemRenderer {
         });
   }
 
-  private void renderMainGunAttachments(LivingEntity livingEntity, IGun gun, boolean glint,
+  private void renderMainGunAttachments(IGun gun, boolean glint,
       ItemCameraTransforms.TransformType transformType, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     if (gun.hasIronSight()) {
       matrixStack.push();
       {
-        this.renderAdditionalParts(livingEntity, gun, partialTicks, matrixStack, renderTypeBuffer,
+        this.renderAdditionalParts(gun, partialTicks, matrixStack, renderTypeBuffer,
             packedLight, packedOverlay);
       }
       matrixStack.pop();
@@ -515,7 +541,7 @@ public abstract class GunRenderer implements IItemRenderer {
       for (AttachmentItem attachmentItem : gun.getAttachments()) {
         matrixStack.push();
         {
-          this.applyAttachmentTransforms(livingEntity, attachmentItem, matrixStack);
+          this.applyAttachmentTransforms(attachmentItem, matrixStack);
           scale = 10F;
           matrixStack.scale(scale, scale, scale);
 
@@ -532,7 +558,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.pop();
   }
 
-  private void renderMainGunAmmo(LivingEntity livingEntity, IGun gun, boolean glint,
+  private void renderMainGunAmmo(IGun gun, boolean glint,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     IMagazine magazine = gun.getMagazine().orElse(null);
@@ -542,7 +568,7 @@ public abstract class GunRenderer implements IItemRenderer {
         float scale = 0.1F;
         matrixStack.scale(scale, scale, scale);
 
-        this.applyMagazineTransforms(livingEntity, gun.getMagazineStack(), matrixStack);
+        this.applyMagazineTransforms(gun.getMagazineStack(), matrixStack);
 
         scale = 10F;
         matrixStack.scale(scale, scale, scale);
@@ -565,30 +591,27 @@ public abstract class GunRenderer implements IItemRenderer {
     }
   }
 
-  protected abstract void renderAdditionalParts(LivingEntity livingEntity, IGun gun,
+  protected abstract void renderAdditionalParts(IGun gun,
       float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay);
 
-  protected abstract void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
+  protected abstract void applyGenericTransforms(IGun gun, MatrixStack matrixStack);
+
+  protected abstract void applyThirdPersonTransforms(IGun gun, MatrixStack matrixStack);
+
+  protected abstract void applyFirstPersonTransforms(IGun gun, MatrixStack matrixStack);
+
+  protected abstract void applyAimingTransforms(IGun gun, MatrixStack matrixStack);
+
+  protected abstract void applyWearingTransforms(IGun gun, MatrixStack matrixStack);
+
+  protected abstract void applyMagazineTransforms(ItemStack magazineStack, MatrixStack matrixStack);
+
+  protected abstract void applyAttachmentTransforms(AttachmentItem attachmentItem,
       MatrixStack matrixStack);
 
-  protected abstract void applyFirstPersonTransforms(PlayerEntity playerEntity, IGun gun,
+  protected abstract void applyHandTransforms(IGun gun, boolean rightHanded,
       MatrixStack matrixStack);
-
-  protected abstract void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
-      MatrixStack matrixStack);
-
-  protected abstract void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
-      MatrixStack matrixStack);
-
-  protected abstract void applyMagazineTransforms(LivingEntity livingEntity,
-      ItemStack magazineStack, MatrixStack matrixStack);
-
-  protected abstract void applyAttachmentTransforms(LivingEntity livingEntity,
-      AttachmentItem attachmentItem, MatrixStack matrixStack);
-
-  protected abstract void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
-      boolean rightHanded, MatrixStack matrixStack);
 
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
     matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));

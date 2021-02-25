@@ -51,6 +51,9 @@ public interface IItemRenderer {
       LivingEntity livingEntity, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay);
 
+  void renderGeneric(ItemStack itemStack, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay);
+
   /**
    * Get all models this {@link IItemRenderer} depends on. This is used to resolve and stitch model
    * texture dependencies as well as auto baking models upon resource reload.

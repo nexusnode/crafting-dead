@@ -21,17 +21,19 @@ package com.craftingdead.core.capability.magazine;
 import com.craftingdead.core.item.MagazineItem;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 
-public class DefaultMagazine implements IMagazine {
+public class MagazineImpl implements IMagazine {
 
   private final MagazineItem magazineItem;
   private int size;
+  private boolean dirty;
 
-  public DefaultMagazine() {
+  public MagazineImpl() {
     throw new UnsupportedOperationException("Specify magazine item");
   }
 
-  public DefaultMagazine(MagazineItem magazineItem) {
+  public MagazineImpl(MagazineItem magazineItem) {
     this.magazineItem = magazineItem;
     this.size = magazineItem.getSize();
   }
@@ -60,17 +62,20 @@ public class DefaultMagazine implements IMagazine {
 
   @Override
   public void setSize(int size) {
+    this.dirty = true;
     this.size = size;
   }
 
   @Override
   public void refill() {
+    this.dirty = true;
     this.size = this.magazineItem.getSize();
   }
 
   @Override
-  public void decrementSize() {
-    this.size--;
+  public int decrementSize() {
+    this.dirty = true;
+    return --this.size;
   }
 
   @Override
@@ -81,5 +86,26 @@ public class DefaultMagazine implements IMagazine {
   @Override
   public boolean hasCustomTexture() {
     return this.magazineItem.hasCustomTexture();
+  }
+
+  @Override
+  public int getMaxSize() {
+    return this.magazineItem.getSize();
+  }
+
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {
+    out.writeVarInt(this.size);
+    this.dirty = false;
+  }
+
+  @Override
+  public void decode(PacketBuffer in) {
+    this.size = in.readVarInt();
+  }
+
+  @Override
+  public boolean requiresSync() {
+    return this.dirty;
   }
 }

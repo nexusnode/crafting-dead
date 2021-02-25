@@ -66,10 +66,6 @@ subprojects {
 		from rootProject.file('LICENSE.txt')
 	}
 
-	mixin {
-    	add sourceSets.main, "craftingdead.refmap.json"
-	}
-	
 	license {
 		include '**/*.java'
 		

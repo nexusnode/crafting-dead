@@ -23,7 +23,7 @@ import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.tutorial.ITutorialStep;
 
 public enum ModTutorialSteps {
-  OPEN_INVENTORY("open_inventory", OpenModInventoryStep::new), NONE("none",
+  OPEN_INVENTORY("open_inventory", OpenEquipmentMenuStep::new), NONE("none",
       CompletedModTutorialStep::new);
 
   private final String name;

@@ -254,4 +254,12 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   public IPacket<?> createSpawnPacket() {
     return NetworkHooks.getEntitySpawningPacket(this);
   }
+
+  public DamageSource createDamageSource() {
+    return ModDamageSource.causeUnscaledExplosionDamage(
+        this.getThrower()
+            .filter(e -> e instanceof LivingEntity)
+            .map(e -> (LivingEntity) e)
+            .orElse(null));
+  }
 }

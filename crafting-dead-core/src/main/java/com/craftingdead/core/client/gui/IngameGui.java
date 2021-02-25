@@ -26,19 +26,24 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.item.MagazineItem;
+import com.craftingdead.core.item.GrenadeItem;
+import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.potion.ModEffects;
+import com.craftingdead.core.util.KillFeedEntry;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
@@ -46,6 +51,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 public class IngameGui {
 
@@ -55,6 +61,9 @@ public class IngameGui {
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
   private static final ResourceLocation BLOOD_2 =
       new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
+
+  private static final ResourceLocation HEALTH =
+      new ResourceLocation(CraftingDead.ID, "textures/gui/health.png");
 
   private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
 
@@ -94,7 +103,8 @@ public class IngameGui {
   }
 
   @SuppressWarnings("deprecation")
-  private void renderGunFlash(ClientPlayerEntity playerEntity, IGun gun, int width, int height,
+  private void renderGunFlash(AbstractClientPlayerEntity playerEntity, IGun gun, int width,
+      int height,
       float partialTicks) {
     if (gun.getClient().isFlashing()) {
       RenderSystem.pushMatrix();
@@ -122,9 +132,10 @@ public class IngameGui {
     }
   }
 
-  private static void renderScopeOverlay(ClientPlayerEntity playerEntity, IScope scope, int width,
+  private static void renderScopeOverlay(AbstractClientPlayerEntity playerEntity, IScope scope,
+      int width,
       int height) {
-    scope.getOverlayTexture(playerEntity, playerEntity.getHeldItemMainhand())
+    scope.getOverlayTexture(playerEntity)
         .ifPresent(overlayTexture -> {
           RenderUtil.bind(overlayTexture);
           double overlayTextureWidth = scope.getOverlayTextureWidth();
@@ -141,7 +152,7 @@ public class IngameGui {
         });
   }
 
-  public void renderOverlay(IPlayer<ClientPlayerEntity> player, ItemStack heldStack,
+  public void renderOverlay(IPlayer<AbstractClientPlayerEntity> player, ItemStack heldStack,
       @Nullable IGun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
 
     // TODO Fixes Minecraft bug when using post-processing shaders.
@@ -155,10 +166,10 @@ public class IngameGui {
 
     this.renderKillFeed(matrixStack, partialTicks);
 
-    final ClientPlayerEntity playerEntity = player.getEntity();
+    final AbstractClientPlayerEntity playerEntity = player.getEntity();
 
     heldStack.getCapability(ModCapabilities.SCOPE)
-        .filter(scope -> scope.isAiming(playerEntity, heldStack))
+        .filter(scope -> scope.isAiming(playerEntity))
         .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
 
     // Draws Flashbang effect
@@ -172,13 +183,13 @@ public class IngameGui {
       RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
     }
 
-    player.getActionProgress()
-        .ifPresent(observer -> renderActionProgress(matrixStack, this.minecraft.fontRenderer, width,
-            height, observer.getMessage(), observer.getSubMessage(),
+    player.getProgressMonitor()
+        .ifPresent(observer -> renderProgress(matrixStack, this.minecraft.fontRenderer, width,
+            height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
 
     // Only draw in survival
-    if (this.minecraft.playerController.shouldDrawHUD()) {
+    if (this.minecraft.playerController.shouldDrawHUD() && !player.isCombatModeEnabled()) {
       float healthPercentage = playerEntity.getHealth() / playerEntity.getMaxHealth();
       if (ClientDist.clientConfig.displayBlood.get() && healthPercentage < 1.0F
           && playerEntity.isPotionActive(ModEffects.BLEEDING.get())) {
@@ -199,8 +210,11 @@ public class IngameGui {
 
     // Needs to render after blood or else it causes Z level issues
     if (gun != null) {
-      renderAmmo(matrixStack, this.minecraft.getItemRenderer(), this.minecraft.fontRenderer,
-          width, height, gun.getMagazineSize(), gun.getMagazineStack());
+      this.renderAmmo(matrixStack, width, height, gun);
+    }
+
+    if (player.isCombatModeEnabled()) {
+      this.renderCombatMode(player, matrixStack, width, height);
     }
   }
 
@@ -233,29 +247,132 @@ public class IngameGui {
     for (int i = 0; i < this.killFeedMessages.size(); i++) {
       final KillFeedEntry killFeedMessage = this.killFeedMessages.get(i);
       float killFeedMessageY = 5.0F + ((i - (1.0F * animationPct)) * 12.0F);
-      killFeedMessage.render(matrixStack, killFeedMessageX, killFeedMessageY,
+      this.renderKillFeedEntry(killFeedMessage, matrixStack, killFeedMessageX, killFeedMessageY,
           i == 0 ? 1.0F - animationPct : 1.0F);
     }
   }
 
-  private static void renderAmmo(MatrixStack matrixStack, ItemRenderer itemRenderer,
-      FontRenderer fontRenderer, int width,
-      int height, int ammo, ItemStack magazineStack) {
-    if (magazineStack.getItem() instanceof MagazineItem) {
-      MagazineItem magazine = (MagazineItem) magazineStack.getItem();
-      String text = ammo + "/" + magazine.getSize();
-      int x = width - 15 - fontRenderer.getStringWidth(text);
-      if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
-          && CapabilityUtils.isWearingBackpack(Minecraft.getInstance().player)) {
-        x -= 25;
+  @SuppressWarnings("deprecation")
+  private void renderKillFeedEntry(KillFeedEntry entry, MatrixStack matrixStack, float x, float y,
+      float alpha) {
+    final Minecraft minecraft = Minecraft.getInstance();
+
+    final String playerEntityName = entry.getKillerEntity().getDisplayName().getString();
+    final String deadEntityName = entry.getDeadEntity().getDisplayName().getString();
+    final int playerEntityNameWidth = minecraft.fontRenderer.getStringWidth(playerEntityName);
+    final int deadEntityNameWidth = minecraft.fontRenderer.getStringWidth(deadEntityName);
+
+    int spacing = 20;
+    alpha *= minecraft.player == entry.getKillerEntity() ? 0.7F : 0.5F;
+
+    switch (entry.getType()) {
+      case WALLBANG_HEADSHOT:
+        spacing += 16;
+      case HEADSHOT:
+      case WALLBANG:
+        spacing += 16;
+        break;
+      default:
+        break;
+    }
+
+    final int opacity = Math.min((int) (alpha * 255.0F), 255);
+    if (opacity < 8) {
+      return;
+    }
+
+    int colour = 0x000000 + (opacity << 24);
+    RenderUtil.drawGradientRectangle(x, y,
+        x + playerEntityNameWidth + deadEntityNameWidth + spacing, y + 11, colour, colour);
+
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        entry.getKillerEntity().getDisplayName().getString(),
+        x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
+    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        entry.getDeadEntity().getDisplayName().getString(),
+        x + playerEntityNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
+
+    switch (entry.getType()) {
+      case HEADSHOT:
+        RenderSystem.enableBlend();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
+        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 17, y - 1, 12, 12);
+        RenderSystem.disableBlend();
+        break;
+      case WALLBANG:
+        RenderSystem.enableBlend();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
+        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderSystem.disableBlend();
+        break;
+      case WALLBANG_HEADSHOT:
+        RenderSystem.enableBlend();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
+        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
+        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35 + 14, y - 1, 12, 12);
+        RenderSystem.disableBlend();
+        break;
+      default:
+        break;
+    }
+
+    if (!entry.getWeaponStack().isEmpty()) {
+      RenderSystem.pushMatrix();
+      {
+        RenderSystem.translated(x + playerEntityNameWidth + 4, y - 1, 0);
+
+        if (entry.getWeaponStack().getItem() instanceof GunItem) {
+          double scale = 0.75D;
+          RenderSystem.scaled(scale, scale, scale);
+        }
+
+        // if (this.itemStack.getItem() instanceof ItemKnife) {
+        // double scale = 0.6D;
+        // GL11.glScaled(scale, scale, scale);
+        // GL11.glRotated(180, 0, 1, 0);
+        // GL11.glRotated(-20, 0, 0, 1);
+        // }
+
+        if (entry.getWeaponStack().getItem() instanceof GrenadeItem) {
+          double scale = 0.8D;
+          RenderSystem.scaled(scale, scale, scale);
+          RenderSystem.translated(4, 1, 0);
+        }
+
+        RenderUtil.renderItemIntoGUI(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
       }
-      int y = height - 10 - fontRenderer.FONT_HEIGHT;
-      fontRenderer.drawStringWithShadow(matrixStack, text, x, y, 0xFFFFFF);
-      itemRenderer.renderItemAndEffectIntoGUI(magazineStack, x - 16, y - 5);
+      RenderSystem.popMatrix();
     }
   }
 
-  private static void renderActionProgress(MatrixStack matrixStack, FontRenderer fontRenderer,
+  private void renderAmmo(MatrixStack matrixStack, int width,
+      int height, IGun gun) {
+
+    int x = width - 115;
+    if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
+        && CapabilityUtils.isWearingBackpack(this.minecraft.player)) {
+      x -= 30;
+    }
+
+    RenderUtil.fill(matrixStack, x, height - 25, 100, 20, 0x66000000);
+
+    IMagazine magazine = gun.getMagazine().orElse(null);
+    boolean empty = (magazine == null || magazine.isEmpty()) && gun.getAmmoReserveSize() == 0;
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+        empty ? I18n.format("hud.empty_magazine")
+            : (magazine == null ? 0 : magazine.getSize()) + "/" + gun.getAmmoReserveSize(),
+        x + 30, height - 18, empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+
+    String fireMode = I18n.format(gun.getFireMode().getTranslationKey());
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+        fireMode, x + 73, height - 18, 0xFFFFFFFF);
+  }
+
+  private static void renderProgress(MatrixStack matrixStack, FontRenderer fontRenderer,
       int width, int height,
       ITextComponent message, @Nullable ITextComponent subMessage, float percent) {
     final int barWidth = 100;
@@ -309,6 +426,104 @@ public class IngameGui {
       }
     }
     RenderSystem.disableBlend();
+  }
+
+  @SuppressWarnings("deprecation")
+  private void renderCombatMode(IPlayer<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+      int width, int height) {
+    final PlayerInventory inventory = player.getEntity().inventory;
+
+    int boxX = width - 115;
+    int boxWidth = 110;
+    int boxY = height - 170;
+    int boxHeight = 30;
+    int boxMarginY = 31;
+
+    int currentItemIndex = inventory.currentItem;
+
+    // Render primary
+    ItemStack primaryStack = inventory.getStackInSlot(0);
+    if (currentItemIndex == 0) {
+      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+    }
+    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "1", boxX + 5, boxY + 5,
+        0xFFFFFFFF);
+    RenderSystem.pushMatrix();
+    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+        boxY + (boxHeight / 2) - 16 / 2, 0);
+    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
+    RenderUtil.renderItemIntoGUI(primaryStack, 0, 0, 0xFFFFFFFF, true);
+    RenderSystem.popMatrix();
+
+
+    // Render secondary
+    ItemStack secondaryStack = inventory.getStackInSlot(1);
+    boxY += boxMarginY;
+    if (currentItemIndex == 1) {
+      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+    }
+    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "2", boxX + 5, boxY + 5,
+        0xFFFFFFFF);
+    RenderSystem.pushMatrix();
+    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+        boxY + (boxHeight / 2) - 16 / 2, 0);
+    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
+    RenderUtil.renderItemIntoGUI(secondaryStack, 0, 0, 0xFFFFFFFF, true);
+    RenderSystem.popMatrix();
+
+    // Render melee
+    ItemStack meleeStack = inventory.getStackInSlot(2);
+    boxY += boxMarginY;
+    if (currentItemIndex == 2) {
+      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+    }
+    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "3", boxX + 5, boxY + 5,
+        0xFFFFFFFF);
+    RenderSystem.pushMatrix();
+    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+        boxY + (boxHeight / 2) - 16 / 2, 0);
+    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
+    RenderUtil.renderItemIntoGUI(meleeStack, 0, 0, 0xFFFFFFFF, true);
+    RenderSystem.popMatrix();
+
+
+    // Render extras
+    boxY += boxMarginY;
+    boxHeight = 25;
+    boxWidth = 25;
+    for (int i = 0; i < 4; i++) {
+      ItemStack extraStack = inventory.getStackInSlot(3 + i);
+      if (currentItemIndex == 3 + i) {
+        RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+      }
+      RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+      this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, String.valueOf(4 + i), boxX + 1,
+          boxY + 1, 0xFFFFFFFF);
+
+      RenderSystem.pushMatrix();
+
+      RenderUtil.renderItemIntoGUI(extraStack, boxX + boxWidth / 2 - 16 / 2,
+          boxY + (boxHeight / 2) - 6, 0xFFFFFFFF, false);
+      RenderSystem.popMatrix();
+
+      boxX += 28;
+    }
+
+    // Render Health
+    final float health = player.getEntity().getHealth();
+    RenderUtil.fill(matrixStack, 5, height - 25, 110, 20, 0x66000000);
+    RenderUtil.bind(HEALTH);
+    RenderSystem.enableBlend();
+    RenderUtil.drawTexturedRectangle(5, height - 25, 20, 20);
+    RenderSystem.disableBlend();
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        String.valueOf((int) health), 28, height - 18, 0xFFFFFFFF);
+    RenderUtil.fill(matrixStack, 45, height - 20, 65, 10, 0x66000000);
+    RenderUtil.fill(matrixStack, 45, height - 20,
+        (int) (65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
   }
 
   @SuppressWarnings("deprecation")

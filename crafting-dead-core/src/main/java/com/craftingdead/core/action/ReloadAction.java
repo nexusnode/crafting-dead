@@ -24,10 +24,10 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
-import com.craftingdead.core.capability.gun.AimableGun;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -36,10 +36,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class ReloadAction extends TimedAction {
+
+  private final ItemStack gunStack;
 
   private final IGun gun;
 
@@ -47,7 +50,8 @@ public class ReloadAction extends TimedAction {
 
   public ReloadAction(ILiving<?, ?> performer) {
     super(ActionTypes.RELOAD.get(), performer, null);
-    this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
+    this.gunStack = performer.getEntity().getHeldItemMainhand();
+    this.gun = this.gunStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
   }
 
@@ -58,11 +62,11 @@ public class ReloadAction extends TimedAction {
 
   @Override
   public boolean start() {
+    // Find ammo for animation purposes
     ItemStack magazineStack = this.findAmmo(this.performer, true);
     if (!this.getPerformer().getEntity().isSprinting() && !magazineStack.isEmpty()) {
-      if (this.gun instanceof AimableGun && ((AimableGun) this.gun)
-          .isAiming(this.performer.getEntity(), this.performer.getEntity().getHeldItemMainhand())) {
-        this.gun.toggleRightMouseAction(this.getPerformer(), false);
+      if (this.gun.isPerformingRightMouseAction()) {
+        this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
       }
       this.oldMagazineStack = this.gun.getMagazineStack();
       // Some guns may not have a reload sound
@@ -113,11 +117,21 @@ public class ReloadAction extends TimedAction {
 
   @Override
   protected void finish() {
+    if (this.performer.getEntity().getEntityWorld().isRemote()) {
+      return;
+    }
+    // Find ammo to put into the gun
     ItemStack magazineStack = this.findAmmo(this.performer, false);
     if (!magazineStack.isEmpty()) {
+      GunEvent.ReloadFinish event =
+          new GunEvent.ReloadFinish(this.gun, this.gunStack, this.oldMagazineStack, magazineStack);
+      MinecraftForge.EVENT_BUS.post(event);
+      magazineStack = event.getNewMagazineStack();
+      this.oldMagazineStack = event.getOldMagazineStack();
       if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
         ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
       }
+      // This will be synced to the client by the gun.
       this.gun.setMagazineStack(magazineStack);
     }
   }
@@ -125,7 +139,7 @@ public class ReloadAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    if (this.getPerformer().getEntity().getEntityWorld().isRemote()) {
+    if (this.gun.getClient() != null) {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound
         Minecraft.getInstance().getSoundHandler()
@@ -134,11 +148,21 @@ public class ReloadAction extends TimedAction {
       this.gun.getClient().getAnimationController()
           .ifPresent(GunAnimationController::removeCurrentAnimation);
     }
+
+    // Call this on both sides as we change the client side stack for the reload animation.
     this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
   private List<IItemHandler> collectAmmoProviders(ILiving<?, ?> living) {
     ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
+
+    GunEvent.CollectAmmoProviders event =
+        new GunEvent.CollectAmmoProviders(this.gun, this.gunStack, living);
+    MinecraftForge.EVENT_BUS.post(event);
+    builder.addAll(event.getAmmoProviders());
+
+    builder.add(this.gun.getAmmoReserve());
+
     // Vest - first
     living.getItemHandler().getStackInSlot(InventorySlotType.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);

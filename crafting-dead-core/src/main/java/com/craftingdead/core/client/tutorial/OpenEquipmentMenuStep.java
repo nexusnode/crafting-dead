@@ -25,18 +25,18 @@ import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class OpenModInventoryStep implements IModTutorialStep {
+public class OpenEquipmentMenuStep implements IModTutorialStep {
   private static final ITextComponent TITLE =
-      new TranslationTextComponent("tutorial.craftingdead.open_inventory.title");
+      new TranslationTextComponent("tutorial.open_equipment_menu.title");
   private static final ITextComponent DESCRIPTION =
-      new TranslationTextComponent("tutorial.open_inventory.description",
-          Tutorial.createKeybindComponent("craftingdead.inventory"));
+      new TranslationTextComponent("tutorial.open_equipment_menu.description",
+          Tutorial.createKeybindComponent("equipment_menu"));
 
   private final ClientDist client;
   private TutorialToast toast;
   private int timeWaiting;
 
-  public OpenModInventoryStep(ClientDist client) {
+  public OpenEquipmentMenuStep(ClientDist client) {
     this.client = client;
   }
 

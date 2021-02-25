@@ -18,8 +18,8 @@
 
 package com.craftingdead.core.item;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +33,12 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.AimableGun;
-import com.craftingdead.core.capability.gun.DefaultGun;
+import com.craftingdead.core.capability.gun.GunImpl;
 import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.capability.gun.IGunProvider;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
+import com.craftingdead.core.inventory.CombatSlotType;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -47,9 +49,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -58,11 +58,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 
-public class GunItem extends ShootableItem implements IRendererProvider {
+public class GunItem extends ShootableItem implements IRendererProvider, IGunProvider {
 
   /**
    * Time between shots in milliseconds.
@@ -107,7 +106,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   /**
    * {@link FireMode}s the gun can cycle through.
    */
-  private final List<FireMode> fireModes;
+  private final Set<FireMode> fireModes;
 
   /**
    * Sound to play for each shot of the gun.
@@ -184,6 +183,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
    */
   private final double range;
 
+  private final CombatSlotType combatSlotType;
+
   public GunItem(Properties properties) {
     super(properties);
     this.fireDelayMs = properties.fireDelayMs;
@@ -210,8 +211,10 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.rightMouseActionSound = properties.rightMouseActionSound;
     this.rightMouseActionSoundRepeatDelayMs = properties.rightMouseActionSoundRepeatDelayMs;
     this.range = properties.range;
+    this.combatSlotType = properties.combatSlotType;
   }
 
+  @Override
   public int getFireDelayMs() {
     return this.fireDelayMs;
   }
@@ -220,88 +223,114 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     return 60000 / this.getFireDelayMs();
   }
 
-  public int getDamage() {
+  @Override
+  public float getDamage() {
     return this.damage;
   }
 
+  @Override
   public int getReloadDurationTicks() {
     return this.reloadDurationTicks;
   }
 
+  @Override
   public float getAccuracyPct() {
     return this.accuracyPct;
   }
 
+  @Override
   public double getRange() {
     return this.range;
   }
 
+  @Override
   public int getBulletAmountToFire() {
     return this.bulletAmountToFire;
   }
 
+  @Override
   public boolean hasCrosshair() {
     return this.crosshair;
   }
 
+  @Override
   public boolean hasBoltAction() {
     return this.boltAction;
   }
 
-  public List<FireMode> getFireModes() {
+  @Override
+  public Set<FireMode> getFireModes() {
     return this.fireModes;
   }
 
+  @Override
   public Supplier<SoundEvent> getShootSound() {
     return this.shootSound;
   }
 
+  @Override
   public Optional<SoundEvent> getDistantShootSound() {
     return Optional.ofNullable(this.distantShootSound.get());
   }
 
+  @Override
   public Optional<SoundEvent> getSilencedShootSound() {
     return Optional.ofNullable(this.silencedShootSound.get());
   }
 
+  @Override
   public Optional<SoundEvent> getReloadSound() {
     return Optional.ofNullable(this.reloadSound.get());
   }
 
+  @Override
   public Map<AnimationType, Supplier<GunAnimation>> getAnimations() {
     return this.animations;
   }
 
+  @Override
   public Set<MagazineItem> getAcceptedMagazines() {
     return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  @Override
   public Supplier<MagazineItem> getDefaultMagazine() {
     return this.defaultMagazine;
   }
 
+  @Override
   public Set<AttachmentItem> getAcceptedAttachments() {
     return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  @Override
   public Set<PaintItem> getAcceptedPaints() {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
+  @Override
   public IGun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
     return this.rightMouseActionTriggerType;
   }
 
+  @Override
   public Predicate<IGun> getTriggerPredicate() {
     return this.triggerPredicate;
   }
 
+  @Override
   public Supplier<SoundEvent> getRightMouseActionSound() {
     return this.rightMouseActionSound;
   }
 
+  @Override
   public long getRightMouseActionSoundRepeatDelayMs() {
     return this.rightMouseActionSoundRepeatDelayMs;
+  }
+
+  @Override
+  public CombatSlotType getCombatSlotType() {
+    return this.combatSlotType;
   }
 
   @Override
@@ -321,13 +350,13 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new ICapabilitySerializable<CompoundNBT>() {
 
-      private final IGun gun =
-          GunItem.this.aimable ? new AimableGun(GunItem.this) : new DefaultGun(GunItem.this);
+      private final IGun gun = GunItem.this.aimable ? new AimableGun(GunItem.this, itemStack)
+          : new GunImpl(GunItem.this, itemStack);
 
       @Override
       public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         if ((GunItem.this.aimable && cap == ModCapabilities.SCOPE)
-            || (cap == ModCapabilities.GUN)) {
+            || (cap == ModCapabilities.GUN) || cap == ModCapabilities.COMBAT_ITEM) {
           return LazyOptional.of(() -> this.gun).cast();
         } else if (cap == ModCapabilities.ANIMATION_PROVIDER) {
           return this.gun.getClient() == null ? LazyOptional.empty()
@@ -360,20 +389,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
-      Hand hand) {
-    if (hand == Hand.MAIN_HAND) {
-      playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> playerEntity
-          .getHeldItem(hand)
-          .getCapability(ModCapabilities.GUN)
-          .filter(
-              gun -> gun.getRightMouseActionTriggerType() == IGun.RightMouseActionTriggerType.CLICK)
-          .ifPresent(gun -> gun.toggleRightMouseAction(living, false)));
-    }
-    return super.onItemRightClick(world, playerEntity, hand);
-  }
-
-  @Override
   public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
     super.addInformation(stack, world, lines, tooltipFlag);
@@ -383,7 +398,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
           Text.of(gun.getMagazineSize()).mergeStyle(TextFormatting.RED);
       ITextComponent damageText = Text.of(this.damage).mergeStyle(TextFormatting.RED);
       ITextComponent headshotDamageText = Text
-          .of((int) (this.damage * DefaultGun.HEADSHOT_MULTIPLIER))
+          .of((int) (this.damage * GunImpl.HEADSHOT_MULTIPLIER))
           .mergeStyle(TextFormatting.RED);
       ITextComponent accuracyText =
           Text.of((int) (this.accuracyPct * 100D) + "%").mergeStyle(TextFormatting.RED);
@@ -457,30 +472,6 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     return 0;
   }
 
-  @Override
-  public CompoundNBT getShareTag(ItemStack stack) {
-    CompoundNBT shareTag = stack.getTag();
-    if (shareTag == null) {
-      shareTag = new CompoundNBT();
-    }
-    CompoundNBT gunTag = stack.getCapability(ModCapabilities.GUN)
-        .map(IGun::getShareTag)
-        .orElse(null);
-    if (gunTag != null && !gunTag.isEmpty()) {
-      shareTag.put("gun", gunTag);
-    }
-    return shareTag;
-  }
-
-  @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    if (nbt != null && nbt.contains("gun", Constants.NBT.TAG_COMPOUND)) {
-      stack.getCapability(ModCapabilities.GUN)
-          .ifPresent(gun -> gun.readShareTag(nbt.getCompound("gun")));
-    }
-    super.readShareTag(stack, nbt);
-  }
-
   public static class Properties extends Item.Properties {
 
     private int fireDelayMs;
@@ -501,7 +492,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
     private boolean boltAction = false;
 
-    private final List<FireMode> fireModes = new ArrayList<>();
+    private final Set<FireMode> fireModes = EnumSet.noneOf(FireMode.class);
 
     private Supplier<SoundEvent> shootSound;
 
@@ -532,6 +523,8 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     private Supplier<SoundEvent> rightMouseActionSound = () -> null;
 
     private long rightMouseActionSoundRepeatDelayMs = -1L;
+
+    private CombatSlotType combatSlotType = CombatSlotType.PRIMARY;
 
     public Properties setFireDelayMs(int fireDelayMs) {
       this.fireDelayMs = fireDelayMs;
@@ -656,6 +649,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     public Properties setRightMouseActionSoundRepeatDelayMs(
         long rightMouseActionSoundRepeatDelayMs) {
       this.rightMouseActionSoundRepeatDelayMs = rightMouseActionSoundRepeatDelayMs;
+      return this;
+    }
+
+    public Properties setCombatSlotType(CombatSlotType combatSlotType) {
+      this.combatSlotType = combatSlotType;
       return this;
     }
   }

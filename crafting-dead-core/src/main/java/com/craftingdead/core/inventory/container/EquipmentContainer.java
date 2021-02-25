@@ -34,15 +34,15 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-public class PlayerContainer extends Container {
+public class EquipmentContainer extends Container {
 
   private final IItemHandler itemHandler;
 
   private final CraftResultInventory outputInventory = new CraftResultInventory();
   private final Inventory craftingInventory = new Inventory(4);
 
-  public PlayerContainer(int windowId, PlayerInventory playerInventory) {
-    super(ModContainerTypes.PLAYER.get(), windowId);
+  public EquipmentContainer(int windowId, PlayerInventory playerInventory) {
+    super(ModContainerTypes.EQUIPMENT.get(), windowId);
     this.itemHandler = playerInventory.player.getCapability(ModCapabilities.LIVING)
         .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
     this.craftingInventory.addListener(this::onCraftMatrixChanged);

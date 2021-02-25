@@ -9,6 +9,7 @@ crafting-dead-core/data/
 crafting-dead-core/out/
 crafting-dead-core/client/
 crafting-dead-core/.idea/
+crafting-dead-core/src/generated/resources/.cache/
 
 crafting-dead-immerse/.classpath
 crafting-dead-immerse/.project

@@ -22,7 +22,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -62,7 +61,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
       if (!this.world.isRemote()) {
         this.remove();
         this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
+            this.createDamageSource(), null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 2F, true,
             Explosion.Mode.NONE);
 

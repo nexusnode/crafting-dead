@@ -30,33 +30,35 @@ public class DefaultScope implements IScope {
   private final Optional<ResourceLocation> overlayTexture;
   private final int overlayTextureWidth;
   private final int overlayTextureHeight;
+  private final ItemStack itemStack;
 
-  public DefaultScope() {
-    this(1.0F, null, 0, 0);
+  public DefaultScope(ItemStack itemStack) {
+    this(1.0F, null, 0, 0, itemStack);
   }
 
   public DefaultScope(float zoomMultiplier, ResourceLocation overlayTexture,
-      int overlayTextureWidth, int overlayTextureHeight) {
+      int overlayTextureWidth, int overlayTextureHeight, ItemStack itemStack) {
     this.zoomMultiplier = zoomMultiplier;
     this.overlayTexture = Optional.ofNullable(overlayTexture);
     this.overlayTextureWidth = overlayTextureWidth;
     this.overlayTextureHeight = overlayTextureHeight;
+    this.itemStack = itemStack;
   }
 
   @Override
-  public boolean isAiming(Entity entity, ItemStack itemStack) {
+  public boolean isAiming(Entity entity) {
     return entity instanceof LivingEntity
-        ? ((LivingEntity) entity).getActiveItemStack() == itemStack
+        ? ((LivingEntity) entity).getActiveItemStack() == this.itemStack
         : false;
   }
 
   @Override
-  public float getZoomMultiplier(Entity entity, ItemStack itemStack) {
+  public float getZoomMultiplier(Entity entit) {
     return this.zoomMultiplier;
   }
 
   @Override
-  public Optional<ResourceLocation> getOverlayTexture(Entity entity, ItemStack itemStack) {
+  public Optional<ResourceLocation> getOverlayTexture(Entity entity) {
     return this.overlayTexture;
   }
 

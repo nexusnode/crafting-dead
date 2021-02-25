@@ -20,29 +20,33 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.item.FireMode;
 import com.craftingdead.core.network.util.NetworkUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ToggleFireModeMessage {
+public class SetFireModeMessage {
 
   private final int entityId;
+  private final FireMode fireMode;
 
-  public ToggleFireModeMessage(int entityId) {
+  public SetFireModeMessage(int entityId, FireMode fireMode) {
     this.entityId = entityId;
+    this.fireMode = fireMode;
   }
 
-  public static void encode(ToggleFireModeMessage msg, PacketBuffer out) {
+  public static void encode(SetFireModeMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
+    out.writeEnumValue(msg.fireMode);
   }
 
-  public static ToggleFireModeMessage decode(PacketBuffer in) {
-    return new ToggleFireModeMessage(in.readVarInt());
+  public static SetFireModeMessage decode(PacketBuffer in) {
+    return new SetFireModeMessage(in.readVarInt(), in.readEnumValue(FireMode.class));
   }
 
-  public static boolean handle(ToggleFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
+  public static boolean handle(SetFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
@@ -51,7 +55,7 @@ public class ToggleFireModeMessage {
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun.toggleFireMode(living,
+                  .ifPresent(gun -> gun.setFireMode(living, msg.fireMode,
                       ctx.get().getDirection().getReceptionSide().isServer())));
         });
     return true;

@@ -22,7 +22,6 @@ import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.particle.RGBFlashParticleData;
-import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.SoundEvents;
@@ -54,7 +53,7 @@ public class PipeGrenadeEntity extends GrenadeEntity {
       if (!this.world.isRemote()) {
         this.remove();
         this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
+            this.createDamageSource(), null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
             Explosion.Mode.NONE);
       }

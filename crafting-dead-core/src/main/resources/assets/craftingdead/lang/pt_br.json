@@ -2,15 +2,16 @@
   "enchantment.craftingdead.explosion":"Explosão",
   "enchantment.craftingdead.incendiary":"Incendiário",
   "enchantment.craftingdead.infection":"Infecção",
-  "message.fire_mode.auto":"Trocado para automático",
-  "message.fire_mode.semi":"Trocado para semi-automático",
-  "message.fire_mode.burst":"Trocado para burst",
+
+  "message.switch_fire_mode":"Trocado para %s",
+  
   "action.reload": "Recarregando",
   "action.remove_magazine":"Removendo pente",
+  
   "key.reload": "Recarregar",
   "key.toggle_fire_mode": "Alternar Modo de Tiro",
-  "key.craftingdead.inventory":"Abrir/Fechar Inventário do Crafting Dead",
-  "tutorial.craftingdead.open_inventory.title":"Abra o menu do Crafting Dead",
+  "key.equipment_menu":"Abrir/Fechar Inventário do Crafting Dead",
+  "tutorial.open_equipment_menu.title":"Abra o menu do Crafting Dead",
   "death.attack.bullet": "%1$s foi baleado",
   "death.attack.bullet.headshot": "%1$s foi baleado na cabeça",
   "options.craftingdead.client": "Cliente",
@@ -338,9 +339,7 @@
   "attachment_multiplier_type.accuracy": "Precisão",
   "attachment_multiplier_type.zoom": "Zoom",
 
-  "biome.craftingdead.zombie_forest": "Floresta de Zumbis",
-
-  "commands.craftingdead.thirst.success.operator": "Sede saciada com sucesso.",
-  "commands.craftingdead.thirst.success.confirmation": "Você foi totalmente hidratado!",
-  "commands.craftingdead.thirst.failure.not_used": "Ninguém estava com sede."
+  "commands.craftingdead.hydrate.success.operator": "Sede saciada com sucesso",
+  "commands.craftingdead.hydrate.success.confirmation": "Você foi totalmente hidratado",
+  "commands.craftingdead.hydrate.failure.not_used": "Ninguém estava com sede"
 }

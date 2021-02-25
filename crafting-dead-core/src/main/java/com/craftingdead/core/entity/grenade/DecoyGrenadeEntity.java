@@ -25,7 +25,6 @@ import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.GunItem;
 import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particles.ParticleTypes;
@@ -59,8 +58,7 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
     if (!activated) {
       if (!this.world.isRemote()) {
         this.remove();
-        this.world.createExplosion(this,
-            ModDamageSource.causeUnscaledExplosionDamage(this.getThrower().orElse(null)), null,
+        this.world.createExplosion(this, this.createDamageSource(), null,
             this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 1.3F, false,
             Explosion.Mode.NONE);
       }

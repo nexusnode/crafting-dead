@@ -21,9 +21,17 @@ package com.craftingdead.core.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
@@ -36,5 +44,25 @@ public abstract class LivingEntityMixin {
         callbackInfo.setReturnValue(true);
       }
     });
+  }
+
+  // TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
+  @Redirect(at = @At(value = "INVOKE",
+      target = "Lnet/minecraft/item/ItemStack;areItemStacksEqual(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"),
+      method = "func_241354_r_")
+  private boolean areItemStacksEqual(ItemStack currentStack, ItemStack lastStack) {
+    if (!currentStack.equals(lastStack, true)) {
+      return false;
+    }
+    LivingEntity livingEntity = (LivingEntity) (Object) this;
+    for (EquipmentSlotType slotType : EquipmentSlotType.values()) {
+      if (currentStack == livingEntity.getItemStackFromSlot(slotType)) {
+        currentStack.getCapability(ModCapabilities.GUN).filter(IGun::requiresSync)
+            .ifPresent(gun -> NetworkChannel.PLAY.getSimpleChannel().send(
+                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+                new SyncGunEquipmentSlotMessage(livingEntity.getEntityId(), slotType, gun, false)));
+      }
+    }
+    return true;
   }
 }

@@ -32,19 +32,20 @@ import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
-import com.craftingdead.core.network.message.play.SetSlotsMessage;
-import io.netty.util.collection.IntObjectHashMap;
+import com.craftingdead.core.util.ModSoundEvents;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
@@ -58,15 +59,19 @@ import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
-    implements ILiving<T, E> {
+public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
+    implements ILiving<L, E> {
 
   /**
    * The vanilla entity.
    */
-  protected final T entity;
+  protected final L entity;
 
-  protected final Map<ResourceLocation, E> extensions = new Object2ObjectOpenHashMap<>();
+  protected final Object2ObjectOpenHashMap<ResourceLocation, E> extensions =
+      new Object2ObjectOpenHashMap<>();
+
+  protected final Object2ObjectOpenHashMap<ResourceLocation, E> dirtyExtensions =
+      new Object2ObjectOpenHashMap<>();
 
   /**
    * The last held {@link ItemStack} - used to check if the entity has switched item.
@@ -82,15 +87,15 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
       new ItemStackHandler(InventorySlotType.values().length) {
         @Override
         public void onContentsChanged(int slot) {
-          if (!DefaultLiving.this.entity.getEntityWorld().isRemote()) {
-            DefaultLiving.this.dirtySlots.add(slot);
+          if (!LivingImpl.this.entity.getEntityWorld().isRemote()) {
+            LivingImpl.this.dirtySlots.add(slot);
           }
         }
       };
 
   private IAction action;
 
-  private IActionProgress actionProgress;
+  private IProgressMonitor actionProgress;
 
   private boolean movementBlocked;
 
@@ -100,11 +105,13 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
 
   private boolean moving;
 
-  public DefaultLiving() {
+  private Visibility cachedVisibility = Visibility.VISIBLE;
+
+  public LivingImpl() {
     throw new IllegalStateException("No entity provided");
   }
 
-  public DefaultLiving(T entity) {
+  public LivingImpl(L entity) {
     this.entity = entity;
   }
 
@@ -128,16 +135,28 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
   }
 
   @Override
+  public E getExpectedExtension(ResourceLocation id) {
+    E extension = this.extensions.get(id);
+    if (extension == null) {
+      throw new IllegalStateException("Missing extension with ID: " + id.toString());
+    }
+    return extension;
+  }
+
+  @Override
   public boolean performAction(IAction action, boolean force, boolean sendUpdate) {
-    final IActionProgress targetActionProgress =
-        action.getTarget().flatMap(ILiving::getActionProgress).orElse(null);
-    if (this.actionProgress != null || targetActionProgress != null) {
+    if (MinecraftForge.EVENT_BUS.post(new LivingEvent.PerformAction<>(this, action))) {
+      return false;
+    }
+    final IProgressMonitor targetProgressMonitor =
+        action.getTarget().flatMap(ILiving::getProgressMonitor).orElse(null);
+    if (this.actionProgress != null || targetProgressMonitor != null) {
       if (!force) {
         return false;
       }
       this.actionProgress.stop();
-      if (targetActionProgress != this.actionProgress) {
-        targetActionProgress.stop();
+      if (targetProgressMonitor != this.actionProgress) {
+        targetProgressMonitor.stop();
       }
     }
     if ((this.action != null && !force) || !action.start()) {
@@ -175,12 +194,12 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
   }
 
   @Override
-  public void setActionProgress(IActionProgress actionProgress) {
+  public void setActionProgress(IProgressMonitor actionProgress) {
     this.actionProgress = actionProgress;
   }
 
   @Override
-  public Optional<IActionProgress> getActionProgress() {
+  public Optional<IProgressMonitor> getProgressMonitor() {
     return Optional.ofNullable(this.actionProgress);
   }
 
@@ -211,8 +230,14 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
   public void tick() {
     ItemStack heldStack = this.entity.getHeldItemMainhand();
     if (heldStack != this.lastHeldStack) {
-      this.getActionProgress().ifPresent(IActionProgress::stop);
-      heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.reset(this, heldStack));
+      this.getProgressMonitor().ifPresent(IProgressMonitor::stop);
+      if (this.lastHeldStack != null) {
+        this.lastHeldStack.getCapability(ModCapabilities.GUN)
+            .ifPresent(gun -> gun.reset(this));
+      }
+      if (heldStack.getCapability(ModCapabilities.GUN).isPresent()) {
+        this.entity.playSound(ModSoundEvents.GUN_EQUIP.get(), 0.8F, 1.0F);
+      }
       this.lastHeldStack = heldStack;
     }
 
@@ -223,7 +248,7 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
       this.removeAction();
     }
 
-    heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this, heldStack));
+    heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this));
     heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER).map(Optional::of)
         .orElse(Optional.empty()).flatMap(IAnimationProvider::getAnimationController)
         .ifPresent(c -> c.tick(this.getEntity(), heldStack));
@@ -233,17 +258,6 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
     this.updateScubaMask();
 
     if (!this.entity.getEntityWorld().isRemote()) {
-      if (!this.dirtySlots.isEmpty()) {
-        Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
-        for (int slot : this.dirtySlots) {
-          slots.put(slot, this.itemHandler.getStackInSlot(slot));
-        }
-        NetworkChannel.PLAY.getSimpleChannel().send(
-            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-            new SetSlotsMessage(this.entity.getEntityId(), slots));
-        this.dirtySlots.clear();
-      }
-
       if (this.snapshots.size() >= 20) {
         this.snapshots.removeFirst();
       }
@@ -252,9 +266,38 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
           new EntitySnapshot(this.entity));
     }
 
-    this.extensions.values().forEach(ILivingHandler::tick);
     this.moving = !this.entity.getPositionVec().equals(this.lastPos);
     this.lastPos = this.entity.getPositionVec();
+
+    for (Map.Entry<ResourceLocation, E> entry : this.extensions.entrySet()) {
+      this.tickExtension(entry.getKey(), entry.getValue());
+    }
+  }
+
+  protected void tickExtension(ResourceLocation extensionId, E extension) {
+    extension.tick();
+
+    // Precedence = (1) INVISIBLE (2) PARTIALLY_VISIBLE (3) VISIBLE
+    this.cachedVisibility = Visibility.VISIBLE;
+    switch (extension.getVisibility()) {
+      case INVISIBLE:
+        this.cachedVisibility = Visibility.INVISIBLE;
+      case PARTIALLY_VISIBLE:
+        if (this.cachedVisibility == Visibility.VISIBLE) {
+          this.cachedVisibility = Visibility.PARTIALLY_VISIBLE;
+        }
+        break;
+      default:
+        break;
+    }
+
+    if (extension.isMovementBlocked()) {
+      this.movementBlocked = true;
+    }
+
+    if (extension.requiresSync()) {
+      this.dirtyExtensions.put(extensionId, extension);
+    }
   }
 
   private void updateScubaClothing() {
@@ -343,18 +386,9 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
     return false;
   }
 
-  protected void sendInventory(PacketTarget target) {
-    Map<Integer, ItemStack> slots = new IntObjectHashMap<>();
-    for (int i = 0; i < this.itemHandler.getSlots(); i++) {
-      slots.put(i, this.itemHandler.getStackInSlot(i));
-    }
-    NetworkChannel.PLAY.getSimpleChannel().send(target,
-        new SetSlotsMessage(this.entity.getEntityId(), slots));
-  }
-
   @Override
-  public void onStartTracking(ServerPlayerEntity playerEntity) {
-    this.sendInventory(PacketDistributor.PLAYER.with(() -> playerEntity));
+  public Visibility getVisibility() {
+    return this.cachedVisibility;
   }
 
   @Override
@@ -405,7 +439,7 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
   }
 
   @Override
-  public T getEntity() {
+  public L getEntity() {
     return this.entity;
   }
 
@@ -414,7 +448,10 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("inventory", this.itemHandler.serializeNBT());
     for (Map.Entry<ResourceLocation, E> entry : this.extensions.entrySet()) {
-      nbt.put(entry.getKey().toString(), entry.getValue().serializeNBT());
+      CompoundNBT extensionNbt = entry.getValue().serializeNBT();
+      if (!extensionNbt.isEmpty()) {
+        nbt.put(entry.getKey().toString(), extensionNbt);
+      }
     }
     return nbt;
   }
@@ -438,6 +475,64 @@ public class DefaultLiving<T extends LivingEntity, E extends ILivingHandler>
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj)
-        || (obj instanceof DefaultLiving && ((DefaultLiving<?, ?>) obj).entity.equals(this.entity));
+        || (obj instanceof LivingImpl && ((LivingImpl<?, ?>) obj).entity.equals(this.entity));
+  }
+
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {
+    // Item Handler
+    if (writeAll) {
+      out.writeShort(this.itemHandler.getSlots());
+      for (int i = 0; i < this.itemHandler.getSlots(); i++) {
+        out.writeShort(i);
+        out.writeItemStack(this.itemHandler.getStackInSlot(i));
+      }
+    } else {
+      out.writeShort(this.dirtySlots.size());
+      for (int i : this.dirtySlots) {
+        out.writeShort(i);
+        out.writeItemStack(this.itemHandler.getStackInSlot(i));
+      }
+    }
+
+    // Extensions
+    ObjectSet<Map.Entry<ResourceLocation, E>> extensionsToSend =
+        writeAll ? this.extensions.entrySet() : this.dirtyExtensions.entrySet();
+    out.writeVarInt(extensionsToSend.size());
+    for (Map.Entry<ResourceLocation, E> entry : extensionsToSend) {
+      out.writeResourceLocation(entry.getKey());
+      PacketBuffer extensionData = new PacketBuffer(Unpooled.buffer());
+      entry.getValue().encode(extensionData, writeAll);
+      out.writeVarInt(extensionData.readableBytes());
+      out.writeBytes(extensionData);
+    }
+    this.dirtyExtensions.clear();
+  }
+
+  @Override
+  public void decode(PacketBuffer in) {
+    // Item Handler
+    int itemsSize = in.readShort();
+    for (int i = 0; i < itemsSize; i++) {
+      this.itemHandler.setStackInSlot(in.readShort(), in.readItemStack());
+    }
+
+    // Extensions
+    int extensionsSize = in.readVarInt();
+    for (int x = 0; x < extensionsSize; x++) {
+      ResourceLocation id = in.readResourceLocation();
+      int dataSize = in.readVarInt();
+      E extension = this.extensions.get(id);
+      if (extension == null) {
+        in.readerIndex(in.readerIndex() + dataSize);
+        continue;
+      }
+      extension.decode(in);
+    }
+  }
+
+  @Override
+  public boolean requiresSync() {
+    return !this.dirtySlots.isEmpty() || !this.dirtyExtensions.isEmpty();
   }
 }

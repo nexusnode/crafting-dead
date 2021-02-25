@@ -205,7 +205,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
                     - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {
-              gun.setTriggerPressed(living, this.getHeldItemMainhand(), false, true);
+              gun.setTriggerPressed(living, false, true);
             }
           }));
     }
@@ -217,7 +217,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
       this.getCapability(ModCapabilities.LIVING).ifPresent(
           living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
             this.triggerPressedStartTime = Util.milliTime();
-            gun.setTriggerPressed(living, this.getHeldItemMainhand(), true, true);
+            gun.setTriggerPressed(living, true, true);
           }));
     }
   }

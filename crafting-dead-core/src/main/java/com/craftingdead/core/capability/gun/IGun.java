@@ -23,26 +23,29 @@ import java.util.Set;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
+import com.craftingdead.core.capability.combatitem.ICombatItem;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.item.AttachmentItem;
+import com.craftingdead.core.item.FireMode;
+import com.craftingdead.core.util.IBufferSerializable;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.items.IItemHandler;
 
-public interface IGun extends INBTSerializable<CompoundNBT> {
+public interface IGun extends INBTSerializable<CompoundNBT>, ICombatItem, IBufferSerializable {
 
-  void tick(ILiving<?, ?> living, ItemStack itemStack);
+  void tick(ILiving<?, ?> living);
 
-  void reset(ILiving<?, ?> living, ItemStack itemStack);
+  void reset(ILiving<?, ?> living);
 
-  void setTriggerPressed(ILiving<?, ?> living, ItemStack itemStack, boolean triggerPressed,
-      boolean sendUpdate);
+  void setTriggerPressed(ILiving<?, ?> living, boolean triggerPressed, boolean sendUpdate);
 
   boolean isTriggerPressed();
 
@@ -50,18 +53,17 @@ public interface IGun extends INBTSerializable<CompoundNBT> {
 
   void removeMagazine(ILiving<?, ?> living);
 
-  void validatePendingHit(IPlayer<ServerPlayerEntity> player, ItemStack itemStack,
-      ILiving<?, ?> hitLiving, PendingHit pendingHit);
+  void validatePendingHit(IPlayer<ServerPlayerEntity> player, ILiving<?, ?> hitLiving,
+      PendingHit pendingHit);
 
-  float getAccuracy(ILiving<?, ?> living, ItemStack itemStack);
+  float getAccuracy(ILiving<?, ?> living);
 
   ItemStack getMagazineStack();
 
   void setMagazineStack(ItemStack magazineStack);
 
   default Optional<IMagazine> getMagazine() {
-    return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE).map(Optional::of)
-        .orElse(Optional.empty());
+    return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE).resolve();
   }
 
   default int getMagazineSize() {
@@ -97,11 +99,14 @@ public interface IGun extends INBTSerializable<CompoundNBT> {
 
   void toggleFireMode(ILiving<?, ?> living, boolean sendUpdate);
 
+  void setFireMode(ILiving<?, ?> living, FireMode fireMode, boolean sendUpdate);
+
   boolean hasCrosshair();
 
   boolean isPerformingRightMouseAction();
 
-  void toggleRightMouseAction(ILiving<?, ?> living, boolean sendUpdate);
+  void setPerformingRightMouseAction(ILiving<?, ?> living, boolean performingAction,
+      boolean sendUpdate);
 
   RightMouseActionTriggerType getRightMouseActionTriggerType();
 
@@ -115,13 +120,17 @@ public interface IGun extends INBTSerializable<CompoundNBT> {
 
   int getShotCount();
 
+  FireMode getFireMode();
+
   Optional<GunAnimation> getAnimation(AnimationType animationType);
 
   IGunClient getClient();
 
-  CompoundNBT getShareTag();
+  ItemStack getDefaultMagazineStack();
 
-  void readShareTag(CompoundNBT nbt);
+  IItemHandler getAmmoReserve();
+
+  int getAmmoReserveSize();
 
   public static enum RightMouseActionTriggerType {
     HOLD, CLICK;

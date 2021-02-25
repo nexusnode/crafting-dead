@@ -19,6 +19,7 @@
 package com.craftingdead.core.capability.living;
 
 import java.util.Collection;
+import com.craftingdead.core.util.IBufferSerializable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -26,9 +27,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface ILivingHandler extends INBTSerializable<CompoundNBT> {
+public interface ILivingExtension extends INBTSerializable<CompoundNBT>, IBufferSerializable {
 
-  void tick();
+  default void tick() {}
 
   /**
    * When this entity is damaged; with potions and armour taken into account.
@@ -90,4 +91,25 @@ public interface ILivingHandler extends INBTSerializable<CompoundNBT> {
    * @param playerEntity - the player tracking us
    */
   default void onStartTracking(ServerPlayerEntity playerEntity) {}
+
+  /**
+   * Whether the {@link ILiving} is allowed to move or not.
+   * 
+   * @return true if movement is blocked
+   */
+  default boolean isMovementBlocked() {
+    return false;
+  }
+
+  default Visibility getVisibility() {
+    return Visibility.VISIBLE;
+  }
+
+  @Override
+  default CompoundNBT serializeNBT() {
+    return new CompoundNBT();
+  }
+
+  @Override
+  default void deserializeNBT(CompoundNBT nbt) {}
 }

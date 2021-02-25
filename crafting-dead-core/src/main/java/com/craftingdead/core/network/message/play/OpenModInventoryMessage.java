@@ -32,7 +32,7 @@ public class OpenModInventoryMessage {
   }
 
   public static boolean handle(OpenModInventoryMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    IPlayer.getExpected(ctx.get().getSender()).openInventory();
+    IPlayer.getExpected(ctx.get().getSender()).openEquipmentMenu();
     return true;
   }
 }

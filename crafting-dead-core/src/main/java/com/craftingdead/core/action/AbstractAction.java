@@ -50,7 +50,7 @@ public abstract class AbstractAction implements IAction {
   }
 
   @Override
-  public ILiving.IActionProgress getPerformerProgress() {
+  public ILiving.IProgressMonitor getPerformerProgress() {
     return new ActionProgress(true);
   }
 
@@ -60,7 +60,7 @@ public abstract class AbstractAction implements IAction {
   }
 
   @Override
-  public ILiving.IActionProgress getTargetProgress() {
+  public ILiving.IProgressMonitor getTargetProgress() {
     return new ActionProgress(false);
   }
 
@@ -70,7 +70,7 @@ public abstract class AbstractAction implements IAction {
 
   protected abstract float getProgress(float partialTicks);
 
-  private class ActionProgress implements ILiving.IActionProgress {
+  private class ActionProgress implements ILiving.IProgressMonitor {
 
     private final boolean performer;
 
@@ -84,13 +84,13 @@ public abstract class AbstractAction implements IAction {
     }
 
     @Override
-    public ITextComponent getSubMessage() {
+    public Optional<ITextComponent> getSubMessage() {
       return this.performer
-          ? AbstractAction.this.target == null ? null
-              : new TranslationTextComponent("action.target",
-                  AbstractAction.this.target.getEntity().getDisplayName().getString())
-          : new TranslationTextComponent("action.performer",
-              AbstractAction.this.performer.getEntity().getDisplayName().getString());
+          ? AbstractAction.this.target == null ? Optional.empty()
+              : Optional.of(new TranslationTextComponent("action.target",
+                  AbstractAction.this.target.getEntity().getDisplayName().getString()))
+          : Optional.of(new TranslationTextComponent("action.performer",
+              AbstractAction.this.performer.getEntity().getDisplayName().getString()));
     }
 
     @Override

@@ -28,10 +28,10 @@ import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.capability.hydration.DefaultHydration;
 import com.craftingdead.core.capability.hydration.PresetHydration;
-import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.capability.living.LivingImpl;
+import com.craftingdead.core.capability.living.PlayerImpl;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.command.Commands;
 import com.craftingdead.core.data.ModItemTagsProvider;
@@ -46,28 +46,32 @@ import com.craftingdead.core.entity.monster.GiantZombieEntity;
 import com.craftingdead.core.entity.monster.PoliceZombieEntity;
 import com.craftingdead.core.entity.monster.TankZombieEntity;
 import com.craftingdead.core.entity.monster.WeakZombieEntity;
+import com.craftingdead.core.event.CombatPickupEvent;
+import com.craftingdead.core.inventory.CombatSlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.SyncLivingMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
 import com.craftingdead.core.util.ArbitraryTooltips;
 import com.craftingdead.core.util.ModSoundEvents;
+import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.MobSpawnInfo;
@@ -79,6 +83,7 @@ import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -86,8 +91,10 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -100,6 +107,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDead.ID)
@@ -155,6 +163,7 @@ public class CraftingDead {
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
     modEventBus.addListener(this::handleGatherData);
+    modEventBus.addListener(this::handleEntityAttributeCreation);
 
     ModEntityTypes.initialize();
     modEventBus.addGenericListener(EntityType.class, ModEntityTypes::registerAll);
@@ -207,21 +216,6 @@ public class CraftingDead {
     logger.info("Registering capabilities");
     ModCapabilities.registerCapabilities();
     event.enqueueWork(() -> {
-      GlobalEntityTypeAttributes.put(ModEntityTypes.advancedZombie,
-          AdvancedZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.doctorZombie,
-          DoctorZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.fastZombie,
-          FastZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.giantZombie,
-          GiantZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.policeZombie,
-          PoliceZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.tankZombie,
-          TankZombieEntity.registerAttributes().create());
-      GlobalEntityTypeAttributes.put(ModEntityTypes.weakZombie,
-          WeakZombieEntity.registerAttributes().create());
-
       BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
           Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
           new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
@@ -247,9 +241,39 @@ public class CraftingDead {
     }
   }
 
+  private void handleEntityAttributeCreation(EntityAttributeCreationEvent event) {
+    event.put(ModEntityTypes.advancedZombie, AdvancedZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.doctorZombie, DoctorZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.fastZombie, FastZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.giantZombie, GiantZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.policeZombie, PoliceZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.tankZombie, TankZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.weakZombie, WeakZombieEntity.registerAttributes().create());
+  }
+
   // ================================================================================
   // Common Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleEntityItemPickup(EntityItemPickupEvent event) {
+    if (IPlayer.getExpected(event.getPlayer()).isCombatModeEnabled()) {
+      final ItemStack itemStack = event.getItem().getItem();
+      CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
+      CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlotType);
+      if (MinecraftForge.EVENT_BUS.post(combatPickupEvent)) {
+        event.setCanceled(true);
+      } else if (combatSlotType != null) {
+        if (combatSlotType.addToInventory(itemStack, event.getPlayer().inventory, false)) {
+          // Allows normal processing of item pickup but prevents item being added to inventory
+          // because we've already added it.
+          event.setResult(Event.Result.ALLOW);
+        } else {
+          event.setCanceled(true);
+        }
+      }
+    }
+  }
 
   @SubscribeEvent
   public void handleBiomeLoading(BiomeLoadingEvent event) {
@@ -346,7 +370,16 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
-    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(ILiving::tick);
+    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+      living.tick();
+      if (!living.getEntity().getEntityWorld().isRemote() && living.requiresSync()) {
+        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+        living.encode(data, false);
+        NetworkChannel.PLAY.getSimpleChannel().send(
+            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
+            new SyncLivingMessage(living.getEntity().getEntityId(), data));
+      }
+    });
   }
 
   @SubscribeEvent
@@ -365,14 +398,11 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-    if (!(event.getObject() instanceof PlayerEntity) && event.getObject() instanceof LivingEntity) {
-      ILiving<?, ?> living = new DefaultLiving<>((LivingEntity) event.getObject());
-      event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
-          living, () -> ModCapabilities.LIVING));
-      living.load();
-    } else if (event.getObject() instanceof ServerPlayerEntity) {
-      ILiving<?, ?> living = new Player<>((ServerPlayerEntity) event.getObject());
-      event.addCapability(ILiving.ID, new SerializableCapabilityProvider<>(
+    if (event.getObject() instanceof LivingEntity) {
+      ILiving<?, ?> living = event.getObject() instanceof PlayerEntity
+          ? new PlayerImpl<>((PlayerEntity) event.getObject())
+          : new LivingImpl<>((LivingEntity) event.getObject());
+      event.addCapability(ILiving.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
           living, () -> ModCapabilities.LIVING));
       living.load();
     }
@@ -409,6 +439,13 @@ public class CraftingDead {
   @SubscribeEvent
   public void handlePlayerStartTracking(PlayerEvent.StartTracking event) {
     event.getTarget().getCapability(ModCapabilities.LIVING)
-        .ifPresent(living -> living.onStartTracking((ServerPlayerEntity) event.getPlayer()));
+        .ifPresent(living -> {
+          living.onStartTracking((ServerPlayerEntity) event.getPlayer());
+          PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+          living.encode(data, true);
+          NetworkChannel.PLAY.getSimpleChannel().send(
+              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()),
+              new SyncLivingMessage(living.getEntity().getEntityId(), data));
+        });
   }
 }

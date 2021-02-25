@@ -18,11 +18,12 @@
 
 package com.craftingdead.core.capability.magazine;
 
+import com.craftingdead.core.util.IBufferSerializable;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IMagazine extends INBTSerializable<CompoundNBT> {
+public interface IMagazine extends INBTSerializable<CompoundNBT>, IBufferSerializable {
 
   float getArmorPenetration();
 
@@ -36,9 +37,11 @@ public interface IMagazine extends INBTSerializable<CompoundNBT> {
     return this.getSize() == 0;
   }
 
-  void decrementSize();
+  int decrementSize();
 
   Item getNextTier();
 
   boolean hasCustomTexture();
+  
+  int getMaxSize();
 }

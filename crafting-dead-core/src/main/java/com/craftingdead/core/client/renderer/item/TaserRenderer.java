@@ -23,8 +23,6 @@ import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.vector.Vector3f;
 
@@ -35,7 +33,13 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyThirdPersonTransforms(LivingEntity livingEntity, IGun gun,
+  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+    matrixStack.scale(1.3F, 1.3F, 1.3F);
+    matrixStack.translate(0.4, -0.3, 0);
+  }
+
+  @Override
+  protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.translate(0.0F, 0.0F, -0.05F);
@@ -53,7 +57,7 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyFirstPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
@@ -67,7 +71,7 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
@@ -81,12 +85,12 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(LivingEntity livingEntity, IGun gun, float partialTicks,
+  protected void renderAdditionalParts(IGun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {}
 
   @Override
-  protected void applyWearingTransforms(LivingEntity livingEntity, IGun gun,
+  protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
     matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
@@ -106,15 +110,15 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyMagazineTransforms(LivingEntity livingEntity, ItemStack itemStack,
+  protected void applyMagazineTransforms(ItemStack itemStack,
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyAttachmentTransforms(LivingEntity livingEntity, AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyHandTransforms(PlayerEntity playerEntity, IGun gun,
+  protected void applyHandTransforms(IGun gun,
       boolean rightHand, MatrixStack matrixStack) {
     matrixStack.translate(0.02F, 0.04F, -0.12F);
   }

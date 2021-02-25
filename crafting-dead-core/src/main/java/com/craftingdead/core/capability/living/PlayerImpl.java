@@ -22,12 +22,14 @@ import java.util.Random;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.clothing.IClothing;
+import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.PlayerContainer;
+import com.craftingdead.core.inventory.container.EquipmentContainer;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.play.SyncPlayerMessage;
-import com.craftingdead.core.network.util.GenericDataManager;
+import com.craftingdead.core.network.message.play.KillFeedMessage;
+import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.core.potion.ModEffects;
+import com.craftingdead.core.util.IKillFeedProvider;
 import com.craftingdead.core.util.ModDamageSource;
 import com.google.common.primitives.Ints;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -35,31 +37,32 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 /**
  * The abstracted player class - represents a Crafting Dead player.<br>
- * Subclasses are attached to the appropriate {@link E} via Forge capabilities.
+ * Subclasses are attached to the appropriate {@link L} via Forge capabilities.
  *
- * @param <E> - the associated {@link PlayerEntity}
+ * @param <L> - the associated {@link PlayerEntity}
  * @author Sm0keySa1m0n
  */
-public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHandler>
-    implements IPlayer<E> {
+public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExtension>
+    implements IPlayer<L> {
 
   /**
    * The % chance of getting infected by a zombie.
@@ -70,56 +73,53 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
 
   private static final int WATER_DELAY_TICKS = 20 * 40;
 
-  private static final int SYNC_DELAY_TICKS = 20 * 1;
-
   private static final Random random = new Random();
 
-  private final GenericDataManager dataManager = new GenericDataManager();
+  private final NetworkDataManager dataManager = new NetworkDataManager();
 
-  private final DataParameter<Integer> water;
+  private static final DataParameter<Integer> WATER =
+      new DataParameter<>(0x00, DataSerializers.VARINT);
 
-  private final DataParameter<Integer> maxWater;
+  private static final DataParameter<Integer> MAX_WATER =
+      new DataParameter<>(0x01, DataSerializers.VARINT);
 
-  private boolean initialSyncToSelf = true;
+  private static final DataParameter<Boolean> COMBAT_MODE_ENABLED =
+      new DataParameter<>(0x02, DataSerializers.BOOLEAN);
 
   private int waterTicks;
 
-  private int syncTicks;
+  private boolean cachedCombatModeEnabled;
 
-  public Player(E entity) {
+  public PlayerImpl(L entity) {
     super(entity);
-    this.water = this.dataManager.register(DataSerializers.VARINT, 20);
-    this.maxWater = this.dataManager.register(DataSerializers.VARINT, 20);
+    this.dataManager.register(WATER, 20);
+    this.dataManager.register(MAX_WATER, 20);
+    this.dataManager.register(COMBAT_MODE_ENABLED, false);
+  }
+
+  @Override
+  public void tick() {
+    this.cachedCombatModeEnabled = false;
+    super.tick();
+  }
+
+  @Override
+  protected void tickExtension(ResourceLocation extensionId, IPlayerExtension extension) {
+    super.tickExtension(extensionId, extension);
+    if (extension.isCombatModeEnabled()) {
+      this.cachedCombatModeEnabled = true;
+    }
   }
 
   @Override
   public void playerTick() {
     if (!this.entity.getEntityWorld().isRemote()) {
-      this.sync();
       this.updateWater();
       this.updateEffects();
       this.updateBrokenLeg();
     }
     if (this.isCrouching()) {
       this.getEntity().setPose(Pose.SWIMMING);
-    }
-    this.extensions.values().forEach(IPlayerHandler::playerTick);
-  }
-
-  private void sync() {
-    if ((++this.syncTicks >= SYNC_DELAY_TICKS && this.dataManager.isDirty())) {
-      NetworkChannel.PLAY.getSimpleChannel().send(
-          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity),
-          new SyncPlayerMessage(this.getEntity().getEntityId(),
-              this.initialSyncToSelf ? this.dataManager.getAll() : this.dataManager.getDirty()));
-    }
-
-    if (this.initialSyncToSelf) {
-      PacketTarget self = PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.entity);
-      NetworkChannel.PLAY.getSimpleChannel().send(self,
-          new SyncPlayerMessage(this.getEntity().getEntityId(), this.dataManager.getAll()));
-      this.sendInventory(self);
-      this.initialSyncToSelf = false;
     }
   }
 
@@ -152,13 +152,13 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   }
 
   private void updateEffects() {
-    if (this.getEntity().isCreative()) {
+    if (this.getEntity().isCreative()
+        || this.getEntity().getEntityWorld().getDifficulty() == Difficulty.PEACEFUL) {
       if (this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
         this.getEntity().removePotionEffect(ModEffects.BLEEDING.get());
       }
       if (this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())) {
         this.getEntity().removePotionEffect(ModEffects.BROKEN_LEG.get());
-
       }
       if (this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
         this.getEntity().removePotionEffect(ModEffects.INFECTION.get());
@@ -168,6 +168,7 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
 
   private void updateBrokenLeg() {
     if (!this.getEntity().isCreative()
+        && this.getEntity().getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
         && !this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())
         && this.getEntity().isOnGround() && !this.getEntity().isInWater()
         && ((this.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
@@ -182,11 +183,30 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   }
 
   @Override
-  public void openInventory() {
+  public boolean isMovementBlocked() {
+    return !this.entity.isSpectator() && super.isMovementBlocked();
+  }
+
+  @Override
+  public boolean isCombatModeEnabled() {
+    return !this.entity.isSpectator()
+        && (this.cachedCombatModeEnabled || this.dataManager.get(COMBAT_MODE_ENABLED));
+  }
+
+  @Override
+  public void setCombatModeEnabled(boolean combatModeEnabled) {
+    this.dataManager.set(COMBAT_MODE_ENABLED, combatModeEnabled);
+  }
+
+  @Override
+  public void openEquipmentMenu() {
+    if (MinecraftForge.EVENT_BUS.post(new OpenEquipmentMenuEvent(this))) {
+      return;
+    }
     this.getEntity()
         .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
-            playerEntity) -> new PlayerContainer(windowId, this.getEntity().inventory),
-            new TranslationTextComponent("container.player")));
+            playerEntity) -> new EquipmentContainer(windowId, this.getEntity().inventory),
+            new TranslationTextComponent("container.equipment")));
   }
 
   @Override
@@ -199,6 +219,18 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
                 new SimpleNamedContainerProvider(storage, storageStack.getDisplayName())));
   }
 
+
+  @Override
+  public boolean onDeath(DamageSource source) {
+    if (super.onDeath(source)) {
+      return true;
+    } else if (source instanceof IKillFeedProvider) {
+      NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+          new KillFeedMessage(((IKillFeedProvider) source).createKillFeedEntry(this.entity)));
+    }
+    return false;
+  }
+
   @Override
   public float onDamaged(DamageSource source, float amount) {
     amount = super.onDamaged(source, amount);
@@ -206,7 +238,8 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
     Entity immediateAttacker = source.getImmediateSource();
 
     boolean isValidSource = immediateAttacker != null || source.isExplosion();
-    if (isValidSource) {
+    if (isValidSource && !this.entity.isCreative()
+        && this.entity.getEntityWorld().getDifficulty() != Difficulty.PEACEFUL) {
       float bleedChance = 0.1F * amount
           * this.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
               .getCapability(ModCapabilities.CLOTHING)
@@ -236,15 +269,10 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
   }
 
   @Override
-  public void onStartTracking(ServerPlayerEntity playerEntity) {
-    super.onStartTracking(playerEntity);
-    NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(() -> playerEntity),
-        new SyncPlayerMessage(playerEntity.getEntityId(), this.dataManager.getAll()));
-  }
-
-  @Override
   public void infect(float chance) {
-    if (!this.getEntity().isCreative() && random.nextFloat() < chance
+    if (!this.entity.isCreative()
+        && this.entity.getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
+        && random.nextFloat() < chance
         && !this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
       this.getEntity()
           .sendStatusMessage(new TranslationTextComponent("message.infected")
@@ -261,29 +289,33 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
     for (int i = 0; i < that.getItemHandler().getSlots() - 1; i++) {
       this.getItemHandler().setStackInSlot(i, that.getItemHandler().getStackInSlot(i));
     }
+
+    for (IPlayerExtension extension : this.extensions.values()) {
+      extension.copyFrom(that, wasDeath);
+    }
   }
 
   @Override
   public int getWater() {
-    return this.dataManager.get(this.water);
+    return this.dataManager.get(WATER);
   }
 
   @Override
   public void setWater(int water) {
-    this.dataManager.set(this.water, Ints.constrainToRange(water, 0, this.getMaxWater()));
+    this.dataManager.set(WATER, Ints.constrainToRange(water, 0, this.getMaxWater()));
   }
 
   @Override
   public int getMaxWater() {
-    return this.dataManager.get(this.maxWater);
+    return this.dataManager.get(MAX_WATER);
   }
 
   @Override
   public void setMaxWater(int maxWater) {
-    this.dataManager.set(this.maxWater, maxWater);
+    this.dataManager.set(MAX_WATER, maxWater);
   }
 
-  public GenericDataManager getDataManager() {
+  public NetworkDataManager getDataManager() {
     return this.dataManager;
   }
 
@@ -300,5 +332,23 @@ public class Player<E extends PlayerEntity> extends DefaultLiving<E, IPlayerHand
     super.deserializeNBT(nbt);
     this.setWater(nbt.getInt("water"));
     this.setMaxWater(nbt.getInt("maxWater"));
+  }
+
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {
+    super.encode(out, writeAll);
+    NetworkDataManager
+        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+  }
+
+  @Override
+  public void decode(PacketBuffer in) {
+    super.decode(in);
+    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+  }
+
+  @Override
+  public boolean requiresSync() {
+    return super.requiresSync() || this.dataManager.isDirty();
   }
 }

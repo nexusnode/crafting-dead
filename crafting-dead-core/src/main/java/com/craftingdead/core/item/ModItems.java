@@ -100,6 +100,7 @@ import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.entity.grenade.FragGrenadeEntity;
 import com.craftingdead.core.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.entity.grenade.SmokeGrenadeEntity;
+import com.craftingdead.core.inventory.CombatSlotType;
 import com.craftingdead.core.inventory.CraftingInventorySlotType;
 import com.craftingdead.core.item.AttachmentItem.MultiplierType;
 import com.craftingdead.core.util.ModSoundEvents;
@@ -1044,6 +1045,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> TASER = ITEMS
       .register("taser",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(2000)
               .setDamage(7)
               .setReloadDurationTicks(20 * 3)
@@ -1062,6 +1064,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M1911 = ITEMS
       .register("m1911",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks(20 * 2)
@@ -1086,6 +1089,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> G18 = ITEMS
       .register("g18",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 2.2F))
@@ -1112,6 +1116,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> M9 = ITEMS
       .register("m9",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(120)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 1.5F))
@@ -1135,6 +1140,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS
       .register("desert_eagle",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(120)
               .setDamage(8)
               .setReloadDurationTicks(20 * 2)
@@ -1160,6 +1166,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> P250 = ITEMS
       .register("p250",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(120)
               .setDamage(6)
               .setReloadDurationTicks((int) (20 * 1.5F))
@@ -1185,6 +1192,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> MAGNUM = ITEMS
       .register("magnum",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(80)
               .setDamage(7)
               .setReloadDurationTicks(20 * 2)
@@ -1205,6 +1213,7 @@ public class ModItems {
   public static final RegistryObject<GunItem> FN57 = ITEMS
       .register("fn57",
           () -> new GunItem((GunItem.Properties) new GunItem.Properties()
+              .setCombatSlotType(CombatSlotType.SECONDARY)
               .setFireDelayMs(140)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 1.5F))

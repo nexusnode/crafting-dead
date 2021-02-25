@@ -22,9 +22,9 @@ import java.util.Optional;
 
 public enum FireMode {
 
-  AUTO("message.fire_mode.auto"),
-  BURST("message.fire_mode.burst", 3),
-  SEMI("message.fire_mode.semi", 1);
+  AUTO("fire_mode.auto"),
+  BURST("fire_mode.burst", 3),
+  SEMI("fire_mode.semi", 1);
 
   private final String translationKey;
   private final Optional<Integer> maxShotsOptional;

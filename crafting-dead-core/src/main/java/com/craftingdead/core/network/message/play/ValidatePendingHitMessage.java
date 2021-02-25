@@ -83,7 +83,7 @@ public class ValidatePendingHitMessage {
             .flatMap(e -> e.getCapability(ModCapabilities.LIVING).resolve())
             .ifPresent(hitLiving -> {
               for (PendingHit value : hit.getValue()) {
-                gun.validatePendingHit(player, heldStack, hitLiving, value);
+                gun.validatePendingHit(player, hitLiving, value);
               }
             });
       }

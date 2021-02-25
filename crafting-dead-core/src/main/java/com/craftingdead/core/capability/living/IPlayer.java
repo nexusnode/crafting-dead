@@ -23,9 +23,13 @@ import com.craftingdead.core.inventory.InventorySlotType;
 import net.minecraft.entity.player.PlayerEntity;
 
 public interface IPlayer<E extends PlayerEntity>
-    extends ILiving<E, IPlayerHandler>, IPlayerHandler {
+    extends ILiving<E, IPlayerExtension>, IPlayerExtension {
 
-  void openInventory();
+  boolean isCombatModeEnabled();
+
+  void setCombatModeEnabled(boolean combatModeEnabled);
+
+  void openEquipmentMenu();
 
   void openStorage(InventorySlotType slotType);
 

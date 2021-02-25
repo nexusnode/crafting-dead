@@ -44,7 +44,6 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
@@ -55,7 +54,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
+public class GunClientImpl<G extends GunImpl> implements IGunClient {
 
   private static final int MUZZLE_FLASH_DURATION_TICKS = 2;
 
@@ -78,26 +77,26 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
 
   private byte hitValidationTicks = 0;
 
-  public DefaultGunClient(G gun) {
+  public GunClientImpl(G gun) {
     this.gun = gun;
   }
 
   @Override
-  public void handleTick(ILiving<?, ?> living, ItemStack itemStack) {
+  public void handleTick(ILiving<?, ?> living) {
     if (living.getEntity() instanceof ClientPlayerEntity
         && this.livingHitValidationBuffer.size() > 0
-        && this.hitValidationTicks++ >= DefaultGun.HIT_VALIDATION_DELAY_TICKS) {
+        && this.hitValidationTicks++ >= GunImpl.HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
       NetworkChannel.PLAY.getSimpleChannel().sendToServer(
           new ValidatePendingHitMessage(new HashMap<>(this.livingHitValidationBuffer.asMap())));
       this.livingHitValidationBuffer.clear();
     }
 
-    SoundEvent rightMouseActionSound = this.gun.getGunItem().getRightMouseActionSound().get();
+    SoundEvent rightMouseActionSound = this.gun.gunProvider.getRightMouseActionSound().get();
     long rightMouseActionSoundDelta = Util.milliTime() - this.rightMouseActionSoundStartTimeMs + 50;
     if (this.gun.isPerformingRightMouseAction()
-        && this.gun.getGunItem().getRightMouseActionSoundRepeatDelayMs() > 0L
-        && rightMouseActionSoundDelta >= this.gun.getGunItem()
+        && this.gun.gunProvider.getRightMouseActionSoundRepeatDelayMs() > 0L
+        && rightMouseActionSoundDelta >= this.gun.gunProvider
             .getRightMouseActionSoundRepeatDelayMs()
         && rightMouseActionSound != null) {
       this.rightMouseActionSoundStartTimeMs = Util.milliTime();
@@ -113,25 +112,25 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
     }
   }
 
-  protected boolean canFlash(ILiving<?, ?> living, ItemStack itemStack) {
+  protected boolean canFlash(ILiving<?, ?> living) {
     return this.minecraft.gameSettings.getPointOfView() == PointOfView.FIRST_PERSON
         && this.gun.getShotCount() != this.lastShotCount && this.gun.getShotCount() > 0;
   }
 
   @Override
-  public void handleShoot(ILiving<?, ?> living, ItemStack itemStack) {
+  public void handleShoot(ILiving<?, ?> living) {
     Entity entity = living.getEntity();
 
-    if (this.canFlash(living, itemStack)) {
+    if (this.canFlash(living)) {
       this.remainingFlashTicks = MUZZLE_FLASH_DURATION_TICKS;
     }
 
     this.lastShotCount = this.gun.getShotCount();
 
-    if (entity instanceof ClientPlayerEntity) {
+    if (entity == this.minecraft.getRenderViewEntity()) {
       final float baseJolt = 0.05F;
       this.client.getCameraManager()
-          .joltCamera(1.0F - this.gun.getAccuracy(living, itemStack) + baseJolt, true);
+          .joltCamera(1.0F - this.gun.getAccuracy(living) + baseJolt, true);
     }
 
     this.gun.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
@@ -144,17 +143,17 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
 
     boolean distant = sqrDistance > 1600.0D;
 
-    final Supplier<SoundEvent> defaultShootSound = this.gun.getGunItem().getShootSound();
+    final Supplier<SoundEvent> defaultShootSound = this.gun.gunProvider.getShootSound();
 
     @Nullable
     final SoundEvent shootSound;
-    boolean amplifyDistantSound = this.gun.gunItem.getDistantShootSound().isPresent();
+    boolean amplifyDistantSound = this.gun.gunProvider.getDistantShootSound().isPresent();
     if (this.gun.getAttachments().stream().anyMatch(AttachmentItem::isSoundSuppressor)) {
       shootSound = distant ? null
-          : this.gun.getGunItem().getSilencedShootSound().orElseGet(defaultShootSound);
+          : this.gun.gunProvider.getSilencedShootSound().orElseGet(defaultShootSound);
     } else {
       shootSound =
-          distant ? this.gun.getGunItem().getDistantShootSound().orElseGet(defaultShootSound)
+          distant ? this.gun.gunProvider.getDistantShootSound().orElseGet(defaultShootSound)
               : defaultShootSound.get();
     }
 
@@ -167,18 +166,18 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
   }
 
   @Override
-  public void handleHitEntityPre(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  public void handleHitEntityPre(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, long randomSeed) {
     if (living.getEntity() instanceof ClientPlayerEntity) {
       this.livingHitValidationBuffer.put(hitEntity.getEntityId(),
-          new PendingHit((byte) (DefaultGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+          new PendingHit((byte) (GunImpl.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
               new EntitySnapshot(living.getEntity()),
               new EntitySnapshot(hitEntity), randomSeed));
     }
   }
 
   @Override
-  public void handleHitEntityPost(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  public void handleHitEntityPost(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot) {
     World world = hitEntity.getEntityWorld();
     Entity entity = living.getEntity();
@@ -197,7 +196,7 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
         1.0F, 1.0F);
 
     // If local player
-    if (hitEntity instanceof ClientPlayerEntity) {
+    if (hitEntity == this.minecraft.getRenderViewEntity()) {
       this.client.getCameraManager().joltCamera(1.5F, false);
     }
 
@@ -210,7 +209,7 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
   }
 
   @Override
-  public void handleHitBlock(ILiving<?, ?> living, ItemStack itemStack,
+  public void handleHitBlock(ILiving<?, ?> living,
       BlockRayTraceResult rayTrace, boolean playSound) {
     final Entity entity = living.getEntity();
     Vector3d hitVec3d = rayTrace.getHitVec();
@@ -244,7 +243,7 @@ public class DefaultGunClient<G extends DefaultGun> implements IGunClient {
 
   @Override
   public void handleToggleRightMouseAction(ILiving<?, ?> living) {
-    SoundEvent rightMouseActionSound = this.gun.getGunItem().getRightMouseActionSound().get();
+    SoundEvent rightMouseActionSound = this.gun.gunProvider.getRightMouseActionSound().get();
     if (rightMouseActionSound != null) {
       if (this.gun.isPerformingRightMouseAction()) {
         this.rightMouseActionSoundStartTimeMs = Util.milliTime();

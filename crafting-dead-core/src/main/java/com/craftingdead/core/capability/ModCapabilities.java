@@ -24,19 +24,19 @@ import com.craftingdead.core.capability.animationprovider.DefaultAnimationProvid
 import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.capability.clothing.DefaultClothing;
 import com.craftingdead.core.capability.clothing.IClothing;
-import com.craftingdead.core.capability.gun.DefaultGun;
+import com.craftingdead.core.capability.combatitem.ICombatItem;
+import com.craftingdead.core.capability.gun.GunImpl;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.hat.DefaultHat;
 import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.capability.hydration.DefaultHydration;
 import com.craftingdead.core.capability.hydration.IHydration;
-import com.craftingdead.core.capability.living.DefaultLiving;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.magazine.DefaultMagazine;
+import com.craftingdead.core.capability.living.LivingImpl;
 import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.capability.magazine.MagazineImpl;
 import com.craftingdead.core.capability.paint.DefaultPaint;
 import com.craftingdead.core.capability.paint.IPaint;
-import com.craftingdead.core.capability.scope.DefaultScope;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.capability.storage.DefaultStorage;
 import com.craftingdead.core.capability.storage.IStorage;
@@ -82,14 +82,18 @@ public class ModCapabilities {
   @CapabilityInject(IAnimationProvider.class)
   public static final Capability<IAnimationProvider<?>> ANIMATION_PROVIDER = null;
 
+  @CapabilityInject(ICombatItem.class)
+  public static final Capability<ICombatItem> COMBAT_ITEM = null;
+
   public static void registerCapabilities() {
-    CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), DefaultLiving::new);
-    CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), DefaultGun::new);
+    CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), LivingImpl::new);
+    CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), GunImpl::new);
     CapabilityManager.INSTANCE.register(IPaint.class, new EmptyStorage<>(), DefaultPaint::new);
     CapabilityManager.INSTANCE
-        .register(IMagazine.class, new EmptyStorage<>(), DefaultMagazine::new);
+        .register(IMagazine.class, new EmptyStorage<>(), MagazineImpl::new);
     CapabilityManager.INSTANCE.register(IStorage.class, new EmptyStorage<>(), DefaultStorage::new);
-    CapabilityManager.INSTANCE.register(IScope.class, new EmptyStorage<>(), DefaultScope::new);
+    CapabilityManager.INSTANCE.register(IScope.class, new EmptyStorage<>(),
+        ModCapabilities::unsupported);
     CapabilityManager.INSTANCE
         .register(IHydration.class, new EmptyStorage<>(), DefaultHydration::new);
     CapabilityManager.INSTANCE
@@ -99,6 +103,12 @@ public class ModCapabilities {
         DefaultActionProvider::new);
     CapabilityManager.INSTANCE.register(IAnimationProvider.class, new EmptyStorage<>(),
         DefaultAnimationProvider::new);
+    CapabilityManager.INSTANCE.register(ICombatItem.class, new EmptyStorage<>(),
+        ModCapabilities::unsupported);
+  }
+
+  private static <T> T unsupported() {
+    throw new UnsupportedOperationException();
   }
 
   @SuppressWarnings("unchecked")

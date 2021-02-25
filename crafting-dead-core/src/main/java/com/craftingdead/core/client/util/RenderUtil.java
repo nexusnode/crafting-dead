@@ -25,6 +25,8 @@ import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.renderer.item.IItemRenderer;
+import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,6 +35,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BreakableBlock;
 import net.minecraft.block.StainedGlassPaneBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GameRenderer;
@@ -76,6 +79,8 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class RenderUtil {
+
+  public static final int FULL_LIGHT = 0xF000F0;
 
   private static final ItemModelGenerator MODEL_GENERATOR = new ItemModelGenerator();
 
@@ -221,6 +226,11 @@ public class RenderUtil {
     return clippingHelper;
   }
 
+  public static void fill(MatrixStack matrixStack, int x, int y, int width, int height,
+      int colour) {
+    AbstractGui.fill(matrixStack, x, y, x + width, y + height, colour);
+  }
+
   @SuppressWarnings("deprecation")
   public static void drawGradientRectangle(double x, double y, double x2, double y2, int startColor,
       int endColor) {
@@ -342,7 +352,14 @@ public class RenderUtil {
 
   public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour) {
     renderItemModelIntoGUI(itemStack, x, y, colour,
-        minecraft.getItemRenderer().getItemModelWithOverrides(itemStack, null, null));
+        minecraft.getItemRenderer().getItemModelWithOverrides(itemStack, null, null), false);
+  }
+
+  public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour,
+      boolean useCustomRenderer) {
+    renderItemModelIntoGUI(itemStack, x, y, colour,
+        minecraft.getItemRenderer().getItemModelWithOverrides(itemStack, null, null),
+        useCustomRenderer);
   }
 
   /**
@@ -350,8 +367,8 @@ public class RenderUtil {
    * colour.
    */
   @SuppressWarnings("deprecation")
-  public static void renderItemModelIntoGUI(ItemStack stack, int x, int y, int colour,
-      IBakedModel bakedmodel) {
+  public static void renderItemModelIntoGUI(ItemStack itemStack, int x, int y,
+      int colour, IBakedModel bakedmodel, boolean useCustomRenderer) {
     RenderSystem.pushMatrix();
     minecraft.textureManager.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     minecraft.textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmapDirect(
@@ -367,19 +384,25 @@ public class RenderUtil {
     RenderSystem.translatef(8.0F, 8.0F, 0.0F);
     RenderSystem.scalef(1.0F, -1.0F, 1.0F);
     RenderSystem.scalef(16.0F, 16.0F, 16.0F);
-    MatrixStack matrixstack = new MatrixStack();
-    IRenderTypeBuffer.Impl irendertypebuffer$impl =
+    IRenderTypeBuffer.Impl renderTypeBuffer =
         Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-    boolean flag = !bakedmodel.isSideLit();
-    if (flag) {
+    boolean enable3dLight = !bakedmodel.isSideLit();
+    if (enable3dLight) {
       RenderHelper.setupGuiFlatDiffuseLighting();
     }
 
-    renderItemColour(stack, ItemCameraTransforms.TransformType.GUI, false, matrixstack,
-        irendertypebuffer$impl, colour, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
-    irendertypebuffer$impl.finish();
+    if (useCustomRenderer && itemStack.getItem() instanceof IRendererProvider) {
+      IItemRenderer itemRenderer = ((IRendererProvider) itemStack.getItem()).getRenderer();
+      itemRenderer.renderGeneric(itemStack, new MatrixStack(),
+          renderTypeBuffer, FULL_LIGHT, OverlayTexture.NO_OVERLAY);
+    } else {
+      renderItemColour(itemStack, ItemCameraTransforms.TransformType.GUI, false, new MatrixStack(),
+          renderTypeBuffer, colour, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
+    }
+
+    renderTypeBuffer.finish();
     RenderSystem.enableDepthTest();
-    if (flag) {
+    if (enable3dLight) {
       RenderHelper.setupGui3DDiffuseLighting();
     }
 

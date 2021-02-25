@@ -1,14 +1,15 @@
 {
-  "container.player": "Crafting Dead - Player",
+  "container.equipment": "Equipment",
   "enchantment.craftingdead.armor_penetration": "Armor Penetration",
   "enchantment.craftingdead.infection": "Infection",
 
   "key.reload": "Reload",
   "key.remove_magazine": "Remove Magazine",
   "key.toggle_fire_mode": "Toggle Fire Mode",
-  "key.craftingdead.inventory":"Open/Close Crafting Dead menu",
+  "key.equipment_menu":"Open/Close Equipment menu",
+  "key.toggle_combat_mode":"Toggle combat mode",
 
-  "tutorial.craftingdead.open_inventory.title":"Open Crafting Dead menu",
+  "tutorial.open_equipment_menu.title":"Open equipment menu",
 
   "death.attack.bullet": "%1$s was shot",
   "death.attack.bullet.headshot": "%1$s was shot in the head",
@@ -40,13 +41,17 @@
   "entity.craftingdead.pipe_grenade": "Pipe Grenade",
   "entity.craftingdead.smoke_grenade": "Smoke Grenade",
 
-  "message.fire_mode.auto":"Switched to automatic",
-  "message.fire_mode.semi":"Switched to semi-automatic",
-  "message.fire_mode.burst":"Switched to burst",
+  "message.switch_fire_mode": "Switched to %s",
   "message.broken_leg": "Ouch! You broke your leg.",
   "message.bleeding": "You're bleeding out!",
   "message.infected": "You've been infected with RBI.",
   "message.low_health": "%1$s's health is too low",
+
+  "fire_mode.auto":"AUTO",
+  "fire_mode.semi":"SEMI",
+  "fire_mode.burst":"BURST",
+
+  "hud.empty_magazine":"EMPTY",
 
   "action.target":"Target: %1$s",
   "action.performer":"Performer: %1$s",
@@ -362,7 +367,7 @@
   "item_lore.gun_item.headshot_damage": "Headshot damage: ",
   "item_lore.gun_item.pellets_shot": "Pellets shot: ",
   "item_lore.gun_item.attachment": "Equipped: ",
-  "item_lore.gun_item.rpm": "Rounds per minute: ",
+  "item_lore.gun_item.rpm": "RPM: ",
   "item_lore.gun_item.accuracy": "Accuracy: ",
   "item_lore.gun_item.range": "Range: ",
   "item_lore.clothing_item.water_breathing": "Gives water breathing ability",
@@ -372,9 +377,7 @@
   "attachment_multiplier_type.accuracy": "Accuracy",
   "attachment_multiplier_type.zoom": "Zoom",
 
-  "biome.craftingdead.zombie_forest": "Zombie Forest",
-
-  "commands.craftingdead.thirst.success.operator": "Thirst quenched.",
-  "commands.craftingdead.thirst.success.confirmation": "Your thirst was cured!",
-  "commands.craftingdead.thirst.failure.not_used": "Nobody was thirsty."
+  "commands.craftingdead.hydrate.success.operator": "Command completed successfully",
+  "commands.craftingdead.hydrate.success.confirmation": "Your thirst was quenched",
+  "commands.craftingdead.hydrate.failure.not_used": "Nobody was thirsty"
 }

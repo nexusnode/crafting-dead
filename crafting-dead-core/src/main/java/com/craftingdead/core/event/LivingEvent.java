@@ -18,8 +18,12 @@
 
 package com.craftingdead.core.event;
 
+import java.lang.reflect.Type;
+import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.living.ILiving;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.IGenericEvent;
 
 public abstract class LivingEvent extends Event {
 
@@ -37,6 +41,27 @@ public abstract class LivingEvent extends Event {
 
     public Load(ILiving<?, ?> living) {
       super(living);
+    }
+  }
+
+  @Cancelable
+  public static class PerformAction<T extends IAction> extends LivingEvent
+      implements IGenericEvent<T> {
+
+    private final T action;
+
+    public PerformAction(ILiving<?, ?> living, T action) {
+      super(living);
+      this.action = action;
+    }
+
+    public T getAction() {
+      return this.action;
+    }
+
+    @Override
+    public Type getGenericType() {
+      return this.action.getClass();
     }
   }
 }

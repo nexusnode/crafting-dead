@@ -20,39 +20,41 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.network.util.NetworkUtil;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ToggleRightMouseAbility {
+public class RightMouseAction {
 
   private final int entityId;
+  private final boolean performing;
 
-  public ToggleRightMouseAbility(int entityId) {
+  public RightMouseAction(int entityId, boolean performing) {
     this.entityId = entityId;
+    this.performing = performing;
   }
 
-  public static void encode(ToggleRightMouseAbility msg, PacketBuffer out) {
-    out.writeVarInt(msg.entityId);
+  public static void encode(RightMouseAction message, PacketBuffer out) {
+    out.writeVarInt(message.entityId);
+    out.writeBoolean(message.performing);
   }
 
-  public static ToggleRightMouseAbility decode(PacketBuffer in) {
-    return new ToggleRightMouseAbility(in.readVarInt());
+  public static RightMouseAction decode(PacketBuffer in) {
+    return new RightMouseAction(in.readVarInt(), in.readBoolean());
   }
 
-  public static boolean handle(ToggleRightMouseAbility msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), msg.entityId)
-        .filter(entity -> entity instanceof LivingEntity)
-        .ifPresent(entity -> {
-          LivingEntity livingEntity = (LivingEntity) entity;
-          ItemStack heldStack = livingEntity.getHeldItemMainhand();
-          livingEntity.getCapability(ModCapabilities.LIVING)
-              .ifPresent(living -> heldStack
-                  .getCapability(ModCapabilities.GUN)
-                  .ifPresent(gun -> gun.toggleRightMouseAction(living,
-                      ctx.get().getDirection().getReceptionSide().isServer())));
+  public static boolean handle(RightMouseAction message, Supplier<NetworkEvent.Context> ctx) {
+    NetworkUtil.getEntity(ctx.get(), message.entityId)
+        .filter(e -> e instanceof LivingEntity)
+        .map(e -> (LivingEntity) e)
+        .<ILiving<LivingEntity, ?>>flatMap(ILiving::getOptional) // Need to cast this or else compiler complains
+        .ifPresent(living -> {
+          living.getEntity().getHeldItemMainhand()
+              .getCapability(ModCapabilities.GUN)
+              .ifPresent(gun -> gun.setPerformingRightMouseAction(living, message.performing,
+                  ctx.get().getDirection().getReceptionSide().isServer()));
         });
     return true;
   }

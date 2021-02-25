@@ -4,11 +4,15 @@
     "compatibilityLevel": "JAVA_8",
     "refmap": "craftingdead.refmap.json",
     "mixins": [
-        "LivingEntityMixin"
+        "LivingEntityMixin",
+        "EntityMixin",
+        "ContainerMixin",
+        "PacketBufferMixin"
     ],
     "client": [
         "ItemRendererMixin",
-        "PlayerRendererMixin"
+        "PlayerRendererMixin",
+        "PlayerInventoryMixin"
     ],
     "injectors": {
         "defaultRequire": 1

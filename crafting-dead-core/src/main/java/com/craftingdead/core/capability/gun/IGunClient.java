@@ -22,23 +22,22 @@ import com.craftingdead.core.capability.animationprovider.IAnimationProvider;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
 import com.craftingdead.core.capability.living.ILiving;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 
 public interface IGunClient extends IAnimationProvider<GunAnimationController> {
 
-  void handleTick(ILiving<?, ?> living, ItemStack itemStack);
+  void handleTick(ILiving<?, ?> living);
 
-  void handleShoot(ILiving<?, ?> living, ItemStack itemStack);
+  void handleShoot(ILiving<?, ?> living);
 
-  void handleHitEntityPre(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  void handleHitEntityPre(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, long randomSeed);
 
-  void handleHitEntityPost(ILiving<?, ?> living, ItemStack itemStack, Entity hitEntity,
+  void handleHitEntityPost(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot);
 
-  void handleHitBlock(ILiving<?, ?> living, ItemStack itemStack, BlockRayTraceResult rayTrace,
+  void handleHitBlock(ILiving<?, ?> living, BlockRayTraceResult rayTrace,
       boolean playSound);
 
   void handleToggleRightMouseAction(ILiving<?, ?> living);

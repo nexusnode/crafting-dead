@@ -137,6 +137,7 @@ public class ModSoundEvents {
       register("vector_distant_shoot");
   public static final RegistryObject<SoundEvent> VECTOR_SHOOT = register("vector_shoot");
   public static final RegistryObject<SoundEvent> SCOPE_ZOOM = register("scope_zoom");
+  public static final RegistryObject<SoundEvent> GUN_EQUIP = register("gun_equip");
 
   private static RegistryObject<SoundEvent> register(String name) {
     ResourceLocation registryName = new ResourceLocation(CraftingDead.ID, name);

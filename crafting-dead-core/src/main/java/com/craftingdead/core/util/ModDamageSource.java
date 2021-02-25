@@ -23,6 +23,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 
@@ -37,16 +38,19 @@ public class ModDamageSource {
   public static final DamageSource INFECTION =
       new DamageSource("infection").setDamageBypassesArmor();
 
-  public static DamageSource causeGunDamage(Entity source, boolean headshot) {
-    return new EntityDamageSource(headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source)
-        .setDamageBypassesArmor()
-        .setProjectile();
+  public static DamageSource causeGunDamage(LivingEntity source, ItemStack gunStack,
+      boolean headshot) {
+    return new KillFeedDamageSource(
+        headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source, gunStack,
+        headshot ? KillFeedEntry.Type.HEADSHOT : KillFeedEntry.Type.NONE)
+            .setDamageBypassesArmor()
+            .setProjectile();
   }
 
   /**
    * Creates an explosion damage source without difficulty scaling.
    */
-  public static DamageSource causeUnscaledExplosionDamage(@Nullable Entity source) {
+  public static DamageSource causeUnscaledExplosionDamage(@Nullable LivingEntity source) {
     return source != null
         ? new EntityDamageSource("explosion.player", source).setExplosion()
         : new DamageSource("explosion").setExplosion();
@@ -65,7 +69,8 @@ public class ModDamageSource {
    * @param amount - the amount of dmg
    * @return the result from <code>victim.attackEntityFrom()</code>
    */
-  public static boolean causeDamageWithoutKnockback(Entity victim, DamageSource source, float amount) {
+  public static boolean causeDamageWithoutKnockback(Entity victim, DamageSource source,
+      float amount) {
     if (victim instanceof LivingEntity) {
       LivingEntity livingHit = (LivingEntity) victim;
 

@@ -41,11 +41,11 @@ public interface IAction {
 
   ILiving<?, ?> getPerformer();
 
-  ILiving.IActionProgress getPerformerProgress();
+  ILiving.IProgressMonitor getPerformerProgress();
 
   Optional<ILiving<?, ?>> getTarget();
 
-  ILiving.IActionProgress getTargetProgress();
+  ILiving.IProgressMonitor getTargetProgress();
 
   ActionType<?> getActionType();
 }

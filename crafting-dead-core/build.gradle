@@ -10,7 +10,6 @@ repositories {
 }
 
 dependencies {
-    shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
     implementation fg.deobf("curse.maven:travelers_backpack-${travelers_backpack_project_id}:${travelers_backpack_file_id}")
 }
 
@@ -26,6 +25,10 @@ jar {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+mixin {
+	add sourceSets.main, "craftingdead.refmap.json"
+}
 
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')

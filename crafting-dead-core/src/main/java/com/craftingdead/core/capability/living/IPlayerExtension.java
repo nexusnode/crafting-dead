@@ -18,9 +18,20 @@
 
 package com.craftingdead.core.capability.living;
 
-public interface IPlayerHandler extends ILivingHandler {
+public interface IPlayerExtension extends ILivingExtension {
 
-  void playerTick();
+  default boolean isCombatModeEnabled() {
+    return false;
+  }
 
-  void copyFrom(IPlayer<?> that, boolean wasDeath);
+  default void playerTick() {}
+
+  /**
+   * Copy data from old player before death/respawn.<br>
+   * <i><b>Only called on server.</b></i>
+   * 
+   * @param that - the old player
+   * @param wasDeath if they died or not
+   */
+  default void copyFrom(IPlayer<?> that, boolean wasDeath) {}
 }

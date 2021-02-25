@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.capability.magazine.DefaultMagazine;
 import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.capability.magazine.MagazineImpl;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -35,6 +35,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.INBTSerializable;
 
 public class MagazineItem extends Item {
 
@@ -69,7 +71,7 @@ public class MagazineItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(new DefaultMagazine(this),
+    return new SerializableCapabilityProvider<>(new MagazineImpl(this),
         () -> ModCapabilities.MAGAZINE);
   }
 
@@ -127,6 +129,30 @@ public class MagazineItem extends Item {
           .mergeStyle(TextFormatting.GRAY)
           .append(Text.of(String.format("%.0f%%", this.armorPenetration))
               .mergeStyle(TextFormatting.RED)));
+    }
+  }
+
+  @Override
+  public CompoundNBT getShareTag(ItemStack itemStack) {
+    CompoundNBT nbt = super.getShareTag(itemStack);
+    if (nbt == null) {
+      nbt = new CompoundNBT();
+    }
+    CompoundNBT magazineNbt = itemStack.getCapability(ModCapabilities.MAGAZINE)
+        .map(INBTSerializable::serializeNBT)
+        .orElse(null);
+    if (magazineNbt != null && !magazineNbt.isEmpty()) {
+      nbt.put("magazine", magazineNbt);
+    }
+    return nbt;
+  }
+
+  @Override
+  public void readShareTag(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+    super.readShareTag(itemStack, nbt);
+    if (nbt != null && nbt.contains("magazine", Constants.NBT.TAG_COMPOUND)) {
+      itemStack.getCapability(ModCapabilities.MAGAZINE)
+          .ifPresent(magazine -> magazine.deserializeNBT(nbt.getCompound("magazine")));
     }
   }
 

@@ -24,7 +24,6 @@ import com.craftingdead.core.capability.animationprovider.gun.GunAnimationContro
 import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.scope.IScope;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
@@ -49,10 +48,8 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public boolean start() {
     if (!this.getPerformer().getEntity().isSprinting() && !this.gun.getMagazineStack().isEmpty()) {
-      if (this.gun instanceof IScope
-          && ((IScope) this.gun).isAiming(this.getPerformer().getEntity(),
-              this.performer.getEntity().getHeldItemMainhand())) {
-        this.gun.toggleRightMouseAction(this.getPerformer(), false);
+      if (this.gun.isPerformingRightMouseAction()) {
+        this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
       }
       if (this.performer.getEntity().getEntityWorld().isRemote()) {
         this.gun.getAnimation(AnimationType.RELOAD)
@@ -85,14 +82,18 @@ public class RemoveMagazineAction extends TimedAction {
       this.gun.getClient().getAnimationController()
           .ifPresent(GunAnimationController::removeCurrentAnimation);
     }
+    // Call this on both sides as we change the client side stack for the remove animation.
     this.gun.setMagazineStack(this.oldMagazineStack);
   }
 
   @Override
   protected void finish() {
-    this.gun.setMagazineStack(ItemStack.EMPTY);
-    if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-      ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
+    if (!this.performer.getEntity().getEntityWorld().isRemote()) {
+      // This will be synced to the client by the gun.
+      this.gun.setMagazineStack(ItemStack.EMPTY);
+      if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
+        ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
+      }
     }
   }
 }

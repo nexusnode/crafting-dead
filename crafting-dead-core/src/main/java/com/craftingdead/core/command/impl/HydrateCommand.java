@@ -21,7 +21,6 @@ package com.craftingdead.core.command.impl;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
@@ -34,17 +33,15 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-public class CommandThirst {
+public class HydrateCommand {
 
   private static final ITextComponent SUCCESS_MESSAGE_OPERATOR;
   private static final ITextComponent SUCCESS_MESSAGE_CONFIRMATION;
   private static final ITextComponent FAILURE_MESSAGE_NOT_USED;
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
-    dispatcher.register(Commands.literal("thirst").requires((source) -> {
-      return source.hasPermissionLevel(3);
+    dispatcher.register(Commands.literal("hydrate").requires((source) -> {
+      return source.hasPermissionLevel(2);
     }).executes((source) -> {
       return processCommand(source.getSource(),
           source.getSource().asPlayer().getGameProfile().getName());
@@ -60,64 +57,54 @@ public class CommandThirst {
    * This method process how the command'll be performed by the server.
    *
    * @param source - Source of command
-   * @param player_name - Name of player to be thirsted (nullable)
+   * @param username - Name of player to be thirsted (nullable)
    * @return
    */
-  private static int processCommand(final CommandSource source, final String player_name) {
-    AtomicBoolean utilized = new AtomicBoolean(false);
-    if (player_name != null && !player_name.isEmpty()) {
-      if (!player_name.equals("all") && !player_name.equals("*")) {
-        source.getServer().getPlayerList().getPlayers().stream().filter(player -> {
-          return player.getGameProfile().getName().equalsIgnoreCase(player_name);
-        }).findFirst().ifPresent(player -> {
-          thirst(source, player);
-          utilized.set(true);
-        });
-      } else {
-        source.getServer().getPlayerList().getPlayers().stream()
-            .forEach(player -> thirst(source, player));
-        utilized.set(true);
-      }
+  private static int processCommand(final CommandSource source, final String username) {
+    int result = -1;
+    if (username != null && !username.isEmpty()) {
+      boolean all = username.equals("all") || username.equals("*");
+      result = source.getServer().getPlayerList().getPlayers()
+          .stream()
+          .filter(player -> all || player.getGameProfile().getName().equalsIgnoreCase(username))
+          .findFirst()
+          .map(HydrateCommand::hydrate)
+          .orElse(-1);
     }
-    if (utilized.get()) {
-      source.sendFeedback(SUCCESS_MESSAGE_OPERATOR, true);
+    if (result == 1) {
+      source.sendFeedback(SUCCESS_MESSAGE_OPERATOR, false);
     } else {
-      source.sendFeedback(FAILURE_MESSAGE_NOT_USED, true);
+      source.sendErrorMessage(FAILURE_MESSAGE_NOT_USED);
     }
-    return 1;
+    return result;
   }
 
   /**
-   * This method provides Thirst function in command.
+   * Hydrate the specified player.
    *
-   * @param source - Command executor
-   * @param serverPlayerEntity - Entity to be thirsted
+   * @param serverPlayerEntity - entity to be hydrated
+   * @return 1 if success or 0 if failed
    */
-  private static int thirst(final CommandSource source, ServerPlayerEntity serverPlayerEntity) {
-    try {
-      if (serverPlayerEntity.isAlive()) {
-        IPlayer.getExpected(serverPlayerEntity).setWater(20);
-        serverPlayerEntity.playSound(SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0f,
-            5.0f);
-        if (source.asPlayer() != serverPlayerEntity) {
-          serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION, Util.DUMMY_UUID);
-        }
-        return 1;
-      }
-    } catch (CommandSyntaxException OK) {
+  private static int hydrate(ServerPlayerEntity serverPlayerEntity) {
+    if (serverPlayerEntity.isAlive()) {
+      IPlayer.getExpected(serverPlayerEntity).setWater(20);
+      serverPlayerEntity.playSound(SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0F,
+          5.0F);
+      serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION, Util.DUMMY_UUID);
+      return 1;
     }
     return 0;
   }
 
   static {
     SUCCESS_MESSAGE_OPERATOR = new StringTextComponent(
-        new TranslationTextComponent("commands.craftingdead.thirst.success.operator").getString())
+        new TranslationTextComponent("commands.craftingdead.hydrate.success.operator").getString())
             .mergeStyle(TextFormatting.GREEN);
     SUCCESS_MESSAGE_CONFIRMATION = new StringTextComponent(
-        new TranslationTextComponent("commands.craftingdead.thirst.success.confirmation")
-            .getString()).mergeStyle(TextFormatting.GREEN);;
+        new TranslationTextComponent("commands.craftingdead.hydrate.success.confirmation")
+            .getString()).mergeStyle(TextFormatting.GREEN);
     FAILURE_MESSAGE_NOT_USED = new StringTextComponent(
-        new TranslationTextComponent("commands.craftingdead.thirst.failure.not_used").getString())
-            .mergeStyle(TextFormatting.GRAY);;
+        new TranslationTextComponent("commands.craftingdead.hydrate.failure.not_used").getString())
+            .mergeStyle(TextFormatting.GRAY);
   }
 }
