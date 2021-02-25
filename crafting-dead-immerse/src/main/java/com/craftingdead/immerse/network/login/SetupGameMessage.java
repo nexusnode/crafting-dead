@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.network.login;
 
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.network.NetworkChannel;
 import net.minecraft.network.PacketBuffer;
@@ -43,7 +43,7 @@ public class SetupGameMessage extends LoginIndexedMessage {
 
   public static void handle(SetupGameMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(
-        () -> ((ClientDist) CraftingDeadImmerse.getInstance().getModDist()).loadGame(msg.gameType));
+        () -> CraftingDeadImmerse.getInstance().getClientDist().loadGame(msg.gameType));
     ctx.get().setPacketHandled(true);
     NetworkChannel.LOGIN.getSimpleChannel().reply(new AcknowledgeGameMessage(), ctx.get());
   }

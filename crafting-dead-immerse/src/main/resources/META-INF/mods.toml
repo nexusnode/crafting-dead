@@ -15,7 +15,7 @@ version = "${file.jarVersion}"
 mandatory = true
 modId = "craftingdead"
 side = "BOTH"
-versionRange = "[${file.jarVersion}]"
+versionRange = "[1.2.9-alpha,)"
 
 [[dependencies.craftingdeadimmerse]]
 mandatory = true

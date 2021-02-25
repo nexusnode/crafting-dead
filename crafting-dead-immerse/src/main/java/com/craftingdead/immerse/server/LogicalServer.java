@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,54 +15,64 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.server;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameServer;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
+import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
+import com.craftingdead.immerse.network.play.ChangeGameMessage;
+import com.craftingdead.immerse.network.play.SyncGameMessage;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.FolderName;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class LogicalServer extends WorldSavedData {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final Gson gson;
+  private static final Gson gson = new Gson();
 
   private final MinecraftServer minecraftServer;
 
-  private static final String GAME_FOLDER_NAME = "game";
+  private static final FolderName GAME_FOLDER_NAME = new FolderName("games");
 
   private final Path gamePath;
 
-  private IGameServer<?> gameServer;
+  private IGameServer gameServer;
+  private String currentGameName;
 
   public LogicalServer(MinecraftServer minecraftServer) {
-    super(CraftingDead.ID);
+    super(CraftingDeadImmerse.ID);
     this.minecraftServer = minecraftServer;
-    this.gamePath = CraftingDeadImmerse.getInstance().getModDir().resolve(GAME_FOLDER_NAME);
-    this.gson = new GsonBuilder()
-        .registerTypeAdapter(IGameServer.class, new IGameServer.Deserializer(this))
-        .create();
+    this.gamePath = minecraftServer.func_240776_a_(GAME_FOLDER_NAME);
   }
 
   public List<Pair<String, SetupGameMessage>> generateSetupGameMessage(boolean isLocal) {
@@ -83,30 +93,29 @@ public class LogicalServer extends WorldSavedData {
   }
 
   private void loadNextGame() {
-    ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotation =
+    ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotationConfig =
         CraftingDeadImmerse.serverConfig.gameRotation;
 
-    if (gameRotation.get().isEmpty()) {
+    List<? extends String> gameRotation = gameRotationConfig.get();
+
+    if (gameRotation.isEmpty()) {
       logger.info("Game rotation empty, defaulting to survival...");
       this.loadGame(new SurvivalServer());
       return;
     }
 
     final String nextGameName;
-    if (this.gameServer == null) {
-      nextGameName = gameRotation.get().get(0);
+    if (this.gameServer == null || this.currentGameName == null) {
+      nextGameName = gameRotation.get(0);
     } else {
-      int nextGameIndex = gameRotation.get().indexOf(this.gameServer.getDisplayName()) + 1;
       nextGameName =
-          gameRotation.get().get(nextGameIndex >= gameRotation.get().size() ? 0 : nextGameIndex);
+          gameRotation.get((gameRotation.indexOf(this.currentGameName) + 1) % gameRotation.size());
     }
 
     if (!this.findAndLoadGame(nextGameName)) {
-      logger.info("Removing game '{}' from game rotation", gameRotation);
-      List<String> newGameRotation = new ArrayList<>(gameRotation.get());
-      newGameRotation.remove(nextGameName);
-      gameRotation.set(newGameRotation);
-      gameRotation.save();
+      logger.info("Removing game '{}' from game rotation", nextGameName);
+      gameRotation.remove(nextGameName);
+      gameRotationConfig.save();
       this.loadNextGame();
     }
   }
@@ -117,46 +126,108 @@ public class LogicalServer extends WorldSavedData {
       logger.error("Game file with name '{}' does not exist");
       return false;
     }
+
+    IGameServer gameServer;
     try (FileReader fileReader = new FileReader(gameFile)) {
-      this.loadGame(this.gson.fromJson(fileReader, IGameServer.class));
-      return true;
-    } catch (IOException e) {
-      logger.error("Failed to load game file '{}'", e);
+      gameServer =
+          IGameServer.CODEC.parse(JsonOps.INSTANCE, gson.fromJson(fileReader, JsonElement.class))
+              .getOrThrow(false, logger::error);
+    } catch (Throwable t) {
+      logger.error("Failed to load game file '{}'", gameFile.toString(), t);
       return false;
+    }
+
+    this.loadGame(gameServer);
+    this.currentGameName = gameName;
+    return true;
+  }
+
+  private void loadGame(IGameServer gameServer) {
+    List<ServerPlayerEntity> players = this.minecraftServer.getPlayerList().getPlayers();
+
+    IGameServer oldGameServer = this.gameServer;
+    if (this.gameServer != null) {
+      logger.info("Unloading current game");
+      players.stream().map(IPlayer::getExpected).forEach(this::removePlayerFromGame);
+      this.gameServer.unload();
+    }
+
+    logger.info("Loading game type '{}'", gameServer.getGameType().getRegistryName().toString());
+
+    this.gameServer = gameServer;
+    this.gameServer.load();
+
+    logger.info("Loading players");
+    for (ServerPlayerEntity playerEntity : players) {
+      playerEntity.connection.sendPacket(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+          new ChangeGameMessage(this.gameServer.getGameType()), NetworkDirection.PLAY_TO_CLIENT));
+
+      if (oldGameServer != null && gameServer.persistPlayerData()
+          && !oldGameServer.persistPlayerData()) {
+        this.minecraftServer.getPlayerList().readPlayerDataFromFile(playerEntity);
+      }
+    }
+
+    players.stream().map(IPlayer::getExpected).forEach(this::addPlayerToGame);
+
+    // Respawn all players - keep data if new game uses persisted player data, otherwise discard
+    // player data.
+    logger.info("Respawning players");
+    this.respawnPlayers(gameServer.persistPlayerData());
+  }
+
+  public void respawnPlayers(boolean keepData) {
+    this.respawnPlayers(player -> true, keepData);
+  }
+
+  public void respawnPlayers(Predicate<ServerPlayerEntity> predicate, boolean keepData) {
+    List<ServerPlayerEntity> players =
+        new ArrayList<>(this.minecraftServer.getPlayerList().getPlayers());
+    for (ServerPlayerEntity playerEntity : players) {
+      if (predicate.test(playerEntity)) {
+        this.respawnPlayer(playerEntity, keepData);
+      }
     }
   }
 
-  private void loadGame(IGameServer<?> gameServer) {
-    if (this.gameServer != null) {
-      logger.info("Unloading game '{}'", this.gameServer.getDisplayName());
-      this.gameServer.unload();
-    }
-    this.gameServer = gameServer;
-    logger.info("Loading game '{}'", this.gameServer.getDisplayName());
-    this.gameServer.load();
+  public void respawnPlayer(ServerPlayerEntity playerEntity, boolean keepData) {
+    playerEntity.connection.player =
+        this.minecraftServer.getPlayerList().func_232644_a_(playerEntity, keepData);
+  }
+
+  private void addPlayerToGame(IPlayer<ServerPlayerEntity> player) {
+    NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(player::getEntity),
+        new SyncGameMessage(this.gameServer, true));
+    this.gameServer.addPlayer(player);
+  }
+
+  private void removePlayerFromGame(IPlayer<ServerPlayerEntity> player) {
+    this.gameServer.removePlayer(player);
   }
 
   public MinecraftServer getMinecraftServer() {
     return this.minecraftServer;
   }
 
-  public IGameServer<?> getGameServer() {
+  public IGameServer getGameServer() {
     return this.gameServer;
   }
 
   @Override
   public void read(CompoundNBT nbt) {
-    String gameName = nbt.getString("gameName");
-    if (!gameName.isEmpty() && this.findAndLoadGame(gameName)) {
-      logger.info("Loading saved game ''", gameName);
-      this.gameServer.deserializeNBT(nbt.getCompound("game"));
+    CompoundNBT gameNbt = nbt.getCompound("game");
+    if (!gameNbt.isEmpty()) {
+      this.loadGame(IGameServer.CODEC.parse(NBTDynamicOps.INSTANCE, gameNbt)
+          .getOrThrow(false, logger::error));
     }
   }
 
   @Override
   public CompoundNBT write(CompoundNBT nbt) {
-    nbt.putString("gameType", this.gameServer.getGameType().getRegistryName().toString());
-    nbt.put("game", this.gameServer.serializeNBT());
+    if (this.gameServer.save()) {
+      nbt.put("game", IGameServer.CODEC.encodeStart(NBTDynamicOps.INSTANCE, this.gameServer)
+          .getOrThrow(false, logger::error));
+    }
     return nbt;
   }
 
@@ -164,25 +235,33 @@ public class LogicalServer extends WorldSavedData {
   // Forge Events
   // ================================================================================
 
-//  @SubscribeEvent
-//  public void handleEntityJoinWorldEvent(EntityJoinWorldEvent event) {
-//    if (event.getEntity() instanceof ServerPlayerEntity
-//        && event.getWorld().getDimension().getType() == DimensionType.OVERWORLD) {
-//      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
-//      playerEntity.teleport(
-//          this.minecraftServer.getWorld(DimensionType.byName(ModDimensions.MAP.getId())),
-//          0, 100, 0, playerEntity.rotationYaw, playerEntity.rotationPitch);
-//    }
-//  }
-
   @SubscribeEvent
   public void handleServerTick(TickEvent.ServerTickEvent event) {
     switch (event.phase) {
       case START:
         this.gameServer.tick();
+        if (this.gameServer.isFinished()) {
+          this.loadNextGame();
+        } else {
+          if (this.gameServer.requiresSync()) {
+            this.minecraftServer.getPlayerList()
+                .sendPacketToAllPlayers(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+                    new SyncGameMessage(this.gameServer, false), NetworkDirection.PLAY_TO_CLIENT));
+          }
+        }
         break;
       default:
         break;
     }
+  }
+
+  @SubscribeEvent
+  public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    this.addPlayerToGame(IPlayer.getExpected((ServerPlayerEntity) event.getPlayer()));
+  }
+
+  @SubscribeEvent
+  public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+    this.removePlayerFromGame(IPlayer.getExpected((ServerPlayerEntity) event.getPlayer()));
   }
 }

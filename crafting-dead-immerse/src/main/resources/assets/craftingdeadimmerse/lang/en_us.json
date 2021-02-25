@@ -1,5 +1,31 @@
 {
     "menu.start": "Press the space bar to start",
     "menu.play": "Play Game",
-    "menu.home": "Home"
+    "menu.home": "Home",
+    
+    "message.first_blood_drawn": "%s drew first blood",
+    "message.joined": "%s has joined the game",
+    "message.left": "%s has left the game",
+
+    "title.warm_up": "Warm Up",
+    "title.game_over": "Game Over",
+
+    "message.game": "Game",
+    "message.no_switch_team": "You can't switch teams right now",
+    "message.joined_team": "%s joined %s",
+
+    "key.switch_teams": "Switch Teams",
+
+    "gui.killed_message.killed_by": "Killed by %s",
+    "gui.killed_message.hp": "HP: %s",
+
+    "gui.screen.shop.title": "Shop",
+    "gui.screen.shop.back": "Back '%s'",
+    "gui.screen.shop.buy_time": "Buy time: %s",
+    "gui.screen.shop.selected": "Selected",
+    "gui.screen.shop.inventory":"Inventory",
+    "gui.screen.select_team.title":"Select Team",
+
+
+    "game.craftingdeadimmerse.deathmatch":"Team Deathmatch"
 }

@@ -8,6 +8,24 @@ repositories {
       	url 'http://maven.ferenyr.info/artifactory/ourten'
     }
     google()
+    maven {
+    	url 'https://maven.enginehub.org/repo'
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+        	"Implementation-Title": project.name,
+        	"Implementation-Version": project.version,
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs": 'craftingdeadimmerse.mixins.json'
+        ])
+    }
+}
+
+mixin {
+	add sourceSets.main, "craftingdeadimmerse.refmap.json"
 }
 
 minecraft {
@@ -55,11 +73,10 @@ minecraft {
 }
 
 dependencies {
-    implementation group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
-	implementation group: 'com.github.Vatuu', name: 'discord-rpc', version: '1.6.2'
+    shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
 	compileOnly project(':crafting-dead-core')
-	implementation "org.lwjgl:lwjgl-yoga:${lwjgl_version}"
-	runtimeOnly "org.lwjgl:lwjgl-yoga::${lwjgl_natives}"
+	shaded group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}"
+	shaded "org.lwjgl:lwjgl-yoga::${lwjgl_natives}"
 }
 
 eclipse {

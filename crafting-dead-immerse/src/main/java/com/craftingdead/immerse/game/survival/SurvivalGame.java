@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.Player;
-import com.craftingdead.immerse.game.AbstractGame;
+import com.craftingdead.core.capability.living.PlayerImpl;
+import com.craftingdead.core.event.LivingEvent;
+import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.entity.Entity;
+import com.craftingdead.immerse.game.IGame;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
-
-  public SurvivalGame() {
-    super(GameTypes.SURVIVAL, ImmutableSet.of(new SurvivorsTeam()), "Survival");
-  }
+public class SurvivalGame implements IGame {
 
   @Override
   public void load() {
@@ -45,16 +39,31 @@ public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
     MinecraftForge.EVENT_BUS.unregister(this);
   }
 
+  @Override
+  public void tick() {}
+
   @SubscribeEvent
-  public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-    ICapabilityProvider capabilityProvider = event.getCapabilities().get(ILiving.ID);
-    if (capabilityProvider != null) {
-      capabilityProvider
-          .getCapability(ModCapabilities.LIVING)
-          .filter(living -> living instanceof Player)
-          .map(living -> (Player<?>) living)
-          .ifPresent(
-              player -> player.registerExtension(SurvivalPlayer.ID, new SurvivalPlayer(player)));
+  public void handleAttachLivingExtensions(LivingEvent.Load event) {
+    if (event.getLiving() instanceof PlayerImpl
+        && !event.getLiving().getExtension(SurvivalPlayer.EXTENSION_ID).isPresent()) {
+      PlayerImpl<?> player = (PlayerImpl<?>) event.getLiving();
+      player.registerExtension(SurvivalPlayer.EXTENSION_ID, new SurvivalPlayer(player));
     }
+  }
+
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {}
+
+  @Override
+  public void decode(PacketBuffer in) {}
+
+  @Override
+  public boolean requiresSync() {
+    return false;
+  }
+
+  @Override
+  public GameType getGameType() {
+    return GameTypes.SURVIVAL.get();
   }
 }

@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.client.util;
 
-import java.lang.reflect.Field;
-import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -33,30 +35,38 @@ import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraft.util.text.ITextComponent;
 
 public class RenderUtil {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 
-  private static final Field listShaders =
-      ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148031_d");
-
   public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
     if (shaderGroup != null) {
-      try {
-        @SuppressWarnings("unchecked")
-        List<Shader> shaders = (List<Shader>) listShaders.get(shaderGroup);
-        for (Shader shader : shaders) {
-          ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
-          if (variable != null) {
-            variable.set(value);
-          }
+      for (Shader shader : shaderGroup.listShaders) {
+        ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+        if (variable != null) {
+          variable.set(value);
         }
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        throw new RuntimeException(e);
       }
     }
+  }
+
+  public static void renderTextRight(FontRenderer fontRenderer, MatrixStack matrixStack, float x,
+      float y, ITextComponent text, int colour, boolean shadow) {
+    if (shadow) {
+      fontRenderer.func_243246_a(matrixStack, text, x - fontRenderer.getStringPropertyWidth(text),
+          y, colour);
+    } else {
+      fontRenderer.func_243248_b(matrixStack, text, x - fontRenderer.getStringPropertyWidth(text),
+          y, colour);
+    }
+  }
+
+  public static void renderTextRight(FontRenderer fontRenderer, MatrixStack matrixStack, float x,
+      float y, String text, int colour, boolean shadow) {
+    fontRenderer.func_238406_a_(matrixStack, text, x - fontRenderer.getStringWidth(text), y, colour,
+        shadow);
   }
 
   public static void drawRoundedFrame(double x, double y, double x2, double y2, int colour,
@@ -79,33 +89,40 @@ public class RenderUtil {
     ShaderLinkHelper.func_227804_a_(0);
   }
 
+  public static void fillWithShadow(double x, double y, double width, double height, int colour) {
+    fill(x - 1, y - 1, x + width + 1, y + height + 1, 0x4D000000);
+    fill(x, y, x + width, y + height, colour);
+  }
+
+  public static void fill2(double x, double y, double width, double height, int colour) {
+    fill(x, y, x + width, y + height, colour);
+  }
+
   public static void fill(double x, double y, double x2, double y2, int colour) {
     if (x < x2) {
       double i = x;
       x = x2;
       x2 = i;
     }
-
     if (y < y2) {
       double j = y;
       y = y2;
       y2 = j;
     }
-
-    float f3 = (float) (colour >> 24 & 255) / 255.0F;
-    float f = (float) (colour >> 16 & 255) / 255.0F;
-    float f1 = (float) (colour >> 8 & 255) / 255.0F;
-    float f2 = (float) (colour & 255) / 255.0F;
+    float alpha = (float) (colour >> 24 & 255) / 255.0F;
+    float red = (float) (colour >> 16 & 255) / 255.0F;
+    float green = (float) (colour >> 8 & 255) / 255.0F;
+    float blue = (float) (colour & 255) / 255.0F;
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder buffer = tessellator.getBuffer();
     RenderSystem.enableBlend();
     RenderSystem.disableTexture();
     RenderSystem.defaultBlendFunc();
     buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-    buffer.pos(x, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x2, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x2, y, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x, y2, 0.0D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(x2, y2, 0.0D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(x2, y, 0.0D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
     tessellator.draw();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
@@ -215,5 +232,39 @@ public class RenderUtil {
   public static int getColour(int[] colour4i) {
     return ((colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16) | ((colour4i[1] & 0xFF) << 8)
         | ((colour4i[2] & 0xFF) << 0);
+  }
+
+  public static void renderHead(ResourceLocation skin, MatrixStack matrixStack, int x, int y,
+      int width, int height) {
+    bind(skin);
+    AbstractGui.blit(matrixStack, x, y, width, height, 8.0F, 8.0F, 8, 8, 64, 64);
+  }
+
+  public static void renderPlayerListRow(MatrixStack matrixStack, int x, int y, int width,
+      int height, ITextComponent ping, ITextComponent username,
+      ITextComponent... stats) {
+
+    final int statWidth = 31;
+    final int pingWidth = 26;
+    final int columnSpacing = 1;
+    final int textYOffset = 1 + (height - minecraft.fontRenderer.FONT_HEIGHT) / 2;
+
+    fill2(x, y, pingWidth, height, 0xB4000000);
+    AbstractGui.drawCenteredString(matrixStack, minecraft.fontRenderer, ping,
+        x + 13, y + textYOffset, 0xFFFFFFFF);
+
+    int usernameColumnWidth =
+        width - pingWidth - columnSpacing - (stats.length * (statWidth));
+    fill2(x + pingWidth + columnSpacing, y, usernameColumnWidth, height, 0xB4000000);
+    minecraft.fontRenderer.func_243246_a(matrixStack, username, x + 54, y + textYOffset,
+        0xFFFFFFFF);
+
+    int statsX = x + pingWidth - 8 + usernameColumnWidth;
+    for (int i = 0; i < stats.length; i++) {
+      ITextComponent stat = stats[i];
+      RenderUtil.fill2(statsX + 10 + (i * 31), y, 30, height, 0xB4000000);
+      AbstractGui.drawCenteredString(matrixStack, minecraft.fontRenderer, stat,
+          statsX + 10 + (i * 31) + 16, y + textYOffset, 0xFFFFFFFF);
+    }
   }
 }

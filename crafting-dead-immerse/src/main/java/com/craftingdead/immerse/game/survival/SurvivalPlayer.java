@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,36 +15,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.living.IPlayerHandler;
-import com.craftingdead.core.capability.living.Player;
+import com.craftingdead.core.capability.living.IPlayerExtension;
+import com.craftingdead.core.capability.living.PlayerImpl;
+import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.immerse.game.GameTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ResourceLocation;
 
-public class SurvivalPlayer implements IPlayerHandler {
+public class SurvivalPlayer implements IPlayerExtension {
 
-  public static final ResourceLocation ID = GameTypes.SURVIVAL.getId();
+  public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
 
-  private final Player<?> player;
+  private static final DataParameter<Integer> DAYS_SURVIVED =
+      new DataParameter<>(0x00, DataSerializers.VARINT);
+  private static final DataParameter<Integer> ZOMBIES_KILLED =
+      new DataParameter<>(0x01, DataSerializers.VARINT);
+  private static final DataParameter<Integer> PLAYERS_KILLED =
+      new DataParameter<>(0x02, DataSerializers.VARINT);
 
-  private final DataParameter<Integer> daysSurvived;
-  private final DataParameter<Integer> zombiesKilled;
-  private final DataParameter<Integer> playersKilled;
+  private final IPlayer<?> player;
 
-  public SurvivalPlayer(Player<?> player) {
+  private final NetworkDataManager dataManager = new NetworkDataManager();
+
+  public SurvivalPlayer(PlayerImpl<?> player) {
     this.player = player;
-    this.daysSurvived = this.player.getDataManager().register(DataSerializers.VARINT, 0);
-    this.zombiesKilled = this.player.getDataManager().register(DataSerializers.VARINT, 0);
-    this.playersKilled = this.player.getDataManager().register(DataSerializers.VARINT, 0);
+    this.dataManager.register(DAYS_SURVIVED, 0);
+    this.dataManager.register(ZOMBIES_KILLED, 0);
+    this.dataManager.register(PLAYERS_KILLED, 0);
   }
 
   @Override
@@ -70,36 +78,42 @@ public class SurvivalPlayer implements IPlayerHandler {
   }
 
   public int getDaysSurvived() {
-    return this.player.getDataManager().get(this.daysSurvived);
+    return this.dataManager.get(DAYS_SURVIVED);
   }
 
   public void setDaysSurvived(int daysSurvived) {
-    this.player.getDataManager().set(this.daysSurvived, daysSurvived);
+    this.dataManager.set(DAYS_SURVIVED, daysSurvived);
   }
 
   public int getZombiesKilled() {
-    return this.player.getDataManager().get(this.zombiesKilled);
+    return this.dataManager.get(ZOMBIES_KILLED);
   }
 
   public void setZombiesKilled(int zombiesKilled) {
-    this.player.getDataManager().set(this.zombiesKilled, zombiesKilled);
+    this.dataManager.set(ZOMBIES_KILLED, zombiesKilled);
   }
 
   public int getPlayersKilled() {
-    return this.player.getDataManager().get(this.playersKilled);
+    return this.dataManager.get(PLAYERS_KILLED);
   }
 
   public void setPlayersKilled(int playersKilled) {
-    this.player.getDataManager().set(this.playersKilled, playersKilled);
+    this.dataManager.set(PLAYERS_KILLED, playersKilled);
+  }
+
+  @Override
+  public boolean isCombatModeEnabled() {
+    return false;
   }
 
   @Override
   public void copyFrom(IPlayer<?> that, boolean wasDeath) {
     if (!wasDeath) {
       that.getExtension(GameTypes.SURVIVAL.getId())
-          .map(t -> (SurvivalPlayer) t).ifPresent(t -> {
-            this.setZombiesKilled(t.getZombiesKilled());
-            this.setPlayersKilled(t.getPlayersKilled());
+          .map(extension -> (SurvivalPlayer) extension)
+          .ifPresent(extension -> {
+            this.setZombiesKilled(extension.getZombiesKilled());
+            this.setPlayersKilled(extension.getPlayersKilled());
           });
     }
   }
@@ -118,8 +132,19 @@ public class SurvivalPlayer implements IPlayerHandler {
     this.setPlayersKilled(nbt.getInt("playersKilled"));
   }
 
-  public static SurvivalPlayer getExpected(IPlayer<?> player) {
-    return (SurvivalPlayer) player.getExtension(ID)
-        .orElseThrow(() -> new IllegalStateException("Missing survival player extension"));
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {
+    NetworkDataManager
+        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+  }
+
+  @Override
+  public void decode(PacketBuffer in) {
+    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+  }
+
+  @Override
+  public boolean requiresSync() {
+    return this.dataManager.isDirty();
   }
 }

@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,41 +15,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game;
 
-import java.lang.reflect.Type;
-import com.craftingdead.immerse.server.LogicalServer;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.registries.RegistryManager;
+import java.util.Optional;
+import com.craftingdead.core.capability.living.IPlayer;
+import com.mojang.serialization.Codec;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
-public interface IGameServer<T extends ITeam> extends IGame<T>, INBTSerializable<CompoundNBT> {
+public interface IGameServer extends IGame {
 
-  public static class Deserializer implements JsonDeserializer<IGameServer<?>> {
+  static final Codec<IGameServer> CODEC =
+      GameType.CODEC.dispatch(IGameServer::getGameType, GameType::getGameServerCodec);
 
-    private final LogicalServer logicalServer;
+  void addPlayer(IPlayer<ServerPlayerEntity> player);
 
-    public Deserializer(LogicalServer logicalServer) {
-      this.logicalServer = logicalServer;
-    }
+  void removePlayer(IPlayer<ServerPlayerEntity> player);
 
-    @Override
-    public IGameServer<?> deserialize(JsonElement json, Type typeOfT,
-        JsonDeserializationContext context) throws JsonParseException {
-      JsonObject jsonObject = json.getAsJsonObject();
-      ResourceLocation gameTypeId = new ResourceLocation(jsonObject.get("gameType").getAsString());
-      GameType gameType = RegistryManager.ACTIVE.getRegistry(GameType.class).getValue(gameTypeId);
-      if (gameType == null) {
-        throw new IllegalStateException(
-            "Game type with id '" + gameTypeId.toString() + "' does not exist.");
-      }
-      return gameType.createGameServer(this.logicalServer, context, jsonObject);
-    }
+  /**
+   * Determine if the game has finished.
+   * 
+   * @return true if the game has finished
+   */
+  boolean isFinished();
+
+  /**
+   * Whether persisted player data should be loaded/saved for this game. <br>
+   * Returning false will result in clean player data being loaded for all players on the server and
+   * any changes to the players will not be saved once the game finishes.<br>
+   * Useful for round based games which don't save any data.
+   * 
+   * @return true if player data should be loaded/saved.
+   */
+  boolean persistPlayerData();
+
+  /**
+   * Get the spawn point for the specified {@link IPlayer}.
+   * 
+   * @param player - the player to get the spawn point for
+   * @return an optional spawn point. If no spawn point is returned, the player's default spawn
+   *         point will be used.
+   */
+  default Optional<SpawnPoint> getSpawnPoint(IPlayer<ServerPlayerEntity> player) {
+    return Optional.empty();
   }
+
+  /**
+   * Whether this game should be saved.
+   * 
+   * @return true to save
+   */
+  boolean save();
 }

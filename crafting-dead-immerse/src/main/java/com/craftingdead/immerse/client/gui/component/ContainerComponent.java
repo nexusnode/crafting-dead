@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.client.gui.component;
 
 import java.io.File;
@@ -40,7 +41,7 @@ import com.mojang.datafixers.util.Either;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenType;
 import io.noties.tumbleweed.equations.Sine;
-import net.minecraft.client.util.NativeUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.ForgeHooks;
 
@@ -57,8 +58,9 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private static final float SCROLL_CHUNK = 15F;
 
-  private static final float SCROLL_MOMENTUM_DAMPING = 7.5F;
+  private static final float SCROLL_MOMENTUM_DAMPING = 1.75F;
 
+  private float lastScrollOffset;
   private float scrollOffset;
 
   private float totalHeight;
@@ -67,9 +69,9 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private boolean calculateWidthWithScrollbar;
 
-  private final VelocitySmoother scrollSmoother = new VelocitySmoother();
+  private final VelocitySmoother scrollSmoother = new VelocitySmoother(1.0F);
 
-  private float lastRenderTime;
+  private float lerpedScrollOffset;
 
   @Override
   public float getContentWidth() {
@@ -78,7 +80,8 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   @Override
   public float getContentY() {
-    return super.getContentY() + (this.totalHeight > this.getHeight() ? -this.scrollOffset : 0.0F);
+    return super.getContentY()
+        + (this.totalHeight > this.getHeight() ? -this.lerpedScrollOffset : 0.0F);
   }
 
   @Override
@@ -116,7 +119,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled() && !this.draggingScroller) {
-      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK));
+      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK * 2));
     }
     return super.mouseScrolled(mouseX, mouseY, scrollDelta);
   }
@@ -160,28 +163,20 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   @Override
   public void tick() {
     super.tick();
+    this.lastScrollOffset = this.scrollOffset;
+    this.scrollOffset += this.scrollSmoother.getAndDecelerate(1.0F / SCROLL_MOMENTUM_DAMPING);
+    if (this.scrollOffset < 0.0F || this.scrollOffset > this.totalHeight - this.getHeight()) {
+      this.scrollSmoother.reset();
+    }
+    this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
   }
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    this.lerpedScrollOffset =
+        MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(), this.lastScrollOffset,
+            this.scrollOffset);
     super.render(matrixStack, mouseX, mouseY, partialTicks);
-
-    float currentTime = (float) NativeUtil.getTime();
-    float timeDelta = currentTime - this.lastRenderTime;
-    this.lastRenderTime = currentTime;
-
-    float scrollDelta = this.scrollSmoother.getAndDecelerate(timeDelta * SCROLL_MOMENTUM_DAMPING);
-    if (Math.abs(scrollDelta) < 0.4) {
-      scrollDelta = 0.0F;
-      this.scrollSmoother.reset();
-    }
-    float newScrollOffset = this.scrollOffset + scrollDelta;
-    if (newScrollOffset < 0.0F || newScrollOffset > this.totalHeight - this.getHeight()) {
-      this.scrollSmoother.reset();
-    }
-    this.scrollOffset =
-        Math.min(Math.max(newScrollOffset, 0.0F), this.totalHeight - this.getHeight());
-
     if (this.isScrollbarEnabled()) {
       RenderUtil.roundedFill(this.getScrollbarX(), this.getY(),
           this.getScrollbarX() + SCROLLBAR_WIDTH,
@@ -219,7 +214,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   }
 
   private final double getScrollbarY() {
-    return this.getY() + (this.scrollOffset / this.totalHeight) * this.getHeight();
+    return this.getY() + (this.lerpedScrollOffset / this.totalHeight) * this.getHeight();
   }
 
   private final float getScrollbarHeight() {

@@ -1,0 +1,42 @@
+{
+  "countdown": {
+    "sounds": [
+      "craftingdeadimmerse:countdown"
+    ]
+  },
+  "victory_music": {
+    "sounds": [
+      "craftingdeadimmerse:victory_music"
+    ]
+  },
+  "defeat_music": {
+    "sounds": [
+      "craftingdeadimmerse:defeat_music"
+    ]
+  },
+  "start_music": {
+    "sounds": [
+      "craftingdeadimmerse:start_music"
+    ]
+  },
+  "team.blue.victory": {
+    "sounds": [
+      "craftingdeadimmerse:team/blue/victory"
+    ]
+  },
+  "team.blue.defeat": {
+    "sounds": [
+      "craftingdeadimmerse:team/blue/defeat"
+    ]
+  },
+  "team.red.victory": {
+    "sounds": [
+      "craftingdeadimmerse:team/red/victory"
+    ]
+  },
+  "team.red.defeat": {
+    "sounds": [
+      "craftingdeadimmerse:team/red/defeat"
+    ]
+  }
+}

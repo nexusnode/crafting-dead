@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game.survival;
 
+import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.game.IGameServer;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
-public class SurvivalServer extends SurvivalGame implements IGameServer<SurvivorsTeam> {
+public class SurvivalServer extends SurvivalGame implements IGameServer {
 
   @Override
-  public CompoundNBT serializeNBT() {
-    return new CompoundNBT();
+  public boolean persistPlayerData() {
+    return true;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {}
+  public boolean isFinished() {
+    return false;
+  }
+
+  @Override
+  public boolean save() {
+    return true;
+  }
+
+  @Override
+  public void addPlayer(IPlayer<ServerPlayerEntity> player) {}
+
+  @Override
+  public void removePlayer(IPlayer<ServerPlayerEntity> player) {}
 }

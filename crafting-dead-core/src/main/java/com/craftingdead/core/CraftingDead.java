@@ -257,22 +257,23 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    if (IPlayer.getExpected(event.getPlayer()).isCombatModeEnabled()) {
-      final ItemStack itemStack = event.getItem().getItem();
-      CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
-      CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlotType);
-      if (MinecraftForge.EVENT_BUS.post(combatPickupEvent)) {
-        event.setCanceled(true);
-      } else if (combatSlotType != null) {
-        if (combatSlotType.addToInventory(itemStack, event.getPlayer().inventory, false)) {
-          // Allows normal processing of item pickup but prevents item being added to inventory
-          // because we've already added it.
-          event.setResult(Event.Result.ALLOW);
-        } else {
-          event.setCanceled(true);
-        }
-      }
-    }
+    event.getPlayer().getCapability(ModCapabilities.LIVING).<IPlayer<?>>cast()
+        .filter(IPlayer::isCombatModeEnabled).ifPresent(living -> {
+          final ItemStack itemStack = event.getItem().getItem();
+          CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
+          CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlotType);
+          if (MinecraftForge.EVENT_BUS.post(combatPickupEvent)) {
+            event.setCanceled(true);
+          } else if (combatSlotType != null) {
+            if (combatSlotType.addToInventory(itemStack, event.getPlayer().inventory, false)) {
+              // Allows normal processing of item pickup but prevents item being added to inventory
+              // because we've already added it.
+              event.setResult(Event.Result.ALLOW);
+            } else {
+              event.setCanceled(true);
+            }
+          }
+        });
   }
 
   @SubscribeEvent

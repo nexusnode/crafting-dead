@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.network;
 
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.network.login.AcknowledgeGameMessage;
 import com.craftingdead.immerse.network.login.LoginIndexedMessage;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
+import com.craftingdead.immerse.network.play.ChangeGameMessage;
+import com.craftingdead.immerse.network.play.DisplayKilledMessage;
+import com.craftingdead.immerse.network.play.SyncGameMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -30,28 +33,47 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 
-  LOGIN(new ResourceLocation(CraftingDead.ID, "login")) {
+  LOGIN(new ResourceLocation(CraftingDeadImmerse.ID, "login")) {
     @Override
     protected void registerMessages(SimpleChannel simpleChannel) {
-      simpleChannel
-          .messageBuilder(SetupGameMessage.class, 0x00, NetworkDirection.LOGIN_TO_CLIENT)
+      simpleChannel.messageBuilder(SetupGameMessage.class, 0x00, NetworkDirection.LOGIN_TO_CLIENT)
           .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
-          .encoder(SetupGameMessage::encode)
-          .decoder(SetupGameMessage::decode)
+          .encoder(SetupGameMessage::encode).decoder(SetupGameMessage::decode)
           .consumer(FMLHandshakeHandler
               .biConsumerFor((handler, msg, ctx) -> SetupGameMessage.handle(msg, ctx)))
-          .buildLoginPacketList(
-              isLocal -> CraftingDeadImmerse.getInstance().getLogicalServer()
-                  .generateSetupGameMessage(isLocal))
+          .buildLoginPacketList(isLocal -> CraftingDeadImmerse.getInstance().getLogicalServer()
+              .generateSetupGameMessage(isLocal))
           .add();
 
       simpleChannel
           .messageBuilder(AcknowledgeGameMessage.class, 0x01, NetworkDirection.LOGIN_TO_SERVER)
           .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
-          .encoder(AcknowledgeGameMessage::encode)
-          .decoder(AcknowledgeGameMessage::decode)
+          .encoder(AcknowledgeGameMessage::encode).decoder(AcknowledgeGameMessage::decode)
           .consumer(FMLHandshakeHandler
               .indexFirst((handler, msg, ctx) -> AcknowledgeGameMessage.handle(msg, ctx)))
+          .add();
+    }
+  },
+  PLAY(new ResourceLocation(CraftingDeadImmerse.ID, "play")) {
+    @Override
+    protected void registerMessages(SimpleChannel simpleChannel) {
+      simpleChannel
+          .messageBuilder(SyncGameMessage.class, 0x00, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncGameMessage::encode)
+          .decoder(SyncGameMessage::decode)
+          .consumer(SyncGameMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(ChangeGameMessage.class, 0x01, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(ChangeGameMessage::encode)
+          .decoder(ChangeGameMessage::decode)
+          .consumer(ChangeGameMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(DisplayKilledMessage.class, 0x02, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(DisplayKilledMessage::encode)
+          .decoder(DisplayKilledMessage::decode)
+          .consumer(DisplayKilledMessage::handle)
           .add();
     }
   };

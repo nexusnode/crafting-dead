@@ -1,0 +1,93 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.craftingdead.immerse.client.gui.screen.game;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.util.Text;
+import com.craftingdead.immerse.client.util.RenderUtil;
+import com.craftingdead.immerse.game.shop.IShop;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+
+public class ItemButton extends GameButton implements IInfoPanel {
+
+  private final FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+
+  private final IPlayer<?> player;
+  private final IShop shop;
+  private final ItemStack itemStack;
+  private final int price;
+
+  public ItemButton(ItemStack itemStack, IPlayer<?> player, IShop shop, int price) {
+    super(0, 0, 0, 0, itemStack.getDisplayName(), btn -> shop.buyItem(player, itemStack));
+    this.player = player;
+    this.shop = shop;
+    this.itemStack = itemStack;
+    this.price = price;
+  }
+
+  private ITextComponent getFormattedPrice() {
+    return Text.of("$" + this.price).mergeStyle(this.shop.canAfford(this.player, this.price)
+        ? TextFormatting.GREEN
+        : TextFormatting.RED);
+  }
+
+  @Override
+  public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+    if (this.price > 0) {
+      RenderUtil.renderTextRight(this.fontRenderer, matrixStack, x + width - 2, y + 7,
+          this.getFormattedPrice(), 0, true);
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
+    this.fontRenderer.func_243246_a(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
+
+    drawCenteredString(matrixStack, this.fontRenderer, this.getFormattedPrice(), x + 53, y - 75, 0);
+
+    RenderSystem.pushMatrix();
+    RenderSystem.translatef(x + 10, y - 40, 0);
+    double scale = 1.2D;
+    RenderSystem.scaled(scale, scale, scale);
+    com.craftingdead.core.client.util.RenderUtil.renderItemIntoGUI(this.itemStack, 0, 0,
+        0xFFFFFFFF, true);
+    RenderSystem.popMatrix();
+
+    List<ITextComponent> itemInfo = new ArrayList<>();
+    this.itemStack.getItem().addInformation(this.itemStack, null, itemInfo, TooltipFlags.NORMAL);
+
+    for (int i = 0; i < itemInfo.size(); i++) {
+      ITextComponent info = itemInfo.get(i);
+      this.fontRenderer.func_243246_a(matrixStack, info, x - 20,
+          y + (i * this.fontRenderer.FONT_HEIGHT + 1), 0xFFFFFFFF);
+    }
+  }
+}

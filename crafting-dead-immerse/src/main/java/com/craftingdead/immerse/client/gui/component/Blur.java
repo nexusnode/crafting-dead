@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.client.gui.component;
 
 import java.io.Closeable;
@@ -41,26 +42,29 @@ public class Blur implements Closeable {
 
   private ShaderGroup blurShader;
 
-
   private float lastFramebufferWidth;
   private float lastFramebufferHeight;
 
   public Blur() {
-    this(0);
+    this(-1);
   }
 
   public Blur(float radius) {
     try {
       this.blurShader = new ShaderGroup(this.minecraft.getTextureManager(),
           this.minecraft.getResourceManager(), this.minecraft.getFramebuffer(), BLUR_SHADER);
-      if (radius > 0) {
-        RenderUtil.updateUniform("Radius", radius, this.blurShader);
-      }
+      this.setRadius(radius);
       this.blurShader.createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
           this.minecraft.getMainWindow().getFramebufferHeight());
     } catch (JsonSyntaxException | IOException ioexception) {
       logger.warn("Failed to load shader: {}", BLUR_SHADER, ioexception);
       this.blurShader = null;
+    }
+  }
+
+  public void setRadius(float radius) {
+    if (radius > -1) {
+      RenderUtil.updateUniform("Radius", radius, this.blurShader);
     }
   }
 

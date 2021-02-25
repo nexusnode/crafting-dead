@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game;
 
 import java.util.function.Supplier;
-import com.craftingdead.immerse.server.LogicalServer;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import com.craftingdead.core.util.Text;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.mojang.serialization.Codec;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.DistExecutor.SafeCallable;
@@ -28,31 +32,32 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GameType extends ForgeRegistryEntry<GameType> {
 
-  private final IGameServerFactory gameServerFactory;
-  private final Supplier<SafeCallable<IGameClient<?>>> gameClientFactory;
+  public final static Codec<GameType> CODEC =
+      ResourceLocation.CODEC.xmap(registryName -> CraftingDeadImmerse.getInstance()
+          .getGameTypeRegistry().getValue(registryName), GameType::getRegistryName);
 
-  public GameType(IGameServerFactory gameServerFactory,
-      Supplier<SafeCallable<IGameClient<?>>> gameClientFactory) {
-    this.gameServerFactory = gameServerFactory;
+  private final Codec<? extends IGameServer> gameServerCodec;
+  private final Supplier<SafeCallable<IGameClient>> gameClientFactory;
+
+  public GameType(Codec<? extends IGameServer> gameServerCodec,
+      Supplier<SafeCallable<IGameClient>> gameClientFactory) {
+    this.gameServerCodec = gameServerCodec;
     this.gameClientFactory = gameClientFactory;
   }
 
-  public IGameServer<?> createGameServer(LogicalServer logicalServer,
-      JsonDeserializationContext deserializationContext, JsonObject json) {
-    return this.gameServerFactory.create(logicalServer, deserializationContext, json);
+  public Codec<? extends IGameServer> getGameServerCodec() {
+    return this.gameServerCodec;
   }
 
-  public IGameClient<?> createGameClient() {
-    IGameClient<?> gameClient = DistExecutor.safeCallWhenOn(Dist.CLIENT, this.gameClientFactory);
+  public IGameClient createGameClient() {
+    IGameClient gameClient = DistExecutor.safeCallWhenOn(Dist.CLIENT, this.gameClientFactory);
     if (gameClient == null) {
-      throw new IllegalStateException("Attempting to create game client on wrong dist");
+      throw new IllegalStateException("Attempting to create game client on a server!");
     }
     return gameClient;
   }
 
-  @FunctionalInterface
-  public static interface IGameServerFactory {
-    IGameServer<?> create(LogicalServer logicalServer,
-        JsonDeserializationContext deserializationContext, JsonObject json);
+  public ITextComponent getDisplayName() {
+    return Text.translate(Util.makeTranslationKey("game", this.getRegistryName()));
   }
 }

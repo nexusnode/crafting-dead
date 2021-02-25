@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.game;
 
 import com.craftingdead.core.capability.living.IPlayer;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 
-public interface IGameClient<T extends ITeam> extends IGame<T> {
+public interface IGameClient extends IGame {
 
-  default void load() {}
+  void renderOverlay(IPlayer<? extends AbstractClientPlayerEntity> player,
+      MatrixStack matrixStack, int width, int height, float partialTicks);
 
-  void renderOverlay(Minecraft minecraft, IPlayer<? extends AbstractClientPlayerEntity> player,
+  void renderPlayerList(IPlayer<? extends AbstractClientPlayerEntity> player,
       MatrixStack matrixStack, int width, int height, float partialTicks);
 }
