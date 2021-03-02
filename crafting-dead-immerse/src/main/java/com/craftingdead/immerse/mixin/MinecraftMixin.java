@@ -32,6 +32,6 @@ public abstract class MinecraftMixin {
   @Inject(method = "getWindowTitle", at = @At("HEAD"), cancellable = true)
   private void getWindowTitle(CallbackInfoReturnable<String> callbackInfo) {
     callbackInfo.setReturnValue("Minecraft " + SharedConstants.getVersion().getName() + " - "
-        + CraftingDead.DISPLAY_NAME + " " + CraftingDead.VERSION);
+        + "Crafting Dead " + CraftingDead.VERSION);
   }
 }

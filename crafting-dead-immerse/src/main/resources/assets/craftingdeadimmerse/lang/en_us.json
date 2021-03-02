@@ -8,11 +8,13 @@
     "message.left": "%s has left the game",
 
     "title.warm_up": "Warm Up",
+    "title.game_start": "Let's roll!",
     "title.game_over": "Game Over",
 
     "message.game": "Game",
     "message.no_switch_team": "You can't switch teams right now",
     "message.joined_team": "%s joined %s",
+    "message.buy_time_expired": "Your buy time has expired",
 
     "key.switch_teams": "Switch Teams",
 

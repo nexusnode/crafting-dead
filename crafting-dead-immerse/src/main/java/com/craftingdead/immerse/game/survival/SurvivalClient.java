@@ -18,9 +18,9 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameClient;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -31,11 +31,11 @@ import net.minecraft.util.ResourceLocation;
 public class SurvivalClient extends SurvivalGame implements IGameClient {
 
   private static final ResourceLocation DAYS_SURVIVED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/days_survived.png");
+      new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/days_survived.png");
   private static final ResourceLocation ZOMBIES_KILLED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/zombies_killed.png");
+      new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/zombies_killed.png");
   private static final ResourceLocation PLAYERS_KILLED =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/hud/players_killed.png");
+      new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/players_killed.png");
 
   private final Minecraft minecraft = Minecraft.getInstance();
 

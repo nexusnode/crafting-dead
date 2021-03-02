@@ -195,7 +195,10 @@ public class CraftingDeadImmerse {
 
   @SubscribeEvent
   public void handleServerStopped(FMLServerStoppedEvent event) {
-    MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
-    this.logicalServer = null;
+    // Server may not have fully started yet so could be null
+    if (this.logicalServer != null) {
+      MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
+      this.logicalServer = null;
+    }
   }
 }

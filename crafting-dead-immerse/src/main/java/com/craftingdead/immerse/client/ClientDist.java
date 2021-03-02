@@ -28,6 +28,8 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.event.RenderArmClothingEvent;
+import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
@@ -35,11 +37,15 @@ import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
+import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.game.GameType;
+import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.IGameClient;
 import com.craftingdead.immerse.game.deathmatch.client.SelectTeamScreen;
+import com.craftingdead.immerse.game.team.AbstractTeamGame;
+import com.craftingdead.immerse.game.team.ITeam;
 import com.craftingdead.immerse.game.team.ITeamGame;
 import com.craftingdead.immerse.server.LogicalServer;
 import net.minecraft.client.Minecraft;
@@ -162,6 +168,8 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
 
   private void handleClientSetup(FMLClientSetupEvent event) {
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
+
+    CraftingDead.getInstance().getClientDist().registerPlayerLayer(TeamClothingLayer::new);
 
     // GLFW code needs to run on main thread
     this.minecraft.enqueue(() -> {
@@ -296,6 +304,9 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
                   IPlayer<?> player = IPlayer.getExpected(this.minecraft.player);
                   if (shop.getBuyTimeSeconds(player) > 0) {
                     this.minecraft.displayGuiScreen(new ShopScreen(null, shop, player));
+                  } else {
+                    this.minecraft.ingameGUI.getChatGUI().printChatMessage(
+                        GameUtil.formatMessage(Text.translate("message.buy_time_expired")));
                   }
                 }
               }
@@ -305,6 +316,10 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
               while (SWITCH_TEAMS.isPressed()) {
                 this.minecraft.displayGuiScreen(new SelectTeamScreen());
               }
+            }
+
+            if (this.gameClient.disableSwapHands()) {
+              while (this.minecraft.gameSettings.keyBindSwapHands.isPressed());
             }
           }
         }
@@ -324,6 +339,21 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
         break;
       default:
         break;
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRenderArmClothing(RenderArmClothingEvent event) {
+    if (this.gameClient instanceof AbstractTeamGame) {
+      ITeam team = event.getPlayerEntity()
+          .getCapability(ModCapabilities.LIVING)
+          .<IPlayer<?>>cast()
+          .resolve()
+          .flatMap(((AbstractTeamGame<?>) this.gameClient)::getPlayerTeam)
+          .orElse(null);
+      if (team != null) {
+        team.getSkin().ifPresent(event::setClothingTexture);
+      }
     }
   }
 }

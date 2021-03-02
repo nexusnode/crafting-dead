@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import com.craftingdead.core.action.RemoveMagazineAction;
+import com.craftingdead.core.ammoprovider.RefillableAmmoProvider;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.event.CombatPickupEvent;
 import com.craftingdead.core.event.GunEvent;
@@ -40,7 +40,6 @@ import com.craftingdead.immerse.game.network.SimpleNetworkProtocol;
 import com.craftingdead.immerse.game.team.AbstractTeamGame;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -78,10 +77,6 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
 
   private final Map<UUID, DeathmatchPlayerData> playerData = new Object2ObjectOpenHashMap<>();
   private final Map<UUID, DeathmatchPlayerData> dirtyPlayerData = new Object2ObjectOpenHashMap<>();
-
-  public DeathmatchGame() {
-    this("");
-  }
 
   public DeathmatchGame(String displayName) {
     super(DeathmatchTeam.class);
@@ -180,24 +175,14 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
 
   @SubscribeEvent
   public void handleGunInitialize(GunEvent.Initialize event) {
-    for (int i = 0; i < 3; i++) {
-      event.addMagazineStack(event.getGun().getDefaultMagazineStack());
-    }
+    RefillableAmmoProvider ammoProvider =
+        new RefillableAmmoProvider(event.getGun().getDefaultMagazineStack(), 3, false);
+    event.setAmmoProvider(ammoProvider);
 
     Item item = event.getItemStack().getItem();
     if (item == ModItems.AWP.get() || item == ModItems.M107.get() || item == ModItems.AS50.get()) {
       event.addAttachment(ModItems.LP_SCOPE.get());
     }
-  }
-
-  @SubscribeEvent
-  public void handleRemoveMagazine(LivingEvent.PerformAction<RemoveMagazineAction> event) {
-    event.setCanceled(true);
-  }
-
-  @SubscribeEvent
-  public void handleReloadFinish(GunEvent.ReloadFinish event) {
-    event.setOldMagazineStack(ItemStack.EMPTY);
   }
 
   @SubscribeEvent

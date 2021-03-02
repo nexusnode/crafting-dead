@@ -28,6 +28,10 @@ public interface IGameServer extends IGame {
   static final Codec<IGameServer> CODEC =
       GameType.CODEC.dispatch(IGameServer::getGameType, GameType::getGameServerCodec);
 
+  default boolean disableBlockBurning() {
+    return false;
+  }
+
   void addPlayer(IPlayer<ServerPlayerEntity> player);
 
   void removePlayer(IPlayer<ServerPlayerEntity> player);

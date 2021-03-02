@@ -68,7 +68,11 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
     }
 
     if (this.ghost && this.pendingSpectate != null) {
-      ((ServerPlayerEntity) this.getPlayer().getEntity()).setSpectatingEntity(this.pendingSpectate);
+      if (this.pendingSpectate.isAlive() && !this.pendingSpectate.isSpectator()) {
+        ((ServerPlayerEntity) this.getPlayer().getEntity())
+            .setSpectatingEntity(this.pendingSpectate);
+      }
+      this.pendingSpectate = null;
     }
 
     if (this.secondTicker++ == 20) {
@@ -94,7 +98,7 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
 
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
-    if (this.getRemainingSpawnProtectionSeconds() > 0) {
+    if (this.getRemainingSpawnProtectionSeconds() > 0 || this.isMovementBlocked()) {
       return true;
     }
 

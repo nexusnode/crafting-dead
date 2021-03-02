@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.living.ILivingExtension;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.event.GunEvent;
+import com.craftingdead.core.inventory.CombatSlotType;
+import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameUtil;
@@ -39,7 +41,6 @@ import com.craftingdead.immerse.game.team.TeamInstance;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
@@ -51,6 +52,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -213,6 +215,11 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   }
 
   @Override
+  public boolean disableBlockBurning() {
+    return true;
+  }
+
+  @Override
   public void tick() {
     if (this.stateMachine.getCurrentState().getState() == DeathmatchState.IDLE
         && this.getMinecraftServer().getCurrentPlayerCount() > 0) {
@@ -355,16 +362,14 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
 
   @SubscribeEvent
   public void handleLivingDeath(LivingDeathEvent event) {
-    if (!event.getEntityLiving().getEntityWorld().isRemote()) {
-      if (event.getSource().getTrueSource() instanceof PlayerEntity
-          && event.getEntityLiving() instanceof PlayerEntity && !this.firstBloodDrawn) {
-        GameUtil.sendGameMessageToAll(Text
-            .translate("message.first_blood_drawn",
-                event.getSource().getTrueSource().getDisplayName().getString())
-            .mergeStyle(TextFormatting.DARK_RED), this.getMinecraftServer());
-        this.firstBloodDrawn = true;
-        this.getPlayerData(event.getSource().getTrueSource().getUniqueID()).incrementScore();
-      }
+    if (this.getGameState() == DeathmatchState.GAME
+        && event.getSource().getTrueSource() instanceof ServerPlayerEntity
+        && event.getEntityLiving() instanceof ServerPlayerEntity && !this.firstBloodDrawn) {
+      GameUtil.sendGameMessageToAll(Text
+          .translate("message.first_blood_drawn",
+              event.getSource().getTrueSource().getDisplayName().getString())
+          .mergeStyle(TextFormatting.DARK_RED), this.getMinecraftServer());
+      this.firstBloodDrawn = true;
     }
   }
 
@@ -375,6 +380,15 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
     if (handler != null) {
       DeathmatchPlayerExtension player = (DeathmatchPlayerExtension) handler;
       player.setRemainingSpawnProtectionSeconds(0);
+    }
+  }
+
+  @SubscribeEvent
+  public void handleEntityJoinWorld(EntityJoinWorldEvent event) {
+    if (event.getEntity() instanceof ServerPlayerEntity) {
+      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
+      CombatSlotType.MELEE.addToInventory(ModItems.COMBAT_KNIFE.get().getDefaultInstance(),
+          playerEntity.inventory, false);
     }
   }
 

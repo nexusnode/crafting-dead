@@ -66,6 +66,10 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
   private boolean sentInitialTeamRequest = false;
 
+  public DeathmatchClient() {
+    super("");
+  }
+
   private ITextComponent getTimer() {
     int totalSeconds = this.getTimerValueSeconds();
     int mins = totalSeconds / 60;
@@ -88,6 +92,11 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
     return Text.of(mins + ":" + (seconds < 10 ? "0" : "") + seconds).mergeStyle(TextFormatting.BOLD,
         colour);
+  }
+
+  @Override
+  public boolean disableSwapHands() {
+    return true;
   }
 
   @SubscribeEvent
@@ -118,20 +127,30 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
   @Override
   public void tick() {
-    if (this.getGameState() != this.lastGameState) {
+    if (this.getGameState() != this.lastGameState && this.minecraft.player != null
+        && this.getPlayerTeam(IPlayer.getExpected(this.minecraft.player)).isPresent()) {
       this.lastGameState = this.getGameState();
 
-      // Warm Up Notification
-      if (this.getGameState() == DeathmatchState.PRE_GAME) {
-        this.minecraft.ingameGUI.setDefaultTitlesTimes();
-        this.minecraft.ingameGUI.func_238452_a_(Text.translate("title.warm_up"), null, -1, -1, -1);
-      }
 
-      // Post Game Notification
-      if (this.getGameState() == DeathmatchState.POST_GAME) {
-        this.minecraft.ingameGUI.setDefaultTitlesTimes();
-        this.minecraft.ingameGUI.func_238452_a_(
-            Text.translate("title.game_over").mergeStyle(TextFormatting.YELLOW), null, -1, -1, -1);
+      switch (this.getGameState()) {
+        case PRE_GAME:
+          this.minecraft.ingameGUI.setDefaultTitlesTimes();
+          this.minecraft.ingameGUI.func_238452_a_(
+              Text.translate("title.warm_up").mergeStyle(TextFormatting.YELLOW), null, -1, -1, -1);
+          break;
+        case GAME:
+          this.minecraft.ingameGUI.setDefaultTitlesTimes();
+          this.minecraft.ingameGUI.func_238452_a_(
+              Text.translate("title.game_start").mergeStyle(TextFormatting.AQUA), null, -1, -1,
+              -1);
+          break;
+        case POST_GAME:
+          this.minecraft.ingameGUI.setDefaultTitlesTimes();
+          this.minecraft.ingameGUI.func_238452_a_(
+              Text.translate("title.game_over").mergeStyle(TextFormatting.RED), null, -1, -1, -1);
+          break;
+        default:
+          break;
       }
     }
 

@@ -7,12 +7,12 @@
         "MinecraftMixin",
         "GameRendererMixin",
         "FirstPersonRendererAccessor",
-        "PlayerControllerMixin",
-        "PlayerRendererMixin"
+        "PlayerControllerMixin"
     ],
     "mixins": [
         "PlayerDataMixin",
-        "ServerPlayerEntityMixin"
+        "ServerPlayerEntityMixin",
+        "FireBlockMixin"
     ],
     "injectors": {
         "defaultRequire": 1

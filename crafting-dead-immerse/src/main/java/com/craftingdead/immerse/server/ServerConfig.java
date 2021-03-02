@@ -30,7 +30,7 @@ public class ServerConfig {
     builder.push("server");
     {
       this.gameRotation = builder.translation("options.craftingdeadimmerse.server.game_rotation")
-          .defineList("game_rotation", ImmutableList.of("default"), gameName -> true);
+          .defineList("game_rotation", ImmutableList.of(), gameName -> true);
     }
     builder.pop();
   }

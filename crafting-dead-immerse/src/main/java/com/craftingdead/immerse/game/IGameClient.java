@@ -24,6 +24,10 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 
 public interface IGameClient extends IGame {
 
+  default boolean disableSwapHands() {
+    return false;
+  }
+
   void renderOverlay(IPlayer<? extends AbstractClientPlayerEntity> player,
       MatrixStack matrixStack, int width, int height, float partialTicks);
 
