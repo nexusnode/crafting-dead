@@ -28,7 +28,6 @@ jobs:
     - name: Build with Gradle
       run: |
        ./gradlew build
-       ./gradlew jar
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead
