@@ -18,13 +18,15 @@
 
 package com.craftingdead.core.entity.monster;
 
+import com.craftingdead.core.ammoprovider.RefillableAmmoProvider;
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.item.ModItems;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class GiantZombieEntity extends AdvancedZombieEntity {
@@ -34,18 +36,21 @@ public class GiantZombieEntity extends AdvancedZombieEntity {
   }
 
   @Override
-  protected Item getMelee() {
-    return ModItems.M4A1.get();
+  protected ItemStack getHeldStack() {
+    ItemStack gunStack = ModItems.M4A1.get().getDefaultInstance();
+    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setAmmoProvider(
+        new RefillableAmmoProvider(ModItems.RPK_MAGAZINE.get().getDefaultInstance(), 0, true)));
+    return gunStack;
   }
 
   @Override
-  protected Item getClothing() {
-    return ModItems.ARMY_CLOTHING.get();
+  protected ItemStack getClothingStack() {
+    return ModItems.ARMY_CLOTHING.get().getDefaultInstance();
   }
 
   @Override
-  protected Item getHat() {
-    return ModItems.ARMY_HELMET.get();
+  protected ItemStack getHatStack() {
+    return ModItems.ARMY_HELMET.get().getDefaultInstance();
   }
 
   public static AttributeModifierMap.MutableAttribute registerAttributes() {

@@ -20,13 +20,13 @@ package com.craftingdead.core.capability.gun;
 
 import java.util.Optional;
 import java.util.Set;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.combatitem.ICombatItem;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.FireMode;
@@ -37,7 +37,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.items.IItemHandler;
 
 public interface IGun extends INBTSerializable<CompoundNBT>, ICombatItem, IBufferSerializable {
 
@@ -49,30 +48,10 @@ public interface IGun extends INBTSerializable<CompoundNBT>, ICombatItem, IBuffe
 
   boolean isTriggerPressed();
 
-  void reload(ILiving<?, ?> living);
-
-  void removeMagazine(ILiving<?, ?> living);
-
   void validatePendingHit(IPlayer<ServerPlayerEntity> player, ILiving<?, ?> hitLiving,
       PendingHit pendingHit);
 
   float getAccuracy(ILiving<?, ?> living);
-
-  ItemStack getMagazineStack();
-
-  void setMagazineStack(ItemStack magazineStack);
-
-  default Optional<IMagazine> getMagazine() {
-    return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE).resolve();
-  }
-
-  default int getMagazineSize() {
-    return this.getMagazine().map(IMagazine::getSize).orElse(0);
-  }
-
-  default void setMagazineSize(int size) {
-    this.getMagazine().ifPresent(magazine -> magazine.setSize(size));
-  }
 
   Set<AttachmentItem> getAttachments();
 
@@ -110,8 +89,6 @@ public interface IGun extends INBTSerializable<CompoundNBT>, ICombatItem, IBuffe
 
   RightMouseActionTriggerType getRightMouseActionTriggerType();
 
-  Set<? extends Item> getAcceptedMagazines();
-
   Optional<SoundEvent> getReloadSound();
 
   int getReloadDurationTicks();
@@ -126,11 +103,13 @@ public interface IGun extends INBTSerializable<CompoundNBT>, ICombatItem, IBuffe
 
   IGunClient getClient();
 
+  IAmmoProvider getAmmoProvider();
+
+  void setAmmoProvider(IAmmoProvider ammoProvider);
+
+  Set<? extends Item> getAcceptedMagazines();
+
   ItemStack getDefaultMagazineStack();
-
-  IItemHandler getAmmoReserve();
-
-  int getAmmoReserveSize();
 
   public static enum RightMouseActionTriggerType {
     HOLD, CLICK;

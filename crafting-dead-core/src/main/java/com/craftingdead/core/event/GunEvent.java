@@ -18,20 +18,16 @@
 
 package com.craftingdead.core.event;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.item.AttachmentItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.items.IItemHandler;
 
 public abstract class GunEvent extends Event {
 
@@ -51,30 +47,6 @@ public abstract class GunEvent extends Event {
     return itemStack;
   }
 
-  public static class CollectAmmoProviders extends GunEvent {
-
-    private final ILiving<?, ?> living;
-
-    private final List<IItemHandler> ammoProviders = new ArrayList<>();
-
-    public CollectAmmoProviders(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
-      super(gun, itemStack);
-      this.living = living;
-    }
-
-    public ILiving<?, ?> getLiving() {
-      return living;
-    }
-
-    public void addAmmoProvider(IItemHandler ammoProvider) {
-      this.ammoProviders.add(ammoProvider);
-    }
-
-    public Collection<IItemHandler> getAmmoProviders() {
-      return Collections.unmodifiableCollection(this.ammoProviders);
-    }
-  }
-
   @Cancelable
   public static class TriggerPressed extends GunEvent {
 
@@ -92,22 +64,20 @@ public abstract class GunEvent extends Event {
 
   public static class Initialize extends GunEvent {
 
-    private final NonNullList<ItemStack> ammoReserve = NonNullList.create();
     private final Set<AttachmentItem> attachments = new HashSet<>();
+    private IAmmoProvider ammoProvider;
 
-    public Initialize(IGun gun, ItemStack itemStack) {
+    public Initialize(IGun gun, ItemStack itemStack, IAmmoProvider ammoProvider) {
       super(gun, itemStack);
+      this.ammoProvider = ammoProvider;
     }
 
-    public void addMagazineStack(ItemStack itemStack) {
-      if (!this.getGun().getAcceptedMagazines().contains(itemStack.getItem())) {
-        throw new IllegalArgumentException("Invalid magazine");
-      }
-      this.ammoReserve.add(itemStack);
+    public void setAmmoProvider(IAmmoProvider ammoProvider) {
+      this.ammoProvider = ammoProvider;
     }
 
-    public Collection<ItemStack> getAmmoReserve() {
-      return Collections.unmodifiableCollection(this.ammoReserve);
+    public IAmmoProvider getAmmoProvider() {
+      return this.ammoProvider;
     }
 
     public void addAttachment(AttachmentItem attachment) {

@@ -18,8 +18,6 @@
 
 package com.craftingdead.core.capability.gun;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +32,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.action.ReloadAction;
-import com.craftingdead.core.action.RemoveMagazineAction;
+import com.craftingdead.core.ammoprovider.AmmoProviderType;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
-import com.craftingdead.core.capability.clothing.IClothing;
+import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.capability.living.EntitySnapshot;
 import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
@@ -97,7 +95,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.CombatRules;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
@@ -110,14 +107,13 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class GunImpl implements IGun {
@@ -127,7 +123,10 @@ public class GunImpl implements IGun {
   private static final AtomicIntegerFieldUpdater<GunImpl> triggerPressedUpdater =
       AtomicIntegerFieldUpdater.newUpdater(GunImpl.class, "triggerPressed");
 
-  private static final int BASE_LATENCY = 4;
+  /**
+   * The constant difference between server and client entity positions.
+   */
+  private static final int BASE_SNAPSHOT_TICK_OFFSET = 3;
 
   public static final float HEADSHOT_MULTIPLIER = 4;
 
@@ -139,11 +138,10 @@ public class GunImpl implements IGun {
   private static final ExecutorService executorSerivce = Executors.newCachedThreadPool(
       new ThreadFactoryBuilder()
           .setNameFormat("gun-pool-%s")
+          .setDaemon(true)
           .build());
   // @formatter:on
 
-  private static final DataParameter<ItemStack> MAGAZINE_STACK =
-      new DataParameter<>(0x00, DataSerializers.ITEMSTACK);
   private static final DataParameter<ItemStack> PAINT_STACK =
       new DataParameter<>(0x01, DataSerializers.ITEMSTACK);
 
@@ -194,12 +192,11 @@ public class GunImpl implements IGun {
 
   private final IGunClient clientHandler;
 
-  private final IItemHandlerModifiable ammoReserve;
-  private boolean ammoReserveDirty;
-  private int cachedAmmoReserveSize;
-
   // Used to ensure the gun thread gets killed if we're not being ticked anymore.
   private volatile long lastTickMs;
+
+  private IAmmoProvider ammoProvider;
+  private boolean ammoProviderChanged;
 
   public GunImpl() {
     throw new UnsupportedOperationException("Specify gun item");
@@ -213,42 +210,14 @@ public class GunImpl implements IGun {
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.clientHandler = this.createClientHandler();
 
-    GunEvent.Initialize event = new GunEvent.Initialize(this, gunStack);
+    GunEvent.Initialize event =
+        new GunEvent.Initialize(this, gunStack, gunProvider.createAmmoProvider());
     MinecraftForge.EVENT_BUS.post(event);
 
+    this.setAmmoProvider(event.getAmmoProvider());
     this.attachments = new HashSet<>(event.getAttachments());
 
-    Collection<ItemStack> ammoReserve = event.getAmmoReserve();
-    if (ammoReserve.isEmpty()) {
-      ammoReserve = Collections.singleton(this.getDefaultMagazineStack());
-    }
-
-    this.ammoReserve =
-        new ItemStackHandler(NonNullList.from(null, ammoReserve.toArray(new ItemStack[0]))) {
-          @Override
-          protected void onContentsChanged(int slot) {
-            GunImpl.this.updateAmmoReserveSize();
-            GunImpl.this.ammoReserveDirty = true;
-          }
-        };
-
-    this.dataManager.register(MAGAZINE_STACK, this.ammoReserve.extractItem(0, 1, false));
     this.dataManager.register(PAINT_STACK, ItemStack.EMPTY);
-
-    this.updateAmmoReserveSize();
-  }
-
-  private void updateAmmoReserveSize() {
-    this.cachedAmmoReserveSize = 0;
-    for (int i = 0; i < this.ammoReserve.getSlots(); i++) {
-      ItemStack itemStack = this.ammoReserve.getStackInSlot(i);
-      if (!itemStack.isEmpty()) {
-        this.cachedAmmoReserveSize += itemStack
-            .getCapability(ModCapabilities.MAGAZINE)
-            .orElseThrow(() -> new IllegalStateException("Expecting magazine capability"))
-            .getSize();
-      }
-    }
   }
 
   protected IGunClient createClientHandler() {
@@ -328,16 +297,6 @@ public class GunImpl implements IGun {
   }
 
   @Override
-  public void reload(ILiving<?, ?> living) {
-    living.performAction(new ReloadAction(living), true);
-  }
-
-  @Override
-  public void removeMagazine(ILiving<?, ?> living) {
-    living.performAction(new RemoveMagazineAction(living), true);
-  }
-
-  @Override
   public void validatePendingHit(IPlayer<ServerPlayerEntity> player,
       ILiving<?, ?> hitLiving, PendingHit pendingHit) {
     final byte tickOffset = pendingHit.getTickOffset();
@@ -346,22 +305,30 @@ public class GunImpl implements IGun {
       return;
     }
 
-    int latencyTicks = player.getEntity().ping / 1000 / 20 + tickOffset + BASE_LATENCY;
+    int latencyTicks = (player.getEntity().ping / 1000) * 20 + tickOffset;
     int tick = player.getEntity().getServer().getTickCounter();
 
     if (tick - latencyTicks > this.triggerPressedTicks && !this.isTriggerPressed()) {
       return;
     }
 
-    EntitySnapshot playerSnapshot = player.getSnapshot(tick - tickOffset)
-        .map(s -> s.combineUntrustedSnapshot(pendingHit.getPlayerSnapshot()))
-        .orElse(null);
+    EntitySnapshot playerSnapshot;
+    try {
+      playerSnapshot = player.getSnapshot(tick - latencyTicks)
+          .combineUntrustedSnapshot(pendingHit.getPlayerSnapshot());
+    } catch (IndexOutOfBoundsException e) {
+      return;
+    }
 
-    EntitySnapshot hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks)
-        .map(s -> s.combineUntrustedSnapshot(pendingHit.getHitSnapshot()))
-        .orElse(null);
+    EntitySnapshot hitSnapshot;
+    try {
+      hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks - BASE_SNAPSHOT_TICK_OFFSET)
+          .combineUntrustedSnapshot(pendingHit.getHitSnapshot());
+    } catch (IndexOutOfBoundsException e) {
+      return;
+    }
 
-    if (playerSnapshot != null && hitSnapshot != null && !hitLiving.getEntity().getShouldBeDead()) {
+    if (!hitLiving.getEntity().getShouldBeDead()) {
       random.setSeed(pendingHit.getRandomSeed());
       // @formatter:off
       hitSnapshot
@@ -369,6 +336,7 @@ public class GunImpl implements IGun {
               playerSnapshot,
               this.gunProvider.getRange(),
               this.getAccuracy(player),
+              shotCount,
               random)
           .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
       // @formatter:on
@@ -385,18 +353,13 @@ public class GunImpl implements IGun {
     final Entity entity = living.getEntity();
 
     // Magazine size will be synced to clients so only decrement this on the server.
-    if (!entity.getEntityWorld().isRemote()
-        && !(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative())) {
+    if (!entity.getEntityWorld().isRemote() && !(living.getEntity() instanceof PlayerEntity
+        && ((PlayerEntity) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, this.gunStack);
       if (!UnbreakingEnchantment.negateDamage(this.gunStack, unbreakingLevel, random)) {
-        this.getMagazine().ifPresent(IMagazine::decrementSize);
+        this.ammoProvider.getExpectedMagazine().decrementSize();
       }
-    }
-
-    float partialTicks = 1.0F;
-    if (entity.getEntityWorld().isRemote()) {
-      partialTicks = this.clientHandler.getPartialTicks();
     }
 
     // Used to avoid playing the same hit sound more than once.
@@ -408,8 +371,8 @@ public class GunImpl implements IGun {
       RayTraceResult rayTraceResult = RayTraceUtil
           .rayTrace(entity,
               this.gunProvider.getRange(),
-              partialTicks,
               this.getAccuracy(living),
+              this.shotCount,
               random)
           .orElse(null);
       // @formatter:on
@@ -436,7 +399,9 @@ public class GunImpl implements IGun {
             if (entityRayTraceResult.getEntity() instanceof ServerPlayerEntity
                 && entity instanceof ServerPlayerEntity) {
               break;
-            } else if (entity.getEntityWorld().isRemote()) {
+            }
+
+            if (entity.getEntityWorld().isRemote()) {
               this.clientHandler.handleHitEntityPre(living,
                   entityRayTraceResult.getEntity(),
                   entityRayTraceResult.getHitVec(), randomSeed);
@@ -468,11 +433,11 @@ public class GunImpl implements IGun {
         living.getEntity().getEntityWorld().isRemote() ? LogicalSide.CLIENT : LogicalSide.SERVER;
     Executor executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
-    if (this.getMagazineSize() <= 0) {
+    if (this.ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0) <= 0) {
       if (side.isServer()) {
         executor.execute(() -> {
           living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-          this.reload(living);
+          this.ammoProvider.reload(living);
         });
       }
       this.setTriggerPressed(false);
@@ -511,7 +476,7 @@ public class GunImpl implements IGun {
     float armorPenetration = Math.min((1.0F
         + (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
             this.gunStack) / 255.0F))
-        * this.getMagazine().map(IMagazine::getArmorPenetration).orElse(0.0F), 1.0F);
+        * this.ammoProvider.getExpectedMagazine().getArmorPenetration(), 1.0F);
     if (armorPenetration > 0 && hitEntity instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) hitEntity;
       float reducedDamage = damage - CombatRules
@@ -523,14 +488,22 @@ public class GunImpl implements IGun {
       damage += reducedDamage * armorPenetration;
     }
 
-    double chinHeight = (hitEntity.getPosY() + hitEntity.getEyeHeight() - 0.2F);
-    boolean headshot = (hitEntity instanceof PlayerEntity || hitEntity instanceof ZombieEntity
-        || hitEntity instanceof SkeletonEntity || hitEntity instanceof CreeperEntity
-        || hitEntity instanceof EndermanEntity || hitEntity instanceof WitchEntity
-        || hitEntity instanceof VillagerEntity || hitEntity instanceof VindicatorEntity
-        || hitEntity instanceof WanderingTraderEntity) && hitPos.y >= chinHeight;
-    if (headshot) {
-      damage *= HEADSHOT_MULTIPLIER;
+    boolean headshot = false;
+    if (hitEntity instanceof LivingEntity) {
+      ILiving<?, ?> hitLiving = ILiving.getExpected((LivingEntity) hitEntity);
+      double chinHeight = (hitEntity.getPosY() + hitEntity.getEyeHeight() - 0.2F);
+      headshot = (hitEntity instanceof PlayerEntity || hitEntity instanceof ZombieEntity
+          || hitEntity instanceof SkeletonEntity || hitEntity instanceof CreeperEntity
+          || hitEntity instanceof EndermanEntity || hitEntity instanceof WitchEntity
+          || hitEntity instanceof VillagerEntity || hitEntity instanceof VindicatorEntity
+          || hitEntity instanceof WanderingTraderEntity) && hitPos.y >= chinHeight;
+      if (headshot) {
+        damage *= HEADSHOT_MULTIPLIER * (1.0F - hitLiving.getItemHandler()
+            .getStackInSlot(InventorySlotType.HAT.getIndex())
+            .getCapability(ModCapabilities.HAT)
+            .map(IHat::getHeadshotReductionPercentage)
+            .orElse(0.0F));
+      }
     }
 
     // Simulated client-side effects
@@ -572,8 +545,9 @@ public class GunImpl implements IGun {
                   * hitPlayer.getItemHandler()
                       .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
                       .getCapability(ModCapabilities.CLOTHING)
-                      .filter(IClothing::hasEnhancedProtection)
-                      .map(clothing -> 0.5F).orElse(1.0F));
+                      .map(clothing -> clothing
+                          .hasEnhancedProtection() ? 0.5F : 0.0F)
+                      .orElse(1.0F));
         }
       }
     }
@@ -624,11 +598,6 @@ public class GunImpl implements IGun {
     float accuracy =
         this.gunProvider.getAccuracyPct() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
     return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
-  }
-
-  @Override
-  public ItemStack getMagazineStack() {
-    return this.dataManager.get(MAGAZINE_STACK);
   }
 
   @Override
@@ -725,93 +694,6 @@ public class GunImpl implements IGun {
     return this.gunProvider.getRightMouseActionTriggerType();
   }
 
-  @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
-    nbt.put("magazineStack", this.getMagazineStack().serializeNBT());
-    ListNBT attachmentsTag = this.attachments
-        .stream()
-        .map(attachment -> StringNBT.valueOf(attachment.getRegistryName().toString()))
-        .collect(ListNBT::new, ListNBT::add, List::addAll);
-    nbt.put("attachments", attachmentsTag);
-    nbt.put("paintStack", this.getPaintStack().serializeNBT());
-    return nbt;
-  }
-
-  @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    this.setMagazineStack(ItemStack.read(nbt.getCompound("magazineStack")));
-    this.setAttachments(nbt.getList("attachments", 8)
-        .stream()
-        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
-            .getValue(new ResourceLocation(tag.getString())))
-        .collect(Collectors.toSet()));
-    this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
-  }
-
-  @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
-    NetworkDataManager
-        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
-    if (writeAll || this.attachmentsDirty) {
-      out.writeVarInt(this.attachments.size());
-      for (Item item : this.attachments) {
-        out.writeRegistryId(item);
-      }
-    } else {
-      out.writeVarInt(-1);
-    }
-    this.attachmentsDirty = false;
-
-    this.getMagazine().ifPresent(magazine -> magazine.encode(out, writeAll));
-
-    if (writeAll || this.ammoReserveDirty) {
-      for (int i = 0; i < this.ammoReserve.getSlots(); i++) {
-        out.writeVarInt(i);
-        out.writeItemStack(this.ammoReserve.getStackInSlot(i));
-      }
-    }
-    out.writeVarInt(-1);
-
-    this.ammoReserveDirty = false;
-  }
-
-  @Override
-  public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
-
-    int size = in.readVarInt();
-    if (size > -1) {
-      this.attachments.clear();
-      for (int i = 0; i < size; i++) {
-        this.attachments.add((AttachmentItem) in.readRegistryIdSafe(Item.class));
-      }
-    }
-
-    this.getMagazine().ifPresent(magazine -> magazine.decode(in));
-
-    int slot;
-    while ((slot = in.readVarInt()) != -1) {
-      this.ammoReserve.setStackInSlot(slot, in.readItemStack());
-    }
-    this.updateAmmoReserveSize();
-  }
-
-  @Override
-  public boolean requiresSync() {
-    return this.attachmentsDirty || this.dataManager.isDirty()
-        || this.getMagazine().map(IMagazine::requiresSync).orElse(false);
-  }
-
-  @Override
-  public void setMagazineStack(ItemStack magazineStack) {
-    this.dataManager.set(MAGAZINE_STACK, magazineStack);
-  }
-
-  @Override
-  public Set<? extends Item> getAcceptedMagazines() {
-    return this.gunProvider.getAcceptedMagazines();
-  }
 
   @Override
   public Optional<SoundEvent> getReloadSound() {
@@ -855,8 +737,19 @@ public class GunImpl implements IGun {
   }
 
   @Override
-  public CombatSlotType getSlotType() {
-    return this.gunProvider.getCombatSlotType();
+  public IAmmoProvider getAmmoProvider() {
+    return this.ammoProvider;
+  }
+
+  @Override
+  public void setAmmoProvider(IAmmoProvider ammoProvider) {
+    this.ammoProvider = ammoProvider;
+    this.ammoProviderChanged = true;
+  }
+
+  @Override
+  public Set<? extends Item> getAcceptedMagazines() {
+    return this.gunProvider.getAcceptedMagazines();
   }
 
   @Override
@@ -865,13 +758,86 @@ public class GunImpl implements IGun {
   }
 
   @Override
-  public IItemHandler getAmmoReserve() {
-    return this.ammoReserve;
+  public CompoundNBT serializeNBT() {
+    CompoundNBT nbt = new CompoundNBT();
+    nbt.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
+    nbt.put("ammoProvider", this.ammoProvider.serializeNBT());
+    ListNBT attachmentsTag = this.attachments
+        .stream()
+        .map(attachment -> StringNBT.valueOf(attachment.getRegistryName().toString()))
+        .collect(ListNBT::new, ListNBT::add, List::addAll);
+    nbt.put("attachments", attachmentsTag);
+    nbt.put("paintStack", this.getPaintStack().serializeNBT());
+    return nbt;
   }
 
   @Override
-  public int getAmmoReserveSize() {
-    return this.cachedAmmoReserveSize;
+  public void deserializeNBT(CompoundNBT nbt) {
+    if (nbt.contains("ammoProviderType", Constants.NBT.TAG_STRING)) {
+      this.setAmmoProvider(GameRegistry.findRegistry(AmmoProviderType.class)
+          .getValue(new ResourceLocation(nbt.getString("ammoProviderType"))).create());
+      this.ammoProvider.deserializeNBT(nbt.getCompound("ammoProvider"));
+      this.ammoProviderChanged = true;
+    }
+    this.setAttachments(nbt.getList("attachments", 8)
+        .stream()
+        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
+            .getValue(new ResourceLocation(tag.getString())))
+        .collect(Collectors.toSet()));
+    this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
+  }
+
+  @Override
+  public void encode(PacketBuffer out, boolean writeAll) {
+    NetworkDataManager
+        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    if (writeAll || this.attachmentsDirty) {
+      out.writeVarInt(this.attachments.size());
+      for (Item item : this.attachments) {
+        out.writeRegistryId(item);
+      }
+    } else {
+      out.writeVarInt(-1);
+    }
+    this.attachmentsDirty = false;
+
+    if (this.ammoProviderChanged || writeAll) {
+      out.writeBoolean(true);
+      out.writeRegistryId(this.ammoProvider.getType());
+    } else {
+      out.writeBoolean(false);
+    }
+    this.ammoProvider.encode(out, this.ammoProviderChanged || writeAll);
+    this.ammoProviderChanged = false;
+  }
+
+  @Override
+  public void decode(PacketBuffer in) {
+    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+
+    int size = in.readVarInt();
+    if (size > -1) {
+      this.attachments.clear();
+      for (int i = 0; i < size; i++) {
+        this.attachments.add((AttachmentItem) in.readRegistryIdSafe(Item.class));
+      }
+    }
+
+    if (in.readBoolean()) {
+      this.ammoProvider = in.readRegistryIdSafe(AmmoProviderType.class).create();
+    }
+    this.ammoProvider.decode(in);
+  }
+
+  @Override
+  public boolean requiresSync() {
+    return this.attachmentsDirty || this.dataManager.isDirty()
+        || this.ammoProvider.requiresSync();
+  }
+
+  @Override
+  public CombatSlotType getSlotType() {
+    return this.gunProvider.getCombatSlotType();
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,

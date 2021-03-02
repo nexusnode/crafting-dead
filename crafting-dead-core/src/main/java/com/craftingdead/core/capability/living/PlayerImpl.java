@@ -243,8 +243,8 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
       float bleedChance = 0.1F * amount
           * this.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
               .getCapability(ModCapabilities.CLOTHING)
-              .filter(IClothing::hasEnhancedProtection)
-              .map(clothing -> 0.5F).orElse(1.0F);
+              .map(clothing -> clothing.hasEnhancedProtection() ? 0.5F : 0.0F)
+              .orElse(1.0F);
       if (random.nextFloat() < bleedChance
           && !this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
         this.getEntity()

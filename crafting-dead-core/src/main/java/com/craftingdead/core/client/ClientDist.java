@@ -27,6 +27,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.client.audio.EffectsManager;
@@ -52,6 +53,7 @@ import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
+import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.GunItem;
@@ -67,7 +69,6 @@ import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.util.MutableVector2f;
 import com.craftingdead.core.util.Text;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -77,7 +78,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -201,6 +201,7 @@ public class ClientDist implements IModDist {
     modBus.addListener(this::handleItemColor);
     modBus.addListener(this::handleTextureStitch);
     modBus.addListener(this::handleSoundLoad);
+    modBus.addListener(this::handleConfigReloading);
 
     MinecraftForge.EVENT_BUS.register(this);
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
@@ -212,7 +213,8 @@ public class ClientDist implements IModDist {
       ((IReloadableResourceManager) this.minecraft.getResourceManager())
           .addReloadListener(this.crosshairManager);
     }
-    this.ingameGui = new IngameGui(this.minecraft, this, CrosshairManager.DEFAULT_CROSSHAIR);
+    this.ingameGui =
+        new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
     this.itemRendererManager = new ItemRendererManager();
     this.cameraManager = new CameraManager();
   }
@@ -284,6 +286,12 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleSoundLoad(SoundLoadEvent event) {
     this.effectsManager = new EffectsManager(event.getManager());
+  }
+
+  private void handleConfigReloading(ModConfig.Reloading event) {
+    if (event.getConfig().getSpec() == clientConfigSpec) {
+      this.ingameGui.setCrosshairLocation(new ResourceLocation(clientConfig.crosshair.get()));
+    }
   }
 
   private void handleModelRegistry(ModelRegistryEvent event) {
@@ -399,7 +407,7 @@ public class ClientDist implements IModDist {
    * @param function - {@link Function} with a {@link PlayerRenderer} as input and a
    *        {@link LayerRenderer} as output.
    */
-  private void registerPlayerLayer(
+  public void registerPlayerLayer(
       Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
     // A little dirty way, blame Mojang
     this.minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
@@ -518,10 +526,10 @@ public class ClientDist implements IModDist {
               gun.toggleFireMode(player, true);
             }
             while (RELOAD.isPressed()) {
-              gun.reload(player);
+              gun.getAmmoProvider().reload(player);
             }
             while (REMOVE_MAGAZINE.isPressed()) {
-              gun.removeMagazine(player);
+              gun.getAmmoProvider().unload(player);
             }
           }
 
@@ -649,29 +657,25 @@ public class ClientDist implements IModDist {
         event.setCanceled(player.isCombatModeEnabled());
         break;
       case ALL:
-        if (player != null) {
-          this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
-              event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
-              event.getPartialTicks());
-        }
+        this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
+            event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
+            event.getPartialTicks());
         break;
       case CROSSHAIRS:
-        if (player != null) {
-          boolean isAiming = heldStack.getCapability(ModCapabilities.SCOPE)
-              .map(scope -> scope.isAiming(this.minecraft.player))
-              .orElse(false);
-          if (player.isMonitoringAction() || isAiming) {
-            event.setCanceled(true);
-            break;
-          }
+        boolean isAiming = heldStack.getCapability(ModCapabilities.SCOPE)
+            .map(scope -> scope.isAiming(player.getEntity()))
+            .orElse(false);
+        if (player.isMonitoringAction() || isAiming) {
+          event.setCanceled(true);
+          break;
+        }
 
-          if (gun != null) {
-            event.setCanceled(true);
-            if (gun.hasCrosshair()) {
-              this.ingameGui.renderCrosshairs(gun.getAccuracy(player),
-                  event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                  event.getWindow().getScaledHeight());
-            }
+        if (gun != null) {
+          event.setCanceled(true);
+          if (gun.hasCrosshair()) {
+            this.ingameGui.renderCrosshairs(gun.getAccuracy(player),
+                event.getPartialTicks(), event.getWindow().getScaledWidth(),
+                event.getWindow().getScaledHeight());
           }
         }
         break;
@@ -781,50 +785,46 @@ public class ClientDist implements IModDist {
   }
 
   // ================================================================================
-  // ASM Hooks
+  // Hooks
   // ================================================================================
 
-  public static boolean renderLivingPre(LivingRenderer<?, ?> renderer, final LivingEntity entity,
-      final MatrixStack matrixStack, final IVertexBuilder builder, final int light,
-      final int overlay, final float limbSwing, final float limbSwingAmount, final float ageInTicks,
-      final float netHeadYaw, final float headPitch) {
-    return false;
-  }
-
-  public static void renderLivingPost(LivingRenderer<?, ?> renderer, final LivingEntity entity,
-      final MatrixStack matrixStack, final IVertexBuilder builder, final int light,
-      final int overlay, final float limbSwing, final float limbSwingAmount, final float ageInTicks,
-      final float netHeadYaw, final float headPitch) {}
-
+  /**
+   * @see com.craftingdead.core.mixin.PlayerRendererMixin
+   */
   public static void renderArmWithClothing(PlayerRenderer renderer, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer,
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
       ModelRenderer armwearRenderer) {
-    playerEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
-      String skinType = playerEntity.getSkinType();
-      ItemStack clothingStack =
-          living.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-      clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
-        ResourceLocation clothingSkin = clothing.getTexture(skinType);
 
-        PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getEntityModel();
-        playerModel.swingProgress = 0.0F;
-        playerModel.isSneak = false;
-        playerModel.swimAnimation = 0.0F;
-        playerModel.setRotationAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+    ResourceLocation clothingTexture = playerEntity.getCapability(ModCapabilities.LIVING)
+        .map(ILiving::getItemHandler)
+        .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
+        .flatMap(clothingStack -> clothingStack.getCapability(ModCapabilities.CLOTHING).resolve())
+        .map(clothing -> clothing.getTexture(playerEntity.getSkinType()))
+        .orElse(null);
 
-        armRenderer.showModel = true;
-        armwearRenderer.showModel = true;
+    RenderArmClothingEvent event = new RenderArmClothingEvent(playerEntity, clothingTexture);
+    MinecraftForge.EVENT_BUS.post(event);
+    clothingTexture = event.getClothingTexture();
 
-        armRenderer.rotateAngleX = 0.0F;
-        armRenderer.render(matrixStack,
-            renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
-            OverlayTexture.NO_OVERLAY);
-        armwearRenderer.rotateAngleX = 0.0F;
-        armwearRenderer.render(matrixStack,
-            renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingSkin)), packedLight,
-            OverlayTexture.NO_OVERLAY);
-      });
-    });
+    if (clothingTexture != null) {
+      PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getEntityModel();
+      playerModel.swingProgress = 0.0F;
+      playerModel.isSneak = false;
+      playerModel.swimAnimation = 0.0F;
+      playerModel.setRotationAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+
+      armRenderer.showModel = true;
+      armwearRenderer.showModel = true;
+
+      armRenderer.rotateAngleX = 0.0F;
+      armRenderer.render(matrixStack,
+          renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingTexture)), packedLight,
+          OverlayTexture.NO_OVERLAY);
+      armwearRenderer.rotateAngleX = 0.0F;
+      armwearRenderer.render(matrixStack,
+          renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingTexture)), packedLight,
+          OverlayTexture.NO_OVERLAY);
+    }
   }
 }

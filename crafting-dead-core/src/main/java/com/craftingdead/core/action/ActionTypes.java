@@ -23,6 +23,8 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.item.BlockActionEntry;
 import com.craftingdead.core.action.item.EntityActionEntry;
 import com.craftingdead.core.action.item.UseItemAction;
+import com.craftingdead.core.action.reload.MagazineReloadAction;
+import com.craftingdead.core.action.reload.RefillableReloadAction;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.ModDamageSource;
@@ -46,8 +48,15 @@ public class ActionTypes {
   public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
       DeferredRegister.create((Class<ActionType<?>>) (Class<?>) ActionType.class, CraftingDead.ID);
 
-  public static final RegistryObject<ActionType<?>> RELOAD = ACTION_TYPES.register("reload",
-      () -> new ActionType<>((actionType, performer, target) -> new ReloadAction(performer), true));
+  public static final RegistryObject<ActionType<?>> MAGAZINE_RELOAD = ACTION_TYPES.register(
+      "magazine_reload",
+      () -> new ActionType<>((actionType, performer, target) -> new MagazineReloadAction(performer),
+          true));
+
+  public static final RegistryObject<ActionType<?>> REFILLABLE_RELOAD =
+      ACTION_TYPES.register("refillable_reload",
+          () -> new ActionType<>(
+              (actionType, performer, target) -> new RefillableReloadAction(performer), true));
 
   public static final RegistryObject<ActionType<?>> REMOVE_MAGAZINE =
       ACTION_TYPES.register("remove_magazine", () -> new ActionType<>(

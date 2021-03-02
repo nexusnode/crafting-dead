@@ -34,7 +34,6 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
@@ -561,22 +560,22 @@ public abstract class GunRenderer implements IItemRenderer {
   private void renderMainGunAmmo(IGun gun, boolean glint,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    IMagazine magazine = gun.getMagazine().orElse(null);
-    if (magazine != null) {
+    ItemStack magazineStack = gun.getAmmoProvider().getMagazineStack();
+    if (!magazineStack.isEmpty()) {
       matrixStack.push();
       {
         float scale = 0.1F;
         matrixStack.scale(scale, scale, scale);
 
-        this.applyMagazineTransforms(gun.getMagazineStack(), matrixStack);
+        this.applyMagazineTransforms(magazineStack, matrixStack);
 
         scale = 10F;
         matrixStack.scale(scale, scale, scale);
 
         final ResourceLocation modelLocation =
-            this.getMagazineModelLocation(gun.getMagazineStack().getItem().getRegistryName());
+            this.getMagazineModelLocation(magazineStack.getItem().getRegistryName());
         final IBakedModel magazineBakedModel;
-        if (magazine.hasCustomTexture()) {
+        if (gun.getAmmoProvider().getExpectedMagazine().hasCustomTexture()) {
           magazineBakedModel = this.getBakedModel(modelLocation, null);
         } else {
           magazineBakedModel = this.getBakedModel(modelLocation,

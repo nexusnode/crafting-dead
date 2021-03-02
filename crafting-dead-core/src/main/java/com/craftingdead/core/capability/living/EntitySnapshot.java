@@ -58,22 +58,15 @@ public class EntitySnapshot {
   }
 
   public Optional<Vector3d> rayTrace(World world, EntitySnapshot fromSnapshot, double distance,
-      float accuracy, Random random) {
+      float accuracy, int shotCount, Random random) {
     if (!fromSnapshot.complete || !this.complete) {
       return Optional.empty();
     }
 
     Vector3d start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
-
-    float pitchOffset = 0.0F;
-    float yawOffset = 0.0F;
-    if (accuracy < 1.0F) {
-      pitchOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
-      yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
-    }
-
-    Vector3d look = RayTraceUtil.getVectorForRotation(fromSnapshot.getPitchYaw().x + pitchOffset,
-        fromSnapshot.getPitchYaw().y + yawOffset);
+    Vector3d look = RayTraceUtil.getVectorForRotation(
+        fromSnapshot.getPitchYaw().x + RayTraceUtil.getAccuracyOffset(accuracy, shotCount, random),
+        fromSnapshot.getPitchYaw().y + RayTraceUtil.getAccuracyOffset(accuracy, shotCount, random));
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
         RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);

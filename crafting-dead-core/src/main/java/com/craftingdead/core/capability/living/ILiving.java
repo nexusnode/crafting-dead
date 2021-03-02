@@ -31,7 +31,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ILiving<T extends LivingEntity, E extends ILivingExtension> extends ILivingExtension {
+public interface ILiving<T extends LivingEntity, E extends ILivingExtension>
+    extends ILivingExtension {
 
   /**
    * @see {@link net.minecraftforge.event.AttachCapabilitiesEvent}
@@ -148,9 +149,10 @@ public interface ILiving<T extends LivingEntity, E extends ILivingExtension> ext
    * Get an {@link EntitySnapshot} for the specified tick time.
    * 
    * @param tick - the tick in which to retrieve the {@link EntitySnapshot} for
-   * @return an {@link Optional} snapshot
+   * @return the snapshot
+   * @throws IndexOutOfBoundsException if the tick is too small
    */
-  Optional<EntitySnapshot> getSnapshot(long tick);
+  EntitySnapshot getSnapshot(int tick) throws IndexOutOfBoundsException;
 
   /**
    * Whether this {@link ILiving} is crouching.

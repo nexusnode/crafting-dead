@@ -54,10 +54,12 @@ public abstract class LivingEntityMixin {
     if (!currentStack.equals(lastStack, true)) {
       return false;
     }
+
     LivingEntity livingEntity = (LivingEntity) (Object) this;
     for (EquipmentSlotType slotType : EquipmentSlotType.values()) {
       if (currentStack == livingEntity.getItemStackFromSlot(slotType)) {
-        currentStack.getCapability(ModCapabilities.GUN).filter(IGun::requiresSync)
+        currentStack.getCapability(ModCapabilities.GUN)
+            .filter(IGun::requiresSync)
             .ifPresent(gun -> NetworkChannel.PLAY.getSimpleChannel().send(
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
                 new SyncGunEquipmentSlotMessage(livingEntity.getEntityId(), slotType, gun, false)));

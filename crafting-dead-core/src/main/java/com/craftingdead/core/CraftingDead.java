@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.action.ActionTypes;
+import com.craftingdead.core.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
@@ -117,8 +118,6 @@ public class CraftingDead {
 
   public static final String VERSION;
 
-  public static final String DISPLAY_NAME;
-
   public static final CommonConfig commonConfig;
   public static final ForgeConfigSpec commonConfigSpec;
 
@@ -126,9 +125,6 @@ public class CraftingDead {
     VERSION = JarVersionLookupHandler
         .getImplementationVersion(CraftingDead.class)
         .orElse("[version]");
-    DISPLAY_NAME = JarVersionLookupHandler
-        .getImplementationTitle(CraftingDead.class)
-        .orElse("[display_name]");
 
     final Pair<CommonConfig, ForgeConfigSpec> commonConfigPair =
         new ForgeConfigSpec.Builder().configure(CommonConfig::new);
@@ -179,6 +175,9 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new);
     ActionTypes.ACTION_TYPES.register(modEventBus);
 
+    AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_types", RegistryBuilder::new);
+    AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
+
     // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
@@ -211,10 +210,8 @@ public class CraftingDead {
   // ================================================================================
 
   private void handleCommonSetup(FMLCommonSetupEvent event) {
-    logger.info("Starting {}, version {}", DISPLAY_NAME, VERSION);
+    logger.info("Starting Crafting Dead, version {}", VERSION);
     NetworkChannel.loadChannels();
-    logger.info("Registering capabilities");
-    ModCapabilities.registerCapabilities();
     event.enqueueWork(() -> {
       BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
           Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),

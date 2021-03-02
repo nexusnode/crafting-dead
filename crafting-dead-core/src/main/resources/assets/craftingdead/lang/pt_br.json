@@ -5,8 +5,9 @@
 
   "message.switch_fire_mode":"Trocado para %s",
   
-  "action.reload": "Recarregando",
-  "action.remove_magazine":"Removendo pente",
+  "action.craftingdead.magazine_reload.message": "Recarregando",
+  "action.craftingdead.refillable_reload.message": "Recarregando",
+  "action.craftingdead.remove_magazine.message":"Removendo pente",
   
   "key.reload": "Recarregar",
   "key.toggle_fire_mode": "Alternar Modo de Tiro",

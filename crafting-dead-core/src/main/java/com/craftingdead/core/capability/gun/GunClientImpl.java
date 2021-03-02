@@ -43,6 +43,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -168,7 +169,8 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
   @Override
   public void handleHitEntityPre(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, long randomSeed) {
-    if (living.getEntity() instanceof ClientPlayerEntity) {
+    if (living.getEntity() instanceof ClientPlayerEntity
+        && hitEntity instanceof LivingEntity) {
       this.livingHitValidationBuffer.put(hitEntity.getEntityId(),
           new PendingHit((byte) (GunImpl.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
               new EntitySnapshot(living.getEntity()),
@@ -253,11 +255,6 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
             .stop(rightMouseActionSound.getRegistryName(), SoundCategory.PLAYERS);
       }
     }
-  }
-
-  @Override
-  public float getPartialTicks() {
-    return this.minecraft.getRenderPartialTicks();
   }
 
   @Override

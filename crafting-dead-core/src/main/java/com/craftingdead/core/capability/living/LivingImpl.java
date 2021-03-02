@@ -35,10 +35,7 @@ import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.util.ModSoundEvents;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -80,8 +77,7 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
 
   private List<Integer> dirtySlots = new IntArrayList();
 
-  private final Long2ObjectLinkedOpenHashMap<EntitySnapshot> snapshots =
-      new Long2ObjectLinkedOpenHashMap<>();
+  private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
   private final ItemStackHandler itemHandler =
       new ItemStackHandler(InventorySlotType.values().length) {
@@ -258,12 +254,9 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     this.updateScubaMask();
 
     if (!this.entity.getEntityWorld().isRemote()) {
-      if (this.snapshots.size() >= 20) {
-        this.snapshots.removeFirst();
-      }
       // This is called at the start of the entity tick so it's equivalent of last tick's position.
-      this.snapshots.put(this.entity.getServer().getTickCounter() - 1,
-          new EntitySnapshot(this.entity));
+      this.snapshots[this.entity.getServer().getTickCounter() % 20] =
+          new EntitySnapshot(this.entity);
     }
 
     this.moving = !this.entity.getPositionVec().equals(this.lastPos);
@@ -397,28 +390,20 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
   }
 
   @Override
-  public Optional<EntitySnapshot> getSnapshot(long tick) {
-    if (tick >= this.entity.getServer().getTickCounter()) {
-      return Optional.of(new EntitySnapshot(this.entity));
+  public EntitySnapshot getSnapshot(int tick) {
+    final int currentTick = this.entity.getServer().getTickCounter();
+    if (tick >= currentTick) {
+      return new EntitySnapshot(this.entity);
+    } else if (tick < currentTick - 20) {
+      return this.snapshots[0];
     }
-    EntitySnapshot snapshot = this.snapshots.get(tick);
-    if (snapshot == null && tick >= this.snapshots.firstLongKey()
-        && tick <= this.snapshots.lastLongKey()) {
-      ObjectBidirectionalIterator<Long2ObjectMap.Entry<EntitySnapshot>> it =
-          this.snapshots.long2ObjectEntrySet().fastIterator();
-      while (it.hasNext()) {
-        Long2ObjectMap.Entry<EntitySnapshot> entry = it.next();
-        EntitySnapshot nextSnapshot = entry.getValue();
-        if (entry.getLongKey() > tick) {
-          if (snapshot == null) {
-            snapshot = nextSnapshot;
-          }
-          break;
-        }
-        snapshot = nextSnapshot;
-      }
+
+    final int snapshotIndex = tick % 20;
+    EntitySnapshot snapshot = this.snapshots[snapshotIndex];
+    if (snapshot == null) {
+      throw new IndexOutOfBoundsException();
     }
-    return Optional.ofNullable(snapshot);
+    return snapshot;
   }
 
   @Override
@@ -482,18 +467,17 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
   public void encode(PacketBuffer out, boolean writeAll) {
     // Item Handler
     if (writeAll) {
-      out.writeShort(this.itemHandler.getSlots());
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         out.writeShort(i);
         out.writeItemStack(this.itemHandler.getStackInSlot(i));
       }
     } else {
-      out.writeShort(this.dirtySlots.size());
       for (int i : this.dirtySlots) {
         out.writeShort(i);
         out.writeItemStack(this.itemHandler.getStackInSlot(i));
       }
     }
+    out.writeShort(255);
 
     // Extensions
     ObjectSet<Map.Entry<ResourceLocation, E>> extensionsToSend =
@@ -512,9 +496,9 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
   @Override
   public void decode(PacketBuffer in) {
     // Item Handler
-    int itemsSize = in.readShort();
-    for (int i = 0; i < itemsSize; i++) {
-      this.itemHandler.setStackInSlot(in.readShort(), in.readItemStack());
+    int slot;
+    while ((slot = in.readShort()) != 255) {
+      this.itemHandler.setStackInSlot(slot, in.readItemStack());
     }
 
     // Extensions

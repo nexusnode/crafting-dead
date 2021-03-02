@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
 import com.craftingdead.core.capability.gun.IGun.RightMouseActionTriggerType;
@@ -46,6 +47,8 @@ public interface IGunProvider {
   float getDamage();
 
   float getAccuracyPct();
+
+  IAmmoProvider createAmmoProvider();
 
   Set<? extends Item> getAcceptedMagazines();
 

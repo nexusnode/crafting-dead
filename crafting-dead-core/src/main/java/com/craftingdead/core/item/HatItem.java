@@ -80,8 +80,7 @@ public class HatItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(new DefaultHat(this.nightVision,
-        this.headshotReductionPercentage, this.immuneToFlashes, this.immuneToGas),
-        () -> ModCapabilities.HAT);
+        this.headshotReductionPercentage, this.immuneToFlashes), () -> ModCapabilities.HAT);
   }
 
   public static class Properties extends Item.Properties {

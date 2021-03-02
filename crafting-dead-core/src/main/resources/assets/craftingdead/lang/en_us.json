@@ -56,7 +56,8 @@
   "action.target":"Target: %1$s",
   "action.performer":"Performer: %1$s",
 
-  "action.craftingdead.reload.message":"Reloading",
+  "action.craftingdead.magazine_reload.message":"Reloading",
+  "action.craftingdead.refillable_reload.message":"Reloading",
   "action.craftingdead.remove_magazine.message":"Removing magazine",
   "action.craftingdead.use_cure_syringe.message":"Injecting cure",
   "action.craftingdead.use_clean_rag.message":"Cleaning wound",

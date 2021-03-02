@@ -29,6 +29,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimation;
@@ -36,6 +38,7 @@ import com.craftingdead.core.capability.gun.AimableGun;
 import com.craftingdead.core.capability.gun.GunImpl;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.gun.IGunProvider;
+import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.inventory.CombatSlotType;
@@ -44,7 +47,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShootableItem;
@@ -289,6 +291,14 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
   }
 
   @Override
+  public IAmmoProvider createAmmoProvider() {
+    IAmmoProvider ammoProvider =
+        new MagazineAmmoProvider(this.getDefaultMagazine().get().getDefaultInstance());
+    ammoProvider.getExpectedMagazine().setSize(0);
+    return ammoProvider;
+  }
+
+  @Override
   public Set<MagazineItem> getAcceptedMagazines() {
     return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
   }
@@ -394,8 +404,9 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
     super.addInformation(stack, world, lines, tooltipFlag);
 
     stack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-      ITextComponent magazineSizeText =
-          Text.of(gun.getMagazineSize()).mergeStyle(TextFormatting.RED);
+      ITextComponent ammoCount =
+          Text.of(gun.getAmmoProvider().getMagazine().map(IMagazine::getSize).orElse(0))
+              .mergeStyle(TextFormatting.RED);
       ITextComponent damageText = Text.of(this.damage).mergeStyle(TextFormatting.RED);
       ITextComponent headshotDamageText = Text
           .of((int) (this.damage * GunImpl.HEADSHOT_MULTIPLIER))
@@ -408,7 +419,7 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
 
       lines.add(Text.translate("item_lore.gun_item.ammo_amount")
           .mergeStyle(TextFormatting.GRAY)
-          .append(magazineSizeText));
+          .append(ammoCount));
       lines.add(Text.translate("item_lore.gun_item.damage")
           .mergeStyle(TextFormatting.GRAY)
           .append(damageText));
@@ -460,11 +471,6 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
   @Override
   public int getItemEnchantability() {
     return 1;
-  }
-
-  @Override
-  public void onCreated(ItemStack itemStack, World world, PlayerEntity playerEntity) {
-    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setMagazineSize(0));
   }
 
   @Override

@@ -18,8 +18,10 @@
 
 package com.craftingdead.core.client;
 
+import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.HitMarker;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig {
@@ -32,18 +34,27 @@ public class ClientConfig {
 
   public final ForgeConfigSpec.EnumValue<ModTutorialSteps> tutorialStep;
 
+  public final ForgeConfigSpec.ConfigValue<String> crosshair;
+
   public ClientConfig(ForgeConfigSpec.Builder builder) {
     builder.push("client");
     {
       this.displayBlood = builder
           .translation("options.craftingdead.client.display_blood")
           .define("displayBlood", true);
-      this.hitMarkerMode = builder.translation("options.craftingdead.client.hit_marker_mode")
+      this.hitMarkerMode = builder
+          .translation("options.craftingdead.client.hit_marker_mode")
           .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
-      this.playKillSound = builder.translation("options.craftingdead.client.play_kill_sound")
+      this.playKillSound = builder
+          .translation("options.craftingdead.client.play_kill_sound")
           .define("playKillSound", true);
-      this.tutorialStep =
-          builder.comment("Internal").defineEnum("tutorialStep", ModTutorialSteps.OPEN_INVENTORY);
+      this.tutorialStep = builder
+          .comment("Internal")
+          .defineEnum("tutorialStep", ModTutorialSteps.OPEN_EQUIPMENT_MENU);
+      this.crosshair = builder
+          .translation("options.craftingdead.client.crosshair")
+          .define("crosshair", CrosshairManager.DEFAULT_CROSSHAIR.toString(),
+              v -> v instanceof String && ResourceLocation.isResouceNameValid((String) v));
     }
     builder.pop();
   }

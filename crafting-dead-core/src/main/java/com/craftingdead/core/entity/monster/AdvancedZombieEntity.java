@@ -19,6 +19,7 @@
 package com.craftingdead.core.entity.monster;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -47,7 +48,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
@@ -143,31 +143,33 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
     this.dataManager.set(TEXTURE_NUMBER, this.rand.nextInt(23));
-    this.setItemStackToSlot(EquipmentSlotType.MAINHAND,
-        new ItemStack(this.getMelee()));
+    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, this.getHeldStack());
     this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
-      living.getItemHandler()
-          .setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
-              new ItemStack(
-                  this.getClothing()));
-      living.getItemHandler().setStackInSlot(InventorySlotType.HAT.getIndex(),
-          new ItemStack(this.getHat()));
+      living.getItemHandler().setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
+          this.getClothingStack());
+      living.getItemHandler().setStackInSlot(InventorySlotType.HAT.getIndex(), this.getHatStack());
     });
   }
 
-  protected Item getMelee() {
-    return this.getRandomItem(item -> item instanceof MeleeWeaponItem, MELEE_CHANCE);
+  protected ItemStack getHeldStack() {
+    return this.getRandomItem(item -> item instanceof MeleeWeaponItem, MELEE_CHANCE)
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
   }
 
-  protected Item getClothing() {
-    return this.getRandomItem(item -> item instanceof ClothingItem, CLOTHING_CHANCE);
+  protected ItemStack getClothingStack() {
+    return this.getRandomItem(item -> item instanceof ClothingItem, CLOTHING_CHANCE)
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
   }
 
-  protected Item getHat() {
-    return this.getRandomItem(item -> item instanceof HatItem, HAT_CHANCE);
+  protected ItemStack getHatStack() {
+    return this.getRandomItem(item -> item instanceof HatItem, HAT_CHANCE)
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
   }
 
-  protected Item getRandomItem(Predicate<Item> predicate, float probability) {
+  protected Optional<Item> getRandomItem(Predicate<Item> predicate, float probability) {
     if (this.rand.nextFloat() < probability) {
       List<Item> items = ModItems.ITEMS
           .getEntries()
@@ -175,9 +177,9 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
           .map(RegistryObject::get)
           .filter(predicate)
           .collect(Collectors.toList());
-      return items.get(this.rand.nextInt(items.size()));
+      return Optional.of(items.get(this.rand.nextInt(items.size())));
     }
-    return null;
+    return Optional.empty();
   }
 
   public int getTextureNumber() {
@@ -198,10 +200,6 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     if (!this.getEntityWorld().isRemote()) {
       this.getCapability(ModCapabilities.LIVING).ifPresent(
           living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-            if (gun.getMagazineSize() == 0) {
-              this.setHeldItem(Hand.OFF_HAND,
-                  new ItemStack(gun.getAcceptedMagazines().stream().findAny().get()));
-            }
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
                     - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {

@@ -42,7 +42,5 @@ public interface IGunClient extends IAnimationProvider<GunAnimationController> {
 
   void handleToggleRightMouseAction(ILiving<?, ?> living);
 
-  float getPartialTicks();
-
   boolean isFlashing();
 }

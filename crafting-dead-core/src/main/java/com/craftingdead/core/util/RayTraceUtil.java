@@ -20,13 +20,7 @@ package com.craftingdead.core.util;
 
 import java.util.Optional;
 import java.util.Random;
-import net.minecraft.block.AbstractGlassBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.block.FenceBlock;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.block.TrapDoorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
@@ -38,6 +32,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeMod;
@@ -146,8 +141,15 @@ public class RayTraceUtil {
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
-      final double distance, final float accuracy, final Random random) {
-    return rayTrace(fromEntity, distance, 1.0F, accuracy, random);
+      final double distance, final float accuracy, int shotCount, final Random random) {
+    return rayTrace(fromEntity, distance, 1.0F, getAccuracyOffset(accuracy, shotCount, random),
+        getAccuracyOffset(accuracy, shotCount, random));
+  }
+
+  public static float getAccuracyOffset(float accuracy, int shotCount, final Random random) {
+    return (1.0F - (accuracy * accuracy)) * (Math.min(20, shotCount + 1) / 2.0F)
+        * ((1.0F - accuracy) * (random.nextInt(9) + 1))
+        * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F);
   }
 
   /**
@@ -160,15 +162,8 @@ public class RayTraceUtil {
    * @return the {@link RayTraceResult} as an {@link Optional}
    */
   public static Optional<? extends RayTraceResult> rayTrace(final Entity fromEntity,
-      final double distance, final float partialTicks, final float accuracy, final Random random) {
+      final double distance, final float partialTicks, float pitchOffset, float yawOffset) {
     Vector3d start = fromEntity.getEyePosition(partialTicks);
-
-    float pitchOffset = 0.0F;
-    float yawOffset = 0.0F;
-    if (accuracy < 1.0F) {
-      pitchOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
-      yawOffset += (1.0F + accuracy * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F));
-    }
 
     Vector3d look = getVectorForRotation(fromEntity.getPitch(partialTicks) + pitchOffset,
         fromEntity.getYaw(partialTicks) + yawOffset);
@@ -212,7 +207,7 @@ public class RayTraceUtil {
       World world) {
     Vector3d newStart = start;
     Vector3d end = start.add(look.scale(distance));
-    boolean pierceableBlock;
+    boolean pierceableBlock = false;
     BlockRayTraceResult blockRayTraceResult = null;
     BlockPos lastBlockPos = null;
     do {
@@ -220,7 +215,6 @@ public class RayTraceUtil {
         break;
       }
 
-      pierceableBlock = false;
       RayTraceContext context = new RayTraceContext(newStart, end, blockMode, fluidMode, null);
       blockRayTraceResult = world.rayTraceBlocks(context);
 
@@ -234,39 +228,33 @@ public class RayTraceUtil {
         lastBlockPos = blockPos;
 
         BlockState blockState = world.getBlockState(blockPos);
-        Block block = blockState.getBlock();
-        pierceableBlock = isBlockPierceable(block);
+        pierceableBlock = !blockState.isSolid();
         if (pierceableBlock) {
           Vector3d hitVec = blockRayTraceResult.getHitVec();
-          AxisAlignedBB bb = context.getBlockShape(blockState, world, blockPos).getBoundingBox();
-          double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
-              : blockPos.getX() - hitVec.getX() + bb.maxX;
-          double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
-              : blockPos.getY() - hitVec.getY() + bb.maxY;
-          double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ - blockPos.getZ()
-              : blockPos.getZ() - hitVec.getZ() + bb.maxZ;
-          double xRayDist =
-              Math.abs(look.getX()) != 0d ? xDist / Math.abs(look.getX()) : Double.MAX_VALUE;
-          double yRayDist =
-              Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
-          double zRayDist =
-              Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
+          VoxelShape shape = context.getBlockShape(blockState, world, blockPos);
+          if (!shape.isEmpty()) {
+            AxisAlignedBB bb = shape.getBoundingBox();
+            double xDist = look.getX() < 0d ? hitVec.getX() - bb.minX - blockPos.getX()
+                : blockPos.getX() - hitVec.getX() + bb.maxX;
+            double yDist = look.getY() < 0d ? hitVec.getY() - bb.minY - blockPos.getY()
+                : blockPos.getY() - hitVec.getY() + bb.maxY;
+            double zDist = look.getZ() < 0d ? hitVec.getZ() - bb.minZ - blockPos.getZ()
+                : blockPos.getZ() - hitVec.getZ() + bb.maxZ;
+            double xRayDist =
+                Math.abs(look.getX()) != 0d ? xDist / Math.abs(look.getX()) : Double.MAX_VALUE;
+            double yRayDist =
+                Math.abs(look.getY()) != 0d ? yDist / Math.abs(look.getY()) : Double.MAX_VALUE;
+            double zRayDist =
+                Math.abs(look.getZ()) != 0d ? zDist / Math.abs(look.getZ()) : Double.MAX_VALUE;
 
-          double rayDist = Math.min(xRayDist, Math.min(zRayDist, yRayDist));
-          newStart = hitVec.add(look.scale(rayDist));
+            double rayDist = Math.min(xRayDist, Math.min(zRayDist, yRayDist));
+            newStart = hitVec.add(look.scale(rayDist));
+          }
         }
       }
     } while (pierceableBlock);
 
     return Optional.ofNullable(blockRayTraceResult);
-  }
-
-  public static boolean isBlockPierceable(Block block) {
-    return block instanceof FenceBlock
-        || block instanceof DoorBlock
-        || block instanceof AbstractGlassBlock
-        || block instanceof LeavesBlock
-        || block instanceof TrapDoorBlock;
   }
 
   public static Vector3d getVectorForRotation(float pitch, float yaw) {

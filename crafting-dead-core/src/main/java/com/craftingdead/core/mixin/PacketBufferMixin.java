@@ -39,6 +39,7 @@ public class PacketBufferMixin {
       CallbackInfoReturnable<PacketBuffer> callbackInfo) {
     PacketBuffer packetBuffer = (PacketBuffer) (Object) this;
     IGun gun = itemStack.getCapability(ModCapabilities.GUN).orElse(null);
+
     if (gun == null) {
       packetBuffer.writeVarInt(0);
     } else {
@@ -61,6 +62,5 @@ public class PacketBufferMixin {
         gun.decode(new PacketBuffer(Unpooled.wrappedBuffer(data)));
       }
     }
-
   }
 }

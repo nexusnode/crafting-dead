@@ -22,6 +22,7 @@ import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.tags.ModItemTags;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class DoctorZombieEntity extends AdvancedZombieEntity {
@@ -31,17 +32,19 @@ public class DoctorZombieEntity extends AdvancedZombieEntity {
   }
 
   @Override
-  protected Item getMelee() {
-    return this.getRandomItem(ModItemTags.SYRINGES::contains, 1.0F);
+  protected ItemStack getHeldStack() {
+    return this.getRandomItem(ModItemTags.SYRINGES::contains, 1.0F)
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
   }
 
   @Override
-  protected Item getClothing() {
-    return ModItems.DOCTOR_CLOTHING.get();
+  protected ItemStack getClothingStack() {
+    return ModItems.DOCTOR_CLOTHING.get().getDefaultInstance();
   }
 
   @Override
-  protected Item getHat() {
-    return ModItems.DOCTOR_MASK.get();
+  protected ItemStack getHatStack() {
+    return ModItems.DOCTOR_MASK.get().getDefaultInstance();
   }
 }

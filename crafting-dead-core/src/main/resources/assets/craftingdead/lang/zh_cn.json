@@ -52,7 +52,8 @@
   "action.target":"目标: %1$s",
   "action.performer":"实施者: %1$s",
 
-  "action.craftingdead.reload.message":"上弹中",
+  "action.craftingdead.magazine_reload.message":"上弹中",
+  "action.craftingdead.refillable_reload.message":"上弹中",
   "action.craftingdead.remove_magazine.message":"移除弹夹",
   "action.craftingdead.use_cure_syringe.message":"注射丧尸病毒解药",
   "action.craftingdead.use_clean_rag.message":"包扎",

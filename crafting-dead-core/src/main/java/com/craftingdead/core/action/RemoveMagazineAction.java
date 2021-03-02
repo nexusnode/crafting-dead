@@ -18,6 +18,8 @@
 
 package com.craftingdead.core.action;
 
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
 import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
@@ -33,11 +35,18 @@ public class RemoveMagazineAction extends TimedAction {
 
   private final ItemStack oldMagazineStack;
 
+  private final MagazineAmmoProvider ammoProvider;
+
   public RemoveMagazineAction(ILiving<?, ?> performer) {
     super(ActionTypes.REMOVE_MAGAZINE.get(), performer, null);
     this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
-    this.oldMagazineStack = this.gun.getMagazineStack();
+    IAmmoProvider ammoProvider = this.gun.getAmmoProvider();
+    if (!(ammoProvider instanceof MagazineAmmoProvider)) {
+      throw new IllegalStateException("No MagazineAmmoProvider present");
+    }
+    this.ammoProvider = (MagazineAmmoProvider) ammoProvider;
+    this.oldMagazineStack = this.ammoProvider.getMagazineStack();
   }
 
   @Override
@@ -47,7 +56,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean start() {
-    if (!this.getPerformer().getEntity().isSprinting() && !this.gun.getMagazineStack().isEmpty()) {
+    if (!this.getPerformer().getEntity().isSprinting() && !this.oldMagazineStack.isEmpty()) {
       if (this.gun.isPerformingRightMouseAction()) {
         this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
       }
@@ -58,7 +67,8 @@ public class RemoveMagazineAction extends TimedAction {
             .ifPresent(animation -> {
               animation.setEjectingClip(true);
               this.gun.getClient().getAnimationController().ifPresent(
-                  c -> c.addAnimation(animation, () -> this.gun.setMagazineStack(ItemStack.EMPTY)));
+                  c -> c.addAnimation(animation,
+                      () -> this.ammoProvider.setMagazineStack(ItemStack.EMPTY)));
             });
       }
       return true;
@@ -83,14 +93,14 @@ public class RemoveMagazineAction extends TimedAction {
           .ifPresent(GunAnimationController::removeCurrentAnimation);
     }
     // Call this on both sides as we change the client side stack for the remove animation.
-    this.gun.setMagazineStack(this.oldMagazineStack);
+    this.ammoProvider.setMagazineStack(this.oldMagazineStack);
   }
 
   @Override
   protected void finish() {
     if (!this.performer.getEntity().getEntityWorld().isRemote()) {
       // This will be synced to the client by the gun.
-      this.gun.setMagazineStack(ItemStack.EMPTY);
+      this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
       if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
         ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
       }

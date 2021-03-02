@@ -85,7 +85,11 @@ public class ModCapabilities {
   @CapabilityInject(ICombatItem.class)
   public static final Capability<ICombatItem> COMBAT_ITEM = null;
 
-  public static void registerCapabilities() {
+  static {
+    ModCapabilities.registerCapabilities();
+  }
+
+  private static void registerCapabilities() {
     CapabilityManager.INSTANCE.register(ILiving.class, new EmptyStorage<>(), LivingImpl::new);
     CapabilityManager.INSTANCE.register(IGun.class, new EmptyStorage<>(), GunImpl::new);
     CapabilityManager.INSTANCE.register(IPaint.class, new EmptyStorage<>(), DefaultPaint::new);

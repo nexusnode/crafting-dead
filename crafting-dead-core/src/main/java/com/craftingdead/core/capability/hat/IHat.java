@@ -25,6 +25,4 @@ public interface IHat {
   float getHeadshotReductionPercentage();
 
   boolean isImmuneToFlashes();
-
-  boolean isImmuneToGas();
 }

@@ -23,18 +23,16 @@ public class DefaultHat implements IHat {
   private final boolean nightVision;
   private final float headshotReductionPercentage;
   private final boolean immuneToFlashes;
-  private final boolean immuneToGas;
 
   public DefaultHat() {
-    this(false, 0.0F, false, false);
+    this(false, 0.0F, false);
   }
 
-  public DefaultHat(boolean nightVision, float headshotReductionPercentage, boolean immuneToFlashes,
-      boolean immuneToGas) {
+  public DefaultHat(boolean nightVision, float headshotReductionPercentage,
+      boolean immuneToFlashes) {
     this.nightVision = nightVision;
     this.headshotReductionPercentage = headshotReductionPercentage;
     this.immuneToFlashes = immuneToFlashes;
-    this.immuneToGas = immuneToGas;
   }
 
   @Override
@@ -50,10 +48,5 @@ public class DefaultHat implements IHat {
   @Override
   public boolean isImmuneToFlashes() {
     return this.immuneToFlashes;
-  }
-
-  @Override
-  public boolean isImmuneToGas() {
-    return this.immuneToGas;
   }
 }

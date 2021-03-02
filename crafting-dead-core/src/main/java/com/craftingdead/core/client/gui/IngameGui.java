@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.capability.living.IPlayer;
@@ -64,6 +65,8 @@ public class IngameGui {
 
   private static final ResourceLocation HEALTH =
       new ResourceLocation(CraftingDead.ID, "textures/gui/health.png");
+  private static final ResourceLocation SHIELD =
+      new ResourceLocation(CraftingDead.ID, "textures/gui/shield.png");
 
   private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
 
@@ -88,6 +91,10 @@ public class IngameGui {
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
+    this.crosshairLocation = crosshairLocation;
+  }
+
+  public void setCrosshairLocation(ResourceLocation crosshairLocation) {
     this.crosshairLocation = crosshairLocation;
   }
 
@@ -353,23 +360,49 @@ public class IngameGui {
       int height, IGun gun) {
 
     int x = width - 115;
+    int boxHeight = 25;
     if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
         && CapabilityUtils.isWearingBackpack(this.minecraft.player)) {
       x -= 30;
     }
 
-    RenderUtil.fill(matrixStack, x, height - 25, 100, 20, 0x66000000);
+    RenderUtil.drawGradientRectangle(x - 10, height - boxHeight, x + 30, height, 0x00000000,
+        0x55000000);
+    AbstractGui.fill(matrixStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
 
-    IMagazine magazine = gun.getMagazine().orElse(null);
-    boolean empty = (magazine == null || magazine.isEmpty()) && gun.getAmmoReserveSize() == 0;
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
-        empty ? I18n.format("hud.empty_magazine")
-            : (magazine == null ? 0 : magazine.getSize()) + "/" + gun.getAmmoReserveSize(),
-        x + 30, height - 18, empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+    IAmmoProvider ammoProvider = gun.getAmmoProvider();
+    int ammoCount = ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0);
+    int reserveSize = ammoProvider.getReserveSize();
+    boolean empty = ammoCount == 0 && reserveSize == 0;
+
+    String ammoText = empty ? I18n.format("hud.empty_magazine")
+        : String.valueOf(ammoCount);
+    int ammoTextWidth = this.minecraft.fontRenderer.getStringWidth(ammoText);
+
+    float reserveTextScale = 0.6F;
+    String reserveText = " / " + reserveSize;
+    int reserveTextWidth =
+        (int) (this.minecraft.fontRenderer.getStringWidth(reserveText) * reserveTextScale);
+
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        ammoText,
+        x + 55 - ammoTextWidth - (empty ? 0 : reserveTextWidth),
+        height - (boxHeight / 2) - this.minecraft.fontRenderer.FONT_HEIGHT / 2,
+        empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+
+    if (!empty) {
+      matrixStack.push();
+      matrixStack.translate(x + 55 - reserveTextWidth,
+          height - (boxHeight / 2) - (reserveTextScale * 2), 0);
+      matrixStack.scale(reserveTextScale, reserveTextScale, reserveTextScale);
+      this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+          reserveText, 0, 0, empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+      matrixStack.pop();
+    }
 
     String fireMode = I18n.format(gun.getFireMode().getTranslationKey());
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
-        fireMode, x + 73, height - 18, 0xFFFFFFFF);
+    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+        fireMode, x + 65, height - 16, 0xFFFFFFFF);
   }
 
   private static void renderProgress(MatrixStack matrixStack, FontRenderer fontRenderer,
@@ -512,18 +545,51 @@ public class IngameGui {
       boxX += 28;
     }
 
+
+    final int healthBoxHeight = 25;
     // Render Health
     final float health = player.getEntity().getHealth();
-    RenderUtil.fill(matrixStack, 5, height - 25, 110, 20, 0x66000000);
+    final float armour = player.getEntity().getTotalArmorValue();
+
+
+
+    int healthWidth = 100;
+    if (armour > 0) {
+      healthWidth *= 2;
+    }
+
+    AbstractGui.fill(matrixStack, 0, height - healthBoxHeight, healthWidth, height, 0x55000000);
+
+    RenderUtil.drawGradientRectangle(healthWidth, height - healthBoxHeight, healthWidth + 40,
+        height, 0x55000000, 0x00000000);
+
     RenderUtil.bind(HEALTH);
     RenderSystem.enableBlend();
-    RenderUtil.drawTexturedRectangle(5, height - 25, 20, 20);
+    RenderUtil.drawTexturedRectangle(5, height - healthBoxHeight / 2 - 8, 16, 16);
     RenderSystem.disableBlend();
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
-        String.valueOf((int) health), 28, height - 18, 0xFFFFFFFF);
-    RenderUtil.fill(matrixStack, 45, height - 20, 65, 10, 0x66000000);
-    RenderUtil.fill(matrixStack, 45, height - 20,
+
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+        String.valueOf((int) health), 31,
+        height - healthBoxHeight / 2 - this.minecraft.fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
+    RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
+    RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5,
         (int) (65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
+
+    if (armour > 0) {
+      int armourX = healthWidth / 2 + 7;
+      RenderUtil.bind(SHIELD);
+      RenderSystem.enableBlend();
+      RenderUtil.drawTexturedRectangle(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);
+      RenderSystem.disableBlend();
+
+      AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+          String.valueOf((int) armour), armourX + 31,
+          height - healthBoxHeight / 2 - this.minecraft.fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
+      RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5, 65, 10,
+          0x66000000);
+      RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5,
+          (int) (65 * (armour / 20)), 10, 0xCCFFFFFF);
+    }
   }
 
   @SuppressWarnings("deprecation")
