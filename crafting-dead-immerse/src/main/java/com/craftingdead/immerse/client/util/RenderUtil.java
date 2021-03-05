@@ -98,8 +98,6 @@ public class RenderUtil {
     fill(x, y, x + width, y + height, colour);
   }
 
-  public static void fill(double x, double y, double x2, double y2, int colour) {
-
   public static void fill(double x, double y, double x2, double y2, long colour) {
     RenderUtil.fill(x, y, x2, y2, colour, 0D);
   }
@@ -236,7 +234,8 @@ public class RenderUtil {
   }
 
   public static long getColour(int[] colour4i) {
-    return ((long) (colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16) | ((colour4i[1] & 0xFF) << 8)
+    return ((long) (colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16)
+        | ((colour4i[1] & 0xFF) << 8)
         | ((colour4i[2] & 0xFF) << 0);
   }
 

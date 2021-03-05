@@ -92,12 +92,13 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     super.layout();
     this.totalHeight =
         scrollOffset +
-        (float) (this.getEventListeners()
-            .stream()
-            .mapToDouble(c -> c.getY() + c.getHeight() + c.getBottomMargin() + this.getBottomPadding())
-            .max()
-            .orElse(0.0F)
-            - super.getContentY());
+            (float) (this.getEventListeners()
+                .stream()
+                .mapToDouble(
+                    c -> c.getY() + c.getHeight() + c.getBottomMargin() + this.getBottomPadding())
+                .max()
+                .orElse(0.0F)
+                - super.getContentY());
     if (this.totalHeight < 0) {
       this.totalHeight = 0F;
     }
@@ -176,6 +177,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    // For some reason the partial ticks passed to us isn't correct.
     this.lerpedScrollOffset =
         MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(), this.lastScrollOffset,
             this.scrollOffset);
@@ -201,19 +203,20 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
     boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
     if (scissor) {
-      if(alreadyEnabled) {
+      if (alreadyEnabled) {
         GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
       }
       GL11.glEnable(GL11.GL_SCISSOR_TEST);
       double lowerBound = this.getBotScissorBoundScaled() * scale;
       GL11.glScissor((int) (this.getScaledX() * scale),
           (int) (this.mainWindow.getFramebufferHeight() - lowerBound),
-          (int) (this.getScaledWidth() * scale), (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
+          (int) (this.getScaledWidth() * scale),
+          (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
     }
     super.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
       GL11.glDisable(GL11.GL_SCISSOR_TEST);
-      if(alreadyEnabled) {
+      if (alreadyEnabled) {
         GL11.glPopAttrib();
       }
     }

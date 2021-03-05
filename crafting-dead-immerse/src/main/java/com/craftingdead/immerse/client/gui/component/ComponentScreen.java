@@ -69,7 +69,6 @@ public class ComponentScreen extends Screen implements IView {
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-   System.out.println(partialTicks);
     this.container.render(matrixStack, mouseX, mouseY, partialTicks);
   }
 

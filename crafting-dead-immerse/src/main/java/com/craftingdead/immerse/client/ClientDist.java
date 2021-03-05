@@ -33,8 +33,8 @@ import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
-import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
 import com.craftingdead.immerse.client.gui.menu.StartScreen;
+import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
@@ -267,7 +267,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     if (event.getGui() instanceof MainMenuScreen) {
-      // event.setGui(new StartScreen());
+      event.setGui(new StartScreen());
     }
   }
 

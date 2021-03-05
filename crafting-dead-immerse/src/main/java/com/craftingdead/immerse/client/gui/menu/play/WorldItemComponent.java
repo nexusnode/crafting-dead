@@ -1,5 +1,18 @@
 package com.craftingdead.immerse.client.gui.menu.play;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
@@ -10,7 +23,15 @@ import com.craftingdead.immerse.client.gui.component.type.Justify;
 import com.google.common.hash.Hashing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.AlertScreen;
+import net.minecraft.client.gui.screen.ConfirmBackupScreen;
+import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.gui.screen.DirtMessageScreen;
+import net.minecraft.client.gui.screen.EditWorldScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorkingScreen;
+import net.minecraft.client.gui.screen.WorldSelectionList;
 import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
@@ -27,20 +48,6 @@ import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraft.world.storage.FolderName;
 import net.minecraft.world.storage.SaveFormat;
 import net.minecraft.world.storage.WorldSummary;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class WorldItemComponent extends ContainerComponent {
 
@@ -110,7 +117,6 @@ public class WorldItemComponent extends ContainerComponent {
   @Nullable
   private DynamicTexture loadIconTexture(WorldSummary worldSummary, ResourceLocation resourceLocation) {
     File iconFile = worldSummary.getIconFile();
-    String fileName = worldSummary.getFileName();
     if (iconFile.isFile()) {
       try (InputStream inputstream = new FileInputStream(iconFile)) {
         NativeImage nativeimage = NativeImage.read(inputstream);

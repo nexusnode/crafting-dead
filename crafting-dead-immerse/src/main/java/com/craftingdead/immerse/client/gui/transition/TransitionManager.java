@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.Util;
 
+// TODO go over this
 public class TransitionManager {
   /**
    * {@link Minecraft} instance
@@ -36,6 +37,7 @@ public class TransitionManager {
   /**
    * The default {@link Transitions} to use if no others are available
    */
+  @SuppressWarnings("unused")
   private final ITransition defaultTransition;
   /**
    * The {@link Framebuffer} used to draw the transition to
