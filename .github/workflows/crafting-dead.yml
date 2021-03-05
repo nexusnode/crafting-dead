@@ -20,16 +20,19 @@ jobs:
     - name: Cache Gradle packages
       uses: actions/cache@v2
       with:
-        path: ~/.gradle/caches
+        path: |
+         ~/.gradle
+         ./.gradle
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
         restore-keys: ${{ runner.os }}-gradle
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
       run: |
-       ./gradlew build
        ./gradlew jar
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead
-        path: crafting-dead-core/build/libs
+        path: |
+          ./crafting-dead-core/build/libs/*.jar
+          ./crafting-dead-immerse/build/libs/*.jar
