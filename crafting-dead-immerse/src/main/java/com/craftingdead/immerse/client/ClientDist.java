@@ -34,6 +34,7 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
+import com.craftingdead.immerse.client.gui.menu.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;

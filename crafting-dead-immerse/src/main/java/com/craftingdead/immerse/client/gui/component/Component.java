@@ -21,6 +21,17 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+
+import com.craftingdead.immerse.client.gui.component.event.CharTypeEvent;
+import com.craftingdead.immerse.client.gui.component.event.KeyEvent;
+import com.craftingdead.immerse.client.gui.component.event.MouseEnterEvent;
+import com.craftingdead.immerse.client.gui.component.event.MouseEvent;
+import com.craftingdead.immerse.client.gui.component.event.MouseLeaveEvent;
+import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
+import com.craftingdead.immerse.client.gui.component.type.Align;
+import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
+import com.craftingdead.immerse.client.gui.component.type.PositionType;
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
@@ -67,6 +78,23 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
       new SimpleTweenType<>(
           (SimpleTweenType.FloatGetter<Component<?>>) c -> c.yTranslation,
           (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.yTranslation = v);
+  public static final TweenType<Component<?>> BORDER_WIDTH_BOTTOM =
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.bottomBorderWidth,
+          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.bottomBorderWidth = v);
+  public static final TweenType<Component<?>> BACKGROUND_COLOUR =
+      new SimpleTweenType<>( 4,
+          t -> t.backgroundColour.getColour4f(),
+          (t, v) -> t.backgroundColour.setColour4f(v));
+  public static final TweenType<Component<?>> BORDER_WIDTH =
+      new SimpleTweenType<>( 4,
+          t -> new float[]{t.topBorderWidth, t.rightBorderWidth, t.bottomBorderWidth, t.leftBorderWidth},
+          (t, v) -> {
+            t.topBorderWidth = v[0];
+            t.rightBorderWidth = v[1];
+            t.bottomBorderWidth = v[2];
+            t.leftBorderWidth = v[3];
+          });
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
@@ -84,6 +112,15 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   private float xTranslation = 0.0F;
   private float yTranslation = 0.0F;
 
+  private float topBorderWidth = 0F;
+  private Colour topBorderColour = Colour.WHITE;
+  private float rightBorderWidth = 0F;
+  private Colour rightBorderColour = Colour.WHITE;
+  private float bottomBorderWidth = 0F;
+  private Colour bottomBorderColour = Colour.WHITE;
+  private float leftBorderWidth = 0F;
+  private Colour leftBorderColour = Colour.WHITE;
+
   protected final long node;
 
   @Nullable
@@ -97,7 +134,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   protected IView parent;
 
-  private boolean wasMouseOver;
+  private boolean mouseOver;
 
   private float lastTime = 0F;
 
@@ -105,6 +142,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private boolean unscaleWidth;
   private boolean unscaleHeight;
+
+  private int zLevel = 0;
 
   public Component() {
     this.node = Yoga.YGNodeNew();
@@ -120,14 +159,13 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return new Vector2f(width, height);
   }
 
+  protected void zLevelChanged() {
+    this.post(new ZLevelChangeEvent());
+  }
+
   protected void added() {}
 
-  protected void removed() {
-    if (this.backgroundBlur != null) {
-      this.backgroundBlur.close();
-    }
-    Yoga.YGNodeFree(this.node);
-  }
+  protected void removed() {}
 
   protected void layout() {
     Yoga.YGNodeMarkDirty(this.node);
@@ -151,8 +189,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.tweenManager.update(deltaTime);
 
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.render(this.getScaledX(), this.getScaledY(), this.getScaledWidth(),
-          this.getScaledHeight(), partialTicks);
+      this.backgroundBlur.render(this.getScaledContentX(), this.getScaledContentY(),
+          this.getScaledWidth(), this.getScaledHeight(), partialTicks);
     }
 
     if (this.backgroundColour != null) {
@@ -161,13 +199,35 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
           this.getScaledY() + this.getScaledHeight(), this.backgroundColour.getHexColour());
     }
 
-    if (this.tooltip != null && this.isMouseOver(mouseX, mouseY)) {
+    RenderSystem.enableDepthTest();
+    if (this.topBorderWidth > 0F) {
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour(), 0.5D);
+    }
+    if (this.rightBorderWidth > 0F) {
+      RenderUtil.fill(this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth, this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+          this.rightBorderColour.getHexColour(), 0.5D);
+    }
+    if (this.bottomBorderWidth > 0F) {
+      RenderUtil.fill(this.getScaledX(), this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
+          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+          this.bottomBorderColour.getHexColour(), 0.5D);
+    }
+    if (this.leftBorderWidth > 0F) {
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getScaledX() + this.leftBorderWidth,
+          this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour(), 0.5D);
+    }
+    RenderSystem.disableDepthTest();
+
+    if (this.tooltip != null && this.isMouseOver()) {
       this.tooltip.render(this.minecraft.fontRenderer, matrixStack,
           10.0D + this.getX() + this.getWidth(), this.getY());
     }
   }
 
-  protected void mouseEntered() {
+  protected void mouseEntered(double mouseX, double mouseY) {
+    this.mouseOver = true;
     if (this.tooltip != null) {
       Timeline.createParallel(150)
           .push(Tween.to(this.tooltip, Tooltip.ALPHA)
@@ -181,7 +241,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.post(new MouseEnterEvent());
   }
 
-  protected void mouseLeft() {
+  protected void mouseLeft(double mouseX, double mouseY) {
+    this.mouseOver = false;
     if (this.tooltip != null) {
       Timeline.createParallel(250)
           .push(Tween.to(this.tooltip, Tooltip.ALPHA)
@@ -195,16 +256,18 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    boolean mouseOver = this.isMouseOver((int) mouseX, (int) mouseY);
-    if (mouseOver && !this.wasMouseOver) {
-      this.mouseEntered();
-    } else if (this.wasMouseOver && !mouseOver) {
-      this.mouseLeft();
+    if (this.parent == null || !(this.parent instanceof ParentComponent)) {
+      boolean mouseOver = this.isMouseOver((int) mouseX, (int) mouseY);
+      boolean mouseWasOver = this.mouseOver;
+      if (mouseOver && !mouseWasOver) {
+        this.mouseEntered(mouseX, mouseY);
+      } else if (this.mouseOver && !mouseOver) {
+        this.mouseLeft(mouseX, mouseY);
+      }
+      this.mouseOver = mouseOver;
+      this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
     }
-    this.wasMouseOver = mouseOver;
-    this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
-
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_PRESS));
@@ -247,23 +310,44 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.focused;
   }
 
+  /**
+   * Checks if mouse is over a component based on mouse position.
+   * Doesn't check whether there are other components over this one.
+   * @see #isMouseOver()
+   */
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
     return mouseX > this.getX() && mouseX < this.getX() + this.getWidth()
         && mouseY > this.getY() && mouseY < this.getY() + this.getHeight();
   }
 
+  /**
+   * Similar to {@link #isMouseOver(double, double)} but checks for components over it
+   * @return {@code false} if mouse is not over the component or if there's another component over it
+   * @see #isMouseOver(double, double)
+   */
+  protected boolean isMouseOver() {
+    return mouseOver;
+  }
+
   public final TweenManager getTweenManager() {
     return this.tweenManager;
+  }
+
+  public void close() {
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.close();
+    }
+    Yoga.YGNodeFree(this.node);
   }
 
   /**
    * Helper method to add an animation triggered by {@link MouseEnterEvent} that will be reversed
    * upon {@link MouseLeaveEvent}.
    * 
-   * @param target - the {@link IAnimatedProperty} to animate
+   * @param tweenType - the {@link TweenType} to animate
    * @param to - the target value
-   * @param fadeDuration - the duration of the animation
+   * @param duration - the duration of the animation
    * @return instance of self for easy construction
    */
   public final SELF addHoverAnimation(TweenType<? super SELF> tweenType, float[] to,
@@ -337,7 +421,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final float getX() {
     return (float) (Yoga.YGNodeLayoutGetLeft(this.node) + this.xTranslation
-        + this.parent.getContentX()
+        + (this.parent == null ? 0f : this.parent.getContentX())
         + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
@@ -357,7 +441,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final float getY() {
     return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
-        + this.parent.getContentY()
+        + (this.parent == null ? 0f : this.parent.getContentY())
         + (this.unscaleHeight ? this.getHeight() * this.mainWindow.getGuiScaleFactor() : 0.0F));
   }
 
@@ -399,13 +483,57 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.xScale;
   }
 
+  public SELF setZLevel(int zLevel) {
+    if (this.zLevel != zLevel) {
+      this.zLevel = zLevel;
+      this.zLevelChanged();
+    }
+    return this.self();
+  }
+
+  public int getZLevel() {
+    return zLevel;
+  }
+
   public final SELF setXScale(float xScale) {
     this.xScale = xScale;
     return this.self();
   }
 
-  public float getYScale() {
+  public final float getYScale() {
     return this.yScale;
+  }
+
+  public final float getTopMargin() {
+    return Yoga.YGNodeLayoutGetMargin(this.node, Yoga.YGEdgeTop);
+  }
+
+  public final float getRightMargin() {
+    return Yoga.YGNodeLayoutGetMargin(this.node, Yoga.YGEdgeRight);
+  }
+
+  public final float getBottomMargin() {
+    return Yoga.YGNodeLayoutGetMargin(this.node, Yoga.YGEdgeBottom);
+  }
+
+  public final float getLeftMargin() {
+    return Yoga.YGNodeLayoutGetMargin(this.node, Yoga.YGEdgeLeft);
+  }
+
+  public final float getTopPadding() {
+    return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop);
+  }
+
+  public final float getRightPadding() {
+    return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeRight);
+  }
+
+  public final float getBottomPadding() {
+    return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeBottom);
+  }
+
+  public final float getLeftPadding() {
+    return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft);
   }
 
   public final SELF setYScale(float yScale) {
@@ -417,7 +545,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.setXScale(scale).setYScale(scale);
   }
 
-  public final SELF setWidth(float width) {
+  public SELF setWidth(float width) {
     Yoga.YGNodeStyleSetWidth(this.node, width);
     return this.self();
   }
@@ -429,6 +557,11 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF setWidthAuto() {
     Yoga.YGNodeStyleSetWidthAuto(this.node);
+    return this.self();
+  }
+
+  public SELF setMaxWidth(float maxWidth) {
+    Yoga.YGNodeStyleSetMaxWidth(this.node, maxWidth);
     return this.self();
   }
 
@@ -444,6 +577,72 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF setHeightAuto() {
     Yoga.YGNodeStyleSetHeightAuto(this.node);
+    return this.self();
+  }
+
+  public SELF setMaxHeight(float maxHeight) {
+    Yoga.YGNodeStyleSetMaxHeight(this.node, maxHeight);
+    return this.self();
+  }
+
+  public final SELF setTopBorderWidth(float width) {
+    this.topBorderWidth = width;
+    return this.self();
+  }
+
+  public final SELF setRightBorderWidth(float width) {
+    this.rightBorderWidth = width;
+    return this.self();
+  }
+
+  public final SELF setBotBorderWidth(float width) {
+    this.bottomBorderWidth = width;
+    return this.self();
+  }
+
+  public final SELF setLeftBorderWidth(float width) {
+    this.leftBorderWidth = width;
+    return this.self();
+  }
+
+  public final SELF setTopBorderColour(Colour colour) {
+    this.topBorderColour = colour;
+    return this.self();
+  }
+
+  public final SELF setRightBorderColour(Colour colour) {
+    this.rightBorderColour = colour;
+    return this.self();
+  }
+
+  public final SELF setBotBorderColour(Colour colour) {
+    this.bottomBorderColour = colour;
+    return this.self();
+  }
+
+  public final SELF setLeftBorderColour(Colour colour) {
+    this.leftBorderColour = colour;
+    return this.self();
+  }
+
+  public final SELF setBorderWidth(float width) {
+    this.topBorderWidth = width;
+    this.rightBorderWidth = width;
+    this.bottomBorderWidth = width;
+    this.leftBorderWidth = width;
+    return this.self();
+  }
+
+  public final SELF setBorderColour(Colour colour) {
+    this.topBorderColour = colour;
+    this.rightBorderColour = colour;
+    this.bottomBorderColour = colour;
+    this.leftBorderColour = colour;
+    return this.self();
+  }
+
+  public final SELF testDirection() {
+    Yoga.YGNodeStyleSetDirection(this.node, Yoga.YGDirectionRTL);
     return this.self();
   }
 
@@ -641,6 +840,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF setAspectRatio(float aspectRatio) {
     Yoga.YGNodeStyleSetAspectRatio(this.node, aspectRatio);
+    return this.self();
+  }
+
+  public final SELF setAlignSelf(Align align) {
+    Yoga.YGNodeStyleSetAlignSelf(this.node, align.getYogaType());
+    return this.self();
+  }
+
+  public final SELF setDisplay(Display display) {
+    Yoga.nYGNodeStyleSetDisplay(this.node, display.getYogaType());
     return this.self();
   }
 

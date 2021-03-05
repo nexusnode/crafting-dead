@@ -1,8 +1,4 @@
-{
-    "menu.start": "Press the space bar to start",
-    "menu.play": "Play Game",
-    "menu.home": "Home",
-    
+{    
     "message.first_blood_drawn": "%s drew first blood",
     "message.joined": "%s has joined the game",
     "message.left": "%s has left the game",
@@ -28,6 +24,26 @@
     "gui.screen.shop.inventory":"Inventory",
     "gui.screen.select_team.title":"Select Team",
 
+    "game.craftingdeadimmerse.deathmatch":"Team Deathmatch",
 
-    "game.craftingdeadimmerse.deathmatch":"Team Deathmatch"
+    "menu.start": "Press the space bar to start",
+    "menu.play": "Play Game",
+    "menu.home": "Home",
+    "menu.play.play": "Play",
+    "menu.play.dropdown.official": "Official",
+    "menu.play.dropdown.singleplayer": "Singleplayer",
+    "menu.play.dropdown.community": "Community",
+    "menu.play.tab.survival": "Community",
+    "menu.play.tab.team_death_match": "Team DM",
+    "menu.play.server_list.server": "SERVER",
+    "menu.play.server_list.ping": "PING",
+    "menu.play.server_list.players": "PLAYERS",
+    "menu.play.server_list.failed_to_load": "?",
+    "menu.play.server_list.button.play": "PLAY",
+    "menu.play.server_list.button.refresh": "REFRESH",
+    "menu.play.world_list.button.play": "PLAY",
+    "menu.play.world_list.button.create": "CREATE",
+    "menu.play.world_list.button.edit": "EDIT",
+    "menu.play.world_list.button.delete": "DELETE",
+    "menu.play.world_list.button.recreate": "RE-CREATE"
 }

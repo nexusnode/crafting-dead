@@ -6,8 +6,8 @@ crafting-dead-core/.settings/
 crafting-dead-core/build/
 crafting-dead-core/server/
 crafting-dead-core/data/
-crafting-dead-core/out/
 crafting-dead-core/client/
+crafting-dead-core/data/
 crafting-dead-core/.idea/
 crafting-dead-core/src/generated/resources/.cache/
 
@@ -19,7 +19,7 @@ crafting-dead-immerse/.settings/
 crafting-dead-immerse/build/
 crafting-dead-immerse/server/
 crafting-dead-immerse/client/
-crafting-dead-core/data/
+crafting-dead-immerse/data/
 crafting-dead-immerse/.idea/
 
 # Launch configurations from Eclipse

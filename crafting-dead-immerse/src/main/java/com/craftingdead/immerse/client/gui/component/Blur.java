@@ -18,7 +18,6 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
-import java.io.Closeable;
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +30,7 @@ import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.util.ResourceLocation;
 
-public class Blur implements Closeable {
+public class Blur implements AutoCloseable {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -91,9 +90,14 @@ public class Blur implements Closeable {
     this.minecraft.getFramebuffer().bindFramebuffer(false);
     Framebuffer framebuffer = this.blurShader.getFramebufferRaw("output");
     framebuffer.bindFramebufferTexture();
-    RenderUtil.blit(x, y, x + width, y + height, x, y, x + width, y + height,
-        this.minecraft.getMainWindow().getScaledWidth(),
-        this.minecraft.getMainWindow().getScaledHeight());
+    float textureWidth = (float) (framebuffer.framebufferTextureWidth
+        / this.minecraft.getMainWindow().getGuiScaleFactor());
+    float textureHeight = (float) (framebuffer.framebufferTextureHeight
+        / this.minecraft.getMainWindow().getGuiScaleFactor());
+    float textureX = x;
+    float textureY = (textureHeight - height) - y;
+    RenderUtil.blit(x, y, x + width, y + height, textureX, textureY, textureX + width,
+        textureY + height, textureWidth, textureHeight);
   }
 
   @Override

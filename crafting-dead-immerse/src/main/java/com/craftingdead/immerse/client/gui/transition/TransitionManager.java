@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.transition;
 
 import org.lwjgl.opengl.GL11;
-import com.craftingdead.immerse.client.gui.screen.ModScreen;
+import com.craftingdead.immerse.client.gui.menu.ModScreen;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;

@@ -45,6 +45,7 @@ public class Tooltip {
   public void render(FontRenderer fontRenderer, MatrixStack matrixStack, double x, double y) {
     final double width = 10.0D + fontRenderer.getStringPropertyWidth(this.text);
     final double height = 14;
+
     RenderSystem.enableBlend();
     RenderUtil.roundedFill(x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24),
         3.0F);
