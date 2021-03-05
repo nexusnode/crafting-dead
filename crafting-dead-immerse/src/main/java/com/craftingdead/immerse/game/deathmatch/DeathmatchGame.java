@@ -176,7 +176,7 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
   @SubscribeEvent
   public void handleGunInitialize(GunEvent.Initialize event) {
     RefillableAmmoProvider ammoProvider =
-        new RefillableAmmoProvider(event.getGun().getDefaultMagazineStack(), 3, false);
+        new RefillableAmmoProvider(event.getGun().getDefaultMagazineStack(), 3, true);
     event.setAmmoProvider(ammoProvider);
 
     Item item = event.getItemStack().getItem();
