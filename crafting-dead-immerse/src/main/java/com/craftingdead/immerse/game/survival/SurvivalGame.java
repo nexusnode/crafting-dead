@@ -53,6 +53,7 @@ public class SurvivalGame extends AbstractGame<SurvivorsTeam> {
           .getCapability(ModCapabilities.LIVING)
           .filter(living -> living instanceof Player)
           .map(living -> (Player<?>) living)
+          .filter(player -> !player.getExtension(SurvivalPlayer.ID).isPresent())
           .ifPresent(
               player -> player.registerExtension(SurvivalPlayer.ID, new SurvivalPlayer(player)));
     }

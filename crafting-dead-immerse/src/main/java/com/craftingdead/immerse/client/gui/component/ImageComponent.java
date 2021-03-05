@@ -18,6 +18,9 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Optional;
+
+import com.craftingdead.immerse.client.gui.component.type.FitType;
+import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -34,6 +37,7 @@ public class ImageComponent extends Component<ImageComponent> {
 
   private ResourceLocation image;
   private FitType fitType = FitType.FILL;
+  private boolean depthTest = false;
   private Colour colour = new Colour();
 
   private Vector2f fittedImageSize;
@@ -50,6 +54,11 @@ public class ImageComponent extends Component<ImageComponent> {
 
   public ImageComponent setColour(Colour colour) {
     this.colour = colour;
+    return this;
+  }
+
+  public ImageComponent setDepthTest(boolean depthTest) {
+    this.depthTest = depthTest;
     return this;
   }
 
@@ -79,7 +88,7 @@ public class ImageComponent extends Component<ImageComponent> {
 
   @Override
   public Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-      float height) {
+                          float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
         .orElse(new Vector2f(width, height));
@@ -102,6 +111,9 @@ public class ImageComponent extends Component<ImageComponent> {
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
     RenderSystem.enableBlend();
+    if (depthTest) {
+      RenderSystem.enableDepthTest();
+    }
     final float[] colour = this.colour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
     if (this.bind()) {
@@ -116,6 +128,9 @@ public class ImageComponent extends Component<ImageComponent> {
           0xFFFFFFFF);
     }
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    if (depthTest) {
+      RenderSystem.disableDepthTest();
+    }
     RenderSystem.disableBlend();
   }
 }

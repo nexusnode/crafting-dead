@@ -27,7 +27,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.IModDist;
-import com.craftingdead.immerse.client.gui.screen.StartScreen;
+import com.craftingdead.immerse.client.gui.menu.StartScreen;
 import com.craftingdead.immerse.client.gui.transition.TransitionManager;
 import com.craftingdead.immerse.client.gui.transition.Transitions;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;

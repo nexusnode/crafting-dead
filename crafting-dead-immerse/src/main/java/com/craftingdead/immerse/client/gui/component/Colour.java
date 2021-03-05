@@ -45,7 +45,7 @@ public class Colour {
       new Colour[] {BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY,
           DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE};
 
-  private int hexColour;
+  private long hexColour;
   private int[] colour4i = new int[4];
   private float[] colour4f = new float[4];
 
@@ -57,7 +57,7 @@ public class Colour {
     this(colour.hexColour);
   }
 
-  public Colour(int value) {
+  public Colour(long value) {
     this.setHexColour(value);
   }
 
@@ -81,11 +81,11 @@ public class Colour {
     this.setColour4f(value4f);
   }
 
-  public int getHexColour() {
+  public long getHexColour() {
     return this.hexColour;
   }
 
-  public void setHexColour(int hex) {
+  public void setHexColour(long hex) {
     this.hexColour = hex;
     this.colour4i = RenderUtil.getColour4i(hex);
     this.colour4f = RenderUtil.getColour4f(this.colour4i);
