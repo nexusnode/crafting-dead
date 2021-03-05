@@ -102,6 +102,6 @@ public class Blur implements AutoCloseable {
 
   @Override
   public void close() {
-    this.blurShader.close();
+   // this.blurShader.close();
   }
 }

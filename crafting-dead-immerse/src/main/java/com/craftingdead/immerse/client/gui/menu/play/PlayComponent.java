@@ -18,7 +18,13 @@
 
 package com.craftingdead.immerse.client.gui.menu.play;
 
-import com.craftingdead.immerse.client.gui.component.*;
+import com.craftingdead.immerse.client.gui.component.Colour;
+import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.ContentDropdownComponent;
+import com.craftingdead.immerse.client.gui.component.ContentTabsComponent;
+import com.craftingdead.immerse.client.gui.component.RectangleComponent;
+import com.craftingdead.immerse.client.gui.component.TabsComponent;
+import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayComponent extends ContainerComponent {
@@ -38,37 +44,45 @@ public class PlayComponent extends ContainerComponent {
     ContainerComponent container = new ContainerComponent()
         .setBackgroundColour(new Colour(0x50777777))
         .setBackgroundBlur(50.0F)
-        .addChild(new TextBlockComponent(new TranslationTextComponent("menu.play.play"))
-            .setShadow(true)
-            .setMargin(5.5F))
+        .addChild(new TextBlockComponent(new TranslationTextComponent(
+            "menu.play.title"))
+                .setShadow(true)
+                .setMargin(5.5F))
         .addChild(this.newSeparator())
         .addChild(new ContentDropdownComponent(dropdownContent)
-            .addItem(1, new TranslationTextComponent("menu.play.dropdown.official"), officialContent)
-            .addItem(2, new TranslationTextComponent("menu.play.dropdown.singleplayer"), singleplayerContent)
-            .addItem(3, new TranslationTextComponent("menu.play.dropdown.community"), communityContent)
+            .addItem(1, new TranslationTextComponent("menu.play.dropdown.official"),
+                officialContent)
+            .addItem(2, new TranslationTextComponent("menu.play.dropdown.singleplayer"),
+                singleplayerContent)
+            .addItem(3, new TranslationTextComponent("menu.play.dropdown.community"),
+                communityContent)
             .setDisabled(3, true)
             .selectItem(1)
             .setWidth(100F)
             .setHeight(19F)
             .setTopMargin(1F)
             .setLeftMargin(1F))
+        .addChild(newSeparator())
         .addChild(dropdownContent
             .setFlexShrink(1F));
 
     ContainerComponent officialContentContainer = new ContainerComponent();
     ContainerComponent officialSurvivalContent = new ContainerComponent()
-        .addChild(newSeparator())
         .addChild(new ServerListComponent("official_survival")
+            .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
             .setTopMargin(1F));
     ContainerComponent officialTdmContent = new ContainerComponent()
-        .addChild(newSeparator())
         .addChild(new ServerListComponent("official_tdm")
+            .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
             .setTopMargin(1F));
     officialContent
-        .addChild(this.newSeparator())
         .addChild(new ContentTabsComponent(officialContentContainer)
-            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")), officialSurvivalContent)
-            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.team_death_match")), officialTdmContent)
+            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")),
+                officialSurvivalContent)
+            .addTab(
+                new TabsComponent.Tab(
+                    new TranslationTextComponent("menu.play.tab.team_death_match")),
+                officialTdmContent)
             .setHeight(19)
             .setZLevel(1))
         .addChild(officialContentContainer
@@ -77,29 +91,23 @@ public class PlayComponent extends ContainerComponent {
 
     ContainerComponent communityContentContainer = new ContainerComponent();
     ContainerComponent communitySurvivalContent = new ContainerComponent()
-        .addChild(newSeparator())
         .addChild(new TextBlockComponent("Community Survival content")
             .setTopMargin(4F)
             .setShadow(false));
-    communityContent.addChild(newSeparator())
+    communityContent
         .addChild(new ContentTabsComponent(communityContentContainer)
-            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")), communitySurvivalContent)
+            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")),
+                communitySurvivalContent)
             .setHeight(19F)
             .setZLevel(1))
         .addChild(communityContentContainer
             .setFlexShrink(1F));
 
-    ContainerComponent spContentContainer = new ContainerComponent();
-    ContainerComponent spSurvivalContent = new ContainerComponent()
-        .addChild(newSeparator())
-        .addChild(new WorldListComponent()
-            .setFlexShrink(1F));
-    singleplayerContent.addChild(newSeparator())
-        .addChild(new ContentTabsComponent(spContentContainer)
-            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")), spSurvivalContent)
-            .setHeight(19F)
-            .setZLevel(1))
-        .addChild(spContentContainer
+    singleplayerContent
+        .addChild(new ContainerComponent()
+            .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
+            .addChild(new WorldListComponent()
+                .setFlexShrink(1F))
             .setFlexShrink(1F));
 
     container.layout();

@@ -50,7 +50,7 @@ public class MenuScreen extends ComponentScreen {
   private Page currentPage;
 
   public MenuScreen(Page page) {
-    super(new TranslationTextComponent("narrator.screen.title"));
+    super(new TranslationTextComponent("menu.home.title"));
 
     // Fix null font field in constructor
     final Minecraft mc = Minecraft.getInstance();
@@ -118,7 +118,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addClickSound(SoundEvents.UI_BUTTON_CLICK)
         .addActionListener(c -> this.displayPage(Page.HOME))
-        .setTooltip(new Tooltip(new TranslationTextComponent("menu.home"))));
+        .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
 
     sideBar.addChild(new RectangleComponent()
         .setUnscaleHeight()
@@ -137,7 +137,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addClickSound(SoundEvents.UI_BUTTON_CLICK)
         .addActionListener(c -> this.displayPage(Page.PLAY))
-        .setTooltip(new Tooltip(new TranslationTextComponent("menu.play"))));
+        .setTooltip(new Tooltip(new TranslationTextComponent("menu.play_button"))));
 
     sideBar.addChild(new RectangleComponent()
         .setUnscaleHeight()

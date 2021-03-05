@@ -37,7 +37,6 @@ public class StartScreen extends ModScreen {
   private float fadeStartTime = 0L;
 
   public StartScreen() {
-    // TODO add narrator.screen.start translation
     super(new TranslationTextComponent("narrator.screen.start"));
   }
 
@@ -64,8 +63,9 @@ public class StartScreen extends ModScreen {
         logoHeight);
     RenderSystem.disableBlend();
 
-    this.font.drawString(matrixStack, I18n.format("menu.start"),
-        this.width / 2 - this.font.getStringWidth(I18n.format("menu.start")) / 2,
+    String messageText = I18n.format("gui.screen.start.message");
+    this.font.drawString(matrixStack, messageText,
+        this.width / 2 - this.font.getStringWidth(messageText) / 2,
         this.height / 2 + this.height / 4, 0xFFFFFF | MathHelper.ceil(fadePct * 255.0F) << 24);
   }
 

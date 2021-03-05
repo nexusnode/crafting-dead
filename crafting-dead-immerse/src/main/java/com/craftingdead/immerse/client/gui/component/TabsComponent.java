@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 public class TabsComponent extends ParentComponent<TabsComponent> {
 
-  private List<Tab> tabList = new ArrayList<>();
+  private final List<Tab> tabList = new ArrayList<>();
   private Tab selectedTab = null;
   private float tabWidth = 60f;
   private float tabHeight = 20f;
@@ -47,47 +47,47 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
    * If called after adding this component as a child,
    */
   public TabsComponent addTab(Tab tab) {
-    tabList.add(tab);
+    this.tabList.add(tab);
     return this;
   }
 
   @Override
   protected void layout() {
-    init();
+    this.init();
     super.layout();
   }
 
   public void init() {
-    if (init) {
+    if (this.init) {
       return;
     }
-    init = true;
+    this.init = true;
     Tab newSelectedTab = null;
-    for (Tab tab : tabList) {
-      tab.setWidth(tabWidth);
-      float y = (tabHeight - this.minecraft.fontRenderer.FONT_HEIGHT) / 2F;
+    for (Tab tab : this.tabList) {
+      tab.setWidth(this.tabWidth);
+      float y = (this.tabHeight - this.minecraft.fontRenderer.FONT_HEIGHT) / 2F;
       tab.setTopPadding(y);
       tab.setBottomPadding(y);
       this.addChild(tab);
-      if (tab.isSelected() && selectedTab == null) {
+      if (tab.isSelected() && this.selectedTab == null) {
         newSelectedTab = tab;
       } else if (tab.isSelected()) {
         tab.setSelected(false);
       }
       tab.layout();
-      tab.addActionListener(tab1 -> changeTab((Tab) tab1));
+      tab.addActionListener(tab1 -> this.changeTab((Tab) tab1));
     }
 
     if (newSelectedTab != null) {
-      changeTab(newSelectedTab);
-    } else if (tabList.size() > 0){
-      changeTab(tabList.get(0));
+      this.changeTab(newSelectedTab);
+    } else if (this.tabList.size() > 0) {
+      this.changeTab(this.tabList.get(0));
     }
   }
 
   private void changeTab(Tab newTab) {
-    Tab previousTab = selectedTab;
-    selectedTab = newTab;
+    Tab previousTab = this.selectedTab;
+    this.selectedTab = newTab;
     if (previousTab != newTab) {
       if (previousTab != null) {
         previousTab.setSelected(false);
@@ -98,12 +98,13 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
   }
 
   public void addTabChangeListener(Consumer<Tab> listener) {
-    this.addListener(TabChangeEvent.class, (tabsComponent, tabChangeEvent) -> {
-      listener.accept(tabChangeEvent.getTab());
-    });
+    this.addListener(TabChangeEvent.class,
+        (tabsComponent, tabChangeEvent) -> listener.accept(tabChangeEvent.getTab()));
   }
 
+
   public static class Tab extends TextBlockComponent {
+
     public static final Colour DEFAULT_UNDERSCORE_COLOR = Colour.WHITE;
     public static final double DEFAULT_UNDERSCORE_HEIGHT = 2.5D;
     public static final int DEFAULT_UNDERSCORE_OFFSET = 1;
@@ -150,18 +151,24 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
       super.render(matrixStack, mouseX, mouseY, partialTicks);
 
       if (this.selected) {
-        RenderUtil.fill(this.getScaledX(), this.getScaledY() + this.getScaledHeight() - underscoreHeight + underscoreYOffset,
+        RenderUtil.fill(this.getScaledX(),
+            this.getScaledY() + this.getScaledHeight() - this.underscoreHeight
+                + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
-            this.getScaledY() + this.getScaledHeight() + underscoreYOffset, underscoreColor.getHexColour());
+            this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
+            this.underscoreColor.getHexColour());
       } else if (this.hovered) {
-        RenderUtil.fill(this.getScaledX(), this.getScaledY() + this.getScaledHeight() - underscoreHeight / 1.5D + underscoreYOffset,
+        RenderUtil.fill(this.getScaledX(),
+            this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5D
+                + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
-            this.getScaledY() + this.getScaledHeight() + underscoreYOffset, underscoreColor.getHexColour());
+            this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
+            this.underscoreColor.getHexColour());
       }
     }
 
     public boolean isSelected() {
-      return selected;
+      return this.selected;
     }
 
     public Tab setSelected(boolean selected) {
@@ -170,7 +177,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     public Colour getUnderscoreColor() {
-      return underscoreColor;
+      return this.underscoreColor;
     }
 
     public Tab setUnderscoreColor(Colour underscoreColor) {
@@ -179,7 +186,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     public double getUnderscoreHeight() {
-      return underscoreHeight;
+      return this.underscoreHeight;
     }
 
     public Tab setUnderscoreHeight(double underscoreHeight) {
@@ -188,7 +195,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     public boolean isDisabled() {
-      return disabled;
+      return this.disabled;
     }
 
     public Tab setDisabled(boolean disabled) {
@@ -197,7 +204,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     public float getUnderscoreYOffset() {
-      return underscoreYOffset;
+      return this.underscoreYOffset;
     }
 
     public Tab setUnderscoreYOffset(float underscoreYOffset) {

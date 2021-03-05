@@ -28,7 +28,6 @@ public class ContentDropdownComponent extends DropdownComponent {
   private final ParentComponent<?> contentContainer;
 
   public ContentDropdownComponent(ParentComponent<?> contentContainer) {
-    super();
     this.contentContainer = contentContainer;
     this.addSelectListener(this::onSelectionChanged);
   }
@@ -46,10 +45,8 @@ public class ContentDropdownComponent extends DropdownComponent {
   }
 
   private void onSelectionChanged(int newSelectionId) {
-    contentContainer.clearChildren();
-    contentContainer.addChild(itemContent.get(newSelectionId));
-    contentContainer.layout();
+    this.contentContainer.clearChildren();
+    this.contentContainer.addChild(this.itemContent.get(newSelectionId));
+    this.contentContainer.layout();
   }
-
-
 }

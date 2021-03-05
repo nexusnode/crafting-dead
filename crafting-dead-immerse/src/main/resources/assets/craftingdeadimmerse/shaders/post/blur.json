@@ -27,46 +27,6 @@
         {
             "name": "craftingdeadimmerse:blur",
             "intarget": "swap",
-            "outtarget": "swap",
-            "uniforms": [
-                {
-                    "name": "BlurDir",
-                    "values": [
-                        0.0,
-                        1.0
-                    ]
-                },
-                {
-                    "name": "Radius",
-                    "values": [
-                        20.0
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "craftingdeadimmerse:blur",
-            "intarget": "swap",
-            "outtarget": "swap",
-            "uniforms": [
-                {
-                    "name": "BlurDir",
-                    "values": [
-                        1.0,
-                        0.0
-                    ]
-                },
-                {
-                    "name": "Radius",
-                    "values": [
-                        20.0
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "craftingdeadimmerse:blur",
-            "intarget": "swap",
             "outtarget": "output",
             "uniforms": [
                 {

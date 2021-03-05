@@ -24,17 +24,23 @@
     "gui.screen.shop.inventory":"Inventory",
     "gui.screen.select_team.title":"Select Team",
 
+    "narrator.screen.start": "Start",
+
     "game.craftingdeadimmerse.deathmatch":"Team Deathmatch",
 
-    "menu.start": "Press the space bar to start",
-    "menu.play": "Play Game",
-    "menu.home": "Home",
-    "menu.play.play": "Play",
-    "menu.play.dropdown.official": "Official",
-    "menu.play.dropdown.singleplayer": "Singleplayer",
-    "menu.play.dropdown.community": "Community",
+    "gui.screen.start.message": "Press the space bar to start",
+
+    "menu.play_button": "Play Game",
+    "menu.home_button": "Home",
+
+    "menu.home.title": "Home",
+
+    "menu.play.title": "PLAY",
+    "menu.play.dropdown.official": "OFFICIAL",
+    "menu.play.dropdown.singleplayer": "SINGLEPLAYER",
+    "menu.play.dropdown.community": "COMMUNITY",
     "menu.play.tab.survival": "Community",
-    "menu.play.tab.team_death_match": "Team DM",
+    "menu.play.tab.team_death_match": "TDM",
     "menu.play.server_list.server": "SERVER",
     "menu.play.server_list.ping": "PING",
     "menu.play.server_list.players": "PLAYERS",

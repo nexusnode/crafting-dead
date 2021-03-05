@@ -83,12 +83,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
           (SimpleTweenType.FloatGetter<Component<?>>) c -> c.bottomBorderWidth,
           (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.bottomBorderWidth = v);
   public static final TweenType<Component<?>> BACKGROUND_COLOUR =
-      new SimpleTweenType<>( 4,
-          t -> t.backgroundColour.getColour4f(),
+      new SimpleTweenType<>(4, t -> t.backgroundColour.getColour4f(),
           (t, v) -> t.backgroundColour.setColour4f(v));
   public static final TweenType<Component<?>> BORDER_WIDTH =
-      new SimpleTweenType<>( 4,
-          t -> new float[]{t.topBorderWidth, t.rightBorderWidth, t.bottomBorderWidth, t.leftBorderWidth},
+      new SimpleTweenType<>(4,
+          t -> new float[] {t.topBorderWidth, t.rightBorderWidth, t.bottomBorderWidth,
+              t.leftBorderWidth},
           (t, v) -> {
             t.topBorderWidth = v[0];
             t.rightBorderWidth = v[1];
@@ -201,21 +201,25 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
     RenderSystem.enableDepthTest();
     if (this.topBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getScaledX() + this.getScaledWidth(),
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour(), 0.5D);
     }
     if (this.rightBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth, this.getScaledY(),
+      RenderUtil.fill(this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
+          this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
           this.rightBorderColour.getHexColour(), 0.5D);
     }
     if (this.bottomBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
+      RenderUtil.fill(this.getScaledX(),
+          this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
           this.bottomBorderColour.getHexColour(), 0.5D);
     }
     if (this.leftBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getScaledX() + this.leftBorderWidth,
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+          this.getScaledX() + this.leftBorderWidth,
           this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour(), 0.5D);
     }
     RenderSystem.disableDepthTest();
@@ -268,6 +272,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
       this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
     }
   }
+
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_PRESS));
@@ -311,8 +316,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   /**
-   * Checks if mouse is over a component based on mouse position.
-   * Doesn't check whether there are other components over this one.
+   * Checks if mouse is over a component based on mouse position. Doesn't check whether there are
+   * other components over this one.
+   * 
    * @see #isMouseOver()
    */
   @Override
@@ -323,11 +329,13 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   /**
    * Similar to {@link #isMouseOver(double, double)} but checks for components over it
-   * @return {@code false} if mouse is not over the component or if there's another component over it
+   * 
+   * @return {@code false} if mouse is not over the component or if there's another component over
+   *         it
    * @see #isMouseOver(double, double)
    */
   protected boolean isMouseOver() {
-    return mouseOver;
+    return this.mouseOver;
   }
 
   public final TweenManager getTweenManager() {
@@ -442,7 +450,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public final float getY() {
     return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
         + (this.parent == null ? 0f : this.parent.getContentY())
-        + (this.unscaleHeight ? this.getHeight() * this.mainWindow.getGuiScaleFactor() : 0.0F));
+        + (this.unscaleHeight ? this.getHeight() / 2.0F * this.mainWindow.getGuiScaleFactor()
+            : 0.0F));
   }
 
   public final float getScaledWidth() {

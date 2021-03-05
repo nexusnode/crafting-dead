@@ -18,8 +18,11 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 public class DropdownComponent extends Component<DropdownComponent> {
-  public static final int DEFAULT_ITEM_HEIGHT = 14;
-  public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0xEA666666;
+  public static final int DEFAULT_HEIGHT = 14;
+  public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0xFF444444;
+  public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR = 0xFF222222;
+  public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR = 0xFF333333;
+
   public static final int DEFAULT_Z_LEVEL = 5;
   public static final double DEFAULT_ARROW_WIDTH = 12D;
   public static final double DEFAULT_ARROW_HEIGHT = 5D;
@@ -28,28 +31,30 @@ public class DropdownComponent extends Component<DropdownComponent> {
 
   private static final Logger logger = LogManager.getLogger();
 
-  //Need ordering for #mouseClicked, could alternatively use LinkedHashMap for insertion ordering
+  // Need ordering for #mouseClicked, could alternatively use LinkedHashMap for insertion ordering
   private final Map<Integer, Item> items = new TreeMap<>();
 
-  private int itemHeight;
-  private int itemBgColour;
+  private int itemBackgroundColour;
+  private int selectedItemBackgroundColour;
+  private int hoveredItemBackgroundColour;
 
   private boolean expanded = false;
   private int selectedItemId = -1;
   private boolean init = false;
 
   private double arrowWidth;
-  private double arrowHeight ;
+  private double arrowHeight;
   private double arrowLineWidth;
   private double arrowLineWidthX;
   private double arrowLineWidthY;
   private double xArrowOffset;
 
   public DropdownComponent() {
-    this.itemHeight = DEFAULT_ITEM_HEIGHT;
-    this.itemBgColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
+    this.setHeight(DEFAULT_HEIGHT);
+    this.itemBackgroundColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
+    this.selectedItemBackgroundColour = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR;
+    this.hoveredItemBackgroundColour = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR;
     this.setZLevel(DEFAULT_Z_LEVEL);
-    this.setHeight(itemHeight);
     this.arrowWidth = DEFAULT_ARROW_WIDTH;
     this.arrowHeight = DEFAULT_ARROW_HEIGHT;
     this.arrowLineWidth = DEFAULT_ARROW_LINE_WIDTH;
@@ -83,13 +88,18 @@ public class DropdownComponent extends Component<DropdownComponent> {
     return this;
   }
 
-  public DropdownComponent setItemHeight(int itemHeight) {
-    this.itemHeight = itemHeight;
+  public DropdownComponent setItemBackgroundColour(int itemBackgroundColour) {
+    this.itemBackgroundColour = itemBackgroundColour;
     return this;
   }
 
-  public DropdownComponent setItemBgColour(int bgColour) {
-    this.itemBgColour = bgColour;
+  public DropdownComponent setSelectedItemBackgroundColour(int selectedItemBackgroundColour) {
+    this.selectedItemBackgroundColour = selectedItemBackgroundColour;
+    return this;
+  }
+
+  public DropdownComponent setHoveredItemBackgroundColour(int hoveredItemBackgroundColour) {
+    this.hoveredItemBackgroundColour = hoveredItemBackgroundColour;
     return this;
   }
 
@@ -99,12 +109,12 @@ public class DropdownComponent extends Component<DropdownComponent> {
   }
 
   public DropdownComponent setDisabled(int itemId, boolean disabled) {
-    items.get(itemId).setDisabled(disabled);
+    this.items.get(itemId).setDisabled(disabled);
     return this;
   }
 
   public DropdownComponent selectItem(int itemId) {
-    this.onItemSelected(items.get(itemId));
+    this.onItemSelected(this.items.get(itemId));
     return this;
   }
 
@@ -121,8 +131,9 @@ public class DropdownComponent extends Component<DropdownComponent> {
           if (item.isDisabled()) {
             continue;
           }
-          final double itemY = this.getY() + this.getHeight() + this.itemHeight * i;
-          if (item.getId() != this.selectedItemId && mouseY >= itemY && mouseY <= itemY + this.itemHeight) {
+          final double itemY = this.getY() + this.getHeight() + this.getItemHeight() * i;
+          if (item.getId() != this.selectedItemId && mouseY >= itemY
+              && mouseY <= itemY + this.getItemHeight()) {
             this.onItemSelected(item);
           }
           i++;
@@ -135,9 +146,9 @@ public class DropdownComponent extends Component<DropdownComponent> {
   }
 
   public void addSelectListener(Consumer<Integer> listener) {
-    this.addListener(DropdownItemSelectEvent.class, (dropdownComponent, dropdownItemSelectEvent) -> {
-      listener.accept(dropdownItemSelectEvent.getItem().getId());
-    });
+    this.addListener(DropdownItemSelectEvent.class,
+        (dropdownComponent, dropdownItemSelectEvent) -> listener
+            .accept(dropdownItemSelectEvent.getItem().getId()));
   }
 
   protected void onItemSelected(Item item) {
@@ -155,63 +166,82 @@ public class DropdownComponent extends Component<DropdownComponent> {
   @Override
   protected void layout() {
     super.layout();
-    init();
+    this.init();
   }
 
   private void init() {
-    if (init) {
+    if (this.init) {
       return;
     }
-    init = true;
-    if (selectedItemId == -1 && items.size() > 0) {
-      this.selectItem(items.keySet().stream().findFirst().get());
+    this.init = true;
+    if (this.selectedItemId == -1 && this.items.size() > 0) {
+      this.selectItem(this.items.keySet().stream().findFirst().get());
     }
   }
 
   @Override
   public int getZLevel() {
-    return super.getZLevel() + (expanded ? 1 : 0);
+    return super.getZLevel() + (this.expanded ? 1 : 0);
   }
 
   @Override
   public boolean changeFocus(boolean focused) {
     boolean changeFocus = super.changeFocus(focused);
-    if (changeFocus != expanded) {
-      switchExpanded();
+    if (changeFocus != this.expanded) {
+      this.toggleExpanded();
     }
     return this.expanded;
   }
 
-  protected void switchExpanded() {
+  protected void toggleExpanded() {
     this.expanded = !this.expanded;
     this.zLevelChanged();
   }
 
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    if (expanded) {
-      //so clicks elsewhere get passed to #mouseClicked to minimize the dropdown
-      //might be buggy with components with higher Z level
-      //also mouse enter and leave events will not work for other components (with lower Z) while a dropdown is expanded
-      //TODO look for a better solution, maybe separate event when a component is clicked and general click event?
+    if (this.expanded) {
+      // so clicks elsewhere get passed to #mouseClicked to minimize the dropdown
+      // might be buggy with components with higher Z level
+      // also mouse enter and leave events will not work for other components (with lower Z) while a
+      // dropdown is expanded
+      // TODO look for a better solution, maybe separate event when a component is clicked and
+      // general click event?
       return true;
     }
     return mouseX > this.getX() && mouseX < this.getX() + this.getWidth() &&
         mouseY > this.getY() && mouseY < this.getY() + this.getHeight()
-        + (this.expanded ? this.items.size() * itemHeight : 0);
+            + (this.expanded ? this.items.size() * this.getItemHeight() : 0);
+  }
+
+  protected int getItemHeight() {
+    return (int) this.getScaledContentHeight();
   }
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
-    this.renderItem(this.getScaledContentY(), (int) this.getScaledContentHeight(),
-        this.items.get(this.selectedItemId), false, false);
+    this.renderItem(this.getScaledContentY(), this.getItemHeight(),
+        this.items.get(this.selectedItemId), Type.SELECTED);
     renderArrow();
     if (this.expanded) {
       int i = 0;
-      for (Item item : items.values()) {
-        final double itemY = this.getScaledContentY() + this.getHeight() + this.itemHeight * i;
-        this.renderItem(itemY, this.itemHeight, item, item.getId() == this.selectedItemId, item.isDisabled());
+      for (Item item : this.items.values()) {
+        final double itemY = this.getScaledContentY() + this.getHeight() + this.getItemHeight() * i;
+
+        Type type;
+        if (item.isDisabled()) {
+          type = Type.DISABLED;
+        } else if (item.getId() == this.selectedItemId) {
+          type = Type.HIGHLIGHTED;
+        } else if (this.isMouseOver() && mouseY >= itemY
+            && mouseY <= itemY + this.getItemHeight()) {
+          type = Type.HOVERED;
+        } else {
+          type = Type.NONE;
+        }
+
+        this.renderItem(itemY, this.getItemHeight(), item, type);
         i++;
       }
     }
@@ -219,55 +249,79 @@ public class DropdownComponent extends Component<DropdownComponent> {
 
   @SuppressWarnings("deprecation")
   private void renderArrow() {
-    //TODO make it smoother around the edges?
+    // TODO make it smoother around the edges?
     RenderSystem.pushMatrix();
     {
-      double xOffset = this.getScaledContentX() + this.getScaledContentWidth() * (1 - xArrowOffset);
-      double yOffset = (this.getScaledContentY() + (this.getScaledContentHeight() - arrowHeight) / 2d);
+      double xOffset =
+          this.getScaledContentX() + this.getScaledContentWidth() * (1 - this.xArrowOffset);
+      double yOffset =
+          (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2d);
       RenderSystem.translated(xOffset, yOffset, 0);
       Tessellator tessellator = Tessellator.getInstance();
       BufferBuilder buffer = tessellator.getBuffer();
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
       buffer.pos(0, 0, 0.0D).endVertex();
-      buffer.pos(arrowWidth / 2.0D, arrowHeight, 0.0D).endVertex();
-      buffer.pos(arrowWidth / 2.0D, arrowHeight - arrowLineWidthY, 0.0D).endVertex();
-      buffer.pos(arrowLineWidthX, 0, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D).endVertex();
+      buffer.pos(this.arrowLineWidthX, 0, 0.0D).endVertex();
       tessellator.draw();
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-      buffer.pos(arrowWidth - arrowLineWidthX, 0, 0.0D).endVertex();
-      buffer.pos(arrowWidth / 2.0D, arrowHeight - arrowLineWidthY, 0.0D).endVertex();
-      buffer.pos(arrowWidth / 2.0D, arrowHeight, 0.0D).endVertex();
-      buffer.pos(arrowWidth, 0, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth - this.arrowLineWidthX, 0, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
+      buffer.pos(this.arrowWidth, 0, 0.0D).endVertex();
       tessellator.draw();
     }
     RenderSystem.popMatrix();
   }
 
   private void calculateArrowLineWidthProjections() {
-    double arrowLinePitchRad = Math.toRadians(90) - Math.atan(arrowWidth / 2D / arrowHeight);
-    arrowLineWidthX = arrowLineWidth / Math.sin(arrowLinePitchRad);
-    arrowLineWidthY = arrowHeight - Math.tan(arrowLinePitchRad) * (arrowWidth / 2D - arrowLineWidthX);
+    double arrowLinePitchRad =
+        Math.toRadians(90) - Math.atan(this.arrowWidth / 2D / this.arrowHeight);
+    this.arrowLineWidthX = this.arrowLineWidth / Math.sin(arrowLinePitchRad);
+    this.arrowLineWidthY =
+        arrowHeight - Math.tan(arrowLinePitchRad) * (this.arrowWidth / 2D - this.arrowLineWidthX);
   }
 
-  private void renderItem(double y, int height, Item item, boolean selected, boolean disabled) {
-    RenderUtil.fill(this.getScaledContentX(), y,
-        this.getScaledContentX() + this.getScaledContentWidth(), y + height,
-        this.itemBgColour);
-    int colour;
-    if (disabled) {
-      colour = TextFormatting.GRAY.getColor();
-    } else if (selected) {
-      colour = TextFormatting.GRAY.getColor();
-    } else {
-      colour = TextFormatting.WHITE.getColor();
+  private void renderItem(double y, int height, Item item, Type type) {
+    int backgroundColour = this.itemBackgroundColour;
+    int textColour = TextFormatting.GRAY.getColor();
+
+    switch (type) {
+      case SELECTED:
+        backgroundColour ^= 0xFF000000;
+        backgroundColour += 128 << 24;
+        textColour = TextFormatting.WHITE.getColor();
+        break;
+      case HIGHLIGHTED:
+        backgroundColour = this.selectedItemBackgroundColour;
+        break;
+      case DISABLED:
+        textColour = TextFormatting.DARK_GRAY.getColor();
+        break;
+      case HOVERED:
+        backgroundColour = this.hoveredItemBackgroundColour;
+        break;
+      default:
+        break;
     }
 
+    RenderUtil.fill(this.getScaledContentX(), y,
+        this.getScaledContentX() + this.getScaledContentWidth(), y + height,
+        backgroundColour);
+
     this.minecraft.fontRenderer.func_238418_a_(item.text,
-        (int) this.getScaledContentX() + 3, (int) y + (height - this.minecraft.fontRenderer.FONT_HEIGHT) / 2 + 1,
-        (int) this.getScaledContentWidth(), colour);
+        (int) this.getScaledContentX() + 3,
+        (int) y + (height - this.minecraft.fontRenderer.FONT_HEIGHT) / 2 + 1,
+        (int) this.getScaledContentWidth(), textColour);
+  }
+
+  private enum Type {
+    HIGHLIGHTED, SELECTED, DISABLED, HOVERED, NONE;
   }
 
   public static class Item {
+
     private final int id;
     private final ITextComponent text;
     private boolean disabled = false;

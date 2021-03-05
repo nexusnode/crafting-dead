@@ -265,7 +265,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
       builder.setErrorHandler(LoggingErrorHandler.INSTANCE);
       document = builder.parse(file);
     } catch (IOException | ParserConfigurationException | SAXException e) {
-      logger.warn("Failed to pass xml {} {}", file.getAbsolutePath(), e);
+      logger.warn("Failed to parse xml {} {}", file.getAbsolutePath(), e);
       return this;
     }
 
