@@ -79,7 +79,12 @@ public class RenderUtil {
     ShaderLinkHelper.func_227804_a_(0);
   }
 
-  public static void fill(double x, double y, double x2, double y2, int colour) {
+
+  public static void fill(double x, double y, double x2, double y2, long colour) {
+    RenderUtil.fill(x, y, x2, y2, colour, 0D);
+  }
+
+  public static void fill(double x, double y, double x2, double y2, long colour, double z) {
     if (x < x2) {
       double i = x;
       x = x2;
@@ -102,10 +107,10 @@ public class RenderUtil {
     RenderSystem.disableTexture();
     RenderSystem.defaultBlendFunc();
     buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-    buffer.pos(x, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x2, y2, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x2, y, 0.0D).color(f, f1, f2, f3).endVertex();
-    buffer.pos(x, y, 0.0D).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x, y2, z).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x2, y2, z).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x2, y, z).color(f, f1, f2, f3).endVertex();
+    buffer.pos(x, y, z).color(f, f1, f2, f3).endVertex();
     tessellator.draw();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
@@ -181,7 +186,7 @@ public class RenderUtil {
     minecraft.getTextureManager().bindTexture(resourceLocation);
   }
 
-  public static int lerp(int colour1, int colour2, float pct) {
+  public static long lerp(int colour1, int colour2, float pct) {
     return getColour(lerp(getColour4i(colour1), getColour4i(colour2), pct));
   }
 
@@ -198,12 +203,12 @@ public class RenderUtil {
         colour4i[3] / 255.0F};
   }
 
-  public static int[] getColour4i(int colour) {
+  public static int[] getColour4i(long colour) {
     int[] rgba = new int[4];
-    rgba[0] = (colour >> 16) & 0xFF;
-    rgba[1] = (colour >> 8) & 0xFF;
-    rgba[2] = (colour >> 0) & 0xFF;
-    rgba[3] = (colour >> 24) & 0xFF;
+    rgba[0] = (int) ((colour >> 16) & 0xFF);
+    rgba[1] = (int) (colour >> 8) & 0xFF;
+    rgba[2] = (int) (colour >> 0) & 0xFF;
+    rgba[3] = (int) (colour >> 24) & 0xFF;
     return rgba;
   }
 
@@ -212,8 +217,8 @@ public class RenderUtil {
         MathHelper.ceil(colour4f[2] * 255), MathHelper.ceil(colour4f[3] * 255)};
   }
 
-  public static int getColour(int[] colour4i) {
-    return ((colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16) | ((colour4i[1] & 0xFF) << 8)
+  public static long getColour(int[] colour4i) {
+    return ((long) (colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16) | ((colour4i[1] & 0xFF) << 8)
         | ((colour4i[2] & 0xFF) << 0);
   }
 }

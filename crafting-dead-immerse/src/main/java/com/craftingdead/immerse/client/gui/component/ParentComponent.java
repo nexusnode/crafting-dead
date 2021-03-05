@@ -17,10 +17,12 @@
  */
 package com.craftingdead.immerse.client.gui.component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
+import com.craftingdead.immerse.client.gui.component.type.*;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.yoga.Yoga;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -30,7 +32,8 @@ import net.minecraft.client.gui.INestedGuiEventHandler;
 public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Component<SELF>
     implements INestedGuiEventHandler {
 
-  private final List<Component<?>> children = new ArrayList<>();
+  private final List<Child> children = new ArrayList<>();
+  private int prevChildIndex = -1;
 
   protected final long contentNode;
 
@@ -45,7 +48,6 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   @Override
   protected void removed() {
     super.removed();
-    Yoga.YGNodeFreeRecursive(this.contentNode);
   }
 
   @Override
@@ -53,14 +55,30 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     super.layout();
     Yoga.YGNodeCalculateLayout(this.contentNode, this.getContentWidth(), this.getContentHeight(),
         Yoga.YGDirectionLTR);
-    this.children.forEach(Component::layout);
+    this.getChildren().forEach(child -> child.getComponent().layout());
+  }
+
+  public float getTopScissorBoundScaled() {
+    float bound = this.getOverflow() == Overflow.HIDDEN ? Float.MIN_VALUE : this.getScaledY();
+    if (parent == null || !(parent instanceof ParentComponent)) {
+      return bound;
+    }
+    return Math.max(bound, ((ParentComponent<?>)this.parent).getTopScissorBoundScaled());
+  }
+
+  public float getBotScissorBoundScaled() {
+    float bound = this.getOverflow() == Overflow.HIDDEN ? Float.MAX_VALUE : this.getScaledY() + this.getScaledHeight();
+    if (parent == null || !(parent instanceof ParentComponent)) {
+      return bound;
+    }
+    return Math.min(bound, ((ParentComponent<?>)this.parent).getBotScissorBoundScaled());
   }
 
   @Override
   public void tick() {
     super.tick();
-    for (Component<?> child : this.getEventListeners()) {
-      child.tick();
+    for (Child child : this.getChildren()) {
+      child.getComponent().tick();
     }
   }
 
@@ -72,22 +90,58 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   protected void renderChildren(MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    for (Component<?> child : this.getEventListeners()) {
-      child.render(matrixStack, mouseX, mouseY, partialTicks);
+    for (Child child : this.getChildren()) {
+      child.getComponent().render(matrixStack, mouseX, mouseY, partialTicks);
     }
   }
 
   @Override
   public List<Component<?>> getEventListeners() {
+    return this.getChildrenComponents();
+  }
+
+  public List<Child> getChildren() {
     return this.children;
+  }
+
+  public List<Component<?>> getChildrenComponents() {
+    return this.getChildren().stream()
+        .map(Child::getComponent)
+        .collect(Collectors.toList());
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     super.mouseMoved(mouseX, mouseY);
-    for (Component<?> child : this.getEventListeners()) {
-      child.mouseMoved(mouseX, mouseY);
+    for (Child child : this.getChildren()) {
+      child.getComponent().mouseMoved(mouseX, mouseY);
     }
+
+    Optional<Component<?>> mouseOverChild = this.getComponentForPos(mouseX, mouseY);
+    if (this.isMouseOver()) {
+      mouseOverChild
+          .filter(component -> !component.isMouseOver())
+          .ifPresent(component -> component.mouseEntered(mouseX,mouseY));
+    }
+    this.getChildren().stream()
+        .filter(child -> child.getComponent().isMouseOver() &&
+            (!mouseOverChild.isPresent() || !mouseOverChild.get().equals(child.getComponent())))
+        .forEach(child -> child.getComponent().mouseLeft(mouseX, mouseY));
+  }
+
+  @Override
+  public boolean isMouseOver(double mouseX, double mouseY) {
+    boolean mouseOverThis = super.isMouseOver(mouseX, mouseY);
+    if (mouseOverThis) {
+      return true;
+    }
+    //for cases when a child is overflowing its parent (e.g. expanded dropdown)
+    for (Child child : this.getChildren()) {
+      if (child.getComponent().isMouseOver(mouseX, mouseY)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -153,6 +207,12 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.dragging = dragging;
   }
 
+  @Override
+  public void close() {
+    this.closeChildren();
+    super.close();
+  }
+
   @Nullable
   @Override
   public IGuiEventListener getListener() {
@@ -172,39 +232,59 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.focused = focused;
   }
 
-  public SELF addChild(int index, Component<?> child) {
-    this.getEventListeners().add(index, child);
-    this.childAdded(child, index);
+  public SELF addChild(Component<?> child) {
+    this.getChildren().add(new Child(child, ++prevChildIndex));
+    this.childAdded(child, this.getChildren().size() - 1);
     return this.self();
   }
 
-  public SELF addChild(Component<?> child) {
-    this.getEventListeners().add(child);
-    this.childAdded(child, this.children.size() - 1);
-    return this.self();
+  private void sortChildren() {
+    this.getChildren().sort(Comparator.naturalOrder());
   }
 
   protected void childAdded(Component<?> child, int index) {
     Yoga.YGNodeInsertChild(this.contentNode, child.node, index);
+    child.addListener(ZLevelChangeEvent.class, (component, zLevelChangeEvent) -> this.sortChildren());
+    //TODO how to unregister the listener
     child.parent = this;
+    sortChildren();
     child.added();
   }
 
-  public SELF removeChild(Component<?> child) {
-    this.childRemoved(child);
-    this.getEventListeners().remove(child);
+  public SELF removeChild(Component<?> childComponent) {
+    this.getChildren().stream().
+        filter(child -> child.getComponent().equals(childComponent))
+        .findAny()
+        .ifPresent(child -> {
+          this.childRemoved(child);
+          this.getChildren().remove(child);
+        });
     return this.self();
   }
 
-  protected void childRemoved(Component<?> child) {
-    child.removed();
-    child.parent = null;
-    Yoga.YGNodeRemoveChild(this.contentNode, child.node);
+  protected void childRemoved(Child child) {
+    Yoga.YGNodeRemoveChild(this.contentNode, child.getComponent().node);
+    child.getComponent().removed();
+    child.getComponent().parent = null;
   }
 
   public SELF clearChildren() {
-    this.children.forEach(this::childRemoved);
-    this.children.clear();
+    this.getChildren().forEach(this::childRemoved);
+    this.getChildren().clear();
+    return this.self();
+  }
+
+  public SELF closeChildren() {
+    this.getChildren().forEach(child -> child.getComponent().close());
+    return this.self();
+  }
+
+  public SELF clearChildrenClosing() {
+    for (Child child : this.getChildren()) {
+      this.childRemoved(child);
+      child.getComponent().close();
+    }
+    this.getChildren().clear();
     return this.self();
   }
 
@@ -217,8 +297,9 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
    * @return the {@link Component} if found
    */
   public Optional<Component<?>> getComponentForPos(double mouseX, double mouseY) {
-    for (int i = this.getEventListeners().size() - 1; i >= 0; i--) {
-      Component<?> component = this.getEventListeners().get(i);
+    ListIterator<Child> iter = this.getChildren().listIterator(this.getChildren().size());
+    while (iter.hasPrevious()) {
+      Component<?> component = iter.previous().getComponent();
       if (component.isMouseOver(mouseX, mouseY)) {
         return Optional.of(component);
       }
@@ -240,6 +321,11 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     return this.self();
   }
 
+  public final SELF setFlexWrap(FlexWrap flexDirection) {
+    Yoga.YGNodeStyleSetFlexWrap(this.contentNode, flexDirection.getYogaType());
+    return this.self();
+  }
+
   public final SELF setAlignItems(Align align) {
     Yoga.YGNodeStyleSetAlignItems(this.contentNode, align.getYogaType());
     return this.self();
@@ -257,5 +343,38 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   public final SELF setOverflow(Overflow overflow) {
     Yoga.YGNodeStyleSetOverflow(this.contentNode, overflow.getYogaType());
     return this.self();
+  }
+
+  public static class Child implements Comparable<Child> {
+    private final Component<?> component;
+    private final int insertionId;
+
+    public Child(Component<?> component, int insertionId) {
+      this.component = component;
+      this.insertionId = insertionId;
+    }
+
+    public int getInsertionId() {
+      return insertionId;
+    }
+
+    public Component<?> getComponent() {
+      return component;
+    }
+
+
+    @Override
+    public int compareTo(Child another) {
+      if (another == null) {
+        return 1;
+      }
+      if (this.getComponent().getZLevel() < another.getComponent().getZLevel()) {
+        return -1;
+      } else if (this.getComponent().getZLevel() > another.getComponent().getZLevel()) {
+        return 1;
+      } else {
+        return Integer.compare(this.insertionId, another.insertionId);
+      }
+    }
   }
 }

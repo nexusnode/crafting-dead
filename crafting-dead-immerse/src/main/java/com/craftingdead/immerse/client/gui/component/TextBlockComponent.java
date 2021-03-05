@@ -19,6 +19,9 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.craftingdead.core.util.Text;
+import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.RenderComponentsUtil;
@@ -32,20 +35,55 @@ import net.minecraft.util.text.Style;
 
 public class TextBlockComponent extends Component<TextBlockComponent> {
 
-  private final FontRenderer fontRenderer;
-
-  private final ITextComponent text;
-
-  private final boolean shadow;
-
+  private  ITextComponent text;
+  private FontRenderer fontRenderer;
+  private boolean shadow;
+  private boolean centered;
+  private boolean customWidth = false;
   private List<IReorderingProcessor> lines;
 
-  public TextBlockComponent(FontRenderer fontRenderer, ITextComponent text, boolean shadow) {
-    this.fontRenderer = fontRenderer;
+  public TextBlockComponent(ITextComponent text) {
+    super();
     this.text = text;
-    this.shadow = shadow;
+    this.fontRenderer = super.minecraft.fontRenderer;
+    this.shadow = true;
+    this.centered = false;
     // Auto adjust width to size of text
-    this.setWidth(this.fontRenderer.getStringPropertyWidth(text));
+    super.setWidth(this.fontRenderer.getStringPropertyWidth(text));
+  }
+
+  public TextBlockComponent(String text) {
+    this(Text.of(text));
+  }
+
+  public TextBlockComponent setFontRenderer(FontRenderer fontRenderer) {
+    this.fontRenderer = fontRenderer;
+    return this;
+  }
+
+  public TextBlockComponent setShadow(boolean shadow) {
+    this.shadow = shadow;
+    return this;
+  }
+
+  public TextBlockComponent setCentered(boolean centered) {
+    this.centered = centered;
+    return this;
+  }
+
+  @Override
+  public TextBlockComponent setWidth(float width) {
+    this.customWidth = true;
+    return super.setWidth(width);
+  }
+
+  public void changeText(ITextComponent text) {
+    this.lines = null;
+    this.text = text;
+    if (!customWidth) {
+      super.setWidth(this.fontRenderer.getStringPropertyWidth(text));
+    }
+    this.layout();
   }
 
   @Override
@@ -58,7 +96,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
 
   @Override
   protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-      float height) {
+                             float height) {
     if (widthMode == MeasureMode.UNDEFINED) {
       width = this.fontRenderer.getStringWidth(this.text.getString());
     }
@@ -91,7 +129,8 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
         matrixStack.push();
         {
           matrixStack.translate(0.0D, i * this.fontRenderer.FONT_HEIGHT, 0.0D);
-          this.fontRenderer.func_238416_a_(line, 0, 0, 0xFFFFFFFF, this.shadow,
+          float x = this.centered ? (this.getWidth()  - fontRenderer.func_243245_a(line)) / 2F : 0;
+          this.fontRenderer.func_238416_a_(line, x, 0, 0xFFFFFFFF, this.shadow,
               matrixStack.getLast().getMatrix(), renderTypeBuffer, false, 0, 0xF000F0);
         }
         matrixStack.pop();

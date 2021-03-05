@@ -23,6 +23,9 @@ import java.util.function.Consumer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import com.craftingdead.immerse.client.gui.component.type.FitType;
+import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -85,16 +88,16 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   public void layout() {
     super.layout();
     this.totalHeight =
+        scrollOffset +
         (float) (this.getEventListeners()
             .stream()
-            .mapToDouble(c -> c.getY() + c.getHeight())
+            .mapToDouble(c -> c.getY() + c.getHeight() + c.getBottomMargin() + this.getBottomPadding())
             .max()
             .orElse(0.0F)
-            - this.getEventListeners()
-                .stream()
-                .mapToDouble(Component::getY)
-                .min()
-                .orElse(0.0F));
+            - super.getContentY());
+    if (this.totalHeight < 0) {
+      this.totalHeight = 0F;
+    }
     if (this.isScrollbarEnabled() != this.calculateWidthWithScrollbar) {
       this.calculateWidthWithScrollbar = this.isScrollbarEnabled();
       super.layout();
@@ -201,16 +204,23 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
+    boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
     if (scissor) {
+      if(alreadyEnabled) {
+        GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
+      }
       GL11.glEnable(GL11.GL_SCISSOR_TEST);
+      double lowerBound = this.getBotScissorBoundScaled() * scale;
       GL11.glScissor((int) (this.getScaledX() * scale),
-          (int) (this.mainWindow.getFramebufferHeight()
-              - ((this.getScaledY() + this.getScaledHeight()) * scale)),
-          (int) (this.getScaledWidth() * scale), (int) (this.getScaledHeight() * scale));
+          (int) (this.mainWindow.getFramebufferHeight() - lowerBound),
+          (int) (this.getScaledWidth() * scale), (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
     }
     super.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
       GL11.glDisable(GL11.GL_SCISSOR_TEST);
+      if(alreadyEnabled) {
+        GL11.glPopAttrib();
+      }
     }
   }
 
@@ -262,7 +272,6 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
     }
 
     NodeList nodes = document.getDocumentElement().getChildNodes();
-    int nextIndex = this.getEventListeners().size();
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       switch (node.getNodeName()) {
@@ -289,11 +298,11 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
           }
 
           if (text != null) {
-            Component<?> component = new TextBlockComponent(this.minecraft.fontRenderer,
-                ForgeHooks.newChatWithLinks(text), shadow).setScale(scale);
+            Component<?> component = new TextBlockComponent(ForgeHooks.newChatWithLinks(text))
+                .setShadow(shadow)
+                .setScale(scale);
             component.setWidthPercent(100.0F);
             this.addChild(component);
-            nextIndex++;
           }
           break;
         case "image":
@@ -356,7 +365,7 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
           if (height != null) {
             height.ifLeft(component::setHeight).ifRight(component::setHeightPercent);
           }
-          this.addChild(nextIndex, component);
+          this.addChild(component);
           DownloadUtil.downloadImageAsTexture(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {
                 component.setImage(image);
