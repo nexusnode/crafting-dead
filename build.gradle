@@ -1,13 +1,13 @@
 buildscript {
     repositories {
         maven { 
-        	name 'forge'
-        	url 'https://files.minecraftforge.net/maven'
-		}
-		maven {
-			name 'sponge'
-			url 'https://dist.creeper.host/Sponge/maven'
-		}
+            name 'forge'
+            url 'https://files.minecraftforge.net/maven'
+        }
+        maven {
+            name 'sponge'
+            url 'https://repo.spongepowered.org/repository/maven-public'
+        }
         jcenter()
     }
     dependencies {
@@ -25,23 +25,22 @@ plugins {
 subprojects {
     apply plugin: 'net.minecraftforge.gradle'
     apply plugin: 'org.spongepowered.mixin'
-	apply plugin: 'eclipse'
-	apply plugin: 'org.cadixdev.licenser'
+    apply plugin: 'eclipse'
+    apply plugin: 'org.cadixdev.licenser'
 
-	sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+    sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
     group = 'com.craftingdead'
     version = "${mod_version}"
-	
-	minecraft {
-    	mappings channel: "${mappings_channel}", version: "${mappings_version}"
+    minecraft {
+        mappings channel: "${mappings_channel}", version: "${mappings_version}"
     }
     
     repositories {
-	    jcenter()
-	    maven {
-	    	name 'sponge'
-	    	url 'https://dist.creeper.host/Sponge/maven'
+        jcenter()
+	maven {
+	    name 'sponge'
+	    url 'https://dist.creeper.host/Sponge/maven'
 		}
 	}
 
@@ -59,7 +58,7 @@ subprojects {
 	
 	jar {
 	    baseName = project.name
-	    appendix = minecraft_version
+        appendix = minecraft_version
 	    from {
 			configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
 		}
