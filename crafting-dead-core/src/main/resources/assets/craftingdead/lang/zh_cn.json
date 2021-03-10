@@ -44,8 +44,8 @@
   "fire_mode.auto":"自动模式",
   "fire_mode.semi":"半自动模式",
   "fire_mode.burst":"三连发模式",
-  "message.broken_leg": "他妈的! 你骨折了.",
-  "message.bleeding": "狗日的你他妈流血了!",
+  "message.broken_leg": "你骨折了.",
+  "message.bleeding": "你流血了!",
   "message.infected": "你已被丧尸病毒感染.",
   "message.low_health": "%1$s的生命值很低!",
 
