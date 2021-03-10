@@ -19,7 +19,7 @@ public class FogComponent extends Component<FogComponent> {
 
   @SuppressWarnings("deprecation")
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float paritalTicks) {
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float paritalTicks) {
     Vector2f fogSize =
         FitType.COVER.getSize(1920, 1080, this.getScaledContentWidth(),
             this.getScaledContentHeight());

@@ -18,9 +18,12 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
+import javax.annotation.Nullable;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.IRenderable;
 import net.minecraft.client.gui.screen.Screen;
 
-public interface IView {
+public interface IView extends IGuiEventListener, IRenderable {
 
   default float getContentX() {
     return 0.0F;
@@ -33,6 +36,11 @@ public interface IView {
   float getWidth();
 
   float getHeight();
+  
+  int getZLevel();
+
+  @Nullable
+  IParentView getParent();
 
   Screen getScreen();
 }

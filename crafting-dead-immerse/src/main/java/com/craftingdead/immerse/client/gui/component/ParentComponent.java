@@ -18,28 +18,31 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-
-import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
-import com.craftingdead.immerse.client.gui.component.type.*;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.yoga.Yoga;
+import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
+import com.craftingdead.immerse.client.gui.component.type.Align;
+import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.type.FlexWrap;
+import com.craftingdead.immerse.client.gui.component.type.Justify;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.INestedGuiEventHandler;
 
 public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Component<SELF>
-    implements INestedGuiEventHandler {
+    implements IParentView {
 
-  private final List<Child> children = new ArrayList<>();
+  private final List<Component<?>> children = new ArrayList<>();
   private int prevChildIndex = -1;
 
   protected final long contentNode;
 
   @Nullable
-  private IGuiEventListener focused;
+  private IGuiEventListener focusedListener;
   private boolean dragging;
 
   public ParentComponent() {
@@ -47,155 +50,95 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   @Override
-  protected void removed() {
-    super.removed();
+  public float getActualContentHeight() {
+    return Math.max(
+        (float) (this.getChildren()
+            .stream()
+            .mapToDouble(
+                c -> c.getY() + c.getHeight() + c.getBottomMargin())
+            .max()
+            .orElse(0.0F)
+            - super.getContentY()),
+        0);
   }
 
   @Override
-  protected void layout() {
-    super.layout();
+  public void layout() {
     Yoga.YGNodeCalculateLayout(this.contentNode, this.getContentWidth(), this.getContentHeight(),
         Yoga.YGDirectionLTR);
-    this.getChildren().forEach(child -> child.getComponent().layout());
-  }
-
-  public float getTopScissorBoundScaled() {
-    float bound = this.getOverflow() == Overflow.HIDDEN ? Float.MIN_VALUE : this.getScaledY();
-    if (parent == null || !(parent instanceof ParentComponent)) {
-      return bound;
-    }
-    return Math.max(bound, ((ParentComponent<?>)this.parent).getTopScissorBoundScaled());
-  }
-
-  public float getBotScissorBoundScaled() {
-    float bound = this.getOverflow() == Overflow.HIDDEN ? Float.MAX_VALUE : this.getScaledY() + this.getScaledHeight();
-    if (parent == null || !(parent instanceof ParentComponent)) {
-      return bound;
-    }
-    return Math.min(bound, ((ParentComponent<?>)this.parent).getBotScissorBoundScaled());
+    this.getChildren().forEach(Component::layout);
+    super.layout();
   }
 
   @Override
   public void tick() {
     super.tick();
-    for (Child child : this.getChildren()) {
-      child.getComponent().tick();
-    }
+    this.children.forEach(Component::tick);
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
-    this.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
-  }
-
-  protected void renderChildren(MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
-    for (Child child : this.getChildren()) {
-      child.getComponent().render(matrixStack, mouseX, mouseY, partialTicks);
-    }
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+    this.children.forEach(component -> component.render(matrixStack, mouseX, mouseY, partialTicks));
   }
 
   @Override
-  public List<Component<?>> getEventListeners() {
-    return this.getChildrenComponents();
-  }
-
-  public List<Child> getChildren() {
-    return this.children;
-  }
-
-  public List<Component<?>> getChildrenComponents() {
-    return this.getChildren().stream()
-        .map(Child::getComponent)
+  public List<? extends IGuiEventListener> getEventListeners() {
+    return this.children.stream()
+        .sorted(Collections.reverseOrder())
         .collect(Collectors.toList());
+  }
+
+  public List<Component<?>> getChildren() {
+    return this.children;
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
+    IParentView.super.mouseMoved(mouseX, mouseY);
     super.mouseMoved(mouseX, mouseY);
-    for (Child child : this.getChildren()) {
-      child.getComponent().mouseMoved(mouseX, mouseY);
-    }
-
-    Optional<Component<?>> mouseOverChild = this.getComponentForPos(mouseX, mouseY);
-    if (this.isMouseOver()) {
-      mouseOverChild
-          .filter(component -> !component.isMouseOver())
-          .ifPresent(component -> component.mouseEntered(mouseX,mouseY));
-    }
-    this.getChildren().stream()
-        .filter(child -> child.getComponent().isMouseOver() &&
-            (!mouseOverChild.isPresent() || !mouseOverChild.get().equals(child.getComponent())))
-        .forEach(child -> child.getComponent().mouseLeft(mouseX, mouseY));
   }
 
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    boolean mouseOverThis = super.isMouseOver(mouseX, mouseY);
-    if (mouseOverThis) {
-      return true;
-    }
-    //for cases when a child is overflowing its parent (e.g. expanded dropdown)
-    for (Child child : this.getChildren()) {
-      if (child.getComponent().isMouseOver(mouseX, mouseY)) {
-        return true;
-      }
-    }
-    return false;
+    return IParentView.super.isMouseOver(mouseX, mouseY) || super.isMouseOver(mouseX, mouseY);
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
-    }
-
-    final Component<?> component = this.getComponentForPos(mouseX, mouseY)
-        .filter(c -> c.mouseClicked(mouseX, mouseY, button))
-        .orElse(null);
-    if (component == null) {
-      this.setListener(null);
-      return false;
-    } else {
-      this.setListener(component);
-      if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-        this.setDragging(true);
-      }
-      return true;
-    }
+    return IParentView.super.mouseClicked(mouseX, mouseY, button)
+        || super.mouseClicked(mouseX, mouseY, button);
   }
 
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
-        || INestedGuiEventHandler.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    return IParentView.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+        || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
   }
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    return super.mouseScrolled(mouseX, mouseY, scrollDelta)
-        || this.getComponentForPos(mouseX, mouseY)
-            .filter(component -> component.mouseScrolled(mouseX, mouseY, scrollDelta)).isPresent();
+    return IParentView.super.mouseScrolled(mouseX, mouseY, scrollDelta)
+        || super.mouseScrolled(mouseX, mouseY, scrollDelta);
   }
 
   @Override
-  public boolean keyPressed(int key, int scancode, int mods) {
-    return super.keyPressed(key, scancode, scancode)
-        || INestedGuiEventHandler.super.keyPressed(key, scancode, scancode);
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    return IParentView.super.keyPressed(keyCode, scanCode, modifiers)
+        || super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
-  public boolean keyReleased(int key, int scancode, int mods) {
-    return super.keyReleased(key, scancode, scancode)
-        || INestedGuiEventHandler.super.keyReleased(key, scancode, mods);
+  public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    return IParentView.super.keyReleased(keyCode, scanCode, modifiers)
+        || super.keyReleased(keyCode, scanCode, modifiers);
   }
 
   @Override
-  public boolean charTyped(char character, int mods) {
-    return super.charTyped(character, mods)
-        || INestedGuiEventHandler.super.charTyped(character, mods);
+  public boolean charTyped(char codePoint, int modifiers) {
+    return IParentView.super.charTyped(codePoint, modifiers)
+        || super.charTyped(codePoint, modifiers);
   }
 
   @Override
@@ -217,24 +160,32 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   @Nullable
   @Override
   public IGuiEventListener getListener() {
-    return this.focused;
+    return this.focusedListener;
   }
 
   @Override
-  public void setListener(@Nullable IGuiEventListener focused) {
-    if (this.getListener() != focused) {
-      if (this.getListener() instanceof Component) {
-        ((Component<?>) this.getListener()).focusChanged(false);
-      }
-      if (focused instanceof Component) {
-        ((Component<?>) focused).focusChanged(true);
-      }
+  public boolean changeFocus(boolean focus) {
+    if (!super.changeFocus(focus)) {
+      return IParentView.super.changeFocus(focus);
     }
-    this.focused = focused;
+    return true;
+  }
+
+  @Override
+  public void setListener(@Nullable IGuiEventListener focusedListener) {
+    this.focusedListener = focusedListener;
   }
 
   public SELF addChild(Component<?> child) {
-    this.getChildren().add(new Child(child, ++prevChildIndex));
+    int zLevel = ++this.prevChildIndex;
+    IParentView parent = this;
+    while (parent != null) {
+      zLevel += parent.getZLevel();
+      parent = parent.getParent();
+    }
+    child.zLevel = zLevel;
+
+    this.children.add(child);
     this.childAdded(child, this.getChildren().size() - 1);
     return this.self();
   }
@@ -245,16 +196,17 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   protected void childAdded(Component<?> child, int index) {
     Yoga.YGNodeInsertChild(this.contentNode, child.node, index);
-    child.addListener(ZLevelChangeEvent.class, (component, zLevelChangeEvent) -> this.sortChildren());
-    //TODO how to unregister the listener
+    child.addListener(ZLevelChangeEvent.class,
+        (component, zLevelChangeEvent) -> this.sortChildren());
+    // TODO how to unregister the listener
     child.parent = this;
-    sortChildren();
+    this.sortChildren();
     child.added();
   }
 
   public SELF removeChild(Component<?> childComponent) {
-    this.getChildren().stream().
-        filter(child -> child.getComponent().equals(childComponent))
+    this.getChildren().stream()
+        .filter(childComponent::equals)
         .findAny()
         .ifPresent(child -> {
           this.childRemoved(child);
@@ -263,10 +215,10 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     return this.self();
   }
 
-  protected void childRemoved(Child child) {
-    Yoga.YGNodeRemoveChild(this.contentNode, child.getComponent().node);
-    child.getComponent().removed();
-    child.getComponent().parent = null;
+  protected void childRemoved(Component<?> child) {
+    Yoga.YGNodeRemoveChild(this.contentNode, child.node);
+    child.removed();
+    child.parent = null;
   }
 
   public SELF clearChildren() {
@@ -276,36 +228,17 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   public SELF closeChildren() {
-    this.getChildren().forEach(child -> child.getComponent().close());
+    this.getChildren().forEach(Component::close);
     return this.self();
   }
 
   public SELF clearChildrenClosing() {
-    for (Child child : this.getChildren()) {
+    for (Component<?> child : this.getChildren()) {
       this.childRemoved(child);
-      child.getComponent().close();
+      child.close();
     }
     this.getChildren().clear();
     return this.self();
-  }
-
-  /**
-   * Get a {@link Component} at the specified mouse position, similar to
-   * {@link #getEventListenerForPos(double, double)} but searches in reverse.
-   * 
-   * @param mouseX
-   * @param mouseY
-   * @return the {@link Component} if found
-   */
-  public Optional<Component<?>> getComponentForPos(double mouseX, double mouseY) {
-    ListIterator<Child> iter = this.getChildren().listIterator(this.getChildren().size());
-    while (iter.hasPrevious()) {
-      Component<?> component = iter.previous().getComponent();
-      if (component.isMouseOver(mouseX, mouseY)) {
-        return Optional.of(component);
-      }
-    }
-    return Optional.empty();
   }
 
   @Override
@@ -335,47 +268,5 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   public final SELF setJustifyContent(Justify justify) {
     Yoga.YGNodeStyleSetJustifyContent(this.contentNode, justify.getYogaType());
     return this.self();
-  }
-
-  public final Overflow getOverflow() {
-    return Overflow.fromYogaType(Yoga.YGNodeStyleGetOverflow(this.contentNode));
-  }
-
-  public final SELF setOverflow(Overflow overflow) {
-    Yoga.YGNodeStyleSetOverflow(this.contentNode, overflow.getYogaType());
-    return this.self();
-  }
-
-  public static class Child implements Comparable<Child> {
-    private final Component<?> component;
-    private final int insertionId;
-
-    public Child(Component<?> component, int insertionId) {
-      this.component = component;
-      this.insertionId = insertionId;
-    }
-
-    public int getInsertionId() {
-      return insertionId;
-    }
-
-    public Component<?> getComponent() {
-      return component;
-    }
-
-
-    @Override
-    public int compareTo(Child another) {
-      if (another == null) {
-        return 1;
-      }
-      if (this.getComponent().getZLevel() < another.getComponent().getZLevel()) {
-        return -1;
-      } else if (this.getComponent().getZLevel() > another.getComponent().getZLevel()) {
-        return 1;
-      } else {
-        return Integer.compare(this.insertionId, another.insertionId);
-      }
-    }
   }
 }

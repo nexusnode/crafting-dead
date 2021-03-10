@@ -30,6 +30,8 @@ public class ModSoundEvents {
   public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
       DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDeadImmerse.ID);
 
+  public static final RegistryObject<SoundEvent> BUTTON_CLICK = register("button_click");
+
   public static final RegistryObject<SoundEvent> COUNTDOWN = register("countdown");
   public static final RegistryObject<SoundEvent> VICTORY_MUSIC = register("victory_music");
   public static final RegistryObject<SoundEvent> DEFEAT_MUSIC = register("defeat_music");

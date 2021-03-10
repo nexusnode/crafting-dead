@@ -26,10 +26,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
 
-public class ComponentScreen extends Screen implements IView {
+public class ComponentScreen extends Screen implements IParentView {
 
   private final ContainerComponent container;
   private final long node;
+
+  private Component<?> hovered;
 
   protected ComponentScreen(ITextComponent title) {
     super(title);
@@ -60,6 +62,34 @@ public class ComponentScreen extends Screen implements IView {
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     this.container.mouseMoved(mouseX, mouseY);
+
+    Component<?> hovered = this.container.isMouseOver(mouseX, mouseY) ? this.container : null;
+    while (hovered instanceof ParentComponent) {
+      Component<?> nextHovered = ((ParentComponent<?>) hovered)
+          .getEventListenerForPos(mouseX, mouseY)
+          .filter(listener -> listener instanceof Component)
+          .map(listener -> (Component<?>) listener)
+          .orElse(null);
+
+      if (nextHovered == null) {
+        break;
+      }
+
+      hovered = nextHovered;
+
+      if (!hovered.isHovered()) {
+        hovered.mouseEntered(mouseX, mouseY);
+      }
+    }
+
+    while (this.hovered != null && (!this.hovered.isMouseOver(mouseX, mouseY)
+        || (hovered != null && hovered.compareTo(this.hovered) == 1))) {
+      this.hovered.mouseLeft(mouseX, mouseY);
+      this.hovered =
+          this.hovered.parent instanceof Component ? (Component<?>) this.hovered.parent : null;
+    }
+
+    this.hovered = hovered;
   }
 
   @Override
@@ -90,5 +120,15 @@ public class ComponentScreen extends Screen implements IView {
   @Override
   public Screen getScreen() {
     return this;
+  }
+
+  @Override
+  public int getZLevel() {
+    return 0;
+  }
+
+  @Override
+  public IParentView getParent() {
+    return null;
   }
 }

@@ -45,8 +45,8 @@ public class EntityComponent extends Component<EntityComponent> {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
     this.minecraft.getRenderManager().cacheActiveRenderInfo(FakeWorld.getInstance(),
         this.minecraft.gameRenderer.getActiveRenderInfo(), null);

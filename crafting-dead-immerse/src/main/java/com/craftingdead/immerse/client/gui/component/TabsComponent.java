@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import com.craftingdead.core.util.Text;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.component.event.TabChangeEvent;
 import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.type.FlexWrap;
@@ -52,7 +53,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
   }
 
   @Override
-  protected void layout() {
+  public void layout() {
     this.init();
     super.layout();
   }
@@ -75,7 +76,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
         tab.setSelected(false);
       }
       tab.layout();
-      tab.addActionListener(tab1 -> this.changeTab((Tab) tab1));
+      tab.addListener(ActionEvent.class, (c, e) -> this.changeTab((Tab) c));
     }
 
     if (newSelectedTab != null) {
@@ -147,8 +148,8 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-      super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+      super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
       if (this.selected) {
         RenderUtil.fill(this.getScaledX(),
@@ -211,6 +212,5 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
       this.underscoreYOffset = underscoreYOffset;
       return this;
     }
-
   }
 }

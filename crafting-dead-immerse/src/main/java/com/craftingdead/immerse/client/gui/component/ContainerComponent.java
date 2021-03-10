@@ -24,216 +24,22 @@ import java.util.function.Consumer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import com.craftingdead.immerse.client.gui.component.type.FitType;
-import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import com.craftingdead.core.client.renderer.VelocitySmoother;
+import com.craftingdead.immerse.client.gui.component.type.FitType;
 import com.craftingdead.immerse.client.util.DownloadUtil;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.base.Strings;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Either;
-import io.noties.tumbleweed.Tween;
-import io.noties.tumbleweed.TweenType;
-import io.noties.tumbleweed.equations.Sine;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.ForgeHooks;
 
 public class ContainerComponent extends ParentComponent<ContainerComponent> {
 
   private static final Logger logger = LogManager.getLogger();
-
-  private static final TweenType<ContainerComponent> SCROLL_OFFSET =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<ContainerComponent>) c -> (float) c.scrollOffset,
-          (SimpleTweenType.FloatSetter<ContainerComponent>) (c, v) -> c.scrollOffset = v);
-
-  private static final int SCROLLBAR_WIDTH = 4;
-
-  private static final float SCROLL_CHUNK = 15F;
-
-  private static final float SCROLL_MOMENTUM_DAMPING = 1.75F;
-
-  private float lastScrollOffset;
-  private float scrollOffset;
-
-  private float totalHeight;
-
-  private boolean draggingScroller;
-
-  private boolean calculateWidthWithScrollbar;
-
-  private final VelocitySmoother scrollSmoother = new VelocitySmoother(1.0F);
-
-  private float lerpedScrollOffset;
-
-  @Override
-  public float getContentWidth() {
-    return super.getContentWidth() - (this.calculateWidthWithScrollbar ? SCROLLBAR_WIDTH : 0.0F);
-  }
-
-  @Override
-  public float getContentY() {
-    return super.getContentY()
-        + (this.totalHeight > this.getHeight() ? -this.lerpedScrollOffset : 0.0F);
-  }
-
-  @Override
-  public void layout() {
-    super.layout();
-    this.totalHeight =
-        scrollOffset +
-            (float) (this.getEventListeners()
-                .stream()
-                .mapToDouble(
-                    c -> c.getY() + c.getHeight() + c.getBottomMargin() + this.getBottomPadding())
-                .max()
-                .orElse(0.0F)
-                - super.getContentY());
-    if (this.totalHeight < 0) {
-      this.totalHeight = 0F;
-    }
-    if (this.isScrollbarEnabled() != this.calculateWidthWithScrollbar) {
-      this.calculateWidthWithScrollbar = this.isScrollbarEnabled();
-      super.layout();
-    }
-    this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
-  }
-
-  private final void scrollTo(float y, float duration) {
-    Tween.to(this, SCROLL_OFFSET, duration)
-        .target(this.clampScrollOffset(y))
-        .ease(Sine.OUT)
-        .start(this.getTweenManager());
-  }
-
-  private final float clampScrollOffset(float scrollOffset) {
-    return MathHelper.clamp(scrollOffset, 0.0F, this.totalHeight - this.getHeight());
-  }
-
-  @Override
-  public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    if (this.isScrollbarEnabled() && !this.draggingScroller) {
-      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK * 2));
-    }
-    return super.mouseScrolled(mouseX, mouseY, scrollDelta);
-  }
-
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    super.mouseClicked(mouseX, mouseY, button);
-    if (this.isScrollbarEnabled() && mouseX >= this.getX() + this.getWidth() - SCROLLBAR_WIDTH
-        && mouseX <= this.getX() + this.getWidth() && mouseY >= this.getY()
-        && mouseY <= this.getY() + this.getHeight()) {
-      if (mouseX >= this.getScrollbarX() && mouseX <= this.getScrollbarX() + SCROLLBAR_WIDTH
-          && mouseY >= this.getScrollbarY()
-          && mouseY <= this.getScrollbarY() + this.getScrollbarHeight()) {
-        this.draggingScroller = true;
-      } else {
-        this.scrollTo(this.scrollOffset
-            + (mouseY > this.getScrollbarY() ? this.getHeight() : -this.getHeight()), 200);
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
-      double deltaY) {
-    if (this.draggingScroller && mouseY >= this.getY()
-        && mouseY <= this.getY() + this.getHeight()) {
-      this.scrollOffset = this.clampScrollOffset((float) (this.scrollOffset
-          + deltaY * this.totalHeight / (this.getHeight())));
-    }
-    return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-  }
-
-  @Override
-  public boolean mouseReleased(double mouseX, double mouseY, int button) {
-    super.mouseReleased(mouseX, mouseY, button);
-    this.draggingScroller = false;
-    return true;
-  }
-
-  @Override
-  public void tick() {
-    super.tick();
-    this.lastScrollOffset = this.scrollOffset;
-    this.scrollOffset += this.scrollSmoother.getAndDecelerate(1.0F / SCROLL_MOMENTUM_DAMPING);
-    if (this.scrollOffset < 0.0F || this.scrollOffset > this.totalHeight - this.getHeight()) {
-      this.scrollSmoother.reset();
-    }
-    this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
-  }
-
-  @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    // For some reason the partial ticks passed to us isn't correct.
-    this.lerpedScrollOffset =
-        MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(), this.lastScrollOffset,
-            this.scrollOffset);
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
-    if (this.isScrollbarEnabled()) {
-      RenderUtil.roundedFill(this.getScrollbarX(), this.getY(),
-          this.getScrollbarX() + SCROLLBAR_WIDTH,
-          this.getY() + this.getHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
-      RenderUtil.roundedFill(this.getScrollbarX(), this.getScrollbarY(),
-          this.getScrollbarX() + SCROLLBAR_WIDTH, this.getScrollbarY() + this.getScrollbarHeight(),
-          0x4CFFFFFF, SCROLLBAR_WIDTH / 2.0F);
-    }
-  }
-
-  protected boolean isScrollbarEnabled() {
-    return this.getOverflow() == Overflow.SCROLL && this.totalHeight > this.getHeight();
-  }
-
-  @Override
-  public void renderChildren(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
-    final boolean scissor =
-        this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
-    boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
-    if (scissor) {
-      if (alreadyEnabled) {
-        GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
-      }
-      GL11.glEnable(GL11.GL_SCISSOR_TEST);
-      double lowerBound = this.getBotScissorBoundScaled() * scale;
-      GL11.glScissor((int) (this.getScaledX() * scale),
-          (int) (this.mainWindow.getFramebufferHeight() - lowerBound),
-          (int) (this.getScaledWidth() * scale),
-          (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
-    }
-    super.renderChildren(matrixStack, mouseX, mouseY, partialTicks);
-    if (scissor) {
-      GL11.glDisable(GL11.GL_SCISSOR_TEST);
-      if (alreadyEnabled) {
-        GL11.glPopAttrib();
-      }
-    }
-  }
-
-  private final double getScrollbarX() {
-    return this.getX() + this.getWidth() - SCROLLBAR_WIDTH;
-  }
-
-  private final double getScrollbarY() {
-    return this.getY() + (this.lerpedScrollOffset / this.totalHeight) * this.getHeight();
-  }
-
-  private final float getScrollbarHeight() {
-    return MathHelper.clamp(this.getHeight() * (this.getHeight() / this.totalHeight), 10.0F,
-        this.getHeight());
-  }
 
   /**
    * Add all the {@link Component}s specified in the passed {@link File}, spacing them evenly with
@@ -245,7 +51,6 @@ public class ContainerComponent extends ParentComponent<ContainerComponent> {
   public ContainerComponent addAll(File file) {
     return this.addAll(file, c -> c.setFlex(1.0F));
   }
-
 
   /**
    * Add all the {@link Component}s specified in the passed {@link File}.

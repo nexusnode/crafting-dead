@@ -1,4 +1,9 @@
 {
+  "button_click": {
+    "sounds": [
+      "craftingdeadimmerse:button_click"
+    ]
+  },
   "countdown": {
     "sounds": [
       "craftingdeadimmerse:countdown"

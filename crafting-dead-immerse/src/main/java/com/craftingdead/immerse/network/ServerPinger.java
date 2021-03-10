@@ -5,12 +5,14 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.Lists;
-import net.minecraft.client.multiplayer.ServerAddress;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.client.network.status.IClientStatusNetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.ProtocolType;
@@ -20,6 +22,7 @@ import net.minecraft.network.status.client.CPingPacket;
 import net.minecraft.network.status.client.CServerQueryPacket;
 import net.minecraft.network.status.server.SPongPacket;
 import net.minecraft.network.status.server.SServerInfoPacket;
+import net.minecraft.util.DefaultUncaughtExceptionHandler;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -30,27 +33,46 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class ServerPinger {
 
-  private static final Logger LOGGER = LogManager.getLogger();
-  /** A list of NetworkManagers that have pending pings */
-  private final List<NetworkManager> pingDestinations =
+  public static final ServerPinger INSTANCE = new ServerPinger();
+
+  private static final Logger logger = LogManager.getLogger();
+
+  private static final Executor executor = Executors.newFixedThreadPool(5,
+      new ThreadFactoryBuilder()
+          .setNameFormat("Server Pinger #%d")
+          .setDaemon(true)
+          .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
+          .build());
+
+  private final List<NetworkManager> pendingPings =
       Collections.synchronizedList(Lists.newArrayList());
 
-  public void ping(String ip, Consumer<PingData> pingCallback) throws UnknownHostException {
-    ServerAddress serveraddress = ServerAddress.fromString(ip);
-    final NetworkManager networkmanager = NetworkManager
-        .createNetworkManagerAndConnect(InetAddress.getByName(serveraddress.getIP()),
-            serveraddress.getPort(),
-            false);
-    this.pingDestinations.add(networkmanager);
-    networkmanager.setNetHandler(new IClientStatusNetHandler() {
+  private ServerPinger() {}
+
+  public void ping(String hostName, int port, Consumer<PingData> callback) {
+    NetworkManager networkManagger;
+    try {
+      networkManagger = NetworkManager
+          .createNetworkManagerAndConnect(InetAddress.getByName(hostName), port, false);
+    } catch (UnknownHostException e) {
+      logger.warn("Unknown host: " + hostName);
+      callback.accept(PingData.FAILED);
+      return;
+    }
+
+    this.pendingPings.add(networkManagger);
+
+    networkManagger.setNetHandler(new IClientStatusNetHandler() {
+
       private boolean successful;
       private boolean receivedStatus;
       private long pingSentAt;
       private PingData pingData = new PingData();
 
+      @Override
       public void handleServerInfo(SServerInfoPacket packetIn) {
         if (this.receivedStatus) {
-          networkmanager
+          networkManagger
               .closeChannel(new TranslationTextComponent("multiplayer.status.unrequested"));
         } else {
           this.receivedStatus = true;
@@ -64,45 +86,49 @@ public class ServerPinger {
               Text.of(serverstatusresponse.getPlayers().getOnlinePlayerCount() + "/" +
                   serverstatusresponse.getPlayers().getMaxPlayers()));
           this.pingSentAt = Util.milliTime();
-          networkmanager.sendPacket(new CPingPacket(this.pingSentAt));
+          networkManagger.sendPacket(new CPingPacket(this.pingSentAt));
           this.successful = true;
         }
       }
 
+      @Override
       public void handlePong(SPongPacket packetIn) {
         long i = this.pingSentAt;
         long j = Util.milliTime();
         pingData.setPing(j - i);
-        networkmanager.closeChannel(new TranslationTextComponent("multiplayer.status.finished"));
+        networkManagger.closeChannel(new TranslationTextComponent("multiplayer.status.finished"));
       }
 
+      @Override
       public void onDisconnect(ITextComponent reason) {
         if (!this.successful) {
-          LOGGER.error("Can't ping {}: {}", serveraddress, reason.getString());
+          logger.error("Can't ping {}:{} Reason: {}", hostName, port, reason.getString());
           pingData.setMotd(new TranslationTextComponent("multiplayer.status.cannot_connect"));
           pingData.setPlayersAmount(
               new TranslationTextComponent("menu.play.server_list.failed_to_load"));
         }
-        pingCallback.accept(pingData);
+        callback.accept(pingData);
       }
 
+      @Override
       public NetworkManager getNetworkManager() {
-        return networkmanager;
+        return networkManagger;
       }
     });
 
-    try {
-      networkmanager.sendPacket(new CHandshakePacket(serveraddress.getIP(), serveraddress.getPort(),
-          ProtocolType.STATUS));
-      networkmanager.sendPacket(new CServerQueryPacket());
-    } catch (Throwable throwable) {
-      LOGGER.error(throwable);
-    }
+    executor.execute(() -> {
+      try {
+        networkManagger.sendPacket(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
+        networkManagger.sendPacket(new CServerQueryPacket());
+      } catch (Throwable t) {
+        logger.error(t);
+      }
+    });
   }
 
   public void pingPendingNetworks() {
-    synchronized (this.pingDestinations) {
-      Iterator<NetworkManager> iterator = this.pingDestinations.iterator();
+    synchronized (this.pendingPings) {
+      Iterator<NetworkManager> iterator = this.pendingPings.iterator();
 
       while (iterator.hasNext()) {
         NetworkManager networkmanager = iterator.next();
@@ -118,8 +144,8 @@ public class ServerPinger {
   }
 
   public void clearPendingNetworks() {
-    synchronized (this.pingDestinations) {
-      Iterator<NetworkManager> iterator = this.pingDestinations.iterator();
+    synchronized (this.pendingPings) {
+      Iterator<NetworkManager> iterator = this.pendingPings.iterator();
 
       while (iterator.hasNext()) {
         NetworkManager networkmanager = iterator.next();
@@ -141,7 +167,6 @@ public class ServerPinger {
       FAILED.serverVersion = new TranslationTextComponent("multiplayer.status.old");
       FAILED.version = 0;
       FAILED.playersAmount = new TranslationTextComponent("menu.play.server_list.failed_to_load");
-
     }
 
     private long ping;

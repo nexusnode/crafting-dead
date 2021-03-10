@@ -20,27 +20,28 @@ package com.craftingdead.immerse.client.gui.menu;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
-import com.craftingdead.immerse.client.gui.component.type.FitType;
-import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.FogComponent;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
-import com.craftingdead.immerse.client.gui.component.type.PositionType;
 import com.craftingdead.immerse.client.gui.component.RectangleComponent;
 import com.craftingdead.immerse.client.gui.component.Tooltip;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.component.type.Align;
+import com.craftingdead.immerse.client.gui.component.type.FitType;
+import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.type.PositionType;
 import com.craftingdead.immerse.client.gui.menu.play.PlayComponent;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.craftingdead.immerse.util.ModSoundEvents;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class MenuScreen extends ComponentScreen {
@@ -96,7 +97,7 @@ public class MenuScreen extends ComponentScreen {
         .setBackgroundColour(new Colour(0x70777777))
         .setBackgroundBlur(50.0F)
         .setHeightPercent(100.0F)
-        .setWidth(25.0F)
+        .setWidth(30.0F)
         .setAlignItems(Align.CENTER);
 
     sideBar.addChild(new RectangleComponent()
@@ -108,16 +109,15 @@ public class MenuScreen extends ComponentScreen {
         .setBackgroundColour(new Colour(0X80B5B5B5)));
 
     sideBar.addChild(new ImageComponent()
-        .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/home.png"))
+        .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"))
         .setMargin(5)
-        .setWidth(10)
-        .setHeight(10)
+        .setWidth(20)
+        .setHeight(20)
         .addHoverAnimation(ImageComponent.COLOUR,
-            RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
-        .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
-        .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
-        .addClickSound(SoundEvents.UI_BUTTON_CLICK)
-        .addActionListener(c -> this.displayPage(Page.HOME))
+            RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF666666)), 150.0F)
+        .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+        .addListener(ActionEvent.class, (c, e) -> this.displayPage(Page.HOME))
+        .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
 
     sideBar.addChild(new RectangleComponent()
@@ -129,50 +129,49 @@ public class MenuScreen extends ComponentScreen {
     sideBar.addChild(new ImageComponent()
         .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"))
         .setMargin(5)
-        .setWidth(10)
-        .setHeight(10)
+        .setWidth(12)
+        .setHeight(12)
+        .setBilinearFiltering(true)
         .addHoverAnimation(ImageComponent.COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
-        .addClickSound(SoundEvents.UI_BUTTON_CLICK)
-        .addActionListener(c -> this.displayPage(Page.PLAY))
+        .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+        .addListener(ActionEvent.class, (c, e) -> this.displayPage(Page.PLAY))
+        .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.play_button"))));
-
-    sideBar.addChild(new RectangleComponent()
-        .setUnscaleHeight()
-        .setWidthPercent(100.0F)
-        .setHeight(1)
-        .setBackgroundColour(new Colour(0X80B5B5B5)));
 
     sideBar.addChild(new ImageComponent()
         .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"))
         .setMargin(5)
-        .setWidth(10)
-        .setHeight(10)
+        .setWidth(12)
+        .setHeight(12)
+        .setBilinearFiltering(true)
         .addHoverAnimation(ImageComponent.COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
-        .addClickSound(SoundEvents.UI_BUTTON_CLICK)
-        .addActionListener(c -> this.minecraft
+        .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+        .addListener(ActionEvent.class, (c, e) -> this.minecraft
             .displayGuiScreen(new OptionsScreen(this, this.minecraft.gameSettings)))
+        .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.options"))));
 
     sideBar.addChild(new ImageComponent()
         .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"))
         .setMargin(5)
         .setTopMarginAuto()
-        .setWidth(10)
-        .setHeight(10)
+        .setWidth(12)
+        .setHeight(12)
+        .setBilinearFiltering(true)
         .addHoverAnimation(ImageComponent.COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
-        .addClickSound(SoundEvents.UI_BUTTON_CLICK)
-        .addActionListener(c -> this.minecraft.shutdown())
+        .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+        .addListener(ActionEvent.class, (c, e) -> this.minecraft.shutdown())
+        .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));
-
 
     this.getRoot().addChild(this.contentContainer);
 

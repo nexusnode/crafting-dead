@@ -39,6 +39,7 @@ public class ImageComponent extends Component<ImageComponent> {
   private ResourceLocation image;
   private FitType fitType = FitType.FILL;
   private boolean depthTest = false;
+  private boolean bilinearFiltering = false;
   private Colour colour = new Colour();
 
   private Vector2f fittedImageSize;
@@ -60,6 +61,11 @@ public class ImageComponent extends Component<ImageComponent> {
 
   public ImageComponent setDepthTest(boolean depthTest) {
     this.depthTest = depthTest;
+    return this;
+  }
+
+  public ImageComponent setBilinearFiltering(boolean bilinearFiltering) {
+    this.bilinearFiltering = bilinearFiltering;
     return this;
   }
 
@@ -89,7 +95,7 @@ public class ImageComponent extends Component<ImageComponent> {
 
   @Override
   public Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-                          float height) {
+      float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
         .orElse(new Vector2f(width, height));
@@ -109,8 +115,8 @@ public class ImageComponent extends Component<ImageComponent> {
 
   @SuppressWarnings("deprecation")
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     RenderSystem.enableBlend();
     if (depthTest) {
       RenderSystem.enableDepthTest();
@@ -118,8 +124,10 @@ public class ImageComponent extends Component<ImageComponent> {
     final float[] colour = this.colour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
     if (this.bind()) {
-      // Enable bilinear filtering
-      RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+      if (this.bilinearFiltering) {
+        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+      }
       RenderUtil.blit(this.getScaledContentX(), this.getScaledContentY(),
           this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
     } else {

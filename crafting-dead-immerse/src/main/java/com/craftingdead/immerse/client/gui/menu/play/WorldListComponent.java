@@ -18,26 +18,31 @@
 
 package com.craftingdead.immerse.client.gui.menu.play;
 
-import com.craftingdead.immerse.client.gui.component.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import com.craftingdead.immerse.client.gui.component.Colour;
+import com.craftingdead.immerse.client.gui.component.Component;
+import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.ParentComponent;
+import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.type.Justify;
 import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.storage.WorldSummary;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
+public class WorldListComponent extends ParentComponent<WorldListComponent> {
 
-public class WorldListComponent extends ContainerComponent {
-
-  private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger logger = LogManager.getLogger();
 
   private final ContainerComponent worldListContainer;
 
@@ -55,10 +60,8 @@ public class WorldListComponent extends ContainerComponent {
         .setAlignItems(Align.CENTER)
         .setTopPadding(4F)
         .setBottomPadding(10F)
-        .setOverflow(Overflow.SCROLL)
-        .addActionListener(this::resetSelection);
-    this.loadWorlds(this.worldListContainer);
-
+        .setOverflow(Overflow.SCROLL);
+    this.loadWorlds();
 
     ContainerComponent playButton = this.newDefaultStyleButton()
         .setRightMargin(7F)
@@ -66,48 +69,39 @@ public class WorldListComponent extends ContainerComponent {
         .addHoverAnimation(Component.BACKGROUND_COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(PlayComponent.GREEN_HIGHLIGHTED)), 60F)
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.play"))
-        .addActionListener(button -> {
-          this.worldItemsStream(this.worldListContainer)
-              .filter(WorldItemComponent::isSelected)
-              .findAny()
-              .ifPresent(WorldItemComponent::joinWorld);
-        });
+        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
+            .filter(WorldItemComponent::isSelected)
+            .findAny()
+            .ifPresent(WorldItemComponent::joinWorld));
 
     ContainerComponent createButton = this.newDefaultStyleButton()
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.create"))
-        .addActionListener(button -> {
-          this.minecraft.displayGuiScreen(CreateWorldScreen.func_243425_a(this.getScreen()));
-        });
+        .addListener(ActionEvent.class, (c, e) -> this.minecraft
+            .displayGuiScreen(CreateWorldScreen.func_243425_a(this.getScreen())));
 
     ContainerComponent editButton = this.newDefaultStyleButton()
         .setRightMargin(5.7F)
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.edit"))
-        .addActionListener(button -> {
-          this.worldItemsStream(worldListContainer)
-              .filter(WorldItemComponent::isSelected)
-              .findAny()
-              .ifPresent(WorldItemComponent::editWorld);
-        });
+        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
+            .filter(WorldItemComponent::isSelected)
+            .findAny()
+            .ifPresent(WorldItemComponent::editWorld));
     ContainerComponent deleteButton = this.newDefaultStyleButton()
         .setRightMargin(5.7F)
         .setBackgroundColour(new Colour(PlayComponent.RED))
         .addHoverAnimation(Component.BACKGROUND_COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(PlayComponent.RED_HIGHLIGHTED)), 60F)
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.delete"))
-        .addActionListener(button -> {
-          this.worldItemsStream(worldListContainer)
-              .filter(WorldItemComponent::isSelected)
-              .findAny()
-              .ifPresent(WorldItemComponent::deleteWorld);
-        });
+        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
+            .filter(WorldItemComponent::isSelected)
+            .findAny()
+            .ifPresent(WorldItemComponent::deleteWorld));
     ContainerComponent recreateButton = this.newDefaultStyleButton()
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.recreate"))
-        .addActionListener(button -> {
-          this.worldItemsStream(worldListContainer)
-              .filter(WorldItemComponent::isSelected)
-              .findAny()
-              .ifPresent(WorldItemComponent::recreateWorld);
-        });
+        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
+            .filter(WorldItemComponent::isSelected)
+            .findAny()
+            .ifPresent(WorldItemComponent::recreateWorld));
 
     ContainerComponent controlsContainer = new ContainerComponent()
         .setFlexDirection(FlexDirection.COLUMN)
@@ -132,18 +126,20 @@ public class WorldListComponent extends ContainerComponent {
             .addChild(editButton)
             .addChild(recreateButton));
 
-    this.addChild(worldListContainer);
+    this.addChild(this.worldListContainer);
     this.addChild(controlsContainer);
   }
 
   private ContainerComponent newDefaultStyleButton() {
     return new ContainerComponent()
+        .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
         .setWidth(30F)
         .setHeight(20F)
         .setFlexGrow(1F)
         .setJustifyContent(Justify.CENTER)
         .setAlignItems(Align.CENTER)
         .setBackgroundColour(new Colour(PlayComponent.BLUE))
+        .setFocusable(true)
         .addHoverAnimation(Component.BACKGROUND_COLOUR,
             RenderUtil.getColour4f(RenderUtil.getColour4i(PlayComponent.BLUE_HIGHLIGHTED)), 60F);
   }
@@ -154,34 +150,26 @@ public class WorldListComponent extends ContainerComponent {
         .setTopMargin(1F);
   }
 
-  private void resetSelection(ParentComponent<?> parent) {
-    for (Component<?> child : parent.getChildrenComponents()) {
-      if (child instanceof WorldItemComponent) {
-        ((WorldItemComponent) child).removeSelect();
-      }
-    }
-  }
-
-  private void loadWorlds(ContainerComponent worldListContainer) {
+  private void loadWorlds() {
     try {
       List<WorldSummary> saveList = this.minecraft.getSaveLoader().getSaveList();
       Collections.sort(saveList);
       for (WorldSummary worldSummary : saveList) {
-        worldListContainer.addChild(new WorldItemComponent(worldSummary, this));
+        this.worldListContainer.addChild(new WorldItemComponent(worldSummary, this));
       }
     } catch (AnvilConverterException e) {
-      LOGGER.error("Unable to load save list", e);
+      logger.error("Unable to load save list", e);
     }
   }
 
   public void reloadWorlds() {
     this.worldListContainer.clearChildren();
-    this.loadWorlds(this.worldListContainer);
+    this.loadWorlds();
   }
 
-  private Stream<WorldItemComponent> worldItemsStream(ParentComponent<?> worldItemsParent) {
-    return worldItemsParent.getChildren().stream()
-        .filter(child -> child.getComponent() instanceof WorldItemComponent)
-        .map(child -> (WorldItemComponent) child.getComponent());
+  private Stream<WorldItemComponent> streamItems() {
+    return this.worldListContainer.getChildren().stream()
+        .filter(child -> child instanceof WorldItemComponent)
+        .map(child -> (WorldItemComponent) child);
   }
 }

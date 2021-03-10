@@ -19,10 +19,18 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
-
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.yoga.YGMeasureFunc;
+import org.lwjgl.util.yoga.YGSize;
+import org.lwjgl.util.yoga.Yoga;
+import com.craftingdead.core.client.renderer.VelocitySmoother;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.ClientDist;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.component.event.CharTypeEvent;
+import com.craftingdead.immerse.client.gui.component.event.FocusChangedEvent;
 import com.craftingdead.immerse.client.gui.component.event.KeyEvent;
 import com.craftingdead.immerse.client.gui.component.event.MouseEnterEvent;
 import com.craftingdead.immerse.client.gui.component.event.MouseEvent;
@@ -30,16 +38,11 @@ import com.craftingdead.immerse.client.gui.component.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
 import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
+import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import com.craftingdead.immerse.client.gui.component.type.PositionType;
-import com.mojang.blaze3d.systems.RenderSystem;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.util.yoga.YGMeasureFunc;
-import org.lwjgl.util.yoga.YGSize;
-import org.lwjgl.util.yoga.Yoga;
-import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenManager;
@@ -49,10 +52,9 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
@@ -60,7 +62,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public abstract class Component<SELF extends Component<SELF>> extends AbstractGui
-    implements IRenderable, IGuiEventListener, IView {
+    implements IView, Comparable<Component<?>> {
 
   public static final TweenType<Component<?>> X_SCALE =
       new SimpleTweenType<>(
@@ -95,6 +97,23 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
             t.bottomBorderWidth = v[2];
             t.leftBorderWidth = v[3];
           });
+  private static final TweenType<Component<?>> SCROLL_OFFSET =
+      new SimpleTweenType<>(
+          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.scrollOffset,
+          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.scrollOffset = v);
+
+  private static final int SCROLLBAR_WIDTH = 4;
+
+  private static final float SCROLL_CHUNK = 15F;
+
+  private static final float SCROLL_MOMENTUM_DAMPING = 1.75F;
+
+  private float lastScrollOffset;
+  private float scrollOffset;
+
+  private final VelocitySmoother scrollSmoother = new VelocitySmoother(1.0F);
+
+  private float lerpedScrollOffset;
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
@@ -132,9 +151,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @Nullable
   private Blur backgroundBlur;
 
-  protected IView parent;
+  protected IParentView parent;
+  protected int insertionIndex;
 
-  private boolean mouseOver;
+  private boolean hovered;
 
   private float lastTime = 0F;
 
@@ -143,7 +163,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   private boolean unscaleWidth;
   private boolean unscaleHeight;
 
-  private int zLevel = 0;
+  private int zLevelOffset = 0;
+
+  private float actualContentHeight;
+
+  protected boolean focusable;
+
+  protected int zLevel;
+
+  private boolean doubleClick;
+  private int doubleClickTicks = 0;
 
   public Component() {
     this.node = Yoga.YGNodeNew();
@@ -159,6 +188,10 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return new Vector2f(width, height);
   }
 
+  protected float getActualContentHeight() {
+    return this.getContentHeight();
+  }
+
   protected void zLevelChanged() {
     this.post(new ZLevelChangeEvent());
   }
@@ -168,17 +201,27 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   protected void removed() {}
 
   protected void layout() {
+    this.actualContentHeight = this.getActualContentHeight();
+    this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
     Yoga.YGNodeMarkDirty(this.node);
   }
 
   public void tick() {
+    this.lastScrollOffset = this.scrollOffset;
+    this.scrollOffset += this.scrollSmoother.getAndDecelerate(1.0F / SCROLL_MOMENTUM_DAMPING);
+    if (this.scrollOffset < 0.0F
+        || this.scrollOffset > this.actualContentHeight - this.getHeight()) {
+      this.scrollSmoother.reset();
+    }
+    this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
+
     if (this.backgroundBlur != null) {
       this.backgroundBlur.tick();
     }
-  }
 
-  protected void focusChanged(boolean focused) {
-    this.focused = focused;
+    if (this.doubleClickTicks > 0) {
+      this.doubleClickTicks--;
+    }
   }
 
   @Override
@@ -189,7 +232,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.tweenManager.update(deltaTime);
 
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.render(this.getScaledContentX(), this.getScaledContentY(),
+      this.backgroundBlur.render(this.getScaledX(), this.getScaledY(),
           this.getScaledWidth(), this.getScaledHeight(), partialTicks);
     }
 
@@ -224,14 +267,106 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     }
     RenderSystem.disableDepthTest();
 
-    if (this.tooltip != null && this.isMouseOver()) {
+    if (this.tooltip != null && this.isHovered()) {
       this.tooltip.render(this.minecraft.fontRenderer, matrixStack,
           10.0D + this.getX() + this.getWidth(), this.getY());
     }
+
+    // For some reason the partial ticks passed to us isn't correct.
+    this.lerpedScrollOffset =
+        MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(), this.lastScrollOffset,
+            this.scrollOffset);
+
+
+    // ---- Render Content----
+
+    final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
+    final boolean scissor =
+        this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
+    boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+    if (scissor) {
+      if (alreadyEnabled) {
+        GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
+      }
+      GL11.glEnable(GL11.GL_SCISSOR_TEST);
+      double lowerBound = this.getBotScissorBoundScaled() * scale;
+      GL11.glScissor((int) (this.getScaledContentX() * scale),
+          (int) (this.mainWindow.getFramebufferHeight() - lowerBound),
+          (int) (this.getScaledContentWidth() * scale),
+          (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
+    }
+    this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+    if (scissor) {
+      GL11.glDisable(GL11.GL_SCISSOR_TEST);
+      if (alreadyEnabled) {
+        GL11.glPopAttrib();
+      }
+    }
+
+    // ---- Render Scrollbar ----
+
+    if (this.isScrollbarEnabled()) {
+      RenderUtil.roundedFill(this.getScrollbarX(), this.getY(),
+          this.getScrollbarX() + SCROLLBAR_WIDTH,
+          this.getY() + this.getHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
+      RenderUtil.roundedFill(this.getScrollbarX(), this.getScrollbarY(),
+          this.getScrollbarX() + SCROLLBAR_WIDTH, this.getScrollbarY() + this.getScrollbarHeight(),
+          0x4CFFFFFF, SCROLLBAR_WIDTH / 2.0F);
+    }
+  }
+
+  public float getTopScissorBoundScaled() {
+    float bound =
+        this.getOverflow() == Overflow.HIDDEN ? Float.MIN_VALUE : this.getScaledY();
+    if (parent == null || !(parent instanceof ParentComponent)) {
+      return bound;
+    }
+    return Math.max(bound, ((ParentComponent<?>) this.parent).getTopScissorBoundScaled());
+  }
+
+  public float getBotScissorBoundScaled() {
+    float bound = this.getOverflow() == Overflow.HIDDEN ? Float.MAX_VALUE
+        : this.getScaledY() + this.getScaledHeight();
+    if (parent == null || !(parent instanceof ParentComponent)) {
+      return bound;
+    }
+    return Math.min(bound, ((ParentComponent<?>) this.parent).getBotScissorBoundScaled());
+  }
+
+  protected boolean isScrollbarEnabled() {
+    return this.getOverflow() == Overflow.SCROLL && this.actualContentHeight > this.getHeight();
+  }
+
+  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {}
+
+
+  private final double getScrollbarX() {
+    return this.getX() + this.getWidth() - SCROLLBAR_WIDTH;
+  }
+
+  private final double getScrollbarY() {
+    return this.getY() + (this.lerpedScrollOffset / this.actualContentHeight) * this.getHeight();
+  }
+
+  private final float getScrollbarHeight() {
+    return MathHelper.clamp(this.getHeight() * (this.getHeight() / this.actualContentHeight), 10.0F,
+        this.getHeight());
+  }
+
+  private final void scrollTo(float y, float duration) {
+    Tween.to(this, SCROLL_OFFSET, duration)
+        .target(this.clampScrollOffset(y))
+        .ease(Sine.OUT)
+        .start(this.getTweenManager());
+  }
+
+  private final float clampScrollOffset(float scrollOffset) {
+    return MathHelper.clamp(scrollOffset, 0.0F, this.actualContentHeight - this.getHeight());
   }
 
   protected void mouseEntered(double mouseX, double mouseY) {
-    this.mouseOver = true;
+    this.hovered = true;
     if (this.tooltip != null) {
       Timeline.createParallel(150)
           .push(Tween.to(this.tooltip, Tooltip.ALPHA)
@@ -242,11 +377,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
               .target(1.0F))
           .start(this.getTweenManager());
     }
+
     this.post(new MouseEnterEvent());
   }
 
   protected void mouseLeft(double mouseX, double mouseY) {
-    this.mouseOver = false;
+    this.hovered = false;
     if (this.tooltip != null) {
       Timeline.createParallel(250)
           .push(Tween.to(this.tooltip, Tooltip.ALPHA)
@@ -260,66 +396,116 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    if (this.parent == null || !(this.parent instanceof ParentComponent)) {
-      boolean mouseOver = this.isMouseOver((int) mouseX, (int) mouseY);
-      boolean mouseWasOver = this.mouseOver;
-      if (mouseOver && !mouseWasOver) {
-        this.mouseEntered(mouseX, mouseY);
-      } else if (this.mouseOver && !mouseOver) {
-        this.mouseLeft(mouseX, mouseY);
-      }
-      this.mouseOver = mouseOver;
-      this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
-    }
+    this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_PRESS));
+    if (this.isHovered()) {
+      // Clicked on scrollbar region
+      if (this.isScrollbarEnabled() && mouseX >= this.getX() + this.getWidth() - SCROLLBAR_WIDTH
+          && mouseX <= this.getX() + this.getWidth() && mouseY >= this.getY()
+          && mouseY <= this.getY() + this.getHeight()) {
+        // Clicked on actual scrollbar
+        if (mouseX >= this.getScrollbarX() && mouseX <= this.getScrollbarX() + SCROLLBAR_WIDTH
+            && mouseY >= this.getScrollbarY()
+            && mouseY <= this.getScrollbarY() + this.getScrollbarHeight()) {
+        } else {
+          this.scrollTo(this.scrollOffset
+              + (mouseY > this.getScrollbarY() ? this.getHeight() : -this.getHeight()), 200);
+        }
+        return true;
+      }
+
+      if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
+          GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
+        return true;
+      }
+
+      if ((!this.doubleClick || this.doubleClickTicks > 0)
+          && this.post(new ActionEvent()) == Event.Result.ALLOW) {
+        return true;
+      } else if (this.doubleClick) {
+        this.doubleClickTicks = 4;
+      }
+    }
+    return false;
   }
 
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
-    return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_RELEASE));
+    return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
+        GLFW.GLFW_RELEASE)) == Event.Result.ALLOW;
   }
 
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    return this.post(new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY));
+    if (mouseY >= this.getY() && mouseY <= this.getY() + this.getHeight()) {
+      this.scrollOffset = this.clampScrollOffset((float) (this.scrollOffset
+          + deltaY * this.actualContentHeight / (this.getHeight())));
+    }
+    return this.post(
+        new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY)) == Event.Result.ALLOW;
   }
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    return this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta));
+    if (this.isScrollbarEnabled()) {
+      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK * 2));
+    }
+    return this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
   }
 
   @Override
-  public boolean keyPressed(int key, int scancode, int mods) {
-    return this.post(new KeyEvent(key, scancode, GLFW.GLFW_PRESS, mods));
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    if (this
+        .post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
+      return true;
+    }
+
+    if (keyCode == GLFW.GLFW_KEY_ENTER && this.post(new ActionEvent()) == Event.Result.ALLOW) {
+      return true;
+    }
+
+    return false;
   }
 
   @Override
-  public boolean keyReleased(int key, int scancode, int mods) {
-    return this.post(new KeyEvent(key, scancode, GLFW.GLFW_RELEASE, mods));
+  public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    return this
+        .post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers)) == Event.Result.ALLOW;
   }
 
   @Override
-  public boolean charTyped(char character, int mods) {
-    return this.post(new CharTypeEvent(character, mods));
+  public boolean charTyped(char codePoint, int modifiers) {
+    return this.post(new CharTypeEvent(codePoint, modifiers)) == Event.Result.ALLOW;
   }
 
   @Override
   public boolean changeFocus(boolean forward) {
-    this.focusChanged(!this.focused);
-    return this.focused;
+    if (this.focusable) {
+      this.focused = !this.focused;
+      this.focusChanged();
+      return this.focused;
+    }
+    return false;
+  }
+
+  protected void focusChanged() {
+    if (this.focused) {
+      this.setBorderWidth(0.7F);
+    } else {
+      this.setBorderWidth(0.0F);
+    }
+    this.post(new FocusChangedEvent());
   }
 
   /**
    * Checks if mouse is over a component based on mouse position. Doesn't check whether there are
    * other components over this one.
    * 
-   * @see #isMouseOver()
+   * @see #isHovered()
    */
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
@@ -334,8 +520,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
    *         it
    * @see #isMouseOver(double, double)
    */
-  protected boolean isMouseOver() {
-    return this.mouseOver;
+  protected boolean isHovered() {
+    return this.hovered;
+  }
+
+  public boolean isFocused() {
+    return this.focused;
   }
 
   public final TweenManager getTweenManager() {
@@ -376,30 +566,25 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
-  public final SELF addClickSound(SoundEvent soundEvent) {
-    return this.addListener(MouseEvent.ButtonEvent.class, (component, event) -> {
-      if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
-          && event.getAction() == GLFW.GLFW_PRESS) {
-        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(soundEvent, 1.0F));
-      }
-    });
-  }
-
-  public final SELF addActionListener(Consumer<SELF> consumer) {
-    this.addListener(MouseEvent.ButtonEvent.class, (component, event) -> {
-      if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
-          && event.getAction() == GLFW.GLFW_PRESS) {
-        consumer.accept(this.self());
-      }
-    });
-    return this.self();
+  public final SELF addActionSound(SoundEvent soundEvent) {
+    return this.addListener(ActionEvent.class, (component, event) -> this.minecraft
+        .getSoundHandler().play(SimpleSound.master(soundEvent, 1.0F)));
   }
 
   public final <T extends Event> SELF addListener(Class<T> eventType,
       BiConsumer<SELF, T> consumer) {
-    this.eventBus
-        .addListener(EventPriority.NORMAL, true, eventType,
-            event -> consumer.accept(this.self(), event));
+    return this.addListener(eventType, consumer, true);
+  }
+
+  public final <T extends Event> SELF addListener(Class<T> eventType,
+      BiConsumer<SELF, T> consumer, boolean consumeEvent) {
+    this.eventBus.addListener(EventPriority.NORMAL, true, eventType,
+        event -> {
+          if (event.hasResult() && consumeEvent) {
+            event.setResult(Event.Result.ALLOW);
+          }
+          consumer.accept(this.self(), event);
+        });
     return this.self();
   }
 
@@ -409,8 +594,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
    * @param event - The event to dispatch to listeners
    * @return true if the event was cancelled
    */
-  public final boolean post(Event event) {
-    return this.eventBus.post(event);
+  public final Event.Result post(Event event) {
+    this.eventBus.post(event);
+    return event.getResult();
   }
 
   public final float getScaledX() {
@@ -444,7 +630,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public float getContentY() {
-    return this.getY() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop);
+    return this.getY() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop)
+        + (this.actualContentHeight > this.getHeight() ? -this.lerpedScrollOffset : 0.0F);
   }
 
   public final float getY() {
@@ -463,7 +650,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   public float getContentWidth() {
-    return this.getWidth() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeRight);
+    return this.getWidth() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeRight)
+        - (this.isScrollbarEnabled() ? SCROLLBAR_WIDTH : 0.0F);
   }
 
   public final float getWidth() {
@@ -480,7 +668,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   public final float getContentHeight() {
-    return this.getHeight() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeBottom);
+    return this.getHeight() - this.getBottomPadding();
   }
 
   public final float getHeight() {
@@ -492,16 +680,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.xScale;
   }
 
-  public SELF setZLevel(int zLevel) {
-    if (this.zLevel != zLevel) {
-      this.zLevel = zLevel;
+  public SELF setZLevelOffset(int zLevelOffset) {
+    if (this.zLevelOffset != zLevelOffset) {
+      this.zLevelOffset = zLevelOffset;
       this.zLevelChanged();
     }
     return this.self();
   }
 
   public int getZLevel() {
-    return zLevel;
+    return this.zLevel + this.zLevelOffset;
   }
 
   public final SELF setXScale(float xScale) {
@@ -511,6 +699,15 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final float getYScale() {
     return this.yScale;
+  }
+
+  public final Overflow getOverflow() {
+    return Overflow.fromYogaType(Yoga.YGNodeStyleGetOverflow(this.node));
+  }
+
+  public final SELF setOverflow(Overflow overflow) {
+    Yoga.YGNodeStyleSetOverflow(this.node, overflow.getYogaType());
+    return this.self();
   }
 
   public final float getTopMargin() {
@@ -884,6 +1081,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
+  public final SELF setFocusable(boolean focusable) {
+    this.focusable = focusable;
+    return this.self();
+  }
+
+  public final SELF setDoubleClick(boolean doubleClick) {
+    this.doubleClick = doubleClick;
+    return this.self();
+  }
+
   public final SELF setUnscaleWidth() {
     this.unscaleWidth = true;
     return this.self();
@@ -898,8 +1105,26 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.parent.getScreen();
   }
 
+  @Override
+  public IParentView getParent() {
+    return this.parent;
+  }
+
   @SuppressWarnings("unchecked")
   protected final SELF self() {
     return (SELF) this;
+  }
+
+  @Override
+  public int compareTo(Component<?> another) {
+    if (another == null) {
+      return 1;
+    }
+    if (this.getZLevel() < another.getZLevel()) {
+      return -1;
+    } else if (this.getZLevel() > another.getZLevel()) {
+      return 1;
+    }
+    return 0;
   }
 }

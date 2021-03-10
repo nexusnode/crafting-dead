@@ -18,60 +18,68 @@
 
 package com.craftingdead.immerse.client.gui.menu.play;
 
-import com.craftingdead.immerse.client.gui.component.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.stream.Stream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import com.craftingdead.immerse.client.gui.component.Colour;
+import com.craftingdead.immerse.client.gui.component.Component;
+import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.ParentComponent;
+import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.component.serverentry.IServerEntryReader;
 import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.type.Justify;
 import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.network.ServerPinger;
+import com.craftingdead.immerse.util.ModSoundEvents;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
 import net.minecraft.util.DefaultUncaughtExceptionHandler;
 import net.minecraft.util.text.TranslationTextComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-public class ServerListComponent extends ContainerComponent {
+public class ServerListComponent extends ParentComponent<ServerListComponent> {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final Gson gson = new Gson();
-  private final String serverListKey;
-  private final Executor executor = Executors.newFixedThreadPool(5, new ThreadFactoryBuilder()
-      .setNameFormat("Server Pinger #%d")
-      .setDaemon(true)
-      .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
-      .build());
-  private final ServerPinger serverPinger = new ServerPinger();
+  private final IServerEntryReader serverEntryProvider;
 
-  public ServerListComponent(String serverListKey) {
-    this.serverListKey = serverListKey;
+  private final ContainerComponent listContainer;
+
+  private static final Executor executor = Executors.newFixedThreadPool(5,
+      new ThreadFactoryBuilder()
+          .setNameFormat("Server Provider #%d")
+          .setDaemon(true)
+          .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
+          .build());
+
+  public ServerListComponent(IServerEntryReader serverEntryProvider) {
+    this.serverEntryProvider = serverEntryProvider;
+
     this.setFlexGrow(1F);
     this.setFlexDirection(FlexDirection.COLUMN);
-    ContainerComponent listContainer = new ContainerComponent()
+
+    this.listContainer = new ContainerComponent()
         .addChild(this.firstTableRow())
         .setFlexDirection(FlexDirection.COLUMN)
         .setAlignItems(Align.CENTER)
         .setOverflow(Overflow.SCROLL)
         .setBottomPadding(7F)
         .setHeight(60F)
-        .setFlexGrow(1F)
-        .addActionListener(this::resetSelection);
+        .setFlexGrow(1F);
+    this.addChild(this.listContainer);
 
-    this.addChild(listContainer);
-    this.addChild(this.controlsContainer(listContainer));
-    this.loadServers(listContainer);
+    this.addChild(this.controlsContainer());
+
+    executor.execute(() -> this.serverEntryProvider.read(entry -> this.minecraft.execute(() -> {
+      this.listContainer.addChild(new ServerItemComponent(entry));
+      this.listContainer.layout();
+    })));
   }
 
-  private Component<?> controlsContainer(ContainerComponent listContainer) {
+  protected Component<?> controlsContainer() {
     return new ContainerComponent()
         .setHeight(30F)
         .setJustifyContent(Justify.CENTER)
@@ -92,7 +100,9 @@ public class ServerListComponent extends ContainerComponent {
             .setRightMargin(15F)
             .setWidth(70F)
             .setTopPadding(1F)
-            .addActionListener(containerComponent -> this.refresh(listContainer)))
+            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .setFocusable(true)
+            .addListener(ActionEvent.class, (c, e) -> this.refresh()))
         .addChild(new ContainerComponent()
             .addChild(new TextBlockComponent(
                 new TranslationTextComponent("menu.play.server_list.button.play"))
@@ -107,7 +117,9 @@ public class ServerListComponent extends ContainerComponent {
             .setHeight(21F)
             .setWidth(70F)
             .setTopPadding(1F)
-            .addActionListener(containerComponent -> this.connectToSelected(listContainer)));
+            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .setFocusable(true)
+            .addListener(ActionEvent.class, (c, e) -> this.connectToSelected()));
   }
 
   private Component<?> firstTableRow() {
@@ -119,16 +131,20 @@ public class ServerListComponent extends ContainerComponent {
         .setLeftPadding(10F)
         .setRightPadding(20F)
         .setHeight(22F)
-        .setBackgroundColour(new Colour(0x40121212))
+        .setBackgroundColour(new Colour(0x88121212))
         .setMaxWidth(520F)
         .setFlexDirection(FlexDirection.ROW)
         .setAlignItems(Align.CENTER)
-        .addChild(
-            new TextBlockComponent(new TranslationTextComponent("menu.play.server_list.server"))
-                .setFlexGrow(1F)
-                .setShadow(false)
-                .setCentered(true)
-                .setHeight(8))
+        .addChild(new TextBlockComponent(new TranslationTextComponent("menu.play.server_list.motd"))
+            .setFlex(2F)
+            .setShadow(false)
+            .setCentered(true)
+            .setHeight(8))
+        .addChild(new TextBlockComponent(new TranslationTextComponent("menu.play.server_list.map"))
+            .setFlex(1)
+            .setShadow(false)
+            .setCentered(true)
+            .setHeight(8))
         .addChild(new TextBlockComponent(new TranslationTextComponent("menu.play.server_list.ping"))
             .setWidth(60F)
             .setShadow(false)
@@ -144,73 +160,20 @@ public class ServerListComponent extends ContainerComponent {
                 .setHeight(8));
   }
 
-  private void connectToSelected(ParentComponent<?> parent) {
-    parent.getChildrenComponents().stream()
-        .filter(component -> component instanceof ServerItemComponent
-            && ((ServerItemComponent) component).isSelected())
+  private void connectToSelected() {
+    this.streamItems()
+        .filter(ServerItemComponent::isSelected)
         .findFirst()
-        .ifPresent(component -> ((ServerItemComponent) component).connect());
+        .ifPresent(ServerItemComponent::connect);
   }
 
-  private void refresh(ParentComponent<?> parent) {
-    for (Component<?> child : parent.getChildrenComponents()) {
-      if (child instanceof ServerItemComponent) {
-        ((ServerItemComponent) child).refreshPing();
-      }
-    }
+  private void refresh() {
+    this.streamItems().forEach(ServerItemComponent::ping);
   }
 
-  private void loadServers(ContainerComponent listContainer) {
-    File file = new File("server_list.json");
-    try {
-      FileReader fileReader = new FileReader(file);
-      JsonReader jsonReader = new JsonReader(fileReader);
-      JsonObject jsonObject = gson.fromJson(jsonReader, JsonObject.class);
-      JsonArray jsonArray = jsonObject.getAsJsonArray(this.serverListKey);
-      if (jsonArray == null) {
-        logger.info("Missing server list with key {}", this.serverListKey);
-        return;
-      }
-
-      for (JsonElement jsonElement : jsonArray) {
-        JsonObject serverObj = jsonElement.getAsJsonObject();
-        listContainer.addChild(new ServerItemComponent(this, serverObj.get("name").getAsString(),
-            serverObj.get("hostName").getAsString(), serverObj.get("port").getAsInt()));
-      }
-
-    } catch (FileNotFoundException | JsonSyntaxException | JsonIOException e) {
-      logger.warn("Unable to load server list from {} - {}", file.getAbsolutePath(),
-          e.getMessage());
-      return;
-    }
+  private Stream<ServerItemComponent> streamItems() {
+    return this.listContainer.getChildren().stream()
+        .filter(child -> child instanceof ServerItemComponent)
+        .map(child -> (ServerItemComponent) child);
   }
-
-  private void resetSelection(ParentComponent<?> parent) {
-    for (Component<?> child : parent.getChildrenComponents()) {
-      if (child instanceof ServerItemComponent) {
-        ((ServerItemComponent) child).removeSelect();
-      }
-    }
-  }
-
-  @Override
-  public void tick() {
-    super.tick();
-    serverPinger.pingPendingNetworks();
-  }
-
-  @Override
-  public void close() {
-    super.close();
-    serverPinger.clearPendingNetworks();
-  }
-
-  public Executor getExecutor() {
-    return executor;
-  }
-
-  public ServerPinger getServerPinger() {
-    return serverPinger;
-  }
-
 }

@@ -18,9 +18,9 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -36,15 +36,14 @@ import net.minecraft.util.text.Style;
 
 public class TextBlockComponent extends Component<TextBlockComponent> {
 
-  private  ITextComponent text;
+  private ITextComponent text;
   private FontRenderer fontRenderer;
   private boolean shadow;
   private boolean centered;
   private boolean customWidth = false;
-  private List<IReorderingProcessor> lines;
+  private List<IReorderingProcessor> lines = new ArrayList<>();
 
   public TextBlockComponent(ITextComponent text) {
-    super();
     this.text = text;
     this.fontRenderer = super.minecraft.fontRenderer;
     this.shadow = true;
@@ -89,15 +88,13 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
 
   @Override
   public void layout() {
+    this.generateLines((int) this.getContentWidth());
     super.layout();
-    if (this.lines == null) {
-      this.generateLines((int) this.getContentWidth());
-    }
   }
 
   @Override
   protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-                             float height) {
+      float height) {
     if (widthMode == MeasureMode.UNDEFINED) {
       width = this.fontRenderer.getStringWidth(this.text.getString());
     }
@@ -111,14 +108,20 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return this.getMouseOverText(mouseX, mouseY).map(this.getScreen()::handleComponentClicked)
-        .orElse(false) || super.mouseClicked(mouseX, mouseY, button);
+  public float getActualContentHeight() {
+    return this.lines.size() * this.fontRenderer.FONT_HEIGHT;
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    return super.mouseClicked(mouseX, mouseY, button)
+        || this.getMouseOverText(mouseX, mouseY).map(this.getScreen()::handleComponentClicked)
+            .orElse(false);
+  }
+
+  @Override
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     matrixStack.push();
     {
       matrixStack.translate(this.getContentX(), this.getContentY(), 0.0D);
@@ -130,7 +133,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
         matrixStack.push();
         {
           matrixStack.translate(0.0D, i * this.fontRenderer.FONT_HEIGHT, 0.0D);
-          float x = this.centered ? (this.getWidth()  - fontRenderer.func_243245_a(line)) / 2F : 0;
+          float x = this.centered ? (this.getWidth() - fontRenderer.func_243245_a(line)) / 2F : 0;
           this.fontRenderer.func_238416_a_(line, x, 0, 0xFFFFFFFF, this.shadow,
               matrixStack.getLast().getMatrix(), renderTypeBuffer, false, 0, 0xF000F0);
         }

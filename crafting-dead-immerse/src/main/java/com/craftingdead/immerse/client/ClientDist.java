@@ -48,6 +48,7 @@ import com.craftingdead.immerse.game.deathmatch.client.SelectTeamScreen;
 import com.craftingdead.immerse.game.team.AbstractTeamGame;
 import com.craftingdead.immerse.game.team.ITeam;
 import com.craftingdead.immerse.game.team.ITeamGame;
+import com.craftingdead.immerse.network.ServerPinger;
 import com.craftingdead.immerse.server.LogicalServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -286,6 +287,9 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
         if (this.gameClient != null) {
           this.gameClient.tick();
         }
+
+        ServerPinger.INSTANCE.pingPendingNetworks();
+
         if (this.minecraft.player != null) {
           boolean worldFocused = !this.minecraft.isGamePaused() && this.minecraft.loadingGui == null
               && (this.minecraft.currentScreen == null);

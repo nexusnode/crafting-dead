@@ -1,23 +1,24 @@
 package com.craftingdead.immerse.client.gui.component;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Consumer;
-
-import com.craftingdead.immerse.client.gui.component.event.DropdownItemSelectEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
-public class DropdownComponent extends Component<DropdownComponent> {
+public class DropdownComponent extends Component<DropdownComponent>
+    implements IParentView {
+
   public static final int DEFAULT_HEIGHT = 14;
   public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0xFF444444;
   public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR = 0xFF222222;
@@ -29,17 +30,14 @@ public class DropdownComponent extends Component<DropdownComponent> {
   public static final double DEFAULT_ARROW_LINE_WIDTH = 1.6D;
   public static final double DEFAULT_X_ARROW_OFFSET = 0.18D;
 
-  private static final Logger logger = LogManager.getLogger();
-
-  // Need ordering for #mouseClicked, could alternatively use LinkedHashMap for insertion ordering
-  private final Map<Integer, Item> items = new TreeMap<>();
+  private final List<Item> items = new ArrayList<>();
 
   private int itemBackgroundColour;
   private int selectedItemBackgroundColour;
   private int hoveredItemBackgroundColour;
 
   private boolean expanded = false;
-  private int selectedItemId = -1;
+  private int selectedItemIndex = -1;
   private boolean init = false;
 
   private double arrowWidth;
@@ -49,12 +47,16 @@ public class DropdownComponent extends Component<DropdownComponent> {
   private double arrowLineWidthY;
   private double xArrowOffset;
 
+  @Nullable
+  private IGuiEventListener listener;
+  private boolean dragging;
+
   public DropdownComponent() {
     this.setHeight(DEFAULT_HEIGHT);
     this.itemBackgroundColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
     this.selectedItemBackgroundColour = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR;
     this.hoveredItemBackgroundColour = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR;
-    this.setZLevel(DEFAULT_Z_LEVEL);
+    this.setZLevelOffset(DEFAULT_Z_LEVEL);
     this.arrowWidth = DEFAULT_ARROW_WIDTH;
     this.arrowHeight = DEFAULT_ARROW_HEIGHT;
     this.arrowLineWidth = DEFAULT_ARROW_LINE_WIDTH;
@@ -103,8 +105,8 @@ public class DropdownComponent extends Component<DropdownComponent> {
     return this;
   }
 
-  public DropdownComponent addItem(int id, ITextComponent text) {
-    this.items.put(id, new Item(id, text));
+  public DropdownComponent addItem(ITextComponent text, Runnable actionListener) {
+    this.items.add(new Item(this.items.size(), text, actionListener));
     return this;
   }
 
@@ -113,54 +115,25 @@ public class DropdownComponent extends Component<DropdownComponent> {
     return this;
   }
 
-  public DropdownComponent selectItem(int itemId) {
-    this.onItemSelected(this.items.get(itemId));
-    return this;
-  }
-
   public Item getSelectedItem() {
-    return this.items.get(this.selectedItemId);
+    return this.items.get(this.selectedItemIndex);
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (!super.mouseClicked(mouseX, mouseY, button)) {
+    if (super.mouseClicked(mouseX, mouseY, button)) {
+      return true;
+    }
+
+    if (this.expanded || this.isMouseOver(mouseX, mouseY)) {
       if (this.expanded) {
-        int i = 0;
-        for (Item item : items.values()) {
-          if (item.isDisabled()) {
-            continue;
-          }
-          final double itemY = this.getY() + this.getHeight() + this.getItemHeight() * i;
-          if (item.getId() != this.selectedItemId && mouseY >= itemY
-              && mouseY <= itemY + this.getItemHeight()) {
-            this.onItemSelected(item);
-          }
-          i++;
-        }
+        IParentView.super.mouseClicked(mouseX, mouseY, button);
       }
       this.expanded = !this.expanded;
       return true;
     }
+
     return false;
-  }
-
-  public void addSelectListener(Consumer<Integer> listener) {
-    this.addListener(DropdownItemSelectEvent.class,
-        (dropdownComponent, dropdownItemSelectEvent) -> listener
-            .accept(dropdownItemSelectEvent.getItem().getId()));
-  }
-
-  protected void onItemSelected(Item item) {
-    if (item == null) {
-      logger.warn("Tried to select null Item in DropdownComponent");
-      return;
-    }
-
-    if (this.selectedItemId != item.getId()) {
-      this.selectedItemId = item.getId();
-      this.post(new DropdownItemSelectEvent(item));
-    }
   }
 
   @Override
@@ -174,8 +147,9 @@ public class DropdownComponent extends Component<DropdownComponent> {
       return;
     }
     this.init = true;
-    if (this.selectedItemId == -1 && this.items.size() > 0) {
-      this.selectItem(this.items.keySet().stream().findFirst().get());
+    if (this.selectedItemIndex == -1 && this.items.size() > 0) {
+      this.selectedItemIndex = 0;
+      this.items.get(0).actionListener.run();
     }
   }
 
@@ -185,12 +159,26 @@ public class DropdownComponent extends Component<DropdownComponent> {
   }
 
   @Override
-  public boolean changeFocus(boolean focused) {
-    boolean changeFocus = super.changeFocus(focused);
-    if (changeFocus != this.expanded) {
+  public boolean changeFocus(boolean forward) {
+    if (this.expanded) {
+      if (!IParentView.super.changeFocus(forward)) {
+        this.toggleExpanded();
+      }
+    } else {
       this.toggleExpanded();
     }
     return this.expanded;
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    return IParentView.super.keyPressed(keyCode, scanCode, modifiers)
+        || super.keyPressed(keyCode, scanCode, modifiers);
+  }
+
+  @Override
+  public List<? extends IGuiEventListener> getEventListeners() {
+    return Collections.unmodifiableList(this.items);
   }
 
   protected void toggleExpanded() {
@@ -200,17 +188,8 @@ public class DropdownComponent extends Component<DropdownComponent> {
 
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    if (this.expanded) {
-      // so clicks elsewhere get passed to #mouseClicked to minimize the dropdown
-      // might be buggy with components with higher Z level
-      // also mouse enter and leave events will not work for other components (with lower Z) while a
-      // dropdown is expanded
-      // TODO look for a better solution, maybe separate event when a component is clicked and
-      // general click event?
-      return true;
-    }
-    return mouseX > this.getX() && mouseX < this.getX() + this.getWidth() &&
-        mouseY > this.getY() && mouseY < this.getY() + this.getHeight()
+    return mouseX > this.getScaledX() && mouseX < this.getScaledX() + this.getScaledWidth() &&
+        mouseY > this.getScaledY() && mouseY < this.getScaledY() + this.getScaledHeight()
             + (this.expanded ? this.items.size() * this.getItemHeight() : 0);
   }
 
@@ -219,30 +198,26 @@ public class DropdownComponent extends Component<DropdownComponent> {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
-    this.renderItem(this.getScaledContentY(), this.getItemHeight(),
-        this.items.get(this.selectedItemId), Type.SELECTED);
-    renderArrow();
-    if (this.expanded) {
-      int i = 0;
-      for (Item item : this.items.values()) {
-        final double itemY = this.getScaledContentY() + this.getHeight() + this.getItemHeight() * i;
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
+    this.items.get(this.selectedItemIndex).render(Type.SELECTED);
+    this.renderArrow();
+
+    if (this.expanded) {
+      for (Item item : this.items) {
         Type type;
-        if (item.isDisabled()) {
+        if (item.disabled) {
           type = Type.DISABLED;
-        } else if (item.getId() == this.selectedItemId) {
+        } else if (item.index == this.selectedItemIndex) {
           type = Type.HIGHLIGHTED;
-        } else if (this.isMouseOver() && mouseY >= itemY
-            && mouseY <= itemY + this.getItemHeight()) {
+        } else if (item.isMouseOver(mouseX, mouseY) || this.listener == item) {
           type = Type.HOVERED;
         } else {
           type = Type.NONE;
         }
 
-        this.renderItem(itemY, this.getItemHeight(), item, type);
-        i++;
+        item.render(type);
       }
     }
   }
@@ -283,68 +258,134 @@ public class DropdownComponent extends Component<DropdownComponent> {
         arrowHeight - Math.tan(arrowLinePitchRad) * (this.arrowWidth / 2D - this.arrowLineWidthX);
   }
 
-  private void renderItem(double y, int height, Item item, Type type) {
-    int backgroundColour = this.itemBackgroundColour;
-    int textColour = TextFormatting.GRAY.getColor();
-
-    switch (type) {
-      case SELECTED:
-        backgroundColour ^= 0xFF000000;
-        backgroundColour += 128 << 24;
-        textColour = TextFormatting.WHITE.getColor();
-        break;
-      case HIGHLIGHTED:
-        backgroundColour = this.selectedItemBackgroundColour;
-        break;
-      case DISABLED:
-        textColour = TextFormatting.DARK_GRAY.getColor();
-        break;
-      case HOVERED:
-        backgroundColour = this.hoveredItemBackgroundColour;
-        break;
-      default:
-        break;
-    }
-
-    RenderUtil.fill(this.getScaledContentX(), y,
-        this.getScaledContentX() + this.getScaledContentWidth(), y + height,
-        backgroundColour);
-
-    this.minecraft.fontRenderer.func_238418_a_(item.text,
-        (int) this.getScaledContentX() + 3,
-        (int) y + (height - this.minecraft.fontRenderer.FONT_HEIGHT) / 2 + 1,
-        (int) this.getScaledContentWidth(), textColour);
-  }
-
   private enum Type {
     HIGHLIGHTED, SELECTED, DISABLED, HOVERED, NONE;
   }
 
-  public static class Item {
+  public class Item implements IGuiEventListener {
 
-    private final int id;
+    private final int index;
     private final ITextComponent text;
+    private final Runnable actionListener;
+
     private boolean disabled = false;
 
-    public Item(int id, ITextComponent text) {
-      this.id = id;
+    public Item(int index, ITextComponent text, Runnable actionListener) {
+      this.index = index;
       this.text = text;
+      this.actionListener = actionListener;
     }
 
-    public int getId() {
-      return id;
+    private void render(Type type) {
+      float y = this.getY();
+
+      int backgroundColour = DropdownComponent.this.itemBackgroundColour;
+      int textColour = TextFormatting.GRAY.getColor();
+
+      switch (type) {
+        case SELECTED:
+          y = DropdownComponent.this.getScaledContentY();
+          backgroundColour ^= 0xFF000000;
+          backgroundColour += 128 << 24;
+          textColour = TextFormatting.WHITE.getColor();
+          break;
+        case HIGHLIGHTED:
+          backgroundColour = DropdownComponent.this.selectedItemBackgroundColour;
+          break;
+        case DISABLED:
+          textColour = TextFormatting.DARK_GRAY.getColor();
+          break;
+        case HOVERED:
+          backgroundColour = DropdownComponent.this.hoveredItemBackgroundColour;
+          break;
+        default:
+          break;
+      }
+
+      this.render(DropdownComponent.this.getScaledContentX(), y,
+          DropdownComponent.this.getScaledContentWidth(), DropdownComponent.this.getItemHeight(),
+          backgroundColour, textColour);
     }
 
-    public ITextComponent getText() {
-      return text;
+    private void render(float x, float y, float width, float height, int backgroundColour,
+        int textColour) {
+      float x2 = x + width;
+      float y2 = y + height;
+
+      RenderUtil.fill(x, y, x2, y2, backgroundColour);
+
+      DropdownComponent.this.minecraft.fontRenderer.func_238418_a_(this.text,
+          (int) x + 3,
+          (int) (y + (height - DropdownComponent.this.minecraft.fontRenderer.FONT_HEIGHT) / 2 + 1),
+          (int) width, textColour);
     }
 
-    public boolean isDisabled() {
-      return disabled;
+    private void click() {
+      DropdownComponent.this.selectedItemIndex = this.index;
+      this.actionListener.run();
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+      if (keyCode == GLFW.GLFW_KEY_ENTER) {
+        this.click();
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+      if (!this.disabled && this.index != DropdownComponent.this.selectedItemIndex
+          && this.isMouseOver(mouseX, mouseY)) {
+        this.click();
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean changeFocus(boolean forward) {
+      return !this.disabled && DropdownComponent.this.selectedItemIndex != this.index
+          && DropdownComponent.this.listener != this;
     }
 
     public void setDisabled(boolean disabled) {
       this.disabled = disabled;
     }
+
+    private float getY() {
+      return DropdownComponent.this.getScaledContentY()
+          + DropdownComponent.this.getScaledContentHeight()
+          + DropdownComponent.this.getItemHeight() * this.index;
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+      final float y = this.getY();
+      return DropdownComponent.this.isMouseOver(mouseX, mouseY) && mouseY >= y
+          && mouseY <= y + DropdownComponent.this.getItemHeight();
+    }
+  }
+
+  @Override
+  public final boolean isDragging() {
+    return this.dragging;
+  }
+
+  @Override
+  public final void setDragging(boolean dragging) {
+    this.dragging = dragging;
+  }
+
+  @Nullable
+  @Override
+  public IGuiEventListener getListener() {
+    return this.listener;
+  }
+
+  @Override
+  public void setListener(@Nullable IGuiEventListener listener) {
+    this.listener = listener;
   }
 }

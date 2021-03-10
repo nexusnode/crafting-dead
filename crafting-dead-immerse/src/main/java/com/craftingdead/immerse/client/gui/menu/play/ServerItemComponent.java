@@ -18,148 +18,169 @@
 
 package com.craftingdead.immerse.client.gui.menu.play;
 
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.Colour;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.ParentComponent;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.component.serverentry.ServerEntry;
 import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import com.craftingdead.immerse.network.ServerPinger;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ConnectingScreen;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class ServerItemComponent extends ContainerComponent {
+public class ServerItemComponent extends ParentComponent<ServerItemComponent> {
 
+  private final ServerEntry serverEntry;
+
+  private final TextBlockComponent motdComponent;
   private final TextBlockComponent pingComponent;
   private final TextBlockComponent playersAmountComponent;
-  private final ServerListComponent parent;
-  private final String hostName;
-  private final int port;
 
-  private boolean hovered = false;
   private boolean selected = false;
-  private int doubleClickTicks = 0;
 
-  public ServerItemComponent(ServerListComponent parent, String serverName, String hostName, int port) {
-    this.parent = parent;
-    this.hostName = hostName;
-    this.port = port;
-    //TODO replace the loading with animation?
-    pingComponent = new TextBlockComponent("loading");
-    playersAmountComponent = new TextBlockComponent("loading");
+  public ServerItemComponent(ServerEntry serverEntry) {
+    this.serverEntry = serverEntry;
+
+    // TODO replace the loading with animation?
+    this.motdComponent = new TextBlockComponent("???");
+    this.pingComponent = new TextBlockComponent("???");
+    this.playersAmountComponent = new TextBlockComponent("???");
+
     this.setTopMargin(3F)
         .setLeftMargin(7F)
         .setRightMargin(7F)
         .setLeftPadding(10F)
         .setRightPadding(20F)
         .setHeight(22F)
-        .setBackgroundColour(new Colour(0x44393939))
+        .setBackgroundColour(new Colour(0X882C2C2C))
         .setMaxWidth(520F)
         .setFlexDirection(FlexDirection.ROW)
         .setAlignItems(Align.CENTER)
-        .addChild(new TextBlockComponent(serverName)
-            .setFlexGrow(1F)
+        .setFocusable(true)
+        .setDoubleClick(true)
+        .addListener(ActionEvent.class, (c, e) -> this.connect())
+        .addChild(this.motdComponent
+            .setOverflow(Overflow.HIDDEN)
+            .setFlex(2)
             .setShadow(false)
             .setCentered(true)
             .setHeight(8))
-        .addChild(pingComponent
+        .addChild(new TextBlockComponent(
+            Text.of(this.serverEntry.getMap().orElse("-")).mergeStyle(TextFormatting.GRAY))
+                .setOverflow(Overflow.HIDDEN)
+                .setFlex(1)
+                .setShadow(false)
+                .setCentered(true)
+                .setHeight(8))
+        .addChild(this.pingComponent
             .setWidth(60F)
             .setShadow(false)
             .setCentered(true)
             .setLeftMargin(10F)
             .setHeight(8))
-        .addChild(playersAmountComponent
+        .addChild(this.playersAmountComponent
             .setWidth(60F)
             .setShadow(false)
             .setCentered(true)
             .setLeftMargin(10F)
             .setHeight(8));
 
-    this.pingServer();
-  }
-
-  public void refreshPing() {
-    this.pingComponent.changeText(Text.of("loading"));
-    this.playersAmountComponent.changeText(Text.of("loading"));
-    this.pingServer();
+    this.ping();
   }
 
   public void connect() {
-    Minecraft.getInstance().displayGuiScreen(new ConnectingScreen(this.getScreen(), this.minecraft, this.hostName,
-        this.port));
+    this.minecraft.displayGuiScreen(
+        new ConnectingScreen(this.getScreen(), this.minecraft, this.serverEntry.getHostName(),
+            this.serverEntry.getPort()));
   }
 
-  private void pingServer() {
-    this.parent.getExecutor().execute(() -> {
-      try {
-        this.parent.getServerPinger().ping(hostName, (pingData) ->
-            this.minecraft.execute(() -> this.updateServerInfo(pingData)));
-      } catch (Exception exception) {
-        this.minecraft.execute(() -> this.updateServerInfo(ServerPinger.PingData.FAILED));
-      }
-    });
+  public void ping() {
+    ServerPinger.INSTANCE.ping(this.serverEntry.getHostName(), this.serverEntry.getPort(),
+        (pingData) -> this.minecraft.execute(() -> this.updateServerInfo(pingData)));
   }
 
   private void updateServerInfo(ServerPinger.PingData pingData) {
+    this.motdComponent.changeText(pingData.getMotd());
     if (pingData.getPing() >= 0) {
-      pingComponent.changeText(Text.of(pingData.getPing()));
+      long ping = pingData.getPing();
+      String pingText = ping + "ms";
+      if (ping < 200) {
+        pingText = TextFormatting.GREEN + pingText;
+      } else if (ping < 400) {
+        pingText = TextFormatting.YELLOW + pingText;
+      } else if (ping < 1200) {
+        pingText = TextFormatting.RED + pingText;
+      } else {
+        pingText = TextFormatting.DARK_RED + pingText;
+      }
+      this.pingComponent.changeText(Text.of(pingText));
     } else {
-      pingComponent.changeText(new TranslationTextComponent("menu.play.server_list.failed_to_load"));
+      this.pingComponent
+          .changeText(new TranslationTextComponent("menu.play.server_list.failed_to_load"));
     }
-    playersAmountComponent.changeText(pingData.getPlayersAmount());
+    this.playersAmountComponent.changeText(pingData.getPlayersAmount());
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.focused) {
+      this.selected = !this.selected;
+      this.updateBorder();
+      return true;
+    }
+    return super.keyPressed(keyCode, scanCode, modifiers);
+  }
+
+  @Override
+  protected void focusChanged() {
+    this.updateBorder();
   }
 
   @Override
   protected void mouseEntered(double mouseX, double mouseY) {
     super.mouseEntered(mouseX, mouseY);
-    this.hovered = true;
     this.updateBorder();
   }
 
   @Override
   protected void mouseLeft(double mouseX, double mouseY) {
     super.mouseLeft(mouseX, mouseY);
-    this.hovered = false;
     this.updateBorder();
   }
 
   private void updateBorder() {
-    if (selected) {
+    if (this.selected) {
       this.setBorderWidth(1.5F);
-    } else if (hovered) {
+    } else if (this.isHovered() || this.isFocused()) {
       this.setBorderWidth(0.7F);
     } else {
       this.setBorderWidth(0F);
     }
   }
 
-  public void removeSelect() {
-    this.selected = false;
-    this.updateBorder();
-  }
   public boolean isSelected() {
-    return selected;
+    return this.selected;
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    this.selected = true;
-    this.updateBorder();
-    if (doubleClickTicks > 0) {
-      this.connect();
+    if (super.mouseClicked(mouseX, mouseY, button)) {
+      return true;
+    }
+
+    if (this.isHovered()) {
+      this.selected = true;
+      this.updateBorder();
+      return true;
     } else {
-      this.doubleClickTicks = 4;
+      this.selected = false;
+      this.updateBorder();
     }
-    return super.mouseClicked(mouseX, mouseY, button);
+    return false;
   }
-
-  @Override
-  public void tick() {
-    super.tick();
-    if (doubleClickTicks > 0) {
-      doubleClickTicks--;
-    }
-  }
-
 }

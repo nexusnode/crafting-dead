@@ -43,8 +43,8 @@ public class PanoramaComponent extends Component<PanoramaComponent> {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     this.panorama.render(partialTicks, 1.0F);
     RenderUtil.bind(PANORAMA_OVERLAY_TEXTURES);
     RenderSystem.enableBlend();

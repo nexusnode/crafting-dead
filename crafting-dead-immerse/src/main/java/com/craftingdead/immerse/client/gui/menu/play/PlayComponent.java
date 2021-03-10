@@ -18,13 +18,16 @@
 
 package com.craftingdead.immerse.client.gui.menu.play;
 
+import java.nio.file.Paths;
 import com.craftingdead.immerse.client.gui.component.Colour;
+import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ContainerComponent;
-import com.craftingdead.immerse.client.gui.component.ContentDropdownComponent;
 import com.craftingdead.immerse.client.gui.component.ContentTabsComponent;
+import com.craftingdead.immerse.client.gui.component.DropdownComponent;
 import com.craftingdead.immerse.client.gui.component.RectangleComponent;
 import com.craftingdead.immerse.client.gui.component.TabsComponent;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
+import com.craftingdead.immerse.client.gui.component.serverentry.JsonServerList;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayComponent extends ContainerComponent {
@@ -36,10 +39,18 @@ public class PlayComponent extends ContainerComponent {
   public static final long BLUE = 0x6674b9f7;
   public static final long BLUE_HIGHLIGHTED = 0x6691cbff;
 
+  private final ContainerComponent dropdownContent;
+
+  private void displayContent(Component<?> content) {
+    this.dropdownContent.clearChildren();
+    this.dropdownContent.addChild(content);
+    this.dropdownContent.layout();
+  }
+
   public PlayComponent() {
-    ContainerComponent dropdownContent = new ContainerComponent();
+    this.dropdownContent = new ContainerComponent();
+
     ContainerComponent officialContent = new ContainerComponent();
-    ContainerComponent communityContent = new ContainerComponent();
     ContainerComponent singleplayerContent = new ContainerComponent();
     ContainerComponent container = new ContainerComponent()
         .setBackgroundColour(new Colour(0x50777777))
@@ -47,61 +58,50 @@ public class PlayComponent extends ContainerComponent {
         .addChild(new TextBlockComponent(new TranslationTextComponent(
             "menu.play.title"))
                 .setShadow(true)
-                .setMargin(5.5F))
+                .setPadding(12)
+                .setScale(1.5F)
+                .setWidthPercent(100)
+                .setHeight(30))
         .addChild(this.newSeparator())
-        .addChild(new ContentDropdownComponent(dropdownContent)
-            .addItem(1, new TranslationTextComponent("menu.play.dropdown.official"),
-                officialContent)
-            .addItem(2, new TranslationTextComponent("menu.play.dropdown.singleplayer"),
-                singleplayerContent)
-            .addItem(3, new TranslationTextComponent("menu.play.dropdown.community"),
-                communityContent)
-            .setDisabled(3, true)
-            .selectItem(1)
+        .addChild(new DropdownComponent()
+            .addItem(new TranslationTextComponent("menu.play.dropdown.official"),
+                () -> this.displayContent(officialContent))
+            .addItem(new TranslationTextComponent("menu.play.dropdown.singleplayer"),
+                () -> this.displayContent(singleplayerContent))
+            // .addItem(3, new TranslationTextComponent("menu.play.dropdown.community"),
+            // new ServerListComponent("tdm")
+            // .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
+            // .setHeight(19)
+            // .setWidthPercent(100))
             .setWidth(100F)
-            .setHeight(19F)
-            .setTopMargin(1F)
-            .setLeftMargin(1F))
-        .addChild(newSeparator())
-        .addChild(dropdownContent
+            .setHeight(21F)
+            .setTopMargin(1)
+            .setBottomPadding(1)
+            .setLeftMargin(10F))
+        .addChild(this.newSeparator())
+        .addChild(this.dropdownContent
             .setFlexShrink(1F));
 
     ContainerComponent officialContentContainer = new ContainerComponent();
-    ContainerComponent officialSurvivalContent = new ContainerComponent()
-        .addChild(new ServerListComponent("official_survival")
-            .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
-            .setTopMargin(1F));
-    ContainerComponent officialTdmContent = new ContainerComponent()
-        .addChild(new ServerListComponent("official_tdm")
-            .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
-            .setTopMargin(1F));
     officialContent
         .addChild(new ContentTabsComponent(officialContentContainer)
             .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")),
-                officialSurvivalContent)
+                new ServerListComponent(new JsonServerList(
+                    Paths.get(System.getProperty("user.dir"), "survival_servers.json")))
+                        .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
+                        .setTopMargin(1F))
             .addTab(
                 new TabsComponent.Tab(
-                    new TranslationTextComponent("menu.play.tab.team_death_match")),
-                officialTdmContent)
+                    new TranslationTextComponent("menu.play.tab.tdm")),
+                new ServerListComponent(new JsonServerList(
+                    Paths.get(System.getProperty("user.dir"), "tdm_servers.json")))
+                        .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
+                        .setTopMargin(1F))
             .setHeight(19)
-            .setZLevel(1))
+            .setZLevelOffset(1))
         .addChild(officialContentContainer
             .setFlexShrink(1F));
 
-
-    ContainerComponent communityContentContainer = new ContainerComponent();
-    ContainerComponent communitySurvivalContent = new ContainerComponent()
-        .addChild(new TextBlockComponent("Community Survival content")
-            .setTopMargin(4F)
-            .setShadow(false));
-    communityContent
-        .addChild(new ContentTabsComponent(communityContentContainer)
-            .addTab(new TabsComponent.Tab(new TranslationTextComponent("menu.play.tab.survival")),
-                communitySurvivalContent)
-            .setHeight(19F)
-            .setZLevel(1))
-        .addChild(communityContentContainer
-            .setFlexShrink(1F));
 
     singleplayerContent
         .addChild(new ContainerComponent()
