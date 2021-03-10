@@ -29,22 +29,22 @@ public class AdrenalineEffect extends Effect {
 
   protected AdrenalineEffect() {
     super(EffectType.BENEFICIAL, 0xFFD000);
-    this.addAttributesModifier(Attributes.MOVEMENT_SPEED, "91AEAA56-376B-4498-935B-2F7F68070635",
+    this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "91AEAA56-376B-4498-935B-2F7F68070635",
         0.2D, AttributeModifier.Operation.MULTIPLY_TOTAL);
   }
 
   @Override
-  public void removeAttributesModifiersFromEntity(LivingEntity livingEntity,
+  public void removeAttributeModifiers(LivingEntity livingEntity,
       AttributeModifierManager attributes, int amplifier) {
-    super.removeAttributesModifiersFromEntity(livingEntity, attributes, amplifier);
+    super.removeAttributeModifiers(livingEntity, attributes, amplifier);
     livingEntity
         .setAbsorptionAmount(livingEntity.getAbsorptionAmount() - (float) (4 * (amplifier + 1)));
   }
 
   @Override
-  public void applyAttributesModifiersToEntity(LivingEntity livingEntity,
+  public void addAttributeModifiers(LivingEntity livingEntity,
       AttributeModifierManager attributes, int amplifier) {
-    super.applyAttributesModifiersToEntity(livingEntity, attributes, amplifier);
+    super.addAttributeModifiers(livingEntity, attributes, amplifier);
     livingEntity
         .setAbsorptionAmount(livingEntity.getAbsorptionAmount() + (float) (4 * (amplifier + 1)));
   }

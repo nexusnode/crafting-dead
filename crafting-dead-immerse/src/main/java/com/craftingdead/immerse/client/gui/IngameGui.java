@@ -41,17 +41,17 @@ public class IngameGui {
 
   private void renderKilledMessage(MatrixStack matrixStack, int width, int height) {
     if (this.killedMessage != null) {
-      final long currentTime = Util.milliTime();
+      final long currentTime = Util.getMillis();
       if (currentTime - this.killedMessageVisibleTimeMs > KILLED_MESSAGE_LIFE_MS) {
         this.killedMessage = null;
         return;
       }
-      this.killedMessage.render(matrixStack, this.minecraft.fontRenderer, width, height);
+      this.killedMessage.render(matrixStack, this.minecraft.font, width, height);
     }
   }
 
   public void displayKilledMessage(KilledMessage killedMessage) {
-    this.killedMessageVisibleTimeMs = Util.milliTime();
+    this.killedMessageVisibleTimeMs = Util.getMillis();
     this.killedMessage = killedMessage;
   }
 }

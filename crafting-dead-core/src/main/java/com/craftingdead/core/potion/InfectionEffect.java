@@ -37,14 +37,14 @@ public class InfectionEffect extends Effect {
   }
 
   @Override
-  public void performEffect(LivingEntity livingEntity, int amplifier) {
+  public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.getHealth() > 1.0F) {
-      livingEntity.attackEntityFrom(ModDamageSource.INFECTION, 1.0F);
+      livingEntity.hurt(ModDamageSource.INFECTION, 1.0F);
     }
   }
 
   @Override
-  public boolean isReady(int duration, int amplifier) {
+  public boolean isDurationEffectTick(int duration, int amplifier) {
     return random.nextFloat() < 0.5F;
   }
 

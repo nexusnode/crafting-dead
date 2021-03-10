@@ -49,13 +49,13 @@ public class MossbergRenderer extends GunRenderer {
   protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(77));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(77));
 
     matrixStack.translate(0.2F, -0.7F, 0.4F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(15));
     matrixStack.translate(-0.2F, 0.55F, 0.0F);
 
     float scale = 1.2F;
@@ -71,25 +71,25 @@ public class MossbergRenderer extends GunRenderer {
     this.muzzleFlashZ = -2.5F;
     this.muzzleScale = 2F;
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-40.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-3.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-40.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(-3.0F));
 
     matrixStack.translate(0.4F, -0.15F, 0.17F);
 
     float scale = 1F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(3.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(3.0F));
   }
 
   @Override
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-24.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5.1F));
 
     matrixStack.translate(-0F, -0.64F, 0.972F);
 
@@ -101,7 +101,7 @@ public class MossbergRenderer extends GunRenderer {
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-0.7F));
     matrixStack.translate(0F, 0F, 0.0F);
   }
 
@@ -114,26 +114,26 @@ public class MossbergRenderer extends GunRenderer {
 
   private void renderIronSight(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(1.4F, -0.185F, 0.0315F);
       float scale = 0.49F;
       matrixStack.scale(scale, scale, scale);
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.getRenderType(
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is2.png")));
-      this.ironSight.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
     float scale = 0.7F;
     matrixStack.scale(scale, scale, scale);
     matrixStack.translate(-0.9F, 0.32F, 0.23F);
@@ -166,7 +166,7 @@ public class MossbergRenderer extends GunRenderer {
 
   @Override
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(pct * -50));
     matrixStack.translate(pct * 0.5F, 0.0F, pct * 0.1F);
   }
 }

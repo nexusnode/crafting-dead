@@ -63,14 +63,14 @@ public class AttachmentItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world,
+  public void appendHoverText(ItemStack stack, World world,
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
+    super.appendHoverText(stack, world, lines, tooltipFlag);
 
     for (Entry<MultiplierType, Float> entry : this.multipliers.entrySet()) {
       lines.add(Text.translate(entry.getKey().getTranslationKey())
-          .mergeStyle(TextFormatting.GRAY)
-          .append(Text.of(" " + entry.getValue() + "x").mergeStyle(TextFormatting.RED)));
+          .withStyle(TextFormatting.GRAY)
+          .append(Text.of(" " + entry.getValue() + "x").withStyle(TextFormatting.RED)));
     }
   }
 

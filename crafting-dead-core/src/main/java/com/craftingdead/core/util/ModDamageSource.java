@@ -33,17 +33,17 @@ public class ModDamageSource {
   public static final String BULLET_BODY_DAMAGE_TYPE = "bullet";
 
   public static final DamageSource DEHYDRATION =
-      new DamageSource("dehydration").setDamageBypassesArmor();
-  public static final DamageSource BLEEDING = new DamageSource("bleeding").setDamageBypassesArmor();
+      new DamageSource("dehydration").bypassArmor();
+  public static final DamageSource BLEEDING = new DamageSource("bleeding").bypassArmor();
   public static final DamageSource INFECTION =
-      new DamageSource("infection").setDamageBypassesArmor();
+      new DamageSource("infection").bypassArmor();
 
   public static DamageSource causeGunDamage(LivingEntity source, ItemStack gunStack,
       boolean headshot) {
     return new KillFeedDamageSource(
         headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source, gunStack,
         headshot ? KillFeedEntry.Type.HEADSHOT : KillFeedEntry.Type.NONE)
-            .setDamageBypassesArmor()
+            .bypassArmor()
             .setProjectile();
   }
 
@@ -57,8 +57,8 @@ public class ModDamageSource {
   }
 
   public static boolean isGunDamage(DamageSource source) {
-    return source.getDamageType().equals(BULLET_HEADSHOT_DAMAGE_TYPE)
-        || source.getDamageType().equals(BULLET_BODY_DAMAGE_TYPE);
+    return source.getMsgId().equals(BULLET_HEADSHOT_DAMAGE_TYPE)
+        || source.getMsgId().equals(BULLET_BODY_DAMAGE_TYPE);
   }
 
   /**
@@ -83,12 +83,12 @@ public class ModDamageSource {
       // Sets the resistance to make the living not receive knockback
       livingResistance.setBaseValue(Integer.MAX_VALUE);
       // Finally attacks the entity without doing any knockback
-      boolean attackResult = livingHit.attackEntityFrom(source, amount);
+      boolean attackResult = livingHit.hurt(source, amount);
       // Restores the previous knockback resistance value, so the
       // entity can receive knockback again.
       livingResistance.setBaseValue(previousResistance);
       return attackResult;
     }
-    return victim.attackEntityFrom(source, amount);
+    return victim.hurt(source, amount);
   }
 }

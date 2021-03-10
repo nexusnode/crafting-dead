@@ -63,15 +63,15 @@ public class StorageItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack backpackStack, World world, List<ITextComponent> lines,
+  public void appendHoverText(ItemStack backpackStack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
-    super.addInformation(backpackStack, world, lines, tooltipFlag);
+    super.appendHoverText(backpackStack, world, lines, tooltipFlag);
 
     backpackStack.getCapability(ModCapabilities.STORAGE).ifPresent(storage -> {
       if (!storage.isEmpty()) {
         lines.add(Text.of(" "));
         lines.add(Text.translate("container.inventory")
-            .mergeStyle(TextFormatting.RED, TextFormatting.BOLD));
+            .withStyle(TextFormatting.RED, TextFormatting.BOLD));
 
         int rowsBeyondLimit = 0;
 
@@ -82,16 +82,16 @@ public class StorageItem extends Item {
               ++rowsBeyondLimit;
             } else {
               IFormattableTextComponent amountText =
-                  Text.of(stack.getCount() + "x ").mergeStyle(TextFormatting.DARK_GRAY);
+                  Text.of(stack.getCount() + "x ").withStyle(TextFormatting.DARK_GRAY);
               ITextComponent itemText =
-                  stack.getDisplayName().copyRaw().mergeStyle(TextFormatting.GRAY);
+                  stack.getHoverName().plainCopy().withStyle(TextFormatting.GRAY);
               lines.add(amountText.append(itemText));
             }
           }
         }
 
         if (rowsBeyondLimit > 0) {
-          lines.add(Text.of(". . . +" + rowsBeyondLimit).mergeStyle(TextFormatting.RED));
+          lines.add(Text.of(". . . +" + rowsBeyondLimit).withStyle(TextFormatting.RED));
         }
       }
     });

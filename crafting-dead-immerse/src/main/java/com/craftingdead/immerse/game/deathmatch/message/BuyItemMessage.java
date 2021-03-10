@@ -33,11 +33,11 @@ public class BuyItemMessage {
   }
 
   public static void encode(BuyItemMessage message, PacketBuffer out) {
-    out.writeItemStack(message.itemStack);
+    out.writeItem(message.itemStack);
   }
 
   public static BuyItemMessage decode(PacketBuffer in) {
-    return new BuyItemMessage(in.readItemStack());
+    return new BuyItemMessage(in.readItem());
   }
 
   public static void handle(BuyItemMessage message, NetworkEvent.Context ctx) {

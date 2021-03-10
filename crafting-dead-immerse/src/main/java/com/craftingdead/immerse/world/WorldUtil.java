@@ -41,10 +41,10 @@ public class WorldUtil {
 
     if (ForgeRegistries.BLOCKS.containsKey(blockId)) {
       Block block = ForgeRegistries.BLOCKS.getValue(blockId);
-      BlockState blockState = block.getDefaultState();
+      BlockState blockState = block.defaultBlockState();
 
       if (index != -1 && str.length() > (index + 4) && str.charAt(str.length() - 1) == ']') {
-        StateContainer<Block, BlockState> stateContainer = block.getStateContainer();
+        StateContainer<Block, BlockState> stateContainer = block.getStateDefinition();
         String propertyString = str.substring(index + 1, str.length() - 1);
         Iterator<String> propertyIterator = COMMA_SPLITTER.split(propertyString).iterator();
 
@@ -62,9 +62,9 @@ public class WorldUtil {
             continue;
           }
 
-          Comparable<?> value = property.parseValue(valueIterator.next()).orElse(null);
+          Comparable<?> value = property.getValue(valueIterator.next()).orElse(null);
           if (value != null) {
-            blockState = getBlockStateWithProperty(blockState, property, value);
+            blockState = setValue(blockState, property, value);
           }
         }
       }
@@ -76,8 +76,8 @@ public class WorldUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Comparable<T>> BlockState getBlockStateWithProperty(BlockState state,
+  public static <T extends Comparable<T>> BlockState setValue(BlockState state,
       Property<T> prop, Comparable<?> value) {
-    return state.with(prop, (T) value);
+    return state.setValue(prop, (T) value);
   }
 }

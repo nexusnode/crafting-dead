@@ -52,22 +52,24 @@ public class TeamInstance<T extends Enum<T> & ITeam>
   public void broadcastVictorySounds(SoundEvent teamVictoryCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playSound(ModSoundEvents.VICTORY_MUSIC.get(), SoundCategory.MASTER, 0.7F, 1.0F);
-      playerEntity.playSound(teamVictoryCallout, SoundCategory.MASTER, 0.7F, 1.0F);
+      playerEntity.playNotifySound(ModSoundEvents.VICTORY_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+          1.0F);
+      playerEntity.playNotifySound(teamVictoryCallout, SoundCategory.MASTER, 0.7F, 1.0F);
     }, minecraftServer);
   }
 
   public void broadcastDefeatSounds(SoundEvent teamDefeatCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playSound(ModSoundEvents.DEFEAT_MUSIC.get(), SoundCategory.MASTER, 0.7F, 1.0F);
-      playerEntity.playSound(teamDefeatCallout, SoundCategory.MASTER, 0.7F, 1.0F);
+      playerEntity.playNotifySound(ModSoundEvents.DEFEAT_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+          1.0F);
+      playerEntity.playNotifySound(teamDefeatCallout, SoundCategory.MASTER, 0.7F, 1.0F);
     }, minecraftServer);
   }
 
   public void forEach(Consumer<ServerPlayerEntity> action, MinecraftServer minecraftServer) {
     for (UUID memberId : this.members) {
-      action.accept(minecraftServer.getPlayerList().getPlayerByUUID(memberId));
+      action.accept(minecraftServer.getPlayerList().getPlayer(memberId));
     }
   }
 
@@ -100,7 +102,7 @@ public class TeamInstance<T extends Enum<T> & ITeam>
     if (writeAll || this.membersChanged) {
       packetBuffer.writeVarInt(this.members.size());
       for (UUID memberId : this.members) {
-        packetBuffer.writeUniqueId(memberId);
+        packetBuffer.writeUUID(memberId);
       }
       this.membersChanged = false;
     } else {
@@ -115,7 +117,7 @@ public class TeamInstance<T extends Enum<T> & ITeam>
     if (membersSize > -1) {
       this.members.clear();
       for (int i = 0; i < membersSize; i++) {
-        this.members.add(packetBuffer.readUniqueId());
+        this.members.add(packetBuffer.readUUID());
       }
     }
   }

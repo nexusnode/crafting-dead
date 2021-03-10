@@ -48,7 +48,7 @@ public class DefaultScope implements IScope {
   @Override
   public boolean isAiming(Entity entity) {
     return entity instanceof LivingEntity
-        ? ((LivingEntity) entity).getActiveItemStack() == this.itemStack
+        ? ((LivingEntity) entity).getUseItem() == this.itemStack
         : false;
   }
 

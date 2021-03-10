@@ -90,7 +90,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         break;
     }
 
-    return Text.of(mins + ":" + (seconds < 10 ? "0" : "") + seconds).mergeStyle(TextFormatting.BOLD,
+    return Text.of(mins + ":" + (seconds < 10 ? "0" : "") + seconds).withStyle(TextFormatting.BOLD,
         colour);
   }
 
@@ -107,7 +107,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
       DeathmatchTeam playerTeam =
           this.getPlayerTeam(IPlayer.getExpected((PlayerEntity) event.getEntity()))
               .orElse(null);
-      DeathmatchTeam ourTeam = this.minecraft.getRenderViewEntity()
+      DeathmatchTeam ourTeam = this.minecraft.getCameraEntity()
           .getCapability(ModCapabilities.LIVING)
           .<IPlayer<?>>cast()
           .resolve()
@@ -134,28 +134,28 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
       switch (this.getGameState()) {
         case PRE_GAME:
-          this.minecraft.ingameGUI.setDefaultTitlesTimes();
-          this.minecraft.ingameGUI.func_238452_a_(
-              Text.translate("title.warm_up").mergeStyle(TextFormatting.YELLOW), null, -1, -1, -1);
+          this.minecraft.gui.resetTitleTimes();
+          this.minecraft.gui.setTitles(
+              Text.translate("title.warm_up").withStyle(TextFormatting.YELLOW), null, -1, -1, -1);
           break;
         case GAME:
-          this.minecraft.ingameGUI.setDefaultTitlesTimes();
-          this.minecraft.ingameGUI.func_238452_a_(
-              Text.translate("title.game_start").mergeStyle(TextFormatting.AQUA), null, -1, -1,
+          this.minecraft.gui.resetTitleTimes();
+          this.minecraft.gui.setTitles(
+              Text.translate("title.game_start").withStyle(TextFormatting.AQUA), null, -1, -1,
               -1);
           break;
         case POST_GAME:
-          this.minecraft.ingameGUI.setDefaultTitlesTimes();
-          this.minecraft.ingameGUI.func_238452_a_(
-              Text.translate("title.game_over").mergeStyle(TextFormatting.RED), null, -1, -1, -1);
+          this.minecraft.gui.resetTitleTimes();
+          this.minecraft.gui.setTitles(
+              Text.translate("title.game_over").withStyle(TextFormatting.RED), null, -1, -1, -1);
           break;
         default:
           break;
       }
     }
 
-    if (!this.sentInitialTeamRequest && this.minecraft.world != null) {
-      this.minecraft.displayGuiScreen(new SelectTeamScreen());
+    if (!this.sentInitialTeamRequest && this.minecraft.level != null) {
+      this.minecraft.setScreen(new SelectTeamScreen());
       this.sentInitialTeamRequest = true;
     }
   }
@@ -169,26 +169,26 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
     ITextComponent redScore =
         Text.of(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.RED)))
-            .mergeStyle(DeathmatchTeam.RED.getColourStyle());
+            .withStyle(DeathmatchTeam.RED.getColourStyle());
     ITextComponent blueScore =
         Text.of(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.BLUE)))
-            .mergeStyle(DeathmatchTeam.BLUE.getColourStyle());
+            .withStyle(DeathmatchTeam.BLUE.getColourStyle());
 
     ITextComponent timer = this.getTimer();
 
     // Render Red Score
     RenderUtil.fill2(middleWidth - 19, 15, 18, 11, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer, redScore,
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, redScore,
         middleWidth - 9, 17, 0);
 
     // Render Blue Score
     RenderUtil.fill2(middleWidth + 1, 15, 18, 11, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer, blueScore,
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, blueScore,
         middleWidth + 10, 17, 0);
 
     // Render Time
     RenderUtil.fill2(middleWidth - 19, 1, 38, 13, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer, timer, middleWidth + 1,
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, timer, middleWidth + 1,
         4, 0);
 
     final int headWidth = 20;
@@ -200,7 +200,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
       NetworkPlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(redMembers.get(i));
       if (playerInfo != null) {
-        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getGameProfile().getId());
+        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
 
         int x = middleWidth - 21 - headWidth - (i * (headWidth + 3));
         int y = 2;
@@ -210,17 +210,17 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           RenderUtil.fill2(x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
           RenderUtil.bind(DEAD);
-          RenderUtil.blit(x, y, headWidth, headHeight);
+          RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
-          RenderUtil.renderHead(playerInfo.getLocationSkin(), matrixStack,
+          RenderUtil.renderHead(playerInfo.getSkinLocation(), matrixStack,
               x, y, headWidth, headHeight);
         }
 
         RenderUtil.fill2(x - 1, y + headHeight + 2, headWidth + 2,
-            this.minecraft.fontRenderer.FONT_HEIGHT + 2,
+            this.minecraft.font.lineHeight + 2,
             0x80000000);
-        AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+        AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
             String.valueOf(playerData.getScore()), x + headWidth / 2, y + headHeight + 4,
             0xFFFFFFFF);
       }
@@ -232,7 +232,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
       NetworkPlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(blueMembers.get(i));
       if (playerInfo != null) {
-        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getGameProfile().getId());
+        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
 
         int x = middleWidth + 21 + (i * (headWidth + 3));
         int y = 2;
@@ -242,17 +242,17 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           RenderUtil.fill2(x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
           RenderUtil.bind(DEAD);
-          RenderUtil.blit(x, y, headWidth, headHeight);
+          RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
-          RenderUtil.renderHead(playerInfo.getLocationSkin(), matrixStack,
+          RenderUtil.renderHead(playerInfo.getSkinLocation(), matrixStack,
               x, y, headWidth, headHeight);
         }
 
         RenderUtil.fill2(x - 1, y + headHeight + 2, headWidth + 2,
-            this.minecraft.fontRenderer.FONT_HEIGHT + 2,
+            this.minecraft.font.lineHeight + 2,
             0x80000000);
-        AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+        AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
             String.valueOf(playerData.getScore()), x + headWidth / 2, y + headHeight + 4,
             0xFFFFFFFF);
       }
@@ -277,29 +277,29 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
     // Render Logo
     RenderSystem.enableBlend();
     RenderUtil.bind(BANNER_INVERTED);
-    RenderUtil.blit(sbx + 2, sby + 5, 125, 27.5);
+    RenderUtil.blit(matrixStack, sbx + 2, sby + 5, 125, 27.5F);
     RenderSystem.disableBlend();
     // Render Game Information
 
     ITextComponent gameTitle =
-        this.getGameType().getDisplayName().copyRaw().mergeStyle(TextFormatting.WHITE,
+        this.getGameType().getDisplayName().copy().withStyle(TextFormatting.WHITE,
             TextFormatting.BOLD);
-    this.minecraft.fontRenderer.func_243246_a(matrixStack, gameTitle,
-        sbx + sbwidth - 3 - this.minecraft.fontRenderer.getStringPropertyWidth(gameTitle),
+    this.minecraft.font.drawShadow(matrixStack, gameTitle,
+        sbx + sbwidth - 3 - this.minecraft.font.width(gameTitle),
         sby + 9, 0);
 
-    ITextComponent mapTitle = Text.of(this.getDisplayName()).mergeStyle(TextFormatting.GRAY);
-    this.minecraft.fontRenderer.func_243246_a(matrixStack, mapTitle,
-        sbx + sbwidth - 3 - this.minecraft.fontRenderer.getStringPropertyWidth(mapTitle),
+    ITextComponent mapTitle = Text.of(this.getDisplayName()).withStyle(TextFormatting.GRAY);
+    this.minecraft.font.drawShadow(matrixStack, mapTitle,
+        sbx + sbwidth - 3 - this.minecraft.font.width(mapTitle),
         sby + 20, 0);
 
     // Render Time
     RenderSystem.enableBlend();
     RenderUtil.bind(STOPWATCH);
-    RenderUtil.blit(sbx + (sbwidth / 2) - 8, sby + 5, 16, 16);
+    RenderUtil.blit(matrixStack, sbx + (sbwidth / 2) - 8, sby + 5, 16, 16);
     RenderSystem.disableBlend();
     ITextComponent timer = this.getTimer();
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer, timer,
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, timer,
         sbx + (sbwidth / 2),
         sby + 24, 0);
 
@@ -314,11 +314,11 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           this.minecraft.getConnection().getPlayerInfo(blueMembers.get(i));
       if (playerInfo != null) {
         ITextComponent username =
-            playerInfo.getDisplayName() == null ? Text.of(playerInfo.getGameProfile().getName())
-                : playerInfo.getDisplayName();
-        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getGameProfile().getId());
+            playerInfo.getTabListDisplayName() == null ? Text.of(playerInfo.getProfile().getName())
+                : playerInfo.getTabListDisplayName();
+        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 55 + (i * 11), sbwidth, 10,
-            Text.of(String.valueOf(playerInfo.getResponseTime())),
+            Text.of(String.valueOf(playerInfo.getLatency())),
             username, Text.of(playerData.getKills()), Text.of(playerData.getAssists()),
             Text.of(playerData.getDeaths()),
             Text.of(playerData.getScore()));
@@ -331,11 +331,11 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           this.minecraft.getConnection().getPlayerInfo(redMembers.get(i));
       if (playerInfo != null) {
         ITextComponent username =
-            playerInfo.getDisplayName() == null ? Text.of(playerInfo.getGameProfile().getName())
-                : playerInfo.getDisplayName();
-        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getGameProfile().getId());
+            playerInfo.getTabListDisplayName() == null ? Text.of(playerInfo.getProfile().getName())
+                : playerInfo.getTabListDisplayName();
+        DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 147 + (i * 11), sbwidth, 10,
-            Text.of(String.valueOf(playerInfo.getResponseTime())),
+            Text.of(String.valueOf(playerInfo.getLatency())),
             username, Text.of(playerData.getKills()), Text.of(playerData.getAssists()),
             Text.of(playerData.getDeaths()),
             Text.of(playerData.getScore()));

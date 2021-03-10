@@ -49,24 +49,24 @@ public class SpectatorRenderer {
       IRenderTypeBuffer.Impl renderTypeBuffer, AbstractClientPlayerEntity playerEntity,
       int packetLight) {
 
-    float swingProgress = playerEntity.getSwingProgress(partialTicks);
-    Hand hand = MoreObjects.firstNonNull(playerEntity.swingingHand, Hand.MAIN_HAND);
-    float rotationPitch = MathHelper.lerp(partialTicks, playerEntity.prevRotationPitch,
-        playerEntity.rotationPitch);
+    float swingProgress = playerEntity.getAttackAnim(partialTicks);
+    Hand hand = MoreObjects.firstNonNull(playerEntity.swingingArm, Hand.MAIN_HAND);
+    float rotationPitch = MathHelper.lerp(partialTicks, playerEntity.xRotO,
+        playerEntity.xRot);
 
-    ItemStack heldStack = playerEntity.getHeldItemMainhand();
-    ItemStack offStack = playerEntity.getHeldItemOffhand();
+    ItemStack heldStack = playerEntity.getMainHandItem();
+    ItemStack offStack = playerEntity.getOffhandItem();
 
     boolean renderRightHand = true;
     boolean renderLeftHand = true;
-    if (playerEntity.isHandActive()) {
-      ItemStack itemstack = playerEntity.getActiveItemStack();
+    if (playerEntity.isUsingItem()) {
+      ItemStack itemstack = playerEntity.getUseItem();
       if (itemstack.getItem() instanceof ShootableItem) {
-        renderRightHand = playerEntity.getActiveHand() == Hand.MAIN_HAND;
+        renderRightHand = playerEntity.getUsedItemHand() == Hand.MAIN_HAND;
         renderLeftHand = !renderRightHand;
       }
 
-      Hand activeHand = playerEntity.getActiveHand();
+      Hand activeHand = playerEntity.getUsedItemHand();
       if (activeHand == Hand.MAIN_HAND) {
         if (offStack.getItem() == Items.CROSSBOW && CrossbowItem.isCharged(offStack)) {
           renderLeftHand = false;
@@ -84,7 +84,7 @@ public class SpectatorRenderer {
     }
 
     final FirstPersonRendererAccessor firstPersonRenderer =
-        (FirstPersonRendererAccessor) this.minecraft.getFirstPersonRenderer();
+        (FirstPersonRendererAccessor) this.minecraft.getItemInHandRenderer();
 
     if (renderRightHand) {
       float rightHandSwingProgress = hand == Hand.MAIN_HAND ? swingProgress : 0.0F;
@@ -96,7 +96,7 @@ public class SpectatorRenderer {
           rightHandSwingProgress, equippedProgress,
           this.itemStackMainHand))
         firstPersonRenderer
-            .invokeRenderItemInFirstPerson(playerEntity, partialTicks, rotationPitch,
+            .invokeRenderArmWithItem(playerEntity, partialTicks, rotationPitch,
                 Hand.MAIN_HAND, rightHandSwingProgress,
                 this.itemStackMainHand, equippedProgress, matrixStack, renderTypeBuffer,
                 packetLight);
@@ -111,34 +111,34 @@ public class SpectatorRenderer {
           matrixStack, renderTypeBuffer, packetLight, partialTicks, rotationPitch,
           leftHandSwingProgress, equippedProgress,
           this.itemStackOffHand))
-        firstPersonRenderer.invokeRenderItemInFirstPerson(playerEntity, partialTicks,
+        firstPersonRenderer.invokeRenderArmWithItem(playerEntity, partialTicks,
             rotationPitch,
             Hand.OFF_HAND, leftHandSwingProgress,
             this.itemStackOffHand, equippedProgress, matrixStack, renderTypeBuffer, packetLight);
     }
 
-    renderTypeBuffer.finish();
+    renderTypeBuffer.endBatch();
   }
 
   public void tick(AbstractClientPlayerEntity playerEntity) {
     this.prevEquippedProgressMainHand = this.equippedProgressMainHand;
     this.prevEquippedProgressOffHand = this.equippedProgressOffHand;
 
-    ItemStack heldStack = playerEntity.getHeldItemMainhand();
-    ItemStack offStack = playerEntity.getHeldItemOffhand();
+    ItemStack heldStack = playerEntity.getMainHandItem();
+    ItemStack offStack = playerEntity.getOffhandItem();
 
-    if (ItemStack.areItemStacksEqual(this.itemStackMainHand, heldStack)) {
+    if (ItemStack.matches(this.itemStackMainHand, heldStack)) {
       this.itemStackMainHand = heldStack;
     }
 
-    if (ItemStack.areItemStacksEqual(this.itemStackOffHand, offStack)) {
+    if (ItemStack.matches(this.itemStackOffHand, offStack)) {
       this.itemStackOffHand = offStack;
     }
 
 
-    float cooledAttackStrength = playerEntity.getCooledAttackStrength(1.0F);
+    float cooledAttackStrength = playerEntity.getAttackStrengthScale(1.0F);
     boolean requipMainHand = ForgeHooksClient.shouldCauseReequipAnimation(
-        this.itemStackMainHand, heldStack, playerEntity.inventory.currentItem);
+        this.itemStackMainHand, heldStack, playerEntity.inventory.selected);
     boolean requipOffHand = ForgeHooksClient
         .shouldCauseReequipAnimation(this.itemStackOffHand, offStack, -1);
 

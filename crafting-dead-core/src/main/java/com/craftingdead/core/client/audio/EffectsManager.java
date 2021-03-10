@@ -70,15 +70,15 @@ public class EffectsManager {
   }
 
   public void setDirectHighpassForAll() {
-    for (ChannelManager.Entry entry : this.soundEngine.playingSoundsChannel.values()) {
-      entry.runOnSoundExecutor(source -> this.setDirectHighpass(source.id));
+    for (ChannelManager.Entry entry : this.soundEngine.instanceToChannel.values()) {
+      entry.execute(source -> this.setDirectHighpass(source.source));
     }
   }
 
   public void setDirectHighpass(ISound sound) {
-    ChannelManager.Entry entry = this.soundEngine.playingSoundsChannel.get(sound);
+    ChannelManager.Entry entry = this.soundEngine.instanceToChannel.get(sound);
     if (entry != null) {
-      entry.runOnSoundExecutor(source -> this.setDirectHighpass(source.id));
+      entry.execute(source -> this.setDirectHighpass(source.source));
     }
   }
 
@@ -87,8 +87,8 @@ public class EffectsManager {
   }
 
   public void removeFilterForAll() {
-    for (ChannelManager.Entry entry : this.soundEngine.playingSoundsChannel.values()) {
-      entry.runOnSoundExecutor(source -> this.removeFilter(source.id));
+    for (ChannelManager.Entry entry : this.soundEngine.instanceToChannel.values()) {
+      entry.execute(source -> this.removeFilter(source.source));
     }
   }
 

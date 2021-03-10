@@ -31,8 +31,8 @@ import net.minecraft.util.Hand;
 public interface FirstPersonRendererAccessor {
 
   @Invoker
-  public void invokeRenderItemInFirstPerson(AbstractClientPlayerEntity playerEntity,
-      float partialTicks,
-      float pitch, Hand hand, float swingProgress, ItemStack itemStack, float equippedProgress,
-      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight);
+  public void invokeRenderArmWithItem(AbstractClientPlayerEntity playerEntity,
+      float partialTicks, float pitch, Hand hand, float swingProgress, ItemStack itemStack,
+      float equippedProgress, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+      int packedLight);
 }

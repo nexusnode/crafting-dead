@@ -50,7 +50,7 @@ public class TriggerPressedMessage {
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
-          ItemStack heldStack = livingEntity.getHeldItemMainhand();
+          ItemStack heldStack = livingEntity.getMainHandItem();
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)

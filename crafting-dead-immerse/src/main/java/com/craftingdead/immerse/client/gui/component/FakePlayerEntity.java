@@ -34,7 +34,7 @@ public class FakePlayerEntity extends AbstractClientPlayerEntity {
   }
 
   @Override
-  public Vector3d getPositionVec() {
+  public Vector3d position() {
     return new Vector3d(99.0D, 99.0D, 99.0D);
   }
 
@@ -50,12 +50,7 @@ public class FakePlayerEntity extends AbstractClientPlayerEntity {
   }
 
   @Override
-  public boolean hasPlayerInfo() {
-    return false;
-  }
-
-  @Override
-  public boolean isInvisibleToPlayer(PlayerEntity playerEntity) {
+  public boolean isInvisibleTo(PlayerEntity playerEntity) {
     return false;
   }
 

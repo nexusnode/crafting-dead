@@ -81,10 +81,10 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
       if (!itemStack.isEmpty()) {
         IBakedModel itemModel =
-            itemRenderer.getItemModelWithOverrides(itemStack, entity.world, entity);
+            itemRenderer.getModel(itemStack, entity.level, entity);
 
 
-        matrix.push();
+        matrix.pushPose();
 
         // Applies crouching rotation is needed
         if (this.useCrouchingOrientation && entity.isCrouching()) {
@@ -94,13 +94,13 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
         // Applies the head orientation if needed
         if (this.useHeadOrientation) {
           // Vanilla's transformation for child entities, like baby zombies
-          if (entity.isChild()) {
+          if (entity.isBaby()) {
             matrix.translate(0.0D, 0.03125D, 0.0D);
             matrix.scale(0.7F, 0.7F, 0.7F);
             matrix.translate(0.0D, 1.0D, 0.0D);
           }
 
-          this.getEntityModel().getModelHead().translateRotate(matrix);
+          this.getParentModel().getHead().translateAndRotate(matrix);
         }
 
         // Applies the arbitrary transformation if needed
@@ -110,10 +110,10 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
         // Renders the item. Also note the TransformType.
         itemRenderer
-            .renderItem(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
+            .render(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
                 packedLight, OverlayTexture.NO_OVERLAY, itemModel);
 
-        matrix.pop();
+        matrix.popPose();
       }
     });
   }

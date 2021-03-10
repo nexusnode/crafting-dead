@@ -50,9 +50,9 @@ public class Text {
   }
 
   public static ITextComponent copyAndJoin(ITextComponent... texts) {
-    IFormattableTextComponent fullText = texts[0].deepCopy();
+    IFormattableTextComponent fullText = texts[0].copy();
     for (int i = 1; i < texts.length; i++) {
-      fullText = fullText.append(texts[i].deepCopy());
+      fullText = fullText.append(texts[i].copy());
     }
     return fullText;
   }

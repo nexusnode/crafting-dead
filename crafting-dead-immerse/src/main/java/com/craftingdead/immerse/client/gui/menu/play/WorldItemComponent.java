@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.client.gui.menu.play;
 
 import java.io.File;
@@ -66,14 +84,14 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
   public WorldItemComponent(WorldSummary worldSummary, WorldListComponent parentWorldList) {
     this.worldSummary = worldSummary;
     this.parentWorldList = parentWorldList;
-    String displayName = worldSummary.getDisplayName();
-    String info = worldSummary.getFileName() + " (" + dateFormat.format(
-        new Date(worldSummary.getLastTimePlayed())) + ")";
-    String description = worldSummary.getDescription().getString();
-    String fileName = worldSummary.getFileName();
+    String displayName = worldSummary.getLevelName();
+    String info = worldSummary.getLevelId() + " (" + dateFormat.format(
+        new Date(worldSummary.getLastPlayed())) + ")";
+    String description = worldSummary.getInfo().getString();
+    String levelId = worldSummary.getLevelId();
     ResourceLocation dynamicWorldIcon =
-        new ResourceLocation("worlds/" + Util.func_244361_a(fileName,
-            ResourceLocation::validatePathChar) + "/" + Hashing.sha1().hashUnencodedChars(fileName)
+        new ResourceLocation("worlds/" + Util.sanitizeName(levelId,
+            ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(levelId)
             + "/icon");
     ResourceLocation worldIcon;
     if (this.loadIconTexture(worldSummary, dynamicWorldIcon) != null) {
@@ -105,32 +123,32 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
             .addChild(new TextBlockComponent(Text.of(displayName))
                 .setShadow(false))
             .addChild(new TextBlockComponent(Text.of(info)
-                .mergeStyle(TextFormatting.GRAY))
+                .withStyle(TextFormatting.GRAY))
                     .setTopMargin(2F)
                     .setShadow(false))
             .addChild(new TextBlockComponent(Text.of(description)
-                .mergeStyle(TextFormatting.GRAY))
+                .withStyle(TextFormatting.GRAY))
                     .setShadow(false)));
   }
 
   @Nullable
   private DynamicTexture loadIconTexture(WorldSummary worldSummary,
-      ResourceLocation resourceLocation) {
-    File iconFile = worldSummary.getIconFile();
+      ResourceLocation textureLocation) {
+    File iconFile = worldSummary.getIcon();
     if (iconFile.isFile()) {
-      try (InputStream inputstream = new FileInputStream(iconFile)) {
-        NativeImage nativeimage = NativeImage.read(inputstream);
-        Validate.validState(nativeimage.getWidth() == 64, "Must be 64 pixels wide");
-        Validate.validState(nativeimage.getHeight() == 64, "Must be 64 pixels high");
-        DynamicTexture dynamictexture = new DynamicTexture(nativeimage);
-        this.minecraft.getTextureManager().loadTexture(resourceLocation, dynamictexture);
-        return dynamictexture;
+      try (InputStream inputStream = new FileInputStream(iconFile)) {
+        NativeImage image = NativeImage.read(inputStream);
+        Validate.validState(image.getWidth() == 64, "Must be 64 pixels wide");
+        Validate.validState(image.getHeight() == 64, "Must be 64 pixels high");
+        DynamicTexture texture = new DynamicTexture(image);
+        this.minecraft.getTextureManager().register(textureLocation, texture);
+        return texture;
       } catch (Throwable throwable) {
-        logger.error("Invalid icon for world {}", worldSummary.getFileName(), throwable);
+        logger.error("Invalid icon for world {}", worldSummary.getLevelId(), throwable);
         return null;
       }
     } else {
-      this.minecraft.getTextureManager().deleteTexture(resourceLocation);
+      this.minecraft.getTextureManager().release(textureLocation);
       return null;
     }
   }
@@ -195,24 +213,24 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
   }
 
   /**
-   * A slightly edited copy of {@link WorldSelectionList.Entry#func_214438_a}
+   * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
   public void joinWorld() {
     if (!this.worldSummary.isLocked()) {
-      if (this.worldSummary.askToCreateBackup()) {
+      if (this.worldSummary.shouldBackup()) {
         ITextComponent itextcomponent = new TranslationTextComponent("selectWorld.backupQuestion");
         ITextComponent itextcomponent1 = new TranslationTextComponent("selectWorld.backupWarning",
-            this.worldSummary.getVersionName(), SharedConstants.getVersion().getName());
-        this.minecraft.displayGuiScreen(
+            this.worldSummary.getWorldVersionName(), SharedConstants.getCurrentVersion().getName());
+        this.minecraft.setScreen(
             new ConfirmBackupScreen(this.getScreen(), (p_214436_1_, p_214436_2_) -> {
               if (p_214436_1_) {
-                String s = this.worldSummary.getFileName();
+                String s = this.worldSummary.getLevelName();
 
-                try (SaveFormat.LevelSave saveformat$levelsave =
-                    this.minecraft.getSaveLoader().getLevelSave(s)) {
-                  EditWorldScreen.func_239019_a_(saveformat$levelsave);
+                try (SaveFormat.LevelSave levelSave =
+                    this.minecraft.getLevelSource().createAccess(s)) {
+                  EditWorldScreen.makeBackupAndShowToast(levelSave);
                 } catch (IOException ioexception) {
-                  SystemToast.func_238535_a_(this.minecraft, s);
+                  SystemToast.onWorldAccessFailure(this.minecraft, s);
                   logger.error("Failed to backup level {}", s, ioexception);
                 }
               }
@@ -220,24 +238,24 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
               this.loadWorld();
             }, itextcomponent, itextcomponent1, false));
       } else if (this.worldSummary.askToOpenWorld()) {
-        this.minecraft.displayGuiScreen(new ConfirmScreen((p_214434_1_) -> {
+        this.minecraft.setScreen(new ConfirmScreen((p_214434_1_) -> {
           if (p_214434_1_) {
             try {
               this.loadWorld();
             } catch (Exception exception) {
               logger.error("Failure to open 'future world'", (Throwable) exception);
-              this.minecraft.displayGuiScreen(new AlertScreen(() -> {
-                this.minecraft.displayGuiScreen(this.getScreen());
+              this.minecraft.setScreen(new AlertScreen(() -> {
+                this.minecraft.setScreen(this.getScreen());
               }, new TranslationTextComponent("selectWorld.futureworld.error.title"),
                   new TranslationTextComponent("selectWorld.futureworld.error.text")));
             }
           } else {
-            this.minecraft.displayGuiScreen(this.getScreen());
+            this.minecraft.setScreen(this.getScreen());
           }
 
         }, new TranslationTextComponent("selectWorld.versionQuestion"),
             new TranslationTextComponent("selectWorld.versionWarning",
-                this.worldSummary.getVersionName(),
+                this.worldSummary.getWorldVersionName(),
                 new TranslationTextComponent("selectWorld.versionJoinButton"),
                 DialogTexts.GUI_CANCEL)));
       } else {
@@ -247,21 +265,21 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
   }
 
   private void loadWorld() {
-    if (this.minecraft.getSaveLoader().canLoadWorld(this.worldSummary.getFileName())) {
-      this.minecraft.forcedScreenTick(
+    if (this.minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
+      this.minecraft.forceSetScreen(
           new DirtMessageScreen(new TranslationTextComponent("selectWorld.data_read")));
-      this.minecraft.loadWorld(this.worldSummary.getFileName());
+      this.minecraft.loadLevel(this.worldSummary.getLevelId());
     }
   }
 
   /**
-   * A slightly edited copy of {@link WorldSelectionList.Entry#func_214444_c}
+   * A slightly edited copy of {@link WorldSelectionList.Entry#editWorld}
    */
   public void editWorld() {
-    String fileName = this.worldSummary.getFileName();
+    String fileName = this.worldSummary.getLevelName();
     try {
-      SaveFormat.LevelSave levelSave = this.minecraft.getSaveLoader().getLevelSave(fileName);
-      this.minecraft.displayGuiScreen(new EditWorldScreen((backupFailed) -> {
+      SaveFormat.LevelSave levelSave = this.minecraft.getLevelSource().createAccess(fileName);
+      this.minecraft.setScreen(new EditWorldScreen((backupFailed) -> {
         try {
           levelSave.close();
         } catch (IOException ioexception1) {
@@ -269,82 +287,81 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
         }
         Screen screen = this.getScreen();
         this.parentWorldList.reloadWorlds();
-        this.minecraft.displayGuiScreen(screen);
+        this.minecraft.setScreen(screen);
       }, levelSave));
     } catch (IOException ioexception) {
-      SystemToast.func_238535_a_(this.minecraft, fileName);
+      SystemToast.onWorldAccessFailure(this.minecraft, fileName);
       logger.error("Failed to access level {}", fileName, ioexception);
       this.parentWorldList.reloadWorlds();
     }
   }
 
   /**
-   * A slightly edited copy of {@link WorldSelectionList.Entry#func_214442_b}
+   * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
   public void deleteWorld() {
-    this.minecraft.displayGuiScreen(new ConfirmScreen((confirmed) -> {
+    this.minecraft.setScreen(new ConfirmScreen((confirmed) -> {
       Screen screen = this.getScreen();
       if (confirmed) {
-        this.minecraft.displayGuiScreen(new WorkingScreen());
-        SaveFormat saveformat = this.minecraft.getSaveLoader();
-        String s = this.worldSummary.getFileName();
-        try (SaveFormat.LevelSave levelSave = saveformat.getLevelSave(s)) {
-          levelSave.deleteSave();
+        this.minecraft.setScreen(new WorkingScreen());
+        SaveFormat levelSource = this.minecraft.getLevelSource();
+        String s = this.worldSummary.getLevelName();
+        try (SaveFormat.LevelSave levelSave = levelSource.createAccess(s)) {
+          levelSave.deleteLevel();
         } catch (IOException ioexception) {
-          SystemToast.func_238538_b_(this.minecraft, s);
+          SystemToast.onWorldDeleteFailure(this.minecraft, s);
           logger.error("Failed to delete world {}", s, ioexception);
         }
         this.parentWorldList.reloadWorlds();
       }
-      this.minecraft.displayGuiScreen(screen);
+      this.minecraft.setScreen(screen);
     }, new TranslationTextComponent("selectWorld.deleteQuestion"),
         new TranslationTextComponent("selectWorld.deleteWarning",
-            this.worldSummary.getDisplayName()),
+            this.worldSummary.getLevelName()),
         new TranslationTextComponent("selectWorld.deleteButton"),
         DialogTexts.GUI_CANCEL));
   }
 
   /**
-   * A slightly edited copy of {@link WorldSelectionList.Entry#func_214445_d}
+   * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
   public void recreateWorld() {
-    this.minecraft.forcedScreenTick(
+    this.minecraft.forceSetScreen(
         new DirtMessageScreen(new TranslationTextComponent("selectWorld.data_read")));
-    DynamicRegistries.Impl dynamicRegistries = DynamicRegistries.func_239770_b_();
+    DynamicRegistries.Impl dynamicRegistries = DynamicRegistries.builtin();
 
     try (
         SaveFormat.LevelSave levelSave =
-            this.minecraft.getSaveLoader().getLevelSave(this.worldSummary.getFileName());
-        Minecraft.PackManager packManager = this.minecraft.reloadDatapacks(dynamicRegistries,
-            Minecraft::loadDataPackCodec, Minecraft::loadWorld, false, levelSave);) {
-      WorldSettings worldsettings = packManager.getServerConfiguration().getWorldSettings();
-      DatapackCodec datapackcodec = worldsettings.getDatapackCodec();
-      DimensionGeneratorSettings dimensiongeneratorsettings = packManager
-          .getServerConfiguration()
-          .getDimensionGeneratorSettings();
-      Path path = CreateWorldScreen.func_238943_a_(levelSave.resolveFilePath(FolderName.DATAPACKS),
-          this.minecraft);
-      if (dimensiongeneratorsettings.func_236229_j_()) {
-        this.minecraft.displayGuiScreen(new ConfirmScreen((p_239095_6_) -> {
-          this.minecraft.displayGuiScreen(p_239095_6_
-              ? new CreateWorldScreen(this.getScreen(), worldsettings,
-                  dimensiongeneratorsettings, path, datapackcodec, dynamicRegistries)
+            this.minecraft.getLevelSource().createAccess(this.worldSummary.getLevelName());
+        Minecraft.PackManager serverStem = this.minecraft.makeServerStem(dynamicRegistries,
+            Minecraft::loadDataPacks, Minecraft::loadWorldData, false, levelSave);) {
+      WorldSettings levelSettings = serverStem.worldData().getLevelSettings();
+      DatapackCodec dataPackCodec = levelSettings.getDataPackConfig();
+      DimensionGeneratorSettings worldGenSettings = serverStem
+          .worldData().worldGenSettings();
+      Path path =
+          CreateWorldScreen.createTempDataPackDirFromExistingWorld(
+              levelSave.getLevelPath(FolderName.DATAPACK_DIR),
+              this.minecraft);
+      if (worldGenSettings.isOldCustomizedWorld()) {
+        this.minecraft.setScreen(new ConfirmScreen((p_239095_6_) -> {
+          this.minecraft.setScreen(p_239095_6_
+              ? new CreateWorldScreen(this.getScreen(), levelSettings,
+                  worldGenSettings, path, dataPackCodec, dynamicRegistries)
               : this.getScreen());
         }, new TranslationTextComponent("selectWorld.recreate.customized.title"),
             new TranslationTextComponent("selectWorld.recreate.customized.text"),
             DialogTexts.GUI_PROCEED, DialogTexts.GUI_CANCEL));
       } else {
-        this.minecraft.displayGuiScreen(new CreateWorldScreen(this.getScreen(), worldsettings,
-            dimensiongeneratorsettings, path, datapackcodec, dynamicRegistries));
+        this.minecraft.setScreen(new CreateWorldScreen(this.getScreen(), levelSettings,
+            worldGenSettings, path, dataPackCodec, dynamicRegistries));
       }
-    } catch (Exception exception) {
-      logger.error("Unable to recreate world", exception);
-      this.minecraft.displayGuiScreen(new AlertScreen(() -> {
-        this.minecraft.displayGuiScreen(this.getScreen());
+    } catch (Exception e) {
+      logger.error("Unable to recreate world", e);
+      this.minecraft.setScreen(new AlertScreen(() -> {
+        this.minecraft.setScreen(this.getScreen());
       }, new TranslationTextComponent("selectWorld.recreate.error.title"),
           new TranslationTextComponent("selectWorld.recreate.error.text")));
     }
-
   }
-
 }

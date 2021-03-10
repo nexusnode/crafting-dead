@@ -41,17 +41,17 @@ public class DisplayKilledMessage {
 
   public static void encode(DisplayKilledMessage message, PacketBuffer out) {
     out.writeVarInt(message.killerEntityId);
-    out.writeItemStack(message.itemStack);
+    out.writeItem(message.itemStack);
   }
 
   public static DisplayKilledMessage decode(PacketBuffer in) {
-    return new DisplayKilledMessage(in.readVarInt(), in.readItemStack());
+    return new DisplayKilledMessage(in.readVarInt(), in.readItem());
   }
 
   public static boolean handle(DisplayKilledMessage message, Supplier<NetworkEvent.Context> ctx) {
     LogicalSidedProvider.CLIENTWORLD
         .<Optional<World>>get(ctx.get().getDirection().getReceptionSide())
-        .map(w -> w.getEntityByID(message.killerEntityId))
+        .map(w -> w.getEntity(message.killerEntityId))
         .filter(e -> e instanceof AbstractClientPlayerEntity)
         .ifPresent(e -> CraftingDeadImmerse.getInstance().getClientDist().getIngameGui()
             .displayKilledMessage(

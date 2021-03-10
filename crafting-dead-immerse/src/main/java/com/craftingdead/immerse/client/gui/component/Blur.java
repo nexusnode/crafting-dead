@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.shader.Framebuffer;
@@ -51,10 +52,10 @@ public class Blur implements AutoCloseable {
   public Blur(float radius) {
     try {
       this.blurShader = new ShaderGroup(this.minecraft.getTextureManager(),
-          this.minecraft.getResourceManager(), this.minecraft.getFramebuffer(), BLUR_SHADER);
+          this.minecraft.getResourceManager(), this.minecraft.getMainRenderTarget(), BLUR_SHADER);
       this.setRadius(radius);
-      this.blurShader.createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
-          this.minecraft.getMainWindow().getFramebufferHeight());
+      this.blurShader.resize(this.minecraft.getWindow().getWidth(),
+          this.minecraft.getWindow().getHeight());
     } catch (JsonSyntaxException | IOException ioexception) {
       logger.warn("Failed to load shader: {}", BLUR_SHADER, ioexception);
       this.blurShader = null;
@@ -68,36 +69,37 @@ public class Blur implements AutoCloseable {
   }
 
   public void tick() {
-    float framebufferWidth = this.minecraft.getFramebuffer().framebufferTextureWidth;
-    float framebufferHeight = this.minecraft.getFramebuffer().framebufferTextureHeight;
+    float framebufferWidth = this.minecraft.getMainRenderTarget().width;
+    float framebufferHeight = this.minecraft.getMainRenderTarget().height;
     // Can't use #resized as it's called before the framebuffer is resized.
     if (framebufferWidth != this.lastFramebufferWidth
         || framebufferHeight != this.lastFramebufferHeight) {
       if (this.blurShader != null) {
-        this.blurShader.createBindFramebuffers(this.minecraft.getMainWindow().getFramebufferWidth(),
-            this.minecraft.getMainWindow().getFramebufferHeight());
+        this.blurShader.resize(this.minecraft.getWindow().getWidth(),
+            this.minecraft.getWindow().getHeight());
       }
       this.lastFramebufferWidth = framebufferWidth;
       this.lastFramebufferHeight = framebufferHeight;
     }
   }
 
-  public void render(float x, float y, float width, float height, float partialTicks) {
-    this.blurShader.render(partialTicks);
+  public void render(MatrixStack matrixStack, float x, float y, float width, float height,
+      float partialTicks) {
+    this.blurShader.process(partialTicks);
     // TODO Fixes Minecraft bug when using post-processing shaders.
     RenderSystem.enableTexture();
 
-    this.minecraft.getFramebuffer().bindFramebuffer(false);
-    Framebuffer framebuffer = this.blurShader.getFramebufferRaw("output");
-    framebuffer.bindFramebufferTexture();
-    float textureWidth = (float) (framebuffer.framebufferTextureWidth
-        / this.minecraft.getMainWindow().getGuiScaleFactor());
-    float textureHeight = (float) (framebuffer.framebufferTextureHeight
-        / this.minecraft.getMainWindow().getGuiScaleFactor());
+    this.minecraft.getMainRenderTarget().bindWrite(false);
+    Framebuffer framebuffer = this.blurShader.getTempTarget("output");
+    framebuffer.bindRead();
+    float textureWidth = (float) (framebuffer.width
+        / this.minecraft.getWindow().getGuiScale());
+    float textureHeight = (float) (framebuffer.height
+        / this.minecraft.getWindow().getGuiScale());
     float textureX = x;
     float textureY = (textureHeight - height) - y;
-    RenderUtil.blit(x, y, x + width, y + height, textureX, textureY, textureX + width,
-        textureY + height, textureWidth, textureHeight);
+    RenderUtil.blit(matrixStack, x, y, x + width, y + height, textureX, textureY,
+        textureX + width, textureY + height, textureWidth, textureHeight);
   }
 
   @Override

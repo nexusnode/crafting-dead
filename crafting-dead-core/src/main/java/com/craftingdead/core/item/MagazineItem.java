@@ -76,9 +76,9 @@ public class MagazineItem extends Item {
   }
 
   @Override
-  public boolean getIsRepairable(ItemStack itemStack, ItemStack materialStack) {
+  public boolean isValidRepairItem(ItemStack itemStack, ItemStack materialStack) {
     return Tags.Items.GUNPOWDER.contains(materialStack.getItem())
-        || super.getIsRepairable(itemStack, materialStack);
+        || super.isValidRepairItem(itemStack, materialStack);
   }
 
   @Override
@@ -102,14 +102,14 @@ public class MagazineItem extends Item {
   }
 
   @Override
-  public boolean isDamageable() {
+  public boolean canBeDepleted() {
     return true;
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+  public void appendHoverText(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
+    super.appendHoverText(stack, world, lines, tooltipFlag);
 
     // Shows the current amount if the maximum size is higher than 1
     if (this.getSize() > 1) {
@@ -117,18 +117,18 @@ public class MagazineItem extends Item {
           stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::getSize).orElse(0);
 
       ITextComponent amountText =
-          Text.of(currentAmount + "/" + this.getSize()).mergeStyle(TextFormatting.RED);
+          Text.of(currentAmount + "/" + this.getSize()).withStyle(TextFormatting.RED);
 
       lines.add(Text.translate("item_lore.magazine_item.amount")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(amountText));
     }
 
     if (this.armorPenetration > 0) {
       lines.add(Text.translate("item_lore.magazine_item.armor_penetration")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(Text.of(String.format("%.0f%%", this.armorPenetration))
-              .mergeStyle(TextFormatting.RED)));
+              .withStyle(TextFormatting.RED)));
     }
   }
 

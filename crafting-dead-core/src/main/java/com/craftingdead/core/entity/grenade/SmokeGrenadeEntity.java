@@ -62,7 +62,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
   @Override
   public void onActivationStateChange(boolean activated) {
     if (!activated) {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
       }
     }
@@ -77,30 +77,30 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
     int activatedTicksCount = this.getActivatedTicksCount();
     double radius = MathHelper.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D);
 
-    if (this.world.isRemote()) {
+    if (this.level.isClientSide()) {
       if (activatedTicksCount % 10 == 0) {
         int maximumDuration = this.getMinimumTicksUntilAutoDeactivation();
         float progress =
             Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
                 / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
         float gradualPitch = MathHelper.lerp(1F - progress, 0.5F, 1.7F);
-        this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
-            SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1.5F, gradualPitch, false);
+        this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
+            SoundEvents.FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1.5F, gradualPitch, false);
       }
 
       if (activatedTicksCount % 5 == 0) {
         double halfSphereVolume = (4D / 3D) * Math.PI * Math.pow(radius / 2D, 3);
         for (int i = 0; i < halfSphereVolume; i++) {
-          double theta = this.rand.nextDouble() * 2 * Math.PI;
-          double phi = Math.acos(2 * this.rand.nextDouble() - 1);
+          double theta = this.random.nextDouble() * 2 * Math.PI;
+          double phi = Math.acos(2 * this.random.nextDouble() - 1);
 
           double extraX = radius * Math.sin(phi) * Math.cos(theta);
           double extraY =
-              radius * Math.abs(Math.sin(phi) * Math.sin(theta)) * this.rand.nextDouble();
+              radius * Math.abs(Math.sin(phi) * Math.sin(theta)) * this.random.nextDouble();
           double extraZ = radius * Math.cos(phi);
 
-          this.world.addParticle(LARGE_WHITE_SMOKE, true, this.getPosX() + extraX,
-              this.getPosY() + extraY, this.getPosZ() + extraZ, 0, 0, 0);
+          this.level.addParticle(LARGE_WHITE_SMOKE, true, this.getX() + extraX,
+              this.getY() + extraY, this.getZ() + extraZ, 0, 0, 0);
         }
       }
     } else {
@@ -108,20 +108,20 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
         // Extra size for better detection
         double detectionRadius = radius + 1.5D;
 
-        BlockPos from = this.getPosition().add(-detectionRadius, 0, -detectionRadius);
-        BlockPos to = this.getPosition().add(detectionRadius, detectionRadius, detectionRadius);
-        BlockPos.getAllInBox(from, to).forEach(blockPos -> {
+        BlockPos from = this.blockPosition().offset(-detectionRadius, 0, -detectionRadius);
+        BlockPos to = this.blockPosition().offset(detectionRadius, detectionRadius, detectionRadius);
+        BlockPos.betweenClosedStream(from, to).forEach(blockPos -> {
 
-          double xDiff = this.getPosX() - blockPos.getX();
-          double zDiff = this.getPosZ() - blockPos.getZ();
+          double xDiff = this.getX() - blockPos.getX();
+          double zDiff = this.getZ() - blockPos.getZ();
           double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
 
           if (distance2D <= detectionRadius) {
-            BlockState blockState = this.world.getBlockState(blockPos);
+            BlockState blockState = this.level.getBlockState(blockPos);
             if (blockState.getBlock() instanceof FireBlock) {
               // Sets the fire block to its final age.
               // It should be extinguished in a short time.
-              this.world.setBlockState(blockPos, blockState.with(FireBlock.AGE, 15),
+              this.level.setBlock(blockPos, blockState.setValue(FireBlock.AGE, 15),
                   FIRE_BLOCK_STATE_FLAGS);
             }
           }

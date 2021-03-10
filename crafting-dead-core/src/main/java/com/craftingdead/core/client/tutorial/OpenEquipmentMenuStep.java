@@ -30,7 +30,7 @@ public class OpenEquipmentMenuStep implements IModTutorialStep {
       new TranslationTextComponent("tutorial.open_equipment_menu.title");
   private static final ITextComponent DESCRIPTION =
       new TranslationTextComponent("tutorial.open_equipment_menu.description",
-          Tutorial.createKeybindComponent("equipment_menu"));
+          Tutorial.key("equipment_menu"));
 
   private final ClientDist client;
   private TutorialToast toast;
@@ -45,12 +45,12 @@ public class OpenEquipmentMenuStep implements IModTutorialStep {
     ++this.timeWaiting;
     if (this.timeWaiting >= 600 && this.toast == null) {
       this.toast = new TutorialToast(TutorialToast.Icons.RECIPE_BOOK, TITLE, DESCRIPTION, false);
-      Minecraft.getInstance().getToastGui().add(this.toast);
+      Minecraft.getInstance().getToasts().addToast(this.toast);
     }
   }
 
   @Override
-  public void onStop() {
+  public void clear() {
     if (this.toast != null) {
       this.toast.hide();
       this.toast = null;

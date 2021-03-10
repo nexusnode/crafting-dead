@@ -98,20 +98,20 @@ public class GunAnimationReloadP90 extends GunAnimationReload {
   @Override
   public void doRender(ItemStack par1, float par2, MatrixStack matrixStack) {
     float progress = lastRotation1 + (rotation1 - lastRotation1) * par2;
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(progress));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(progress));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 0.25F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(progress));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(progress));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-progress * 0.25F));
   }
 
   @Override
   public void doRenderHand(ItemStack par1, float par2, boolean par3, MatrixStack matrixStack) {
     if (par3) {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(progress * 0.4F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(progress * 0.4F));
     } else {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 1.4F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-progress * 1.4F));
       matrixStack.translate(-transprogress * 0.8F, 0F, 0.0F);
     }
   }

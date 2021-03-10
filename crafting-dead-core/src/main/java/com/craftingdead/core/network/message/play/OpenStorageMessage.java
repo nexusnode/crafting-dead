@@ -33,11 +33,11 @@ public class OpenStorageMessage {
   }
 
   public static void encode(OpenStorageMessage msg, PacketBuffer out) {
-    out.writeEnumValue(msg.slotType);
+    out.writeEnum(msg.slotType);
   }
 
   public static OpenStorageMessage decode(PacketBuffer in) {
-    return new OpenStorageMessage(in.readEnumValue(InventorySlotType.class));
+    return new OpenStorageMessage(in.readEnum(InventorySlotType.class));
   }
 
   public static boolean handle(OpenStorageMessage msg, Supplier<NetworkEvent.Context> ctx) {

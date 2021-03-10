@@ -30,15 +30,15 @@ import net.minecraft.world.storage.PlayerData;
 @Mixin(PlayerData.class)
 public class PlayerDataMixin {
 
-  @Inject(method = "savePlayerData", at = @At("HEAD"), cancellable = true)
-  private void savePlayerData(CallbackInfo callbackInfo) {
+  @Inject(method = "save", at = @At("HEAD"), cancellable = true)
+  private void save(CallbackInfo callbackInfo) {
     if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer().persistPlayerData()) {
       callbackInfo.cancel();
     }
   }
 
-  @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
-  private void loadPlayerData(CallbackInfoReturnable<CompoundNBT> callbackInfo) {
+  @Inject(method = "load", at = @At("HEAD"), cancellable = true)
+  private void load(CallbackInfoReturnable<CompoundNBT> callbackInfo) {
     if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer().persistPlayerData()) {
       callbackInfo.setReturnValue(null);
     }

@@ -79,12 +79,12 @@ public class GameNetworkChannel {
   }
 
   public static <MSG> void sendToServer(MSG message) {
-    sendTo(message, Minecraft.getInstance().getConnection().getNetworkManager(),
+    sendTo(message, Minecraft.getInstance().getConnection().getConnection(),
         NetworkDirection.PLAY_TO_SERVER);
   }
 
   public static <MSG> void sendTo(MSG message, NetworkManager manager, NetworkDirection direction) {
-    manager.sendPacket(toVanillaPacket(message, direction));
+    manager.send(toVanillaPacket(message, direction));
   }
 
   public static <MSG> void send(PacketDistributor.PacketTarget target, MSG message) {

@@ -18,31 +18,31 @@
 
 package com.craftingdead.immerse.client.gui.transition;
 
-import com.craftingdead.immerse.client.gui.transition.TransitionManager.TransitionType;
-import com.mojang.blaze3d.systems.RenderSystem;
-
-public enum Transitions implements ITransition {
-
-  GROW {
-
-    private static final float SCALE = 0.075F;
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void transform(double width, double height, float progress) {
-      float scaleOffset = (1.0F - progress) * SCALE;
-      RenderSystem.translated(width * -scaleOffset, height * -scaleOffset, 0.0F);
-      RenderSystem.scalef(1.0F + 2.0F * scaleOffset, 1.0F + 2.0F * scaleOffset, 1.0F);
-    }
-
-    @Override
-    public int getTransitionTime() {
-      return 250;
-    }
-
-    @Override
-    public TransitionType getTransitionType() {
-      return TransitionType.SINE;
-    }
-  }
-}
+//import com.craftingdead.immerse.client.gui.transition.TransitionManager.TransitionType;
+//import com.mojang.blaze3d.systems.RenderSystem;
+//
+//public enum Transitions implements ITransition {
+//
+//  GROW {
+//
+//    private static final float SCALE = 0.075F;
+//
+//    @SuppressWarnings("deprecation")
+//    @Override
+//    public void transform(double width, double height, float progress) {
+//      float scaleOffset = (1.0F - progress) * SCALE;
+//      RenderSystem.translated(width * -scaleOffset, height * -scaleOffset, 0.0F);
+//      RenderSystem.scalef(1.0F + 2.0F * scaleOffset, 1.0F + 2.0F * scaleOffset, 1.0F);
+//    }
+//
+//    @Override
+//    public int getTransitionTime() {
+//      return 250;
+//    }
+//
+//    @Override
+//    public TransitionType getTransitionType() {
+//      return TransitionType.SINE;
+//    }
+//  }
+//}

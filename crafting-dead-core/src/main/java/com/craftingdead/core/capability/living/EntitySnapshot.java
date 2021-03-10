@@ -45,7 +45,7 @@ public class EntitySnapshot {
   }
 
   public EntitySnapshot(Entity entity) {
-    this(entity.getBoundingBox(), entity.getPitchYaw(), entity.getEyeHeight());
+    this(entity.getBoundingBox(), entity.getRotationVector(), entity.getEyeHeight());
   }
 
   public EntitySnapshot(AxisAlignedBB boundingBox, Vector2f pitchYaw, float eyeHeight) {
@@ -74,10 +74,10 @@ public class EntitySnapshot {
     Vector3d scaledLook = look.scale(distance);
 
     Vector3d end = blockRayTraceResult
-        .map(RayTraceResult::getHitVec)
+        .map(RayTraceResult::getLocation)
         .orElse(start.add(scaledLook));
 
-    Optional<Vector3d> potentialHit = this.getCollisionBox().rayTrace(start, end);
+    Optional<Vector3d> potentialHit = this.getCollisionBox().clip(start, end);
     if (this.getCollisionBox().contains(start)) {
       return Optional.of(potentialHit.orElse(start));
     } else {
@@ -109,8 +109,8 @@ public class EntitySnapshot {
 
     AxisAlignedBB boundingBox = snapshot.boundingBox;
     if (this.pos.distanceTo(snapshot.pos) > 1.0D
-        || Math.abs(this.boundingBox.getAverageEdgeLength()
-            - snapshot.boundingBox.getAverageEdgeLength()) > 1.0E-10D) {
+        || Math.abs(this.boundingBox.getSize()
+            - snapshot.boundingBox.getSize()) > 1.0E-10D) {
       boundingBox = this.boundingBox;
     }
 

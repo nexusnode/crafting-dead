@@ -68,10 +68,10 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
     }
 
     final int dataVersion = nbt.getInt("DataVersion");
-    if (dataVersion != SharedConstants.getVersion().getWorldVersion()) {
+    if (dataVersion != SharedConstants.getCurrentVersion().getWorldVersion()) {
       logger.warn(
           "Schematic was made in a different version of Minecraft (schematic_version={}, game_version={}). Data may be incompatible.",
-          dataVersion, SharedConstants.getVersion().getWorldVersion());
+          dataVersion, SharedConstants.getCurrentVersion().getWorldVersion());
     }
 
     IVersionReader versionReader = versionReaders.get(version);
@@ -90,9 +90,9 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
 
     @Override
     public SpongeSchematic read(CompoundNBT nbt) throws IOException {
-      final int width = getExpectedTag(nbt, "Width", ShortNBT.class).getInt();
-      final int height = getExpectedTag(nbt, "Height", ShortNBT.class).getInt();
-      final int length = getExpectedTag(nbt, "Length", ShortNBT.class).getInt();
+      final int width = getExpectedTag(nbt, "Width", ShortNBT.class).getAsInt();
+      final int height = getExpectedTag(nbt, "Height", ShortNBT.class).getAsInt();
+      final int length = getExpectedTag(nbt, "Length", ShortNBT.class).getAsInt();
 
       final CompoundNBT metadataNbt = nbt.getCompound("Metadata");
 
@@ -103,7 +103,7 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
           .setPalette(this.readPalette(nbt.getCompound("Palette")).orElse(null))
           .setBlockData(
               convertVarIntArray(
-                  getExpectedTag(nbt, "BlockData", ByteArrayNBT.class).getByteArray()))
+                  getExpectedTag(nbt, "BlockData", ByteArrayNBT.class).getAsByteArray()))
           .setBiomePalette(
               this.readBiomePalette(nbt.getCompound("BiomePalette")).orElse(null))
           .setBiomeData(convertVarIntArray(nbt.getByteArray("BiomeData")))
@@ -148,16 +148,16 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
     }
 
     protected Optional<Map<Integer, BlockState>> readPalette(CompoundNBT nbt) throws IOException {
-      final int size = nbt.keySet().size();
+      final int size = nbt.getAllKeys().size();
       Map<Integer, BlockState> palette = new Int2ObjectArrayMap<>(size);
 
-      for (String key : nbt.keySet()) {
+      for (String key : nbt.getAllKeys()) {
         final int id = nbt.getInt(key);
         BlockState blockState = WorldUtil.getBlockStateFromString(key);
 
         if (blockState == null) {
           logger.warn("Unknown block state \"{}\"", key);
-          blockState = Blocks.AIR.getDefaultState();
+          blockState = Blocks.AIR.defaultBlockState();
         }
 
         if (id < 0 || id >= size) {
@@ -172,10 +172,10 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
     }
 
     protected Optional<Map<Integer, Biome>> readBiomePalette(CompoundNBT nbt) throws IOException {
-      final int size = nbt.keySet().size();
+      final int size = nbt.getAllKeys().size();
       Map<Integer, Biome> palette = new Int2ObjectArrayMap<>(size);
 
-      for (String key : nbt.keySet()) {
+      for (String key : nbt.getAllKeys()) {
         final int id = nbt.getInt(key);
         Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(key));
 
@@ -200,7 +200,7 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
       for (int i = 0; i < nbt.size(); i++) {
         CompoundNBT entry = nbt.getCompound(i);
         ResourceLocation id =
-            new ResourceLocation(getExpectedTag(entry, "Id", StringNBT.class).getString());
+            new ResourceLocation(getExpectedTag(entry, "Id", StringNBT.class).getAsString());
 
         CompoundNBT tileEntityNbt = entry.copy();
 
@@ -227,9 +227,9 @@ public class SpongeSchematicType extends NBTSchematicType<SpongeSchematic> {
           continue;
         }
 
-        tileEntity.read(null, tileEntityNbt);
+        tileEntity.load(null, tileEntityNbt);
 
-        tileEntities.put(tileEntity.getPos(), tileEntity);
+        tileEntities.put(tileEntity.getBlockPos(), tileEntity);
       }
       return tileEntities;
     }

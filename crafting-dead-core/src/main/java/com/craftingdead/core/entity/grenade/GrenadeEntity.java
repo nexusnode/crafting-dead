@@ -46,9 +46,9 @@ import net.minecraft.world.World;
 public abstract class GrenadeEntity extends BounceableProjectileEntity {
 
   private static final Triple<SoundEvent, Float, Float> DEFAULT_BOUNCE_SOUND =
-      Triple.of(SoundEvents.BLOCK_SCAFFOLDING_BREAK, 0.5F, 2F);
+      Triple.of(SoundEvents.SCAFFOLDING_BREAK, 0.5F, 2F);
   private static final DataParameter<Boolean> ACTIVATED =
-      EntityDataManager.createKey(GrenadeEntity.class, DataSerializers.BOOLEAN);
+      EntityDataManager.defineId(GrenadeEntity.class, DataSerializers.BOOLEAN);
   private int activatedTicksCount = 0;
   private int deactivatedTicksCount = 0;
 
@@ -112,34 +112,34 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   @Override
-  public boolean attackEntityFrom(DamageSource source, float amount) {
+  public boolean hurt(DamageSource source, float amount) {
     if (ModDamageSource.isGunDamage(source)) {
       EntityDamageSource entitySource = (EntityDamageSource) source;
-      this.setMotion(entitySource.getTrueSource().getLookVec().scale(1.5D));
+      this.setDeltaMovement(entitySource.getEntity().getLookAngle().scale(1.5D));
     }
-    return super.attackEntityFrom(source, amount);
+    return super.hurt(source, amount);
   }
 
   @Override
   public void onSurfaceHit(BlockRayTraceResult blockRayTraceResult) {
     Triple<SoundEvent, Float, Float> bounceSound = this.getBounceSound(blockRayTraceResult);
-    if (this.world.isRemote()) {
-      this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
+    if (this.level.isClientSide()) {
+      this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
           bounceSound.getLeft(), SoundCategory.NEUTRAL, bounceSound.getMiddle(),
           bounceSound.getRight(), false);
     }
   }
 
   @Override
-  public final ActionResultType processInitialInteract(PlayerEntity playerEntity, Hand hand) {
+  public final ActionResultType interact(PlayerEntity playerEntity, Hand hand) {
     boolean canPickup = !playerEntity.isSecondaryUseActive() && this.canBePickedUp(playerEntity);
     if (canPickup) {
       this.remove();
-      playerEntity.addItemStackToInventory(new ItemStack(this.asItem(), 1));
-      this.world.playSound(this.getPosX(), this.getPosY(), this.getPosZ(),
-          SoundEvents.ENTITY_ITEM_PICKUP,
+      playerEntity.addItem(new ItemStack(this.asItem(), 1));
+      this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
+          SoundEvents.ITEM_PICKUP,
           SoundCategory.PLAYERS, 0.2F,
-          (this.rand.nextFloat() - this.rand.nextFloat()) * 1.4F + 2.0F, false);
+          (this.random.nextFloat() - this.random.nextFloat()) * 1.4F + 2.0F, false);
     }
     return canPickup ? ActionResultType.SUCCESS : ActionResultType.PASS;
   }
@@ -173,8 +173,8 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   public void setActivated(boolean activated) {
-    boolean previousValue = this.getDataManager().get(ACTIVATED);
-    this.getDataManager().set(ACTIVATED, activated);
+    boolean previousValue = this.getEntityData().get(ACTIVATED);
+    this.getEntityData().set(ACTIVATED, activated);
 
     // has changed
     if (activated != previousValue) {
@@ -207,7 +207,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   public boolean isActivated() {
-    return this.getDataManager().get(ACTIVATED);
+    return this.getEntityData().get(ACTIVATED);
   }
 
   public int getActivatedTicksCount() {
@@ -215,20 +215,20 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   @Override
-  public boolean canBeCollidedWith() {
+  public boolean isPickable() {
     return true;
   }
 
   @Override
-  protected void writeAdditional(CompoundNBT compound) {
-    super.writeAdditional(compound);
+  protected void addAdditionalSaveData(CompoundNBT compound) {
+    super.addAdditionalSaveData(compound);
     compound.putBoolean("activated", this.isActivated());
     compound.putInt("activatedTicksCount", this.activatedTicksCount);
   }
 
   @Override
-  protected void readAdditional(CompoundNBT compound) {
-    super.readAdditional(compound);
+  protected void readAdditionalSaveData(CompoundNBT compound) {
+    super.readAdditionalSaveData(compound);
     this.setActivated(compound.getBoolean("activated"));
     this.activatedTicksCount = compound.getInt("activatedTicksCount");
   }
@@ -246,12 +246,12 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   @Override
-  protected void registerData() {
-    this.getDataManager().register(ACTIVATED, false);
+  protected void defineSynchedData() {
+    this.getEntityData().define(ACTIVATED, false);
   }
 
   @Override
-  public IPacket<?> createSpawnPacket() {
+  public IPacket<?> getAddEntityPacket() {
     return NetworkHooks.getEntitySpawningPacket(this);
   }
 

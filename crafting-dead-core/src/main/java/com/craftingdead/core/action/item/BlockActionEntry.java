@@ -49,8 +49,8 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
     RayTraceResult result = performer.getEntity().pick(
         reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue(), 1.0F, true);
     if (result instanceof BlockRayTraceResult) {
-      BlockPos blockPos = ((BlockRayTraceResult) result).getPos();
-      BlockState blockState = performer.getEntity().getEntityWorld().getBlockState(blockPos);
+      BlockPos blockPos = ((BlockRayTraceResult) result).getBlockPos();
+      BlockState blockState = performer.getEntity().getCommandSenderWorld().getBlockState(blockPos);
       if (this.blockPosTarget == null || this.blockStateTarget == null) {
         this.blockPosTarget = blockPos;
         this.blockStateTarget = blockState;

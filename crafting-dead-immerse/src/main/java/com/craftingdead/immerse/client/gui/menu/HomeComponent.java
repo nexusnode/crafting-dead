@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.client.gui.menu;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class HomeComponent extends ContainerComponent {
             .addAll(new File("news.xml"))));
 
     final FakePlayerEntity fakePlayerEntity =
-        new FakePlayerEntity(this.minecraft.getSession().getProfile());
+        new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
 
 
     List<Item> gunItems = ForgeRegistries.ITEMS.getValues()
@@ -66,14 +67,14 @@ public class HomeComponent extends ContainerComponent {
         .filter(item -> item instanceof GunItem)
         .collect(Collectors.toList());
     Item randomGunItem = gunItems.get(random.nextInt(gunItems.size()));
-    fakePlayerEntity.setHeldItem(Hand.MAIN_HAND, new ItemStack(randomGunItem));
+    fakePlayerEntity.setItemInHand(Hand.MAIN_HAND, new ItemStack(randomGunItem));
 
     this.addChild(new ContainerComponent()
         .setAlignItems(Align.CENTER)
         .setWidthPercent(30.0F)
         .setHeightPercent(45.0F)
         .addChild(new TextBlockComponent(
-            Text.of(this.minecraft.getSession().getUsername()).mergeStyle(TextFormatting.BOLD,
+            Text.of(this.minecraft.getUser().getName()).withStyle(TextFormatting.BOLD,
                 TextFormatting.DARK_RED)))
         .addChild(new EntityComponent(fakePlayerEntity)
             .setWidthPercent(100.0F)

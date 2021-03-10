@@ -63,7 +63,7 @@ public class NetworkDataManager {
           "Data parameter id is too big with " + id + "! (Max is 254)");
     } else if (this.entries.containsKey(id)) {
       throw new IllegalArgumentException("Duplicate id value for " + id + "!");
-    } else if (DataSerializers.getSerializerId(parameter.getSerializer()) < 0) {
+    } else if (DataSerializers.getSerializedId(parameter.getSerializer()) < 0) {
       throw new IllegalArgumentException(
           "Unregistered serializer " + parameter.getSerializer() + " for " + id + "!");
     } else {
@@ -88,9 +88,9 @@ public class NetworkDataManager {
       entry = (NetworkDataManager.DataEntry<T>) this.entries.get(parameter.getId());
     } catch (Throwable throwable) {
       CrashReport crashReport =
-          CrashReport.makeCrashReport(throwable, "Getting data entry");
-      CrashReportCategory category = crashReport.makeCategory("Getting data entry");
-      category.addDetail("Data parameter ID", parameter);
+          CrashReport.forThrowable(throwable, "Getting data entry");
+      CrashReportCategory category = crashReport.addCategory("Getting data entry");
+      category.setDetail("Data parameter ID", parameter);
       throw new ReportedException(crashReport);
     } finally {
       this.lock.readLock().unlock();
@@ -145,7 +145,7 @@ public class NetworkDataManager {
 
   private static <T> void writeEntry(PacketBuffer out, NetworkDataManager.DataEntry<T> entry) {
     DataParameter<T> parameter = entry.getKey();
-    int i = DataSerializers.getSerializerId(parameter.getSerializer());
+    int i = DataSerializers.getSerializedId(parameter.getSerializer());
     if (i < 0) {
       throw new EncoderException("Unknown serializer type " + parameter.getSerializer());
     } else {
@@ -213,7 +213,7 @@ public class NetworkDataManager {
 
   private static <T> NetworkDataManager.DataEntry<T> readEntry(PacketBuffer buf,
       int id, IDataSerializer<T> serializer) {
-    return new NetworkDataManager.DataEntry<>(serializer.createKey(id),
+    return new NetworkDataManager.DataEntry<>(serializer.createAccessor(id),
         serializer.read(buf));
   }
 
@@ -297,7 +297,7 @@ public class NetworkDataManager {
 
     public NetworkDataManager.DataEntry<T> copy() {
       return new NetworkDataManager.DataEntry<>(this.parameter,
-          this.parameter.getSerializer().copyValue(this.value));
+          this.parameter.getSerializer().copy(this.value));
     }
   }
 }

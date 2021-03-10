@@ -80,7 +80,7 @@ public class ActionTypes {
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS.andThen(
-                      t -> (t == null || !t.getEntity().isPotionActive(ModEffects.BLEEDING.get()))
+                      t -> (t == null || !t.getEntity().hasEffect(ModEffects.BLEEDING.get()))
                           ? null
                           : t))
                   .setReturnItem(ModItems.BLOODY_RAG)))
@@ -93,7 +93,7 @@ public class ActionTypes {
               .setHeldItemPredicate(item -> item == ModItems.SPLINT.get())
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS.andThen(
-                      t -> (t == null || !t.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get()))
+                      t -> (t == null || !t.getEntity().hasEffect(ModEffects.BROKEN_LEG.get()))
                           ? null
                           : t))))
               .build(),
@@ -108,7 +108,7 @@ public class ActionTypes {
                   .setTargetSelector(
                       EntityActionEntry.TargetSelector.OTHERS_ONLY.ofType(ZombieEntity.class))
                   .setCustomAction(Pair.of(
-                      t -> t.getEntity().attackEntityFrom(ModDamageSource.BLEEDING, 2.0F), 0.25F))
+                      t -> t.getEntity().hurt(ModDamageSource.BLEEDING, 2.0F), 0.25F))
                   .setReturnItem(ModItems.RBI_SYRINGE)))
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector((p, t) -> {
@@ -121,17 +121,17 @@ public class ActionTypes {
                       if (targetEntity.getHealth() > 4) {
                         return t;
                       } else if (p.getEntity() instanceof PlayerEntity) {
-                        ((PlayerEntity) p.getEntity()).sendStatusMessage(
+                        ((PlayerEntity) p.getEntity()).displayClientMessage(
                             new TranslationTextComponent("message.low_health",
                                 targetEntity.getDisplayName()).setStyle(
-                                    Style.EMPTY.createStyleFromFormattings(TextFormatting.RED)),
+                                    Style.EMPTY.applyFormats(TextFormatting.RED)),
                             true);
                       }
                     }
                     return null;
                   })
                   .setCustomAction(Pair.of(
-                      t -> t.getEntity().attackEntityFrom(ModDamageSource.BLEEDING, 2.0F), 1.0F))
+                      t -> t.getEntity().hurt(ModDamageSource.BLEEDING, 2.0F), 1.0F))
                   .setReturnItem(ModItems.BLOOD_SYRINGE)))
               .build(),
           false));
@@ -156,7 +156,7 @@ public class ActionTypes {
               .setFreezeMovement(true)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 1), 1.0F))))
+                  .addEffect(Pair.of(new EffectInstance(Effects.HEAL, 1, 1), 1.0F))))
               .build(),
           false));
 
@@ -182,7 +182,7 @@ public class ActionTypes {
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
-                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
+                  .addEffect(Pair.of(new EffectInstance(Effects.HEAL, 1, 0), 1.0F))))
               .build(),
           false));
 
@@ -193,7 +193,7 @@ public class ActionTypes {
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .addEffect(Pair.of(new EffectInstance(Effects.INSTANT_HEALTH, 1, 0), 1.0F))))
+                  .addEffect(Pair.of(new EffectInstance(Effects.HEAL, 1, 0), 1.0F))))
               .build(),
           false));
 
@@ -204,9 +204,9 @@ public class ActionTypes {
                   item -> item == ModItems.DIRTY_RAG.get() || item == ModItems.BLOODY_RAG.get())
               .addEntry(new BlockActionEntry(new BlockActionEntry.Properties()
                   .setReturnItem(ModItems.CLEAN_RAG)
-                  .setFinishSound(SoundEvents.ITEM_BUCKET_FILL)
+                  .setFinishSound(SoundEvents.BUCKET_FILL)
                   .setPredicate(
-                      blockState -> blockState.getFluidState().getFluid() == Fluids.WATER)))
+                      blockState -> blockState.getFluidState().getType() == Fluids.WATER)))
               .build(),
           false));
 }

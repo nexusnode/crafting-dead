@@ -40,8 +40,8 @@ public class EntityUtil {
     float yawToTarget = ROTATIONS_TO_TARGET.getX();
     float pitchToTarget = ROTATIONS_TO_TARGET.getY();
 
-    float currentYaw = MathHelper.wrapDegrees(viewer.rotationYawHead);
-    float currentPitch = MathHelper.wrapDegrees(viewer.rotationPitch);
+    float currentYaw = MathHelper.wrapDegrees(viewer.yHeadRot);
+    float currentPitch = MathHelper.wrapDegrees(viewer.xRot);
 
     float yawDifference = Math.abs(MathHelper.wrapDegrees(currentYaw - yawToTarget));
     float pitchDifference = Math.abs(MathHelper.wrapDegrees(currentPitch - pitchToTarget));
@@ -58,8 +58,8 @@ public class EntityUtil {
    */
   public static void getRotationsToTarget(LivingEntity viewer, Entity target,
       MutableVector2f result) {
-    Vector3d entityVec = target.getPositionVec();
-    Vector3d livingVec = viewer.getPositionVec();
+    Vector3d entityVec = target.position();
+    Vector3d livingVec = viewer.position();
 
     double xDiff = livingVec.x - entityVec.x;
     double zDiff = entityVec.z - livingVec.z;

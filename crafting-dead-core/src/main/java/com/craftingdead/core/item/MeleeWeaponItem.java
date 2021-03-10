@@ -48,9 +48,9 @@ public class MeleeWeaponItem extends ToolItem {
     this.attackDamage = attackDamage;
 
     Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-    builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER,
+    builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID,
         "Weapon modifier", this.attackDamage, AttributeModifier.Operation.ADDITION));
-    builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER,
+    builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID,
         "Weapon modifier", this.attackSpeed, AttributeModifier.Operation.ADDITION));
     this.attributeModifiers = builder.build();
   }

@@ -37,7 +37,7 @@ public class KillFeedDamageSource extends EntityDamageSource implements IKillFee
 
   @Override
   public KillFeedEntry createKillFeedEntry(PlayerEntity killedEntity) {
-    return new KillFeedEntry((LivingEntity) this.damageSourceEntity, killedEntity, this.itemStack,
+    return new KillFeedEntry((LivingEntity) this.entity, killedEntity, this.itemStack,
         this.killFeedType);
   }
 }

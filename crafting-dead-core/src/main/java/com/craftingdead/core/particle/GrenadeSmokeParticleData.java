@@ -41,7 +41,7 @@ public class GrenadeSmokeParticleData implements IParticleData {
   public static final IParticleData.IDeserializer<GrenadeSmokeParticleData> DESERIALIZER =
       new IParticleData.IDeserializer<GrenadeSmokeParticleData>() {
         @Override
-        public GrenadeSmokeParticleData deserialize(
+        public GrenadeSmokeParticleData fromCommand(
             ParticleType<GrenadeSmokeParticleData> particleType, StringReader stringReader)
             throws CommandSyntaxException {
           stringReader.expect(' ');
@@ -56,7 +56,7 @@ public class GrenadeSmokeParticleData implements IParticleData {
         }
 
         @Override
-        public GrenadeSmokeParticleData read(ParticleType<GrenadeSmokeParticleData> particleType,
+        public GrenadeSmokeParticleData fromNetwork(ParticleType<GrenadeSmokeParticleData> particleType,
             PacketBuffer packetBuffer) {
           return new GrenadeSmokeParticleData(packetBuffer.readFloat(), packetBuffer.readFloat(),
               packetBuffer.readFloat(), packetBuffer.readFloat());
@@ -76,7 +76,7 @@ public class GrenadeSmokeParticleData implements IParticleData {
   }
 
   @Override
-  public void write(PacketBuffer packetBuffer) {
+  public void writeToNetwork(PacketBuffer packetBuffer) {
     packetBuffer.writeFloat(this.red);
     packetBuffer.writeFloat(this.green);
     packetBuffer.writeFloat(this.blue);
@@ -84,7 +84,7 @@ public class GrenadeSmokeParticleData implements IParticleData {
   }
 
   @Override
-  public String getParameters() {
+  public String writeToString() {
     return String.format(Locale.ROOT, "%s %.2f %.2f %.2f %.2f",
         this.getType().getRegistryName(), this.red, this.green, this.blue, this.scale);
   }

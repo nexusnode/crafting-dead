@@ -36,8 +36,8 @@ import net.minecraftforge.fml.network.PacketDistributor;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
-  @Inject(at = @At("RETURN"), method = "isMovementBlocked", cancellable = true)
-  private void isMovementBlocked(CallbackInfoReturnable<Boolean> callbackInfo) {
+  @Inject(at = @At("RETURN"), method = "isImmobile", cancellable = true)
+  private void isImmobile(CallbackInfoReturnable<Boolean> callbackInfo) {
     final LivingEntity livingEntity = (LivingEntity) (Object) this;
     ILiving.getOptional(livingEntity).ifPresent(living -> {
       if (!callbackInfo.getReturnValue() && living.isMovementBlocked()) {
@@ -48,21 +48,21 @@ public abstract class LivingEntityMixin {
 
   // TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
   @Redirect(at = @At(value = "INVOKE",
-      target = "Lnet/minecraft/item/ItemStack;areItemStacksEqual(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"),
-      method = "func_241354_r_")
-  private boolean areItemStacksEqual(ItemStack currentStack, ItemStack lastStack) {
+      target = "Lnet/minecraft/item/ItemStack;matches(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"),
+      method = "collectEquipmentChanges")
+  private boolean matches(ItemStack currentStack, ItemStack lastStack) {
     if (!currentStack.equals(lastStack, true)) {
       return false;
     }
 
     LivingEntity livingEntity = (LivingEntity) (Object) this;
     for (EquipmentSlotType slotType : EquipmentSlotType.values()) {
-      if (currentStack == livingEntity.getItemStackFromSlot(slotType)) {
+      if (currentStack == livingEntity.getItemBySlot(slotType)) {
         currentStack.getCapability(ModCapabilities.GUN)
             .filter(IGun::requiresSync)
             .ifPresent(gun -> NetworkChannel.PLAY.getSimpleChannel().send(
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                new SyncGunEquipmentSlotMessage(livingEntity.getEntityId(), slotType, gun, false)));
+                new SyncGunEquipmentSlotMessage(livingEntity.getId(), slotType, gun, false)));
       }
     }
     return true;

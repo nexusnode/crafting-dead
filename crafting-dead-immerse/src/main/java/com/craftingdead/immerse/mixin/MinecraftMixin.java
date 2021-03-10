@@ -29,9 +29,14 @@ import net.minecraft.util.SharedConstants;
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
 
-  @Inject(method = "getWindowTitle", at = @At("HEAD"), cancellable = true)
-  private void getWindowTitle(CallbackInfoReturnable<String> callbackInfo) {
-    callbackInfo.setReturnValue("Minecraft " + SharedConstants.getVersion().getName() + " - "
+  @Inject(method = "createTitle", at = @At("HEAD"), cancellable = true)
+  private void createTitle(CallbackInfoReturnable<String> callbackInfo) {
+    callbackInfo.setReturnValue("Minecraft " + SharedConstants.getCurrentVersion().getName() + " - "
         + "Crafting Dead " + CraftingDead.VERSION);
+  }
+
+  @Inject(method = "getFramerateLimit", at = @At("HEAD"), cancellable = true)
+  private void getFramerateLimit(CallbackInfoReturnable<Integer> callbackInfo) {
+    callbackInfo.setReturnValue(Minecraft.getInstance().getWindow().getFramerateLimit());
   }
 }

@@ -66,11 +66,11 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
     this(entityType, world);
     this.lootTable = lootTable;
     this.lootTableSeed = lootTableSeed;
-    this.setPosition(x, y, z);
-    this.setMotion(Vector3d.ZERO);
-    this.prevPosX = x;
-    this.prevPosY = y;
-    this.prevPosZ = z;
+    this.setPos(x, y, z);
+    this.setDeltaMovement(Vector3d.ZERO);
+    this.xo = x;
+    this.yo = y;
+    this.zo = z;
   }
 
   public SupplyDropEntity(FMLPlayMessages.SpawnEntity packet, World world) {
@@ -78,46 +78,46 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
   }
 
   @Override
-  protected void registerData() {}
+  protected void defineSynchedData() {}
 
   @Override
   public void tick() {
     super.baseTick();
-    if (!this.hasNoGravity()) {
-      this.setMotion(this.getMotion().add(0.0D, -0.009D, 0.0D));
+    if (!this.isNoGravity()) {
+      this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -0.009D, 0.0D));
     }
 
     if (this.onGround) {
-      this.setMotion(this.getMotion().scale(0.5D));
+      this.setDeltaMovement(this.getDeltaMovement().scale(0.5D));
     }
 
-    this.move(MoverType.SELF, this.getMotion());
+    this.move(MoverType.SELF, this.getDeltaMovement());
 
   }
 
   @Override
   public void remove(boolean keepData) {
-    if (!this.world.isRemote && !keepData) {
-      InventoryHelper.dropInventoryItems(this.world, this, this.inventory);
+    if (!this.level.isClientSide && !keepData) {
+      InventoryHelper.dropContents(this.level, this, this.inventory);
     }
     super.remove(keepData);
   }
 
   @Override
-  protected void readAdditional(CompoundNBT compound) {
+  protected void readAdditionalSaveData(CompoundNBT compound) {
     if (compound.contains("lootTable", NBT.TAG_STRING)) {
       this.lootTable = new ResourceLocation(compound.getString("lootTable"));
       this.lootTableSeed = compound.getLong("lootTableSeed");
     } else if (compound.contains("inventory")) {
       NonNullList<ItemStack> items =
-          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
+          NonNullList.withSize(this.inventory.getContainerSize(), ItemStack.EMPTY);
       ItemStackHelper.loadAllItems(compound.getCompound("inventory"), items);
       this.inventory = new Inventory(items.toArray(new ItemStack[0]));
     }
   }
 
   @Override
-  protected void writeAdditional(CompoundNBT compound) {
+  protected void addAdditionalSaveData(CompoundNBT compound) {
     if (this.lootTable != null) {
       compound.putString("lootTable", this.lootTable.toString());
       if (this.lootTableSeed != 0L) {
@@ -125,9 +125,9 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
       }
     } else {
       NonNullList<ItemStack> items =
-          NonNullList.withSize(this.inventory.getSizeInventory(), ItemStack.EMPTY);
-      for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
-        items.set(i, this.inventory.getStackInSlot(i));
+          NonNullList.withSize(this.inventory.getContainerSize(), ItemStack.EMPTY);
+      for (int i = 0; i < this.inventory.getContainerSize(); i++) {
+        items.set(i, this.inventory.getItem(i));
       }
       compound
           .put("inventory", ItemStackHelper.saveAllItems(compound.getCompound("inventory"), items));
@@ -135,24 +135,24 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
   }
 
   @Override
-  public boolean canBeCollidedWith() {
+  public boolean isPickable() {
     return true;
   }
 
   @Override
-  public IPacket<?> createSpawnPacket() {
+  public IPacket<?> getAddEntityPacket() {
     return NetworkHooks.getEntitySpawningPacket(this);
   }
 
   @Override
-  public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
-    player.openContainer(this);
+  public ActionResultType interactAt(PlayerEntity player, Vector3d vec, Hand hand) {
+    player.openMenu(this);
     return ActionResultType.PASS;
   }
 
   @Override
-  public boolean attackEntityFrom(DamageSource source, float amount) {
-    if (!this.world.isRemote && this.isAlive()) {
+  public boolean hurt(DamageSource source, float amount) {
+    if (!this.level.isClientSide && this.isAlive()) {
       if (this.isInvulnerableTo(source)) {
         return false;
       }
@@ -163,24 +163,24 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
   }
 
   private void addLoot(@Nullable PlayerEntity player) {
-    if (this.lootTable != null && this.world.getServer() != null) {
+    if (this.lootTable != null && this.level.getServer() != null) {
       LootTable lootTable =
-          this.world.getServer().getLootTableManager().getLootTableFromLocation(this.lootTable);
+          this.level.getServer().getLootTables().get(this.lootTable);
       this.lootTable = null;
-      LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.world)
-          .withParameter(LootParameters.field_237457_g_, this.getPositionVec())
-          .withSeed(this.lootTableSeed);
+      LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.level)
+          .withParameter(LootParameters.ORIGIN, this.position())
+          .withOptionalRandomSeed(this.lootTableSeed);
       builder.withParameter(LootParameters.KILLER_ENTITY, this);
       if (player != null) {
         builder.withLuck(player.getLuck()).withParameter(LootParameters.THIS_ENTITY, player);
       }
-      lootTable.fillInventory(this.inventory, builder.build(LootParameterSets.CHEST));
+      lootTable.fill(this.inventory, builder.create(LootParameterSets.CHEST));
     }
   }
 
   @Override
   public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
     this.addLoot(playerEntity);
-    return ChestContainer.createGeneric9X6(id, playerInventory, this.inventory);
+    return ChestContainer.sixRows(id, playerInventory, this.inventory);
   }
 }

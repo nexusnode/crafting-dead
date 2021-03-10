@@ -50,7 +50,7 @@ public class MagazineAmmoProvider implements IAmmoProvider {
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     if (nbt.contains("magazineStack", Constants.NBT.TAG_COMPOUND)) {
-      this.magazineStack = ItemStack.read(nbt.getCompound("magazineStack"));
+      this.magazineStack = ItemStack.of(nbt.getCompound("magazineStack"));
       this.stackChanged = true;
     }
   }
@@ -59,7 +59,7 @@ public class MagazineAmmoProvider implements IAmmoProvider {
   public void encode(PacketBuffer out, boolean writeAll) {
     if (this.stackChanged || writeAll) {
       out.writeBoolean(true);
-      out.writeItemStack(this.magazineStack);
+      out.writeItem(this.magazineStack);
       this.stackChanged = false;
     } else {
       out.writeBoolean(false);
@@ -70,7 +70,7 @@ public class MagazineAmmoProvider implements IAmmoProvider {
   @Override
   public void decode(PacketBuffer in) {
     if (in.readBoolean()) {
-      this.magazineStack = in.readItemStack();
+      this.magazineStack = in.readItem();
     }
     this.getMagazine().ifPresent(magazine -> magazine.decode(in));
   }

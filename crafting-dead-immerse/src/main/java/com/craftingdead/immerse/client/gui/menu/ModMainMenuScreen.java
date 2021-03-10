@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Crafting Dead
  * Copyright (C) 2020  Nexus Node
@@ -44,18 +62,18 @@ import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class MenuScreen extends ComponentScreen {
+public class ModMainMenuScreen extends ComponentScreen {
 
   private final ContainerComponent contentContainer = new ContainerComponent().setFlex(1);
 
   private Page currentPage;
 
-  public MenuScreen(Page page) {
+  public ModMainMenuScreen(Page page) {
     super(new TranslationTextComponent("menu.home.title"));
 
     // Fix null font field in constructor
     final Minecraft mc = Minecraft.getInstance();
-    this.font = mc.fontRenderer;
+    this.font = mc.font;
 
     ImageComponent backgroundComponent = new ImageComponent()
         .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
@@ -63,6 +81,7 @@ public class MenuScreen extends ComponentScreen {
         .setFitType(FitType.COVER)
         .setHeightPercent(100)
         .setWidthPercent(100)
+        .setBilinearFiltering(true)
         .setScale(1.25F);
     this.getRoot().addChild(backgroundComponent);
 
@@ -153,7 +172,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
         .addListener(ActionEvent.class, (c, e) -> this.minecraft
-            .displayGuiScreen(new OptionsScreen(this, this.minecraft.gameSettings)))
+            .setScreen(new OptionsScreen(this, this.minecraft.options)))
         .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.options"))));
 
@@ -169,7 +188,7 @@ public class MenuScreen extends ComponentScreen {
         .addHoverAnimation(Component.X_SCALE, new float[] {1.15F}, 150.0F)
         .addHoverAnimation(Component.Y_SCALE, new float[] {1.15F}, 150.0F)
         .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
-        .addListener(ActionEvent.class, (c, e) -> this.minecraft.shutdown())
+        .addListener(ActionEvent.class, (c, e) -> this.minecraft.stop())
         .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));
 

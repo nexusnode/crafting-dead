@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     Tab newSelectedTab = null;
     for (Tab tab : this.tabList) {
       tab.setWidth(this.tabWidth);
-      float y = (this.tabHeight - this.minecraft.fontRenderer.FONT_HEIGHT) / 2F;
+      float y = (this.tabHeight - this.minecraft.font.lineHeight) / 2F;
       tab.setTopPadding(y);
       tab.setBottomPadding(y);
       this.addChild(tab);

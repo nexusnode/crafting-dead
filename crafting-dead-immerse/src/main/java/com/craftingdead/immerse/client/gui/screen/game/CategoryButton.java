@@ -31,14 +31,14 @@ public class CategoryButton extends GameButton implements IInfoPanel {
   public CategoryButton(AbstractShopScreen screen, IPlayer<?> player, IShopCategory category) {
     super(0, 0, 0, 0, category.getDisplayName(),
         btn -> Minecraft.getInstance()
-            .displayGuiScreen(new CategoryScreen(screen, player, category)));
+            .setScreen(new CategoryScreen(screen, player, category)));
     this.info = category.getInfo();
   }
 
   @Override
   public void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    this.fontRenderer.func_243246_a(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
-    this.fontRenderer.func_238418_a_(this.info, x - 20, y - 45, 90, 0xFFFFFFFF);
+    this.font.drawShadow(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
+    this.font.drawWordWrap(this.info, x - 20, y - 45, 90, 0xFFFFFFFF);
   }
 }

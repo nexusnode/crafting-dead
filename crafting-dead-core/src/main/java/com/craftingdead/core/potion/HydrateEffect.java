@@ -35,7 +35,7 @@ public class HydrateEffect extends InstantEffect {
   }
 
   @Override
-  public void performEffect(LivingEntity livingEntity, int amplifier) {
+  public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
     if (livingEntity instanceof PlayerEntity) {
       livingEntity.getCapability(ModCapabilities.LIVING)
           .filter(living -> living instanceof IPlayer)
@@ -45,9 +45,9 @@ public class HydrateEffect extends InstantEffect {
   }
 
   @Override
-  public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource,
+  public void applyInstantenousEffect(@Nullable Entity source, @Nullable Entity indirectSource,
       LivingEntity entityLivingBaseIn, int amplifier, double health) {
-    this.performEffect(entityLivingBaseIn, amplifier);
+    this.applyEffectTick(entityLivingBaseIn, amplifier);
   }
 
   @Override

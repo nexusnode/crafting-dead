@@ -35,23 +35,23 @@ public class FollowAttractiveGrenadeGoal extends Goal {
   public FollowAttractiveGrenadeGoal(MobEntity goalOwner, double moveSpeedMultiplier) {
     this.goalOwner = goalOwner;
     this.moveSpeedMultiplier = moveSpeedMultiplier;
-    this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+    this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
   }
 
   @Override
-  public boolean shouldExecute() {
-    if (this.goalOwner.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+  public boolean canUse() {
+    if (this.goalOwner.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
       return false;
     }
-    List<GrenadeEntity> list = this.goalOwner.world.getEntitiesWithinAABB(GrenadeEntity.class,
-        this.goalOwner.getBoundingBox().grow(20.0D, 5.0D, 20.0D));
+    List<GrenadeEntity> list = this.goalOwner.level.getEntitiesOfClass(GrenadeEntity.class,
+        this.goalOwner.getBoundingBox().inflate(20.0D, 5.0D, 20.0D));
 
     GrenadeEntity nearestGrenade = null;
     double lastSqDistance = Double.MAX_VALUE;
 
     for (GrenadeEntity grenade : list) {
       if (grenade.isAttracting()) {
-        double sqDistance = this.goalOwner.getDistanceSq(grenade);
+        double sqDistance = this.goalOwner.distanceToSqr(grenade);
         if (sqDistance <= lastSqDistance) {
           lastSqDistance = sqDistance;
           nearestGrenade = grenade;
@@ -68,40 +68,40 @@ public class FollowAttractiveGrenadeGoal extends Goal {
   }
 
   @Override
-  public boolean shouldContinueExecuting() {
+  public boolean canContinueToUse() {
     if (!this.grenade.isAlive()) {
       return false;
     }
 
-    if (this.goalOwner.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+    if (this.goalOwner.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
       return false;
     }
 
-    if (this.grenade.world != this.goalOwner.world) {
+    if (this.grenade.level != this.goalOwner.level) {
       return false;
     }
 
-    return this.goalOwner.getDistanceSq(this.grenade) <= 256.0D;
+    return this.goalOwner.distanceToSqr(this.grenade) <= 256.0D;
   }
 
   @Override
-  public void startExecuting() {
+  public void start() {
     this.delayCounter = 0;
   }
 
   @Override
-  public void resetTask() {
+  public void stop() {
     this.grenade = null;
   }
 
   @Override
   public void tick() {
-    this.goalOwner.getLookController().setLookPosition(this.grenade.getPosX(),
-        this.grenade.getPosYEye(),
-        this.grenade.getPosZ());
+    this.goalOwner.getLookControl().setLookAt(this.grenade.getX(),
+        this.grenade.getEyeY(),
+        this.grenade.getZ());
     if (--this.delayCounter <= 0) {
-      this.delayCounter = 5 + this.goalOwner.getRNG().nextInt(10);
-      this.goalOwner.getNavigator().tryMoveToEntityLiving(this.grenade, this.moveSpeedMultiplier);
+      this.delayCounter = 5 + this.goalOwner.getRandom().nextInt(10);
+      this.goalOwner.getNavigation().moveTo(this.grenade, this.moveSpeedMultiplier);
     }
   }
 }

@@ -48,29 +48,30 @@ public class KilledMessage {
 
     RenderUtil.fillWithShadow(x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
 
-    matrixStack.push();
+    matrixStack.pushPose();
     matrixStack.translate(x + 5, y + 5, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
-    fontRenderer.func_243246_a(matrixStack,
+    fontRenderer.drawShadow(matrixStack,
         Text.translate("gui.killed_message.killed_by", this.killerEntity.getDisplayName())
-            .mergeStyle(TextFormatting.DARK_RED),
+            .withStyle(TextFormatting.DARK_RED),
         0, 0, 0);
-    matrixStack.pop();
+    matrixStack.popPose();
 
     RenderUtil.fillWithShadow(x, y + boxTitleHeight, boxWidth, boxContentsHeight - boxTitleHeight,
         0xDD000000);
 
-    matrixStack.push();
+    matrixStack.pushPose();
     matrixStack.translate(x + 5, y + 24, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
-    fontRenderer.func_243246_a(matrixStack,
+    fontRenderer.drawShadow(matrixStack,
         Text.translate("gui.killed_message.hp", this.killerEntity.getHealth()), 0, 0,
         0xFFFFFFFF);
-    matrixStack.pop();
+    matrixStack.popPose();
 
-    RenderUtil.renderHead(this.killerEntity.getLocationSkin(), matrixStack, x + 5, y + 40, 35, 35);
+    RenderUtil.renderHead(this.killerEntity.getSkinTextureLocation(), matrixStack, x + 5, y + 40,
+        35, 35);
 
-    fontRenderer.func_243246_a(matrixStack, this.itemStack.getDisplayName(), x + 80, y + 30,
+    fontRenderer.drawShadow(matrixStack, this.itemStack.getDisplayName(), x + 80, y + 30,
         0xFFFFFFFF);
 
     RenderSystem.pushMatrix();

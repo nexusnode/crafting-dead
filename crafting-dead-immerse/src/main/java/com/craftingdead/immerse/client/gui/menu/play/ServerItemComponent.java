@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public class ServerItemComponent extends ParentComponent<ServerItemComponent> {
             .setCentered(true)
             .setHeight(8))
         .addChild(new TextBlockComponent(
-            Text.of(this.serverEntry.getMap().orElse("-")).mergeStyle(TextFormatting.GRAY))
+            Text.of(this.serverEntry.getMap().orElse("-")).withStyle(TextFormatting.GRAY))
                 .setOverflow(Overflow.HIDDEN)
                 .setFlex(1)
                 .setShadow(false)
@@ -94,7 +94,7 @@ public class ServerItemComponent extends ParentComponent<ServerItemComponent> {
   }
 
   public void connect() {
-    this.minecraft.displayGuiScreen(
+    this.minecraft.setScreen(
         new ConnectingScreen(this.getScreen(), this.minecraft, this.serverEntry.getHostName(),
             this.serverEntry.getPort()));
   }

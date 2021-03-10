@@ -1,6 +1,6 @@
-/**
+/*
  * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.craftingdead.immerse.client.gui.component.type;
 
 import org.lwjgl.util.yoga.Yoga;
 
 public enum Justify {
-  FLEX_START(Yoga.YGJustifyFlexStart), CENTER(Yoga.YGJustifyCenter), FLEX_END(
-      Yoga.YGJustifyFlexEnd), SPACE_BETWEEN(Yoga.YGJustifySpaceBetween), SPACE_AROUND(
-          Yoga.YGJustifySpaceAround), SPACE_EVENLY(Yoga.YGJustifySpaceEvenly);
+  // @formatter:off
+  FLEX_START(Yoga.YGJustifyFlexStart),
+  CENTER(Yoga.YGJustifyCenter),
+  FLEX_END(Yoga.YGJustifyFlexEnd),
+  SPACE_BETWEEN(Yoga.YGJustifySpaceBetween),
+  SPACE_AROUND(Yoga.YGJustifySpaceAround),
+  SPACE_EVENLY(Yoga.YGJustifySpaceEvenly);
+  // @formatter:on
 
   private final int yogaType;
 

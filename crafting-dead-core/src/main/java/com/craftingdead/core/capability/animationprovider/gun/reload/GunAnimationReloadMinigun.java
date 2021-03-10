@@ -99,8 +99,8 @@ public class GunAnimationReloadMinigun extends GunAnimationReload {
   public void doRender(ItemStack par1, float par2, MatrixStack matrixStack) {
     float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
 
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-progress));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-progress));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(-progress));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(-progress));
     matrixStack.translate(progress / 100, 0, 0);
   }
 

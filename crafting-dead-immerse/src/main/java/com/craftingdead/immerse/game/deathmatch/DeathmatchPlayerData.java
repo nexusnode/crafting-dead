@@ -28,13 +28,13 @@ import net.minecraft.network.datasync.DataSerializers;
 public class DeathmatchPlayerData implements IBufferSerializable {
 
   private static final DataParameter<Integer> SCORE =
-      new DataParameter<>(0x00, DataSerializers.VARINT);
+      new DataParameter<>(0x00, DataSerializers.INT);
   private static final DataParameter<Integer> KILLS =
-      new DataParameter<>(0x01, DataSerializers.VARINT);
+      new DataParameter<>(0x01, DataSerializers.INT);
   private static final DataParameter<Integer> ASSISTS =
-      new DataParameter<>(0x02, DataSerializers.VARINT);
+      new DataParameter<>(0x02, DataSerializers.INT);
   private static final DataParameter<Integer> DEATHS =
-      new DataParameter<>(0x03, DataSerializers.VARINT);
+      new DataParameter<>(0x03, DataSerializers.INT);
   private static final DataParameter<Boolean> DEAD =
       new DataParameter<>(0x04, DataSerializers.BOOLEAN);
 

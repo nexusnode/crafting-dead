@@ -32,15 +32,15 @@ public class GunAnimationInspectPistol extends GunAnimationInspect {
       matrixStack.translate(transprogress * 0.2F, transprogress * 0.2F, -transprogress * 0.6F);
 
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * partialTicks);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 0.1F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-progress * 0.1F));
 
     } else {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * partialTicks;
       matrixStack.translate(-transprogress, 0, -transprogress);
 
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * partialTicks);
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(progress));
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(-progress / 2));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(progress));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(-progress / 2));
     }
   }
 }

@@ -61,7 +61,7 @@ public class UseItemAction extends TimedAction {
 
   @Override
   public boolean start() {
-    final ItemStack heldStack = this.performer.getEntity().getHeldItemMainhand();
+    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
     if (this.heldItemPredicate.test(heldStack.getItem())) {
       for (IActionEntry entry : this.entries) {
         if (entry.canPerform(this.performer, this.target, heldStack)) {
@@ -75,7 +75,7 @@ public class UseItemAction extends TimedAction {
 
   @Override
   protected final void finish() {
-    final ItemStack heldStack = this.performer.getEntity().getHeldItemMainhand();
+    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
     if (this.selectedEntry.finish(this.performer, this.target, heldStack)) {
       final boolean shrinkStack = this.selectedEntry.shouldShrinkStack(this.performer);
       final ItemStack resultStack = new ItemStack(this.selectedEntry.getReturnItem(this.performer));
@@ -90,10 +90,10 @@ public class UseItemAction extends TimedAction {
 
       if (!resultStack.isEmpty()) {
         if (heldStack.isEmpty()) {
-          this.performer.getEntity().setHeldItem(Hand.MAIN_HAND, resultStack);
+          this.performer.getEntity().setItemInHand(Hand.MAIN_HAND, resultStack);
         } else if (playerEntity != null
-            && playerEntity.inventory.addItemStackToInventory(resultStack)) {
-          this.performer.getEntity().entityDropItem(resultStack);
+            && playerEntity.inventory.add(resultStack)) {
+          this.performer.getEntity().spawnAtLocation(resultStack);
         }
       }
 
@@ -106,10 +106,10 @@ public class UseItemAction extends TimedAction {
   @Override
   public boolean tick() {
     boolean finished = super.tick();
-    final ItemStack heldStack = this.performer.getEntity().getHeldItemMainhand();
+    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
 
     final boolean usingItem;
-    if (this.performer.getEntity().getEntityWorld().isRemote()) {
+    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
       ClientDist clientDist = CraftingDead.getInstance().getClientDist();
       usingItem =
           clientDist.isLocalPlayer(this.performer.getEntity()) && clientDist.isRightMouseDown();

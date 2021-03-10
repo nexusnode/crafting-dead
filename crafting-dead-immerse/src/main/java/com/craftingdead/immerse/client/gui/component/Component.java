@@ -25,7 +25,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;
-import com.craftingdead.core.client.renderer.VelocitySmoother;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
@@ -104,20 +103,19 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private static final int SCROLLBAR_WIDTH = 4;
 
-  private static final float SCROLL_CHUNK = 15F;
+  private static final float SCROLL_CHUNK = 50F;
 
-  private static final float SCROLL_MOMENTUM_DAMPING = 1.75F;
+  private static final float SCROLL_MOMENTUM_DAMPING = 3F;
 
   private float lastScrollOffset;
   private float scrollOffset;
-
-  private final VelocitySmoother scrollSmoother = new VelocitySmoother(1.0F);
+  private float scrollVelocity;
 
   private float lerpedScrollOffset;
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
-  protected final MainWindow mainWindow = this.minecraft.getMainWindow();
+  protected final MainWindow mainWindow = this.minecraft.getWindow();
 
   protected final ClientDist clientDist =
       (ClientDist) CraftingDeadImmerse.getInstance().getModDist();
@@ -208,10 +206,17 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public void tick() {
     this.lastScrollOffset = this.scrollOffset;
-    this.scrollOffset += this.scrollSmoother.getAndDecelerate(1.0F / SCROLL_MOMENTUM_DAMPING);
+
+    this.scrollVelocity *= (1.0F / SCROLL_MOMENTUM_DAMPING);
+    if (Math.abs(this.scrollVelocity) < 0.08F) {
+      this.scrollVelocity = 0.0F;
+    }
+
+    this.scrollOffset += this.scrollVelocity;
+
     if (this.scrollOffset < 0.0F
         || this.scrollOffset > this.actualContentHeight - this.getHeight()) {
-      this.scrollSmoother.reset();
+      this.scrollVelocity = 0.0F;
     }
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
 
@@ -230,9 +235,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
-
+    
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.render(this.getScaledX(), this.getScaledY(),
+      this.backgroundBlur.render(matrixStack, this.getScaledX(), this.getScaledY(),
           this.getScaledWidth(), this.getScaledHeight(), partialTicks);
     }
 
@@ -268,19 +273,19 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     RenderSystem.disableDepthTest();
 
     if (this.tooltip != null && this.isHovered()) {
-      this.tooltip.render(this.minecraft.fontRenderer, matrixStack,
+      this.tooltip.render(this.minecraft.font, matrixStack,
           10.0D + this.getX() + this.getWidth(), this.getY());
     }
 
     // For some reason the partial ticks passed to us isn't correct.
     this.lerpedScrollOffset =
-        MathHelper.lerp(Minecraft.getInstance().getRenderPartialTicks(), this.lastScrollOffset,
+        MathHelper.lerp(Minecraft.getInstance().getFrameTime(), this.lastScrollOffset,
             this.scrollOffset);
 
 
     // ---- Render Content----
 
-    final double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
+    final double scale = this.minecraft.getWindow().getGuiScale();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
     boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
@@ -291,7 +296,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
       GL11.glEnable(GL11.GL_SCISSOR_TEST);
       double lowerBound = this.getBotScissorBoundScaled() * scale;
       GL11.glScissor((int) (this.getScaledContentX() * scale),
-          (int) (this.mainWindow.getFramebufferHeight() - lowerBound),
+          (int) (this.mainWindow.getHeight() - lowerBound),
           (int) (this.getScaledContentWidth() * scale),
           (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
     }
@@ -444,6 +449,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     if (mouseY >= this.getY() && mouseY <= this.getY() + this.getHeight()) {
       this.scrollOffset = this.clampScrollOffset((float) (this.scrollOffset
           + deltaY * this.actualContentHeight / (this.getHeight())));
+      return true;
     }
     return this.post(
         new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY)) == Event.Result.ALLOW;
@@ -452,7 +458,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled()) {
-      this.scrollSmoother.add((float) (-scrollDelta * SCROLL_CHUNK * 2));
+      this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
     }
     return this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
   }
@@ -568,7 +574,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final SELF addActionSound(SoundEvent soundEvent) {
     return this.addListener(ActionEvent.class, (component, event) -> this.minecraft
-        .getSoundHandler().play(SimpleSound.master(soundEvent, 1.0F)));
+        .getSoundManager().play(SimpleSound.forUI(soundEvent, 1.0F)));
   }
 
   public final <T extends Event> SELF addListener(Class<T> eventType,
@@ -616,7 +622,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public final float getX() {
     return (float) (Yoga.YGNodeLayoutGetLeft(this.node) + this.xTranslation
         + (this.parent == null ? 0f : this.parent.getContentX())
-        + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScaleFactor() : 0.0F));
+        + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScale() : 0.0F));
   }
 
   public final float getScaledContentY() {
@@ -637,7 +643,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   public final float getY() {
     return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
         + (this.parent == null ? 0f : this.parent.getContentY())
-        + (this.unscaleHeight ? this.getHeight() / 2.0F * this.mainWindow.getGuiScaleFactor()
+        + (this.unscaleHeight ? this.getHeight() / 2.0F * this.mainWindow.getGuiScale()
             : 0.0F));
   }
 
@@ -656,7 +662,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final float getWidth() {
     return (float) (Yoga.YGNodeLayoutGetWidth(this.node)
-        / (this.unscaleWidth ? this.mainWindow.getGuiScaleFactor() : 1.0F));
+        / (this.unscaleWidth ? this.mainWindow.getGuiScale() : 1.0F));
   }
 
   public float getScaledHeight() {
@@ -673,7 +679,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   public final float getHeight() {
     return (float) (Yoga.YGNodeLayoutGetHeight(this.node)
-        / (this.unscaleHeight ? this.mainWindow.getGuiScaleFactor() : 1.0F));
+        / (this.unscaleHeight ? this.mainWindow.getGuiScale() : 1.0F));
   }
 
   public final float getXScale() {

@@ -84,7 +84,7 @@ public abstract class AbstractShopScreen extends Screen {
     if (super.keyPressed(keyCode, scanCode, modifiers)) {
       return true;
     } else if (keyCode == GLFW.GLFW_KEY_B) {
-      this.minecraft.displayGuiScreen(this.lastScreen);
+      this.minecraft.setScreen(this.lastScreen);
       return true;
     }
     return false;
@@ -94,7 +94,7 @@ public abstract class AbstractShopScreen extends Screen {
   public void tick() {
     this.cachedBuyTime = this.shop.getBuyTimeSeconds(this.player);
     if (this.cachedBuyTime <= 0) {
-      this.closeScreen();
+      this.onClose();
     }
   }
 
@@ -110,17 +110,17 @@ public abstract class AbstractShopScreen extends Screen {
     RenderUtil.fillWithShadow(0, this.height - 30, this.width, 30, 0x80000000);
 
     drawCenteredString(matrixStack, font,
-        Text.translate("gui.screen.shop.back", "B").mergeStyle(TextFormatting.ITALIC),
+        Text.translate("gui.screen.shop.back", "B").withStyle(TextFormatting.ITALIC),
         mx - 150, 18, 0xFFFFFFFF);
 
     drawCenteredString(matrixStack, this.font,
-        this.getTitle().copyRaw().mergeStyle(TextFormatting.BOLD),
+        this.getTitle().copy().withStyle(TextFormatting.BOLD),
         mx, 10, 0xFFFFFFFF);
 
     RenderUtil.renderTextRight(this.font, matrixStack, mx + 150, 18,
         Text.translate("gui.screen.shop.buy_time", Text.of(this.cachedBuyTime)
-            .mergeStyle(TextFormatting.RED))
-            .mergeStyle(TextFormatting.ITALIC),
+            .withStyle(TextFormatting.RED))
+            .withStyle(TextFormatting.ITALIC),
         0xFFFFFFFF, true);
 
     // render slots and background
@@ -131,8 +131,8 @@ public abstract class AbstractShopScreen extends Screen {
 
     // render info of item over
     RenderUtil.fillWithShadow(mx - 25, my - 80, 115, 160, 0x80000000);
-    this.font.func_243246_a(matrixStack,
-        Text.translate("gui.screen.shop.selected").mergeStyle(TextFormatting.BOLD),
+    this.font.drawShadow(matrixStack,
+        Text.translate("gui.screen.shop.selected").withStyle(TextFormatting.BOLD),
         mx - 20, my - 75, 0xFFFFFFFF);
 
     for (GameButton shopButton : this.shopButtons) {
@@ -147,8 +147,8 @@ public abstract class AbstractShopScreen extends Screen {
     boolean renderMoney = this.shop.getPlayerMoney(this.player) > -1;
     if (renderMoney) {
       RenderUtil.fillWithShadow(mx + 95, my - 80, 69, moneyHeight, 0x80000000);
-      this.font.func_243246_a(matrixStack,
-          Text.of("$" + this.shop.getPlayerMoney(this.player)).mergeStyle(TextFormatting.BOLD,
+      this.font.drawShadow(matrixStack,
+          Text.of("$" + this.shop.getPlayerMoney(this.player)).withStyle(TextFormatting.BOLD,
               TextFormatting.GREEN),
           mx + 100, my - 76, 0);
     }
@@ -157,14 +157,14 @@ public abstract class AbstractShopScreen extends Screen {
 
 
     RenderUtil.fillWithShadow(mx + 95, my - 80 + inventoryYOffset, 69, 140, 0x80000000);
-    this.font.func_243246_a(matrixStack,
-        Text.translate("gui.screen.shop.inventory").mergeStyle(TextFormatting.BOLD),
+    this.font.drawShadow(matrixStack,
+        Text.translate("gui.screen.shop.inventory").withStyle(TextFormatting.BOLD),
         mx + 100, my - 75 + inventoryYOffset, 0xFFFFFFFF);
 
 
     PlayerInventory inventory = this.player.getEntity().inventory;
     for (int i = 0; i < 7; i++) {
-      ItemStack itemStack = inventory.getStackInSlot(i);
+      ItemStack itemStack = inventory.getItem(i);
       com.craftingdead.core.client.util.RenderUtil.renderItemIntoGUI(itemStack, mx + 120,
           my - 60 + inventoryYOffset + (i * 21), 0xFFFFFFFF, true);
     }

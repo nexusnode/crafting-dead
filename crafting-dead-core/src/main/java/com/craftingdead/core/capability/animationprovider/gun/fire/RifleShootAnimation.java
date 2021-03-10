@@ -79,7 +79,7 @@ public class RifleShootAnimation extends GunAnimation {
     matrixStack.translate(-transprogress, 0, 0);
 
     float rotprogress = lastRotation1 + (rotation1 - lastRotation1) * par2;
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-rotprogress));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-rotprogress));
   }
 
   @Override
@@ -89,13 +89,13 @@ public class RifleShootAnimation extends GunAnimation {
       matrixStack.translate(-transprogress, 0, 0);
 
       float rotprogress = lastRotation1 + (rotation1 - lastRotation1) * par2;
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-rotprogress));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-rotprogress));
     } else {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;
       matrixStack.translate(-transprogress, -transprogress * 0.5F, 0);
 
       float rotprogress = lastRotation1 + (rotation1 - lastRotation1) * par2;
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-rotprogress));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-rotprogress));
     }
   }
 

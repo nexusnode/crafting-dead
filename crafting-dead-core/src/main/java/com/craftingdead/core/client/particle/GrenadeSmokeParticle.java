@@ -38,17 +38,17 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
     super(world, x, y, z);
     this.animatedSprite = animatedSprite;
     float colorScale = 1.0F - (float) (Math.random() * (double) 0.3F);
-    this.particleRed = colorScale * data.getRed();
-    this.particleGreen = colorScale * data.getGreen();
-    this.particleBlue = colorScale * data.getBlue();
-    this.particleScale *= data.getScale();
+    this.rCol = colorScale * data.getRed();
+    this.gCol = colorScale * data.getGreen();
+    this.bCol = colorScale * data.getBlue();
+    this.quadSize *= data.getScale();
 
     // From vanilla's Cloud particle
     int i = (int) (10.0D / (Math.random() * 0.8D + 0.3D));
-    this.maxAge = (int) Math.max((float) i * 2.5F, 1.0F);
+    this.lifetime = (int) Math.max((float) i * 2.5F, 1.0F);
 
-    this.canCollide = false;
-    this.selectSpriteWithAge(animatedSprite);
+    this.hasPhysics = false;
+    this.setSpriteFromAge(animatedSprite);
   }
 
   @Override
@@ -57,20 +57,20 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
   }
 
   @Override
-  public float getScale(float partialTicks) {
-    return this.particleScale * MathHelper
-        .clamp(((float) this.age + partialTicks) / (float) this.maxAge * 32.0F, 0.0F, 1.0F);
+  public float getQuadSize(float partialTicks) {
+    return this.quadSize * MathHelper
+        .clamp(((float) this.age + partialTicks) / (float) this.lifetime * 32.0F, 0.0F, 1.0F);
   }
 
   @Override
   public void tick() {
-    this.prevPosX = this.posX;
-    this.prevPosY = this.posY;
-    this.prevPosZ = this.posZ;
-    if (this.age++ >= this.maxAge) {
-      this.setExpired();
+    this.xo = this.x;
+    this.yo = this.y;
+    this.zo = this.z;
+    if (this.age++ >= this.lifetime) {
+      this.remove();
     } else {
-      this.selectSpriteWithAge(this.animatedSprite);
+      this.setSpriteFromAge(this.animatedSprite);
     }
   }
 
@@ -82,7 +82,7 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public Particle makeParticle(GrenadeSmokeParticleData data, ClientWorld world, double xPos,
+    public Particle createParticle(GrenadeSmokeParticleData data, ClientWorld world, double xPos,
         double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
       return new GrenadeSmokeParticle(data, this.spriteSet, world, xPos, yPos, zPos);
     }

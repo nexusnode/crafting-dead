@@ -36,34 +36,34 @@ public class SupplyDropModel extends Model {
   private boolean renderParachute;
 
   public SupplyDropModel() {
-    super(RenderType::getEntityCutoutNoCull);
-    this.textureWidth = 256;
-    this.textureHeight = 256;
+    super(RenderType::entityCutoutNoCull);
+    this.texWidth = 256;
+    this.texHeight = 256;
 
     this.Shape1 = new ModelRenderer(this, 0, 0);
     this.Shape1.addBox(0F, 0.01F, 0F, 32, 4, 32, true);
-    this.Shape1.setRotationPoint(-16F, 20F, -16F);
-    this.Shape1.setTextureSize(256, 256);
+    this.Shape1.setPos(-16F, 20F, -16F);
+    this.Shape1.setTexSize(256, 256);
     this.Shape2 = new ModelRenderer(this, 0, 38);
     this.Shape2.addBox(0F, 0F, 0F, 30, 18, 15, true);
-    this.Shape2.setRotationPoint(-15F, 2F, 0F);
-    this.Shape2.setTextureSize(256, 256);
+    this.Shape2.setPos(-15F, 2F, 0F);
+    this.Shape2.setTexSize(256, 256);
     this.Shape3 = new ModelRenderer(this, 0, 73);
     this.Shape3.addBox(0F, 0F, 0F, 14, 14, 14, true);
-    this.Shape3.setRotationPoint(0F, 6F, -15F);
-    this.Shape3.setTextureSize(256, 256);
+    this.Shape3.setPos(0F, 6F, -15F);
+    this.Shape3.setTexSize(256, 256);
     this.Shape4 = new ModelRenderer(this, 0, 105);
     this.Shape4.addBox(0F, 0F, 0F, 11, 6, 6, true);
-    this.Shape4.setRotationPoint(-13F, 14F, -15F);
-    this.Shape4.setTextureSize(256, 256);
+    this.Shape4.setPos(-13F, 14F, -15F);
+    this.Shape4.setTexSize(256, 256);
     this.Shape5 = new ModelRenderer(this, 0, 119);
     this.Shape5.addBox(0F, 0F, 0F, 11, 6, 6, true);
-    this.Shape5.setRotationPoint(-13F, 14F, -7F);
-    this.Shape5.setTextureSize(256, 256);
+    this.Shape5.setPos(-13F, 14F, -7F);
+    this.Shape5.setTexSize(256, 256);
     this.parachute = new ModelRenderer(this, 0, 133);
     this.parachute.addBox(0F, 0F, 0F, 40, 30, 40, true);
-    this.parachute.setRotationPoint(-20F, -50F, -20F);
-    this.parachute.setTextureSize(256, 256);
+    this.parachute.setPos(-20F, -50F, -20F);
+    this.parachute.setTexSize(256, 256);
   }
 
   public void setRenderParachute(boolean renderParachute) {
@@ -71,7 +71,7 @@ public class SupplyDropModel extends Model {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
+  public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
       int packedOverlay, float red, float greeen, float blue, float alpha) {
     this.Shape1
         .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,

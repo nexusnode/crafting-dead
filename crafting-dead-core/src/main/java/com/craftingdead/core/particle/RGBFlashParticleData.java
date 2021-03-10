@@ -41,7 +41,7 @@ public class RGBFlashParticleData implements IParticleData {
   public static final IParticleData.IDeserializer<RGBFlashParticleData> DESERIALIZER =
       new IParticleData.IDeserializer<RGBFlashParticleData>() {
         @Override
-        public RGBFlashParticleData deserialize(ParticleType<RGBFlashParticleData> particleType,
+        public RGBFlashParticleData fromCommand(ParticleType<RGBFlashParticleData> particleType,
             StringReader stringReader) throws CommandSyntaxException {
           stringReader.expect(' ');
           float red = stringReader.readFloat();
@@ -55,7 +55,7 @@ public class RGBFlashParticleData implements IParticleData {
         }
 
         @Override
-        public RGBFlashParticleData read(ParticleType<RGBFlashParticleData> particleType,
+        public RGBFlashParticleData fromNetwork(ParticleType<RGBFlashParticleData> particleType,
             PacketBuffer packetBuffer) {
           return new RGBFlashParticleData(packetBuffer.readFloat(), packetBuffer.readFloat(),
               packetBuffer.readFloat(), packetBuffer.readFloat());
@@ -75,7 +75,7 @@ public class RGBFlashParticleData implements IParticleData {
   }
 
   @Override
-  public void write(PacketBuffer packetBuffer) {
+  public void writeToNetwork(PacketBuffer packetBuffer) {
     packetBuffer.writeFloat(this.red);
     packetBuffer.writeFloat(this.green);
     packetBuffer.writeFloat(this.blue);
@@ -83,7 +83,7 @@ public class RGBFlashParticleData implements IParticleData {
   }
 
   @Override
-  public String getParameters() {
+  public String writeToString() {
     return String.format(Locale.ROOT, "%s %.2f %.2f %.2f %.2f",
         this.getType().getRegistryName(), this.red, this.green, this.blue, this.scale);
   }

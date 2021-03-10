@@ -53,7 +53,7 @@ public class PreGameStateInstance extends TimedStateInstance<DeathmatchServer> {
       return true;
     }
 
-    if (this.getContext().getMinecraftServer().getCurrentPlayerCount() > 5
+    if (this.getContext().getMinecraftServer().getPlayerCount() > 5
         && this.getTimeRemainingSeconds() > 16) {
       this.setTimeRemainingSeconds(15);
     }

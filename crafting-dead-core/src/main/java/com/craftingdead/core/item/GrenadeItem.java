@@ -56,38 +56,38 @@ public class GrenadeItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World world,
+  public void appendHoverText(ItemStack stack, @Nullable World world,
       List<ITextComponent> texts, ITooltipFlag tooltipFlag) {
     texts
-        .add(Text.translate("item_lore.grenade").mergeStyle(TextFormatting.GRAY));
+        .add(Text.translate("item_lore.grenade").withStyle(TextFormatting.GRAY));
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
+  public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
-    ItemStack itemStack = playerIn.getHeldItem(handIn);
+    ItemStack itemStack = playerIn.getItemInHand(handIn);
     worldIn
-        .playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(),
-            SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
+        .playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
+            SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
             0.4F / (random.nextFloat() * 0.4F + 0.8F));
-    if (!worldIn.isRemote) {
+    if (!worldIn.isClientSide) {
       GrenadeEntity grenadeEntity = this.grenadeEntitySupplier.apply(playerIn, worldIn);
 
-      float force = playerIn.isSneaking() ? 0.4F : this.throwSpeed;
-      grenadeEntity.setPositionAndUpdate(playerIn.getPosX(),
-          playerIn.getPosY() + playerIn.getEyeHeight(),
-          playerIn.getPosZ());
-      grenadeEntity.shootFromEntity(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0,
+      float force = playerIn.isShiftKeyDown() ? 0.4F : this.throwSpeed;
+      grenadeEntity.teleportTo(playerIn.getX(),
+          playerIn.getY() + playerIn.getEyeHeight(),
+          playerIn.getZ());
+      grenadeEntity.shootFromEntity(playerIn, playerIn.xRot, playerIn.yRot, 0,
           force, 1.0F);
-      worldIn.addEntity(grenadeEntity);
+      worldIn.addFreshEntity(grenadeEntity);
     }
 
-    playerIn.addStat(Stats.ITEM_USED.get(this));
-    if (!playerIn.abilities.isCreativeMode) {
+    playerIn.awardStat(Stats.ITEM_USED.get(this));
+    if (!playerIn.abilities.instabuild) {
       itemStack.shrink(1);
     }
 
-    return ActionResult.resultSuccess(itemStack);
+    return ActionResult.success(itemStack);
   }
 
 

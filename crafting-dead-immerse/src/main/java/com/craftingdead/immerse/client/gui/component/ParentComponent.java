@@ -52,7 +52,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   @Override
   public float getActualContentHeight() {
     return Math.max(
-        (float) (this.getChildren()
+        (float) (this.children
             .stream()
             .mapToDouble(
                 c -> c.getY() + c.getHeight() + c.getBottomMargin())
@@ -66,7 +66,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   public void layout() {
     Yoga.YGNodeCalculateLayout(this.contentNode, this.getContentWidth(), this.getContentHeight(),
         Yoga.YGDirectionLTR);
-    this.getChildren().forEach(Component::layout);
+    this.children.forEach(Component::layout);
     super.layout();
   }
 
@@ -83,13 +83,13 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   @Override
-  public List<? extends IGuiEventListener> getEventListeners() {
+  public List<? extends IGuiEventListener> children() {
     return this.children.stream()
         .sorted(Collections.reverseOrder())
         .collect(Collectors.toList());
   }
 
-  public List<Component<?>> getChildren() {
+  public List<Component<?>> getChildComponents() {
     return this.children;
   }
 
@@ -159,7 +159,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   @Nullable
   @Override
-  public IGuiEventListener getListener() {
+  public IGuiEventListener getFocused() {
     return this.focusedListener;
   }
 
@@ -172,7 +172,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   @Override
-  public void setListener(@Nullable IGuiEventListener focusedListener) {
+  public void setFocused(@Nullable IGuiEventListener focusedListener) {
     this.focusedListener = focusedListener;
   }
 
@@ -186,12 +186,12 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     child.zLevel = zLevel;
 
     this.children.add(child);
-    this.childAdded(child, this.getChildren().size() - 1);
+    this.childAdded(child, this.children.size() - 1);
     return this.self();
   }
 
   private void sortChildren() {
-    this.getChildren().sort(Comparator.naturalOrder());
+    this.children.sort(Comparator.naturalOrder());
   }
 
   protected void childAdded(Component<?> child, int index) {
@@ -205,12 +205,12 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   public SELF removeChild(Component<?> childComponent) {
-    this.getChildren().stream()
+    this.children.stream()
         .filter(childComponent::equals)
         .findAny()
         .ifPresent(child -> {
           this.childRemoved(child);
-          this.getChildren().remove(child);
+          this.children.remove(child);
         });
     return this.self();
   }
@@ -222,32 +222,32 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
   }
 
   public SELF clearChildren() {
-    this.getChildren().forEach(this::childRemoved);
-    this.getChildren().clear();
+    this.children.forEach(this::childRemoved);
+    this.children.clear();
     return this.self();
   }
 
   public SELF closeChildren() {
-    this.getChildren().forEach(Component::close);
+    this.children.forEach(Component::close);
     return this.self();
   }
 
   public SELF clearChildrenClosing() {
-    for (Component<?> child : this.getChildren()) {
+    for (Component<?> child : this.children) {
       this.childRemoved(child);
       child.close();
     }
-    this.getChildren().clear();
+    this.children.clear();
     return this.self();
   }
 
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     this.setDragging(false);
-    if (this.getListener() != null) {
-      this.getListener().mouseReleased(mouseX, mouseY, button);
+    if (this.getFocused() != null) {
+      return this.getFocused().mouseReleased(mouseX, mouseY, button);
     }
-    return true;
+    return false;
   }
 
   public final SELF setFlexDirection(FlexDirection flexDirection) {

@@ -39,32 +39,32 @@ public class GenericContainerScreen extends ContainerScreen<GenericContainer>
       ITextComponent title) {
     super(container, playerInventory, title);
     this.passEvents = false;
-    this.ySize = 114 + this.container.getRowCount() * 18;
+    this.imageHeight = 114 + this.menu.getRowCount() * 18;
   }
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
-    this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    this.renderTooltip(matrixStack, mouseX, mouseY);
   }
 
   @Override
-  protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-    this.font.func_243248_b(matrixStack, this.title, 8.0F, 6.0F, 4210752);
-    this.font.func_243248_b(matrixStack, this.playerInventory.getDisplayName(), 8.0F,
-        this.ySize - 96 + 2, TITLE_TEXT_COLOUR);
+  protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+    this.font.draw(matrixStack, this.title, 8.0F, 6.0F, 4210752);
+    this.font.draw(matrixStack, this.inventory.getDisplayName(), 8.0F,
+        this.imageHeight - 96 + 2, TITLE_TEXT_COLOUR);
   }
 
   @SuppressWarnings("deprecation")
   @Override
-  protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks,
+  protected void renderBg(MatrixStack matrixStack, float partialTicks,
       int mouseX, int mouseY) {
     this.renderBackground(matrixStack);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    this.minecraft.getTextureManager().bindTexture(GENERIC_CONTAINER_TEXTURE);
-    int x = (this.width - this.xSize) / 2;
-    int y = (this.height - this.ySize) / 2;
-    this.blit(matrixStack, x, y, 0, 0, this.xSize, this.container.getRowCount() * 18 + 17);
-    this.blit(matrixStack, x, y + this.container.getRowCount() * 18 + 17, 0, 126, this.xSize, 96);
+    this.minecraft.getTextureManager().bind(GENERIC_CONTAINER_TEXTURE);
+    int x = (this.width - this.imageWidth) / 2;
+    int y = (this.height - this.imageHeight) / 2;
+    this.blit(matrixStack, x, y, 0, 0, this.imageWidth, this.menu.getRowCount() * 18 + 17);
+    this.blit(matrixStack, x, y + this.menu.getRowCount() * 18 + 17, 0, 126, this.imageWidth, 96);
   }
 }

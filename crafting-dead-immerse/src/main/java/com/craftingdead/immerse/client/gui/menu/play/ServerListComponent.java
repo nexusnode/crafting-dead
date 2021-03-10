@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
   }
 
   private Stream<ServerItemComponent> streamItems() {
-    return this.listContainer.getChildren().stream()
+    return this.listContainer.getChildComponents().stream()
         .filter(child -> child instanceof ServerItemComponent)
         .map(child -> (ServerItemComponent) child);
   }

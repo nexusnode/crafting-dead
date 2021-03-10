@@ -65,7 +65,7 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
   }
 
   @Override
-  public ResourceLocation getEntityTexture(AdvancedZombieEntity entity) {
+  public ResourceLocation getTextureLocation(AdvancedZombieEntity entity) {
     ResourceLocation texture = new ResourceLocation(CraftingDead.ID, "textures/entity/zombie/zombie"
         + ((AdvancedZombieEntity) entity).getTextureNumber() + ".png");
     return texture;

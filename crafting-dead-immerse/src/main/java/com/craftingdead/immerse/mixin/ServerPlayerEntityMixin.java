@@ -34,24 +34,24 @@ import net.minecraft.world.World;
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
 
-  @Inject(method = "func_241140_K_", at = @At("HEAD"), cancellable = true)
-  public void getSpawnPos(CallbackInfoReturnable<BlockPos> callbackInfo) {
+  @Inject(method = "getRespawnPosition", at = @At("HEAD"), cancellable = true)
+  public void getRespawnPosition(CallbackInfoReturnable<BlockPos> callbackInfo) {
     SpawnPoint spawnPoint = this.getSpawnPoint();
     if (spawnPoint != null) {
       callbackInfo.setReturnValue(spawnPoint.getBlockPos());
     }
   }
 
-  @Inject(method = "func_241141_L_", at = @At("HEAD"), cancellable = true)
-  public void getSpawnDimension(CallbackInfoReturnable<RegistryKey<World>> callbackInfo) {
+  @Inject(method = "getRespawnDimension", at = @At("HEAD"), cancellable = true)
+  public void getRespawnDimension(CallbackInfoReturnable<RegistryKey<World>> callbackInfo) {
     SpawnPoint spawnPoint = this.getSpawnPoint();
     if (spawnPoint != null) {
       callbackInfo.setReturnValue(spawnPoint.getDimension());
     }
   }
 
-  @Inject(method = "func_241142_M_", at = @At("HEAD"), cancellable = true)
-  public void isSpawnPointSet(CallbackInfoReturnable<Boolean> callbackInfo) {
+  @Inject(method = "isRespawnForced", at = @At("HEAD"), cancellable = true)
+  public void isRespawnForced(CallbackInfoReturnable<Boolean> callbackInfo) {
     if (this.getSpawnPoint() != null) {
       callbackInfo.setReturnValue(true);
     }

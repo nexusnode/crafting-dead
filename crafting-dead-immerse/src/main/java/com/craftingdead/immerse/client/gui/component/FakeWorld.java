@@ -48,12 +48,12 @@ public class FakeWorld extends ClientWorld {
 
   private FakeWorld(Minecraft mc) {
     super(mc.getConnection(), new ClientWorld.ClientWorldInfo(Difficulty.NORMAL, false, false),
-        World.OVERWORLD, DimensionType.OVERWORLD_TYPE, 3, mc::getProfiler, mc.worldRenderer, false,
-        0L);
+        World.OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 3, mc::getProfiler, mc.levelRenderer,
+        false, 0L);
   }
 
   @Override
-  public void notifyBlockUpdate(BlockPos blockPos, BlockState oldState,
+  public void sendBlockUpdated(BlockPos blockPos, BlockState oldState,
       BlockState newState, int flags) {}
 
   @Override
@@ -62,12 +62,12 @@ public class FakeWorld extends ClientWorld {
       SoundCategory soundCategory, float volume, float pitch) {}
 
   @Override
-  public void playMovingSound(@Nullable PlayerEntity playerEntity, Entity entity,
+  public void playSound(@Nullable PlayerEntity playerEntity, Entity entity,
       SoundEvent soundEvent, SoundCategory soundCategory, float volume,
       float pitch) {}
 
   @Override
-  public Entity getEntityByID(int entityId) {
+  public Entity getEntity(int entityId) {
     return null;
   }
 
@@ -77,15 +77,15 @@ public class FakeWorld extends ClientWorld {
   }
 
   @Override
-  public void registerMapData(MapData mapData) {}
+  public void setMapData(MapData mapData) {}
 
   @Override
-  public int getNextMapId() {
+  public int getFreeMapId() {
     return 0;
   }
 
   @Override
-  public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {}
+  public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {}
 
   @Override
   public Scoreboard getScoreboard() {
@@ -98,37 +98,37 @@ public class FakeWorld extends ClientWorld {
   }
 
   @Override
-  public ITagCollectionSupplier getTags() {
+  public ITagCollectionSupplier getTagManager() {
     return null;
   }
 
   @Override
-  public ITickList<Block> getPendingBlockTicks() {
+  public ITickList<Block> getBlockTicks() {
     return null;
   }
 
   @Override
-  public ITickList<Fluid> getPendingFluidTicks() {
+  public ITickList<Fluid> getLiquidTicks() {
     return null;
   }
 
   @Override
-  public void playEvent(@Nullable PlayerEntity playerEntity, int type,
+  public void levelEvent(@Nullable PlayerEntity playerEntity, int type,
       BlockPos pos, int data) {}
 
   @Override
-  public List<AbstractClientPlayerEntity> getPlayers() {
+  public List<AbstractClientPlayerEntity> players() {
     return null;
   }
 
   @Override
-  public Biome getNoiseBiomeRaw(int x, int y, int z) {
+  public Biome getUncachedNoiseBiome(int x, int y, int z) {
     return null;
   }
 
   @Override
-  public DynamicRegistries func_241828_r() {
-    return DynamicRegistries.func_239770_b_();
+  public DynamicRegistries registryAccess() {
+    return DynamicRegistries.builtin();
   }
 
   public static FakeWorld getInstance() {

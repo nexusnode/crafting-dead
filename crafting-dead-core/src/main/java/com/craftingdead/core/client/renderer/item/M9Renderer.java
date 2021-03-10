@@ -53,13 +53,13 @@ public class M9Renderer extends GunRenderer {
 
     matrixStack.translate(0.0F, 0.0F, -0.05F);
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(78));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(78));
 
     matrixStack.translate(0.0F, -0.28F, 0.35F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(15));
 
     float scale = 1.1F;
     matrixStack.scale(scale, scale, scale);
@@ -74,8 +74,8 @@ public class M9Renderer extends GunRenderer {
     this.muzzleFlashZ = -1.9F;
     this.muzzleScale = 2F;
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-35));
 
 
     matrixStack.translate(0.6F, -0.3F, 0.35F);
@@ -88,9 +88,9 @@ public class M9Renderer extends GunRenderer {
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-25));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5));
 
     matrixStack.translate(0.2F, -0.695F, 0.972F);
 
@@ -113,45 +113,45 @@ public class M9Renderer extends GunRenderer {
 
   private void renderIronSight1(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
       scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.translate(-0.3F, -0.15F, -0.25F);
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is1.png")));
-      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private void renderIronSight2(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(0.6F, -0.05F, 0.07F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(90));
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(90));
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is2.png")));
-      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
 
     float scale = 0.55F;
     matrixStack.scale(scale, scale, scale);
@@ -163,7 +163,7 @@ public class M9Renderer extends GunRenderer {
   protected void applyMagazineTransforms(ItemStack itemStack,
       MatrixStack matrixStack) {
     if (itemStack.getItem() == ModItems.M9_MAGAZINE.get()) {
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(5));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(5));
     }
   }
 

@@ -31,12 +31,12 @@ public class BrokenLegEffect extends Effect {
 
   public BrokenLegEffect() {
     super(EffectType.HARMFUL, 0x816C5A);
-    this.addAttributesModifier(Attributes.MOVEMENT_SPEED, "021BEAA1-498F-4D7B-933E-F0FA0B88B9D1",
+    this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "021BEAA1-498F-4D7B-933E-F0FA0B88B9D1",
         -0.15D, AttributeModifier.Operation.MULTIPLY_TOTAL);
   }
 
   @Override
-  public boolean isReady(int duration, int amplifier) {
+  public boolean isDurationEffectTick(int duration, int amplifier) {
     return true;
   }
 

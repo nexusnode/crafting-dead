@@ -42,13 +42,13 @@ public interface ITeam {
   }
 
   default Style getColourStyle() {
-    return Style.EMPTY.setColor(Color.fromInt(this.getColour()));
+    return Style.EMPTY.withColor(Color.fromRgb(this.getColour()));
   }
 
   String getName();
 
   default ITextComponent getDisplayName() {
     return new StringTextComponent(this.getName())
-        .mergeStyle(Style.EMPTY.setColor(Color.fromInt(this.getColour())));
+        .withStyle(Style.EMPTY.withColor(Color.fromRgb(this.getColour())));
   }
 }

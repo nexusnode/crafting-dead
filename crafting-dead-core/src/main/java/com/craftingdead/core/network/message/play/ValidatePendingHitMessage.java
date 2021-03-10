@@ -75,10 +75,10 @@ public class ValidatePendingHitMessage {
   public static boolean handle(ValidatePendingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ServerPlayerEntity playerEntity = ctx.get().getSender();
     IPlayer<ServerPlayerEntity> player = IPlayer.getExpected(playerEntity);
-    ItemStack heldStack = playerEntity.getHeldItemMainhand();
+    ItemStack heldStack = playerEntity.getMainHandItem();
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
-        final Entity hitEntity = playerEntity.getEntityWorld().getEntityByID(hit.getKey());
+        final Entity hitEntity = playerEntity.getCommandSenderWorld().getEntity(hit.getKey());
         Optional.ofNullable(hitEntity)
             .flatMap(e -> e.getCapability(ModCapabilities.LIVING).resolve())
             .ifPresent(hitLiving -> {

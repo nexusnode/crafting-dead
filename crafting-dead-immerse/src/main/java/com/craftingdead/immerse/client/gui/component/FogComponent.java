@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.client.gui.component;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
@@ -15,7 +33,7 @@ public class FogComponent extends Component<FogComponent> {
   private static final ResourceLocation SMOKE_TEXTURE =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/smoke.png");
 
-  private static long fogStartTime = Util.milliTime();
+  private static long fogStartTime = Util.getMillis();
 
   @SuppressWarnings("deprecation")
   @Override
@@ -23,30 +41,33 @@ public class FogComponent extends Component<FogComponent> {
     Vector2f fogSize =
         FitType.COVER.getSize(1920, 1080, this.getScaledContentWidth(),
             this.getScaledContentHeight());
-    double fogWidth = fogSize.x;
-    double fogHeight = fogSize.y;
+    float fogWidth = fogSize.x;
+    float fogHeight = fogSize.y;
 
-    final double pct =
-        MathHelper.clamp((Util.milliTime() - fogStartTime) / (1000.0D * 100.0D * 2.0D), 0.0D, 1.0D);
-    if (pct == 1.0D) {
-      fogStartTime = Util.milliTime();
+    final float pct =
+        MathHelper.clamp((Util.getMillis() - fogStartTime) / (1000.0F * 100.0F * 2.0F), 0.0F, 1.0F);
+    if (pct == 1.0F) {
+      fogStartTime = Util.getMillis();
     }
 
-    RenderSystem.pushMatrix();
+    matrixStack.pushPose();
     {
-      RenderSystem.scalef(4F, 4F, 4F);
+      matrixStack.scale(4F, 4F, 4F);
       RenderSystem.enableBlend();
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, 0.3F);
 
       RenderUtil.bind(SMOKE_TEXTURE);
 
-      final double smokeX = this.getScaledX() + pct * this.getContentWidth();
+      final float smokeX = this.getScaledX() + pct * this.getContentWidth();
 
-      RenderUtil.blit(smokeX, this.getScaledContentY(), fogWidth, fogHeight);
-      RenderUtil.blit(smokeX - fogWidth, this.getScaledContentY(), fogWidth, fogHeight);
+      RenderUtil.blit(matrixStack, smokeX, this.getScaledContentY(), fogWidth, fogHeight);
+      RenderUtil.blit(matrixStack, smokeX - fogWidth, this.getScaledContentY(), fogWidth,
+          fogHeight);
+
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
       RenderSystem.disableBlend();
     }
-    RenderSystem.popMatrix();
+    matrixStack.popPose();
   }
 }

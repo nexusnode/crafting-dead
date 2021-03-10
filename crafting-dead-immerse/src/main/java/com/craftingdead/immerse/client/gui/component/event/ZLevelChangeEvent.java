@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

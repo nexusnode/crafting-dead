@@ -42,31 +42,31 @@ public class ContainerMixin {
 
   @Shadow
   @Final
-  private List<IContainerListener> listeners;
+  private List<IContainerListener> containerListeners;
 
-  @Inject(at = @At("HEAD"), method = "detectAndSendChanges")
-  private void detectAndSendChanges(CallbackInfo callbackInfo) {
+  @Inject(at = @At("HEAD"), method = "broadcastChanges")
+  private void broadcastChanges(CallbackInfo callbackInfo) {
     Container container = (Container) (Object) this;
-    for (Slot slot : container.inventorySlots) {
-      slot.getStack().getCapability(ModCapabilities.GUN).filter(IBufferSerializable::requiresSync)
+    for (Slot slot : container.slots) {
+      slot.getItem().getCapability(ModCapabilities.GUN).filter(IBufferSerializable::requiresSync)
           .ifPresent(gun -> {
-            for (IContainerListener listener : this.listeners) {
+            for (IContainerListener listener : this.containerListeners) {
               if (listener instanceof ServerPlayerEntity) {
                 ServerPlayerEntity playerEntity = (ServerPlayerEntity) listener;
 
-                if (slot.inventory == playerEntity.inventory) {
-                  for (ItemStack equipmentStack : playerEntity.getEquipmentAndArmor()) {
+                if (slot.container == playerEntity.inventory) {
+                  for (ItemStack equipmentStack : playerEntity.getAllSlots()) {
                     // If the item is equipment we don't need to sync it as Minecraft does
                     // that in a separate method (and if we sync it twice the capability wont think
                     // it's dirty anymore on the second call).
-                    if (equipmentStack == slot.getStack()) {
+                    if (equipmentStack == slot.getItem()) {
                       return;
                     }
                   }
                 }
                 NetworkChannel.PLAY.getSimpleChannel().send(
                     PacketDistributor.PLAYER.with(() -> playerEntity),
-                    new SyncGunContainerSlotMessage(playerEntity.getEntityId(), slot.getSlotIndex(),
+                    new SyncGunContainerSlotMessage(playerEntity.getId(), slot.getSlotIndex(),
                         gun, false));
                 break;
               }

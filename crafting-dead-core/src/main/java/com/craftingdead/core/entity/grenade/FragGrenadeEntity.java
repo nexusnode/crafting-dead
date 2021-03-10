@@ -47,11 +47,11 @@ public class FragGrenadeEntity extends GrenadeEntity {
   @Override
   public void onActivationStateChange(boolean activated) {
     if (activated) {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
-        this.world.createExplosion(this,
+        this.level.explode(this,
             this.createDamageSource(), null,
-            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
+            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 4F, false,
             Explosion.Mode.NONE);
       }
     }

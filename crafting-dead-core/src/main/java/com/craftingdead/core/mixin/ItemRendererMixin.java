@@ -37,9 +37,9 @@ import net.minecraft.world.World;
 public abstract class ItemRendererMixin {
 
   @Inject(at = @At("HEAD"),
-      method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V",
+      method = "render(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V",
       cancellable = true)
-  private void renderItem(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
+  private void render(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
       boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay, IBakedModel bakedModel, CallbackInfo callbackInfo) {
     if (this.renderItem(null, itemStack, transformType, leftHanded,
@@ -49,9 +49,9 @@ public abstract class ItemRendererMixin {
   }
 
   @Inject(at = @At("HEAD"),
-      method = "renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/world/World;II)V",
+      method = "renderStatic(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/world/World;II)V",
       cancellable = true)
-  private void renderItem(@Nullable LivingEntity livingEntity, ItemStack itemStack,
+  private void renderStatic(@Nullable LivingEntity livingEntity, ItemStack itemStack,
       ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, @Nullable World world, int packedLight, int packedOverlay,
       CallbackInfo callbackInfo) {

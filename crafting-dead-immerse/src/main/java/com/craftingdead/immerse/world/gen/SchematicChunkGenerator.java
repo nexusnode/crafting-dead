@@ -49,17 +49,17 @@ public class SchematicChunkGenerator extends ChunkGenerator {
   }
 
   @Override
-  public void generateSurface(WorldGenRegion worldGenRegion, IChunk chunk) {}
+  public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, IChunk chunk) {}
 
   @Override
-  public void func_230350_a_(long seed, BiomeManager biomeManagerIn, IChunk chunkIn,
+  public void applyCarvers(long seed, BiomeManager biomeManagerIn, IChunk chunkIn,
       GenerationStage.Carving carvingStage) {}
 
   @Override
-  public int getGroundHeight() {
+  public int getSpawnHeight() {
     for (int y = 0; y < this.schematic.getHeight(); y++) {
       final BlockState blockState = this.schematic.getBlockState(new BlockPos(0, y, 0));
-      if (!Heightmap.Type.MOTION_BLOCKING.getHeightLimitPredicate().test(blockState)) {
+      if (!Heightmap.Type.MOTION_BLOCKING.isOpaque().test(blockState)) {
         return y - 1;
       }
     }
@@ -67,13 +67,15 @@ public class SchematicChunkGenerator extends ChunkGenerator {
   }
 
   @Override
-  public void func_230352_b_(IWorld world, StructureManager structureManager, IChunk chunk) {
+  public void fillFromNoise(IWorld world, StructureManager structureManager, IChunk chunk) {
     ChunkPos chunkPos = chunk.getPos();
     BlockPos.Mutable relativeBlockPos = new BlockPos.Mutable();
     BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
-    Heightmap oceanFloorHeightmap = chunk.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG);
-    Heightmap worldSurfaceHeightMap = chunk.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG);
+    Heightmap oceanFloorHeightmap =
+        chunk.getOrCreateHeightmapUnprimed(Heightmap.Type.OCEAN_FLOOR_WG);
+    Heightmap worldSurfaceHeightMap =
+        chunk.getOrCreateHeightmapUnprimed(Heightmap.Type.WORLD_SURFACE_WG);
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
         final int worldX = (chunkPos.x << 4) + x;
@@ -81,8 +83,8 @@ public class SchematicChunkGenerator extends ChunkGenerator {
         if (worldX >= 0 && worldX < this.schematic.getWidth() && worldZ >= 0
             && worldZ < this.schematic.getLength()) {
           for (int y = 0; y < this.schematic.getHeight(); ++y) {
-            relativeBlockPos.setPos(x, y, z);
-            blockPos.setPos(worldX, y, worldZ);
+            relativeBlockPos.set(x, y, z);
+            blockPos.set(worldX, y, worldZ);
 
             BlockState blockState = this.schematic.getBlockState(blockPos);
 
@@ -92,7 +94,7 @@ public class SchematicChunkGenerator extends ChunkGenerator {
 
             TileEntity tileEntity = this.schematic.getTileEntity(blockPos);
             if (tileEntity != null) {
-              chunk.addTileEntity(relativeBlockPos, tileEntity);
+              chunk.setBlockEntity(relativeBlockPos, tileEntity);
             }
           }
         }
@@ -101,10 +103,10 @@ public class SchematicChunkGenerator extends ChunkGenerator {
   }
 
   @Override
-  public int getHeight(int x, int z, Heightmap.Type heightmapType) {
+  public int getBaseHeight(int x, int z, Heightmap.Type heightmapType) {
     for (int y = 0; y < this.schematic.getHeight(); y++) {
       final BlockState blockState = this.schematic.getBlockState(new BlockPos(x, y, z));
-      if (heightmapType.getHeightLimitPredicate().test(blockState)) {
+      if (heightmapType.isOpaque().test(blockState)) {
         return y + 1;
       }
     }
@@ -112,17 +114,17 @@ public class SchematicChunkGenerator extends ChunkGenerator {
   }
 
   @Override
-  protected Codec<? extends ChunkGenerator> func_230347_a_() {
+  protected Codec<? extends ChunkGenerator> codec() {
     return Codec.unit(this);
   }
 
   @Override
-  public ChunkGenerator func_230349_a_(long seed) {
+  public ChunkGenerator withSeed(long seed) {
     return this;
   }
 
   @Override
-  public IBlockReader func_230348_a_(int x, int z) {
+  public IBlockReader getBaseColumn(int x, int z) {
     return new SchematicBlockReader(this.schematic);
   }
 
@@ -141,12 +143,12 @@ public class SchematicChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    protected Codec<? extends BiomeProvider> getBiomeProviderCodec() {
+    protected Codec<? extends BiomeProvider> codec() {
       return Codec.unit(this);
     }
 
     @Override
-    public BiomeProvider getBiomeProvider(long seed) {
+    public BiomeProvider withSeed(long seed) {
       return this;
     }
   }

@@ -43,21 +43,21 @@ public class ActionItem extends Item {
   }
 
   @Override
-  public ActionResultType itemInteractionForEntity(ItemStack itemStack, PlayerEntity playerEntity,
+  public ActionResultType interactLivingEntity(ItemStack itemStack, PlayerEntity playerEntity,
       LivingEntity targetEntity, Hand hand) {
-    if (!playerEntity.getEntityWorld().isRemote()) {
+    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
       this.performAction(playerEntity, targetEntity);
     }
     return ActionResultType.PASS;
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
+  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
       Hand hand) {
-    if (!playerEntity.getEntityWorld().isRemote()) {
+    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
       this.performAction(playerEntity, null);
     }
-    return new ActionResult<>(ActionResultType.PASS, playerEntity.getHeldItem(hand));
+    return new ActionResult<>(ActionResultType.PASS, playerEntity.getItemInHand(hand));
   }
 
   private void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {

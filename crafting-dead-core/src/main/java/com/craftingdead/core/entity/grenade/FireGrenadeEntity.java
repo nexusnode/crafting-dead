@@ -37,7 +37,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
 
   private static final double FIRE_RADIUS = 2D;
   private static final Triple<SoundEvent, Float, Float> FIRE_GRENADE_BOUNCE_SOUND =
-      Triple.of(SoundEvents.BLOCK_GLASS_BREAK, 1.0F, 0.9F);
+      Triple.of(SoundEvents.GLASS_BREAK, 1.0F, 0.9F);
 
   public FireGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
     super(entityIn, worldIn);
@@ -50,7 +50,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
   @Override
   public void onSurfaceHit(BlockRayTraceResult blockRayTraceResult) {
     super.onSurfaceHit(blockRayTraceResult);
-    if (blockRayTraceResult.getFace() == Direction.UP) {
+    if (blockRayTraceResult.getDirection() == Direction.UP) {
       this.setActivated(true);
     }
   }
@@ -58,18 +58,18 @@ public class FireGrenadeEntity extends GrenadeEntity {
   @Override
   public void onActivationStateChange(boolean activated) {
     if (activated) {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
-        this.world.createExplosion(this,
+        this.level.explode(this,
             this.createDamageSource(), null,
-            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 2F, true,
+            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 2F, true,
             Explosion.Mode.NONE);
 
-        BlockPos.getAllInBox(this.getPosition().add(-FIRE_RADIUS, 0, -FIRE_RADIUS),
-            this.getPosition().add(FIRE_RADIUS, 0, FIRE_RADIUS)).forEach(blockPos -> {
-              if (this.world.getBlockState(blockPos).getBlock() == Blocks.AIR) {
+        BlockPos.betweenClosedStream(this.blockPosition().offset(-FIRE_RADIUS, 0, -FIRE_RADIUS),
+            this.blockPosition().offset(FIRE_RADIUS, 0, FIRE_RADIUS)).forEach(blockPos -> {
+              if (this.level.getBlockState(blockPos).getBlock() == Blocks.AIR) {
                 if (Math.random() <= 0.8D) {
-                  this.world.setBlockState(blockPos, Blocks.FIRE.getDefaultState());
+                  this.level.setBlockAndUpdate(blockPos, Blocks.FIRE.defaultBlockState());
                 }
               }
             });
@@ -87,7 +87,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
 
   @Override
   public Triple<SoundEvent, Float, Float> getBounceSound(BlockRayTraceResult blockRayTraceResult) {
-    return blockRayTraceResult.getFace() == Direction.UP
+    return blockRayTraceResult.getDirection() == Direction.UP
         ? FIRE_GRENADE_BOUNCE_SOUND
         : super.getBounceSound(blockRayTraceResult);
   }

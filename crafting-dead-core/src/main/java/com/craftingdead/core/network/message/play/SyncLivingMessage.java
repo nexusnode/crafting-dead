@@ -57,7 +57,7 @@ public class SyncLivingMessage {
     ctx.get().enqueueWork(() -> {
       Optional<World> world =
           LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-      Entity entity = world.map(w -> w.getEntityByID(msg.entityId)).orElse(null);
+      Entity entity = world.map(w -> w.getEntity(msg.entityId)).orElse(null);
       if (entity == null) {
         return;
       }

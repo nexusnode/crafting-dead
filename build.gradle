@@ -33,7 +33,7 @@ subprojects {
     group = 'com.craftingdead'
     version = "${mod_version}"
     minecraft {
-        mappings channel: "${mappings_channel}", version: "${mappings_version}"
+        mappings channel: 'official', version: "${minecraft_version}"
     }
     
     repositories {

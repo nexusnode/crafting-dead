@@ -62,7 +62,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   private static final float HAT_CHANCE = 0.05F;
 
   private static final DataParameter<Integer> TEXTURE_NUMBER =
-      EntityDataManager.createKey(AdvancedZombieEntity.class, DataSerializers.VARINT);
+      EntityDataManager.defineId(AdvancedZombieEntity.class, DataSerializers.INT);
 
   private RangedAttackGoal rangedAttackGoal;
 
@@ -77,10 +77,10 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     super.registerGoals();
     this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F) {
       @Override
-      public boolean shouldExecute() {
-        return super.shouldExecute()
+      public boolean canUse() {
+        return super.canUse()
             && AdvancedZombieEntity.this.getCapability(ModCapabilities.LIVING)
-                .map(living -> AdvancedZombieEntity.this.getHeldItemMainhand()
+                .map(living -> AdvancedZombieEntity.this.getMainHandItem()
                     .getCapability(ModCapabilities.GUN)
                     .isPresent())
                 .orElse(false);
@@ -93,25 +93,25 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   @Override
-  public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
+  public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
     return true;
   }
 
   public static AttributeModifierMap.MutableAttribute registerAttributes() {
-    return ZombieEntity.func_234342_eQ_()
-        .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
-        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
+    return ZombieEntity.createAttributes()
+        .add(Attributes.MAX_HEALTH, 20.0D)
+        .add(Attributes.ATTACK_DAMAGE, 6.0D);
   }
 
   @Override
-  public void registerData() {
-    super.registerData();
-    this.getDataManager().register(TEXTURE_NUMBER, 0);
+  public void defineSynchedData() {
+    super.defineSynchedData();
+    this.getEntityData().define(TEXTURE_NUMBER, 0);
   }
 
   @Override
-  public int getTotalArmorValue() {
-    int armorValue = super.getTotalArmorValue() + 2;
+  public int getArmorValue() {
+    int armorValue = super.getArmorValue() + 2;
     if (armorValue > 20) {
       armorValue = 20;
     }
@@ -119,31 +119,31 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   @Override
-  public int getMaxSpawnedInChunk() {
+  public int getMaxSpawnClusterSize() {
     return 12;
   }
 
   @Override
-  protected boolean shouldBurnInDay() {
+  protected boolean isSunSensitive() {
     return false;
   }
 
   @Override
-  public void readAdditional(CompoundNBT compound) {
-    super.readAdditional(compound);
-    this.dataManager.set(TEXTURE_NUMBER, compound.getInt("textureNumber"));
+  public void readAdditionalSaveData(CompoundNBT compound) {
+    super.readAdditionalSaveData(compound);
+    this.entityData.set(TEXTURE_NUMBER, compound.getInt("textureNumber"));
   }
 
   @Override
-  public void writeAdditional(CompoundNBT compound) {
-    super.writeAdditional(compound);
-    compound.putInt("textureNumber", this.dataManager.get(TEXTURE_NUMBER));
+  public void addAdditionalSaveData(CompoundNBT compound) {
+    super.addAdditionalSaveData(compound);
+    compound.putInt("textureNumber", this.entityData.get(TEXTURE_NUMBER));
   }
 
   @Override
-  protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
-    this.dataManager.set(TEXTURE_NUMBER, this.rand.nextInt(23));
-    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, this.getHeldStack());
+  protected void populateDefaultEquipmentSlots(DifficultyInstance difficulty) {
+    this.entityData.set(TEXTURE_NUMBER, this.random.nextInt(23));
+    this.setItemSlot(EquipmentSlotType.MAINHAND, this.getHeldStack());
     this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       living.getItemHandler().setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
           this.getClothingStack());
@@ -170,20 +170,20 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   protected Optional<Item> getRandomItem(Predicate<Item> predicate, float probability) {
-    if (this.rand.nextFloat() < probability) {
+    if (this.random.nextFloat() < probability) {
       List<Item> items = ModItems.ITEMS
           .getEntries()
           .stream()
           .map(RegistryObject::get)
           .filter(predicate)
           .collect(Collectors.toList());
-      return Optional.of(items.get(this.rand.nextInt(items.size())));
+      return Optional.of(items.get(this.random.nextInt(items.size())));
     }
     return Optional.empty();
   }
 
   public int getTextureNumber() {
-    return this.dataManager.get(TEXTURE_NUMBER);
+    return this.entityData.get(TEXTURE_NUMBER);
   }
 
   /**
@@ -197,12 +197,12 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   public void tick() {
     super.tick();
-    if (!this.getEntityWorld().isRemote()) {
+    if (!this.getCommandSenderWorld().isClientSide()) {
       this.getCapability(ModCapabilities.LIVING).ifPresent(
-          living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+          living -> this.getMainHandItem().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
             if (gun.isTriggerPressed()
-                && (!this.rangedAttackGoal.shouldContinueExecuting() || (Util.milliTime()
-                    - this.triggerPressedStartTime > 1000 + this.rand.nextInt(2000)))) {
+                && (!this.rangedAttackGoal.canContinueToUse() || (Util.getMillis()
+                    - this.triggerPressedStartTime > 1000 + this.random.nextInt(2000)))) {
               gun.setTriggerPressed(living, false, true);
             }
           }));
@@ -210,11 +210,11 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   @Override
-  public void attackEntityWithRangedAttack(LivingEntity livingEntity, float distance) {
-    if (!this.getEntityWorld().isRemote()) {
+  public void performRangedAttack(LivingEntity livingEntity, float distance) {
+    if (!this.getCommandSenderWorld().isClientSide()) {
       this.getCapability(ModCapabilities.LIVING).ifPresent(
-          living -> this.getHeldItemMainhand().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
-            this.triggerPressedStartTime = Util.milliTime();
+          living -> this.getMainHandItem().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+            this.triggerPressedStartTime = Util.getMillis();
             gun.setTriggerPressed(living, true, true);
           }));
     }

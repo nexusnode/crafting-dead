@@ -72,8 +72,8 @@ public class ImageComponent extends Component<ImageComponent> {
   private Optional<Vector2f> getImageSize() {
     if (this.bind()) {
       return Optional.of(new Vector2f(
-          GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH),
-          GlStateManager.getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT)));
+          GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH),
+          GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT)));
     }
     return Optional.empty();
   }
@@ -118,7 +118,8 @@ public class ImageComponent extends Component<ImageComponent> {
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     RenderSystem.enableBlend();
-    if (depthTest) {
+    RenderSystem.defaultBlendFunc();
+    if (this.depthTest) {
       RenderSystem.enableDepthTest();
     }
     final float[] colour = this.colour.getColour4f();
@@ -128,7 +129,7 @@ public class ImageComponent extends Component<ImageComponent> {
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
       }
-      RenderUtil.blit(this.getScaledContentX(), this.getScaledContentY(),
+      RenderUtil.blit(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
     } else {
       RenderUtil.fill(this.getScaledContentX(), this.getScaledContentY(),
@@ -137,7 +138,7 @@ public class ImageComponent extends Component<ImageComponent> {
           0xFFFFFFFF);
     }
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    if (depthTest) {
+    if (this.depthTest) {
       RenderSystem.disableDepthTest();
     }
     RenderSystem.disableBlend();

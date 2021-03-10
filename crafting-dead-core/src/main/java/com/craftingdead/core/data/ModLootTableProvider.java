@@ -55,9 +55,9 @@ public class ModLootTableProvider extends LootTableProvider {
       ValidationTracker validationTracker) {
     for (ResourceLocation location : Sets.difference(ModLootTables.getLootTables(),
         map.keySet())) {
-      validationTracker.addProblem("Missing built-in table: " + location);
+      validationTracker.reportProblem("Missing built-in table: " + location);
     }
-    map.forEach((location, lootTable) -> LootTableManager.validateLootTable(validationTracker,
+    map.forEach((location, lootTable) -> LootTableManager.validate(validationTracker,
         location, lootTable));
   }
 

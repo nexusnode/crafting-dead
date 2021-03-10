@@ -65,7 +65,7 @@ public abstract class AbstractAction implements IAction {
   }
 
   protected String getTranslationKey() {
-    return Util.makeTranslationKey("action", AbstractAction.this.actionType.getRegistryName());
+    return Util.makeDescriptionId("action", AbstractAction.this.actionType.getRegistryName());
   }
 
   protected abstract float getProgress(float partialTicks);

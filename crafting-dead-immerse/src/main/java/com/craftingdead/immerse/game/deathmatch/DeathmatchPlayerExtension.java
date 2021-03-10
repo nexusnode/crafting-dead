@@ -38,16 +38,16 @@ public class DeathmatchPlayerExtension implements IPlayerExtension {
   public static final ResourceLocation EXTENSION_ID = GameTypes.DEATHMATCH.getId();
 
   protected static final DataParameter<Integer> REMAINING_BUY_TIME_SECONDS =
-      new DataParameter<>(0x00, DataSerializers.VARINT);
+      new DataParameter<>(0x00, DataSerializers.INT);
 
   protected static final DataParameter<Integer> TEAM_ORDINAL =
-      new DataParameter<>(0x01, DataSerializers.VARINT);
+      new DataParameter<>(0x01, DataSerializers.INT);
 
   protected static final DataParameter<Integer> REMAINING_SPAWN_PROTECTION_SECONDS =
-      new DataParameter<>(0x02, DataSerializers.VARINT);
+      new DataParameter<>(0x02, DataSerializers.INT);
 
   protected static final DataParameter<Integer> REMAINING_GHOST_TIME_SECONDS =
-      new DataParameter<>(0x03, DataSerializers.VARINT);
+      new DataParameter<>(0x03, DataSerializers.INT);
 
   private final IPlayer<?> player;
 
@@ -105,7 +105,7 @@ public class DeathmatchPlayerExtension implements IPlayerExtension {
   }
 
   public DeathmatchPlayerData getPlayerData() {
-    return this.game.getPlayerData(this.player.getEntity().getUniqueID());
+    return this.game.getPlayerData(this.player.getEntity().getUUID());
   }
 
   @Override

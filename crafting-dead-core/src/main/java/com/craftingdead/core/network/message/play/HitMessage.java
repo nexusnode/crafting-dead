@@ -39,9 +39,9 @@ public class HitMessage {
   }
 
   public static void encode(HitMessage msg, PacketBuffer out) {
-    out.writeDouble(msg.hitPos.getX());
-    out.writeDouble(msg.hitPos.getY());
-    out.writeDouble(msg.hitPos.getZ());
+    out.writeDouble(msg.hitPos.x());
+    out.writeDouble(msg.hitPos.y());
+    out.writeDouble(msg.hitPos.z());
     out.writeBoolean(msg.dead);
   }
 
@@ -59,8 +59,8 @@ public class HitMessage {
         if (msg.dead && ClientDist.clientConfig.playKillSound.get()) {
           // Plays a sound that follows the player
           PlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
-          playerEntity.getEntityWorld().playMovingSound(clientDist.getExpectedPlayer().getEntity(),
-              playerEntity, SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
+          playerEntity.getCommandSenderWorld().playSound(clientDist.getExpectedPlayer().getEntity(),
+              playerEntity, SoundEvents.TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
         }
       });
     }

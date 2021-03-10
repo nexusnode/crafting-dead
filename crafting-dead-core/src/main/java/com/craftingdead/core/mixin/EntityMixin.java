@@ -42,8 +42,8 @@ public class EntityMixin {
     }
   }
 
-  @Inject(method = "isInvisibleToPlayer", at = @At("HEAD"), cancellable = true)
-  private void isInvisibleToPlayer(PlayerEntity playerEntity,
+  @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
+  private void isInvisibleTo(PlayerEntity playerEntity,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
     if (entity instanceof LivingEntity && ILiving.getOptional((LivingEntity) entity)

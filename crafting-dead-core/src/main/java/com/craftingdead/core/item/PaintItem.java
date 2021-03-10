@@ -54,14 +54,14 @@ public class PaintItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lines,
+  public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
     stack
         .getCapability(ModCapabilities.PAINT)
         .map(IPaint::getColour)
         .orElse(Optional.empty())
         .ifPresent(colour -> lines
-            .add(Text.of("#" + Integer.toHexString(colour)).mergeStyle(TextFormatting.GRAY)));
+            .add(Text.of("#" + Integer.toHexString(colour)).withStyle(TextFormatting.GRAY)));
   }
 
   @Override

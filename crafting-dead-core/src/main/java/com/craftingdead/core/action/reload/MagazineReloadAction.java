@@ -74,7 +74,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
     if (!displayOnly) {
       if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
+        ((PlayerEntity) this.performer.getEntity()).addItem(this.oldMagazineStack);
       }
     }
   }
@@ -85,7 +85,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
     ItemStack remainingStack =
         this.magazineLocation.itemHandler.insertItem(this.magazineLocation.slot, newMagazineStack,
             false);
-    this.performer.getEntity().entityDropItem(remainingStack);
+    this.performer.getEntity().spawnAtLocation(remainingStack);
   }
 
   private List<IItemHandler> collectItemHandlers(ILiving<?, ?> living) {

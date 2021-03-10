@@ -51,9 +51,9 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
   private static final DataParameter<Boolean> MOVEMENT_BLOCKED =
       new DataParameter<>(0x00, DataSerializers.BOOLEAN);
   private static final DataParameter<Integer> TIMER_VALUE_SECONDS =
-      new DataParameter<>(0x01, DataSerializers.VARINT);
+      new DataParameter<>(0x01, DataSerializers.INT);
   private static final DataParameter<Integer> GAME_STATE_ORDINAL =
-      new DataParameter<>(0x02, DataSerializers.VARINT);
+      new DataParameter<>(0x02, DataSerializers.INT);
   private static final DataParameter<String> DISPLAY_NAME =
       new DataParameter<>(0x03, DataSerializers.STRING);
 
@@ -118,7 +118,7 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
         writeAll ? this.playerData.entrySet() : this.dirtyPlayerData.entrySet();
     packetBuffer.writeVarInt(playerDataCollection.size());
     for (Map.Entry<UUID, DeathmatchPlayerData> entry : playerDataCollection) {
-      packetBuffer.writeUniqueId(entry.getKey());
+      packetBuffer.writeUUID(entry.getKey());
       DeathmatchPlayerData playerData = entry.getValue();
       if (playerData == null) {
         packetBuffer.writeBoolean(true);
@@ -136,7 +136,7 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
     this.dataManager.setEntryValues(NetworkDataManager.readEntries(packetBuffer));
     int playerDataSize = packetBuffer.readVarInt();
     for (int i = 0; i < playerDataSize; i++) {
-      UUID playerId = packetBuffer.readUniqueId();
+      UUID playerId = packetBuffer.readUUID();
       if (packetBuffer.readBoolean()) {
         this.playerData.remove(playerId);
       } else {

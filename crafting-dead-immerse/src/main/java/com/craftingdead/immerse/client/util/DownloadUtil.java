@@ -45,7 +45,7 @@ public class DownloadUtil {
       TextureManager textureManager = Minecraft.getInstance().getTextureManager();
       ResourceLocation textureLocation =
           new ResourceLocation(CraftingDeadImmerse.ID, String.valueOf(imageUrl.hashCode()));
-      textureManager.loadTexture(textureLocation, new DynamicTexture(image));
+      textureManager.register(textureLocation, new DynamicTexture(image));
       return textureLocation;
     }), Minecraft.getInstance());
   }
@@ -72,6 +72,6 @@ public class DownloadUtil {
         }
       }
       return Optional.empty();
-    }, Util.getServerExecutor());
+    }, Util.backgroundExecutor());
   }
 }

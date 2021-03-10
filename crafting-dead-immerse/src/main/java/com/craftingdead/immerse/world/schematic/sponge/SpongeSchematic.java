@@ -71,11 +71,11 @@ public class SpongeSchematic implements ISchematic {
     try {
       index = this.blockData[(pos.getY() * length + pos.getZ()) * width + pos.getX()];
     } catch (ArrayIndexOutOfBoundsException e) {
-      return Blocks.AIR.getDefaultState();
+      return Blocks.AIR.defaultBlockState();
     }
 
     if (this.palette == null) {
-      return GameData.getBlockStateIDMap().getByValue(index);
+      return GameData.getBlockStateIDMap().byId(index);
     } else {
       return this.palette.get(index);
     }
@@ -106,7 +106,7 @@ public class SpongeSchematic implements ISchematic {
     }
 
     if (this.biomePalette == null) {
-      return GameData.getWrapper(Registry.BIOME_KEY, Lifecycle.stable()).getByValue(index);
+      return GameData.getWrapper(Registry.BIOME_REGISTRY, Lifecycle.stable()).byId(index);
     } else {
       return this.biomePalette.get(index);
     }

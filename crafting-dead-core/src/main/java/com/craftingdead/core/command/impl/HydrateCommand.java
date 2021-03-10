@@ -41,12 +41,12 @@ public class HydrateCommand {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
     dispatcher.register(Commands.literal("hydrate").requires((source) -> {
-      return source.hasPermissionLevel(2);
+      return source.hasPermission(2);
     }).executes((source) -> {
       return processCommand(source.getSource(),
-          source.getSource().asPlayer().getGameProfile().getName());
+          source.getSource().getPlayerOrException().getGameProfile().getName());
     }).then(Commands.argument("target", StringArgumentType.string()).suggests((source, builder) -> {
-      return ISuggestionProvider.suggest(source.getSource().getServer().getOnlinePlayerNames(),
+      return ISuggestionProvider.suggest(source.getSource().getServer().getPlayerNames(),
           builder);
     }).executes((source) -> {
       return processCommand(source.getSource(), StringArgumentType.getString(source, "target"));
@@ -72,9 +72,9 @@ public class HydrateCommand {
           .orElse(-1);
     }
     if (result == 1) {
-      source.sendFeedback(SUCCESS_MESSAGE_OPERATOR, false);
+      source.sendSuccess(SUCCESS_MESSAGE_OPERATOR, false);
     } else {
-      source.sendErrorMessage(FAILURE_MESSAGE_NOT_USED);
+      source.sendFailure(FAILURE_MESSAGE_NOT_USED);
     }
     return result;
   }
@@ -88,9 +88,9 @@ public class HydrateCommand {
   private static int hydrate(ServerPlayerEntity serverPlayerEntity) {
     if (serverPlayerEntity.isAlive()) {
       IPlayer.getExpected(serverPlayerEntity).setWater(20);
-      serverPlayerEntity.playSound(SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0F,
+      serverPlayerEntity.playNotifySound(SoundEvents.GENERIC_DRINK, SoundCategory.NEUTRAL, 5.0F,
           5.0F);
-      serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION, Util.DUMMY_UUID);
+      serverPlayerEntity.sendMessage(SUCCESS_MESSAGE_CONFIRMATION, Util.NIL_UUID);
       return 1;
     }
     return 0;
@@ -99,12 +99,12 @@ public class HydrateCommand {
   static {
     SUCCESS_MESSAGE_OPERATOR = new StringTextComponent(
         new TranslationTextComponent("commands.craftingdead.hydrate.success.operator").getString())
-            .mergeStyle(TextFormatting.GREEN);
+            .withStyle(TextFormatting.GREEN);
     SUCCESS_MESSAGE_CONFIRMATION = new StringTextComponent(
         new TranslationTextComponent("commands.craftingdead.hydrate.success.confirmation")
-            .getString()).mergeStyle(TextFormatting.GREEN);
+            .getString()).withStyle(TextFormatting.GREEN);
     FAILURE_MESSAGE_NOT_USED = new StringTextComponent(
         new TranslationTextComponent("commands.craftingdead.hydrate.failure.not_used").getString())
-            .mergeStyle(TextFormatting.GRAY);
+            .withStyle(TextFormatting.GRAY);
   }
 }

@@ -38,10 +38,10 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   public boolean matches(CraftingInventory inventory, World world) {
     ItemStack magazineStack = ItemStack.EMPTY;
     int ironNuggetCount = 0;
-    for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-      ItemStack itemStack = inventory.getStackInSlot(i);
+    for (int i = 0; i < inventory.getContainerSize(); ++i) {
+      ItemStack itemStack = inventory.getItem(i);
       boolean isSingleMagazine = itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()
-          && itemStack.getCount() == 1 && i == (inventory.getSizeInventory()) / 2;
+          && itemStack.getCount() == 1 && i == (inventory.getContainerSize()) / 2;
       boolean isIronNuggets = Tags.Items.NUGGETS_IRON.contains(itemStack.getItem());
       if (isSingleMagazine) {
         if (!magazineStack.isEmpty()) {
@@ -67,11 +67,11 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public ItemStack getCraftingResult(CraftingInventory inventory) {
+  public ItemStack assemble(CraftingInventory inventory) {
     ItemStack magazineStack = ItemStack.EMPTY;
     int ironNuggetCount = 0;
-    for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-      ItemStack itemStack = inventory.getStackInSlot(i);
+    for (int i = 0; i < inventory.getContainerSize(); ++i) {
+      ItemStack itemStack = inventory.getItem(i);
       if (itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
         magazineStack = itemStack;
       } else if (Tags.Items.NUGGETS_IRON.contains(itemStack.getItem())) {
@@ -100,7 +100,7 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public boolean canFit(int width, int height) {
+  public boolean canCraftInDimensions(int width, int height) {
     return width * height >= 9;
   }
 

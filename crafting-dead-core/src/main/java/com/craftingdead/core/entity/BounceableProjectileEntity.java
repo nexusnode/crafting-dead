@@ -56,22 +56,22 @@ public abstract class BounceableProjectileEntity extends Entity
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
       double x, double y, double z, World world) {
     this(entityType, world);
-    this.setPosition(x, y, z);
+    this.setPos(x, y, z);
   }
 
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
       LivingEntity throwerEntity, World world) {
-    this(entityType, throwerEntity.getPosX(), throwerEntity.getPosYEye(), throwerEntity.getPosZ(),
+    this(entityType, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
         world);
-    this.ownerId = throwerEntity.getUniqueID();
+    this.ownerId = throwerEntity.getUUID();
   }
 
   @Override
   public void tick() {
     super.tick();
 
-    BlockPos currentBlockPos = this.getPosition();
-    BlockState currentBlockState = this.world.getBlockState(currentBlockPos);
+    BlockPos currentBlockPos = this.blockPosition();
+    BlockState currentBlockState = this.level.getBlockState(currentBlockPos);
 
     if (this.stoppedInGround) {
       // Places the current inBlockState if it is not present
@@ -80,8 +80,8 @@ public abstract class BounceableProjectileEntity extends Entity
       }
 
       boolean notCollided = (this.blockStanding != currentBlockState
-          && this.world.hasNoCollisions(this.getBoundingBox().grow(0.0625D)));
-      boolean shouldMove = !this.getMotion().equals(Vector3d.ZERO) || notCollided;
+          && this.level.noCollision(this.getBoundingBox().inflate(0.0625D)));
+      boolean shouldMove = !this.getDeltaMovement().equals(Vector3d.ZERO) || notCollided;
 
       if (shouldMove) {
         this.stoppedInGround = false;
@@ -91,55 +91,55 @@ public abstract class BounceableProjectileEntity extends Entity
 
     if (!this.stoppedInGround) {
       // Natural loss of speed
-      this.setMotion(this.getMotion().scale(0.98D));
+      this.setDeltaMovement(this.getDeltaMovement().scale(0.98D));
 
       // Gravity speed
-      if (!this.hasNoGravity()) {
-        this.setMotion(this.getMotion().subtract(0, 0.04D, 0));
+      if (!this.isNoGravity()) {
+        this.setDeltaMovement(this.getDeltaMovement().subtract(0, 0.04D, 0));
       }
 
       this.totalTicksInAir++;
-      Vector3d position = this.getPositionVec();
-      Vector3d motionBeforeHit = this.getMotion();
+      Vector3d position = this.position();
+      Vector3d motionBeforeHit = this.getDeltaMovement();
 
       BlockRayTraceResult blockRayTraceResult =
-          this.world.rayTraceBlocks(new RayTraceContext(position, position.add(motionBeforeHit),
+          this.level.clip(new RayTraceContext(position, position.add(motionBeforeHit),
               RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
 
       Vector3d nextBounceMotion = null;
 
       if (blockRayTraceResult.getType() != RayTraceResult.Type.MISS) {
-        BlockState blockHitState = this.world.getBlockState(blockRayTraceResult.getPos());
+        BlockState blockHitState = this.level.getBlockState(blockRayTraceResult.getBlockPos());
 
         Vector3d difference =
-            blockRayTraceResult.getHitVec().subtract(this.getPosX(), this.getPosY(),
-                this.getPosZ());
-        this.setMotion(difference);
+            blockRayTraceResult.getLocation().subtract(this.getX(), this.getY(),
+                this.getZ());
+        this.setDeltaMovement(difference);
 
         // From vanilla's AbstractArrowEntity logic.
         // I didn't found a good name for the variable.
         Vector3d vec = difference.normalize().scale(0.05D);
-        this.setPosition(this.getPosX() - vec.x, this.getPosY() - vec.y, this.getPosZ() - vec.z);
+        this.setPos(this.getX() - vec.x, this.getY() - vec.y, this.getZ() - vec.z);
 
         Float bounceFactor = this.getBounceFactor(blockRayTraceResult);
         if (bounceFactor != null) {
-          switch (blockRayTraceResult.getFace()) {
+          switch (blockRayTraceResult.getDirection()) {
             case UP:
               // If the grenade is going up too slowly, set the next bounce to zero
               nextBounceMotion = Math.abs(motionBeforeHit.y) > 0.1D
-                  ? motionBeforeHit.mul(0.9D * 0.7D, (-bounceFactor), 0.9D * 0.7D)
+                  ? motionBeforeHit.multiply(0.9D * 0.7D, (-bounceFactor), 0.9D * 0.7D)
                   : Vector3d.ZERO;
               break;
             case DOWN:
-              nextBounceMotion = motionBeforeHit.mul(0.9D, -bounceFactor, 0.9D);
+              nextBounceMotion = motionBeforeHit.multiply(0.9D, -bounceFactor, 0.9D);
               break;
             case WEST:
             case EAST:
-              nextBounceMotion = motionBeforeHit.mul(-bounceFactor, 0.9D, 0.9D);
+              nextBounceMotion = motionBeforeHit.multiply(-bounceFactor, 0.9D, 0.9D);
               break;
             case SOUTH:
             case NORTH:
-              nextBounceMotion = motionBeforeHit.mul(0.9D, 0.9D, -bounceFactor);
+              nextBounceMotion = motionBeforeHit.multiply(0.9D, 0.9D, -bounceFactor);
               break;
             default:
               break;
@@ -152,7 +152,7 @@ public abstract class BounceableProjectileEntity extends Entity
 
         // Check if the entity is still alive after hitting the surface
         if (this.isAlive()) {
-          if (nextBounceMotion != null && blockRayTraceResult.getFace() == Direction.UP) {
+          if (nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP) {
             // Stops if the next bounce is too slow
             if (nextBounceMotion.length() < 0.1D) {
               nextBounceMotion = Vector3d.ZERO;
@@ -164,19 +164,19 @@ public abstract class BounceableProjectileEntity extends Entity
         }
       }
 
-      Vector3d currentMotion = this.getMotion();
+      Vector3d currentMotion = this.getDeltaMovement();
 
-      double nextX = this.getPosX() + currentMotion.x;
-      double nextY = this.getPosY() + currentMotion.y;
-      double nextZ = this.getPosZ() + currentMotion.z;
+      double nextX = this.getX() + currentMotion.x;
+      double nextY = this.getY() + currentMotion.y;
+      double nextZ = this.getZ() + currentMotion.z;
 
       // Use .setPosition instead of .move() for a better collision detection.
       // Otherwise the grenade will bounce imprecisely.
-      this.setPosition(nextX, nextY, nextZ);
-      this.doBlockCollisions();
+      this.setPos(nextX, nextY, nextZ);
+      this.checkInsideBlocks();
 
       if (nextBounceMotion != null) {
-        this.setMotion(nextBounceMotion);
+        this.setDeltaMovement(nextBounceMotion);
       }
     }
   }
@@ -199,23 +199,23 @@ public abstract class BounceableProjectileEntity extends Entity
     float f2 =
         MathHelper.cos(y * ((float) Math.PI / 180F)) * MathHelper.cos(x * ((float) Math.PI / 180F));
     this.shoot((double) f, (double) f1, (double) f2, force, p_184538_6_);
-    Vector3d vec3d = entity.getMotion();
-    this.setMotion(this.getMotion().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
+    Vector3d vec3d = entity.getDeltaMovement();
+    this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
   }
 
   public void shoot(double x, double y, double z, float force, float p_70186_8_) {
     Vector3d vec = (new Vector3d(x, y, z)).normalize()
-        .add(this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
-            this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
-            this.rand.nextGaussian() * (double) 0.0075F * (double) p_70186_8_)
+        .add(this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
+            this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
+            this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_)
         .scale((double) force);
-    this.setMotion(vec);
-    float f = MathHelper.sqrt(horizontalMag(vec));
-    this.rotationYaw = (float) (MathHelper.atan2(vec.x, vec.z) * (double) (180F / (float) Math.PI));
-    this.rotationPitch =
+    this.setDeltaMovement(vec);
+    float f = MathHelper.sqrt(getHorizontalDistanceSqr(vec));
+    this.yRot = (float) (MathHelper.atan2(vec.x, vec.z) * (double) (180F / (float) Math.PI));
+    this.xRot =
         (float) (MathHelper.atan2(vec.y, (double) f) * (double) (180F / (float) Math.PI));
-    this.prevRotationYaw = this.rotationYaw;
-    this.prevRotationPitch = this.rotationPitch;
+    this.yRotO = this.yRot;
+    this.xRotO = this.xRot;
   }
 
   public int getTotalTicksInAir() {
@@ -255,9 +255,9 @@ public abstract class BounceableProjectileEntity extends Entity
   }
 
   @Override
-  protected void writeAdditional(CompoundNBT compound) {
+  protected void addAdditionalSaveData(CompoundNBT compound) {
     if (this.ownerId != null) {
-      compound.put("owner", NBTUtil.func_240626_a_(this.ownerId));
+      compound.put("owner", NBTUtil.createUUID(this.ownerId));
     }
 
     compound.putBoolean("inGround", this.stoppedInGround);
@@ -265,9 +265,9 @@ public abstract class BounceableProjectileEntity extends Entity
   }
 
   @Override
-  protected void readAdditional(CompoundNBT compound) {
+  protected void readAdditionalSaveData(CompoundNBT compound) {
     if (compound.contains("owner", 10)) {
-      this.ownerId = NBTUtil.readUniqueId(compound.getCompound("owner"));
+      this.ownerId = NBTUtil.loadUUID(compound.getCompound("owner"));
     }
     this.stoppedInGround = compound.getBoolean("inGround");
     this.motionStopCount = compound.getInt("motionStopCount");
@@ -289,8 +289,8 @@ public abstract class BounceableProjectileEntity extends Entity
 
   @Nullable
   public Optional<Entity> getThrower() {
-    if (this.world instanceof ServerWorld) {
-      return Optional.ofNullable(((ServerWorld) this.world).getEntityByUuid(this.ownerId));
+    if (this.level instanceof ServerWorld) {
+      return Optional.ofNullable(((ServerWorld) this.level).getEntity(this.ownerId));
     }
     return Optional.empty();
   }

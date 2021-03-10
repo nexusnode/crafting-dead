@@ -30,15 +30,15 @@ public class ScubaEffect extends Effect {
   }
 
   @Override
-  public void performEffect(LivingEntity livingEntity, int amplifier) {
+  public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.isInWater()) {
-      livingEntity.setAir(livingEntity.getMaxAir());
+      livingEntity.setAirSupply(livingEntity.getMaxAirSupply());
       livingEntity.moveRelative(0.1F, new Vector3d(0.0D, 0.0D, 0.2D));
     }
   }
 
   @Override
-  public boolean isReady(int duration, int amplifier) {
+  public boolean isDurationEffectTick(int duration, int amplifier) {
     return true;
   }
 }

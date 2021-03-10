@@ -58,6 +58,6 @@ public class GameType extends ForgeRegistryEntry<GameType> {
   }
 
   public ITextComponent getDisplayName() {
-    return Text.translate(Util.makeTranslationKey("game", this.getRegistryName()));
+    return Text.translate(Util.makeDescriptionId("game", this.getRegistryName()));
   }
 }

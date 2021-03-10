@@ -49,17 +49,17 @@ public abstract class AbstractClothingLayer<T extends LivingEntity, M extends Bi
     Minecraft minecraft = Minecraft.getInstance();
     boolean invisible = livingEntity.isInvisible();
     boolean partiallyVisible =
-        livingEntity.isInvisible() && !livingEntity.isInvisibleToPlayer(minecraft.player);
+        livingEntity.isInvisible() && !livingEntity.isInvisibleTo(minecraft.player);
     if (partiallyVisible || !invisible) {
       String skinType = livingEntity instanceof ClientPlayerEntity
-          ? ((ClientPlayerEntity) livingEntity).getSkinType()
+          ? ((ClientPlayerEntity) livingEntity).getModelName()
           : "default";
       ResourceLocation texture = this.getClothingTexture(livingEntity, skinType);
       if (texture != null) {
-        RenderType renderType = partiallyVisible ? RenderType.getItemEntityTranslucentCull(texture)
-            : this.getEntityModel().getRenderType(texture);
-        this.getEntityModel().render(matrixStack, renderTypeBuffer.getBuffer(renderType),
-            packedLight, LivingRenderer.getPackedOverlay(livingEntity, 0.0F), 1.0F, 1.0F, 1.0F,
+        RenderType renderType = partiallyVisible ? RenderType.itemEntityTranslucentCull(texture)
+            : this.getParentModel().renderType(texture);
+        this.getParentModel().renderToBuffer(matrixStack, renderTypeBuffer.getBuffer(renderType),
+            packedLight, LivingRenderer.getOverlayCoords(livingEntity, 0.0F), 1.0F, 1.0F, 1.0F,
             partiallyVisible ? 0.15F : 1.0F);
       }
     }

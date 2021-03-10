@@ -44,7 +44,7 @@ public class SelectTeamScreen extends Screen {
         Text.of("Join Red"),
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.RED));
-          this.closeScreen();
+          this.onClose();
         }));
 
     this.addButton(new GameButton(this.width - (int) (this.width * 0.25F) - 50,
@@ -52,7 +52,7 @@ public class SelectTeamScreen extends Screen {
         Text.of("Join Blue"),
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.BLUE));
-          this.closeScreen();
+          this.onClose();
         }));
 
     this.addButton(new GameButton(this.width - (int) (this.width * 0.5F) - 25,
@@ -60,7 +60,7 @@ public class SelectTeamScreen extends Screen {
         Text.of("Spectate"),
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(null));
-          this.closeScreen();
+          this.onClose();
         }));
   }
 
@@ -73,14 +73,14 @@ public class SelectTeamScreen extends Screen {
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
-    this.blur.render(0, 0, this.width, this.height, partialTicks);
+    this.blur.render(matrixStack, 0, 0, this.width, this.height, partialTicks);
 
     super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-    matrixStack.push();
+    matrixStack.pushPose();
     matrixStack.translate(this.width / 2, this.height / 4, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
     drawCenteredString(matrixStack, this.font, Text.of("Select a Team"), 0, 0, 0xFFFFFFFF);
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 }

@@ -143,7 +143,7 @@ public class GunImpl implements IGun {
   // @formatter:on
 
   private static final DataParameter<ItemStack> PAINT_STACK =
-      new DataParameter<>(0x01, DataSerializers.ITEMSTACK);
+      new DataParameter<>(0x01, DataSerializers.ITEM_STACK);
 
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
@@ -227,11 +227,11 @@ public class GunImpl implements IGun {
 
   @Override
   public void tick(ILiving<?, ?> living) {
-    this.lastTickMs = Util.milliTime();
+    this.lastTickMs = Util.getMillis();
 
-    if (!living.getEntity().getEntityWorld().isRemote() && !this.isTriggerPressed()
+    if (!living.getEntity().getCommandSenderWorld().isClientSide() && !this.isTriggerPressed()
         && this.wasTriggerPressed) {
-      this.triggerPressedTicks = living.getEntity().getServer().getTickCounter();
+      this.triggerPressedTicks = living.getEntity().getServer().getTickCount();
     }
     this.wasTriggerPressed = this.isTriggerPressed();
 
@@ -240,7 +240,7 @@ public class GunImpl implements IGun {
       this.setPerformingRightMouseAction(living, false, true);
     }
 
-    if (living.getEntity().getEntityWorld().isRemote()) {
+    if (living.getEntity().getCommandSenderWorld().isClientSide()) {
       this.clientHandler.handleTick(living);
     }
   }
@@ -265,7 +265,7 @@ public class GunImpl implements IGun {
 
     if (this.isTriggerPressed()) {
       executorSerivce.execute(() -> {
-        while (this.isTriggerPressed() && (Util.milliTime() - this.lastTickMs < 500L)) {
+        while (this.isTriggerPressed() && (Util.getMillis() - this.lastTickMs < 500L)) {
           this.tryShoot(living);
         }
       });
@@ -276,13 +276,13 @@ public class GunImpl implements IGun {
 
     if (sendUpdate) {
       PacketTarget target =
-          living.getEntity().getEntityWorld().isRemote()
+          living.getEntity().getCommandSenderWorld().isClientSide()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY
           .getSimpleChannel()
           .send(target,
-              new TriggerPressedMessage(living.getEntity().getEntityId(),
+              new TriggerPressedMessage(living.getEntity().getId(),
                   triggerPressed));
     }
   }
@@ -305,8 +305,8 @@ public class GunImpl implements IGun {
       return;
     }
 
-    int latencyTicks = (player.getEntity().ping / 1000) * 20 + tickOffset;
-    int tick = player.getEntity().getServer().getTickCounter();
+    int latencyTicks = (player.getEntity().latency / 1000) * 20 + tickOffset;
+    int tick = player.getEntity().getServer().getTickCount();
 
     if (tick - latencyTicks > this.triggerPressedTicks && !this.isTriggerPressed()) {
       return;
@@ -328,11 +328,11 @@ public class GunImpl implements IGun {
       return;
     }
 
-    if (!hitLiving.getEntity().getShouldBeDead()) {
+    if (!hitLiving.getEntity().isDeadOrDying()) {
       random.setSeed(pendingHit.getRandomSeed());
       // @formatter:off
       hitSnapshot
-          .rayTrace(player.getEntity().getEntityWorld(),
+          .rayTrace(player.getEntity().getCommandSenderWorld(),
               playerSnapshot,
               this.gunProvider.getRange(),
               this.getAccuracy(player),
@@ -353,11 +353,13 @@ public class GunImpl implements IGun {
     final Entity entity = living.getEntity();
 
     // Magazine size will be synced to clients so only decrement this on the server.
-    if (!entity.getEntityWorld().isRemote() && !(living.getEntity() instanceof PlayerEntity
-        && ((PlayerEntity) living.getEntity()).isCreative())) {
+    if (!entity.getCommandSenderWorld().isClientSide()
+        && !(living.getEntity() instanceof PlayerEntity
+            && ((PlayerEntity) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
-          EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, this.gunStack);
-      if (!UnbreakingEnchantment.negateDamage(this.gunStack, unbreakingLevel, random)) {
+          EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.gunStack);
+      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(this.gunStack, unbreakingLevel,
+          random)) {
         this.ammoProvider.getExpectedMagazine().decrementSize();
       }
     }
@@ -365,7 +367,7 @@ public class GunImpl implements IGun {
     // Used to avoid playing the same hit sound more than once.
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.gunProvider.getBulletAmountToFire(); i++) {
-      final long randomSeed = entity.getEntityWorld().getGameTime() + i;
+      final long randomSeed = entity.getCommandSenderWorld().getGameTime() + i;
       random.setSeed(randomSeed);
       // @formatter:off
       RayTraceResult rayTraceResult = RayTraceUtil
@@ -382,12 +384,12 @@ public class GunImpl implements IGun {
             final BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) rayTraceResult;
             boolean playSound = true;
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
-              playSound = entity.getEntityWorld()
-                  .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getPos()) != entity
-                      .getEntityWorld().getBlockState(blockRayTraceResult.getPos());
+              playSound = entity.getCommandSenderWorld()
+                  .getBlockState(((BlockRayTraceResult) lastRayTraceResult).getBlockPos()) != entity
+                      .getCommandSenderWorld().getBlockState(blockRayTraceResult.getBlockPos());
             }
             this.hitBlock(living, (BlockRayTraceResult) rayTraceResult,
-                playSound && entity.getEntityWorld().isRemote());
+                playSound && entity.getCommandSenderWorld().isClientSide());
             break;
           case ENTITY:
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
@@ -401,19 +403,19 @@ public class GunImpl implements IGun {
               break;
             }
 
-            if (entity.getEntityWorld().isRemote()) {
+            if (entity.getCommandSenderWorld().isClientSide()) {
               this.clientHandler.handleHitEntityPre(living,
                   entityRayTraceResult.getEntity(),
-                  entityRayTraceResult.getHitVec(), randomSeed);
+                  entityRayTraceResult.getLocation(), randomSeed);
             }
 
             this.hitEntity(living, entityRayTraceResult.getEntity(),
-                entityRayTraceResult.getHitVec(),
+                entityRayTraceResult.getLocation(),
                 !(lastRayTraceResult instanceof EntityRayTraceResult)
                     || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
                         .getRegistryName()
                         .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
-                        && entity.getEntityWorld().isRemote());
+                        && entity.getCommandSenderWorld().isClientSide());
             break;
           default:
             break;
@@ -430,7 +432,8 @@ public class GunImpl implements IGun {
     }
 
     LogicalSide side =
-        living.getEntity().getEntityWorld().isRemote() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+        living.getEntity().getCommandSenderWorld().isClientSide() ? LogicalSide.CLIENT
+            : LogicalSide.SERVER;
     Executor executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
     if (this.ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0) <= 0) {
@@ -444,7 +447,7 @@ public class GunImpl implements IGun {
       return;
     }
 
-    long time = Util.milliTime();
+    long time = Util.getMillis();
     long timeDelta = time - this.lastShotMs;
     if (timeDelta < this.gunProvider.getFireDelayMs()) {
       return;
@@ -470,17 +473,17 @@ public class GunImpl implements IGun {
   private void hitEntity(ILiving<?, ?> living, Entity hitEntity, Vector3d hitPos,
       boolean playSound) {
     final LivingEntity entity = living.getEntity();
-    final World world = hitEntity.getEntityWorld();
+    final World world = hitEntity.getCommandSenderWorld();
     float damage = this.gunProvider.getDamage();
 
     float armorPenetration = Math.min((1.0F
-        + (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
+        + (EnchantmentHelper.getItemEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
             this.gunStack) / 255.0F))
         * this.ammoProvider.getExpectedMagazine().getArmorPenetration(), 1.0F);
     if (armorPenetration > 0 && hitEntity instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) hitEntity;
       float reducedDamage = damage - CombatRules
-          .getDamageAfterAbsorb(damage, livingEntityHit.getTotalArmorValue(),
+          .getDamageAfterAbsorb(damage, livingEntityHit.getArmorValue(),
               (float) livingEntityHit
                   .getAttribute(Attributes.ARMOR_TOUGHNESS)
                   .getValue());
@@ -491,7 +494,7 @@ public class GunImpl implements IGun {
     boolean headshot = false;
     if (hitEntity instanceof LivingEntity) {
       ILiving<?, ?> hitLiving = ILiving.getExpected((LivingEntity) hitEntity);
-      double chinHeight = (hitEntity.getPosY() + hitEntity.getEyeHeight() - 0.2F);
+      double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
       headshot = (hitEntity instanceof PlayerEntity || hitEntity instanceof ZombieEntity
           || hitEntity instanceof SkeletonEntity || hitEntity instanceof CreeperEntity
           || hitEntity instanceof EndermanEntity || hitEntity instanceof WitchEntity
@@ -507,22 +510,23 @@ public class GunImpl implements IGun {
     }
 
     // Simulated client-side effects
-    if (world.isRemote()) {
+    if (world.isClientSide()) {
       this.clientHandler.handleHitEntityPost(living, hitEntity, hitPos, playSound,
           headshot);
     } else {
       // Resets the temporary invincibility before causing the damage, preventing
       // previous damages from blocking the gun damage.
       // Also, allows multiple bullets to hit the same target at the same time.
-      hitEntity.hurtResistantTime = 0;
+      hitEntity.invulnerableTime = 0;
 
       ModDamageSource.causeDamageWithoutKnockback(hitEntity,
           ModDamageSource.causeGunDamage(entity, this.gunStack, headshot), damage);
 
       checkCreateExplosion(this.gunStack, entity, hitPos);
 
-      if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, this.gunStack) > 0) {
-        hitEntity.setFire(100);
+      if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
+          this.gunStack) > 0) {
+        hitEntity.setSecondsOnFire(100);
       }
 
       if (hitEntity instanceof LivingEntity) {
@@ -530,7 +534,7 @@ public class GunImpl implements IGun {
 
         // Alert client of hit (real hit as opposed to client prediction)
         if (entity instanceof ServerPlayerEntity) {
-          boolean dead = hitLivingEntity.getShouldBeDead();
+          boolean dead = hitLivingEntity.isDeadOrDying();
           NetworkChannel.PLAY.getSimpleChannel().send(
               PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
               new HitMessage(hitPos, dead));
@@ -540,7 +544,8 @@ public class GunImpl implements IGun {
           IPlayer<ServerPlayerEntity> hitPlayer =
               IPlayer.getExpected((ServerPlayerEntity) hitLivingEntity);
           hitPlayer.infect(
-              (EnchantmentHelper.getEnchantmentLevel(ModEnchantments.INFECTION.get(), this.gunStack)
+              (EnchantmentHelper.getItemEnchantmentLevel(ModEnchantments.INFECTION.get(),
+                  this.gunStack)
                   / (float) ModEnchantments.INFECTION.get().getMaxLevel())
                   * hitPlayer.getItemHandler()
                       .getStackInSlot(InventorySlotType.CLOTHING.getIndex())
@@ -556,37 +561,38 @@ public class GunImpl implements IGun {
   private void hitBlock(ILiving<?, ?> living, BlockRayTraceResult rayTrace,
       boolean playSound) {
     final Entity entity = living.getEntity();
-    BlockPos blockPos = rayTrace.getPos();
-    BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
+    BlockPos blockPos = rayTrace.getBlockPos();
+    BlockState blockState = entity.getCommandSenderWorld().getBlockState(blockPos);
     Block block = blockState.getBlock();
-    World world = entity.getEntityWorld();
+    World world = entity.getCommandSenderWorld();
 
     // Client-side effects
-    if (world.isRemote()) {
+    if (world.isClientSide()) {
       this.clientHandler.handleHitBlock(living, rayTrace, playSound);
     } else {
       if (blockState.getBlock() instanceof BellBlock) {
-        ((BellBlock) blockState.getBlock()).attemptRing(world, blockState, rayTrace,
+        ((BellBlock) blockState.getBlock()).onHit(world, blockState, rayTrace,
             entity instanceof PlayerEntity ? (PlayerEntity) entity : null, playSound);
       }
 
       if (block instanceof TNTBlock) {
-        block.catchFire(blockState, entity.getEntityWorld(), blockPos, null,
+        block.catchFire(blockState, entity.getCommandSenderWorld(), blockPos, null,
             entity instanceof LivingEntity ? (LivingEntity) entity : null);
-        entity.getEntityWorld().removeBlock(blockPos, false);
+        entity.getCommandSenderWorld().removeBlock(blockPos, false);
       }
 
-      checkCreateExplosion(this.gunStack, entity, rayTrace.getHitVec());
+      checkCreateExplosion(this.gunStack, entity, rayTrace.getLocation());
 
-      if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, this.gunStack) > 0) {
-        if (CampfireBlock.canBeLit(blockState)) {
-          world.setBlockState(blockPos,
-              blockState.with(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
+      if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
+          this.gunStack) > 0) {
+        if (CampfireBlock.canLight(blockState)) {
+          world.setBlock(blockPos,
+              blockState.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
         } else {
-          BlockPos faceBlockPos = blockPos.offset(rayTrace.getFace());
-          if (AbstractFireBlock.canLightBlock(world, faceBlockPos, entity.getHorizontalFacing())) {
-            BlockState blockstate1 = AbstractFireBlock.getFireForPlacement(world, faceBlockPos);
-            world.setBlockState(faceBlockPos, blockstate1, 11);
+          BlockPos faceBlockPos = blockPos.relative(rayTrace.getDirection());
+          if (AbstractFireBlock.canBePlacedAt(world, faceBlockPos, entity.getDirection())) {
+            BlockState blockstate1 = AbstractFireBlock.getState(world, faceBlockPos);
+            world.setBlock(faceBlockPos, blockstate1, 11);
           }
         }
       }
@@ -641,18 +647,18 @@ public class GunImpl implements IGun {
     living.getEntity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
     if (living.getEntity() instanceof PlayerEntity) {
       ((PlayerEntity) living.getEntity())
-          .sendStatusMessage(Text.translate("message.switch_fire_mode",
+          .displayClientMessage(Text.translate("message.switch_fire_mode",
               Text.translate(this.fireMode.getTranslationKey())), true);
     }
 
     if (sendUpdate) {
       PacketTarget target =
-          living.getEntity().getEntityWorld().isRemote()
+          living.getEntity().getCommandSenderWorld().isClientSide()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY
           .getSimpleChannel()
-          .send(target, new SetFireModeMessage(living.getEntity().getEntityId(), this.fireMode));
+          .send(target, new SetFireModeMessage(living.getEntity().getId(), this.fireMode));
     }
   }
 
@@ -675,17 +681,17 @@ public class GunImpl implements IGun {
     }
 
     this.performingRightMouseAction = !this.performingRightMouseAction;
-    if (living.getEntity().getEntityWorld().isRemote()) {
+    if (living.getEntity().getCommandSenderWorld().isClientSide()) {
       this.clientHandler.handleToggleRightMouseAction(living);
     }
 
     if (sendUpdate) {
       PacketTarget target =
-          living.getEntity().getEntityWorld().isRemote()
+          living.getEntity().getCommandSenderWorld().isClientSide()
               ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new RightMouseAction(living.getEntity().getEntityId(), this.performingRightMouseAction));
+          new RightMouseAction(living.getEntity().getId(), this.performingRightMouseAction));
     }
   }
 
@@ -782,9 +788,9 @@ public class GunImpl implements IGun {
     this.setAttachments(nbt.getList("attachments", 8)
         .stream()
         .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
-            .getValue(new ResourceLocation(tag.getString())))
+            .getValue(new ResourceLocation(tag.getAsString())))
         .collect(Collectors.toSet()));
-    this.setPaintStack(ItemStack.read(nbt.getCompound("paintStack")));
+    this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
   }
 
   @Override
@@ -842,11 +848,12 @@ public class GunImpl implements IGun {
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
       Vector3d position) {
-    float explosionSize = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, magazineStack)
-        / (float) Enchantments.POWER.getMaxLevel();
+    float explosionSize =
+        EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, magazineStack)
+            / (float) Enchantments.POWER_ARROWS.getMaxLevel();
     if (explosionSize > 0) {
-      entity.getEntityWorld().createExplosion(entity, position.getX(), position.getY(),
-          position.getZ(), explosionSize, Explosion.Mode.NONE);
+      entity.getCommandSenderWorld().explode(entity, position.x(), position.y(),
+          position.z(), explosionSize, Explosion.Mode.NONE);
     }
   }
 }

@@ -36,50 +36,50 @@ public class AdvancedZombieModel<T extends AdvancedZombieEntity> extends ZombieM
     super(p_i1168_1_, p_i1168_2_);
     this.bipedLeftArmwear = new ModelRenderer(this, 48, 48);
     this.bipedLeftArmwear.addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, p_i1168_1_ + 0.25F);
-    this.bipedLeftArmwear.setRotationPoint(5.0F, 2.0F, 0.0F);
+    this.bipedLeftArmwear.setPos(5.0F, 2.0F, 0.0F);
     this.bipedRightArmwear = new ModelRenderer(this, 40, 32);
     this.bipedRightArmwear.addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, p_i1168_1_ + 0.25F);
-    this.bipedRightArmwear.setRotationPoint(-5.0F, 2.0F, 10.0F);
+    this.bipedRightArmwear.setPos(-5.0F, 2.0F, 10.0F);
     this.bipedLeftLegwear = new ModelRenderer(this, 0, 48);
     this.bipedLeftLegwear.addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, p_i1168_1_ + 0.25F);
-    this.bipedLeftLegwear.setRotationPoint(1.9F, 12.0F, 0.0F);
+    this.bipedLeftLegwear.setPos(1.9F, 12.0F, 0.0F);
     this.bipedRightLegwear = new ModelRenderer(this, 0, 32);
     this.bipedRightLegwear.addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, p_i1168_1_ + 0.25F);
-    this.bipedRightLegwear.setRotationPoint(-1.9F, 12.0F, 0.0F);
+    this.bipedRightLegwear.setPos(-1.9F, 12.0F, 0.0F);
     this.bipedBodyWear = new ModelRenderer(this, 16, 32);
     this.bipedBodyWear.addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, p_i1168_1_ + 0.25F);
-    this.bipedBodyWear.setRotationPoint(0.0F, 0.0F, 0.0F);
+    this.bipedBodyWear.setPos(0.0F, 0.0F, 0.0F);
   }
 
   @Override
-  protected Iterable<ModelRenderer> getBodyParts() {
+  protected Iterable<ModelRenderer> bodyParts() {
     return Iterables
-        .concat(super.getBodyParts(),
+        .concat(super.bodyParts(),
             ImmutableList
                 .of(this.bipedLeftLegwear, this.bipedRightLegwear, this.bipedLeftArmwear,
                     this.bipedRightArmwear, this.bipedBodyWear));
   }
 
   @Override
-  public void setRotationAngles(T p_225597_1_, float p_225597_2_, float p_225597_3_,
+  public void setupAnim(T p_225597_1_, float p_225597_2_, float p_225597_3_,
       float p_225597_4_,
       float p_225597_5_, float p_225597_6_) {
-    super.setRotationAngles(p_225597_1_, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_,
+    super.setupAnim(p_225597_1_, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_,
         p_225597_6_);
-    this.bipedLeftLegwear.copyModelAngles(this.bipedLeftLeg);
-    this.bipedRightLegwear.copyModelAngles(this.bipedRightLeg);
-    this.bipedLeftArmwear.copyModelAngles(this.bipedLeftArm);
-    this.bipedRightArmwear.copyModelAngles(this.bipedRightArm);
-    this.bipedBodyWear.copyModelAngles(this.bipedBody);
+    this.bipedLeftLegwear.copyFrom(this.leftLeg);
+    this.bipedRightLegwear.copyFrom(this.rightLeg);
+    this.bipedLeftArmwear.copyFrom(this.leftArm);
+    this.bipedRightArmwear.copyFrom(this.rightArm);
+    this.bipedBodyWear.copyFrom(this.body);
   }
 
   @Override
-  public void setVisible(boolean p_178719_1_) {
-    super.setVisible(p_178719_1_);
-    this.bipedLeftArmwear.showModel = p_178719_1_;
-    this.bipedRightArmwear.showModel = p_178719_1_;
-    this.bipedLeftLegwear.showModel = p_178719_1_;
-    this.bipedRightLegwear.showModel = p_178719_1_;
-    this.bipedBodyWear.showModel = p_178719_1_;
+  public void setAllVisible(boolean p_178719_1_) {
+    super.setAllVisible(p_178719_1_);
+    this.bipedLeftArmwear.visible = p_178719_1_;
+    this.bipedRightArmwear.visible = p_178719_1_;
+    this.bipedLeftLegwear.visible = p_178719_1_;
+    this.bipedRightLegwear.visible = p_178719_1_;
+    this.bipedBodyWear.visible = p_178719_1_;
   }
 }

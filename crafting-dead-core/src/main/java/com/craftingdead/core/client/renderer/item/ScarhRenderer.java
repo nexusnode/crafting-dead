@@ -51,13 +51,13 @@ public class ScarhRenderer extends GunRenderer {
   protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(77));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(77));
 
     matrixStack.translate(0.6F, -0.7F, 0.35F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(15));
     matrixStack.translate(-0.45F, 0.5F, 0.0F);
 
     float scale = 1.2F;
@@ -73,35 +73,35 @@ public class ScarhRenderer extends GunRenderer {
     this.muzzleFlashZ = -1.8F;
     this.muzzleScale = 1.2F;
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-35));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5));
 
     matrixStack.translate(0.3F, -0.3F, 0.4F);
 
     float scale = 0.8F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-2));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(-2));
   }
 
   @Override
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-35));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5));
 
     matrixStack.translate(1F, -0.22F, 0.94F);
 
     float scale = 1F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(10));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-1));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(0.18F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(1.2F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(10));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(-1));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(0.18F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(1.2F));
     matrixStack.translate(-0.8F, -0.17F, 0.01F);
 
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
@@ -121,43 +121,43 @@ public class ScarhRenderer extends GunRenderer {
 
   private void renderIronSight1(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.translate(-0.2F, -0.15F, -0.187F);
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is1.png")));
-      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private void renderIronSight2(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(1.1255F, -0.19F, 0.0318F);
       float scale = 0.495F;
       matrixStack.scale(scale, scale, scale);
 
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is2.png")));
-      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
     float scale = 0.72F;
     matrixStack.scale(scale, scale, scale);
     matrixStack.translate(-0.7F, 0.2F, 0.2F);
@@ -180,15 +180,15 @@ public class ScarhRenderer extends GunRenderer {
     }
 
     if (itemStack.getItem() == ModItems.STANAG_DRUM_MAGAZINE.get()) {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(90));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(90));
       matrixStack.translate(-1.24D, 2.4D, 2.7D);
       float scale = 0.65F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(5));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(5));
     }
 
     if (itemStack.getItem() == ModItems.STANAG_BOX_MAGAZINE.get()) {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(90));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(90));
       matrixStack.translate(-1.8D, 3.2D, 3D);
       float scale = 0.95F;
       matrixStack.scale(scale, scale, scale);

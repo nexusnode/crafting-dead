@@ -58,7 +58,7 @@ public class ShaderProgram implements IShaderManager {
 
   public void compile(IResourceManager manager) {
     if (this.vertexShader != null || this.fragmentShader != null) {
-      ShaderLinkHelper.deleteShader(this);
+      ShaderLinkHelper.releaseProgram(this);
     }
     try {
       this.vertexShader =
@@ -77,12 +77,13 @@ public class ShaderProgram implements IShaderManager {
       @Nonnull ResourceLocation location, ShaderLoader.ShaderType type) throws IOException {
     IResource resource = manager.getResource(location);
     try (InputStream stream = new BufferedInputStream(resource.getInputStream())) {
-      return ShaderLoader.func_216534_a(type, location.toString(), stream, resource.getPackName());
+      return ShaderLoader.compileShader(type, location.toString(), stream,
+          resource.getSourceName());
     }
   }
 
   @Override
-  public int getProgram() {
+  public int getId() {
     return this.program;
   }
 
@@ -91,13 +92,13 @@ public class ShaderProgram implements IShaderManager {
 
   @Nonnull
   @Override
-  public ShaderLoader getVertexShaderLoader() {
+  public ShaderLoader getVertexProgram() {
     return this.vertexShader;
   }
 
   @Nonnull
   @Override
-  public ShaderLoader getFragmentShaderLoader() {
+  public ShaderLoader getFragmentProgram() {
     return this.fragmentShader;
   }
 }

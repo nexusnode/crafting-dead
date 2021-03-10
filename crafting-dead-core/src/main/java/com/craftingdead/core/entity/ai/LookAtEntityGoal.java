@@ -44,27 +44,27 @@ public class LookAtEntityGoal<T extends Entity> extends Goal {
     this.watchedClass = watchedClass;
     this.maxDistance = maxDistance;
     this.chance = chance;
-    this.setMutexFlags(EnumSet.of(Goal.Flag.LOOK));
+    this.setFlags(EnumSet.of(Goal.Flag.LOOK));
   }
 
   @Override
-  public boolean shouldExecute() {
-    if (this.goalOwner.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+  public boolean canUse() {
+    if (this.goalOwner.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
       return false;
     }
 
-    if (this.goalOwner.getRNG().nextFloat() >= this.chance) {
+    if (this.goalOwner.getRandom().nextFloat() >= this.chance) {
       return false;
     }
 
     List<Entity> possibleEntities =
-        this.goalOwner.world.getEntitiesWithinAABB(this.watchedClass, this.goalOwner
-            .getBoundingBox().grow((double) this.maxDistance, 4.0D, (double) this.maxDistance));
+        this.goalOwner.level.getEntitiesOfClass(this.watchedClass, this.goalOwner
+            .getBoundingBox().inflate((double) this.maxDistance, 4.0D, (double) this.maxDistance));
 
     double lastSqDistance = Double.MAX_VALUE;
 
     for (Entity grenade : possibleEntities) {
-      double sqDistance = this.goalOwner.getDistanceSq(grenade);
+      double sqDistance = this.goalOwner.distanceToSqr(grenade);
       if (sqDistance <= lastSqDistance) {
         lastSqDistance = sqDistance;
         this.watchedEntity = grenade;
@@ -75,17 +75,17 @@ public class LookAtEntityGoal<T extends Entity> extends Goal {
   }
 
   @Override
-  public boolean shouldContinueExecuting() {
+  public boolean canContinueToUse() {
     if (!this.watchedEntity.isAlive()) {
       return false;
     }
 
-    if (this.goalOwner.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
+    if (this.goalOwner.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
       return false;
     }
 
     if (this.goalOwner
-        .getDistanceSq(this.watchedEntity) > (double) (this.maxDistance * this.maxDistance)) {
+        .distanceToSqr(this.watchedEntity) > (double) (this.maxDistance * this.maxDistance)) {
       return false;
     }
 
@@ -93,19 +93,19 @@ public class LookAtEntityGoal<T extends Entity> extends Goal {
   }
 
   @Override
-  public void startExecuting() {
-    this.lookDuration = 40 + this.goalOwner.getRNG().nextInt(40);
+  public void start() {
+    this.lookDuration = 40 + this.goalOwner.getRandom().nextInt(40);
   }
 
   @Override
-  public void resetTask() {
+  public void stop() {
     this.watchedEntity = null;
   }
 
   @Override
   public void tick() {
-    this.goalOwner.getLookController().setLookPosition(this.watchedEntity.getPosX(),
-        this.watchedEntity.getPosYEye(), this.watchedEntity.getPosZ());
+    this.goalOwner.getLookControl().setLookAt(this.watchedEntity.getX(),
+        this.watchedEntity.getEyeY(), this.watchedEntity.getZ());
     --this.lookDuration;
   }
 }

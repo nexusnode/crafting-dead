@@ -57,7 +57,7 @@ public class PerformActionMessage {
       ILiving<?, ?> performer =
           performerEntity.getCapability(ModCapabilities.LIVING).orElse(null);
       ILiving<?, ?> target = msg.targetEntityId == -1 ? null
-          : performerEntity.getEntityWorld().getEntityByID(msg.targetEntityId)
+          : performerEntity.getCommandSenderWorld().getEntity(msg.targetEntityId)
               .getCapability(ModCapabilities.LIVING).orElse(null);
       final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();
       if (!isServer || msg.actionType.isTriggeredByClient()) {

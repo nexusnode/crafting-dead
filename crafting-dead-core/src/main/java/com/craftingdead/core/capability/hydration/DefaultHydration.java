@@ -26,6 +26,6 @@ public class DefaultHydration implements IHydration {
 
   @Override
   public int getHydration(ItemStack itemStack) {
-    return PotionUtils.getPotionFromItem(itemStack) == Potions.WATER ? 5 : 0;
+    return PotionUtils.getPotion(itemStack) == Potions.WATER ? 5 : 0;
   }
 }

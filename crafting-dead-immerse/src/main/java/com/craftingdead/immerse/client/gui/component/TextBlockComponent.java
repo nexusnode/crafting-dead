@@ -37,7 +37,7 @@ import net.minecraft.util.text.Style;
 public class TextBlockComponent extends Component<TextBlockComponent> {
 
   private ITextComponent text;
-  private FontRenderer fontRenderer;
+  private FontRenderer font;
   private boolean shadow;
   private boolean centered;
   private boolean customWidth = false;
@@ -45,11 +45,11 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
 
   public TextBlockComponent(ITextComponent text) {
     this.text = text;
-    this.fontRenderer = super.minecraft.fontRenderer;
+    this.font = super.minecraft.font;
     this.shadow = true;
     this.centered = false;
     // Auto adjust width to size of text
-    super.setWidth(this.fontRenderer.getStringPropertyWidth(text));
+    super.setWidth(this.font.width(text));
   }
 
   public TextBlockComponent(String text) {
@@ -57,7 +57,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   public TextBlockComponent setFontRenderer(FontRenderer fontRenderer) {
-    this.fontRenderer = fontRenderer;
+    this.font = fontRenderer;
     return this;
   }
 
@@ -81,7 +81,7 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
     this.lines = null;
     this.text = text;
     if (!customWidth) {
-      super.setWidth(this.fontRenderer.getStringPropertyWidth(text));
+      super.setWidth(this.font.width(text));
     }
     this.layout();
   }
@@ -96,66 +96,66 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     if (widthMode == MeasureMode.UNDEFINED) {
-      width = this.fontRenderer.getStringWidth(this.text.getString());
+      width = this.font.width(this.text.getString());
     }
 
     this.generateLines((int) width);
-    return new Vector2f(width, this.lines.size() * this.fontRenderer.FONT_HEIGHT);
+    return new Vector2f(width, this.lines.size() * this.font.lineHeight);
   }
 
   private void generateLines(int width) {
-    this.lines = RenderComponentsUtil.func_238505_a_(this.text, width, this.fontRenderer);
+    this.lines = RenderComponentsUtil.wrapComponents(this.text, width, this.font);
   }
 
   @Override
   public float getActualContentHeight() {
-    return this.lines.size() * this.fontRenderer.FONT_HEIGHT;
+    return this.lines.size() * this.font.lineHeight;
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     return super.mouseClicked(mouseX, mouseY, button)
-        || this.getMouseOverText(mouseX, mouseY).map(this.getScreen()::handleComponentClicked)
+        || this.componentStyleAtWidth(mouseX, mouseY).map(this.getScreen()::handleComponentClicked)
             .orElse(false);
   }
 
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(this.getContentX(), this.getContentY(), 0.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
-          IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+          IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
         IReorderingProcessor line = this.lines.get(i);
-        matrixStack.push();
+        matrixStack.pushPose();
         {
-          matrixStack.translate(0.0D, i * this.fontRenderer.FONT_HEIGHT, 0.0D);
-          float x = this.centered ? (this.getWidth() - fontRenderer.func_243245_a(line)) / 2F : 0;
-          this.fontRenderer.func_238416_a_(line, x, 0, 0xFFFFFFFF, this.shadow,
-              matrixStack.getLast().getMatrix(), renderTypeBuffer, false, 0, 0xF000F0);
+          matrixStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
+          float x = this.centered ? (this.getWidth() - this.font.width(line)) / 2F : 0;
+          this.font.drawInBatch(line, x, 0, 0xFFFFFFFF, this.shadow,
+              matrixStack.last().pose(), renderTypeBuffer, false, 0, 0xF000F0);
         }
-        matrixStack.pop();
+        matrixStack.popPose();
       }
-      renderTypeBuffer.finish();
+      renderTypeBuffer.endBatch();
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
-  public Optional<Style> getMouseOverText(double mouseX, double mouseY) {
+  public Optional<Style> componentStyleAtWidth(double mouseX, double mouseY) {
     int offsetMouseX = MathHelper.floor(mouseX - this.getScaledContentX());
     int offsetMouseY = MathHelper.floor(mouseY - this.getScaledContentY());
     if (offsetMouseX >= 0 && offsetMouseY >= 0) {
       final int lines = this.lines.size();
       if (offsetMouseX <= this.getScaledContentWidth()
-          && offsetMouseY < this.fontRenderer.FONT_HEIGHT * lines + lines) {
-        int maxLines = offsetMouseY / this.fontRenderer.FONT_HEIGHT;
+          && offsetMouseY < this.font.lineHeight * lines + lines) {
+        int maxLines = offsetMouseY / this.font.lineHeight;
         if (maxLines >= 0 && maxLines < this.lines.size()) {
           IReorderingProcessor line = this.lines.get(maxLines);
           return Optional.ofNullable(
-              this.fontRenderer.getCharacterManager().func_243239_a(line, offsetMouseX));
+              this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
         }
       }
     }

@@ -31,9 +31,9 @@ public class TankZombieEntity extends AdvancedZombieEntity {
 
   public static AttributeModifierMap.MutableAttribute registerAttributes() {
     return AdvancedZombieEntity.registerAttributes()
-        .createMutableAttribute(Attributes.FOLLOW_RANGE, 20.0D)
-        .createMutableAttribute(Attributes.MAX_HEALTH, 100.0D)
-        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 15.0D)
-        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.19D);
+        .add(Attributes.FOLLOW_RANGE, 20.0D)
+        .add(Attributes.MAX_HEALTH, 100.0D)
+        .add(Attributes.ATTACK_DAMAGE, 15.0D)
+        .add(Attributes.MOVEMENT_SPEED, 0.19D);
   }
 }

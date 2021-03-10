@@ -85,8 +85,8 @@ public abstract class GunAnimationInspect extends GunAnimation {
 
     float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
 
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-progress));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(progress / 3));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(-progress));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(progress / 3));
   }
 
   @Override

@@ -188,7 +188,7 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
 
   public void resetPlayerData() {
     for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
-      this.deletePlayerData(playerEntity.getUniqueID());
+      this.deletePlayerData(playerEntity.getUUID());
     }
   }
 
@@ -222,7 +222,7 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   @Override
   public void tick() {
     if (this.stateMachine.getCurrentState().getState() == DeathmatchState.IDLE
-        && this.getMinecraftServer().getCurrentPlayerCount() > 0) {
+        && this.getMinecraftServer().getPlayerCount() > 0) {
       this.stateMachine.nextState();
     }
 
@@ -241,35 +241,34 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   public void load() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
-    GameRules.BooleanValue daylightCycle = gameRules.get(GameRules.DO_DAYLIGHT_CYCLE);
+    GameRules.BooleanValue daylightCycle = gameRules.getRule(GameRules.RULE_DAYLIGHT);
     this.daylightCycleOld = daylightCycle.get();
     daylightCycle.set(false, this.getMinecraftServer());
 
-    GameRules.BooleanValue weatherCycle = gameRules.get(GameRules.DO_WEATHER_CYCLE);
+    GameRules.BooleanValue weatherCycle = gameRules.getRule(GameRules.RULE_WEATHER_CYCLE);
     this.weatherCycleOld = weatherCycle.get();
     weatherCycle.set(false, this.getMinecraftServer());
 
-    BooleanValue showDeathMessages = gameRules.get(GameRules.SHOW_DEATH_MESSAGES);
+    BooleanValue showDeathMessages = gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES);
     this.showDeathMessagesOld = showDeathMessages.get();
     showDeathMessages.set(false, this.getMinecraftServer());
 
-    BooleanValue naturalRegeneration = gameRules.get(GameRules.NATURAL_REGENERATION);
+    BooleanValue naturalRegeneration = gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION);
     this.naturalRegenerationOld = naturalRegeneration.get();
     naturalRegeneration.set(false, this.getMinecraftServer());
 
-    BooleanValue immediateRespawn = gameRules.get(GameRules.DO_IMMEDIATE_RESPAWN);
+    BooleanValue immediateRespawn = gameRules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
     this.immediateRespawnOld = immediateRespawn.get();
     immediateRespawn.set(true, this.getMinecraftServer());
 
-    ServerWorld world = this.getMinecraftServer().getWorld(World.OVERWORLD);
+    ServerWorld world = this.getMinecraftServer().getLevel(World.OVERWORLD);
     // Set weather to clear
-    world.func_241113_a_(6000, 0, false, false);
+    world.setWeatherParameters(6000, 0, false, false);
     // Set time to day
     world.setDayTime(1000);
 
-
-    this.oldDifficulty = this.getMinecraftServer().getServerConfiguration().getDifficulty();
-    this.getMinecraftServer().setDifficultyForAllWorlds(Difficulty.PEACEFUL, true);
+    this.oldDifficulty = this.getMinecraftServer().getWorldData().getDifficulty();
+    this.getMinecraftServer().setDifficulty(Difficulty.PEACEFUL, true);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
@@ -278,17 +277,18 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   public void unload() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
-    gameRules.get(GameRules.DO_DAYLIGHT_CYCLE).set(this.daylightCycleOld,
+    gameRules.getRule(GameRules.RULE_DAYLIGHT).set(this.daylightCycleOld,
         this.getMinecraftServer());
-    gameRules.get(GameRules.DO_WEATHER_CYCLE).set(this.weatherCycleOld, this.getMinecraftServer());
-    gameRules.get(GameRules.SHOW_DEATH_MESSAGES).set(this.showDeathMessagesOld,
+    gameRules.getRule(GameRules.RULE_WEATHER_CYCLE).set(this.weatherCycleOld,
         this.getMinecraftServer());
-    gameRules.get(GameRules.NATURAL_REGENERATION).set(this.naturalRegenerationOld,
+    gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES).set(this.showDeathMessagesOld,
         this.getMinecraftServer());
-    gameRules.get(GameRules.DO_IMMEDIATE_RESPAWN).set(this.immediateRespawnOld,
+    gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(this.naturalRegenerationOld,
+        this.getMinecraftServer());
+    gameRules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN).set(this.immediateRespawnOld,
         this.getMinecraftServer());
 
-    this.getMinecraftServer().setDifficultyForAllWorlds(this.oldDifficulty, true);
+    this.getMinecraftServer().setDifficulty(this.oldDifficulty, true);
 
     for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((DeathmatchServerPlayerExtension) IPlayer.getExpected(playerEntity)
@@ -319,7 +319,7 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
 
       if (scoresClose || tooLate) {
         player.getEntity().sendMessage(
-            GameUtil.formatMessage(Text.translate("message.no_switch_team")), Util.DUMMY_UUID);
+            GameUtil.formatMessage(Text.translate("message.no_switch_team")), Util.NIL_UUID);
         return false;
       }
     }
@@ -330,9 +330,9 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
     deathmatchPlayer.setTeam(newTeam == null ? null : newTeam.getTeam());
 
     if (newTeam == null) {
-      player.getEntity().setGameType(GameType.SPECTATOR);
+      player.getEntity().setGameMode(GameType.SPECTATOR);
     } else {
-      player.getEntity().setGameType(GameType.ADVENTURE);
+      player.getEntity().setGameMode(GameType.ADVENTURE);
       this.logicalServer.respawnPlayer((ServerPlayerEntity) player.getEntity(), false);
       GameUtil.sendGameMessageToAll(
           Text.translate("message.joined_team", player.getEntity().getDisplayName().getString(),
@@ -354,7 +354,7 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   @Override
   public void removePlayer(IPlayer<ServerPlayerEntity> player) {
     this.setPlayerTeam(player, null);
-    this.deletePlayerData(player.getEntity().getUniqueID());
+    this.deletePlayerData(player.getEntity().getUUID());
     GameUtil.sendGameMessageToAll(
         Text.translate("message.left", player.getEntity().getDisplayName().getString()),
         this.getMinecraftServer());
@@ -363,12 +363,12 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   @SubscribeEvent
   public void handleLivingDeath(LivingDeathEvent event) {
     if (this.getGameState() == DeathmatchState.GAME
-        && event.getSource().getTrueSource() instanceof ServerPlayerEntity
+        && event.getSource().getEntity() instanceof ServerPlayerEntity
         && event.getEntityLiving() instanceof ServerPlayerEntity && !this.firstBloodDrawn) {
       GameUtil.sendGameMessageToAll(Text
           .translate("message.first_blood_drawn",
-              event.getSource().getTrueSource().getDisplayName().getString())
-          .mergeStyle(TextFormatting.DARK_RED), this.getMinecraftServer());
+              event.getSource().getEntity().getDisplayName().getString())
+          .withStyle(TextFormatting.DARK_RED), this.getMinecraftServer());
       this.firstBloodDrawn = true;
     }
   }

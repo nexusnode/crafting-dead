@@ -70,7 +70,7 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
     if (this.ghost && this.pendingSpectate != null) {
       if (this.pendingSpectate.isAlive() && !this.pendingSpectate.isSpectator()) {
         ((ServerPlayerEntity) this.getPlayer().getEntity())
-            .setSpectatingEntity(this.pendingSpectate);
+            .setCamera(this.pendingSpectate);
       }
       this.pendingSpectate = null;
     }
@@ -81,7 +81,7 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
         if (this.dataManager.getUpdate(REMAINING_GHOST_TIME_SECONDS,
             ghostTime -> --ghostTime) <= 0) {
           this.ghost = false;
-          this.getPlayer().getEntity().setGameType(GameType.ADVENTURE);
+          this.getPlayer().getEntity().setGameMode(GameType.ADVENTURE);
           ((DeathmatchServer) this.game).getLogicalServer()
               .respawnPlayer((ServerPlayerEntity) this.getPlayer().getEntity(), false);
         }
@@ -102,10 +102,10 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
       return true;
     }
 
-    if (source.getTrueSource() instanceof PlayerEntity) {
-      PlayerEntity playerEntity = (PlayerEntity) source.getTrueSource();
+    if (source.getEntity() instanceof PlayerEntity) {
+      PlayerEntity playerEntity = (PlayerEntity) source.getEntity();
 
-      if (playerEntity.getHeldItemMainhand().isEmpty()) {
+      if (playerEntity.getMainHandItem().isEmpty()) {
         return true;
       }
 
@@ -134,8 +134,8 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
 
       NetworkChannel.PLAY.getSimpleChannel().send(
           PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) target),
-          new DisplayKilledMessage(this.getPlayer().getEntity().getEntityId(),
-              this.getPlayer().getEntity().getHeldItemMainhand()));
+          new DisplayKilledMessage(this.getPlayer().getEntity().getId(),
+              this.getPlayer().getEntity().getMainHandItem()));
     }
     return false;
   }
@@ -148,18 +148,18 @@ public class DeathmatchServerPlayerExtension extends DeathmatchPlayerExtension {
       this.getPlayerData().incrementDeaths();
 
       if (this.lastSignificantDamage != null
-          && this.lastSignificantDamage != cause.getTrueSource()) {
-        this.game.getPlayerData(this.lastSignificantDamage.getUniqueID()).incrementAssists();
+          && this.lastSignificantDamage != cause.getEntity()) {
+        this.game.getPlayerData(this.lastSignificantDamage.getUUID()).incrementAssists();
       }
 
       this.ghost = true;
-      playerEntity.getEntityWorld().addParticle(ParticleTypes.EXPLOSION,
-          playerEntity.getPosX(),
-          playerEntity.getPosY(),
-          playerEntity.getPosZ(), 0.0D, 0.0D, 0.0D);
-      playerEntity.setGameType(GameType.SPECTATOR);
-      if (cause.getTrueSource() instanceof ServerPlayerEntity) {
-        this.pendingSpectate = (ServerPlayerEntity) cause.getTrueSource();
+      playerEntity.getLevel().addParticle(ParticleTypes.EXPLOSION,
+          playerEntity.getX(),
+          playerEntity.getY(),
+          playerEntity.getZ(), 0.0D, 0.0D, 0.0D);
+      playerEntity.setGameMode(GameType.SPECTATOR);
+      if (cause.getEntity() instanceof ServerPlayerEntity) {
+        this.pendingSpectate = (ServerPlayerEntity) cause.getEntity();
       }
     }
     return false;

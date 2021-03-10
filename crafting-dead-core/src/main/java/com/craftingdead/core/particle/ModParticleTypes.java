@@ -45,7 +45,7 @@ public class ModParticleTypes {
       Codec<T> codec) {
     return new ParticleType<T>(alwaysShow, deserializer) {
       @Override
-      public Codec<T> func_230522_e_() {
+      public Codec<T> codec() {
         return codec;
       }
     };

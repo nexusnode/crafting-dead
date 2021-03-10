@@ -120,7 +120,7 @@ public class IngameGui {
         final float scale = this.lastFlashScale =
             MathHelper.lerp(partialTicks, this.lastFlashScale, flashIntensity);
         this.minecraft.getTextureManager()
-            .bindTexture(
+            .bind(
                 new ResourceLocation(CraftingDead.ID, "textures/flash/white_flash.png"));
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -182,7 +182,7 @@ public class IngameGui {
     // Draws Flashbang effect
     EffectInstance flashEffect =
         player.getEntity()
-            .getActivePotionEffect(ModEffects.FLASH_BLINDNESS.get());
+            .getEffect(ModEffects.FLASH_BLINDNESS.get());
     if (flashEffect != null) {
       int alpha = (int) (255F
           * (MathHelper.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
@@ -191,21 +191,21 @@ public class IngameGui {
     }
 
     player.getProgressMonitor()
-        .ifPresent(observer -> renderProgress(matrixStack, this.minecraft.fontRenderer, width,
+        .ifPresent(observer -> renderProgress(matrixStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
 
     // Only draw in survival
-    if (this.minecraft.playerController.shouldDrawHUD() && !player.isCombatModeEnabled()) {
+    if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
       float healthPercentage = playerEntity.getHealth() / playerEntity.getMaxHealth();
       if (ClientDist.clientConfig.displayBlood.get() && healthPercentage < 1.0F
-          && playerEntity.isPotionActive(ModEffects.BLEEDING.get())) {
+          && playerEntity.hasEffect(ModEffects.BLEEDING.get())) {
         renderBlood(width, height, healthPercentage);
       }
 
       // Only render when air level is not being rendered
-      if (!playerEntity.areEyesInFluid(FluidTags.WATER)
-          && playerEntity.getAir() == playerEntity.getMaxAir()) {
+      if (!playerEntity.isEyeInFluid(FluidTags.WATER)
+          && playerEntity.getAirSupply() == playerEntity.getMaxAirSupply()) {
         renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
             RenderUtil.ICONS);
       }
@@ -227,21 +227,21 @@ public class IngameGui {
 
   private void renderKillFeed(MatrixStack matrixStack, float partialTicks) {
     if (this.killFeedVisibleTimeMs == 0L) {
-      this.killFeedVisibleTimeMs = Util.milliTime();
+      this.killFeedVisibleTimeMs = Util.getMillis();
       this.killFeedAnimationTimeMs = 0L;
     }
 
-    final long currentTime = Util.milliTime();
+    final long currentTime = Util.getMillis();
     float durationPct = MathHelper.clamp(
         (float) (currentTime - this.killFeedVisibleTimeMs) / KILL_FEED_MESSAGE_LIFE_MS, 0.0F, 1.0F);
     if (durationPct == 1.0F && !this.killFeedMessages.isEmpty()) {
       this.killFeedMessages.remove(0);
       if (!this.killFeedMessages.isEmpty()) {
-        this.killFeedVisibleTimeMs = Util.milliTime();
+        this.killFeedVisibleTimeMs = Util.getMillis();
         this.killFeedAnimationTimeMs = 0L;
       }
     } else if (durationPct >= 0.75F && this.killFeedAnimationTimeMs == 0L) {
-      this.killFeedAnimationTimeMs = Util.milliTime();
+      this.killFeedAnimationTimeMs = Util.getMillis();
     }
 
     float animationPct =
@@ -266,8 +266,8 @@ public class IngameGui {
 
     final String playerEntityName = entry.getKillerEntity().getDisplayName().getString();
     final String deadEntityName = entry.getDeadEntity().getDisplayName().getString();
-    final int playerEntityNameWidth = minecraft.fontRenderer.getStringWidth(playerEntityName);
-    final int deadEntityNameWidth = minecraft.fontRenderer.getStringWidth(deadEntityName);
+    final int playerEntityNameWidth = minecraft.font.width(playerEntityName);
+    final int deadEntityNameWidth = minecraft.font.width(deadEntityName);
 
     int spacing = 20;
     alpha *= minecraft.player == entry.getKillerEntity() ? 0.7F : 0.5F;
@@ -292,10 +292,10 @@ public class IngameGui {
     RenderUtil.drawGradientRectangle(x, y,
         x + playerEntityNameWidth + deadEntityNameWidth + spacing, y + 11, colour, colour);
 
-    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    minecraft.font.drawShadow(matrixStack,
         entry.getKillerEntity().getDisplayName().getString(),
         x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    minecraft.font.drawShadow(matrixStack,
         entry.getDeadEntity().getDisplayName().getString(),
         x + playerEntityNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
 
@@ -375,33 +375,33 @@ public class IngameGui {
     int reserveSize = ammoProvider.getReserveSize();
     boolean empty = ammoCount == 0 && reserveSize == 0;
 
-    String ammoText = empty ? I18n.format("hud.empty_magazine")
+    String ammoText = empty ? I18n.get("hud.empty_magazine")
         : String.valueOf(ammoCount);
-    int ammoTextWidth = this.minecraft.fontRenderer.getStringWidth(ammoText);
+    int ammoTextWidth = this.minecraft.font.width(ammoText);
 
     float reserveTextScale = 0.6F;
     String reserveText = " / " + reserveSize;
     int reserveTextWidth =
-        (int) (this.minecraft.fontRenderer.getStringWidth(reserveText) * reserveTextScale);
+        (int) (this.minecraft.font.width(reserveText) * reserveTextScale);
 
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         ammoText,
         x + 55 - ammoTextWidth - (empty ? 0 : reserveTextWidth),
-        height - (boxHeight / 2) - this.minecraft.fontRenderer.FONT_HEIGHT / 2,
+        height - (boxHeight / 2) - this.minecraft.font.lineHeight / 2,
         empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
 
     if (!empty) {
-      matrixStack.push();
+      matrixStack.pushPose();
       matrixStack.translate(x + 55 - reserveTextWidth,
           height - (boxHeight / 2) - (reserveTextScale * 2), 0);
       matrixStack.scale(reserveTextScale, reserveTextScale, reserveTextScale);
-      this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+      this.minecraft.font.drawShadow(matrixStack,
           reserveText, 0, 0, empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
-      matrixStack.pop();
+      matrixStack.popPose();
     }
 
-    String fireMode = I18n.format(gun.getFireMode().getTranslationKey());
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    String fireMode = I18n.get(gun.getFireMode().getTranslationKey());
+    this.minecraft.font.drawShadow(matrixStack,
         fireMode, x + 65, height - 16, 0xFFFFFFFF);
   }
 
@@ -413,13 +413,13 @@ public class IngameGui {
     final int barColour = 0xC0FFFFFF;
     final float x = width / 2 - barWidth / 2;
     final float y = height / 2;
-    fontRenderer.drawStringWithShadow(matrixStack, message.getString(), x,
-        y - barHeight - ((fontRenderer.FONT_HEIGHT / 2) + 0.5F), 0xFFFFFF);
+    fontRenderer.drawShadow(matrixStack, message.getString(), x,
+        y - barHeight - ((fontRenderer.lineHeight / 2) + 0.5F), 0xFFFFFF);
     RenderUtil.drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour,
         barColour);
     if (subMessage != null) {
-      fontRenderer.drawStringWithShadow(matrixStack, subMessage.getString(), x,
-          y + barHeight + ((fontRenderer.FONT_HEIGHT / 2) + 0.5F), 0xFFFFFF);
+      fontRenderer.drawShadow(matrixStack, subMessage.getString(), x,
+          y + barHeight + ((fontRenderer.lineHeight / 2) + 0.5F), 0xFFFFFF);
     }
   }
 
@@ -472,15 +472,15 @@ public class IngameGui {
     int boxHeight = 30;
     int boxMarginY = 31;
 
-    int currentItemIndex = inventory.currentItem;
+    int currentItemIndex = inventory.selected;
 
     // Render primary
-    ItemStack primaryStack = inventory.getStackInSlot(0);
+    ItemStack primaryStack = inventory.getItem(0);
     if (currentItemIndex == 0) {
       RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "1", boxX + 5, boxY + 5,
+    this.minecraft.font.drawShadow(matrixStack, "1", boxX + 5, boxY + 5,
         0xFFFFFFFF);
     RenderSystem.pushMatrix();
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
@@ -491,13 +491,13 @@ public class IngameGui {
 
 
     // Render secondary
-    ItemStack secondaryStack = inventory.getStackInSlot(1);
+    ItemStack secondaryStack = inventory.getItem(1);
     boxY += boxMarginY;
     if (currentItemIndex == 1) {
       RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "2", boxX + 5, boxY + 5,
+    this.minecraft.font.drawShadow(matrixStack, "2", boxX + 5, boxY + 5,
         0xFFFFFFFF);
     RenderSystem.pushMatrix();
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
@@ -507,13 +507,13 @@ public class IngameGui {
     RenderSystem.popMatrix();
 
     // Render melee
-    ItemStack meleeStack = inventory.getStackInSlot(2);
+    ItemStack meleeStack = inventory.getItem(2);
     boxY += boxMarginY;
     if (currentItemIndex == 2) {
       RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, "3", boxX + 5, boxY + 5,
+    this.minecraft.font.drawShadow(matrixStack, "3", boxX + 5, boxY + 5,
         0xFFFFFFFF);
     RenderSystem.pushMatrix();
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
@@ -528,12 +528,12 @@ public class IngameGui {
     boxHeight = 25;
     boxWidth = 25;
     for (int i = 0; i < 4; i++) {
-      ItemStack extraStack = inventory.getStackInSlot(3 + i);
+      ItemStack extraStack = inventory.getItem(3 + i);
       if (currentItemIndex == 3 + i) {
         RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
       }
       RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-      this.minecraft.fontRenderer.drawStringWithShadow(matrixStack, String.valueOf(4 + i), boxX + 1,
+      this.minecraft.font.drawShadow(matrixStack, String.valueOf(4 + i), boxX + 1,
           boxY + 1, 0xFFFFFFFF);
 
       RenderSystem.pushMatrix();
@@ -549,7 +549,7 @@ public class IngameGui {
     final int healthBoxHeight = 25;
     // Render Health
     final float health = player.getEntity().getHealth();
-    final float armour = player.getEntity().getTotalArmorValue();
+    final float armour = player.getEntity().getArmorValue();
 
 
 
@@ -568,9 +568,9 @@ public class IngameGui {
     RenderUtil.drawTexturedRectangle(5, height - healthBoxHeight / 2 - 8, 16, 16);
     RenderSystem.disableBlend();
 
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
         String.valueOf((int) health), 31,
-        height - healthBoxHeight / 2 - this.minecraft.fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
+        height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
     RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
     RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5,
         (int) (65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
@@ -582,9 +582,9 @@ public class IngameGui {
       RenderUtil.drawTexturedRectangle(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);
       RenderSystem.disableBlend();
 
-      AbstractGui.drawCenteredString(matrixStack, this.minecraft.fontRenderer,
+      AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
           String.valueOf((int) armour), armourX + 31,
-          height - healthBoxHeight / 2 - this.minecraft.fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
+          height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
       RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5, 65, 10,
           0x66000000);
       RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5,

@@ -29,8 +29,8 @@ import net.minecraft.entity.player.PlayerInventory;
 @Mixin(PlayerInventory.class)
 public class PlayerInventoryMixin {
 
-  @Inject(at = @At("HEAD"), method = "changeCurrentItem", cancellable = true)
-  private void changeCurrentItem(double direction, CallbackInfo callbackInfo) {
+  @Inject(at = @At("HEAD"), method = "swapPaint", cancellable = true)
+  private void swapPaint(double direction, CallbackInfo callbackInfo) {
     if (CraftingDead.getInstance().getClientDist().getPlayer()
         .map(IPlayer::isCombatModeEnabled)
         .orElse(false)) {
@@ -47,13 +47,13 @@ public class PlayerInventoryMixin {
       }
 
       do {
-        inventory.currentItem -= direction;
-        if (inventory.currentItem < 0) {
-          inventory.currentItem = 6;
-        } else if (inventory.currentItem > 6) {
-          inventory.currentItem = 0;
+        inventory.selected -= direction;
+        if (inventory.selected < 0) {
+          inventory.selected = 6;
+        } else if (inventory.selected > 6) {
+          inventory.selected = 0;
         }
-      } while (!inventory.isEmpty() && inventory.getCurrentItem().isEmpty());
+      } while (!inventory.isEmpty() && inventory.getSelected().isEmpty());
     }
   }
 }

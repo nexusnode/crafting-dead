@@ -50,14 +50,14 @@ public class SyncGunEquipmentSlotMessage {
 
   public static void encode(SyncGunEquipmentSlotMessage message, PacketBuffer out) {
     out.writeVarInt(message.entityId);
-    out.writeEnumValue(message.slot);
+    out.writeEnum(message.slot);
     out.writeVarInt(message.data.readableBytes());
     out.writeBytes(message.data);
   }
 
   public static SyncGunEquipmentSlotMessage decode(PacketBuffer in) {
     int entityId = in.readVarInt();
-    EquipmentSlotType slot = in.readEnumValue(EquipmentSlotType.class);
+    EquipmentSlotType slot = in.readEnum(EquipmentSlotType.class);
     byte[] data = new byte[in.readVarInt()];
     in.readBytes(data);
     return new SyncGunEquipmentSlotMessage(entityId, slot,
@@ -68,9 +68,9 @@ public class SyncGunEquipmentSlotMessage {
       Supplier<NetworkEvent.Context> ctx) {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-    world.map(w -> w.getEntityByID(message.entityId))
+    world.map(w -> w.getEntity(message.entityId))
         .filter(e -> e instanceof LivingEntity)
-        .map(e -> ((LivingEntity) e).getItemStackFromSlot(message.slot))
+        .map(e -> ((LivingEntity) e).getItemBySlot(message.slot))
         .flatMap(itemStack -> itemStack.getCapability(ModCapabilities.GUN).resolve())
         .ifPresent(gun -> gun.decode(message.data));
     return true;

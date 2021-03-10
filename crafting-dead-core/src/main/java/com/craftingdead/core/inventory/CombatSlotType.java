@@ -43,7 +43,7 @@ public enum CombatSlotType {
 
   protected int getAvailableSlot(PlayerInventory playerInventory, boolean ignoreEmpty) {
     for (int i = 0; i < 6; i++) {
-      if ((ignoreEmpty || playerInventory.getStackInSlot(i).isEmpty()) && getSlotType(i) == this) {
+      if ((ignoreEmpty || playerInventory.getItem(i).isEmpty()) && getSlotType(i) == this) {
         return i;
       }
     }
@@ -56,11 +56,11 @@ public enum CombatSlotType {
     if (index == -1) {
       return false;
     }
-    if (this.dropExistingItems && !playerInventory.getStackInSlot(index).isEmpty()) {
-      ItemStack oldStack = playerInventory.removeStackFromSlot(index);
-      playerInventory.player.dropItem(oldStack, true, true);
+    if (this.dropExistingItems && !playerInventory.getItem(index).isEmpty()) {
+      ItemStack oldStack = playerInventory.removeItemNoUpdate(index);
+      playerInventory.player.drop(oldStack, true, true);
     }
-    playerInventory.setInventorySlotContents(index, itemStack);
+    playerInventory.setItem(index, itemStack);
     return true;
   }
 
@@ -78,7 +78,7 @@ public enum CombatSlotType {
   public static boolean isInventoryValid(PlayerInventory inventory) {
     for (int i = 0; i < 7; i++) {
       if (!CombatSlotType
-          .isItemValidForSlot(inventory.getStackInSlot(i), i)) {
+          .isItemValidForSlot(inventory.getItem(i), i)) {
         return false;
       }
     }

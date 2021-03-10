@@ -32,8 +32,8 @@ import net.minecraft.client.renderer.model.ModelRenderer;
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin {
 
-  @Inject(at = @At("RETURN"), method = "renderItem")
-  private void renderArm(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+  @Inject(at = @At("RETURN"), method = "renderHand")
+  private void renderHand(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
       ModelRenderer armwearRenderer,
       CallbackInfo callbackInfo) {

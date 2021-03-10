@@ -38,37 +38,37 @@ public class ModelMuzzleFlash extends Model {
 
   public ModelMuzzleFlash() {
     super(ModelMuzzleFlash::getFlashRenderType);
-    textureWidth = 64;
-    textureHeight = 64;
+    texWidth = 64;
+    texHeight = 64;
 
     Box_0 = new ModelRenderer(this, 1, 1);
     Box_0.addBox(0F, 0F, 0F, 8, 8, 0);
-    Box_0.setRotationPoint(-4F, -4F, 0F);
-    Box_0.setTextureSize(64, 32);
+    Box_0.setPos(-4F, -4F, 0F);
+    Box_0.setTexSize(64, 32);
     Box_0.mirror = true;
     setRotation(Box_0, 0F, 0F, 0F);
     Box_1 = new ModelRenderer(this, 9, 1);
     Box_1.addBox(-4F, 0F, 0F, 8, 0, 15);
-    Box_1.setRotationPoint(0F, 0F, -15F);
-    Box_1.setTextureSize(64, 32);
+    Box_1.setPos(0F, 0F, -15F);
+    Box_1.setTexSize(64, 32);
     Box_1.mirror = true;
     setRotation(Box_1, 0F, 0F, -0.7853982F);
     Box_3 = new ModelRenderer(this, 1, 17);
     Box_3.addBox(-4F, 0F, 0F, 8, 0, 15);
-    Box_3.setRotationPoint(0F, 0F, -15F);
-    Box_3.setTextureSize(64, 32);
+    Box_3.setPos(0F, 0F, -15F);
+    Box_3.setTexSize(64, 32);
     Box_3.mirror = true;
     setRotation(Box_3, 0F, 0F, -2.373648F);
   }
 
   private void setRotation(ModelRenderer model, float x, float y, float z) {
-    model.rotateAngleX = x;
-    model.rotateAngleY = y;
-    model.rotateAngleZ = z;
+    model.xRot = x;
+    model.yRot = y;
+    model.zRot = z;
   }
 
   @Override
-  public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
+  public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
       int packedOverlay, float red, float green, float blue,
       float alpha) {
     Box_0.render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, green,
@@ -80,18 +80,18 @@ public class ModelMuzzleFlash extends Model {
   }
 
   private static RenderType getFlashRenderType(ResourceLocation texture) {
-    return RenderType.makeType("flash",
+    return RenderType.create("flash",
         DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 256, false,
-        true, RenderType.State.getBuilder()
-            .lightmap(new LightmapState(true))
-            .texture(new RenderState.TextureState(texture,
+        true, RenderType.State.builder()
+            .setLightmapState(new LightmapState(true))
+            .setTextureState(new RenderState.TextureState(texture,
                 false, false))
-            .transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
+            .setTransparencyState(new RenderState.TransparencyState("translucent_transparency", () -> {
               RenderSystem.enableBlend();
               RenderSystem.defaultBlendFunc();
             }, () -> {
               RenderSystem.disableBlend();
             }))
-            .build(true));
+            .createCompositeState(true));
   }
 }

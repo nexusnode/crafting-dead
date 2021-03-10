@@ -38,11 +38,11 @@ public class SurvivalPlayer implements IPlayerExtension {
   public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
 
   private static final DataParameter<Integer> DAYS_SURVIVED =
-      new DataParameter<>(0x00, DataSerializers.VARINT);
+      new DataParameter<>(0x00, DataSerializers.INT);
   private static final DataParameter<Integer> ZOMBIES_KILLED =
-      new DataParameter<>(0x01, DataSerializers.VARINT);
+      new DataParameter<>(0x01, DataSerializers.INT);
   private static final DataParameter<Integer> PLAYERS_KILLED =
-      new DataParameter<>(0x02, DataSerializers.VARINT);
+      new DataParameter<>(0x02, DataSerializers.INT);
 
   private final IPlayer<?> player;
 

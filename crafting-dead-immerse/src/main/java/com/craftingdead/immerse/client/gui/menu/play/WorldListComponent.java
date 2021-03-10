@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
     ContainerComponent createButton = this.newDefaultStyleButton()
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.create"))
         .addListener(ActionEvent.class, (c, e) -> this.minecraft
-            .displayGuiScreen(CreateWorldScreen.func_243425_a(this.getScreen())));
+            .setScreen(CreateWorldScreen.create(this.getScreen())));
 
     ContainerComponent editButton = this.newDefaultStyleButton()
         .setRightMargin(5.7F)
@@ -152,7 +152,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
 
   private void loadWorlds() {
     try {
-      List<WorldSummary> saveList = this.minecraft.getSaveLoader().getSaveList();
+      List<WorldSummary> saveList = this.minecraft.getLevelSource().getLevelList();
       Collections.sort(saveList);
       for (WorldSummary worldSummary : saveList) {
         this.worldListContainer.addChild(new WorldItemComponent(worldSummary, this));
@@ -168,7 +168,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
   }
 
   private Stream<WorldItemComponent> streamItems() {
-    return this.worldListContainer.getChildren().stream()
+    return this.worldListContainer.getChildComponents().stream()
         .filter(child -> child instanceof WorldItemComponent)
         .map(child -> (WorldItemComponent) child);
   }

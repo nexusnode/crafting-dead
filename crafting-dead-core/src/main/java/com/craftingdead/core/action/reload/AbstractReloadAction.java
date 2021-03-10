@@ -41,7 +41,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   public AbstractReloadAction(ActionType<?> actionType, ILiving<?, ?> performer) {
     super(actionType, performer, null);
-    this.gunStack = performer.getEntity().getHeldItemMainhand();
+    this.gunStack = performer.getEntity().getMainHandItem();
     this.gun = this.gunStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     this.oldMagazineStack = this.gun.getAmmoProvider().getMagazineStack();
@@ -64,10 +64,10 @@ public abstract class AbstractReloadAction extends TimedAction {
 
     // Some guns may not have a reload sound
     this.gun.getReloadSound()
-        .ifPresent(sound -> this.performer.getEntity().getEntityWorld().playMovingSound(null,
+        .ifPresent(sound -> this.performer.getEntity().getCommandSenderWorld().playSound(null,
             this.performer.getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
 
-    if (this.performer.getEntity().getEntityWorld().isRemote()) {
+    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
       if (this.oldMagazineStack.isEmpty()) {
         this.playLoadAnimation(false, null);
       } else {
@@ -97,7 +97,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().getEntity().getEntityWorld().isRemote()
+    if (!this.getPerformer().getEntity().getCommandSenderWorld().isClientSide()
         && this.getPerformer().getEntity().isSprinting()) {
       this.getPerformer().cancelAction(true);
       return false;
@@ -107,7 +107,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   protected void finish() {
-    if (this.performer.getEntity().getEntityWorld().isRemote()) {
+    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
       return;
     }
     // This will be synced to the client by the gun.
@@ -120,7 +120,7 @@ public abstract class AbstractReloadAction extends TimedAction {
     if (this.gun.getClient() != null) {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound
-        Minecraft.getInstance().getSoundHandler()
+        Minecraft.getInstance().getSoundManager()
             .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
       }
       this.gun.getClient().getAnimationController()

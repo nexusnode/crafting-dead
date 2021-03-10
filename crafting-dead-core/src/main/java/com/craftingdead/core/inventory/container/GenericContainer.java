@@ -72,29 +72,29 @@ public class GenericContainer extends Container {
   }
 
   @Override
-  public boolean canInteractWith(PlayerEntity playerEntity) {
+  public boolean stillValid(PlayerEntity playerEntity) {
     return true;
   }
 
   @Override
-  public ItemStack transferStackInSlot(PlayerEntity playerEntity, int index) {
+  public ItemStack quickMoveStack(PlayerEntity playerEntity, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
-    Slot slot = this.inventorySlots.get(index);
-    if (slot != null && slot.getHasStack()) {
-      ItemStack itemstack1 = slot.getStack();
+    Slot slot = this.slots.get(index);
+    if (slot != null && slot.hasItem()) {
+      ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
       if (index < this.rows * 9) {
-        if (!this.mergeItemStack(itemstack1, this.rows * 9, this.inventorySlots.size(), true)) {
+        if (!this.moveItemStackTo(itemstack1, this.rows * 9, this.slots.size(), true)) {
           return ItemStack.EMPTY;
         }
-      } else if (!this.mergeItemStack(itemstack1, 0, this.rows * 9, false)) {
+      } else if (!this.moveItemStackTo(itemstack1, 0, this.rows * 9, false)) {
         return ItemStack.EMPTY;
       }
 
       if (itemstack1.isEmpty()) {
-        slot.putStack(ItemStack.EMPTY);
+        slot.set(ItemStack.EMPTY);
       } else {
-        slot.onSlotChanged();
+        slot.setChanged();
       }
     }
 

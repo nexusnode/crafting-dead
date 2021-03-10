@@ -29,9 +29,9 @@ import net.minecraft.client.multiplayer.PlayerController;
 @Mixin(PlayerController.class)
 public class PlayerControllerMixin {
 
-  @Inject(at = @At("RETURN"), method = "shouldDrawHUD", cancellable = true)
-  private void shouldDrawHUD(CallbackInfoReturnable<Boolean> callbackInfo) {
+  @Inject(at = @At("RETURN"), method = "canHurtPlayer", cancellable = true)
+  private void canHurtPlayer(CallbackInfoReturnable<Boolean> callbackInfo) {
     callbackInfo.setReturnValue(callbackInfo.getReturnValue() ||
-        Minecraft.getInstance().getRenderViewEntity() instanceof RemoteClientPlayerEntity);
+        Minecraft.getInstance().getCameraEntity() instanceof RemoteClientPlayerEntity);
   }
 }

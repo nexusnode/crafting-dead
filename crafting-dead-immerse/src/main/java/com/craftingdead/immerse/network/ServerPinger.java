@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.network;
 
 import java.net.InetAddress;
@@ -52,8 +70,8 @@ public class ServerPinger {
   public void ping(String hostName, int port, Consumer<PingData> callback) {
     NetworkManager networkManagger;
     try {
-      networkManagger = NetworkManager
-          .createNetworkManagerAndConnect(InetAddress.getByName(hostName), port, false);
+      networkManagger =
+          NetworkManager.connectToServer(InetAddress.getByName(hostName), port, false);
     } catch (UnknownHostException e) {
       logger.warn("Unknown host: " + hostName);
       callback.accept(PingData.FAILED);
@@ -62,7 +80,7 @@ public class ServerPinger {
 
     this.pendingPings.add(networkManagger);
 
-    networkManagger.setNetHandler(new IClientStatusNetHandler() {
+    networkManagger.setListener(new IClientStatusNetHandler() {
 
       private boolean successful;
       private boolean receivedStatus;
@@ -70,33 +88,33 @@ public class ServerPinger {
       private PingData pingData = new PingData();
 
       @Override
-      public void handleServerInfo(SServerInfoPacket packetIn) {
+      public void handleStatusResponse(SServerInfoPacket packet) {
         if (this.receivedStatus) {
           networkManagger
-              .closeChannel(new TranslationTextComponent("multiplayer.status.unrequested"));
+              .disconnect(new TranslationTextComponent("multiplayer.status.unrequested"));
         } else {
           this.receivedStatus = true;
-          ServerStatusResponse serverstatusresponse = packetIn.getResponse();
-          ITextComponent serverDescription = serverstatusresponse.getServerDescription();
-          pingData.setMotd(serverDescription);
-          pingData.setServerVersion(
-              new StringTextComponent(serverstatusresponse.getVersion().getName()));
-          pingData.setVersion(serverstatusresponse.getVersion().getProtocol());
-          pingData.setPlayersAmount(
-              Text.of(serverstatusresponse.getPlayers().getOnlinePlayerCount() + "/" +
-                  serverstatusresponse.getPlayers().getMaxPlayers()));
-          this.pingSentAt = Util.milliTime();
-          networkManagger.sendPacket(new CPingPacket(this.pingSentAt));
+          ServerStatusResponse status = packet.getStatus();
+          ITextComponent description = status.getDescription();
+          this.pingData.setMotd(description);
+          this.pingData.setServerVersion(
+              new StringTextComponent(status.getVersion().getName()));
+          this.pingData.setVersion(status.getVersion().getProtocol());
+          this.pingData.setPlayersAmount(
+              Text.of(status.getPlayers().getNumPlayers() + "/" +
+                  status.getPlayers().getMaxPlayers()));
+          this.pingSentAt = Util.getMillis();
+          networkManagger.send(new CPingPacket(this.pingSentAt));
           this.successful = true;
         }
       }
 
       @Override
-      public void handlePong(SPongPacket packetIn) {
+      public void handlePongResponse(SPongPacket packetIn) {
         long i = this.pingSentAt;
-        long j = Util.milliTime();
+        long j = Util.getMillis();
         pingData.setPing(j - i);
-        networkManagger.closeChannel(new TranslationTextComponent("multiplayer.status.finished"));
+        networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.finished"));
       }
 
       @Override
@@ -111,15 +129,15 @@ public class ServerPinger {
       }
 
       @Override
-      public NetworkManager getNetworkManager() {
+      public NetworkManager getConnection() {
         return networkManagger;
       }
     });
 
     executor.execute(() -> {
       try {
-        networkManagger.sendPacket(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
-        networkManagger.sendPacket(new CServerQueryPacket());
+        networkManagger.send(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
+        networkManagger.send(new CServerQueryPacket());
       } catch (Throwable t) {
         logger.error(t);
       }
@@ -132,7 +150,7 @@ public class ServerPinger {
 
       while (iterator.hasNext()) {
         NetworkManager networkmanager = iterator.next();
-        if (networkmanager.isChannelOpen()) {
+        if (networkmanager.isConnected()) {
           networkmanager.tick();
         } else {
           iterator.remove();
@@ -146,12 +164,11 @@ public class ServerPinger {
   public void clearPendingNetworks() {
     synchronized (this.pendingPings) {
       Iterator<NetworkManager> iterator = this.pendingPings.iterator();
-
       while (iterator.hasNext()) {
         NetworkManager networkmanager = iterator.next();
-        if (networkmanager.isChannelOpen()) {
+        if (networkmanager.isConnected()) {
           iterator.remove();
-          networkmanager.closeChannel(new TranslationTextComponent("multiplayer.status.cancelled"));
+          networkmanager.disconnect(new TranslationTextComponent("multiplayer.status.cancelled"));
         }
       }
 

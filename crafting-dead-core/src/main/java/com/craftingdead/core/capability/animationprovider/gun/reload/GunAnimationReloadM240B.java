@@ -97,9 +97,9 @@ public class GunAnimationReloadM240B extends GunAnimationReload {
   public void doRender(ItemStack par1, float par2, MatrixStack matrixStack) {
     float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
 
-    matrixStack.rotate(new Vector3f((!ejectingClip ? 2.5F : 4.0F), (!ejectingClip ? 1.0F : 0.0F),
+    matrixStack.mulPose(new Vector3f((!ejectingClip ? 2.5F : 4.0F), (!ejectingClip ? 1.0F : 0.0F),
         (!ejectingClip ? 2.0F : 1.0F)).rotationDegrees(-progress));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(progress));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(progress));
   }
 
   public void doRenderAmmo(ItemStack par1, float par2, MatrixStack matrixStack) {
@@ -124,7 +124,7 @@ public class GunAnimationReloadM240B extends GunAnimationReload {
   public void doRenderHand(ItemStack par1, float par2, boolean par3, MatrixStack matrixStack) {
     if (par3) {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 0.4F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-progress * 0.4F));
       // matrixStack.rotate(Vector3f.XP.rotationDegrees(progress));
     } else {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;

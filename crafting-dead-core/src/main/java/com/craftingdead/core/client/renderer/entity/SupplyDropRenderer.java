@@ -43,18 +43,18 @@ public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
 
     matrixStack.translate(0, 1.51D, 0);
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
 
     this.model.setRenderParachute(entity.fallDistance > 0 && !entity.isOnGround());
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(this.model.getRenderType(this.getEntityTexture(entity)));
-    this.model.render(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.NO_OVERLAY, 1.0F,
+        renderTypeBuffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
+    this.model.renderToBuffer(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.NO_OVERLAY, 1.0F,
         1.0F, 1.0F, 0.15F);
   }
 
   @Override
-  public ResourceLocation getEntityTexture(SupplyDropEntity entity) {
+  public ResourceLocation getTextureLocation(SupplyDropEntity entity) {
     return new ResourceLocation(CraftingDead.ID, "textures/entity/supply_drop.png");
   }
 }

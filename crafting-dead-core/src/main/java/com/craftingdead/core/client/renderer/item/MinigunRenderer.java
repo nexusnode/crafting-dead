@@ -51,9 +51,9 @@ public class MinigunRenderer extends GunRenderer {
   protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(190));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(80));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(190));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(80));
 
     matrixStack.translate(0F, 0.25F, 0.25F);
 
@@ -73,32 +73,32 @@ public class MinigunRenderer extends GunRenderer {
     this.muzzleFlashZ = -1.8F;
     this.muzzleScale = 2F;
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-40.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(-3.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-40.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(-3.0F));
 
     matrixStack.translate(0.1F, 0.5F, -0.1F);
 
     float scale = 1.3F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(3.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(3.0F));
   }
 
   @Override
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-24.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.1F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-24.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5.1F));
 
     matrixStack.translate(-0.1F, -0.665F, 0.952F);
 
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-0.7F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-0.7F));
   }
 
   @Override
@@ -116,28 +116,28 @@ public class MinigunRenderer extends GunRenderer {
 
   private void renderBarrel(float partialTicks, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       final float x = 0.155F;
       final float y = 0.035F;
       matrixStack.translate(0, x, -y);
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(this.rotation));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(this.rotation));
       matrixStack.translate(0, -x, y);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.barrelModel
-          .getRenderType(new ResourceLocation(CraftingDead.ID, "textures/gun/minigun.png")));
-      this.barrelModel.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+          .renderType(new ResourceLocation(CraftingDead.ID, "textures/gun/minigun.png")));
+      this.barrelModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
     float scale = 0.8F;
     matrixStack.scale(scale, scale, scale);
     matrixStack.translate(-0.8F, 0.2F, 0.4F);
@@ -163,7 +163,7 @@ public class MinigunRenderer extends GunRenderer {
 
   @Override
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(pct * -50));
     matrixStack.translate(pct * 0.3F, 0.0F, pct * 0.1F);
   }
 }

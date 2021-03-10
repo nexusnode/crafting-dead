@@ -32,8 +32,8 @@ public class WeakZombieEntity extends AdvancedZombieEntity {
 
   public static AttributeModifierMap.MutableAttribute registerAttributes() {
     return AdvancedZombieEntity.registerAttributes()
-        .createMutableAttribute(Attributes.FOLLOW_RANGE, 25.0D)
-        .createMutableAttribute(Attributes.MAX_HEALTH, 5.0D)
-        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D);
+        .add(Attributes.FOLLOW_RANGE, 25.0D)
+        .add(Attributes.MAX_HEALTH, 5.0D)
+        .add(Attributes.ATTACK_DAMAGE, 2.0D);
   }
 }

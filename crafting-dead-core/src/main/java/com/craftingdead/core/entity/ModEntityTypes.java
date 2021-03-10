@@ -74,119 +74,119 @@ public class ModEntityTypes {
   public static void initialize() {
     c4Explosive = add("c4_explosive",
         EntityType.Builder
-            .<C4ExplosiveEntity>create(C4ExplosiveEntity::new, EntityClassification.MISC)
+            .<C4ExplosiveEntity>of(C4ExplosiveEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.65F, 0.25F)
+            .sized(0.65F, 0.25F)
             .setShouldReceiveVelocityUpdates(false));
 
     decoyGrenade = add("decoy_grenade",
         EntityType.Builder
-            .<DecoyGrenadeEntity>create(DecoyGrenadeEntity::new, EntityClassification.MISC)
+            .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
+            .sized(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     fireGrenade = add("fire_grenade",
         EntityType.Builder
-            .<FireGrenadeEntity>create(FireGrenadeEntity::new, EntityClassification.MISC)
+            .<FireGrenadeEntity>of(FireGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
+            .sized(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     flashGrenade = add("flash_grenade",
         EntityType.Builder
-            .<FlashGrenadeEntity>create(FlashGrenadeEntity::new, EntityClassification.MISC)
+            .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
+            .sized(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     fragGrenade = add("frag_grenade",
         EntityType.Builder
-            .<FragGrenadeEntity>create(FragGrenadeEntity::new, EntityClassification.MISC)
+            .<FragGrenadeEntity>of(FragGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.25F)
+            .sized(0.25F, 0.25F)
             .setShouldReceiveVelocityUpdates(false));
 
     pipeGrenade = add("pipe_grenade",
         EntityType.Builder
-            .<PipeGrenadeEntity>create(PipeGrenadeEntity::new, EntityClassification.MISC)
+            .<PipeGrenadeEntity>of(PipeGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
+            .sized(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     smokeGrenade = add("smoke_grenade",
         EntityType.Builder
-            .<SmokeGrenadeEntity>create(SmokeGrenadeEntity::new, EntityClassification.MISC)
+            .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, EntityClassification.MISC)
             .setTrackingRange(64)
             .setUpdateInterval(4)
-            .size(0.25F, 0.5F)
+            .sized(0.25F, 0.5F)
             .setShouldReceiveVelocityUpdates(false));
 
     advancedZombie = add("advanced_zombie",
         EntityType.Builder
-            .<AdvancedZombieEntity>create(AdvancedZombieEntity::new, EntityClassification.MONSTER)
+            .<AdvancedZombieEntity>of(AdvancedZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     fastZombie = add("fast_zombie",
         EntityType.Builder
-            .<FastZombieEntity>create(FastZombieEntity::new, EntityClassification.MONSTER)
+            .<FastZombieEntity>of(FastZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     tankZombie = add("tank_zombie",
         EntityType.Builder
-            .<TankZombieEntity>create(TankZombieEntity::new, EntityClassification.MONSTER)
+            .<TankZombieEntity>of(TankZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     weakZombie = add("weak_zombie",
         EntityType.Builder
-            .<WeakZombieEntity>create(WeakZombieEntity::new, EntityClassification.MONSTER)
+            .<WeakZombieEntity>of(WeakZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     policeZombie = add("police_zombie",
         EntityType.Builder
-            .<AdvancedZombieEntity>create(PoliceZombieEntity::new, EntityClassification.MONSTER)
+            .<AdvancedZombieEntity>of(PoliceZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     doctorZombie = add("doctor_zombie",
         EntityType.Builder
-            .<AdvancedZombieEntity>create(DoctorZombieEntity::new, EntityClassification.MONSTER)
+            .<AdvancedZombieEntity>of(DoctorZombieEntity::new, EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(0.6F, 1.95F)
+            .sized(0.6F, 1.95F)
             .setShouldReceiveVelocityUpdates(false));
 
     giantZombie = add("giant_zombie",
         EntityType.Builder
-            .<GiantZombieEntity>create(GiantZombieEntity::new,
+            .<GiantZombieEntity>of(GiantZombieEntity::new,
                 EntityClassification.MONSTER)
             .setTrackingRange(64)
             .setUpdateInterval(3)
-            .size(3.6F, 12.0F)
+            .sized(3.6F, 12.0F)
             .setShouldReceiveVelocityUpdates(false));
 
     supplyDrop = add("supply_drop", EntityType.Builder
-        .<SupplyDropEntity>create(SupplyDropEntity::new, EntityClassification.MISC));
+        .<SupplyDropEntity>of(SupplyDropEntity::new, EntityClassification.MISC));
 
     // Spawn placement rules
     EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,

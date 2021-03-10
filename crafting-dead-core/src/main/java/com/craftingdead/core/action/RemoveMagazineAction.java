@@ -39,7 +39,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   public RemoveMagazineAction(ILiving<?, ?> performer) {
     super(ActionTypes.REMOVE_MAGAZINE.get(), performer, null);
-    this.gun = performer.getEntity().getHeldItemMainhand().getCapability(ModCapabilities.GUN)
+    this.gun = performer.getEntity().getMainHandItem().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     IAmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
@@ -60,7 +60,7 @@ public class RemoveMagazineAction extends TimedAction {
       if (this.gun.isPerformingRightMouseAction()) {
         this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
       }
-      if (this.performer.getEntity().getEntityWorld().isRemote()) {
+      if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
         this.gun.getAnimation(AnimationType.RELOAD)
             .filter(animation -> animation instanceof GunAnimationReload)
             .map(animation -> (GunAnimationReload) animation)
@@ -98,11 +98,11 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   protected void finish() {
-    if (!this.performer.getEntity().getEntityWorld().isRemote()) {
+    if (!this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
       // This will be synced to the client by the gun.
       this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
       if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.performer.getEntity()).addItemStackToInventory(this.oldMagazineStack);
+        ((PlayerEntity) this.performer.getEntity()).addItem(this.oldMagazineStack);
       }
     }
   }

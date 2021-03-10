@@ -51,16 +51,16 @@ public class BinocularsItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
+  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
       Hand hand) {
-    ItemStack itemstack = playerEntity.getHeldItem(hand);
-    playerEntity.setActiveHand(hand);
+    ItemStack itemstack = playerEntity.getItemInHand(hand);
+    playerEntity.startUsingItem(hand);
     playerEntity.playSound(ModSoundEvents.SCOPE_ZOOM.get(), 0.75F, 1.0F);
-    if (world.isRemote()) {
+    if (world.isClientSide()) {
       Minecraft mc = Minecraft.getInstance();
-      mc.gameSettings.setPointOfView(PointOfView.FIRST_PERSON);
+      mc.options.setCameraType(PointOfView.FIRST_PERSON);
     }
-    return ActionResult.resultConsume(itemstack);
+    return ActionResult.consume(itemstack);
   }
 
   @Override

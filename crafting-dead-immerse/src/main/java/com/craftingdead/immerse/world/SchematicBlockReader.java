@@ -34,7 +34,7 @@ public class SchematicBlockReader implements IBlockReader {
   }
 
   @Override
-  public TileEntity getTileEntity(BlockPos pos) {
+  public TileEntity getBlockEntity(BlockPos pos) {
     return this.schematic.getTileEntity(pos);
   }
 

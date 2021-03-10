@@ -26,7 +26,7 @@ import net.minecraft.util.ResourceLocation;
 public class ModItemModelsProperties {
 
   public static void register() {
-    ItemModelsProperties.registerGlobalProperty(new ResourceLocation("wearing"),
+    ItemModelsProperties.registerGeneric(new ResourceLocation("wearing"),
         (itemStack, world, entity) -> entity.getCapability(ModCapabilities.LIVING)
             .map(living -> living.getItemHandler()
                 .getStackInSlot(InventorySlotType.HAT.getIndex()) == itemStack ? 1.0F : 0.0F)

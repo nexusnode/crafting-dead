@@ -35,7 +35,7 @@ import net.minecraft.util.text.TextFormatting;
 
 public class ItemButton extends GameButton implements IInfoPanel {
 
-  private final FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+  private final FontRenderer font = Minecraft.getInstance().font;
 
   private final IPlayer<?> player;
   private final IShop shop;
@@ -51,7 +51,7 @@ public class ItemButton extends GameButton implements IInfoPanel {
   }
 
   private ITextComponent getFormattedPrice() {
-    return Text.of("$" + this.price).mergeStyle(this.shop.canAfford(this.player, this.price)
+    return Text.of("$" + this.price).withStyle(this.shop.canAfford(this.player, this.price)
         ? TextFormatting.GREEN
         : TextFormatting.RED);
   }
@@ -60,7 +60,7 @@ public class ItemButton extends GameButton implements IInfoPanel {
   public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
     if (this.price > 0) {
-      RenderUtil.renderTextRight(this.fontRenderer, matrixStack, x + width - 2, y + 7,
+      RenderUtil.renderTextRight(this.font, matrixStack, x + width - 2, y + 7,
           this.getFormattedPrice(), 0, true);
     }
   }
@@ -69,9 +69,9 @@ public class ItemButton extends GameButton implements IInfoPanel {
   @Override
   public void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    this.fontRenderer.func_243246_a(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
+    this.font.drawShadow(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
 
-    drawCenteredString(matrixStack, this.fontRenderer, this.getFormattedPrice(), x + 53, y - 75, 0);
+    drawCenteredString(matrixStack, this.font, this.getFormattedPrice(), x + 53, y - 75, 0);
 
     RenderSystem.pushMatrix();
     RenderSystem.translatef(x + 10, y - 40, 0);
@@ -82,12 +82,12 @@ public class ItemButton extends GameButton implements IInfoPanel {
     RenderSystem.popMatrix();
 
     List<ITextComponent> itemInfo = new ArrayList<>();
-    this.itemStack.getItem().addInformation(this.itemStack, null, itemInfo, TooltipFlags.NORMAL);
+    this.itemStack.getItem().appendHoverText(this.itemStack, null, itemInfo, TooltipFlags.NORMAL);
 
     for (int i = 0; i < itemInfo.size(); i++) {
       ITextComponent info = itemInfo.get(i);
-      this.fontRenderer.func_243246_a(matrixStack, info, x - 20,
-          y + (i * this.fontRenderer.FONT_HEIGHT + 1), 0xFFFFFFFF);
+      this.font.drawShadow(matrixStack, info, x - 20,
+          y + (i * this.font.lineHeight + 1), 0xFFFFFFFF);
     }
   }
 }

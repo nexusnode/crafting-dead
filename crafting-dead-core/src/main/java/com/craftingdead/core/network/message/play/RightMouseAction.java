@@ -51,7 +51,7 @@ public class RightMouseAction {
         .map(e -> (LivingEntity) e)
         .<ILiving<LivingEntity, ?>>flatMap(ILiving::getOptional) // Need to cast this or else compiler complains
         .ifPresent(living -> {
-          living.getEntity().getHeldItemMainhand()
+          living.getEntity().getMainHandItem()
               .getCapability(ModCapabilities.GUN)
               .ifPresent(gun -> gun.setPerformingRightMouseAction(living, message.performing,
                   ctx.get().getDirection().getReceptionSide().isServer()));

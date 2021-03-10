@@ -32,11 +32,11 @@ import net.minecraft.util.math.MathHelper;
 public class RGBFlashParticle extends SpriteTexturedParticle {
   private RGBFlashParticle(RGBFlashParticleData data, ClientWorld world, double x, double y, double z) {
     super(world, x, y, z);
-    this.maxAge = 4;
-    this.particleRed = data.getRed();
-    this.particleGreen = data.getGreen();
-    this.particleBlue = data.getBlue();
-    this.particleScale = data.getScale();
+    this.lifetime = 4;
+    this.rCol = data.getRed();
+    this.gCol = data.getGreen();
+    this.bCol = data.getBlue();
+    this.quadSize = data.getScale();
   }
 
   @Override
@@ -45,16 +45,16 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
   }
 
   @Override
-  public void renderParticle(IVertexBuilder vertexBuilder, ActiveRenderInfo activeRenderInfo,
+  public void render(IVertexBuilder vertexBuilder, ActiveRenderInfo activeRenderInfo,
       float partialTicks) {
-    this.setAlphaF(0.6F - ((float) this.age + partialTicks - 1.0F) * 0.25F * 0.5F);
-    super.renderParticle(vertexBuilder, activeRenderInfo, partialTicks);
+    this.setAlpha(0.6F - ((float) this.age + partialTicks - 1.0F) * 0.25F * 0.5F);
+    super.render(vertexBuilder, activeRenderInfo, partialTicks);
   }
 
   @Override
-  public float getScale(float partialTicks) {
+  public float getQuadSize(float partialTicks) {
     return 3.1F * MathHelper.sin(((float) this.age + partialTicks - 1.0F) * 0.25F * (float) Math.PI)
-        * this.particleScale;
+        * this.quadSize;
   }
 
   public static class Factory implements IParticleFactory<RGBFlashParticleData> {
@@ -65,10 +65,10 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public Particle makeParticle(RGBFlashParticleData data, ClientWorld world, double xPos, double yPos,
+    public Particle createParticle(RGBFlashParticleData data, ClientWorld world, double xPos, double yPos,
         double zPos, double xVelocity, double yVelocity, double zVelocity) {
       RGBFlashParticle flashParticle = new RGBFlashParticle(data, world, xPos, yPos, zPos);
-      flashParticle.selectSpriteRandomly(this.animatedSprite);
+      flashParticle.pickSprite(this.animatedSprite);
       return flashParticle;
     }
   }

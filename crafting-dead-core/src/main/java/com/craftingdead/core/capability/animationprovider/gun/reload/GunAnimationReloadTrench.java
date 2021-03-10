@@ -106,8 +106,8 @@ public class GunAnimationReloadTrench extends GunAnimationReload {
 
     // matrixStack.translate(0.0F, -(progress / 250), 0.0F);
 
-    matrixStack.rotate(new Vector3f(6.0F, 0.0F, 1.0F).rotationDegrees(-progress));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(progress));
+    matrixStack.mulPose(new Vector3f(6.0F, 0.0F, 1.0F).rotationDegrees(-progress));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(progress));
   }
 
   @Override
@@ -132,13 +132,13 @@ public class GunAnimationReloadTrench extends GunAnimationReload {
     } else {
       if (par3) {
         float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-        matrixStack.rotate(new Vector3f(1.0F, 0.0F, 1.0F).rotationDegrees(progress * 0.2F));
+        matrixStack.mulPose(new Vector3f(1.0F, 0.0F, 1.0F).rotationDegrees(progress * 0.2F));
       } else {
         float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;
         matrixStack.translate(-transprogress * 1F, transprogress * 0.5F, transprogress);
 
         float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-        matrixStack.rotate(Vector3f.ZP.rotationDegrees(progress * 0.2F));
+        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(progress * 0.2F));
       }
     }
   }

@@ -145,7 +145,7 @@ public class ClientDist implements IModDist {
       new KeyBinding("key.equipment_menu", GLFW.GLFW_KEY_Z, "key.categories.inventory");
   public static final KeyBinding TOGGLE_COMBAT_MODE =
       new KeyBinding("key.toggle_combat_mode", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
-          InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_C), "key.categories.inventory");
+          InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_C), "key.categories.inventory");
 
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;
@@ -211,7 +211,7 @@ public class ClientDist implements IModDist {
     // Minecraft is null on date gen launch
     if (this.minecraft != null) {
       ((IReloadableResourceManager) this.minecraft.getResourceManager())
-          .addReloadListener(this.crosshairManager);
+          .registerReloadListener(this.crosshairManager);
     }
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
@@ -223,7 +223,7 @@ public class ClientDist implements IModDist {
     clientConfig.tutorialStep.set(step);
     Tutorial tutorial = this.minecraft.getTutorial();
     tutorial.setStep(TutorialSteps.NONE);
-    tutorial.tutorialStep = step.create(this);
+    tutorial.instance = step.create(this);
   }
 
   public CrosshairManager getCrosshairManager() {
@@ -269,7 +269,7 @@ public class ClientDist implements IModDist {
   }
 
   public boolean isRightMouseDown() {
-    return this.minecraft.gameSettings.keyBindUseItem.isKeyDown();
+    return this.minecraft.options.keyUse.isDown();
   }
 
   public boolean isLocalPlayer(Entity entity) {
@@ -314,17 +314,17 @@ public class ClientDist implements IModDist {
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
         (stack, world, tooltipFlags) -> Text
             .translate("item_lore.clothing_item.water_breathing")
-            .mergeStyle(TextFormatting.GRAY));
+            .withStyle(TextFormatting.GRAY));
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
         (stack, world, tooltipFlags) -> Text
             .translate("item_lore.clothing_item.water_speed")
-            .mergeStyle(TextFormatting.GRAY));
+            .withStyle(TextFormatting.GRAY));
 
     StartupMessageManager.addModMessage("Registering container screen factories");
 
-    ScreenManager.registerFactory(ModContainerTypes.EQUIPMENT.get(), PlayerScreen::new);
-    ScreenManager.registerFactory(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
+    ScreenManager.register(ModContainerTypes.EQUIPMENT.get(), PlayerScreen::new);
+    ScreenManager.register(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
 
     StartupMessageManager.addModMessage("Registering key bindings");
 
@@ -410,16 +410,16 @@ public class ClientDist implements IModDist {
   public void registerPlayerLayer(
       Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
     // A little dirty way, blame Mojang
-    this.minecraft.getRenderManager().getSkinMap().forEach((skin, renderer) -> {
+    this.minecraft.getEntityRenderDispatcher().getSkinMap().forEach((skin, renderer) -> {
       renderer.addLayer(function.apply(renderer));
     });
   }
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    final ParticleManager particleManager = this.minecraft.particles;
-    particleManager.registerFactory(ModParticleTypes.RGB_FLASH.get(),
+    final ParticleManager particleManager = this.minecraft.particleEngine;
+    particleManager.register(ModParticleTypes.RGB_FLASH.get(),
         RGBFlashParticle.Factory::new);
-    particleManager.registerFactory(ModParticleTypes.GRENADE_SMOKE.get(),
+    particleManager.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
   }
 
@@ -462,7 +462,7 @@ public class ClientDist implements IModDist {
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
-    if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
+    if (event.getMap().location().equals(PlayerContainer.BLOCK_ATLAS)) {
       this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
     }
   }
@@ -479,7 +479,7 @@ public class ClientDist implements IModDist {
 
     // Applies the arbitrary tooltip
     for (TooltipFunction function : functions) {
-      World world = event.getEntity() != null ? event.getEntity().world : null;
+      World world = event.getEntity() != null ? event.getEntity().level : null;
       ITextComponent tooltip =
           function.createTooltip(event.getItemStack(), world, event.getFlags());
       if (tooltip != null) {
@@ -495,11 +495,11 @@ public class ClientDist implements IModDist {
         this.lastTime = (float) Math.ceil(this.lastTime);
         IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
         if (player != null) {
-          ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+          ItemStack heldStack = player.getEntity().getMainHandItem();
           IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
 
-          boolean worldFocused = !this.minecraft.isGamePaused() && this.minecraft.loadingGui == null
-              && (this.minecraft.currentScreen == null);
+          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.overlay == null
+              && (this.minecraft.screen == null);
 
           this.cameraManager.tick();
 
@@ -516,45 +516,45 @@ public class ClientDist implements IModDist {
             return;
           }
 
-          while (TOGGLE_COMBAT_MODE.isPressed()) {
+          while (TOGGLE_COMBAT_MODE.consumeClick()) {
             player.setCombatModeEnabled(!player.isCombatModeEnabled());
           }
 
           // Update gun input
           if (gun != null) {
-            while (TOGGLE_FIRE_MODE.isPressed()) {
+            while (TOGGLE_FIRE_MODE.consumeClick()) {
               gun.toggleFireMode(player, true);
             }
-            while (RELOAD.isPressed()) {
+            while (RELOAD.consumeClick()) {
               gun.getAmmoProvider().reload(player);
             }
-            while (REMOVE_MAGAZINE.isPressed()) {
+            while (REMOVE_MAGAZINE.consumeClick()) {
               gun.getAmmoProvider().unload(player);
             }
           }
 
           // Update crouching
-          if (this.minecraft.player.isSneaking() != this.wasSneaking) {
-            if (this.minecraft.player.isSneaking()) {
-              final long currentTime = Util.milliTime();
+          if (this.minecraft.player.isShiftKeyDown() != this.wasSneaking) {
+            if (this.minecraft.player.isShiftKeyDown()) {
+              final long currentTime = Util.getMillis();
               if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
                 player.setCrouching(true, true);
               }
-              this.lastSneakPressTime = Util.milliTime();
+              this.lastSneakPressTime = Util.getMillis();
             } else {
               player.setCrouching(false, true);
             }
-            this.wasSneaking = this.minecraft.player.isSneaking();
+            this.wasSneaking = this.minecraft.player.isShiftKeyDown();
           }
 
           // Update tutorial
-          while (OPEN_EQUIPMENT_MENU.isPressed()) {
+          while (OPEN_EQUIPMENT_MENU.consumeClick()) {
             NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
-            if (this.minecraft.getTutorial().tutorialStep instanceof IModTutorialStep) {
-              ((IModTutorialStep) this.minecraft.getTutorial().tutorialStep).openModInventory();
+            if (this.minecraft.getTutorial().instance instanceof IModTutorialStep) {
+              ((IModTutorialStep) this.minecraft.getTutorial().instance).openModInventory();
             }
           }
-          TutorialSteps currentTutorialStep = this.minecraft.gameSettings.tutorialStep;
+          TutorialSteps currentTutorialStep = this.minecraft.options.tutorialStep;
           if (this.lastTutorialStep != currentTutorialStep) {
             if (currentTutorialStep == TutorialSteps.NONE) {
               this.setTutorialStep(clientConfig.tutorialStep.get());
@@ -563,7 +563,7 @@ public class ClientDist implements IModDist {
           }
 
           // Update adrenaline effects
-          if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
+          if (this.minecraft.player.hasEffect(ModEffects.ADRENALINE.get())) {
             this.wasAdrenalineActive = true;
             this.effectsManager.setHighpassLevels(1.0F, 0.015F);
             this.effectsManager.setDirectHighpassForAll();
@@ -582,17 +582,17 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
     IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
-    if (player != null && this.minecraft.loadingGui == null
-        && this.minecraft.currentScreen == null && !player.getEntity().isSpectator()) {
-      ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+    if (player != null && this.minecraft.overlay == null
+        && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
+      ItemStack heldStack = player.getEntity().getMainHandItem();
       IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
-      if (this.minecraft.gameSettings.keyBindAttack.matchesMouseKey(event.getButton())) {
+      if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
           event.setCanceled(true);
           gun.setTriggerPressed(player, triggerPressed, true);
         }
-      } else if (this.minecraft.gameSettings.keyBindUseItem.matchesMouseKey(event.getButton())) {
+      } else if (this.minecraft.options.keyUse.matchesMouse(event.getButton())) {
         if (gun != null) {
           switch (gun.getRightMouseActionTriggerType()) {
             case HOLD:
@@ -615,12 +615,12 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
-    ItemStack heldStack = event.getEntity().getHeldItemMainhand();
+    ItemStack heldStack = event.getEntity().getMainHandItem();
     // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
-    if (event.getRenderer().getEntityModel() instanceof BipedModel
+    if (event.getRenderer().getModel() instanceof BipedModel
         && heldStack.getItem() instanceof GunItem) {
-      BipedModel<?> model = event.getRenderer().getEntityModel();
-      switch (event.getEntity().getPrimaryHand()) {
+      BipedModel<?> model = event.getRenderer().getModel();
+      switch (event.getEntity().getMainArm()) {
         case LEFT:
           model.leftArmPose = ArmPose.BOW_AND_ARROW;
           break;
@@ -636,15 +636,15 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     IPlayer<AbstractClientPlayerEntity> player =
-        this.minecraft.getRenderViewEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getRenderViewEntity().getCapability(ModCapabilities.LIVING)
+        this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
+            ? this.minecraft.getCameraEntity().getCapability(ModCapabilities.LIVING)
                 .<IPlayer<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;
     if (player == null) {
       return;
     }
-    ItemStack heldStack = player.getEntity().getHeldItemMainhand();
+    ItemStack heldStack = player.getEntity().getMainHandItem();
     IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
     switch (event.getType()) {
       case HEALTH:
@@ -658,7 +658,7 @@ public class ClientDist implements IModDist {
         break;
       case ALL:
         this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
-            event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(),
+            event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
             event.getPartialTicks());
         break;
       case CROSSHAIRS:
@@ -674,8 +674,8 @@ public class ClientDist implements IModDist {
           event.setCanceled(true);
           if (gun.hasCrosshair()) {
             this.ingameGui.renderCrosshairs(gun.getAccuracy(player),
-                event.getPartialTicks(), event.getWindow().getScaledWidth(),
-                event.getWindow().getScaledHeight());
+                event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
+                event.getWindow().getGuiScaledHeight());
           }
         }
         break;
@@ -687,22 +687,22 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
     this.cameraManager.getCameraRotations((float) event.getRenderPartialTicks(), CAMERA_ROTATIONS);
-    event.setPitch(event.getPitch() + CAMERA_ROTATIONS.getX());
-    event.setYaw(event.getYaw() + CAMERA_ROTATIONS.getY());
-    event.setRoll(event.getRoll() + CAMERA_ROTATIONS.getZ());
+    event.setPitch(event.getPitch() + CAMERA_ROTATIONS.x());
+    event.setYaw(event.getYaw() + CAMERA_ROTATIONS.y());
+    event.setRoll(event.getRoll() + CAMERA_ROTATIONS.z());
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
     event.setNewfov(event.getNewfov()
-        + this.cameraManager.getFov(Minecraft.getInstance().getRenderPartialTicks()));
+        + this.cameraManager.getFov(Minecraft.getInstance().getFrameTime()));
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(EntityViewRenderEvent.FOVModifier event) {
-    if (this.minecraft.getRenderViewEntity() instanceof LivingEntity) {
-      LivingEntity livingEntity = (LivingEntity) this.minecraft.getRenderViewEntity();
-      ItemStack heldStack = livingEntity.getHeldItemMainhand();
+    if (this.minecraft.getCameraEntity() instanceof LivingEntity) {
+      LivingEntity livingEntity = (LivingEntity) this.minecraft.getCameraEntity();
+      ItemStack heldStack = livingEntity.getMainHandItem();
       float newFov = heldStack.getCapability(ModCapabilities.SCOPE)
           .filter(scope -> scope.isAiming(livingEntity))
           .map(scope -> 1 / scope.getZoomMultiplier(livingEntity)).orElse(1.0F);
@@ -711,7 +711,7 @@ public class ClientDist implements IModDist {
       this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
 
       event.setFOV(event.getFOV()
-          * MathHelper.lerp(this.minecraft.getRenderPartialTicks(), this.lastFov, this.fov));
+          * MathHelper.lerp(this.minecraft.getFrameTime(), this.lastFov, this.fov));
     }
   }
 
@@ -721,7 +721,7 @@ public class ClientDist implements IModDist {
       case START:
         if (this.minecraft.player != null) {
           this.cameraManager.getLookRotationDelta(FOV);
-          this.minecraft.player.rotateTowards(FOV.getY(), FOV.getX());
+          this.minecraft.player.turn(FOV.getY(), FOV.getX());
         }
         break;
       case END:
@@ -736,35 +736,35 @@ public class ClientDist implements IModDist {
 
   private void updateAdrenalineShader(float partialTicks) {
     final GameRenderer gameRenderer = this.minecraft.gameRenderer;
-    final boolean shaderLoaded = gameRenderer.getShaderGroup() != null
-        && gameRenderer.getShaderGroup().getShaderGroupName()
+    final boolean shaderLoaded = gameRenderer.currentEffect() != null
+        && gameRenderer.currentEffect().getName()
             .equals(ADRENALINE_SHADER.toString());
-    if (this.minecraft.player.isPotionActive(ModEffects.ADRENALINE.get())) {
-      final long currentTime = Util.milliTime();
+    if (this.minecraft.player.hasEffect(ModEffects.ADRENALINE.get())) {
+      final long currentTime = Util.getMillis();
       if (this.adrenalineShaderStartTime == 0L) {
         this.adrenalineShaderStartTime = currentTime;
       }
       float progress = MathHelper.clamp(
           ((currentTime - this.adrenalineShaderStartTime) - partialTicks) / 5000.0F, 0.0F, 1.0F);
       if (!shaderLoaded) {
-        if (gameRenderer.getShaderGroup() != null) {
-          gameRenderer.stopUseShader();
+        if (gameRenderer.currentEffect() != null) {
+          gameRenderer.shutdownEffect();
         }
-        gameRenderer.loadShader(ADRENALINE_SHADER);
+        gameRenderer.loadEffect(ADRENALINE_SHADER);
       }
-      ShaderGroup shaderGroup = gameRenderer.getShaderGroup();
+      ShaderGroup shaderGroup = gameRenderer.currentEffect();
       RenderUtil.updateUniform("Saturation", progress * 0.25F, shaderGroup);
     } else if (shaderLoaded) {
       this.adrenalineShaderStartTime = 0L;
-      gameRenderer.stopUseShader();
+      gameRenderer.shutdownEffect();
     }
   }
 
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     // Prevents current GUI being closed before new one opens.
-    if (this.minecraft.currentScreen instanceof PlayerScreen && event.getGui() == null
-        && ((PlayerScreen) this.minecraft.currentScreen).isTransitioning()) {
+    if (this.minecraft.screen instanceof PlayerScreen && event.getGui() == null
+        && ((PlayerScreen) this.minecraft.screen).isTransitioning()) {
       event.setCanceled(true);
     }
   }
@@ -800,7 +800,7 @@ public class ClientDist implements IModDist {
         .map(ILiving::getItemHandler)
         .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
         .flatMap(clothingStack -> clothingStack.getCapability(ModCapabilities.CLOTHING).resolve())
-        .map(clothing -> clothing.getTexture(playerEntity.getSkinType()))
+        .map(clothing -> clothing.getTexture(playerEntity.getModelName()))
         .orElse(null);
 
     RenderArmClothingEvent event = new RenderArmClothingEvent(playerEntity, clothingTexture);
@@ -808,22 +808,22 @@ public class ClientDist implements IModDist {
     clothingTexture = event.getClothingTexture();
 
     if (clothingTexture != null) {
-      PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getEntityModel();
-      playerModel.swingProgress = 0.0F;
-      playerModel.isSneak = false;
-      playerModel.swimAnimation = 0.0F;
-      playerModel.setRotationAngles(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+      PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getModel();
+      playerModel.attackTime = 0.0F;
+      playerModel.crouching = false;
+      playerModel.swimAmount = 0.0F;
+      playerModel.setupAnim(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 
-      armRenderer.showModel = true;
-      armwearRenderer.showModel = true;
+      armRenderer.visible = true;
+      armwearRenderer.visible = true;
 
-      armRenderer.rotateAngleX = 0.0F;
+      armRenderer.xRot = 0.0F;
       armRenderer.render(matrixStack,
-          renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingTexture)), packedLight,
+          renderTypeBuffer.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
-      armwearRenderer.rotateAngleX = 0.0F;
+      armwearRenderer.xRot = 0.0F;
       armwearRenderer.render(matrixStack,
-          renderTypeBuffer.getBuffer(RenderType.getEntityTranslucent(clothingTexture)), packedLight,
+          renderTypeBuffer.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
     }
   }

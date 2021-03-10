@@ -59,7 +59,7 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
       }
     }
 
-    if (!performer.getEntity().getEntityWorld().isRemote()) {
+    if (!performer.getEntity().getCommandSenderWorld().isClientSide()) {
       Optional<EntityRayTraceResult> entityRayTraceResult =
           RayTraceUtil.rayTraceEntities(performer.getEntity());
       if (this.selectedTarget != performer
@@ -85,12 +85,12 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
     for (Pair<EffectInstance, Float> pair : this.effects) {
       if (pair.getLeft() != null && UseItemAction.random.nextFloat() < pair.getRight()) {
         EffectInstance effectInstance = pair.getLeft();
-        if (effectInstance.getPotion().isInstant()) {
-          effectInstance.getPotion().affectEntity(this.selectedTarget.getEntity(),
+        if (effectInstance.getEffect().isInstantenous()) {
+          effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
               this.selectedTarget.getEntity(),
               this.selectedTarget.getEntity(), effectInstance.getAmplifier(), 1.0D);
         } else {
-          this.selectedTarget.getEntity().addPotionEffect(new EffectInstance(effectInstance));
+          this.selectedTarget.getEntity().addEffect(new EffectInstance(effectInstance));
         }
       }
     }

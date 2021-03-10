@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Arrays;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -44,13 +45,14 @@ public class EntityComponent extends Component<EntityComponent> {
     this.livingEntity = entity;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-    this.minecraft.getRenderManager().cacheActiveRenderInfo(FakeWorld.getInstance(),
-        this.minecraft.gameRenderer.getActiveRenderInfo(), null);
-    matrixStack.push();
+    this.minecraft.getEntityRenderDispatcher().prepare(FakeWorld.getInstance(),
+        this.minecraft.gameRenderer.getMainCamera(), null);
+    matrixStack.pushPose();
     {
       matrixStack.translate(0, 0, 1050.0F);
       matrixStack.scale(1.0F, 1.0F, -1.0F);
@@ -59,39 +61,43 @@ public class EntityComponent extends Component<EntityComponent> {
           this.getScaledContentY() + this.getScaledContentHeight(), 1000.0D);
       matrixStack.scale(this.getScaledContentWidth() / 2.0F, this.getScaledContentHeight() / 2.0F,
           1.0F);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 
-      final float oldYawOffset = this.livingEntity.renderYawOffset;
-      final float oldYaw = this.livingEntity.rotationYaw;
-      final float oldPitch = this.livingEntity.rotationPitch;
-      final float oldPrevHeadYaw = this.livingEntity.prevRotationYawHead;
-      final float oldHeadYaw = this.livingEntity.rotationYawHead;
+      final float oldYawOffset = this.livingEntity.yBodyRot;
+      final float oldYaw = this.livingEntity.yRot;
+      final float oldPitch = this.livingEntity.xRot;
+      final float oldPrevHeadYaw = this.livingEntity.yHeadRotO;
+      final float oldHeadYaw = this.livingEntity.yHeadRot;
 
       float headYaw = (float) Math
           .atan((this.getScaledContentX() + this.getScaledContentWidth() / 2.0F - mouseX) / 40.0F);
       float headPitch = (float) Math
           .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4.0F - mouseY) / 40.0F);
-      this.livingEntity.renderYawOffset = 180.0F + headYaw * 20.0F;
-      this.livingEntity.rotationYaw = 180.0F + headYaw * 40.0F;
-      this.livingEntity.rotationPitch = -headPitch * 20.0F;
-      this.livingEntity.rotationYawHead = this.livingEntity.rotationYaw;
-      this.livingEntity.prevRotationYawHead = this.livingEntity.rotationYaw;
-      final EntityRendererManager entityRendererManager = this.minecraft.getRenderManager();
+      this.livingEntity.yBodyRot = 180.0F + headYaw * 20.0F;
+      this.livingEntity.yRot = 180.0F + headYaw * 40.0F;
+      this.livingEntity.xRot = -headPitch * 20.0F;
+      this.livingEntity.yHeadRot = this.livingEntity.yRot;
+      this.livingEntity.yHeadRotO = this.livingEntity.yRot;
+      final EntityRendererManager entityRendererManager =
+          this.minecraft.getEntityRenderDispatcher();
 
       entityRendererManager.setRenderShadow(false);
       IRenderTypeBuffer.Impl renderTypeBufferImpl =
-          this.minecraft.getRenderTypeBuffers().getBufferSource();
-      entityRendererManager.renderEntityStatic(this.livingEntity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F,
-          matrixStack, renderTypeBufferImpl, 0xF000F0);
-      renderTypeBufferImpl.finish();
+          this.minecraft.renderBuffers().bufferSource();
+
+      RenderSystem.runAsFancy(() -> entityRendererManager.render(this.livingEntity, 0.0D, 0.0D,
+          0.0D, 0.0F, 1.0F, matrixStack,
+          renderTypeBufferImpl, 0xF000F0));
+
+      renderTypeBufferImpl.endBatch();
       entityRendererManager.setRenderShadow(false);
 
-      this.livingEntity.renderYawOffset = oldYawOffset;
-      this.livingEntity.rotationYaw = oldYaw;
-      this.livingEntity.rotationPitch = oldPitch;
-      this.livingEntity.prevRotationYawHead = oldPrevHeadYaw;
-      this.livingEntity.rotationYawHead = oldHeadYaw;
+      this.livingEntity.yBodyRot = oldYawOffset;
+      this.livingEntity.yRot = oldYaw;
+      this.livingEntity.xRot = oldPitch;
+      this.livingEntity.yHeadRotO = oldPrevHeadYaw;
+      this.livingEntity.yHeadRot = oldHeadYaw;
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 }

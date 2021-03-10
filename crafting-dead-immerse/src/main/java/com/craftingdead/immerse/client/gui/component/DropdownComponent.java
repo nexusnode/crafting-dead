@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.ArrayList;
@@ -48,7 +66,7 @@ public class DropdownComponent extends Component<DropdownComponent>
   private double xArrowOffset;
 
   @Nullable
-  private IGuiEventListener listener;
+  private IGuiEventListener focusedListener;
   private boolean dragging;
 
   public DropdownComponent() {
@@ -177,7 +195,7 @@ public class DropdownComponent extends Component<DropdownComponent>
   }
 
   @Override
-  public List<? extends IGuiEventListener> getEventListeners() {
+  public List<? extends IGuiEventListener> children() {
     return Collections.unmodifiableList(this.items);
   }
 
@@ -211,7 +229,7 @@ public class DropdownComponent extends Component<DropdownComponent>
           type = Type.DISABLED;
         } else if (item.index == this.selectedItemIndex) {
           type = Type.HIGHLIGHTED;
-        } else if (item.isMouseOver(mouseX, mouseY) || this.listener == item) {
+        } else if (item.isMouseOver(mouseX, mouseY) || this.focusedListener == item) {
           type = Type.HOVERED;
         } else {
           type = Type.NONE;
@@ -233,19 +251,21 @@ public class DropdownComponent extends Component<DropdownComponent>
           (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2d);
       RenderSystem.translated(xOffset, yOffset, 0);
       Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder buffer = tessellator.getBuffer();
-      buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-      buffer.pos(0, 0, 0.0D).endVertex();
-      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
-      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D).endVertex();
-      buffer.pos(this.arrowLineWidthX, 0, 0.0D).endVertex();
-      tessellator.draw();
-      buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-      buffer.pos(this.arrowWidth - this.arrowLineWidthX, 0, 0.0D).endVertex();
-      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D).endVertex();
-      buffer.pos(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
-      buffer.pos(this.arrowWidth, 0, 0.0D).endVertex();
-      tessellator.draw();
+      BufferBuilder builder = tessellator.getBuilder();
+      builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+      builder.vertex(0, 0, 0.0D).endVertex();
+      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
+      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D)
+          .endVertex();
+      builder.vertex(this.arrowLineWidthX, 0, 0.0D).endVertex();
+      tessellator.end();
+      builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+      builder.vertex(this.arrowWidth - this.arrowLineWidthX, 0, 0.0D).endVertex();
+      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D)
+          .endVertex();
+      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
+      builder.vertex(this.arrowWidth, 0, 0.0D).endVertex();
+      tessellator.end();
     }
     RenderSystem.popMatrix();
   }
@@ -314,9 +334,9 @@ public class DropdownComponent extends Component<DropdownComponent>
 
       RenderUtil.fill(x, y, x2, y2, backgroundColour);
 
-      DropdownComponent.this.minecraft.fontRenderer.func_238418_a_(this.text,
+      DropdownComponent.this.minecraft.font.drawWordWrap(this.text,
           (int) x + 3,
-          (int) (y + (height - DropdownComponent.this.minecraft.fontRenderer.FONT_HEIGHT) / 2 + 1),
+          (int) (y + (height - DropdownComponent.this.minecraft.font.lineHeight) / 2 + 1),
           (int) width, textColour);
     }
 
@@ -347,7 +367,7 @@ public class DropdownComponent extends Component<DropdownComponent>
     @Override
     public boolean changeFocus(boolean forward) {
       return !this.disabled && DropdownComponent.this.selectedItemIndex != this.index
-          && DropdownComponent.this.listener != this;
+          && DropdownComponent.this.focusedListener != this;
     }
 
     public void setDisabled(boolean disabled) {
@@ -380,12 +400,12 @@ public class DropdownComponent extends Component<DropdownComponent>
 
   @Nullable
   @Override
-  public IGuiEventListener getListener() {
-    return this.listener;
+  public IGuiEventListener getFocused() {
+    return this.focusedListener;
   }
 
   @Override
-  public void setListener(@Nullable IGuiEventListener listener) {
-    this.listener = listener;
+  public void setFocused(@Nullable IGuiEventListener focusedListener) {
+    this.focusedListener = focusedListener;
   }
 }

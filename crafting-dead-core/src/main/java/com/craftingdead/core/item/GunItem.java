@@ -349,7 +349,7 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
   }
 
   @Override
-  public Predicate<ItemStack> getInventoryAmmoPredicate() {
+  public Predicate<ItemStack> getAllSupportedProjectiles() {
     return itemStack -> this.acceptedMagazines
         .stream()
         .map(Supplier::get)
@@ -399,59 +399,59 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+  public void appendHoverText(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
+    super.appendHoverText(stack, world, lines, tooltipFlag);
 
     stack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       ITextComponent ammoCount =
           Text.of(gun.getAmmoProvider().getMagazine().map(IMagazine::getSize).orElse(0))
-              .mergeStyle(TextFormatting.RED);
-      ITextComponent damageText = Text.of(this.damage).mergeStyle(TextFormatting.RED);
+              .withStyle(TextFormatting.RED);
+      ITextComponent damageText = Text.of(this.damage).withStyle(TextFormatting.RED);
       ITextComponent headshotDamageText = Text
           .of((int) (this.damage * GunImpl.HEADSHOT_MULTIPLIER))
-          .mergeStyle(TextFormatting.RED);
+          .withStyle(TextFormatting.RED);
       ITextComponent accuracyText =
-          Text.of((int) (this.accuracyPct * 100D) + "%").mergeStyle(TextFormatting.RED);
-      ITextComponent rpmText = Text.of(this.getFireRateRPM()).mergeStyle(TextFormatting.RED);
+          Text.of((int) (this.accuracyPct * 100D) + "%").withStyle(TextFormatting.RED);
+      ITextComponent rpmText = Text.of(this.getFireRateRPM()).withStyle(TextFormatting.RED);
       ITextComponent rangeText =
-          Text.of(this.getRange() + " blocks").mergeStyle(TextFormatting.RED);
+          Text.of(this.getRange() + " blocks").withStyle(TextFormatting.RED);
 
       lines.add(Text.translate("item_lore.gun_item.ammo_amount")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(ammoCount));
       lines.add(Text.translate("item_lore.gun_item.damage")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(damageText));
       lines.add(Text.translate("item_lore.gun_item.headshot_damage")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(headshotDamageText));
 
       if (this.bulletAmountToFire > 1) {
         ITextComponent pelletsText =
-            Text.of(this.bulletAmountToFire).mergeStyle(TextFormatting.RED);
+            Text.of(this.bulletAmountToFire).withStyle(TextFormatting.RED);
 
         lines.add(Text.translate("item_lore.gun_item.pellets_shot")
-            .mergeStyle(TextFormatting.GRAY)
+            .withStyle(TextFormatting.GRAY)
             .append(pelletsText));
       }
 
       for (AttachmentItem attachment : gun.getAttachments()) {
         ITextComponent attachmentNameText =
-            attachment.getName().copyRaw().mergeStyle(TextFormatting.RED);
+            attachment.getDescription().plainCopy().withStyle(TextFormatting.RED);
         lines.add(Text.translate("item_lore.gun_item.attachment")
-            .mergeStyle(TextFormatting.GRAY)
+            .withStyle(TextFormatting.GRAY)
             .append(attachmentNameText));
       }
 
       lines.add(Text.translate("item_lore.gun_item.rpm")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(rpmText));
       lines.add(Text.translate("item_lore.gun_item.accuracy")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(accuracyText));
       lines.add(Text.translate("item_lore.gun_item.range")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(rangeText));
     });
   }
@@ -463,18 +463,18 @@ public class GunItem extends ShootableItem implements IRendererProvider, IGunPro
 
   @Override
   public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-    return enchantment == Enchantments.FLAME || enchantment == Enchantments.POWER
+    return enchantment == Enchantments.FLAMING_ARROWS || enchantment == Enchantments.POWER_ARROWS
         || enchantment == Enchantments.UNBREAKING
         || super.canApplyAtEnchantingTable(stack, enchantment);
   }
 
   @Override
-  public int getItemEnchantability() {
+  public int getEnchantmentValue() {
     return 1;
   }
 
   @Override
-  public int func_230305_d_() {
+  public int getDefaultProjectileRange() {
     return 0;
   }
 

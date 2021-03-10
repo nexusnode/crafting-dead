@@ -66,9 +66,9 @@ public class SyncGunContainerSlotMessage {
       Supplier<NetworkEvent.Context> ctx) {
     Optional<World> world =
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-    world.map(w -> w.getEntityByID(message.entityId))
+    world.map(w -> w.getEntity(message.entityId))
         .filter(e -> e instanceof PlayerEntity)
-        .map(e -> ((PlayerEntity) e).container.getSlot(message.slot).getStack())
+        .map(e -> ((PlayerEntity) e).inventoryMenu.getSlot(message.slot).getItem())
         .flatMap(itemStack -> itemStack.getCapability(ModCapabilities.GUN).resolve())
         .ifPresent(gun -> gun.decode(message.data));
     return true;

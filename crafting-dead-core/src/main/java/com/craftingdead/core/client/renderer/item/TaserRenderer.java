@@ -44,13 +44,13 @@ public class TaserRenderer extends GunRenderer {
 
     matrixStack.translate(0.0F, 0.0F, -0.05F);
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(78));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(78));
 
     matrixStack.translate(0.5F, -0.2F, 0.35F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(15));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(15));
 
     float scale = 0.75F;
     matrixStack.scale(scale, scale, scale);
@@ -60,8 +60,8 @@ public class TaserRenderer extends GunRenderer {
   protected void applyFirstPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-35));
 
 
     matrixStack.translate(1F, -0.33F, 0.35F);
@@ -74,9 +74,9 @@ public class TaserRenderer extends GunRenderer {
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-25));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-25));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5));
 
     matrixStack.translate(0.63F, -0.655F, 0.955F);
 
@@ -93,8 +93,8 @@ public class TaserRenderer extends GunRenderer {
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
 
     float scale = 0.43F;
     matrixStack.scale(scale, scale, scale);
@@ -104,8 +104,8 @@ public class TaserRenderer extends GunRenderer {
 
   @Override
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(pct * 10));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(pct * 10));
     matrixStack.translate(pct * 0.5F, 0.0F, pct * 1F);
   }
 

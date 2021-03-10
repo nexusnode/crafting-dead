@@ -34,11 +34,11 @@ public class ModItemTagsProvider extends ItemTagsProvider {
   }
 
   @Override
-  public void registerTags() {
-    this.getOrCreateBuilder(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
+  public void addTags() {
+    this.tag(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
         ModItems.SYRINGE.get(), ModItems.BLOOD_SYRINGE.get(), ModItems.RBI_SYRINGE.get(),
         ModItems.CURE_SYRINGE.get());
-    this.getOrCreateBuilder(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),
+    this.tag(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),
         ModItems.ARMY_DESERT_CLOTHING.get(), ModItems.ARMY_MEDIC_CLOTHING.get(),
         ModItems.BLUE_DUSK_CLOTHING.get(), ModItems.BUILDER_CLOTHING.get(),
         ModItems.BUSINESS_CLOTHING.get(), ModItems.CAMO_CLOTHING.get(),
@@ -59,7 +59,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         ModItems.SWAT_CLOTHING.get(), ModItems.TAC_GHILLIE_CLOTHING.get(),
         ModItems.WHITE_DUSK_CLOTHING.get(), ModItems.WINTER_ARMY_CLOTHING.get(),
         ModItems.YELLOW_DUSK_CLOTHING.get());
-    this.getOrCreateBuilder(ModItemTags.MELEES).add(ModItems.BAT.get(), ModItems.BO_STAFF.get(),
+    this.tag(ModItemTags.MELEES).add(ModItems.BAT.get(), ModItems.BO_STAFF.get(),
         ModItems.BOLT_CUTTERS.get(), ModItems.BOWIE_KNIFE.get(), ModItems.BROADSWORD.get(),
         ModItems.BROKEN_BOTTLE.get(), ModItems.CHAINSAW.get(), ModItems.CLEAVER.get(),
         ModItems.COMBAT_KNIFE.get(), ModItems.CROWBAR.get(), ModItems.FIRE_AXE.get(),
@@ -69,7 +69,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         ModItems.RUSTY_PIPE.get(), ModItems.SCYTHE.get(), ModItems.SHOVEL.get(),
         ModItems.SLEDGEHAMMER.get(), ModItems.STEEL_BAT.get(), ModItems.WEAPONIZED_SCYTHE.get(),
         ModItems.WRENCH.get());
-    this.getOrCreateBuilder(ModItemTags.HATS).add(ModItems.BEANIE_HAT.get(),
+    this.tag(ModItemTags.HATS).add(ModItems.BEANIE_HAT.get(),
         ModItems.BLACK_BALLISTIC_HAT.get(), ModItems.BLUE_HARD_HAT.get(), ModItems.BUNNY_HAT.get(),
         ModItems.CLONE_HAT.get(), ModItems.FIREMAN_CHIEF_HAT.get(), ModItems.FIREMAN_HAT.get(),
         ModItems.GHILLIE_HAT.get(), ModItems.GREEN_HARD_HAT.get(), ModItems.HAZMAT_HAT.get(),

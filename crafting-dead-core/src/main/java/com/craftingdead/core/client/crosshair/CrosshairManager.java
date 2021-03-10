@@ -56,9 +56,9 @@ public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Cross
   protected Map<ResourceLocation, Crosshair> prepare(IResourceManager resourceManager,
       IProfiler profiler) {
     Map<ResourceLocation, Crosshair> allCrosshairs = Maps.newHashMap();
-    for (String domain : resourceManager.getResourceNamespaces()) {
+    for (String domain : resourceManager.getNamespaces()) {
       try {
-        resourceManager.getAllResources(new ResourceLocation(domain, "crosshairs.json"))
+        resourceManager.getResources(new ResourceLocation(domain, "crosshairs.json"))
             .forEach((resource) -> {
               try (InputStream input = resource.getInputStream()) {
                 Crosshair[] crosshairs = JSONUtils.fromJson(GSON,
@@ -67,7 +67,7 @@ public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Cross
                   allCrosshairs.put(crosshair.getName(), crosshair);
                 }
               } catch (IOException e) {
-                LOGGER.warn("Invalid crosshairs.json in resourcepack: '{}'", resource.getPackName(),
+                LOGGER.warn("Invalid crosshairs.json in resourcepack: '{}'", resource.getSourceName(),
                     e);
               }
             });

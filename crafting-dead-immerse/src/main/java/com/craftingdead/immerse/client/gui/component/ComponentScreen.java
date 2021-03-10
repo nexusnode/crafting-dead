@@ -23,6 +23,7 @@ import java.util.List;
 import org.lwjgl.util.yoga.Yoga;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
 
@@ -37,8 +38,8 @@ public class ComponentScreen extends Screen implements IParentView {
     super(title);
     this.node = Yoga.YGNodeNew();
     this.minecraft = Minecraft.getInstance();
-    this.width = this.minecraft.getMainWindow().getScaledWidth();
-    this.height = this.minecraft.getMainWindow().getScaledHeight();
+    this.width = this.minecraft.getWindow().getGuiScaledWidth();
+    this.height = this.minecraft.getWindow().getGuiScaledHeight();
     this.container = new ContainerComponent();
     this.container.parent = this;
     Yoga.YGNodeInsertChild(this.node, this.container.node, 0);
@@ -52,10 +53,10 @@ public class ComponentScreen extends Screen implements IParentView {
   public void init() {
     Yoga.YGNodeCalculateLayout(this.node, this.getWidth(), this.getHeight(), Yoga.YGDirectionLTR);
     this.container.layout();
-    double mouseX = this.minecraft.mouseHelper.getMouseX() * (double) this.width
-        / (double) this.minecraft.getMainWindow().getWidth();
-    double mouseY = this.minecraft.mouseHelper.getMouseY() * (double) this.height
-        / (double) this.minecraft.getMainWindow().getHeight();
+    double mouseX = this.minecraft.mouseHandler.xpos() * (double) this.width
+        / (double) this.minecraft.getWindow().getWidth();
+    double mouseY = this.minecraft.mouseHandler.ypos() * (double) this.height
+        / (double) this.minecraft.getWindow().getHeight();
     this.container.mouseMoved(mouseX, mouseY);
   }
 
@@ -66,7 +67,7 @@ public class ComponentScreen extends Screen implements IParentView {
     Component<?> hovered = this.container.isMouseOver(mouseX, mouseY) ? this.container : null;
     while (hovered instanceof ParentComponent) {
       Component<?> nextHovered = ((ParentComponent<?>) hovered)
-          .getEventListenerForPos(mouseX, mouseY)
+          .getChildAt(mouseX, mouseY)
           .filter(listener -> listener instanceof Component)
           .map(listener -> (Component<?>) listener)
           .orElse(null);
@@ -103,7 +104,7 @@ public class ComponentScreen extends Screen implements IParentView {
   }
 
   @Override
-  public List<Component<?>> getEventListeners() {
+  public List<? extends IGuiEventListener> children() {
     return Collections.singletonList(this.container);
   }
 

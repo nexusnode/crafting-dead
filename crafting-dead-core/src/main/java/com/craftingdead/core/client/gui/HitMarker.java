@@ -62,10 +62,10 @@ public class HitMarker {
   @SuppressWarnings("deprecation")
   public boolean render(int width, int height, float partialTicks) {
     if (this.fadeStartTimeMs == 0L) {
-      this.fadeStartTimeMs = Util.milliTime();
+      this.fadeStartTimeMs = Util.getMillis();
     }
     float zeroToOneFadePct = MathHelper.clamp(
-        (float) (Util.milliTime() - this.fadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
+        (float) (Util.getMillis() - this.fadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
         0.0F, 1.0F);
     final float oneToZeroFadePct = 1.0F - zeroToOneFadePct;
 
@@ -73,7 +73,7 @@ public class HitMarker {
       return true;
     }
 
-    RenderUtil.projectToPlayerView(this.pos.getX(), this.pos.getY(), this.pos.getZ(), partialTicks)
+    RenderUtil.projectToPlayerView(this.pos.x(), this.pos.y(), this.pos.z(), partialTicks)
         .ifPresent(pos -> {
           float alpha = (float) (this.kill.colour >> 24 & 255) / 255.0F;
           float red = (float) (this.kill.colour >> 16 & 255) / 255.0F;
@@ -94,15 +94,15 @@ public class HitMarker {
                 (height / 2) - pos.y - markerSizeMean, 0);
             RenderSystem.lineWidth(oneToZeroFadePct * 4.5F);
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferbuilder = tessellator.getBuffer();
+            BufferBuilder bufferbuilder = tessellator.getBuilder();
             bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.pos(higherCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
-            bufferbuilder.pos(leastCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
-            tessellator.draw();
+            bufferbuilder.vertex(higherCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
+            bufferbuilder.vertex(leastCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
+            tessellator.end();
             bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.pos(leastCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
-            bufferbuilder.pos(higherCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
-            tessellator.draw();
+            bufferbuilder.vertex(leastCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
+            bufferbuilder.vertex(higherCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
+            tessellator.end();
           }
           RenderSystem.popMatrix();
           RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

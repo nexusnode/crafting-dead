@@ -38,14 +38,14 @@ public class BleedingEffect extends Effect {
   }
 
   @Override
-  public void performEffect(LivingEntity livingEntity, int amplifier) {
+  public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.getHealth() > 1.0F) {
-      livingEntity.attackEntityFrom(ModDamageSource.BLEEDING, 1.0F);
+      livingEntity.hurt(ModDamageSource.BLEEDING, 1.0F);
     }
   }
 
   @Override
-  public boolean isReady(int duration, int amplifier) {
+  public boolean isDurationEffectTick(int duration, int amplifier) {
     int ticksBetweenHits = (MAXIMUM_DELAY - (amplifier * DELAY_REDUCTION_PER_LEVEL));
     return duration % Math.max(ticksBetweenHits, MINIMUM_DELAY) == 0;
   }

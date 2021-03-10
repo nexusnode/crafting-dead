@@ -29,7 +29,7 @@ public class SpawnPoint {
   public static final Codec<SpawnPoint> CODEC = RecordCodecBuilder
       .create(instance -> instance
           .group(
-              World.CODEC.optionalFieldOf("dimension", World.OVERWORLD)
+              World.RESOURCE_KEY_CODEC.optionalFieldOf("dimension", World.OVERWORLD)
                   .forGetter(SpawnPoint::getDimension),
               BlockPos.CODEC.fieldOf("blockPos").forGetter(SpawnPoint::getBlockPos))
           .apply(instance, SpawnPoint::new));

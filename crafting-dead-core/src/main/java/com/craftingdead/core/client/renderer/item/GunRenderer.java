@@ -124,29 +124,29 @@ public abstract class GunRenderer implements IItemRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
 
     final float partialTicks =
-        this.minecraft.isGamePaused() ? 1.0F : this.minecraft.getRenderPartialTicks();
+        this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
     final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.scale(1.25F, 1.25F, 1.25F);
-      matrixStack.rotate(Vector3f.XP.rotation(3.1F));
-      matrixStack.rotate(Vector3f.YP.rotation(3.14F));
+      matrixStack.mulPose(Vector3f.XP.rotation(3.1F));
+      matrixStack.mulPose(Vector3f.YP.rotation(3.14F));
 
       this.applyGenericTransforms(gun, matrixStack);
 
-      this.renderGunModel(itemStack.hasEffect(), gun, ItemCameraTransforms.TransformType.FIXED,
+      this.renderGunModel(itemStack.hasFoil(), gun, ItemCameraTransforms.TransformType.FIXED,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(gun, itemStack.hasEffect(),
+      this.renderMainGunAmmo(gun, itemStack.hasFoil(),
           ItemCameraTransforms.TransformType.FIXED,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(gun, itemStack.hasEffect(),
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(),
           ItemCameraTransforms.TransformType.FIXED,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
@@ -155,7 +155,7 @@ public abstract class GunRenderer implements IItemRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
 
     final float partialTicks =
-        this.minecraft.isGamePaused() ? 1.0F : this.minecraft.getRenderPartialTicks();
+        this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
     final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
@@ -171,7 +171,7 @@ public abstract class GunRenderer implements IItemRenderer {
         transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND
             || transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
 
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       this.applyLegacyTransforms(matrixStack, transformType, leftHanded);
       switch (transformType) {
@@ -192,14 +192,14 @@ public abstract class GunRenderer implements IItemRenderer {
               packedOverlay);
           break;
         case HEAD:
-          this.renderOnBack(entity, itemStack.hasEffect(), gun, partialTicks, matrixStack,
+          this.renderOnBack(entity, itemStack.hasFoil(), gun, partialTicks, matrixStack,
               renderTypeBuffer, packedLight, packedOverlay);
           break;
         default:
           break;
       }
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   /**
@@ -227,17 +227,17 @@ public abstract class GunRenderer implements IItemRenderer {
 
     if (thirdPerson) {
       matrixStack.translate(-1F, 0, 0.5F);
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(50));
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(70));
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-35));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(50));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(70));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-35));
     }
 
     if (transformType == ItemCameraTransforms.TransformType.HEAD) {
       matrixStack.translate(-1F, 2.5F, 3.75F);
 
 
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(270));
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(25F));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(270));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(25F));
 
 
       matrixStack.scale(2F, 2F, 2F);
@@ -246,9 +246,9 @@ public abstract class GunRenderer implements IItemRenderer {
 
     matrixStack.translate(0.3125F, 0.47625F, 0.8625F);
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(0.0625F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(95.0625F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(335.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(0.0625F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(95.0625F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(335.0F));
     matrixStack.translate(-0.9375F, -0.0625F, 0.0F);
   }
 
@@ -258,52 +258,52 @@ public abstract class GunRenderer implements IItemRenderer {
       IRenderTypeBuffer renderTypeBuffer,
       int packedLight) {
     final PlayerRenderer playerRenderer =
-        (PlayerRenderer) this.minecraft.getRenderManager().getRenderer(playerEntity);
+        (PlayerRenderer) this.minecraft.getEntityRenderDispatcher().getRenderer(playerEntity);
 
     // Right Hand
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.RIGHT_HAND,
               transformType, matrixStack, partialTicks));
 
-      this.minecraft.getTextureManager().bindTexture(playerEntity.getLocationSkin());
+      this.minecraft.getTextureManager().bind(playerEntity.getSkinTextureLocation());
       matrixStack.translate(1F, 1F, 0F);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(125.0F));
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(125.0F));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
       matrixStack.translate(0.19F, -1.4F, 0.5F);
       this.applyHandTransforms(gun, true, matrixStack);
-      playerRenderer.renderRightArm(matrixStack, renderTypeBuffer, packedLight,
+      playerRenderer.renderRightHand(matrixStack, renderTypeBuffer, packedLight,
           playerEntity);
 
     }
-    matrixStack.pop();
+    matrixStack.popPose();
 
     // Left Hand
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.LEFT_HAND,
               transformType, matrixStack, partialTicks));
 
-      this.minecraft.getTextureManager().bindTexture(playerEntity.getLocationSkin());
+      this.minecraft.getTextureManager().bind(playerEntity.getSkinTextureLocation());
       matrixStack.translate(1.5F, 0.0F, 0.0F);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(120.0F));
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(120.0F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(120.0F));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(120.0F));
       matrixStack.translate(0.3F, -1.5F, -0.12F);
       this.applyHandTransforms(gun, false, matrixStack);
       matrixStack.scale(1.0F, 1.2F, 1.0F);
-      playerRenderer.renderLeftArm(matrixStack, renderTypeBuffer, packedLight,
+      playerRenderer.renderLeftHand(matrixStack, renderTypeBuffer, packedLight,
           playerEntity);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private void renderFlash(IGun gun, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
-      long currentTime = Util.milliTime();
+      long currentTime = Util.getMillis();
       long deltaTime = currentTime - this.lastFlashTime;
 
       int texture;
@@ -316,8 +316,8 @@ public abstract class GunRenderer implements IItemRenderer {
       texture = (int) ((deltaTime / 100) + 1);
 
       float scale = (random.nextInt(5) + 3) / 10.0F;
-      matrixStack.rotate(new Vector3f(-0.08F, 1.0F, 0.0F).rotationDegrees(-85));
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(30));
+      matrixStack.mulPose(new Vector3f(-0.08F, 1.0F, 0.0F).rotationDegrees(-85));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(30));
       matrixStack.scale(this.muzzleScale + scale, this.muzzleScale + scale,
           this.muzzleScale + scale);
       if (gun.getAttachments().contains(ModItems.SUPPRESSOR.get())) {
@@ -328,12 +328,12 @@ public abstract class GunRenderer implements IItemRenderer {
           this.muzzleFlashZ - scale * this.muzzleFlashZ / 2);
 
       IVertexBuilder flashVertexBuilder = renderTypeBuffer
-          .getBuffer(this.muzzleFlashModel.getRenderType(new ResourceLocation(CraftingDead.ID,
+          .getBuffer(this.muzzleFlashModel.renderType(new ResourceLocation(CraftingDead.ID,
               "textures/flash/flash" + texture + ".png")));
-      this.muzzleFlashModel.render(matrixStack, flashVertexBuilder, RenderUtil.FULL_LIGHT,
+      this.muzzleFlashModel.renderToBuffer(matrixStack, flashVertexBuilder, RenderUtil.FULL_LIGHT,
           packedOverlay, 1.0F, 1.0F, 1.0F, scale + 0.5F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private final void renderFirstPerson(AbstractClientPlayerEntity playerEntity,
@@ -349,7 +349,7 @@ public abstract class GunRenderer implements IItemRenderer {
       packedLight = RenderUtil.FULL_LIGHT;
     }
 
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       if (aiming) {
         this.applyAimingTransforms(gun, matrixStack);
@@ -367,12 +367,12 @@ public abstract class GunRenderer implements IItemRenderer {
       }
 
       if (this.wasSprinting != playerEntity.isSprinting()) {
-        this.sprintStartTimeMs = Util.milliTime();
+        this.sprintStartTimeMs = Util.getMillis();
         this.wasSprinting = playerEntity.isSprinting();
       }
 
       float zeroToOneFadePct = MathHelper.clamp(
-          (float) (Util.milliTime() - this.sprintStartTimeMs) / SPRINT_TRANSITION_MS,
+          (float) (Util.getMillis() - this.sprintStartTimeMs) / SPRINT_TRANSITION_MS,
           0.0F, 1.0F);
       if (!playerEntity.isSprinting()) {
         zeroToOneFadePct = 1.0F - zeroToOneFadePct;
@@ -383,50 +383,50 @@ public abstract class GunRenderer implements IItemRenderer {
           .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.BODY,
               transformType, matrixStack, partialTicks));
 
-      this.renderGunModel(itemStack.hasEffect(), gun, transformType, matrixStack, renderTypeBuffer,
+      this.renderGunModel(itemStack.hasFoil(), gun, transformType, matrixStack, renderTypeBuffer,
           packedLight, packedOverlay);
 
-      matrixStack.push();
+      matrixStack.pushPose();
       {
         gun.getClient().getAnimationController()
             .ifPresent(c -> c.applyTransforms(playerEntity, itemStack, GunAnimation.MAGAZINE,
                 transformType, matrixStack, partialTicks));
 
-        this.renderMainGunAmmo(gun, itemStack.hasEffect(), transformType, matrixStack,
+        this.renderMainGunAmmo(gun, itemStack.hasFoil(), transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
       }
-      matrixStack.pop();
+      matrixStack.popPose();
 
-      this.renderMainGunAttachments(gun, itemStack.hasEffect(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(), transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private final void renderThirdPerson(LivingEntity livingEntity, ItemStack itemStack, IGun gun,
       ItemCameraTransforms.TransformType transformType, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       this.applyThirdPersonTransforms(gun, matrixStack);
       gun.getClient().getAnimationController()
           .ifPresent(c -> c.applyTransforms(livingEntity, itemStack, GunAnimation.BODY,
-              transformType, matrixStack, this.minecraft.getRenderPartialTicks()));
-      this.renderGunModel(itemStack.hasEffect(), gun,
+              transformType, matrixStack, this.minecraft.getFrameTime()));
+      this.renderGunModel(itemStack.hasFoil(), gun,
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(gun, itemStack.hasEffect(), transformType, matrixStack,
+      this.renderMainGunAmmo(gun, itemStack.hasFoil(), transformType, matrixStack,
           renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(gun, itemStack.hasEffect(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(), transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   public void renderOnBack(LivingEntity entity, boolean glint,
       IGun gun, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       this.applyWearingTransforms(gun, matrixStack);
       this.renderGunModel(glint, gun, ItemCameraTransforms.TransformType.HEAD,
@@ -436,24 +436,24 @@ public abstract class GunRenderer implements IItemRenderer {
       this.renderMainGunAttachments(gun, glint, ItemCameraTransforms.TransformType.HEAD,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   protected final void renderBakedModel(IBakedModel bakedModel, boolean glint, int colour,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F));
       matrixStack.translate(0, -1.45F, 0);
 
       bakedModel = bakedModel.handlePerspective(transformType, matrixStack);
       IVertexBuilder vertexBuilder =
-          ItemRenderer.getBuffer(renderTypeBuffer, Atlases.getTranslucentCullBlockType(), true,
+          ItemRenderer.getFoilBuffer(renderTypeBuffer, Atlases.translucentCullBlockSheet(), true,
               glint);
       List<BakedQuad> bakedQuads = bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE);
-      MatrixStack.Entry matrixStackEntry = matrixStack.getLast();
+      MatrixStack.Entry matrixStackEntry = matrixStack.last();
       for (BakedQuad bakedQuad : bakedQuads) {
         float red = (colour >> 16 & 255) / 255.0F;
         float green = (colour >> 8 & 255) / 255.0F;
@@ -462,26 +462,26 @@ public abstract class GunRenderer implements IItemRenderer {
             packedOverlay, true);
       }
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private final void renderGunModel(boolean glint, IGun gun,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(0.0D, 0.05D, 0.0D);
       IBakedModel bakedModel = this.getBakedModel(this.getGunModelLocation(),
           gun.getPaint().flatMap(IPaint::getSkin).map(skin -> ImmutableMap.of("base",
               Either.<RenderMaterial, String>left(new RenderMaterial(
-                  PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+                  PlayerContainer.BLOCK_ATLAS,
                   new ResourceLocation(skin.getNamespace(), "gun/"
                       + this.gunItem.get().getRegistryName().getPath() + "_" + skin.getPath())))))
               .orElse(null));
       this.renderBakedModel(bakedModel, glint, gun.getPaint().flatMap(IPaint::getColour).orElse(-1),
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   protected final RenderMaterial getGunMaterial(IGun gun) {
@@ -490,14 +490,14 @@ public abstract class GunRenderer implements IItemRenderer {
     ResourceLocation skin = gun.getPaint().flatMap(IPaint::getSkin).orElse(null);
     if (unbakedModel instanceof BlockModel) {
       if (skin != null) {
-        return new RenderMaterial(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+        return new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
             new ResourceLocation(skin.getNamespace(),
                 "gun/" + this.gunItem.get().getRegistryName().getPath() + "_"
                     + skin.getPath()));
       }
-      return ((BlockModel) unbakedModel).resolveTextureName("base");
+      return ((BlockModel) unbakedModel).getMaterial("base");
     }
-    return new RenderMaterial(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+    return new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
         MissingTextureSprite.getLocation());
   }
 
@@ -510,9 +510,9 @@ public abstract class GunRenderer implements IItemRenderer {
             if (model instanceof BlockModel) {
               BlockModel blockModel = (BlockModel) model;
               BlockModel overriddenModel = new BlockModel(null, new ArrayList<>(), textures, false,
-                  null, ItemCameraTransforms.DEFAULT, new ArrayList<>());
+                  null, ItemCameraTransforms.NO_TRANSFORMS, new ArrayList<>());
               overriddenModel.parent = blockModel;
-              return overriddenModel.bakeModel(ModelLoader.instance(), overriddenModel,
+              return overriddenModel.bake(ModelLoader.instance(), overriddenModel,
                   ModelLoader.defaultTextureGetter(), SimpleModelTransform.IDENTITY, modelLocation,
                   false);
             }
@@ -526,19 +526,19 @@ public abstract class GunRenderer implements IItemRenderer {
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     if (gun.hasIronSight()) {
-      matrixStack.push();
+      matrixStack.pushPose();
       {
         this.renderAdditionalParts(gun, partialTicks, matrixStack, renderTypeBuffer,
             packedLight, packedOverlay);
       }
-      matrixStack.pop();
+      matrixStack.popPose();
     }
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       float scale = 0.1F;
       matrixStack.scale(scale, scale, scale);
       for (AttachmentItem attachmentItem : gun.getAttachments()) {
-        matrixStack.push();
+        matrixStack.pushPose();
         {
           this.applyAttachmentTransforms(attachmentItem, matrixStack);
           scale = 10F;
@@ -551,10 +551,10 @@ public abstract class GunRenderer implements IItemRenderer {
               gun.getPaint().flatMap(IPaint::getColour).orElse(-1), transformType, matrixStack,
               renderTypeBuffer, packedLight, packedOverlay);
         }
-        matrixStack.pop();
+        matrixStack.popPose();
       }
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private void renderMainGunAmmo(IGun gun, boolean glint,
@@ -562,7 +562,7 @@ public abstract class GunRenderer implements IItemRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     ItemStack magazineStack = gun.getAmmoProvider().getMagazineStack();
     if (!magazineStack.isEmpty()) {
-      matrixStack.push();
+      matrixStack.pushPose();
       {
         float scale = 0.1F;
         matrixStack.scale(scale, scale, scale);
@@ -586,7 +586,7 @@ public abstract class GunRenderer implements IItemRenderer {
             gun.getPaint().flatMap(IPaint::getColour).orElse(-1), transformType,
             matrixStack, renderTypeBuffer, packedLight, packedOverlay);
       }
-      matrixStack.pop();
+      matrixStack.popPose();
     }
   }
 
@@ -613,7 +613,7 @@ public abstract class GunRenderer implements IItemRenderer {
       MatrixStack matrixStack);
 
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(pct * -50));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(pct * -50));
     matrixStack.translate(pct * 0.3F, 0.0F, pct * 0.3F);
   }
 

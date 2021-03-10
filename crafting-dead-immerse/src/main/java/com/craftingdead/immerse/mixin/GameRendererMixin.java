@@ -33,17 +33,17 @@ import net.minecraft.client.renderer.GameRenderer;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-  @Inject(at = @At("RETURN"), method = "renderHand")
-  private void renderHand(MatrixStack matrixStack, ActiveRenderInfo activeRenderInfo,
+  @Inject(at = @At("RETURN"), method = "renderItemInHand")
+  private void renderItemInHand(MatrixStack matrixStack, ActiveRenderInfo activeRenderInfo,
       float partialTicks, CallbackInfo callbackInfo) {
     final Minecraft mc = Minecraft.getInstance();
-    if (mc.getRenderViewEntity() instanceof RemoteClientPlayerEntity) {
+    if (mc.getCameraEntity() instanceof RemoteClientPlayerEntity) {
       AbstractClientPlayerEntity playerEntity =
-          (AbstractClientPlayerEntity) mc.getRenderViewEntity();
+          (AbstractClientPlayerEntity) mc.getCameraEntity();
       CraftingDeadImmerse.getInstance().getClientDist().getSpectatorRenderer()
           .renderItemInFirstPerson(partialTicks, matrixStack,
-              mc.getRenderTypeBuffers().getBufferSource(), playerEntity,
-              mc.getRenderManager().getPackedLight(playerEntity, partialTicks));
+              mc.renderBuffers().bufferSource(), playerEntity,
+              mc.getEntityRenderDispatcher().getPackedLightCoords(playerEntity, partialTicks));
     }
   }
 }

@@ -58,21 +58,21 @@ public class ClothingItem extends Item {
   }
 
   @Override
-  public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-    if (!worldIn.isRemote) {
+  public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+    if (!worldIn.isClientSide) {
       int randomRagAmount = random.nextInt(3) + 3;
 
       for (int i = 0; i < randomRagAmount; i++) {
         if (random.nextBoolean()) {
-          entityLiving.entityDropItem(new ItemStack(ModItems.CLEAN_RAG::get));
+          entityLiving.spawnAtLocation(new ItemStack(ModItems.CLEAN_RAG::get));
         } else {
-          entityLiving.entityDropItem(new ItemStack(ModItems.DIRTY_RAG::get));
+          entityLiving.spawnAtLocation(new ItemStack(ModItems.DIRTY_RAG::get));
         }
       }
     }
 
     if (entityLiving instanceof PlayerEntity && this.hasContainerItem(stack)) {
-      ((PlayerEntity) entityLiving).addItemStackToInventory(this.getContainerItem(stack));
+      ((PlayerEntity) entityLiving).addItem(this.getContainerItem(stack));
     }
 
     stack.shrink(1);
@@ -90,32 +90,32 @@ public class ClothingItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn,
+  public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
-    ItemStack itemstack = playerIn.getHeldItem(handIn);
-    playerIn.setActiveHand(handIn);
+    ItemStack itemstack = playerIn.getItemInHand(handIn);
+    playerIn.startUsingItem(handIn);
     return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world, List<ITextComponent> lines,
+  public void appendHoverText(ItemStack stack, World world, List<ITextComponent> lines,
       ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
-    ITextComponent armorLevelText = Text.of(this.enhancedProtection).mergeStyle(TextFormatting.RED);
+    super.appendHoverText(stack, world, lines, tooltipFlag);
+    ITextComponent armorLevelText = Text.of(this.enhancedProtection).withStyle(TextFormatting.RED);
     lines.add(Text
         .translate("item_lore.clothing.enhanced_protection")
-        .mergeStyle(TextFormatting.GRAY)
+        .withStyle(TextFormatting.GRAY)
         .append(armorLevelText));
 
     if (this.slownessAmplifier != null) {
-      String potionNameAndLevel = I18n.format(Effects.SLOWNESS.getName()) + " "
-          + I18n.format("enchantment.level." + (this.slownessAmplifier + 1));
-      lines.add(Text.of(potionNameAndLevel).mergeStyle(TextFormatting.GRAY));
+      String potionNameAndLevel = I18n.get(Effects.MOVEMENT_SLOWDOWN.getDescriptionId()) + " "
+          + I18n.get("enchantment.level." + (this.slownessAmplifier + 1));
+      lines.add(Text.of(potionNameAndLevel).withStyle(TextFormatting.GRAY));
     }
 
     if (this.fireImmunity) {
       lines
-          .add(Text.translate("item_lore.clothing.immune_to_fire").mergeStyle(TextFormatting.GRAY));
+          .add(Text.translate("item_lore.clothing.immune_to_fire").withStyle(TextFormatting.GRAY));
     }
   }
 
@@ -125,7 +125,7 @@ public class ClothingItem extends Item {
   }
 
   @Override
-  public UseAction getUseAction(ItemStack stack) {
+  public UseAction getUseAnimation(ItemStack stack) {
     return UseAction.BLOCK;
   }
 

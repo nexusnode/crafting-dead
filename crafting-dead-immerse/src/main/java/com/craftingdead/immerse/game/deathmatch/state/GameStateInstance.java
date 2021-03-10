@@ -27,7 +27,6 @@ import com.craftingdead.immerse.game.state.TimedStateInstance;
 import com.craftingdead.immerse.game.team.TeamInstance;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 
 public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
@@ -68,14 +67,14 @@ public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
     ITextComponent winnerText;
 
     if (winningTeam == null) {
-      winnerText = Text.of("Tie Game!").mergeStyle(TextFormatting.AQUA, TextFormatting.BOLD);
+      winnerText = Text.of("Tie Game!").withStyle(TextFormatting.AQUA, TextFormatting.BOLD);
       redTeam.broadcastVictorySounds(ModSoundEvents.RED_VICTORY.get(),
           this.getContext().getMinecraftServer());
       blueTeam.broadcastVictorySounds(ModSoundEvents.BLUE_VICTORY.get(),
           this.getContext().getMinecraftServer());
     } else {
       winnerText =
-          winningTeam.getDisplayName().copyRaw().mergeStyle(TextFormatting.BOLD)
+          winningTeam.getDisplayName().copy().withStyle(TextFormatting.BOLD)
               .append(Text.of(" Won!"));
       switch (winningTeam) {
         case RED:
@@ -101,8 +100,7 @@ public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
 
   private void sendWinAnnoucement(ITextComponent winnerText, int redScore, int blueScore) {
     ITextComponent scores = Text.of("Red: " + redScore + "    Blue: " + blueScore)
-        .mergeStyle(TextFormatting.RESET)
-        .mergeStyle(Style.EMPTY.setItalic(true));
+        .withStyle(TextFormatting.RESET, TextFormatting.ITALIC);
     GameUtil.sendChatAnnouncement(Text.of("Deathmatch"),
         Text.copyAndJoin(winnerText, GameUtil.NEW_LINE, scores),
         this.getContext().getMinecraftServer());

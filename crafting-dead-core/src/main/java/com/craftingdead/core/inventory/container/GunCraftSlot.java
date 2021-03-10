@@ -42,21 +42,21 @@ public class GunCraftSlot extends Slot {
   }
 
   @Override
-  public boolean isItemValid(ItemStack itemStack) {
+  public boolean mayPlace(ItemStack itemStack) {
     return itemStack.getItem() instanceof GunItem;
   }
 
   @Override
-  public void putStack(ItemStack itemStack) {
+  public void set(ItemStack itemStack) {
     itemStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
       gunController.getAttachments().forEach(attachment -> {
-        this.craftingInventory.setInventorySlotContents(attachment.getInventorySlot().getIndex(),
+        this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
             new ItemStack(attachment));
       });
-      this.craftingInventory.setInventorySlotContents(CraftingInventorySlotType.PAINT.getIndex(),
+      this.craftingInventory.setItem(CraftingInventorySlotType.PAINT.getIndex(),
           gunController.getPaintStack());
     });
-    super.putStack(itemStack);
+    super.set(itemStack);
   }
 
   @Override
@@ -64,15 +64,15 @@ public class GunCraftSlot extends Slot {
     gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
       gunController.setPaintStack(ItemStack.EMPTY);
       Set<AttachmentItem> attachments = new HashSet<>();
-      for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
-        ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
+      for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
+        ItemStack itemStack = this.craftingInventory.getItem(i);
         if (gunController.isAcceptedPaintOrAttachment(itemStack)) {
           if (itemStack.getItem() instanceof AttachmentItem) {
             attachments.add((AttachmentItem) itemStack.getItem());
           } else if (itemStack.getItem() instanceof PaintItem) {
             gunController.setPaintStack(itemStack);
           }
-          this.craftingInventory.setInventorySlotContents(i, ItemStack.EMPTY);
+          this.craftingInventory.setItem(i, ItemStack.EMPTY);
         }
       }
       gunController.setAttachments(attachments);

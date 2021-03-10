@@ -83,7 +83,7 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
       new ItemStackHandler(InventorySlotType.values().length) {
         @Override
         public void onContentsChanged(int slot) {
-          if (!LivingImpl.this.entity.getEntityWorld().isRemote()) {
+          if (!LivingImpl.this.entity.getCommandSenderWorld().isClientSide()) {
             LivingImpl.this.dirtySlots.add(slot);
           }
         }
@@ -164,11 +164,11 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     action.getTarget().ifPresent(target -> target.setActionProgress(action.getTargetProgress()));
     if (sendUpdate) {
       PacketTarget target =
-          this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          this.getEntity().getCommandSenderWorld().isClientSide() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new PerformActionMessage(action.getActionType(), this.getEntity().getEntityId(),
-              action.getTarget().map(ILiving::getEntity).map(Entity::getEntityId).orElse(-1)));
+          new PerformActionMessage(action.getActionType(), this.getEntity().getId(),
+              action.getTarget().map(ILiving::getEntity).map(Entity::getId).orElse(-1)));
     }
     return true;
   }
@@ -182,10 +182,10 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     this.removeAction();
     if (sendUpdate) {
       PacketTarget target =
-          this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          this.getEntity().getCommandSenderWorld().isClientSide() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new CancelActionMessage(this.getEntity().getEntityId()));
+          new CancelActionMessage(this.getEntity().getId()));
     }
   }
 
@@ -224,7 +224,7 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
 
   @Override
   public void tick() {
-    ItemStack heldStack = this.entity.getHeldItemMainhand();
+    ItemStack heldStack = this.entity.getMainHandItem();
     if (heldStack != this.lastHeldStack) {
       this.getProgressMonitor().ifPresent(IProgressMonitor::stop);
       if (this.lastHeldStack != null) {
@@ -253,14 +253,14 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     this.updateScubaClothing();
     this.updateScubaMask();
 
-    if (!this.entity.getEntityWorld().isRemote()) {
+    if (!this.entity.getCommandSenderWorld().isClientSide()) {
       // This is called at the start of the entity tick so it's equivalent of last tick's position.
-      this.snapshots[this.entity.getServer().getTickCounter() % 20] =
+      this.snapshots[this.entity.getServer().getTickCount() % 20] =
           new EntitySnapshot(this.entity);
     }
 
-    this.moving = !this.entity.getPositionVec().equals(this.lastPos);
-    this.lastPos = this.entity.getPositionVec();
+    this.moving = !this.entity.position().equals(this.lastPos);
+    this.lastPos = this.entity.position();
 
     for (Map.Entry<ResourceLocation, E> entry : this.extensions.entrySet()) {
       this.tickExtension(entry.getKey(), entry.getValue());
@@ -297,18 +297,18 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     ItemStack clothingStack =
         this.itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
     if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
-        && this.entity.areEyesInFluid(FluidTags.WATER)) {
+        && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity
-          .addPotionEffect(new EffectInstance(Effects.DOLPHINS_GRACE, 2, 0, false, false, false));
+          .addEffect(new EffectInstance(Effects.DOLPHINS_GRACE, 2, 0, false, false, false));
     }
   }
 
   private void updateScubaMask() {
     ItemStack headStack = this.itemHandler.getStackInSlot(InventorySlotType.HAT.getIndex());
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
-        && this.entity.areEyesInFluid(FluidTags.WATER)) {
+        && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity
-          .addPotionEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
+          .addEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
     }
   }
 
@@ -318,18 +318,18 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
       // Fire immunity
       if (clothing.hasFireImmunity()) {
-        if (this.entity.getFireTimer() > 0) {
-          this.entity.extinguish();
+        if (this.entity.getRemainingFireTicks() > 0) {
+          this.entity.clearFire();
         }
 
-        this.entity.addPotionEffect(
+        this.entity.addEffect(
             new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
 
       // Movement speed
       clothing.getSlownessAmplifier()
-          .ifPresent(amplifier -> this.entity.addPotionEffect(
-              new EffectInstance(Effects.SLOWNESS, 2, amplifier, false, false, false)));
+          .ifPresent(amplifier -> this.entity.addEffect(
+              new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 2, amplifier, false, false, false)));
     });
   }
 
@@ -362,16 +362,17 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
       return true;
     }
     boolean shouldKeepInventory =
-        this.getEntity().getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
+        this.getEntity().getCommandSenderWorld().getGameRules()
+            .getBoolean(GameRules.RULE_KEEPINVENTORY);
     if (!shouldKeepInventory) {
       // Adds items from CD inventory
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         ItemStack itemStack =
             this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
         if (!itemStack.isEmpty()) {
-          ItemEntity itemEntity = new ItemEntity(this.getEntity().world, this.getEntity().getPosX(),
-              this.getEntity().getPosY(), this.getEntity().getPosZ(), itemStack);
-          itemEntity.setDefaultPickupDelay();
+          ItemEntity itemEntity = new ItemEntity(this.getEntity().level, this.getEntity().getX(),
+              this.getEntity().getY(), this.getEntity().getZ(), itemStack);
+          itemEntity.setDefaultPickUpDelay();
           drops.add(itemEntity);
         }
       }
@@ -391,7 +392,7 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
 
   @Override
   public EntitySnapshot getSnapshot(int tick) {
-    final int currentTick = this.entity.getServer().getTickCounter();
+    final int currentTick = this.entity.getServer().getTickCount();
     if (tick >= currentTick) {
       return new EntitySnapshot(this.entity);
     } else if (tick < currentTick - 20) {
@@ -416,10 +417,10 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     this.crouching = crouching;
     if (sendUpdate) {
       PacketTarget target =
-          this.getEntity().getEntityWorld().isRemote() ? PacketDistributor.SERVER.noArg()
+          this.getEntity().getCommandSenderWorld().isClientSide() ? PacketDistributor.SERVER.noArg()
               : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new CrouchMessage(this.getEntity().getEntityId(), crouching));
+          new CrouchMessage(this.getEntity().getId(), crouching));
     }
   }
 
@@ -469,12 +470,12 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     if (writeAll) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         out.writeShort(i);
-        out.writeItemStack(this.itemHandler.getStackInSlot(i));
+        out.writeItem(this.itemHandler.getStackInSlot(i));
       }
     } else {
       for (int i : this.dirtySlots) {
         out.writeShort(i);
-        out.writeItemStack(this.itemHandler.getStackInSlot(i));
+        out.writeItem(this.itemHandler.getStackInSlot(i));
       }
     }
     out.writeShort(255);
@@ -498,7 +499,7 @@ public class LivingImpl<L extends LivingEntity, E extends ILivingExtension>
     // Item Handler
     int slot;
     while ((slot = in.readShort()) != 255) {
-      this.itemHandler.setStackInSlot(slot, in.readItemStack());
+      this.itemHandler.setStackInSlot(slot, in.readItem());
     }
 
     // Extensions

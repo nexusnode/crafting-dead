@@ -43,7 +43,7 @@ public class Tooltip {
   }
 
   public void render(FontRenderer fontRenderer, MatrixStack matrixStack, double x, double y) {
-    final double width = 10.0D + fontRenderer.getStringPropertyWidth(this.text);
+    final double width = 10.0D + fontRenderer.width(this.text);
     final double height = 14;
 
     RenderSystem.enableBlend();
@@ -52,8 +52,8 @@ public class Tooltip {
 
     final int textOpacity = Math.min((int) (this.textAlpha * 255.0F), 255);
     if (textOpacity >= 8) {
-      fontRenderer.func_243246_a(matrixStack, this.text,
-          (float) (x + (width - fontRenderer.getStringPropertyWidth(this.text)) / 2), (float) y + 4,
+      fontRenderer.drawShadow(matrixStack, this.text,
+          (float) (x + (width - fontRenderer.width(this.text)) / 2), (float) y + 4,
           0xFFFFFF + (textOpacity << 24));
     }
 

@@ -53,27 +53,27 @@ public class HatItem extends Item {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
+  public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
       ITooltipFlag tooltipFlag) {
     if (this.headshotReductionPercentage > 0.0F) {
       ITextComponent percentageText =
           Text.of(String.format("%.1f", this.headshotReductionPercentage) + "%")
-              .mergeStyle(TextFormatting.RED);
+              .withStyle(TextFormatting.RED);
 
       lore.add(Text.translate("item_lore.hat_item.headshot_reduction")
-          .mergeStyle(TextFormatting.GRAY)
+          .withStyle(TextFormatting.GRAY)
           .append(percentageText));
     }
     if (this.immuneToFlashes) {
       lore.add(
-          Text.translate("item_lore.hat_item.immune_to_flashes").mergeStyle(TextFormatting.GRAY));
+          Text.translate("item_lore.hat_item.immune_to_flashes").withStyle(TextFormatting.GRAY));
     }
     if (this.immuneToGas) {
-      lore.add(Text.translate("item_lore.hat_item.immune_to_gas").mergeStyle(TextFormatting.GRAY));
+      lore.add(Text.translate("item_lore.hat_item.immune_to_gas").withStyle(TextFormatting.GRAY));
     }
     if (this.nightVision) {
       lore.add(
-          Text.translate("item_lore.hat_item.has_night_vision").mergeStyle(TextFormatting.GRAY));
+          Text.translate("item_lore.hat_item.has_night_vision").withStyle(TextFormatting.GRAY));
     }
   }
 

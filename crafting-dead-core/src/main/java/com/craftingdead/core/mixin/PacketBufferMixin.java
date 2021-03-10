@@ -50,8 +50,8 @@ public class PacketBufferMixin {
     }
   }
 
-  @Inject(at = @At(value = "RETURN"), method = "readItemStack")
-  private void readItemStack(CallbackInfoReturnable<ItemStack> callbackInfo) {
+  @Inject(at = @At(value = "RETURN"), method = "readItem")
+  private void readItem(CallbackInfoReturnable<ItemStack> callbackInfo) {
     PacketBuffer packetBuffer = (PacketBuffer) (Object) this;
     ItemStack itemStack = callbackInfo.getReturnValue();
     byte[] data = new byte[packetBuffer.readVarInt()];

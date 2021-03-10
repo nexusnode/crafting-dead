@@ -38,14 +38,14 @@ public class AirDropRadioItem extends Item {
   }
 
   @Override
-  public ActionResultType onItemUse(ItemUseContext context) {
-    World world = context.getWorld();
-    BlockPos blockPos = context.getPos();
-    ItemStack itemStack = context.getItem();
+  public ActionResultType useOn(ItemUseContext context) {
+    World world = context.getLevel();
+    BlockPos blockPos = context.getClickedPos();
+    ItemStack itemStack = context.getItemInHand();
     SupplyDropEntity airDropEntity =
         new SupplyDropEntity(ModEntityTypes.supplyDrop, world, this.lootTable, random.nextLong(),
             blockPos.getX(), blockPos.getY() + 25.0D, blockPos.getZ());
-    world.addEntity(airDropEntity);
+    world.addFreshEntity(airDropEntity);
     itemStack.shrink(1);
     return ActionResultType.SUCCESS;
   }

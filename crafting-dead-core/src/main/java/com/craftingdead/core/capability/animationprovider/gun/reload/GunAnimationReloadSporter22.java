@@ -99,8 +99,8 @@ public class GunAnimationReloadSporter22 extends GunAnimationReload {
 
     matrixStack.translate(0.0F, -(progress / 600), 0.0F);
 
-    matrixStack.rotate(new Vector3f(1.2F, -0.5F, -1.0F).rotationDegrees(progress));
-    matrixStack.rotate(new Vector3f(0.0F, 1.0F, 1.0F).rotationDegrees(-progress * 0.25F));
+    matrixStack.mulPose(new Vector3f(1.2F, -0.5F, -1.0F).rotationDegrees(progress));
+    matrixStack.mulPose(new Vector3f(0.0F, 1.0F, 1.0F).rotationDegrees(-progress * 0.25F));
   }
 
   public void doRenderAmmo(ItemStack par1, float par2, MatrixStack matrixStack) {
@@ -125,13 +125,13 @@ public class GunAnimationReloadSporter22 extends GunAnimationReload {
   public void doRenderHand(ItemStack par1, float par2, boolean par3, MatrixStack matrixStack) {
     if (par3) {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-      matrixStack.rotate(new Vector3f(1.0F, 0.0F, 1.0F).rotationDegrees(progress * 0.2F));
+      matrixStack.mulPose(new Vector3f(1.0F, 0.0F, 1.0F).rotationDegrees(progress * 0.2F));
     } else {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;
       matrixStack.translate(-transprogress, transprogress * 0.5F, transprogress);
 
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(progress * 0.5F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(progress * 0.5F));
     }
   }
 }

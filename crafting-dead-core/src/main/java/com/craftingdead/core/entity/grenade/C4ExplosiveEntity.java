@@ -37,7 +37,7 @@ import net.minecraft.world.World;
 public class C4ExplosiveEntity extends GrenadeEntity {
 
   private static final Triple<SoundEvent, Float, Float> C4_BOUNCE_SOUND =
-      Triple.of(SoundEvents.ENTITY_PLAYER_SMALL_FALL, 1.0F, 1.5F);
+      Triple.of(SoundEvents.PLAYER_SMALL_FALL, 1.0F, 1.5F);
 
   public C4ExplosiveEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
     super(entityIn, worldIn);
@@ -48,13 +48,13 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   }
 
   @Override
-  public boolean attackEntityFrom(DamageSource source, float amount) {
-    if (ModDamageSource.isGunDamage(source) || source.isExplosion() || source.isFireDamage()) {
+  public boolean hurt(DamageSource source, float amount) {
+    if (ModDamageSource.isGunDamage(source) || source.isExplosion() || source.isFire()) {
       // TODO Save who activated the grenade, so the true source
       // of this DamageSource could be used when the grenade explodes.
       this.setActivated(true);
     }
-    return super.attackEntityFrom(source, amount);
+    return super.hurt(source, amount);
   }
 
   @Override
@@ -63,12 +63,12 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   @Override
   public void onActivationStateChange(boolean activated) {
     if (activated) {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
-        this.world.createExplosion(this,
+        this.level.explode(this,
             this.createDamageSource(),
             null,
-            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 4F, false,
+            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 4F, false,
             Explosion.Mode.NONE);
       }
     }
@@ -81,7 +81,7 @@ public class C4ExplosiveEntity extends GrenadeEntity {
 
   @Override
   public Float getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
-    return blockRayTraceResult.getFace() == Direction.UP ? null
+    return blockRayTraceResult.getDirection() == Direction.UP ? null
         : super.getBounceFactor(blockRayTraceResult);
   }
 

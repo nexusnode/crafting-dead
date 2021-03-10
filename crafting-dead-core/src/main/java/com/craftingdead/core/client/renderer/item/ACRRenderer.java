@@ -47,13 +47,13 @@ public class ACRRenderer extends GunRenderer {
   @Override
   protected void applyThirdPersonTransforms(IGun gun,
       MatrixStack matrixStack) {
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-15.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(77.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(77.0F));
 
     matrixStack.translate(0.6F, -0.4F, 0.35F);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(15.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(15.0F));
     matrixStack.translate(-0.2F, 0.55F, 0.0F);
   }
 
@@ -66,9 +66,9 @@ public class ACRRenderer extends GunRenderer {
     this.muzzleFlashZ = -1.8F;
     this.muzzleScale = 1.2F;
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-33.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-33.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5.0F));
     matrixStack.translate(0.6F, -0F, 0.25F);
 
     float scale = 0.8F;
@@ -79,22 +79,22 @@ public class ACRRenderer extends GunRenderer {
   protected void applyAimingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(-34.5F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(5.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-34.5F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(5.0F));
     matrixStack.translate(1F, -0.23F, 0.94F);
 
     float scale = 0.8F;
     matrixStack.scale(scale, scale, scale);
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(10.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(10.0F));
 
     if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(0.45F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(0.45F));
       matrixStack.translate(0F, 0.015F, 0F);
     }
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(-0.4F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(-0.4F));
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.05F, 0F);
 
@@ -117,9 +117,9 @@ public class ACRRenderer extends GunRenderer {
   protected void applyWearingTransforms(IGun gun,
       MatrixStack matrixStack) {
 
-    matrixStack.rotate(Vector3f.ZP.rotationDegrees(90.0F));
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F));
-    matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
+    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90.0F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+    matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F));
 
     float scale = 0.55F;
     matrixStack.scale(scale, scale, scale);
@@ -128,36 +128,36 @@ public class ACRRenderer extends GunRenderer {
 
   private void renderIronSight1(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F));
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.translate(0.9F, -0.7F, -0.145F);
       scale = 0.75F;
       matrixStack.scale(scale, scale, scale);
       matrixStack.translate(-0.5F, -0.04F, -0.00F);
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.getRenderType(
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m4a1_is1.png")));
-      this.ironSight1.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   private void renderIronSight2(MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.push();
+    matrixStack.pushPose();
     {
       matrixStack.translate(1.09F, -0.406F, 0.0625F);
       float scale = 0.25F;
       matrixStack.scale(scale, scale, scale);
-      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.getRenderType(
+      IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m4a1_is2.png")));
-      this.ironSight2.render(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
           1.0F, 1.0F);
     }
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 
   @Override
@@ -177,15 +177,15 @@ public class ACRRenderer extends GunRenderer {
     }
 
     if (itemStack.getItem() == ModItems.STANAG_DRUM_MAGAZINE.get()) {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(90.0F));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
       matrixStack.translate(-1.7D, -0D, 0.5D);
       float scale = 0.8F;
       matrixStack.scale(scale, scale, scale);
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(5.0F));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(5.0F));
     }
 
     if (itemStack.getItem() == ModItems.STANAG_BOX_MAGAZINE.get()) {
-      matrixStack.rotate(Vector3f.YP.rotationDegrees(90.0F));
+      matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
       matrixStack.translate(-2.4D, 1.2D, 0.5D);
       float scale = 1.2F;
       matrixStack.scale(scale, scale, scale);

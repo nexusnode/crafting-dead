@@ -45,7 +45,7 @@ public class EquipmentContainer extends Container {
     super(ModContainerTypes.EQUIPMENT.get(), windowId);
     this.itemHandler = playerInventory.player.getCapability(ModCapabilities.LIVING)
         .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
-    this.craftingInventory.addListener(this::onCraftMatrixChanged);
+    this.craftingInventory.addListener(this::slotsChanged);
 
     final int slotSize = 18;
 
@@ -120,16 +120,16 @@ public class EquipmentContainer extends Container {
   }
 
   @Override
-  public boolean canInteractWith(PlayerEntity playerEntity) {
+  public boolean stillValid(PlayerEntity playerEntity) {
     return true;
   }
 
   @Override
-  public void onContainerClosed(PlayerEntity playerEntity) {
-    super.onContainerClosed(playerEntity);
-    if (!playerEntity.getEntityWorld().isRemote()) {
-      this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.craftingInventory);
-      this.clearContainer(playerEntity, playerEntity.getEntityWorld(), this.outputInventory);
+  public void removed(PlayerEntity playerEntity) {
+    super.removed(playerEntity);
+    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
+      this.clearContainer(playerEntity, playerEntity.getCommandSenderWorld(), this.craftingInventory);
+      this.clearContainer(playerEntity, playerEntity.getCommandSenderWorld(), this.outputInventory);
     }
   }
 
@@ -138,7 +138,7 @@ public class EquipmentContainer extends Container {
   }
 
   public ItemStack getGunStack() {
-    return this.outputInventory.getStackInSlot(0);
+    return this.outputInventory.getItem(0);
   }
 
   public boolean isCraftingInventoryEmpty() {
@@ -147,8 +147,8 @@ public class EquipmentContainer extends Container {
 
   public boolean isCraftable() {
     return this.getGunStack().getCapability(ModCapabilities.GUN).map(gunController -> {
-      for (int i = 0; i < this.craftingInventory.getSizeInventory(); i++) {
-        ItemStack itemStack = this.craftingInventory.getStackInSlot(i);
+      for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
+        ItemStack itemStack = this.craftingInventory.getItem(i);
         if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {
           return false;
         }
@@ -158,9 +158,9 @@ public class EquipmentContainer extends Container {
   }
 
   @Override
-  public ItemStack transferStackInSlot(PlayerEntity playerEntity, int clickedIndex) {
-    Slot clickedSlot = this.inventorySlots.get(clickedIndex);
-    if (clickedSlot != null && clickedSlot.getHasStack()) {
+  public ItemStack quickMoveStack(PlayerEntity playerEntity, int clickedIndex) {
+    Slot clickedSlot = this.slots.get(clickedIndex);
+    if (clickedSlot != null && clickedSlot.hasItem()) {
       // Shift-clicking gun crafting slots is currently unavailable due to
       // the nature of how itemstacks are merged when shift-clicking.
       // In other words, attachments do not get attached.
@@ -168,25 +168,25 @@ public class EquipmentContainer extends Container {
         return ItemStack.EMPTY;
       }
 
-      ItemStack clickedStack = clickedSlot.getStack();
+      ItemStack clickedStack = clickedSlot.getItem();
 
       if (clickedIndex < 27) {
         // Pushes the clicked stack to the higher slots in a "negative direction"
-        if (!this.mergeItemStack(clickedStack, 27, this.inventorySlots.size(), true)) {
+        if (!this.moveItemStackTo(clickedStack, 27, this.slots.size(), true)) {
           return ItemStack.EMPTY;
         }
       } else {
         // Pushes the clicked stack to the lower slots in a "positive direction"
-        if (!this.mergeItemStack(clickedStack, 0, 27, false)) {
+        if (!this.moveItemStackTo(clickedStack, 0, 27, false)) {
           return ItemStack.EMPTY;
         }
       }
 
       // From vanilla code. Seems to be mandatory.
       if (clickedStack.isEmpty()) {
-        clickedSlot.putStack(ItemStack.EMPTY);
+        clickedSlot.set(ItemStack.EMPTY);
       } else {
-        clickedSlot.onSlotChanged();
+        clickedSlot.setChanged();
       }
     }
 

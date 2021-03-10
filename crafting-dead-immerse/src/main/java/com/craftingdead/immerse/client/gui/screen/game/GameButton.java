@@ -28,7 +28,7 @@ import net.minecraft.util.text.TextFormatting;
 
 public class GameButton extends Button {
 
-  protected final FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+  protected final FontRenderer font = Minecraft.getInstance().font;
 
   public GameButton(int x, int y, int width, int height, ITextComponent title,
       IPressable pressedAction) {
@@ -40,9 +40,9 @@ public class GameButton extends Button {
     RenderUtil.fill2(this.x, this.y, this.width, this.height,
         TextFormatting.DARK_RED.getColor() + ((this.isHovered() ? 255 : 128) << 24));
 
-    this.fontRenderer.func_243246_a(matrixStack, this.getMessage(),
-        this.x + this.getWidth() / 2 - this.fontRenderer.getStringPropertyWidth(getMessage()) / 2,
-        this.y + this.getHeightRealms() / 2 - this.fontRenderer.FONT_HEIGHT / 2,
+    this.font.drawShadow(matrixStack, this.getMessage(),
+        this.x + this.getWidth() / 2 - this.font.width(getMessage()) / 2,
+        this.y + this.getHeight() / 2 - this.font.lineHeight / 2,
         0xFFFFFFFF);
 
     if (this.isHovered()) {

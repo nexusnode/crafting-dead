@@ -39,7 +39,7 @@ public class KillFeedMessage {
   private final KillFeedEntry.Type type;
 
   public KillFeedMessage(KillFeedEntry entry) {
-    this(entry.getKillerEntity().getEntityId(), entry.getDeadEntity().getEntityId(),
+    this(entry.getKillerEntity().getId(), entry.getDeadEntity().getId(),
         entry.getWeaponStack(), entry.getType());
   }
 
@@ -53,13 +53,13 @@ public class KillFeedMessage {
   public static void encode(KillFeedMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.playerEntityId);
     out.writeVarInt(msg.deadEntityId);
-    out.writeItemStack(msg.weaponStack);
-    out.writeEnumValue(msg.type);
+    out.writeItem(msg.weaponStack);
+    out.writeEnum(msg.type);
   }
 
   public static KillFeedMessage decode(PacketBuffer in) {
-    return new KillFeedMessage(in.readVarInt(), in.readVarInt(), in.readItemStack(),
-        in.readEnumValue(KillFeedEntry.Type.class));
+    return new KillFeedMessage(in.readVarInt(), in.readVarInt(), in.readItem(),
+        in.readEnum(KillFeedEntry.Type.class));
   }
 
   public static boolean handle(KillFeedMessage msg, Supplier<NetworkEvent.Context> ctx) {
@@ -67,8 +67,8 @@ public class KillFeedMessage {
         LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
     world.ifPresent(w -> {
       ctx.get().enqueueWork(() -> {
-        Entity playerEntity = w.getEntityByID(msg.playerEntityId);
-        Entity deadEntity = w.getEntityByID(msg.deadEntityId);
+        Entity playerEntity = w.getEntity(msg.playerEntityId);
+        Entity deadEntity = w.getEntity(msg.deadEntityId);
         if (playerEntity instanceof PlayerEntity && deadEntity instanceof PlayerEntity) {
           CraftingDead.getInstance().getClientDist().getIngameGui()
               .addKillFeedMessage(new KillFeedEntry((PlayerEntity) playerEntity,

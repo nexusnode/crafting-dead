@@ -108,7 +108,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     if (nbt.contains("magazineStack", Constants.NBT.TAG_COMPOUND)) {
-      this.magazineStack = ItemStack.read(nbt.getCompound("magazineStack"));
+      this.magazineStack = ItemStack.of(nbt.getCompound("magazineStack"));
     }
     this.reserveSize = nbt.getInt("reserveSize");
     this.infiniteAmmo = nbt.getBoolean("infiniteAmmo");
@@ -118,7 +118,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
   public void encode(PacketBuffer out, boolean writeAll) {
     if (writeAll) {
       out.writeBoolean(true);
-      out.writeItemStack(this.magazineStack);
+      out.writeItem(this.magazineStack);
       out.writeBoolean(this.infiniteAmmo);
     } else {
       out.writeBoolean(false);
@@ -132,7 +132,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
   @Override
   public void decode(PacketBuffer in) {
     if (in.readBoolean()) {
-      this.magazineStack = in.readItemStack();
+      this.magazineStack = in.readItem();
       this.infiniteAmmo = in.readBoolean();
     }
 

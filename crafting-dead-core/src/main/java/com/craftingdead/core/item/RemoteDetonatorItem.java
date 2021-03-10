@@ -43,19 +43,19 @@ public class RemoteDetonatorItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity,
+  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
       Hand hand) {
-    ItemStack itemstack = playerEntity.getHeldItem(hand);
-    playerEntity.setActiveHand(hand);
+    ItemStack itemstack = playerEntity.getItemInHand(hand);
+    playerEntity.startUsingItem(hand);
 
     if (world instanceof ServerWorld) {
       ServerWorld serverWorld = (ServerWorld) world;
 
-      serverWorld.playMovingSound(null, playerEntity, SoundEvents.UI_BUTTON_CLICK,
+      serverWorld.playSound(null, playerEntity, SoundEvents.UI_BUTTON_CLICK,
           SoundCategory.PLAYERS, 0.8F, 1.2F);
 
-      serverWorld.getEntitiesInAABBexcluding(playerEntity,
-          playerEntity.getBoundingBox().grow(RANGE), (entity) -> {
+      serverWorld.getEntities(playerEntity,
+          playerEntity.getBoundingBox().inflate(RANGE), (entity) -> {
             if (!(entity instanceof GrenadeEntity)) {
               return false;
             }
@@ -67,14 +67,14 @@ public class RemoteDetonatorItem extends Item {
             return isOwner && grenadeEntity.canBeRemotelyActivated();
           }).forEach(entity -> ((GrenadeEntity) entity).setActivated(true));
     }
-    return ActionResult.resultConsume(itemstack);
+    return ActionResult.consume(itemstack);
   }
 
   @Override
-  public void addInformation(ItemStack stack, World world,
+  public void appendHoverText(ItemStack stack, World world,
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
-    super.addInformation(stack, world, lines, tooltipFlag);
+    super.appendHoverText(stack, world, lines, tooltipFlag);
     lines.add(Text.translate("item_lore." + this.getRegistryName().getPath(), RANGE)
-        .mergeStyle(TextFormatting.GRAY));
+        .withStyle(TextFormatting.GRAY));
   }
 }

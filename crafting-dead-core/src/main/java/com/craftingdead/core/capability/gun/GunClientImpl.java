@@ -94,13 +94,13 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
     }
 
     SoundEvent rightMouseActionSound = this.gun.gunProvider.getRightMouseActionSound().get();
-    long rightMouseActionSoundDelta = Util.milliTime() - this.rightMouseActionSoundStartTimeMs + 50;
+    long rightMouseActionSoundDelta = Util.getMillis() - this.rightMouseActionSoundStartTimeMs + 50;
     if (this.gun.isPerformingRightMouseAction()
         && this.gun.gunProvider.getRightMouseActionSoundRepeatDelayMs() > 0L
         && rightMouseActionSoundDelta >= this.gun.gunProvider
             .getRightMouseActionSoundRepeatDelayMs()
         && rightMouseActionSound != null) {
-      this.rightMouseActionSoundStartTimeMs = Util.milliTime();
+      this.rightMouseActionSoundStartTimeMs = Util.getMillis();
       living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
     }
 
@@ -114,7 +114,7 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
   }
 
   protected boolean canFlash(ILiving<?, ?> living) {
-    return this.minecraft.gameSettings.getPointOfView() == PointOfView.FIRST_PERSON
+    return this.minecraft.options.getCameraType() == PointOfView.FIRST_PERSON
         && this.gun.getShotCount() != this.lastShotCount && this.gun.getShotCount() > 0;
   }
 
@@ -128,7 +128,7 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
 
     this.lastShotCount = this.gun.getShotCount();
 
-    if (entity == this.minecraft.getRenderViewEntity()) {
+    if (entity == this.minecraft.getCameraEntity()) {
       final float baseJolt = 0.05F;
       this.client.getCameraManager()
           .joltCamera(1.0F - this.gun.getAccuracy(living) + baseJolt, true);
@@ -139,8 +139,8 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
       this.animationController.addAnimation(animation, null);
     });
 
-    double sqrDistance = this.minecraft.gameRenderer.getActiveRenderInfo().getProjectedView()
-        .squareDistanceTo(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+    double sqrDistance = this.minecraft.gameRenderer.getMainCamera().getPosition()
+        .distanceToSqr(entity.getX(), entity.getY(), entity.getZ());
 
     boolean distant = sqrDistance > 1600.0D;
 
@@ -160,9 +160,9 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
 
     if (!entity.isSilent() && shootSound != null) {
       // Sounds have to be played on the main thread (unfortunately)
-      this.minecraft.execute(() -> entity.getEntityWorld().playSound(
-          entity.getPosX(), entity.getPosY(), entity.getPosZ(), shootSound,
-          entity.getSoundCategory(), distant && amplifyDistantSound ? 8.0F : 1.0F, 1.0F, true));
+      this.minecraft.execute(() -> entity.getCommandSenderWorld().playLocalSound(
+          entity.getX(), entity.getY(), entity.getZ(), shootSound,
+          entity.getSoundSource(), distant && amplifyDistantSound ? 8.0F : 1.0F, 1.0F, true));
     }
   }
 
@@ -171,7 +171,7 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
       Vector3d hitPos, long randomSeed) {
     if (living.getEntity() instanceof ClientPlayerEntity
         && hitEntity instanceof LivingEntity) {
-      this.livingHitValidationBuffer.put(hitEntity.getEntityId(),
+      this.livingHitValidationBuffer.put(hitEntity.getId(),
           new PendingHit((byte) (GunImpl.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
               new EntitySnapshot(living.getEntity()),
               new EntitySnapshot(hitEntity), randomSeed));
@@ -181,32 +181,32 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
   @Override
   public void handleHitEntityPost(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot) {
-    World world = hitEntity.getEntityWorld();
+    World world = hitEntity.getCommandSenderWorld();
     Entity entity = living.getEntity();
 
     if (headshot) {
       final int particleCount = 12;
       for (int i = 0; i < particleCount; ++i) {
         world.addParticle(
-            new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.getDefaultState()),
-            hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0.0D, 0.0D, 0.0D);
+            new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState()),
+            hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
       }
     }
 
     world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
-        hitEntity.getPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
+        hitEntity.blockPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
         1.0F, 1.0F);
 
     // If local player
-    if (hitEntity == this.minecraft.getRenderViewEntity()) {
+    if (hitEntity == this.minecraft.getCameraEntity()) {
       this.client.getCameraManager().joltCamera(1.5F, false);
     }
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
       world.addParticle(
-          new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.getDefaultState()),
-          hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0.0D, 0.0D, 0.0D);
+          new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
+          hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
     }
   }
 
@@ -214,19 +214,19 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
   public void handleHitBlock(ILiving<?, ?> living,
       BlockRayTraceResult rayTrace, boolean playSound) {
     final Entity entity = living.getEntity();
-    Vector3d hitVec3d = rayTrace.getHitVec();
-    BlockPos blockPos = rayTrace.getPos();
-    BlockState blockState = entity.getEntityWorld().getBlockState(blockPos);
-    World world = entity.getEntityWorld();
+    Vector3d hitVec3d = rayTrace.getLocation();
+    BlockPos blockPos = rayTrace.getBlockPos();
+    BlockState blockState = entity.getCommandSenderWorld().getBlockState(blockPos);
+    World world = entity.getCommandSenderWorld();
 
     // Gets the hit sound to be played
     SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
     Material blockMaterial = blockState.getMaterial();
     if (blockMaterial == Material.WOOD) {
       hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
-    } else if (blockMaterial == Material.ROCK) {
+    } else if (blockMaterial == Material.STONE) {
       hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
-    } else if (blockMaterial == Material.IRON) {
+    } else if (blockMaterial == Material.METAL) {
       hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
           : ModSoundEvents.BULLET_IMPACT_METAL2.get();
     } else if (blockMaterial == Material.GLASS) {
@@ -238,8 +238,8 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
-      world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.getX(),
-          hitVec3d.getY(), hitVec3d.getZ(), 0.0D, 0.0D, 0.0D);
+      world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.x(),
+          hitVec3d.y(), hitVec3d.z(), 0.0D, 0.0D, 0.0D);
     }
   }
 
@@ -248,10 +248,10 @@ public class GunClientImpl<G extends GunImpl> implements IGunClient {
     SoundEvent rightMouseActionSound = this.gun.gunProvider.getRightMouseActionSound().get();
     if (rightMouseActionSound != null) {
       if (this.gun.isPerformingRightMouseAction()) {
-        this.rightMouseActionSoundStartTimeMs = Util.milliTime();
+        this.rightMouseActionSoundStartTimeMs = Util.getMillis();
         living.getEntity().playSound(rightMouseActionSound, 1.0F, 1.0F);
       } else {
-        Minecraft.getInstance().getSoundHandler()
+        Minecraft.getInstance().getSoundManager()
             .stop(rightMouseActionSound.getRegistryName(), SoundCategory.PLAYERS);
       }
     }

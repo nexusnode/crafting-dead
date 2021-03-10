@@ -40,38 +40,38 @@ public class GameUtil {
 
   public static ITextComponent formatMessage(ITextComponent message) {
     // @formatter:off
-    return Text.translate("message.game").mergeStyle(TextFormatting.AQUA)
+    return Text.translate("message.game").withStyle(TextFormatting.AQUA)
         .append(Text.of(" >>> ")
-            .setStyle(Style.EMPTY
-                .setBold(true)
-                .setColor(Color.fromInt(0xFFFFFF))))
-        .append(message.copyRaw().mergeStyle(TextFormatting.GRAY));
+            .withStyle(style -> style
+                .withBold(true)
+                .withColor(Color.fromRgb(0xFFFFFF))))
+        .append(message.copy().withStyle(TextFormatting.GRAY));
     // @formatter:on
   }
 
   public static void sendGameMessageToAll(ITextComponent message, MinecraftServer minecraftServer) {
-    minecraftServer.getPlayerList().func_232641_a_(formatMessage(message), ChatType.SYSTEM,
-        Util.DUMMY_UUID);
+    minecraftServer.getPlayerList().broadcastMessage(formatMessage(message), ChatType.SYSTEM,
+        Util.NIL_UUID);
   }
 
   public static void sendAnnouncement(ITextComponent message, MinecraftServer minecraftServer) {
     minecraftServer.getPlayerList()
-        .sendPacketToAllPlayers(new STitlePacket(STitlePacket.Type.TITLE, message));
+        .broadcastAll(new STitlePacket(STitlePacket.Type.TITLE, message));
   }
 
   public static void sendChatAnnouncement(ITextComponent title, ITextComponent body,
       MinecraftServer minecraftServer) {
     // @formatter:off
-    final ITextComponent announcement = CHAT_SEPERATOR.copyRaw()
+    final ITextComponent announcement = CHAT_SEPERATOR.copy()
         .append(NEW_LINE)
-        .append(title.copyRaw().mergeStyle(Style.EMPTY.setBold(true)))
+        .append(title.copy().withStyle(Style.EMPTY.withBold(true)))
         .append(NEW_LINE)
         .append(body)
         .append(NEW_LINE)
         .append(CHAT_SEPERATOR);
     // @formatter:on
-    minecraftServer.getPlayerList().func_232641_a_(announcement, ChatType.SYSTEM,
-        Util.DUMMY_UUID);
+    minecraftServer.getPlayerList().broadcastMessage(announcement, ChatType.SYSTEM,
+        Util.NIL_UUID);
   }
 
   public static void broadcastSound(SoundEvent soundEvent, MinecraftServer minecraftServer) {
@@ -81,7 +81,7 @@ public class GameUtil {
   public static void broadcastSound(SoundEvent soundEvent, MinecraftServer minecraftServer,
       float volume, float pitch) {
     minecraftServer.getPlayerList().getPlayers()
-        .forEach(playerEntity -> playerEntity.playSound(soundEvent,
+        .forEach(playerEntity -> playerEntity.playNotifySound(soundEvent,
             SoundCategory.MASTER, volume, pitch));
   }
 }

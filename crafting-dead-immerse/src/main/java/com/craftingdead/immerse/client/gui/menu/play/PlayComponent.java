@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C)  2021  Nexus Node
+ * Copyright (C) 2021  NexusNode LTD
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ public class PlayComponent extends ContainerComponent {
                         .setBackgroundColour(new Colour(0, 0, 0, 0.25F))
                         .setTopMargin(1F))
             .setHeight(19)
-            .setZLevelOffset(1))
+            .setZLevelOffset(2))
         .addChild(officialContentContainer
             .setFlexShrink(1F));
 

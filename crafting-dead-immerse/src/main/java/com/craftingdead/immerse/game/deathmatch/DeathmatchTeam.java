@@ -39,7 +39,7 @@ public enum DeathmatchTeam implements ITeam {
   // @formatter:on
 
   private static final DataParameter<Integer> SCORE =
-      new DataParameter<>(0x00, DataSerializers.VARINT);
+      new DataParameter<>(0x00, DataSerializers.INT);
 
   private final String name;
   private final int colour;

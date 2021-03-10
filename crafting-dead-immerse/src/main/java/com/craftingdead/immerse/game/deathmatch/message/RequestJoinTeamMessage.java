@@ -38,13 +38,13 @@ public class RequestJoinTeamMessage {
   public static void encode(RequestJoinTeamMessage message, PacketBuffer out) {
     out.writeBoolean(message.team == null);
     if (message.team != null) {
-      out.writeEnumValue(message.team);
+      out.writeEnum(message.team);
     }
   }
 
   public static RequestJoinTeamMessage decode(PacketBuffer in) {
     return new RequestJoinTeamMessage(
-        in.readBoolean() ? null : in.readEnumValue(DeathmatchTeam.class));
+        in.readBoolean() ? null : in.readEnum(DeathmatchTeam.class));
   }
 
   public static void handle(RequestJoinTeamMessage message, NetworkEvent.Context ctx) {

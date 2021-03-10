@@ -36,50 +36,50 @@ import net.minecraft.world.World;
 public class ToolItem extends Item {
 
   public static final ITextComponent CAN_OPEN_CANNED_ITEMS_TOOLTIP =
-      Text.translate("item_lore.tool_item.open_canned_items").mergeStyle(TextFormatting.GRAY);
+      Text.translate("item_lore.tool_item.open_canned_items").withStyle(TextFormatting.GRAY);
 
   public ToolItem(Properties properties) {
     super(properties);
   }
 
   @Override
-  public boolean canPlayerBreakBlockWhileHolding(BlockState blockState, World world,
+  public boolean canAttackBlock(BlockState blockState, World world,
       BlockPos blockPos, PlayerEntity playerEntity) {
     return !playerEntity.isCreative();
   }
 
   @Override
   public float getDestroySpeed(ItemStack itemStack, BlockState blockState) {
-    if (blockState.isIn(Blocks.COBWEB)) {
+    if (blockState.is(Blocks.COBWEB)) {
       return 15.0F;
     } else {
       Material material = blockState.getMaterial();
-      return material != Material.PLANTS && material != Material.TALL_PLANTS
-          && material != Material.CORAL && !blockState.isIn(BlockTags.LEAVES)
-          && material != Material.GOURD ? 1.0F : 1.5F;
+      return material != Material.PLANT && material != Material.REPLACEABLE_PLANT
+          && material != Material.CORAL && !blockState.is(BlockTags.LEAVES)
+          && material != Material.VEGETABLE ? 1.0F : 1.5F;
     }
   }
 
   @Override
-  public boolean hitEntity(ItemStack itemStack, LivingEntity targetEntity,
+  public boolean hurtEnemy(ItemStack itemStack, LivingEntity targetEntity,
       LivingEntity attackerEntity) {
-    itemStack.damageItem(1, attackerEntity,
-        (entity) -> entity.sendBreakAnimation(EquipmentSlotType.MAINHAND));
+    itemStack.hurtAndBreak(1, attackerEntity,
+        (entity) -> entity.broadcastBreakEvent(EquipmentSlotType.MAINHAND));
     return true;
   }
 
   @Override
-  public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos,
+  public boolean mineBlock(ItemStack stack, World worldIn, BlockState state, BlockPos pos,
       LivingEntity entityLiving) {
-    if (state.getBlockHardness(worldIn, pos) != 0.0F) {
-      stack.damageItem(2, entityLiving,
-          (entity) -> entity.sendBreakAnimation(EquipmentSlotType.MAINHAND));
+    if (state.getDestroySpeed(worldIn, pos) != 0.0F) {
+      stack.hurtAndBreak(2, entityLiving,
+          (entity) -> entity.broadcastBreakEvent(EquipmentSlotType.MAINHAND));
     }
     return true;
   }
 
   @Override
-  public boolean canHarvestBlock(BlockState blockIn) {
-    return blockIn.isIn(Blocks.COBWEB);
+  public boolean isCorrectToolForDrops(BlockState blockIn) {
+    return blockIn.is(Blocks.COBWEB);
   }
 }

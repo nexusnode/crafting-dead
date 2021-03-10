@@ -50,16 +50,16 @@ public class SlimGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
       totalTicks += partialTicks;
     }
 
-    matrixStack.rotate(Vector3f.XP.rotationDegrees(totalTicks * 30F));
+    matrixStack.mulPose(Vector3f.XP.rotationDegrees(totalTicks * 30F));
 
     IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(model.getRenderType(this.getEntityTexture(entity)));
-    this.model.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F,
+        renderTypeBuffer.getBuffer(model.renderType(this.getTextureLocation(entity)));
+    this.model.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F,
         1.0F, 1.0F, 0.15F);
   }
 
   @Override
-  public ResourceLocation getEntityTexture(GrenadeEntity entity) {
+  public ResourceLocation getTextureLocation(GrenadeEntity entity) {
     return new ResourceLocation(CraftingDead.ID,
         "textures/entity/grenade/" + entity.getType().getRegistryName().getPath() + ".png");
   }

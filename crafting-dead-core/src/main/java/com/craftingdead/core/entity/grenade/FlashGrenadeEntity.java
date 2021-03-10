@@ -57,7 +57,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
     if (activated) {
       this.flash();
     } else {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
       }
     }
@@ -80,14 +80,14 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   public void onMotionStop(int stopsCount) {}
 
   private void flash() {
-    if (this.world.isRemote()) {
-      this.world.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getPosX(),
-          this.getPosY(), this.getPosZ(), 0D, 0D, 0D);
+    if (this.level.isClientSide()) {
+      this.level.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(),
+          this.getY(), this.getZ(), 0D, 0D, 0D);
       CraftingDead.getInstance().getClientDist().checkApplyFlashEffects(this);
     } else {
-      this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 3F, 1.2F);
+      this.playSound(SoundEvents.GENERIC_EXPLODE, 3F, 1.2F);
 
-      this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox().grow(FLASH_MAX_RANGE),
+      this.level.getEntities(this, this.getBoundingBox().inflate(FLASH_MAX_RANGE),
           (entity) -> entity instanceof LivingEntity && !(entity instanceof PlayerEntity))
           .stream()
           .map(entity -> (LivingEntity) entity)
@@ -101,7 +101,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
               if (wasFlashApplied && livingEntity instanceof MobEntity) {
                 MobEntity mobEntity = (MobEntity) livingEntity;
                 // Removes the attack target
-                mobEntity.setAttackTarget(null);
+                mobEntity.setTarget(null);
               }
             }
           });
@@ -115,7 +115,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
    * @return int - The amount in ticks. Zero if it should not be applied.
    */
   public int calculateDuration(LivingEntity viewerEntity, boolean insideFOV) {
-    if (!viewerEntity.canEntityBeSeen(this)) {
+    if (!viewerEntity.canSee(this)) {
       return 0;
     }
 
@@ -129,7 +129,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
     if (insideFOV && !isImmuneToFlashes) {
       double distanceProportion =
-          MathHelper.clamp(this.getDistance(viewerEntity.getEntity()) / FLASH_MAX_RANGE, 0F, 1F);
+          MathHelper.clamp(this.distanceTo(viewerEntity.getEntity()) / FLASH_MAX_RANGE, 0F, 1F);
       int calculatedDuration =
           (int) MathHelper.lerp(1F - distanceProportion, 0, EFFECT_MAX_DURATION);
 

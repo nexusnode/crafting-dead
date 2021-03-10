@@ -31,7 +31,7 @@ public class NetworkUtil {
       case CLIENT:
         Optional<World> world =
             LogicalSidedProvider.CLIENTWORLD.get(ctx.getDirection().getReceptionSide());
-        return world.map(w -> w.getEntityByID(entityId));
+        return world.map(w -> w.getEntity(entityId));
       case SERVER:
         return Optional.ofNullable(ctx.getSender());
       default:

@@ -72,7 +72,7 @@ public class LogicalServer extends WorldSavedData {
   public LogicalServer(MinecraftServer minecraftServer) {
     super(CraftingDeadImmerse.ID);
     this.minecraftServer = minecraftServer;
-    this.gamePath = minecraftServer.func_240776_a_(GAME_FOLDER_NAME);
+    this.gamePath = minecraftServer.getWorldPath(GAME_FOLDER_NAME);
   }
 
   public List<Pair<String, SetupGameMessage>> generateSetupGameMessage(boolean isLocal) {
@@ -83,7 +83,7 @@ public class LogicalServer extends WorldSavedData {
   public void startLoading() {}
 
   public void finishLoading() {
-    this.minecraftServer.getWorld(World.OVERWORLD).getSavedData().getOrCreate(() -> this,
+    this.minecraftServer.getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(() -> this,
         CraftingDead.ID);
 
     // If there was no saved game in the world, load a new game
@@ -159,12 +159,12 @@ public class LogicalServer extends WorldSavedData {
 
     logger.info("Loading players");
     for (ServerPlayerEntity playerEntity : players) {
-      playerEntity.connection.sendPacket(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+      playerEntity.connection.send(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
           new ChangeGameMessage(this.gameServer.getGameType()), NetworkDirection.PLAY_TO_CLIENT));
 
       if (oldGameServer != null && gameServer.persistPlayerData()
           && !oldGameServer.persistPlayerData()) {
-        this.minecraftServer.getPlayerList().readPlayerDataFromFile(playerEntity);
+        this.minecraftServer.getPlayerList().load(playerEntity);
       }
     }
 
@@ -192,7 +192,7 @@ public class LogicalServer extends WorldSavedData {
 
   public void respawnPlayer(ServerPlayerEntity playerEntity, boolean keepData) {
     playerEntity.connection.player =
-        this.minecraftServer.getPlayerList().func_232644_a_(playerEntity, keepData);
+        this.minecraftServer.getPlayerList().respawn(playerEntity, keepData);
   }
 
   private void addPlayerToGame(IPlayer<ServerPlayerEntity> player) {
@@ -214,7 +214,7 @@ public class LogicalServer extends WorldSavedData {
   }
 
   @Override
-  public void read(CompoundNBT nbt) {
+  public void load(CompoundNBT nbt) {
     CompoundNBT gameNbt = nbt.getCompound("game");
     if (!gameNbt.isEmpty()) {
       this.loadGame(IGameServer.CODEC.parse(NBTDynamicOps.INSTANCE, gameNbt)
@@ -223,7 +223,7 @@ public class LogicalServer extends WorldSavedData {
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT nbt) {
+  public CompoundNBT save(CompoundNBT nbt) {
     if (this.gameServer.save()) {
       nbt.put("game", IGameServer.CODEC.encodeStart(NBTDynamicOps.INSTANCE, this.gameServer)
           .getOrThrow(false, logger::error));
@@ -245,7 +245,7 @@ public class LogicalServer extends WorldSavedData {
         } else {
           if (this.gameServer.requiresSync()) {
             this.minecraftServer.getPlayerList()
-                .sendPacketToAllPlayers(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+                .broadcastAll(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
                     new SyncGameMessage(this.gameServer, false), NetworkDirection.PLAY_TO_CLIENT));
           }
         }

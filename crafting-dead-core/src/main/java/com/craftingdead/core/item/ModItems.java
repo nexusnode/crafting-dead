@@ -127,124 +127,124 @@ public class ModItems {
   public static final RegistryObject<PaintItem> VULCAN_PAINT = ITEMS
       .register("vulcan_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> ASMO_PAINT = ITEMS
       .register("asmo_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> CANDY_APPLE_PAINT = ITEMS
       .register("candy_apple_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> CYREX_PAINT = ITEMS
       .register("cyrex_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> DIAMOND_PAINT = ITEMS
       .register("diamond_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> DRAGON_PAINT = ITEMS
       .register("dragon_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> FADE_PAINT = ITEMS
       .register("fade_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> FURY_PAINT = ITEMS
       .register("fury_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> GEM_PAINT = ITEMS
       .register("gem_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> INFERNO_PAINT = ITEMS
       .register("inferno_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> MULTI_PAINT = ITEMS
       .register("multi_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
               .setColour()
               .setHasSkin(false)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> RUBY_PAINT = ITEMS
       .register("ruby_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> SCORCHED_PAINT = ITEMS
       .register("scorched_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> SLAUGHTER_PAINT = ITEMS
       .register("slaughter_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> UV_PAINT = ITEMS
       .register("uv_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> HYPER_BEAST_PAINT = ITEMS
       .register("hyper_beast_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> EMPEROR_DRAGON_PAINT = ITEMS
       .register("emperor_dragon_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> NUCLEAR_WINTER_PAINT = ITEMS
       .register("nuclear_winter_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> MONARCH_PAINT = ITEMS
       .register("monarch_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<PaintItem> LOVELACE_PAINT = ITEMS
       .register("lovelace_paint",
           () -> new PaintItem((PaintItem.Properties) new PaintItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
   // ================================================================================
   // Magazines
   // ================================================================================
@@ -255,8 +255,8 @@ public class ModItems {
               .setSize(85)
               .setArmorPenetration(0.4F)
               .setCustomTexture(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_DRUM_MAGAZINE = ITEMS
       .register("stanag_drum_magazine",
@@ -265,8 +265,8 @@ public class ModItems {
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_BOX_MAGAZINE)
               .setCustomTexture(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_30_ROUND_MAGAZINE = ITEMS
       .register("stanag_30_round_magazine",
@@ -275,8 +275,8 @@ public class ModItems {
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_DRUM_MAGAZINE)
               .setCustomTexture(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> STANAG_20_ROUND_MAGAZINE = ITEMS
       .register("stanag_20_round_magazine",
@@ -285,135 +285,135 @@ public class ModItems {
               .setArmorPenetration(0.4F)
               .setNextTier(STANAG_30_ROUND_MAGAZINE)
               .setCustomTexture(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MPT55_MAGAZINE = ITEMS
       .register("mpt55_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AK47_30_ROUND_MAGAZINE = ITEMS
       .register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> FNFAL_MAGAZINE = ITEMS
       .register("fnfal_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.55F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> ACR_MAGAZINE = ITEMS
       .register("acr_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.5F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> G36C_MAGAZINE = ITEMS
       .register("g36c_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.45F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> HK417_MAGAZINE = ITEMS
       .register("hk417_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.47F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M1911_MAGAZINE = ITEMS
       .register("m1911_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(7)
               .setArmorPenetration(0.08F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> G18_MAGAZINE = ITEMS
       .register("g18_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.08F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M9_MAGAZINE = ITEMS
       .register("m9_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(15)
               .setArmorPenetration(0.08F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> DESERT_EAGLE_MAGAZINE = ITEMS
       .register("desert_eagle_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(13)
               .setArmorPenetration(0.35F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> P250_MAGAZINE = ITEMS
       .register("p250_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(12)
               .setArmorPenetration(0.08F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAGNUM_MAGAZINE = ITEMS
       .register("magnum_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.65F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> FN57_MAGAZINE = ITEMS
       .register("fn57_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.09F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> P90_MAGAZINE = ITEMS
       .register("p90_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(50)
               .setArmorPenetration(0.15F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> VECTOR_MAGAZINE = ITEMS
       .register("vector_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.15F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MP5A5_35_ROUND_MAGAZINE = ITEMS
       .register("mp5a5_35_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(35)
               .setArmorPenetration(0.15F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MP5A5_21_ROUND_MAGAZINE = ITEMS
       .register("mp5a5_21_round_magazine",
@@ -421,16 +421,16 @@ public class ModItems {
               .setSize(21)
               .setArmorPenetration(0.15F)
               .setNextTier(MP5A5_35_ROUND_MAGAZINE)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAC10_EXTENDED_MAGAZINE = ITEMS
       .register("mac10_extended_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.15F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MAC10_MAGAZINE = ITEMS
       .register("mac10_magazine",
@@ -438,86 +438,86 @@ public class ModItems {
               .setSize(30)
               .setArmorPenetration(0.15F)
               .setNextTier(MAC10_EXTENDED_MAGAZINE)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> SPORTER22_MAGAZINE = ITEMS
       .register("sporter22_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M107_MAGAZINE = ITEMS
       .register("m107_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AS50_MAGAZINE = ITEMS
       .register("as50_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M1GARAND_MAGAZINE = ITEMS
       .register("m1garand_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.95F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> AWP_MAGAZINE = ITEMS
       .register("awp_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.95F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> TRENCHGUN_SHELLS = ITEMS
       .register("trenchgun_shells",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.35F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MOSSBERG_SHELLS = ITEMS
       .register("mossberg_shells",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.3F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> DMR_MAGAZINE = ITEMS
       .register("dmr_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(5)
               .setArmorPenetration(0.65F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> TASER_CARTRIDGE = ITEMS
       .register("taser_cartridge",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(3)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> M240B_MAGAZINE = ITEMS
       .register("m240b_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.5F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
   public static final RegistryObject<MagazineItem> RPK_DRUM_MAGAZINE = ITEMS
@@ -526,8 +526,8 @@ public class ModItems {
               .setSize(100)
               .setArmorPenetration(0.5F)
               .setCustomTexture(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> RPK_MAGAZINE = ITEMS
       .register("rpk_magazine",
@@ -535,24 +535,24 @@ public class ModItems {
               .setSize(60)
               .setArmorPenetration(0.5F)
               .setNextTier(RPK_DRUM_MAGAZINE)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MINIGUN_MAGAZINE = ITEMS
       .register("minigun_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(350)
               .setArmorPenetration(0.3F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<MagazineItem> MK48MOD_MAGAZINE = ITEMS
       .register("mk48mod_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.52F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Attachments
@@ -563,16 +563,16 @@ public class ModItems {
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> ACOG_SIGHT = ITEMS
       .register("acog_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ZOOM, 3.25F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> LP_SCOPE = ITEMS
       .register("lp_scope",
@@ -580,8 +580,8 @@ public class ModItems {
               .addMultiplier(MultiplierType.ZOOM, 5.0F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> HP_SCOPE = ITEMS
       .register("hp_scope",
@@ -589,40 +589,40 @@ public class ModItems {
               .addMultiplier(MultiplierType.ZOOM, 8.0F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> SUPPRESSOR = ITEMS
       .register("suppressor",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .setInventorySlot(CraftingInventorySlotType.MUZZLE_ATTACHMENT)
               .setSoundSuppressor(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> TACTICAL_GRIP = ITEMS
       .register("tactical_grip",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ACCURACY, 1.15F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> BIPOD = ITEMS
       .register("bipod",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ACCURACY, 1.05F)
               .setInventorySlot(CraftingInventorySlotType.UNDERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<AttachmentItem> EOTECH_SIGHT = ITEMS
       .register("eotech_sight",
           () -> new AttachmentItem((AttachmentItem.Properties) new AttachmentItem.Properties()
               .addMultiplier(MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(CraftingInventorySlotType.OVERBARREL_ATTACHMENT)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Assault Rifles
@@ -668,8 +668,8 @@ public class ModItems {
               .addAcceptedPaint(HYPER_BEAST_PAINT)
               .addAcceptedPaint(LOVELACE_PAINT)
               .setRendererFactory(() -> M4A1Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> SCARH = ITEMS
       .register("scarh",
@@ -703,8 +703,8 @@ public class ModItems {
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> ScarhRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> AK47 = ITEMS
       .register("ak47",
@@ -736,8 +736,8 @@ public class ModItems {
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> AK47Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> FNFAL = ITEMS
       .register("fnfal",
@@ -765,8 +765,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> FNFALRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> ACR = ITEMS
       .register("acr",
@@ -793,8 +793,8 @@ public class ModItems {
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> ACRRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> HK417 = ITEMS
       .register("hk417",
@@ -822,8 +822,8 @@ public class ModItems {
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> HK417Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MPT55 = ITEMS
       .register("mpt55",
@@ -848,8 +848,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MPT55Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M1GARAND = ITEMS
       .register("m1garand",
@@ -872,8 +872,8 @@ public class ModItems {
               .addAcceptedAttachment(BIPOD)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> M1GarandRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> SPORTER22 = ITEMS
       .register("sporter22",
@@ -901,8 +901,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> Sporter22Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> G36C = ITEMS
       .register("g36c",
@@ -927,8 +927,8 @@ public class ModItems {
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> G36CRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
 
   // ================================================================================
@@ -959,8 +959,8 @@ public class ModItems {
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> M240BRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> RPK = ITEMS
       .register("rpk",
@@ -984,8 +984,8 @@ public class ModItems {
               .addAcceptedAttachment(ACOG_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> RPKRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MINIGUN = ITEMS
       .register("minigun",
@@ -1009,8 +1009,8 @@ public class ModItems {
               .setTriggerPredicate(IGun::isPerformingRightMouseAction)
               .setRightMouseActionSound(ModSoundEvents.MINIGUN_BARREL)
               .setRightMouseActionSoundRepeatDelayMs(177L)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MK48MOD = ITEMS
       .register("mk48mod",
@@ -1035,8 +1035,8 @@ public class ModItems {
               .addAcceptedAttachment(EOTECH_SIGHT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MK48ModRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Pistols
@@ -1058,8 +1058,8 @@ public class ModItems {
               .setDefaultMagazine(TASER_CARTRIDGE)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> TaserRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M1911 = ITEMS
       .register("m1911",
@@ -1083,8 +1083,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> M1911Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> G18 = ITEMS
       .register("g18",
@@ -1110,8 +1110,8 @@ public class ModItems {
               .addAcceptedPaint(FADE_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> G18Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> M9 = ITEMS
       .register("m9",
@@ -1134,8 +1134,8 @@ public class ModItems {
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(CYREX_PAINT)
               .setRendererFactory(() -> M9Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS
       .register("desert_eagle",
@@ -1160,8 +1160,8 @@ public class ModItems {
               .addAcceptedPaint(NUCLEAR_WINTER_PAINT)
               .addAcceptedPaint(LOVELACE_PAINT)
               .setRendererFactory(() -> DesertEagleRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> P250 = ITEMS
       .register("p250",
@@ -1186,8 +1186,8 @@ public class ModItems {
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> P250Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MAGNUM = ITEMS
       .register("magnum",
@@ -1207,8 +1207,8 @@ public class ModItems {
               .setDefaultMagazine(MAGNUM_MAGAZINE)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MagnumRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> FN57 = ITEMS
       .register("fn57",
@@ -1230,8 +1230,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> FN57Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Submachine Guns
@@ -1262,8 +1262,8 @@ public class ModItems {
               .addAcceptedPaint(UV_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MAC10Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> P90 = ITEMS
       .register("p90",
@@ -1290,8 +1290,8 @@ public class ModItems {
               .addAcceptedPaint(MULTI_PAINT)
               .addAcceptedPaint(ASMO_PAINT)
               .setRendererFactory(() -> P90Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> VECTOR = ITEMS
       .register("vector",
@@ -1316,8 +1316,8 @@ public class ModItems {
               .addAcceptedPaint(SLAUGHTER_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> VectorRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MP5A5 = ITEMS
       .register("mp5a5",
@@ -1342,8 +1342,8 @@ public class ModItems {
               .addAcceptedAttachment(SUPPRESSOR)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MP5A5Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Sniper Rifles
@@ -1376,8 +1376,8 @@ public class ModItems {
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> M107Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> AS50 = ITEMS
       .register("as50",
@@ -1405,8 +1405,8 @@ public class ModItems {
               .addAcceptedPaint(DIAMOND_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> AS50Renderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> AWP = ITEMS
       .register("awp",
@@ -1437,8 +1437,8 @@ public class ModItems {
               .addAcceptedPaint(ASMO_PAINT)
               .addAcceptedPaint(MONARCH_PAINT)
               .setRendererFactory(() -> AWPRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> DMR = ITEMS
       .register("dmr",
@@ -1466,8 +1466,8 @@ public class ModItems {
               .addAcceptedPaint(SCORCHED_PAINT)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> DMRRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Shotguns
@@ -1493,8 +1493,8 @@ public class ModItems {
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> TrenchgunRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GunItem> MOSSBERG = ITEMS
       .register("mossberg",
@@ -1516,8 +1516,8 @@ public class ModItems {
               .addAcceptedAttachment(TACTICAL_GRIP)
               .addAcceptedPaint(MULTI_PAINT)
               .setRendererFactory(() -> MossbergRenderer::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Grenades
@@ -1527,55 +1527,55 @@ public class ModItems {
       .register("fire_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(FireGrenadeEntity::new)
-              .maxStackSize(3)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(3)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> SMOKE_GRENADE = ITEMS
       .register("smoke_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
-              .maxStackSize(3)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(3)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> FLASH_GRENADE = ITEMS
       .register("flash_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
-              .maxStackSize(3)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(3)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> DECOY_GRENADE = ITEMS
       .register("decoy_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
-              .maxStackSize(3)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(3)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> FRAG_GRENADE = ITEMS
       .register("frag_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(FragGrenadeEntity::new)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> PIPE_GRENADE = ITEMS
       .register("pipe_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(PipeGrenadeEntity::new)
-              .maxStackSize(3)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(3)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<GrenadeItem> C4 = ITEMS
       .register("c4_explosive",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(C4ExplosiveEntity::new)
               .setThrowSpeed(0.75F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> REMOTE_DETONATOR = ITEMS
       .register("remote_detonator", () -> new RemoteDetonatorItem(
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Medical
@@ -1584,75 +1584,75 @@ public class ModItems {
   public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS
       .register("first_aid_kit",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_FIRST_AID_KIT)));
 
   public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS
       .register("adrenaline_syringe",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_ADRENALINE_SYRINGE)));
 
   public static final RegistryObject<Item> SYRINGE = ITEMS
       .register("syringe",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_SYRINGE)));
 
   public static final RegistryObject<Item> BLOOD_SYRINGE = ITEMS
       .register("blood_syringe",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_BLOOD_SYRINGE)));
 
   public static final RegistryObject<Item> BANDAGE = ITEMS
       .register("bandage",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_BANDAGE)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS
       .register("rbi_syringe",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_RBI_SYRINGE)));
 
   public static final RegistryObject<Item> DIRTY_RAG = ITEMS
       .register("dirty_rag",
           () -> new ActionItem(new Item.Properties()
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.WASH_RAG)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS
       .register("bloody_rag",
           () -> new ActionItem(new Item.Properties()
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.WASH_RAG)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS
       .register("clean_rag",
           () -> new ActionItem(new Item.Properties()
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_CLEAN_RAG)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS
       .register("splint",
           () -> new ActionItem(new Item.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MED),
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_SPLINT)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS
       .register("cure_syringe",
           () -> new ActionItem(
-              new Item.Properties().maxStackSize(1)
-                  .group(ModItemGroups.CRAFTING_DEAD_MED),
+              new Item.Properties().stacksTo(1)
+                  .tab(ModItemGroups.CRAFTING_DEAD_MED),
               new DefaultActionProvider(ActionTypes.USE_CURE_SYRINGE)));
 
   // ================================================================================
@@ -1661,139 +1661,139 @@ public class ModItems {
 
   public static final RegistryObject<Item> CROWBAR = ITEMS
       .register("crowbar", () -> new MeleeWeaponItem(7, -2.4F, new Item.Properties()
-          .maxDamage(100)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(100)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BAT = ITEMS
       .register("bat", () -> new MeleeWeaponItem(5, -2.4F, new Item.Properties()
-          .maxDamage(55)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(55)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> KATANA = ITEMS
       .register("katana", () -> new MeleeWeaponItem(18, -2.4F, new Item.Properties()
-          .maxDamage(40)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(40)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> PIPE = ITEMS
       .register("pipe", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-          .maxDamage(60)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(60)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> RUSTY_PIPE = ITEMS
       .register("rusty_pipe", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-          .maxDamage(20)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(20)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FIRE_AXE = ITEMS
       .register("fire_axe", () -> new AxeItem(ItemTier.IRON, 14, -2.4F, new Item.Properties()
-          .maxDamage(100)
-          .group((ModItemGroups.CRAFTING_DEAD_COMBAT))));
+          .durability(100)
+          .tab((ModItemGroups.CRAFTING_DEAD_COMBAT))));
 
   public static final RegistryObject<Item> CHAINSAW = ITEMS
       .register("chainsaw", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-          .maxDamage(75)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(75)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BOWIE_KNIFE = ITEMS
       .register("bowie_knife", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-          .maxDamage(20)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(20)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> GOLF_CLUB = ITEMS
       .register("golf_club", () -> new MeleeWeaponItem(6, -2.4F, new Item.Properties()
-          .maxDamage(40)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(40)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> NIGHT_STICK = ITEMS
       .register("night_stick", () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
-          .maxDamage(70)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(70)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SLEDGEHAMMER = ITEMS
       .register("sledgehammer", () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F,
           new Item.Properties()
-              .maxDamage(110)
-              .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+              .durability(110)
+              .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> NAIL_BAT = ITEMS
       .register("nail_bat", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-          .maxDamage(55)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(55)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SHOVEL = ITEMS
       .register("shovel", () -> new ShovelItem(ItemTier.IRON, 8, -2.4F, new Item.Properties()
-          .maxDamage(70)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(70)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> HATCHET = ITEMS
       .register("hatchet", () -> new AxeItem(ItemTier.IRON, 16, -2.4F, new Item.Properties()
-          .maxDamage(40)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(40)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BROADSWORD = ITEMS
       .register("broad_sword", () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-          .maxDamage(55)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(55)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> MACHETE = ITEMS
       .register("machete", () -> new MeleeWeaponItem(12, -2.4F, new Item.Properties()
-          .maxDamage(70)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(70)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> WEAPONIZED_SCYTHE = ITEMS
       .register("weaponized_scythe", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-          .maxDamage(40)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(40)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> SCYTHE = ITEMS
       .register("scythe", () -> new MeleeWeaponItem(20, -2.4F, new Item.Properties()
-          .maxDamage(20)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(20)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> PICKAXE = ITEMS
       .register("pickaxe", () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F, new Item.Properties()
-          .maxDamage(210)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(210)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BO_STAFF = ITEMS
       .register("bo_staff", () -> new MeleeWeaponItem(4, -2.4F, new Item.Properties()
-          .maxDamage(70)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(70)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> WRENCH = ITEMS
       .register("wrench", () -> new MeleeWeaponItem(8, -2.4F, new Item.Properties()
-          .maxDamage(120)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(120)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> FRYING_PAN = ITEMS
       .register("frying_pan", () -> new MeleeWeaponItem(6, -2.4F, new Item.Properties()
-          .maxDamage(80)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(80)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BOLT_CUTTERS = ITEMS
       .register("bolt_cutters", () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
-          .maxDamage(50)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(50)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> COMBAT_KNIFE = ITEMS
       .register("combat_knife", () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
-          .maxDamage(100)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(100)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> STEEL_BAT = ITEMS
       .register("steel_bat", () -> new MeleeWeaponItem(7, -2.4F, new Item.Properties()
-          .maxDamage(180)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(180)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> CLEAVER = ITEMS
       .register("cleaver", () -> new MeleeWeaponItem(10, -2.4F, new Item.Properties()
-          .maxDamage(80)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(80)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   public static final RegistryObject<Item> BROKEN_BOTTLE = ITEMS
       .register("broken_bottle", () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-          .maxDamage(10)
-          .group(ModItemGroups.CRAFTING_DEAD_COMBAT)));
+          .durability(10)
+          .tab(ModItemGroups.CRAFTING_DEAD_COMBAT)));
 
   // ================================================================================
   // Vests
@@ -1801,27 +1801,27 @@ public class ModItems {
 
   public static final RegistryObject<Item> BLACK_TACTICAL_VEST = ITEMS
       .register("black_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GHILLIE_TACTICAL_VEST = ITEMS
       .register("ghillie_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_TACTICAL_VEST = ITEMS
       .register("green_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREY_TACTICAL_VEST = ITEMS
       .register("grey_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RIOT_VEST = ITEMS
       .register("riot_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> TAN_TACTICAL_VEST = ITEMS
       .register("tan_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties().maxStackSize(1).group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+          new Item.Properties().stacksTo(1).tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================
   // Hats, Helmets and Masks
@@ -1831,300 +1831,300 @@ public class ModItems {
       .register("army_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BEANIE_HAT = ITEMS
       .register("beanie_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BLACK_BALLISTIC_HAT = ITEMS
       .register("black_ballistic_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> FIREMAN_CHIEF_HAT = ITEMS
       .register("chief_fireman_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BLUE_HARD_HAT = ITEMS
       .register("blue_hard_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BUNNY_HAT = ITEMS
       .register("bunny_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CAMO_HELMET = ITEMS
       .register("camo_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CLONE_HAT = ITEMS
       .register("clone_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COMBAT_BDU_HELMET = ITEMS
       .register("combat_bdu_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COOKIE_MASK = ITEMS
       .register("cookie_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COW_MASK = ITEMS
       .register("cow_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CREEPER_MASK = ITEMS
       .register("creeper_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DEADPOOL_MASK = ITEMS
       .register("deadpool_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DOCTOR_MASK = ITEMS
       .register("doctor_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> FIREMAN_HAT = ITEMS
       .register("fireman_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GAS_MASK = ITEMS
       .register("gas_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setImmuneToFlashes(true)
               .setImmuneToGas(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GHILLIE_HAT = ITEMS
       .register("ghillie_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_ARMY_HELMET = ITEMS
       .register("green_army_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_BALLISTIC_HELMET = ITEMS
       .register("green_ballistic_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_HARD_HAT = ITEMS
       .register("green_hard_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREY_ARMY_HELMET = ITEMS
       .register("grey_army_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> HACKER_MASK = ITEMS
       .register("hacker_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> HAZMAT_HAT = ITEMS
       .register("hazmat_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setImmuneToFlashes(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> JUGGERNAUT_HELMET = ITEMS
       .register("juggernaut_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> KNIGHT_HAT = ITEMS
       .register("knight_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> MILITARY_HAZMAT_HAT = ITEMS
       .register("military_hazmat_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setImmuneToFlashes(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> NINJA_HAT = ITEMS
       .register("ninja_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> NV_GOGGLES_HAT = ITEMS
       .register("nv_goggles_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setNightVision(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ORANGE_HARD_HAT = ITEMS
       .register("orange_hard_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PAYDAY_MASK = ITEMS
       .register("payday_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PAYDAY2_MASK = ITEMS
       .register("payday2_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PILOT_HELMET = ITEMS
       .register("pilot_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PUMPKIN_MASK = ITEMS
       .register("pumpkin_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RADAR_CAP = ITEMS
       .register("radar_cap",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RIOT_HAT = ITEMS
       .register("riot_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SANTA_HAT = ITEMS
       .register("santa_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // TODO Add respiration ability to the CLOTHING+MASK item combo
   public static final RegistryObject<Item> SCUBA_MASK = ITEMS
       .register("scuba_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SHEEP_MASK = ITEMS
       .register("sheep_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SKI_MASK = ITEMS
       .register("ski_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setImmuneToFlashes(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SPETSNAZ_HELMET = ITEMS
       .register("spetsnaz_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> TOP_HAT = ITEMS
       .register("top_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> TRAPPER_HAT = ITEMS
       .register("trapper_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> USHANKA_HAT = ITEMS
       .register("ushanka_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> WINTER_MILITARY_HELMET = ITEMS
       .register("winter_military_helmet",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> YELLOW_HARD_HAT = ITEMS
       .register("yellow_hard_hat",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
               .setHeadshotReductionPercentage(0.2F)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ZOMBIE_MASK = ITEMS
       .register("zombie_mask",
           () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================
   // Clothing
@@ -2134,99 +2134,99 @@ public class ModItems {
       .register("army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SAS_CLOTHING = ITEMS
       .register("sas_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SPETSNAZ_CLOTHING = ITEMS
       .register("spetsnaz_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> POLICE_CLOTHING = ITEMS
       .register("police_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CAMO_CLOTHING = ITEMS
       .register("camo_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COMBAT_BDU_CLOTHING = ITEMS
       .register("combat_bdu_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> WINTER_ARMY_CLOTHING = ITEMS
       .register("winter_army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ARMY_DESERT_CLOTHING = ITEMS
       .register("army_desert_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PILOT_CLOTHING = ITEMS
       .register("pilot_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> HAZMAT_CLOTHING = ITEMS
       .register("hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
               .setFireImmunity(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> TAC_GHILLIE_CLOTHING = ITEMS
       .register("tac_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SWAT_CLOTHING = ITEMS
       .register("swat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SPACE_SUIT_CLOTHING = ITEMS
       .register("space_suit_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SHERIFF_CLOTHING = ITEMS
       .register("sheriff_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(false)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> JUGGERNAUT_CLOTHING = ITEMS
       .register("juggernaut_clothing",
@@ -2234,175 +2234,175 @@ public class ModItems {
               .setEnhancedProtection(true)
               .setFireImmunity(true)
               .setSlownessAmplifier(0)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> FIREMAN_CLOTHING = ITEMS
       .register("fireman_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
               .setFireImmunity(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DOCTOR_CLOTHING = ITEMS
       .register("doctor_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SMART_CLOTHING = ITEMS
       .register("smart_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CASUAL_GREEN_CLOTHING = ITEMS
       .register("casual_green_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BUILDER_CLOTHING = ITEMS
       .register("builder_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BUSINESS_CLOTHING = ITEMS
       .register("business_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SEC_GUARD_CLOTHING = ITEMS
       .register("sec_guard_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> MIL_HAZMAT_CLOTHING = ITEMS
       .register("mil_hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
               .setFireImmunity(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> FULL_GHILLIE_CLOTHING = ITEMS
       .register("full_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> RED_DUSK_CLOTHING = ITEMS
       .register("red_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CLONE_CLOTHING = ITEMS
       .register("clone_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> COOKIE_CLOTHING = ITEMS
       .register("cookie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DEADPOOL_CLOTHING = ITEMS
       .register("deadpool_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> NINJA_CLOTHING = ITEMS
       .register("ninja_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ARMY_MEDIC_CLOTHING = ITEMS
       .register("army_medic_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> BLUE_DUSK_CLOTHING = ITEMS
       .register("blue_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PRESIDENT_CLOTHING = ITEMS
       .register("president_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> YELLOW_DUSK_CLOTHING = ITEMS
       .register("yellow_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> ORANGE_DUSK_CLOTHING = ITEMS
       .register("orange_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> GREEN_DUSK_CLOTHING = ITEMS
       .register("green_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> WHITE_DUSK_CLOTHING = ITEMS
       .register("white_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> PURPLE_DUSK_CLOTHING = ITEMS
       .register("purple_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> SCUBA_CLOTHING = ITEMS
       .register("scuba_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> DDPAT_CLOTHING = ITEMS
       .register("ddpat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   public static final RegistryObject<Item> CONTRACTOR_CLOTHING = ITEMS
       .register("contractor_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
               .setEnhancedProtection(true)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_CLOTHING)));
 
   // ================================================================================
   // Air Drop Radio
@@ -2412,15 +2412,15 @@ public class ModItems {
       .register("medical_drop_radio",
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
               .setLootTable(ModLootTables.MEDICAL_SUPPLY_DROP)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MILITARY_DROP_RADIO = ITEMS
       .register("military_drop_radio",
           () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
               .setLootTable(ModLootTables.MILITARY_SUPPLY_DROP)
-              .maxStackSize(1)
-              .group(ModItemGroups.CRAFTING_DEAD_MISC)));
+              .stacksTo(1)
+              .tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   // ================================================================================
   // Spawn Eggs
@@ -2428,27 +2428,27 @@ public class ModItems {
 
   public static final RegistryObject<Item> ADVANCED_ZOMBIE_SPAWN_EGG = ITEMS
       .register("advanced_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.advancedZombie,
-          0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0x000000, 0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> FAST_ZOMBIE_SPAWN_EGG = ITEMS
       .register("fast_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.fastZombie, 0x000000,
-          0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> TANK_ZOMBIE_SPAWN_EGG = ITEMS
       .register("tank_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.tankZombie, 0x000000,
-          0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> WEAK_ZOMBIE_SPAWN_EGG = ITEMS
       .register("weak_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.weakZombie, 0x000000,
-          0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> POLICE_ZOMBIE_SPAWN_EGG = ITEMS
       .register("police_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.policeZombie,
-          0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0x000000, 0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> DOCTOR_ZOMBIE_SPAWN_EGG = ITEMS
       .register("doctor_zombie_spawn_egg", () -> new SpawnEggItem(ModEntityTypes.doctorZombie,
-          0x000000, 0xFFFFFF, new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          0x000000, 0xFFFFFF, new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   // ================================================================================
   // Miscellaneous
@@ -2456,57 +2456,57 @@ public class ModItems {
 
   public static final RegistryObject<Item> BINOCULARS = ITEMS
       .register("binoculars",
-          () -> new BinocularsItem(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new BinocularsItem(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> SMALL_BARREL = ITEMS
       .register("small_barrel",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MEDIUM_BARREL = ITEMS
       .register("medium_barrel",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> HEAVY_BARREL = ITEMS
       .register("heavy_barrel",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> SMALL_BODY = ITEMS
       .register("small_body",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MEDIUM_BODY = ITEMS
       .register("medium_body",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> HEAVY_BODY = ITEMS
       .register("heavy_body",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> SMALL_HANDLE = ITEMS
       .register("small_handle",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MEDIUM_HANDLE = ITEMS
       .register("medium_handle",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> HEAVY_HANDLE = ITEMS
       .register("heavy_handle",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> SMALL_STOCK = ITEMS
       .register("small_stock",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MEDIUM_STOCK = ITEMS
       .register("medium_stock",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> MEDIUM_BOLT = ITEMS
       .register("medium_bolt",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 
   public static final RegistryObject<Item> HEAVY_BOLT = ITEMS
       .register("heavy_bolt",
-          () -> new Item(new Item.Properties().group(ModItemGroups.CRAFTING_DEAD_MISC)));
+          () -> new Item(new Item.Properties().tab(ModItemGroups.CRAFTING_DEAD_MISC)));
 }

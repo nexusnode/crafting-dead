@@ -26,7 +26,7 @@ import com.craftingdead.immerse.game.IGameServer;
 public interface ITeamGameServer<K extends Enum<K> & ITeam> extends ITeamGame<K>, IGameServer {
 
   default void setPlayerTeam(IPlayer<?> player, @Nullable TeamInstance<K> team) {
-    UUID playerId = player.getEntity().getUniqueID();
+    UUID playerId = player.getEntity().getUUID();
     TeamInstance<K> currentTeam =
         this.getPlayerTeam(player).map(this::getTeamInstance).orElse(null);
     if ((team == null || team != currentTeam) && this.switchTeam(player, currentTeam, team)) {

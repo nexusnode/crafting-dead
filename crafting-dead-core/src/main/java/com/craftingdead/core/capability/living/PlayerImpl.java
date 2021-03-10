@@ -78,10 +78,10 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
   private static final DataParameter<Integer> WATER =
-      new DataParameter<>(0x00, DataSerializers.VARINT);
+      new DataParameter<>(0x00, DataSerializers.INT);
 
   private static final DataParameter<Integer> MAX_WATER =
-      new DataParameter<>(0x01, DataSerializers.VARINT);
+      new DataParameter<>(0x01, DataSerializers.INT);
 
   private static final DataParameter<Boolean> COMBAT_MODE_ENABLED =
       new DataParameter<>(0x02, DataSerializers.BOOLEAN);
@@ -113,7 +113,7 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
 
   @Override
   public void playerTick() {
-    if (!this.entity.getEntityWorld().isRemote()) {
+    if (!this.entity.getCommandSenderWorld().isClientSide()) {
       this.updateWater();
       this.updateEffects();
       this.updateBrokenLeg();
@@ -124,12 +124,12 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
   }
 
   private void updateWater() {
-    if (this.getEntity().getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
-        && !this.getEntity().abilities.disableDamage) {
+    if (this.getEntity().getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL
+        && !this.getEntity().abilities.invulnerable) {
       this.waterTicks++;
       if (this.getWater() <= 0) {
         if (this.waterTicks >= WATER_DAMAGE_DELAY_TICKS && this.getWater() == 0) {
-          this.getEntity().attackEntityFrom(ModDamageSource.DEHYDRATION, 1.0F);
+          this.getEntity().hurt(ModDamageSource.DEHYDRATION, 1.0F);
           this.waterTicks = 0;
         }
       } else if (this.waterTicks >= WATER_DELAY_TICKS) {
@@ -153,32 +153,32 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
 
   private void updateEffects() {
     if (this.getEntity().isCreative()
-        || this.getEntity().getEntityWorld().getDifficulty() == Difficulty.PEACEFUL) {
-      if (this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
-        this.getEntity().removePotionEffect(ModEffects.BLEEDING.get());
+        || this.getEntity().getCommandSenderWorld().getDifficulty() == Difficulty.PEACEFUL) {
+      if (this.getEntity().hasEffect(ModEffects.BLEEDING.get())) {
+        this.getEntity().removeEffect(ModEffects.BLEEDING.get());
       }
-      if (this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())) {
-        this.getEntity().removePotionEffect(ModEffects.BROKEN_LEG.get());
+      if (this.getEntity().hasEffect(ModEffects.BROKEN_LEG.get())) {
+        this.getEntity().removeEffect(ModEffects.BROKEN_LEG.get());
       }
-      if (this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
-        this.getEntity().removePotionEffect(ModEffects.INFECTION.get());
+      if (this.getEntity().hasEffect(ModEffects.INFECTION.get())) {
+        this.getEntity().removeEffect(ModEffects.INFECTION.get());
       }
     }
   }
 
   private void updateBrokenLeg() {
     if (!this.getEntity().isCreative()
-        && this.getEntity().getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
-        && !this.getEntity().isPotionActive(ModEffects.BROKEN_LEG.get())
+        && this.getEntity().getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL
+        && !this.getEntity().hasEffect(ModEffects.BROKEN_LEG.get())
         && this.getEntity().isOnGround() && !this.getEntity().isInWater()
         && ((this.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
             || this.getEntity().fallDistance > 10F)) {
       this.getEntity()
-          .sendStatusMessage(new TranslationTextComponent("message.broken_leg")
-              .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+          .displayClientMessage(new TranslationTextComponent("message.broken_leg")
+              .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)),
               true);
-      this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
-      this.getEntity().addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
+      this.getEntity().addEffect(new EffectInstance(ModEffects.BROKEN_LEG.get(), 9999999, 4));
+      this.getEntity().addEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
   }
 
@@ -204,7 +204,7 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
       return;
     }
     this.getEntity()
-        .openContainer(new SimpleNamedContainerProvider((windowId, playerInventory,
+        .openMenu(new SimpleNamedContainerProvider((windowId, playerInventory,
             playerEntity) -> new EquipmentContainer(windowId, this.getEntity().inventory),
             new TranslationTextComponent("container.equipment")));
   }
@@ -215,8 +215,8 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
     storageStack
         .getCapability(ModCapabilities.STORAGE)
         .ifPresent(storage -> this.getEntity()
-            .openContainer(
-                new SimpleNamedContainerProvider(storage, storageStack.getDisplayName())));
+            .openMenu(
+                new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
   }
 
 
@@ -235,23 +235,23 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
   public float onDamaged(DamageSource source, float amount) {
     amount = super.onDamaged(source, amount);
     // Can be null
-    Entity immediateAttacker = source.getImmediateSource();
+    Entity immediateAttacker = source.getDirectEntity();
 
     boolean isValidSource = immediateAttacker != null || source.isExplosion();
     if (isValidSource && !this.entity.isCreative()
-        && this.entity.getEntityWorld().getDifficulty() != Difficulty.PEACEFUL) {
+        && this.entity.getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL) {
       float bleedChance = 0.1F * amount
           * this.getItemHandler().getStackInSlot(InventorySlotType.CLOTHING.getIndex())
               .getCapability(ModCapabilities.CLOTHING)
               .map(clothing -> clothing.hasEnhancedProtection() ? 0.5F : 0.0F)
               .orElse(1.0F);
       if (random.nextFloat() < bleedChance
-          && !this.getEntity().isPotionActive(ModEffects.BLEEDING.get())) {
+          && !this.getEntity().hasEffect(ModEffects.BLEEDING.get())) {
         this.getEntity()
-            .sendStatusMessage(new TranslationTextComponent("message.bleeding")
-                .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+            .displayClientMessage(new TranslationTextComponent("message.bleeding")
+                .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)),
                 true);
-        this.getEntity().addPotionEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
+        this.getEntity().addEffect(new EffectInstance(ModEffects.BLEEDING.get(), 9999999));
       }
     }
     return amount;
@@ -260,7 +260,7 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
     if (!super.onAttacked(source, amount)) {
-      if (!source.isProjectile() && source.getTrueSource() instanceof ZombieEntity) {
+      if (!source.isProjectile() && source.getEntity() instanceof ZombieEntity) {
         this.infect(INFECTION_CHANCE);
       }
       return false;
@@ -271,14 +271,14 @@ public class PlayerImpl<L extends PlayerEntity> extends LivingImpl<L, IPlayerExt
   @Override
   public void infect(float chance) {
     if (!this.entity.isCreative()
-        && this.entity.getEntityWorld().getDifficulty() != Difficulty.PEACEFUL
+        && this.entity.getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL
         && random.nextFloat() < chance
-        && !this.getEntity().isPotionActive(ModEffects.INFECTION.get())) {
+        && !this.getEntity().hasEffect(ModEffects.INFECTION.get())) {
       this.getEntity()
-          .sendStatusMessage(new TranslationTextComponent("message.infected")
-              .setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.RED).setBold(true)),
+          .displayClientMessage(new TranslationTextComponent("message.infected")
+              .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)),
               true);
-      this.getEntity().addPotionEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
+      this.getEntity().addEffect(new EffectInstance(ModEffects.INFECTION.get(), 9999999));
     }
   }
 

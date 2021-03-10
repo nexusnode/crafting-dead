@@ -44,13 +44,13 @@ public class SimpleButton extends Button {
         0x33000000);
     fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height,
         this.backgroundColour | MathHelper.ceil(this.alpha * 255.0F) << 24);
-    drawCenteredString(matrixStack, minecraft.fontRenderer, this.getMessage(),
+    drawCenteredString(matrixStack, minecraft.font, this.getMessage(),
         this.x + this.width / 2, this.y + (this.height - 8) / 2,
         (this.active ? this.isHovered ? this.packedFGColor : 0xFFFFFF : 0xA0A0A0)
             | MathHelper.ceil(this.alpha * 255.0F) << 24);
-//    RenderSystem.enableBlend();
-//    RenderSystem.defaultBlendFunc();
-//    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
-//        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+    // RenderSystem.enableBlend();
+    // RenderSystem.defaultBlendFunc();
+    // RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+    // GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
   }
 }

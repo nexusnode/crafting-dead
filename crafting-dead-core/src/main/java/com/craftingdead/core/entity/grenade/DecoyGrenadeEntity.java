@@ -36,7 +36,7 @@ import net.minecraftforge.fml.RegistryObject;
 public class DecoyGrenadeEntity extends GrenadeEntity {
 
   private long lastShotMs;
-  private final GunItem gunItem = getRandomGun(this.rand);
+  private final GunItem gunItem = getRandomGun(this.random);
 
   public DecoyGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
     super(entityIn, worldIn);
@@ -56,10 +56,10 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   @Override
   public void onActivationStateChange(boolean activated) {
     if (!activated) {
-      if (!this.world.isRemote()) {
+      if (!this.level.isClientSide()) {
         this.remove();
-        this.world.createExplosion(this, this.createDamageSource(), null,
-            this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ(), 1.3F, false,
+        this.level.explode(this, this.createDamageSource(), null,
+            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 1.3F, false,
             Explosion.Mode.NONE);
       }
     } else {
@@ -78,24 +78,24 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
       return;
     }
 
-    if (!this.world.isRemote()) {
-      if (this.rand.nextInt(20) == 0 && this.canShoot()) {
+    if (!this.level.isClientSide()) {
+      if (this.random.nextInt(20) == 0 && this.canShoot()) {
         this.playFakeShoot();
       }
     } else {
-      this.world.addParticle(ParticleTypes.SMOKE, true, this.getPosX(),
-          this.getPosY() + 0.4D, this.getPosZ(), 0, 0, 0);
+      this.level.addParticle(ParticleTypes.SMOKE, true, this.getX(),
+          this.getY() + 0.4D, this.getZ(), 0, 0, 0);
     }
   }
 
   public boolean canShoot() {
     final long fireDelayMs = this.gunItem.getFireDelayMs();
-    return (Util.milliTime() - this.lastShotMs) >= fireDelayMs;
+    return (Util.getMillis() - this.lastShotMs) >= fireDelayMs;
   }
 
   public void playFakeShoot() {
     this.playSound(this.gunItem.getShootSound().get(), 1.5F, 1F);
-    this.lastShotMs = Util.milliTime();
+    this.lastShotMs = Util.getMillis();
   }
 
   @Override

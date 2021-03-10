@@ -39,11 +39,11 @@ public class SetFireModeMessage {
 
   public static void encode(SetFireModeMessage msg, PacketBuffer out) {
     out.writeVarInt(msg.entityId);
-    out.writeEnumValue(msg.fireMode);
+    out.writeEnum(msg.fireMode);
   }
 
   public static SetFireModeMessage decode(PacketBuffer in) {
-    return new SetFireModeMessage(in.readVarInt(), in.readEnumValue(FireMode.class));
+    return new SetFireModeMessage(in.readVarInt(), in.readEnum(FireMode.class));
   }
 
   public static boolean handle(SetFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
@@ -51,7 +51,7 @@ public class SetFireModeMessage {
         .filter(entity -> entity instanceof LivingEntity)
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
-          ItemStack heldStack = livingEntity.getHeldItemMainhand();
+          ItemStack heldStack = livingEntity.getMainHandItem();
           livingEntity.getCapability(ModCapabilities.LIVING)
               .ifPresent(living -> heldStack
                   .getCapability(ModCapabilities.GUN)

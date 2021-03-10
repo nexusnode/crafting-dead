@@ -100,7 +100,7 @@ public class GunAnimationReloadACR extends GunAnimationReload {
     matrixStack.translate(0.0F, (!ejectingClip ? -(progress / 200) : 0.0F),
         (!ejectingClip ? (progress / 185) : 0.0F));
 
-    matrixStack.rotate(new Vector3f(1.0F, 0.0F, (!ejectingClip ? -1.0F : 0.0F))
+    matrixStack.mulPose(new Vector3f(1.0F, 0.0F, (!ejectingClip ? -1.0F : 0.0F))
         .rotationDegrees(progress));
   }
 
@@ -108,7 +108,7 @@ public class GunAnimationReloadACR extends GunAnimationReload {
   public void doRenderHand(ItemStack par1, float par2, boolean par3, MatrixStack matrixStack) {
     if (par3) {
       float progress = (lastRotation1 + (rotation1 - lastRotation1) * par2);
-      matrixStack.rotate(Vector3f.ZP.rotationDegrees(-progress * 0.4F));
+      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-progress * 0.4F));
     } else {
       float transprogress = lastTrans1 + (trans1 - lastTrans1) * par2;
       matrixStack.translate(-transprogress, transprogress, transprogress);

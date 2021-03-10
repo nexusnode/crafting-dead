@@ -213,11 +213,11 @@ public class CraftingDead {
     logger.info("Starting Crafting Dead, version {}", VERSION);
     NetworkChannel.loadChannels();
     event.enqueueWork(() -> {
-      BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
-          Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
+          Ingredient.of(Tags.Items.DUSTS_REDSTONE),
           new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
-      BrewingRecipeRegistry.addRecipe(Ingredient.fromItems(ModItems.SYRINGE.get()),
-          Ingredient.fromItems(Items.ENCHANTED_GOLDEN_APPLE),
+      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
+          Ingredient.of(Items.ENCHANTED_GOLDEN_APPLE),
           new ItemStack(ModItems.CURE_SYRINGE.get()));
     });
 
@@ -239,13 +239,13 @@ public class CraftingDead {
   }
 
   private void handleEntityAttributeCreation(EntityAttributeCreationEvent event) {
-    event.put(ModEntityTypes.advancedZombie, AdvancedZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.doctorZombie, DoctorZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.fastZombie, FastZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.giantZombie, GiantZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.policeZombie, PoliceZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.tankZombie, TankZombieEntity.registerAttributes().create());
-    event.put(ModEntityTypes.weakZombie, WeakZombieEntity.registerAttributes().create());
+    event.put(ModEntityTypes.advancedZombie, AdvancedZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.doctorZombie, DoctorZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.fastZombie, FastZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.giantZombie, GiantZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.policeZombie, PoliceZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.tankZombie, TankZombieEntity.registerAttributes().build());
+    event.put(ModEntityTypes.weakZombie, WeakZombieEntity.registerAttributes().build());
   }
 
   // ================================================================================
@@ -281,16 +281,16 @@ public class CraftingDead {
       MobSpawnInfo.Spawners spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
         iterator.add(new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie,
-            spawnEntry.itemWeight * 3, 2, 8));
+            spawnEntry.weight * 3, 2, 8));
         iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.fastZombie, spawnEntry.itemWeight / 2, 2, 4));
+            new MobSpawnInfo.Spawners(ModEntityTypes.fastZombie, spawnEntry.weight / 2, 2, 4));
         iterator
-            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.itemWeight / 2, 2,
+            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.weight / 2, 2,
                 4));
         iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.itemWeight, 3, 8));
+            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.weight, 3, 8));
         iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.itemWeight, 3, 12));
+            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.weight, 3, 12));
       }
     }
   }
@@ -304,8 +304,8 @@ public class CraftingDead {
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
     if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
       MobEntity mobEntity = (MobEntity) event.getEntityLiving();
-      if (mobEntity.isPotionActive(ModEffects.FLASH_BLINDNESS.get())) {
-        mobEntity.setAttackTarget(null);
+      if (mobEntity.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
+        mobEntity.setTarget(null);
       }
     }
   }
@@ -316,9 +316,9 @@ public class CraftingDead {
         .getCapability(ModCapabilities.LIVING)
         .map(living -> living.onDeath(event.getSource()))
         .orElse(false)
-        || (event.getSource().getTrueSource() != null && event
+        || (event.getSource().getEntity() != null && event
             .getSource()
-            .getTrueSource()
+            .getEntity()
             .getCapability(ModCapabilities.LIVING)
             .map(living -> living.onKill(event.getEntity()))
             .orElse(false))) {
@@ -363,19 +363,19 @@ public class CraftingDead {
         .map(hydration -> hydration.getHydration(event.getItem()))
         .ifPresent(hydration -> event
             .getEntityLiving()
-            .addPotionEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));
+            .addEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));
   }
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
     event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       living.tick();
-      if (!living.getEntity().getEntityWorld().isRemote() && living.requiresSync()) {
+      if (!living.getEntity().getCommandSenderWorld().isClientSide() && living.requiresSync()) {
         PacketBuffer data = new PacketBuffer(Unpooled.buffer());
         living.encode(data, false);
         NetworkChannel.PLAY.getSimpleChannel().send(
             PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
-            new SyncLivingMessage(living.getEntity().getEntityId(), data));
+            new SyncLivingMessage(living.getEntity().getId(), data));
       }
     });
   }
@@ -443,7 +443,7 @@ public class CraftingDead {
           living.encode(data, true);
           NetworkChannel.PLAY.getSimpleChannel().send(
               PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()),
-              new SyncLivingMessage(living.getEntity().getEntityId(), data));
+              new SyncLivingMessage(living.getEntity().getId(), data));
         });
   }
 }

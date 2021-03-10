@@ -30,7 +30,7 @@ public class DefaultClothing implements IClothing {
   private final ResourceLocation texture;
 
   public DefaultClothing() {
-    this(false, Optional.empty(), false, TextureManager.RESOURCE_LOCATION_EMPTY);
+    this(false, Optional.empty(), false, TextureManager.INTENTIONAL_MISSING_TEXTURE);
   }
 
   public DefaultClothing(boolean enhancedProtection, Optional<Integer> slownessAmplifier,

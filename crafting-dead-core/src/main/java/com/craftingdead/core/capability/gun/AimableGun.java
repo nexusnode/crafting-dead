@@ -51,7 +51,7 @@ public class AimableGun extends GunImpl implements IScope {
 
   @Override
   public void tick(ILiving<?, ?> living) {
-    long timeDelta = Util.milliTime() - this.lastShotMs;
+    long timeDelta = Util.getMillis() - this.lastShotMs;
     if (timeDelta >= this.gunProvider.getFireDelayMs() && this.waitingForBoltAction) {
       this.waitingForBoltAction = false;
       if (!this.isPerformingRightMouseAction()) {

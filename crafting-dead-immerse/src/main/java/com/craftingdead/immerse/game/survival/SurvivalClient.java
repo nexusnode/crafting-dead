@@ -52,17 +52,17 @@ public class SurvivalClient extends SurvivalGame implements IGameClient {
 
     RenderUtil.bind(DAYS_SURVIVED);
     RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
     RenderUtil.bind(ZOMBIES_KILLED);
     RenderUtil.drawTexturedRectangle(x, y, 16, 16);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
     RenderUtil.bind(PLAYERS_KILLED);
     RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
-    this.minecraft.fontRenderer.drawStringWithShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 
     RenderSystem.disableBlend();
@@ -72,8 +72,8 @@ public class SurvivalClient extends SurvivalGame implements IGameClient {
   public void renderPlayerList(
       IPlayer<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
       int height, float partialTicks) {
-    this.minecraft.ingameGUI.getTabList().func_238523_a_(matrixStack, width,
-        this.minecraft.world.getScoreboard(),
-        this.minecraft.world.getScoreboard().getObjectiveInDisplaySlot(0));
+    this.minecraft.gui.getTabList().render(matrixStack, width,
+        this.minecraft.level.getScoreboard(),
+        this.minecraft.level.getScoreboard().getDisplayObjective(0));
   }
 }

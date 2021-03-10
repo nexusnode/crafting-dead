@@ -58,10 +58,10 @@ public class ModEffects {
    * @return <code>true</code> if the effect was applied. <code>false</code> otherwise.
    */
   public static boolean applyOrOverrideIfLonger(LivingEntity target, EffectInstance effect) {
-    EffectInstance currentEffect = target.getActivePotionEffect(effect.getPotion());
+    EffectInstance currentEffect = target.getEffect(effect.getEffect());
     if (currentEffect == null || currentEffect.getDuration() < effect.getDuration()) {
-      target.removePotionEffect(effect.getPotion());
-      return target.addPotionEffect(effect);
+      target.removeEffect(effect.getEffect());
+      return target.addEffect(effect);
     }
     return false;
   }

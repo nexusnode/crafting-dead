@@ -90,10 +90,10 @@ public class RenderUtil {
   private static final Minecraft minecraft = Minecraft.getInstance();
 
   public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
-    ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
+    ShaderGroup sg = minecraft.gameRenderer.currentEffect();
     if (sg != null) {
-      for (Shader shader : sg.listShaders) {
-        ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+      for (Shader shader : sg.passes) {
+        ShaderDefault variable = shader.getEffect().safeGetUniform(name);
         if (variable != null) {
           variable.set(value);
         }
@@ -102,10 +102,10 @@ public class RenderUtil {
   }
 
   public static void updateUniform(String name, float[] value, ShaderGroup shaderGroup) {
-    ShaderGroup sg = minecraft.gameRenderer.getShaderGroup();
+    ShaderGroup sg = minecraft.gameRenderer.currentEffect();
     if (sg != null) {
-      for (Shader shader : sg.listShaders) {
-        ShaderDefault variable = shader.getShaderManager().getShaderUniform(name);
+      for (Shader shader : sg.passes) {
+        ShaderDefault variable = shader.getEffect().safeGetUniform(name);
         if (variable != null) {
           variable.set(value);
         }
@@ -115,10 +115,10 @@ public class RenderUtil {
 
   public static Optional<Vector2f> projectToPlayerView(double x, double y, double z,
       float partialTicks) {
-    final ActiveRenderInfo activeRenderInfo = minecraft.gameRenderer.getActiveRenderInfo();
-    final Vector3d cameraPos = activeRenderInfo.getProjectedView();
-    final Quaternion cameraRotation = activeRenderInfo.getRotation().copy();
-    cameraRotation.conjugate();
+    final ActiveRenderInfo activeRenderInfo = minecraft.gameRenderer.getMainCamera();
+    final Vector3d cameraPos = activeRenderInfo.getPosition();
+    final Quaternion cameraRotation = activeRenderInfo.rotation().copy();
+    cameraRotation.conj();
 
     final Vector3f result = new Vector3f((float) (cameraPos.x - x),
         (float) (cameraPos.y - y),
@@ -126,42 +126,42 @@ public class RenderUtil {
 
     result.transform(cameraRotation);
 
-    if (minecraft.gameSettings.viewBobbing) {
-      Entity renderViewEntity = minecraft.getRenderViewEntity();
+    if (minecraft.options.bobView) {
+      Entity renderViewEntity = minecraft.getCameraEntity();
       if (renderViewEntity instanceof PlayerEntity) {
         PlayerEntity playerentity = (PlayerEntity) renderViewEntity;
-        float distanceWalkedModified = playerentity.distanceWalkedModified;
+        float distanceWalkedModified = playerentity.walkDist;
 
-        float changeInDistance = distanceWalkedModified - playerentity.prevDistanceWalkedModified;
+        float changeInDistance = distanceWalkedModified - playerentity.walkDistO;
         float lerpDistance = -(distanceWalkedModified + changeInDistance * partialTicks);
         float lerpYaw =
-            MathHelper.lerp(partialTicks, playerentity.prevCameraYaw, playerentity.cameraYaw);
+            MathHelper.lerp(partialTicks, playerentity.oBob, playerentity.bob);
         Quaternion q2 = new Quaternion(Vector3f.XP,
             Math.abs(MathHelper.cos(lerpDistance * (float) Math.PI - 0.2F) * lerpYaw) * 5.0F, true);
-        q2.conjugate();
+        q2.conj();
         result.transform(q2);
 
         Quaternion q1 =
             new Quaternion(Vector3f.ZP,
                 MathHelper.sin(lerpDistance * (float) Math.PI) * lerpYaw * 3.0F,
                 true);
-        q1.conjugate();
+        q1.conj();
         result.transform(q1);
 
         Vector3f bobTranslation =
             new Vector3f((MathHelper.sin(lerpDistance * (float) Math.PI) * lerpYaw * 0.5F),
                 (-Math.abs(MathHelper.cos(lerpDistance * (float) Math.PI) * lerpYaw)), 0.0f);
-        bobTranslation.setY(-bobTranslation.getY()); // this is weird but hey, if it works
+        bobTranslation.setY(-bobTranslation.y()); // this is weird but hey, if it works
         result.add(bobTranslation);
       }
     }
 
-    final double fov = minecraft.gameRenderer.getFOVModifier(activeRenderInfo, partialTicks, true);
-    final float halfHeight = (float) minecraft.getMainWindow().getScaledHeight() / 2;
+    final double fov = minecraft.gameRenderer.getFov(activeRenderInfo, partialTicks, true);
+    final float halfHeight = (float) minecraft.getWindow().getGuiScaledHeight() / 2;
     final float scale =
-        halfHeight / (result.getZ() * (float) Math.tan(Math.toRadians(fov / 2.0D)));
-    return result.getZ() > 0.0D ? Optional.empty()
-        : Optional.of(new Vector2f(-result.getX() * scale, result.getY() * scale));
+        halfHeight / (result.z() * (float) Math.tan(Math.toRadians(fov / 2.0D)));
+    return result.z() > 0.0D ? Optional.empty()
+        : Optional.of(new Vector2f(-result.x() * scale, result.y() * scale));
   }
 
   /**
@@ -172,56 +172,56 @@ public class RenderUtil {
    * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
    */
   public static boolean isInsideGameFOV(Entity target, boolean firstPerson) {
-    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getMainCamera();
     Vector3d projectedViewVec3d =
-        firstPerson ? target.getPositionVec().add(0, target.getEyeHeight(), 0)
-            : activerenderinfo.getProjectedView();
-    double viewerX = projectedViewVec3d.getX();
-    double viewerY = projectedViewVec3d.getY();
-    double viewerZ = projectedViewVec3d.getZ();
+        firstPerson ? target.position().add(0, target.getEyeHeight(), 0)
+            : activerenderinfo.getPosition();
+    double viewerX = projectedViewVec3d.x();
+    double viewerY = projectedViewVec3d.y();
+    double viewerZ = projectedViewVec3d.z();
 
-    if (!target.isInRangeToRender3d(viewerX, viewerY, viewerZ)) {
+    if (!target.shouldRender(viewerX, viewerY, viewerZ)) {
       return false;
     }
 
-    AxisAlignedBB renderBoundingBox = target.getRenderBoundingBox();
+    AxisAlignedBB renderBoundingBox = target.getBoundingBoxForCulling();
 
     // Validation from Vanilla.
     // Generates a render bounding box if it is needed.
-    if (renderBoundingBox.hasNaN() || renderBoundingBox.getAverageEdgeLength() == 0.0D) {
-      renderBoundingBox = new AxisAlignedBB(target.getPosX() - 2.0D, target.getPosY() - 2.0D,
-          target.getPosZ() - 2.0D, target.getPosX() + 2.0D, target.getPosY() + 2.0D,
-          target.getPosZ() + 2.0D);
+    if (renderBoundingBox.hasNaN() || renderBoundingBox.getSize() == 0.0D) {
+      renderBoundingBox = new AxisAlignedBB(target.getX() - 2.0D, target.getY() - 2.0D,
+          target.getZ() - 2.0D, target.getX() + 2.0D, target.getY() + 2.0D,
+          target.getZ() + 2.0D);
     }
 
     return RenderUtil.createClippingHelper(1F, firstPerson)
-        .isBoundingBoxInFrustum(renderBoundingBox);
+        .isVisible(renderBoundingBox);
   }
 
   public static ClippingHelper createClippingHelper(float partialTicks, boolean firstPerson) {
     GameRenderer gameRenderer = minecraft.gameRenderer;
-    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getActiveRenderInfo();
+    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getMainCamera();
     Vector3d projectedViewVec3d =
-        firstPerson ? minecraft.player.getPositionVec().add(0, minecraft.player.getEyeHeight(), 0)
-            : activerenderinfo.getProjectedView();
-    double viewerX = projectedViewVec3d.getX();
-    double viewerY = projectedViewVec3d.getY();
-    double viewerZ = projectedViewVec3d.getZ();
-    float pitch = firstPerson ? minecraft.player.rotationPitch : activerenderinfo.getPitch();
-    float yaw = firstPerson ? minecraft.player.rotationYaw : activerenderinfo.getYaw();
+        firstPerson ? minecraft.player.position().add(0, minecraft.player.getEyeHeight(), 0)
+            : activerenderinfo.getPosition();
+    double viewerX = projectedViewVec3d.x();
+    double viewerY = projectedViewVec3d.y();
+    double viewerZ = projectedViewVec3d.z();
+    float pitch = firstPerson ? minecraft.player.xRot : activerenderinfo.getXRot();
+    float yaw = firstPerson ? minecraft.player.yRot : activerenderinfo.getYRot();
 
     MatrixStack cameraRotationStack = new MatrixStack();
     // Reminder: At 1.15.2, roll cannot be get from ActiveRenderInfo
     // cameraRotationStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rollHere));
-    cameraRotationStack.rotate(Vector3f.XP.rotationDegrees(pitch));
-    cameraRotationStack.rotate(Vector3f.YP.rotationDegrees(yaw + 180.0F));
+    cameraRotationStack.mulPose(Vector3f.XP.rotationDegrees(pitch));
+    cameraRotationStack.mulPose(Vector3f.YP.rotationDegrees(yaw + 180.0F));
 
-    Matrix4f fovAndWindowMatrix = new MatrixStack().getLast().getMatrix();
-    fovAndWindowMatrix.mul(gameRenderer.getProjectionMatrix(activerenderinfo, partialTicks, true));
+    Matrix4f fovAndWindowMatrix = new MatrixStack().last().pose();
+    fovAndWindowMatrix.multiply(gameRenderer.getProjectionMatrix(activerenderinfo, partialTicks, true));
 
     ClippingHelper clippingHelper =
-        new ClippingHelper(cameraRotationStack.getLast().getMatrix(), fovAndWindowMatrix);
-    clippingHelper.setCameraPosition(viewerX, viewerY, viewerZ);
+        new ClippingHelper(cameraRotationStack.last().pose(), fovAndWindowMatrix);
+    clippingHelper.prepare(viewerX, viewerY, viewerZ);
 
     return clippingHelper;
   }
@@ -241,7 +241,7 @@ public class RenderUtil {
     RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
     Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder buffer = tessellator.getBuffer();
+    BufferBuilder buffer = tessellator.getBuilder();
     buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
     float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
@@ -254,11 +254,11 @@ public class RenderUtil {
     float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
     float endBlue = (float) (endColor & 255) / 255.0F;
 
-    buffer.pos(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    buffer.pos(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.pos(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    buffer.pos(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    tessellator.draw();
+    buffer.vertex(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    buffer.vertex(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.vertex(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    buffer.vertex(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    tessellator.end();
 
     RenderSystem.shadeModel(GL11.GL_FLAT);
     RenderSystem.enableAlphaTest();
@@ -271,7 +271,7 @@ public class RenderUtil {
    */
   public static void applyPlayerCrouchRotation(MatrixStack matrix) {
     // Fix X rotation
-    matrix.rotate(Vector3f.XP.rotation(0.5F));
+    matrix.mulPose(Vector3f.XP.rotation(0.5F));
 
     // Fix XYZ position
     matrix.translate(0F, 0.2F, -0.1F);
@@ -303,8 +303,8 @@ public class RenderUtil {
     Validate.isTrue(hasGenerationMarker(blockModel), "The model does not have a generation marker");
 
     return MODEL_GENERATOR
-        .makeItemModel(spriteGetter, blockModel)
-        .bakeModel(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
+        .generateBlockModel(spriteGetter, blockModel)
+        .bake(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
   }
 
   public static void drawTexturedRectangle(double x, double y, float width, float height,
@@ -329,36 +329,36 @@ public class RenderUtil {
   public static void drawTexturedRectangle(double x, double y, double x2, double y2, float u,
       float v, float u2, float v2) {
     Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder bufferbuilder = tessellator.getBuffer();
+    BufferBuilder bufferbuilder = tessellator.getBuilder();
     bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    bufferbuilder.pos(x, y2, 0.0D).tex(u, v).endVertex();
-    bufferbuilder.pos(x2, y2, 0.0D).tex(u2, v).endVertex();
-    bufferbuilder.pos(x2, y, 0.0D).tex(u2, v2).endVertex();
-    bufferbuilder.pos(x, y, 0.0D).tex(u, v2).endVertex();
-    tessellator.draw();
+    bufferbuilder.vertex(x, y2, 0.0D).uv(u, v).endVertex();
+    bufferbuilder.vertex(x2, y2, 0.0D).uv(u2, v).endVertex();
+    bufferbuilder.vertex(x2, y, 0.0D).uv(u2, v2).endVertex();
+    bufferbuilder.vertex(x, y, 0.0D).uv(u, v2).endVertex();
+    tessellator.end();
   }
 
   public static void bind(ResourceLocation resourceLocation) {
-    minecraft.getTextureManager().bindTexture(resourceLocation);
+    minecraft.getTextureManager().bind(resourceLocation);
   }
 
   public static double getFitScale(final double imageWidth, final double imageHeight) {
-    double widthScale = minecraft.getMainWindow().getWidth() / imageWidth;
-    double heightScale = minecraft.getMainWindow().getHeight() / imageHeight;
+    double widthScale = minecraft.getWindow().getScreenWidth() / imageWidth;
+    double heightScale = minecraft.getWindow().getScreenHeight() / imageHeight;
     final double scale =
-        imageHeight * widthScale < minecraft.getMainWindow().getHeight() ? heightScale : widthScale;
-    return scale / minecraft.getMainWindow().getGuiScaleFactor();
+        imageHeight * widthScale < minecraft.getWindow().getScreenHeight() ? heightScale : widthScale;
+    return scale / minecraft.getWindow().getGuiScale();
   }
 
   public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour) {
     renderItemModelIntoGUI(itemStack, x, y, colour,
-        minecraft.getItemRenderer().getItemModelWithOverrides(itemStack, null, null), false);
+        minecraft.getItemRenderer().getModel(itemStack, null, null), false);
   }
 
   public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour,
       boolean useCustomRenderer) {
     renderItemModelIntoGUI(itemStack, x, y, colour,
-        minecraft.getItemRenderer().getItemModelWithOverrides(itemStack, null, null),
+        minecraft.getItemRenderer().getModel(itemStack, null, null),
         useCustomRenderer);
   }
 
@@ -370,8 +370,8 @@ public class RenderUtil {
   public static void renderItemModelIntoGUI(ItemStack itemStack, int x, int y,
       int colour, IBakedModel bakedmodel, boolean useCustomRenderer) {
     RenderSystem.pushMatrix();
-    minecraft.textureManager.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-    minecraft.textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmapDirect(
+    minecraft.textureManager.bind(AtlasTexture.LOCATION_BLOCKS);
+    minecraft.textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(
         false, false);
     RenderSystem.enableRescaleNormal();
     RenderSystem.enableAlphaTest();
@@ -380,15 +380,15 @@ public class RenderUtil {
     RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.translatef((float) x, (float) y, 100.0F + minecraft.getItemRenderer().zLevel);
+    RenderSystem.translatef((float) x, (float) y, 100.0F + minecraft.getItemRenderer().blitOffset);
     RenderSystem.translatef(8.0F, 8.0F, 0.0F);
     RenderSystem.scalef(1.0F, -1.0F, 1.0F);
     RenderSystem.scalef(16.0F, 16.0F, 16.0F);
     IRenderTypeBuffer.Impl renderTypeBuffer =
-        Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-    boolean enable3dLight = !bakedmodel.isSideLit();
+        Minecraft.getInstance().renderBuffers().bufferSource();
+    boolean enable3dLight = !bakedmodel.usesBlockLight();
     if (enable3dLight) {
-      RenderHelper.setupGuiFlatDiffuseLighting();
+      RenderHelper.setupForFlatItems();
     }
 
     if (useCustomRenderer && itemStack.getItem() instanceof IRendererProvider) {
@@ -400,10 +400,10 @@ public class RenderUtil {
           renderTypeBuffer, colour, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
     }
 
-    renderTypeBuffer.finish();
+    renderTypeBuffer.endBatch();
     RenderSystem.enableDepthTest();
     if (enable3dLight) {
-      RenderHelper.setupGui3DDiffuseLighting();
+      RenderHelper.setupFor3DItems();
     }
 
     RenderSystem.disableAlphaTest();
@@ -422,22 +422,22 @@ public class RenderUtil {
       boolean leftHand, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int colour,
       int combinedLightIn, int combinedOverlayIn, IBakedModel modelIn) {
     if (!itemStackIn.isEmpty()) {
-      matrixStackIn.push();
+      matrixStackIn.pushPose();
       boolean flag = transformTypeIn == ItemCameraTransforms.TransformType.GUI
           || transformTypeIn == ItemCameraTransforms.TransformType.GROUND
           || transformTypeIn == ItemCameraTransforms.TransformType.FIXED;
       if (itemStackIn.getItem() == Items.TRIDENT && flag) {
-        modelIn = minecraft.getItemRenderer().getItemModelMesher().getModelManager()
+        modelIn = minecraft.getItemRenderer().getItemModelShaper().getModelManager()
             .getModel(new ModelResourceLocation("minecraft:trident#inventory"));
       }
 
       modelIn = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(matrixStackIn,
           modelIn, transformTypeIn, leftHand);
       matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
-      if (!modelIn.isBuiltInRenderer() && (itemStackIn.getItem() != Items.TRIDENT || flag)) {
+      if (!modelIn.isCustomRenderer() && (itemStackIn.getItem() != Items.TRIDENT || flag)) {
         boolean flag1;
         if (transformTypeIn != ItemCameraTransforms.TransformType.GUI
-            && !transformTypeIn.isFirstPerson() && itemStackIn.getItem() instanceof BlockItem) {
+            && !transformTypeIn.firstPerson() && itemStackIn.getItem() instanceof BlockItem) {
           Block block = ((BlockItem) itemStackIn.getItem()).getBlock();
           flag1 = !(block instanceof BreakableBlock) && !(block instanceof StainedGlassPaneBlock);
         } else {
@@ -448,43 +448,43 @@ public class RenderUtil {
               modelIn, itemStackIn, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn,
               flag1);
         } else {
-          RenderType rendertype = RenderTypeLookup.func_239219_a_(itemStackIn, flag1);
+          RenderType rendertype = RenderTypeLookup.getRenderType(itemStackIn, flag1);
           IVertexBuilder ivertexbuilder;
-          if (itemStackIn.getItem() == Items.COMPASS && itemStackIn.hasEffect()) {
-            matrixStackIn.push();
-            MatrixStack.Entry matrixstack$entry = matrixStackIn.getLast();
+          if (itemStackIn.getItem() == Items.COMPASS && itemStackIn.hasFoil()) {
+            matrixStackIn.pushPose();
+            MatrixStack.Entry matrixstack$entry = matrixStackIn.last();
             if (transformTypeIn == ItemCameraTransforms.TransformType.GUI) {
-              matrixstack$entry.getMatrix().mul(0.5F);
-            } else if (transformTypeIn.isFirstPerson()) {
-              matrixstack$entry.getMatrix().mul(0.75F);
+              matrixstack$entry.pose().multiply(0.5F);
+            } else if (transformTypeIn.firstPerson()) {
+              matrixstack$entry.pose().multiply(0.75F);
             }
 
             if (flag1) {
               ivertexbuilder =
-                  ItemRenderer.getDirectGlintVertexBuilder(bufferIn, rendertype, matrixstack$entry);
+                  ItemRenderer.getCompassFoilBufferDirect(bufferIn, rendertype, matrixstack$entry);
             } else {
               ivertexbuilder =
-                  ItemRenderer.getGlintVertexBuilder(bufferIn, rendertype, matrixstack$entry);
+                  ItemRenderer.getCompassFoilBuffer(bufferIn, rendertype, matrixstack$entry);
             }
 
-            matrixStackIn.pop();
+            matrixStackIn.popPose();
           } else if (flag1) {
-            ivertexbuilder = ItemRenderer.getEntityGlintVertexBuilder(bufferIn, rendertype, true,
-                itemStackIn.hasEffect());
+            ivertexbuilder = ItemRenderer.getFoilBufferDirect(bufferIn, rendertype, true,
+                itemStackIn.hasFoil());
           } else {
             ivertexbuilder =
-                ItemRenderer.getBuffer(bufferIn, rendertype, true, itemStackIn.hasEffect());
+                ItemRenderer.getFoilBuffer(bufferIn, rendertype, true, itemStackIn.hasFoil());
           }
 
           renderModelColour(modelIn, colour, combinedLightIn, combinedOverlayIn, matrixStackIn,
               ivertexbuilder);
         }
       } else {
-        itemStackIn.getItem().getItemStackTileEntityRenderer().func_239207_a_(itemStackIn,
+        itemStackIn.getItem().getItemStackTileEntityRenderer().renderByItem(itemStackIn,
             transformTypeIn, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
       }
 
-      matrixStackIn.pop();
+      matrixStackIn.popPose();
     }
   }
 
@@ -507,7 +507,7 @@ public class RenderUtil {
 
   private static void renderQuadsColour(MatrixStack matrixStack, IVertexBuilder vertexBuilder,
       List<BakedQuad> quads, int colour, int packedLight, int packedOverlay) {
-    MatrixStack.Entry matrixStackEntry = matrixStack.getLast();
+    MatrixStack.Entry matrixStackEntry = matrixStack.last();
     for (BakedQuad bakedQuad : quads) {
       float r = (float) (colour >> 16 & 255) / 255.0F;
       float g = (float) (colour >> 8 & 255) / 255.0F;
