@@ -1,0 +1,58 @@
+{    
+    "message.first_blood_drawn": "%s drew first blood",
+    "message.joined": "%s已加入游戏",
+    "message.left": "%s已离开游戏",
+
+    "title.warm_up": "热身",
+    "title.game_start": "我们开始吧!",
+    "title.game_over": "游戏结束",
+
+    "message.game": "游戏",
+    "message.no_switch_team": "你现在不能切换队伍",
+    "message.joined_team": "%s加入%s",
+    "message.buy_time_expired": "您的购买时间已过期",
+
+    "key.switch_teams": "切换队伍",
+
+    "gui.killed_message.killed_by": "被%s杀死",
+    "gui.killed_message.hp": "生命值: %s",
+
+    "gui.screen.shop.title": "商店",
+    "gui.screen.shop.back": "返回 '%s'",
+    "gui.screen.shop.buy_time": "购买时间: %s",
+    "gui.screen.shop.selected": "已选择",
+    "gui.screen.shop.inventory":"物品",
+    "gui.screen.select_team.title":"选择队伍",
+
+    "narrator.screen.start": "开始",
+
+    "game.craftingdeadimmerse.deathmatch":"团队死亡竞赛",
+
+    "gui.screen.start.message": "按下空格键开始",
+
+    "menu.play_button": "开始游戏",
+    "menu.home_button": "主页",
+
+    "menu.home.title": "主页",
+
+    "menu.play.title": "游戏",
+    "menu.play.dropdown.official": "官方",
+    "menu.play.dropdown.singleplayer": "单机",
+    "menu.play.dropdown.community": "社区",
+    "menu.play.tab.survival": "生存",
+    "menu.play.tab.tdm": "TDM",
+
+    "menu.play.server_list.motd": "公告",
+    "menu.play.server_list.map": "地图",
+    "menu.play.server_list.ping": "延迟",
+    "menu.play.server_list.players": "玩家",
+    "menu.play.server_list.failed_to_load": "?",
+    "menu.play.server_list.button.play": "开始",
+    "menu.play.server_list.button.refresh": "刷新",
+
+    "menu.play.world_list.button.play": "开始",
+    "menu.play.world_list.button.create": "创建",
+    "menu.play.world_list.button.edit": "编辑",
+    "menu.play.world_list.button.delete": "删除",
+    "menu.play.world_list.button.recreate": "重新创建"
+}
