@@ -8,7 +8,8 @@
 
 # Discord
 ![Discord Banner 2](https://discordapp.com/api/guilds/473735245636698153/widget.png?style=banner2)
-
+# 社区
+QQ群:805664162 [快速加入](https://jq.qq.com/?_wv=1027&k=EfMzRVgB) 创建者: tsaltedfishking
 # 贡献
 我们欢迎Pull requests, 但请遵守以下准则:
 * 使用 [Google style guide](https://github.com/google/styleguide)
