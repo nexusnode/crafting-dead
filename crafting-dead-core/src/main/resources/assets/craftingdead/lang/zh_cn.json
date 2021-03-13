@@ -1,14 +1,15 @@
 {
-  "container.equipment": "行尸走肉 - 玩家",
+  "container.equipment": "设备",
   "enchantment.craftingdead.armor_penetration": "护甲穿透",
   "enchantment.craftingdead.infection": "尸毒",
 
   "key.reload": "装填弹药",
   "key.remove_magazine": "移除弹夹",
   "key.toggle_fire_mode": "喷火模式",
-  "key.equipment_menu":"打开/关闭行尸走肉菜单",
+  "key.equipment_menu":"打开/关闭设备菜单",
+  "key.toggle_combat_mode":"切换战斗模式",												
 
-  "tutorial.open_equipment_menu.title":"打开行尸走肉菜单",
+  "tutorial.open_equipment_menu.title":"打开设备菜单",
 
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
@@ -41,17 +42,20 @@
   "entity.craftingdead.smoke_grenade": "烟雾弹",
 
   "message.switch_fire_mode": "切换到%s",
-  "fire_mode.auto":"自动模式",
-  "fire_mode.semi":"半自动模式",
-  "fire_mode.burst":"三连发模式",
   "message.broken_leg": "你骨折了.",
   "message.bleeding": "你流血了!",
   "message.infected": "你已被丧尸病毒感染.",
   "message.low_health": "%1$s的生命值很低!",
-
+  
+  "fire_mode.auto":"自动模式",
+  "fire_mode.semi":"半自动模式",
+  "fire_mode.burst":"三连发模式",
+  
+  "hud.empty_magazine":"空",  
+  
   "action.target":"目标: %1$s",
   "action.performer":"实施者: %1$s",
-
+  
   "action.craftingdead.magazine_reload.message":"上弹中",
   "action.craftingdead.refillable_reload.message":"上弹中",
   "action.craftingdead.remove_magazine.message":"移除弹夹",
