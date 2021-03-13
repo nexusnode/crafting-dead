@@ -1,4 +1,4 @@
-![Crafting Dead Logo](/crafting-dead-logo.png)
+![Crafting Dead Logo](./image/crafting-dead-logo.png)
 
 Starting out as a mod for Minecraft 1.5, Crafting Dead has been around for many years now. It was built on F3RULLO's Gun Mod, one of the first gun mods on the Minecraft scene and has been growing ever since, constantly being enhanced with more content and features.
 
