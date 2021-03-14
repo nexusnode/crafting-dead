@@ -30,6 +30,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import net.minecraft.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.ammoprovider.AmmoProviderType;
@@ -94,10 +96,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -135,7 +133,7 @@ public class GunImpl implements IGun {
   private static final Random random = new Random();
 
   // @formatter:off
-  private static final ExecutorService executorSerivce = Executors.newCachedThreadPool(
+  private static final ExecutorService executorService = Executors.newCachedThreadPool(
       new ThreadFactoryBuilder()
           .setNameFormat("gun-pool-%s")
           .setDaemon(true)
@@ -264,7 +262,7 @@ public class GunImpl implements IGun {
     this.setTriggerPressed(triggerPressed);
 
     if (this.isTriggerPressed()) {
-      executorSerivce.execute(() -> {
+      executorService.execute(() -> {
         while (this.isTriggerPressed() && (Util.getMillis() - this.lastTickMs < 500L)) {
           this.tryShoot(living);
         }
@@ -509,6 +507,14 @@ public class GunImpl implements IGun {
       }
     }
 
+    // Post gun hit entity event
+    GunEvent.HitEntity event =
+            new GunEvent.HitEntity(this, gunStack, living, hitEntity, damage, hitPos, headshot);
+
+    MinecraftForge.EVENT_BUS.post(event);
+
+    if (event.isCanceled()) return;
+
     // Simulated client-side effects
     if (world.isClientSide()) {
       this.clientHandler.handleHitEntityPost(living, hitEntity, hitPos, playSound,
@@ -560,11 +566,19 @@ public class GunImpl implements IGun {
 
   private void hitBlock(ILiving<?, ?> living, BlockRayTraceResult rayTrace,
       boolean playSound) {
-    final Entity entity = living.getEntity();
+    final LivingEntity entity = living.getEntity();
     BlockPos blockPos = rayTrace.getBlockPos();
     BlockState blockState = entity.getCommandSenderWorld().getBlockState(blockPos);
     Block block = blockState.getBlock();
     World world = entity.getCommandSenderWorld();
+
+    // Post gun hit block event
+    GunEvent.HitBlock event =
+            new GunEvent.HitBlock(this, gunStack, block, living, world);
+
+    MinecraftForge.EVENT_BUS.post(event);
+
+    if (event.isCanceled()) return;
 
     // Client-side effects
     if (world.isClientSide()) {
