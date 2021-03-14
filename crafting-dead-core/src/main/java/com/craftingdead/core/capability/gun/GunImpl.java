@@ -517,6 +517,9 @@ public class GunImpl implements IGun {
       return;
     }
 
+    damage = event.getDamage();
+    headshot = event.isHeadshot();
+
     // Simulated client-side effects
     if (world.isClientSide()) {
       this.clientHandler.handleHitEntityPost(living, hitEntity, hitPos, playSound,
