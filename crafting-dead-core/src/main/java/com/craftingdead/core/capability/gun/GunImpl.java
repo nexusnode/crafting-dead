@@ -576,7 +576,7 @@ public class GunImpl implements IGun {
 
     // Post gun hit block event
     GunEvent.HitBlock event =
-            new GunEvent.HitBlock(this, gunStack, block, living, world);
+            new GunEvent.HitBlock(this, gunStack, block, blockPos, living, world);
 
     MinecraftForge.EVENT_BUS.post(event);
 
