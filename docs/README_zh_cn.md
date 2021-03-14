@@ -2,15 +2,15 @@
 
 [现在是简体中文] [Change to English](./README.md)  
  
-开始作为一个Minecraft 1.5的模组, Crafting Dead(以下称为行尸走肉)已经存在多年了. 它是建立在F3RULLO的枪Mod, 在Minecraft的第一个枪Mod之一, 它一直在发展, 不断地增加了更多的内容和功能。
+起源于Minecraft 1.5的枪械模组, Crafting Dead(以下称为行尸走肉)已经存在多年了. 它是建立在F3RULLO的枪械Mod, 在Minecraft中的第一个枪械Mod之一, 它一直在发展, 不断地被增加了更多的内容和功能。
 
-行尸走肉增加了大量的僵尸和枪支, 以及装饰品和医疗用品. 枪是完全可定制通过配件和喷漆; 具有精确的命中检测、延迟补偿和后坐力. 医疗用品包括急救箱、肾上腺素和绷带，让你快速逃离、攻击和从战斗中恢复。
+行尸走肉模组增加了大量的僵尸和枪支, 以及装饰品和医疗用品. 枪械完全可以自定义配件和喷漆; 具有精确的命中检测、延迟补偿和后坐力. 医疗用品包括急救箱、肾上腺素和绷带，让你快速逃离、攻击和从战斗中恢复。
 
 # Discord
 ![Discord Banner 2](https://discordapp.com/api/guilds/473735245636698153/widget.png?style=banner2)
 
 # 贡献
-我们欢迎Pull requests, 但请遵守以下准则:
+我们欢迎提交Pull Requests, 但请遵守以下准则:
 * 使用 [Google style guide](https://github.com/google/styleguide)
 * 在适当的地方添加`@Override` 以及注解,这样可以使代码更加整洁,方便维护与多人创作
 * 将半模糊的变量(例如p_77624_1_)重命名为有意义的名称

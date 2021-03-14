@@ -513,7 +513,9 @@ public class GunImpl implements IGun {
 
     MinecraftForge.EVENT_BUS.post(event);
 
-    if (event.isCanceled()) return;
+    if (event.isCanceled()) {
+      return;
+    }
 
     // Simulated client-side effects
     if (world.isClientSide()) {
@@ -578,7 +580,9 @@ public class GunImpl implements IGun {
 
     MinecraftForge.EVENT_BUS.post(event);
 
-    if (event.isCanceled()) return;
+    if (event.isCanceled()) {
+      return;
+    }
 
     // Client-side effects
     if (world.isClientSide()) {
