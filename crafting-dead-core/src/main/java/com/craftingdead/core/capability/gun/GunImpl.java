@@ -511,9 +511,7 @@ public class GunImpl implements IGun {
     GunEvent.HitEntity event =
             new GunEvent.HitEntity(this, gunStack, living, hitEntity, damage, hitPos, headshot);
 
-    MinecraftForge.EVENT_BUS.post(event);
-
-    if (event.isCanceled()) {
+    if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
 
@@ -581,9 +579,7 @@ public class GunImpl implements IGun {
     GunEvent.HitBlock event =
             new GunEvent.HitBlock(this, gunStack, block, blockPos, living, world);
 
-    MinecraftForge.EVENT_BUS.post(event);
-
-    if (event.isCanceled()) {
+    if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
 
