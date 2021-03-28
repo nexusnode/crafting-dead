@@ -11,7 +11,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forge_gradle_version}"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
@@ -37,15 +37,10 @@ subprojects {
     }
     
     repositories {
-        jcenter()
-	maven {
-	    name 'sponge'
-	    url 'https://dist.creeper.host/Sponge/maven'
+	    maven {
+	        name 'sponge'
+	        url 'https://repo.spongepowered.org/repository/maven-public'
 		}
-	}
-
-	configurations {
-		implementation.extendsFrom shaded
 	}
 
     dependencies {
@@ -53,15 +48,10 @@ subprojects {
 		implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
 		annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
 	}
-	
-	jar.finalizedBy('reobfJar') 
-	
+
 	jar {
-	    baseName = project.name
-        appendix = minecraft_version
-	    from {
-			configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
-		}
+	    archiveBaseName = project.name
+        archiveVersion = "${minecraft_version}-${version}"
 		from rootProject.file('LICENSE.txt')
 	}
 
