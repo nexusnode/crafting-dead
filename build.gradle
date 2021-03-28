@@ -35,34 +35,41 @@ subprojects {
     minecraft {
         mappings channel: 'official', version: "${minecraft_version}"
     }
-    
+
     repositories {
-	    maven {
-	        name 'sponge'
-	        url 'https://repo.spongepowered.org/repository/maven-public'
-		}
+        maven {
+            name 'sponge'
+            url 'https://repo.spongepowered.org/repository/maven-public'
+        }
 	}
+	
+    configurations {
+        implementation.extendsFrom shaded
+    }
 
     dependencies {
-    	minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
-		implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
-		annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
-	}
+        minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
+        implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
+        annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
+    }
 
 	jar {
-	    archiveBaseName = project.name
+	    from {
+            configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
+		}
+        archiveBaseName = project.name
         archiveVersion = "${minecraft_version}-${version}"
-		from rootProject.file('LICENSE.txt')
+        from rootProject.file('LICENSE.txt')
 	}
 
-	license {
-		include '**/*.java'
+    license {
+        include '**/*.java'
 		
-	    header = rootProject.file('HEADER.txt')
+        header = rootProject.file('HEADER.txt')
 
-	    ext {
-	        organization = 'NexusNode LTD'
-	        year = 2021
-	    }
-	}
+        ext {
+            organization = 'NexusNode LTD'
+            year = 2021
+        }
+    }
 }
