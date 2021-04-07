@@ -354,7 +354,7 @@
   "item_lore.hat_item.immune_to_flashes": "免疫闪光",
   "item_lore.hat_item.immune_to_gas": "免疫毒气",
   "item_lore.hat_item.has_night_vision": "具有夜视功能",
-  "item_lore.grenade": "Shift+左键来使投掷物丢的更近",
+  "item_lore.grenade": "Shift+右键来使投掷物丢的更近",
   "item_lore.remote_detonator": "右键单击以在%d米内远程引爆爆炸物",
   "item_lore.clothing.enhanced_protection": "增强保护: ",
   "item_lore.clothing.movement_speed": "移动速度: ",
