@@ -78,7 +78,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -214,13 +213,12 @@ public class CraftingDead {
     NetworkChannel.loadChannels();
     event.enqueueWork(() -> {
       BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
-          Ingredient.of(Tags.Items.DUSTS_REDSTONE),
+          Ingredient.of(Items.REDSTONE),
           new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
       BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
-          Ingredient.of(Items.ENCHANTED_GOLDEN_APPLE),
+          Ingredient.of(Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE),
           new ItemStack(ModItems.CURE_SYRINGE.get()));
     });
-
     this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
     if (this.travelersBackpacksLoaded) {
       logger.info("Adding integration for " + TRAVELERS_BACKPACK_ID);
