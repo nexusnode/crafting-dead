@@ -19,7 +19,7 @@ mandatory = true
 modId = "forge"
 ordering = "NONE"
 side = "BOTH"
-versionRange = "[35.1.7,)"
+versionRange = "[36.1.0,)"
 
 [[dependencies.craftingdead]]
 mandatory = false
