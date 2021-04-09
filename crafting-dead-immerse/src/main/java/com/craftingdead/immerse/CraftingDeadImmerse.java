@@ -36,6 +36,7 @@ import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
+import com.craftingdead.immerse.util.DependencyLoader;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -101,6 +102,8 @@ public class CraftingDeadImmerse {
 
   public CraftingDeadImmerse() {
     instance = this;
+
+    DependencyLoader.loadDependencies();
 
     this.modDir = FMLPaths.CONFIGDIR.get().resolve(ID);
     if (!Files.exists(this.modDir)) {

@@ -21,7 +21,6 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;
@@ -235,7 +234,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     float deltaTime = (currentTime - this.lastTime) * 50;
     this.lastTime = currentTime;
     this.tweenManager.update(deltaTime);
-    
+
     if (this.backgroundBlur != null) {
       this.backgroundBlur.render(matrixStack, this.getScaledX(), this.getScaledY(),
           this.getScaledWidth(), this.getScaledHeight(), partialTicks);
@@ -288,24 +287,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     final double scale = this.minecraft.getWindow().getGuiScale();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
-    boolean alreadyEnabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
     if (scissor) {
-      if (alreadyEnabled) {
-        GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
-      }
-      GL11.glEnable(GL11.GL_SCISSOR_TEST);
       double lowerBound = this.getBotScissorBoundScaled() * scale;
-      GL11.glScissor((int) (this.getScaledContentX() * scale),
+      RenderSystem.enableScissor((int) (this.getScaledContentX() * scale),
           (int) (this.mainWindow.getHeight() - lowerBound),
           (int) (this.getScaledContentWidth() * scale),
           (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
     }
     this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
-      GL11.glDisable(GL11.GL_SCISSOR_TEST);
-      if (alreadyEnabled) {
-        GL11.glPopAttrib();
-      }
+      RenderSystem.disableScissor();
     }
 
     // ---- Render Scrollbar ----

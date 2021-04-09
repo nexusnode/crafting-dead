@@ -41,8 +41,8 @@ subprojects {
             name 'sponge'
             url 'https://repo.spongepowered.org/repository/maven-public'
         }
-	}
-	
+    }
+
     configurations {
         implementation.extendsFrom shaded
     }
@@ -53,18 +53,18 @@ subprojects {
         annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
     }
 
-	jar {
-	    from {
-            configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
-		}
+    jar {
+        into('dependencies') {
+            from  configurations.shaded
+        }
         archiveBaseName = project.name
         archiveVersion = "${minecraft_version}-${version}"
         from rootProject.file('LICENSE.txt')
-	}
+    }
 
     license {
         include '**/*.java'
-		
+
         header = rootProject.file('HEADER.txt')
 
         ext {

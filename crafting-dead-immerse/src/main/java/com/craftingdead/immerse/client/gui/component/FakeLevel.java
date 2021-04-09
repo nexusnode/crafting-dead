@@ -42,11 +42,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.storage.MapData;
 
-public class FakeWorld extends ClientWorld {
+public class FakeLevel extends ClientWorld {
 
-  private static FakeWorld instance;
+  private static FakeLevel instance;
 
-  private FakeWorld(Minecraft mc) {
+  private FakeLevel(Minecraft mc) {
     super(mc.getConnection(), new ClientWorld.ClientWorldInfo(Difficulty.NORMAL, false, false),
         World.OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 3, mc::getProfiler, mc.levelRenderer,
         false, 0L);
@@ -131,7 +131,7 @@ public class FakeWorld extends ClientWorld {
     return DynamicRegistries.builtin();
   }
 
-  public static FakeWorld getInstance() {
-    return instance == null ? instance = new FakeWorld(Minecraft.getInstance()) : instance;
+  public static FakeLevel getInstance() {
+    return instance == null ? instance = new FakeLevel(Minecraft.getInstance()) : instance;
   }
 }
