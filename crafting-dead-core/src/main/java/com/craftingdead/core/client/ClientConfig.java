@@ -49,10 +49,10 @@ public class ClientConfig {
           .translation("options.craftingdead.client.hit_marker_mode")
           .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
       this.killSoundEnabled = builder
-          .translation("options.craftingdeadcombat.client.kill_sound_enabled")
+          .translation("options.craftingdead.client.kill_sound_enabled")
           .define("killSoundEnabled", true);
       this.killSound = builder
-          .translation("options.craftingdeadcombat.client.kill_sound")
+          .translation("options.craftingdead.client.kill_sound")
           .define("killSound", SoundEvents.TRIDENT_RETURN.getRegistryName().toString(),
               v -> v instanceof String && ResourceLocation.isValidResourceLocation((String) v));
       this.tutorialStep = builder
