@@ -27,9 +27,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -201,6 +203,9 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   private IAmmoProvider ammoProvider;
   private boolean ammoProviderChanged;
 
+  @Nullable
+  private Future<?> currentWorkHandle;
+
   @SuppressWarnings("unchecked")
   public AbstractGun(T type, ItemStack gunStack) {
     this.type = type;
@@ -263,12 +268,9 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     this.setTriggerPressed(triggerPressed);
 
-    if (this.isTriggerPressed()) {
-      executorService.execute(() -> {
-        while (this.isTriggerPressed() && (Util.getMillis() - this.lastTickMs < 500L)) {
-          this.tryShoot(living);
-        }
-      });
+    if (this.isTriggerPressed()
+        && (this.currentWorkHandle == null || this.currentWorkHandle.isDone())) {
+      this.currentWorkHandle = executorService.submit(() -> this.startGunLoop(living));
     } else {
       // Resets the counter
       this.shotCount = 0;
@@ -340,6 +342,61 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
               random)
           .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
       // @formatter:on
+    }
+  }
+
+  private void startGunLoop(ILiving<?, ?> living) {
+    long time;
+    while (this.isTriggerPressed() && ((time = Util.getMillis()) - this.lastTickMs < 500L)) {
+      long timeDelta = time - this.lastShotMs;
+      if (timeDelta < this.type.getFireDelayMs()) {
+        try {
+          // Sleep to reduce CPU usage
+          Thread.sleep(this.type.getFireDelayMs() - timeDelta);
+        } catch (InterruptedException e) {
+          ;
+        }
+        continue;
+      }
+
+      if (!this.canShoot(living)) {
+        this.setTriggerPressed(false);
+        return;
+      }
+
+      LogicalSide side =
+          living.getEntity().level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+      ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
+
+      if (this.ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0) <= 0) {
+        if (side.isServer()) {
+          executor.execute(() -> {
+            living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+            this.ammoProvider.reload(living);
+          });
+        }
+        this.setTriggerPressed(false);
+        return;
+      }
+
+      boolean isMaxShotsReached =
+          this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+      if (isMaxShotsReached) {
+        this.setTriggerPressed(false);
+        return;
+      }
+
+      this.shotCount++;
+      this.lastShotMs = time;
+
+      this.processShot(living, executor);
+
+      if (side.isClient()) {
+        this.client.handleShoot(living);
+      }
+
+      // Allow other threads to do work (mainly the main thread as we off-load a lot of tasks to it)
+      Thread.yield();
     }
   }
 
@@ -426,51 +483,6 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
         }
         lastRayTraceResult = rayTraceResult;
       }
-    }
-  }
-
-  private void tryShoot(ILiving<?, ?> living) {
-    if (!this.canShoot(living)) {
-      this.setTriggerPressed(false);
-      return;
-    }
-
-    LogicalSide side =
-        living.getEntity().level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
-    ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
-
-    if (this.ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0) <= 0) {
-      if (side.isServer()) {
-        executor.execute(() -> {
-          living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-          this.ammoProvider.reload(living);
-        });
-      }
-      this.setTriggerPressed(false);
-      return;
-    }
-
-    boolean isMaxShotsReached =
-        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
-    if (isMaxShotsReached) {
-      return;
-    }
-
-    this.shotCount++;
-    this.lastShotMs = Util.getMillis();
-
-    this.processShot(living, executor);
-
-    if (side == LogicalSide.CLIENT) {
-      this.client.handleShoot(living);
-    }
-
-    Thread.yield();
-
-    try {
-      Thread.sleep(this.type.getFireDelayMs());
-    } catch (InterruptedException e) {
-      ;
     }
   }
 
