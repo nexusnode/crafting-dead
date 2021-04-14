@@ -444,7 +444,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> M1911 = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(120)
+      .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks(20 * 2)
       .setAccuracy(0.8F)
@@ -465,7 +465,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> G18 = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(120)
+      .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks((int) (20 * 2.2F))
       .setAccuracy(0.7F)
@@ -488,7 +488,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> M9 = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(120)
+      .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks((int) (20 * 1.5F))
       .setAccuracy(0.7F)
@@ -508,7 +508,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> DESERT_EAGLE = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(120)
+      .setFireDelayMs(160)
       .setDamage(8)
       .setReloadDurationTicks(20 * 2)
       .setAccuracy(0.9F)
@@ -530,7 +530,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> P250 = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(120)
+      .setFireDelayMs(160)
       .setDamage(6)
       .setReloadDurationTicks((int) (20 * 1.5F))
       .setAccuracy(0.7F)
@@ -552,7 +552,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> MAGNUM = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(80)
+      .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks(20 * 2)
       .setAccuracy(0.8F)
@@ -569,7 +569,7 @@ public class GunTypes {
 
   public static final AbstractGunType<?> FN57 = AimableGunType.builder()
       .setCombatSlotType(CombatSlotType.SECONDARY)
-      .setFireDelayMs(140)
+      .setFireDelayMs(160)
       .setDamage(8)
       .setReloadDurationTicks((int) (20 * 1.5F))
       .setAccuracy(0.8F)
