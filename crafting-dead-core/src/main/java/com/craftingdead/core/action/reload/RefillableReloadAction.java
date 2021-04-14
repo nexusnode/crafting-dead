@@ -19,9 +19,9 @@
 package com.craftingdead.core.action.reload;
 
 import com.craftingdead.core.action.ActionTypes;
-import com.craftingdead.core.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.ammoprovider.RefillableAmmoProvider;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.item.gun.ammoprovider.RefillableAmmoProvider;
+import com.craftingdead.core.living.ILiving;
 
 public class RefillableReloadAction extends AbstractReloadAction {
 

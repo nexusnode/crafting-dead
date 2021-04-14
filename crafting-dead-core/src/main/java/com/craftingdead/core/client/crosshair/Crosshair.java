@@ -18,13 +18,23 @@
 
 package com.craftingdead.core.client.crosshair;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
 
 public class Crosshair {
 
-  private final ResourceLocation name;
+  public static final Codec<Crosshair> CODEC = RecordCodecBuilder.create(instance -> instance
+      .group(
+          ResourceLocation.CODEC.fieldOf("name").forGetter(Crosshair::getName),
+          ResourceLocation.CODEC.fieldOf("top").forGetter(Crosshair::getTop),
+          ResourceLocation.CODEC.fieldOf("bottom").forGetter(Crosshair::getBottom),
+          ResourceLocation.CODEC.fieldOf("left").forGetter(Crosshair::getLeft),
+          ResourceLocation.CODEC.fieldOf("right").forGetter(Crosshair::getRight),
+          ResourceLocation.CODEC.fieldOf("middle").forGetter(Crosshair::getMiddle))
+      .apply(instance, Crosshair::new));
 
-  private final boolean isStatic;
+  private final ResourceLocation name;
 
   private final ResourceLocation top;
   private final ResourceLocation bottom;
@@ -32,11 +42,10 @@ public class Crosshair {
   private final ResourceLocation right;
   private final ResourceLocation middle;
 
-  public Crosshair(ResourceLocation name, boolean isStatic, ResourceLocation top,
+  public Crosshair(ResourceLocation name, ResourceLocation top,
       ResourceLocation bottom, ResourceLocation left, ResourceLocation right,
       ResourceLocation middle) {
     this.name = name;
-    this.isStatic = isStatic;
     this.top = top;
     this.bottom = bottom;
     this.left = left;
@@ -45,30 +54,26 @@ public class Crosshair {
   }
 
   public ResourceLocation getName() {
-    return name;
-  }
-
-  public boolean isStatic() {
-    return isStatic;
+    return this.name;
   }
 
   public ResourceLocation getTop() {
-    return top;
+    return this.top;
   }
 
   public ResourceLocation getBottom() {
-    return bottom;
+    return this.bottom;
   }
 
   public ResourceLocation getLeft() {
-    return left;
+    return this.left;
   }
 
   public ResourceLocation getRight() {
-    return right;
+    return this.right;
   }
 
   public ResourceLocation getMiddle() {
-    return middle;
+    return this.middle;
   }
 }

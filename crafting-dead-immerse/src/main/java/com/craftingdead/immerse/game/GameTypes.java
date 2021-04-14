@@ -24,14 +24,20 @@ import com.craftingdead.immerse.game.deathmatch.client.DeathmatchClient;
 import com.craftingdead.immerse.game.survival.SurvivalClient;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.mojang.serialization.Codec;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 public class GameTypes {
 
   @SuppressWarnings("unchecked")
   public static final DeferredRegister<GameType> GAME_TYPES =
       DeferredRegister.create((Class<GameType>) (Class<?>) GameType.class, CraftingDeadImmerse.ID);
+
+  public static final Lazy<IForgeRegistry<GameType>> REGISTRY =
+      Lazy.of(GameTypes.GAME_TYPES.makeRegistry("game_types", RegistryBuilder::new));
 
   public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("survival",
       () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new));

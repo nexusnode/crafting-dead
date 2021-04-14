@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.game.deathmatch;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.inventory.CombatSlotType;
+import com.craftingdead.core.item.combatslot.CombatSlotType;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.game.deathmatch.message.BuyItemMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.shop.IShop;

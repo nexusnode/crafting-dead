@@ -44,7 +44,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
   }
 
   public FireGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.fireGrenade, thrower, worldIn);
+    super(ModEntityTypes.FIRE_GRENADE.get(), thrower, worldIn);
   }
 
   @Override

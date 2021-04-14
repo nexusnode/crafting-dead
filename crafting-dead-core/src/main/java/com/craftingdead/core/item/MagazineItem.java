@@ -23,12 +23,13 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.capability.magazine.IMagazine;
-import com.craftingdead.core.capability.magazine.MagazineImpl;
+import com.craftingdead.core.item.gun.magazine.IMagazine;
+import com.craftingdead.core.item.gun.magazine.MagazineImpl;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -37,6 +38,7 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class MagazineItem extends Item {
 
@@ -71,8 +73,8 @@ public class MagazineItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(new MagazineImpl(this),
-        () -> ModCapabilities.MAGAZINE);
+    return new SerializableCapabilityProvider<>(LazyOptional.of(() -> new MagazineImpl(this)),
+        () -> ModCapabilities.MAGAZINE, CompoundNBT::new);
   }
 
   @Override
@@ -160,7 +162,7 @@ public class MagazineItem extends Item {
 
     private float armorPenetration;
     private int size;
-    private Supplier<? extends Item> nextTier;
+    private Supplier<? extends Item> nextTier = () -> Items.AIR;
     private boolean customTexture;
 
     public Properties setArmorPenetration(float armorPenetration) {

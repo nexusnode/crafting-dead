@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/textured_helmet_multiple_of_9",
       "textures": {
-        "base": "craftingdead:models/hats/combat_bdu_helmet"
+        "base": "craftingdead:hats/combat_bdu_helmet"
       }
     }
   }

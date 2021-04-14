@@ -21,10 +21,10 @@ package com.craftingdead.core.event;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.core.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.item.AttachmentItem;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -111,7 +111,8 @@ public abstract class GunEvent extends Event {
     private final BlockPos blockPos;
     private final World world;
 
-    public HitBlock(IGun gun, ItemStack itemStack, Block block, BlockPos blockPos, ILiving<?, ?> living, World world) {
+    public HitBlock(IGun gun, ItemStack itemStack, Block block, BlockPos blockPos,
+        ILiving<?, ?> living, World world) {
       super(gun, itemStack, living);
 
       this.block = block;
@@ -141,14 +142,13 @@ public abstract class GunEvent extends Event {
     private boolean headshot;
 
     public HitEntity(
-            IGun gun,
-            ItemStack itemStack,
-            ILiving<?, ?> living,
-            Entity target,
-            float damage,
-            Vector3d hitPos,
-            boolean headshot
-    ) {
+        IGun gun,
+        ItemStack itemStack,
+        ILiving<?, ?> living,
+        Entity target,
+        float damage,
+        Vector3d hitPos,
+        boolean headshot) {
       super(gun, itemStack, living);
 
       this.target = target;

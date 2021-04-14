@@ -20,28 +20,45 @@ package com.craftingdead.core.capability;
 
 import java.util.Set;
 import java.util.function.Supplier;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.INBT;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullFunction;
 
 public class SerializableCapabilityProvider<C extends INBTSerializable<S>, S extends INBT>
     extends SimpleCapabilityProvider<C> implements INBTSerializable<S> {
 
-  public SerializableCapabilityProvider(C capability, Supplier<Capability<? super C>> capabilityHolder) {
-    super(capability, capabilityHolder);
+  private final Supplier<S> emptyNbt;
+
+  public SerializableCapabilityProvider(LazyOptional<C> capability,
+      Supplier<Capability<? super C>> capabilityHolder, Supplier<S> emptyNbt) {
+    super(capability, ImmutableSet.of(capabilityHolder));
+    this.emptyNbt = emptyNbt;
   }
 
-  public SerializableCapabilityProvider(C capability, Set<Supplier<Capability<? super C>>> capabilityHolder) {
-    super(capability, capabilityHolder);
+  public SerializableCapabilityProvider(LazyOptional<C> capability,
+      Set<Supplier<Capability<? super C>>> capabilityHolder, Supplier<S> emptyNbt) {
+    super(capability, capabilityHolder, null);
+    this.emptyNbt = emptyNbt;
+  }
+
+  public SerializableCapabilityProvider(LazyOptional<C> instance,
+      Set<Supplier<Capability<? super C>>> capabilities,
+      NonNullFunction<C, ICapabilityProvider> instanceMapper, Supplier<S> emptyNbt) {
+    super(instance, capabilities, instanceMapper);
+    this.emptyNbt = emptyNbt;
   }
 
   @Override
   public S serializeNBT() {
-    return this.capability.serializeNBT();
+    return this.instance.map(C::serializeNBT).orElseGet(this.emptyNbt);
   }
 
   @Override
   public void deserializeNBT(S nbt) {
-    this.capability.deserializeNBT(nbt);
+    this.instance.ifPresent(i -> i.deserializeNBT(nbt));
   }
 }

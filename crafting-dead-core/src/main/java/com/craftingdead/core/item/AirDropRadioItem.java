@@ -43,7 +43,8 @@ public class AirDropRadioItem extends Item {
     BlockPos blockPos = context.getClickedPos();
     ItemStack itemStack = context.getItemInHand();
     SupplyDropEntity airDropEntity =
-        new SupplyDropEntity(ModEntityTypes.supplyDrop, world, this.lootTable, random.nextLong(),
+        new SupplyDropEntity(ModEntityTypes.SUPPLY_DROP.get(), world, this.lootTable,
+            random.nextLong(),
             blockPos.getX(), blockPos.getY() + 25.0D, blockPos.getZ());
     world.addFreshEntity(airDropEntity);
     itemStack.shrink(1);

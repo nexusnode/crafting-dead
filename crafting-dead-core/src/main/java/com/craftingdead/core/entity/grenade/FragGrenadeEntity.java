@@ -33,7 +33,7 @@ public class FragGrenadeEntity extends GrenadeEntity {
   }
 
   public FragGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.fragGrenade, thrower, worldIn);
+    super(ModEntityTypes.FRAG_GRENADE.get(), thrower, worldIn);
   }
 
   @Override

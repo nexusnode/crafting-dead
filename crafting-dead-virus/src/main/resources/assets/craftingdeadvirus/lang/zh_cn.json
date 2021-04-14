@@ -1,0 +1,28 @@
+{
+  "enchantment.craftingdeadvirus.infection": "尸毒",
+
+  "effect.craftingdeadvirus.infection":"尸毒",
+
+  "entity.craftingdeadvirus.advanced_zombie": "高级丧尸",
+  "entity.craftingdeadvirus.fast_zombie": "快速丧尸",
+  "entity.craftingdeadvirus.tank_zombie": "坦克丧尸",
+  "entity.craftingdeadvirus.weak_zombie": "柔弱丧尸",
+  "entity.craftingdeadvirus.police_zombie": "警察丧尸",
+  "entity.craftingdeadvirus.doctor_zombie": "医生丧尸",
+  "entity.craftingdeadvirus.giant_zombie": "巨型丧尸",
+
+  "message.infected": "你已被丧尸病毒感染.",
+
+  "action.craftingdeadvirus.use_cure_syringe.message":"注射丧尸病毒解药",
+  "action.craftingdeadvirus.use_rbi_syringe.message":"注射丧尸病毒",
+
+  "item.craftingdeadvirus.rbi_syringe": "带有尸毒的针",
+  "item.craftingdeadvirus.cure_syringe": "治疗尸毒的药剂",
+
+  "item.craftingdeadvirus.advanced_zombie_spawn_egg": "生成 高级丧尸",
+  "item.craftingdeadvirus.fast_zombie_spawn_egg": "生成 快速丧尸",
+  "item.craftingdeadvirus.tank_zombie_spawn_egg": "生成 坦克丧尸",
+  "item.craftingdeadvirus.weak_zombie_spawn_egg": "生成 柔弱丧尸",
+  "item.craftingdeadvirus.police_zombie_spawn_egg": "生成 警察丧尸",
+  "item.craftingdeadvirus.doctor_zombie_spawn_egg": "生成 医生丧尸"
+}

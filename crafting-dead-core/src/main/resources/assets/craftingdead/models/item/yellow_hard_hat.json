@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/hard_hat",
       "textures": {
-        "base": "craftingdead:models/hats/yellow_hard_hat"
+        "base": "craftingdead:hats/yellow_hard_hat"
       }
     }
   }

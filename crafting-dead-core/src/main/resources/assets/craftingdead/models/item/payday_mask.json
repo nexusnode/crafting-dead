@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/mask",
       "textures": {
-        "base": "craftingdead:models/hats/payday_mask"
+        "base": "craftingdead:hats/payday_mask"
       }
     }
   }

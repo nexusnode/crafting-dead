@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.team;
 
 import java.util.Optional;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.game.IGame;
 
 public interface ITeamGame<T extends Enum<T> & ITeam> extends IGame {

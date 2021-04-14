@@ -19,11 +19,10 @@
 package com.craftingdead.core.item;
 
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.clothing.DefaultClothing;
+import com.craftingdead.core.clothing.DefaultClothing;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -42,6 +41,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class ClothingItem extends Item {
 
@@ -82,10 +82,11 @@ public class ClothingItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
-        new DefaultClothing(this.enhancedProtection, Optional.ofNullable(this.slownessAmplifier),
+        LazyOptional.of(() -> new DefaultClothing(this.enhancedProtection,
+            this.slownessAmplifier,
             this.fireImmunity,
-            new ResourceLocation(this.getRegistryName().getNamespace(), "textures/models/clothing/"
-                + this.getRegistryName().getPath() + "_" + "default" + ".png")),
+            new ResourceLocation(this.getRegistryName().getNamespace(), "textures/clothing/"
+                + this.getRegistryName().getPath() + "_" + "default" + ".png"))),
         () -> ModCapabilities.CLOTHING);
   }
 

@@ -19,7 +19,7 @@
 package com.craftingdead.core.action;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 
 public abstract class TimedAction extends AbstractAction {
 

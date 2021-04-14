@@ -74,7 +74,7 @@ public class SupplyDropEntity extends Entity implements INamedContainerProvider 
   }
 
   public SupplyDropEntity(FMLPlayMessages.SpawnEntity packet, World world) {
-    this(ModEntityTypes.supplyDrop, world);
+    this(ModEntityTypes.SUPPLY_DROP.get(), world);
   }
 
   @Override

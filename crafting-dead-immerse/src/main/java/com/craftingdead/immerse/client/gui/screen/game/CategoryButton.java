@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.screen.game;
 
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.game.shop.IShopCategory;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;

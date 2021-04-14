@@ -20,7 +20,7 @@ package com.craftingdead.core.action.item;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.item.ItemStack;

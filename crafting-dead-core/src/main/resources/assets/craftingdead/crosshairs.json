@@ -1,11 +1,26 @@
 [
   {
     "name": "craftingdead:standard",
-    "isStatic": false,
     "top": "craftingdead:textures/crosshair/standard/top.png",
     "bottom": "craftingdead:textures/crosshair/standard/bottom.png",
     "left": "craftingdead:textures/crosshair/standard/left.png",
     "right": "craftingdead:textures/crosshair/standard/right.png",
     "middle": "craftingdead:textures/crosshair/standard/middle.png"
+  },
+  {
+    "name": "craftingdead:noob",
+    "top": "craftingdead:textures/crosshair/noob/top.png",
+    "bottom": "craftingdead:textures/crosshair/noob/bottom.png",
+    "left": "craftingdead:textures/crosshair/noob/left.png",
+    "right": "craftingdead:textures/crosshair/noob/right.png",
+    "middle": "craftingdead:textures/crosshair/noob/middle.png"
+  },
+  {
+    "name": "craftingdead:pro",
+    "top": "craftingdead:textures/crosshair/pro/top.png",
+    "bottom": "craftingdead:textures/crosshair/pro/bottom.png",
+    "left": "craftingdead:textures/crosshair/pro/left.png",
+    "right": "craftingdead:textures/crosshair/pro/right.png",
+    "middle": "craftingdead:textures/crosshair/pro/middle.png"
   }
 ]

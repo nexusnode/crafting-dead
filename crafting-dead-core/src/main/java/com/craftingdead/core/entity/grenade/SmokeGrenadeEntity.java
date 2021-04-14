@@ -44,7 +44,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
   }
 
   public SmokeGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.smokeGrenade, thrower, worldIn);
+    super(ModEntityTypes.SMOKE_GRENADE.get(), thrower, worldIn);
   }
 
   @Override
@@ -109,7 +109,8 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
         double detectionRadius = radius + 1.5D;
 
         BlockPos from = this.blockPosition().offset(-detectionRadius, 0, -detectionRadius);
-        BlockPos to = this.blockPosition().offset(detectionRadius, detectionRadius, detectionRadius);
+        BlockPos to =
+            this.blockPosition().offset(detectionRadius, detectionRadius, detectionRadius);
         BlockPos.betweenClosedStream(from, to).forEach(blockPos -> {
 
           double xDiff = this.getX() - blockPos.getX();

@@ -1,20 +1,10 @@
 repositories {
-	mavenCentral()
-	maven {
-		name 'jitpack'
-		url 'https://jitpack.io' 
-	}
-	maven {
-      	url 'http://maven.ferenyr.info/artifactory/ourten'
-    }
+    mavenCentral()
     google()
-    maven {
-    	url 'https://maven.enginehub.org/repo'
-    }
 }
 
 mixin {
-	add sourceSets.main, "craftingdeadimmerse.refmap.json"
+    add sourceSets.main, 'craftingdeadimmerse.refmap.json'
 }
 
 minecraft {
@@ -22,12 +12,12 @@ minecraft {
 
     runs {
         client {
-        	taskName 'runImmerseClient'
-        
-            workingDirectory project.file('client')
+            taskName 'runImmerseClient'
+
+            workingDirectory project.file('run/client')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            
+
             args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
 
             mods {
@@ -41,13 +31,13 @@ minecraft {
         }
 
         server {
-        	taskName 'runImmerseServer'
-        
-            workingDirectory project.file('server')
+            taskName 'runImmerseServer'
+
+            workingDirectory project.file('run/server')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            
-            args '--mixin', 'craftingdeadimmerse.mixins.json'
+
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
 
             mods {
                 craftingdeadimmerse {
@@ -79,10 +69,10 @@ dependencies {
 jar {
     manifest {
         attributes([
-        	"Implementation-Title": project.name,
-        	"Implementation-Version": project.version,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": 'craftingdeadimmerse.mixins.json'
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'MixinConfigs': 'craftingdeadimmerse.mixins.json'
         ])
     }
 }

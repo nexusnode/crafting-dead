@@ -21,7 +21,7 @@ package com.craftingdead.immerse.client.gui.screen.game;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.game.shop.IShop;

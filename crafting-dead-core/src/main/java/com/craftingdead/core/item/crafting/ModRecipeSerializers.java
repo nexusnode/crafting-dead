@@ -31,7 +31,10 @@ public class ModRecipeSerializers {
       DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, CraftingDead.ID);
 
   public static final RegistryObject<SpecialRecipeSerializer<UpgradeMagazineRecipe>> UPGRADE_MAGAZINE =
-      RECIPE_SERIALIZERS
-          .register("upgrade_magazine",
-              () -> new SpecialRecipeSerializer<>(UpgradeMagazineRecipe::new));
+      RECIPE_SERIALIZERS.register("upgrade_magazine",
+          () -> new SpecialRecipeSerializer<>(UpgradeMagazineRecipe::new));
+
+  public static final RegistryObject<SpecialRecipeSerializer<DuplicateMagazineRecipe>> DUPLICATE_MAGAZINE =
+      RECIPE_SERIALIZERS.register("duplicate_magazine",
+          () -> new SpecialRecipeSerializer<>(DuplicateMagazineRecipe::new));
 }

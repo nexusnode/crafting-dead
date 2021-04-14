@@ -19,7 +19,7 @@
 package com.craftingdead.core.action.item;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.SoundEvent;

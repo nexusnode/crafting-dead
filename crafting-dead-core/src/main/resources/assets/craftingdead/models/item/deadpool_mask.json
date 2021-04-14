@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/textured_helmet_multiple_of_8",
       "textures": {
-        "base": "craftingdead:models/hats/deadpool_mask"
+        "base": "craftingdead:hats/deadpool_mask"
       }
     }
   }

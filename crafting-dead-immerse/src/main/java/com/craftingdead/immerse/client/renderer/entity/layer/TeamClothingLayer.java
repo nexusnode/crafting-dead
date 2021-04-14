@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.client.renderer.entity.layer;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.renderer.entity.layer.AbstractClothingLayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameClient;
 import com.craftingdead.immerse.game.team.ITeam;

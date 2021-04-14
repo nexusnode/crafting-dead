@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game.team;
 
 import java.util.UUID;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.game.IGameServer;
 
 public interface ITeamGameServer<K extends Enum<K> & ITeam> extends ITeamGame<K>, IGameServer {

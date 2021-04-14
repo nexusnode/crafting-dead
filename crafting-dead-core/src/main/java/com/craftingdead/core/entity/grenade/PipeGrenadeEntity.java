@@ -39,7 +39,7 @@ public class PipeGrenadeEntity extends GrenadeEntity {
   }
 
   public PipeGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.pipeGrenade, thrower, worldIn);
+    super(ModEntityTypes.PIPE_GRENADE.get(), thrower, worldIn);
   }
 
   @Override

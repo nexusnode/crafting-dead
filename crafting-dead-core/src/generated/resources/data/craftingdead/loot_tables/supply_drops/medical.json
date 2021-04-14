@@ -61,7 +61,7 @@
           "name": "craftingdead:adrenaline_syringe"
         },
         {
-          "type": "minecraft:item",
+          "type": "minecraft:tag",
           "functions": [
             {
               "function": "minecraft:set_count",
@@ -72,21 +72,8 @@
               }
             }
           ],
-          "name": "craftingdead:cure_syringe"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
-            }
-          ],
-          "name": "craftingdead:rbi_syringe"
+          "name": "craftingdead:syringes",
+          "expand": true
         },
         {
           "type": "minecraft:item",

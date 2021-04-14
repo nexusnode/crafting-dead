@@ -22,7 +22,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.hat.DefaultHat;
+import com.craftingdead.core.hat.DefaultHat;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -32,6 +32,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class HatItem extends Item {
 
@@ -49,7 +50,6 @@ public class HatItem extends Item {
     this.immuneToFlashes = properties.immuneToFlashes;
     this.immuneToGas = properties.immuneToGas;
     this.nightVision = properties.nightVision;
-
   }
 
   @Override
@@ -79,8 +79,8 @@ public class HatItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(new DefaultHat(this.nightVision,
-        this.headshotReductionPercentage, this.immuneToFlashes), () -> ModCapabilities.HAT);
+    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> new DefaultHat(this.nightVision,
+        this.headshotReductionPercentage, this.immuneToFlashes)), () -> ModCapabilities.HAT);
   }
 
   public static class Properties extends Item.Properties {

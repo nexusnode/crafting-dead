@@ -18,8 +18,8 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.IGameClient;
 import com.mojang.blaze3d.matrix.MatrixStack;

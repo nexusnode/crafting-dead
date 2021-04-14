@@ -18,8 +18,6 @@
 
 package com.craftingdead.core.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.entity.grenade.DecoyGrenadeEntity;
@@ -28,194 +26,87 @@ import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.entity.grenade.FragGrenadeEntity;
 import com.craftingdead.core.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.entity.grenade.SmokeGrenadeEntity;
-import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
-import com.craftingdead.core.entity.monster.DoctorZombieEntity;
-import com.craftingdead.core.entity.monster.FastZombieEntity;
-import com.craftingdead.core.entity.monster.GiantZombieEntity;
-import com.craftingdead.core.entity.monster.PoliceZombieEntity;
-import com.craftingdead.core.entity.monster.TankZombieEntity;
-import com.craftingdead.core.entity.monster.WeakZombieEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
-/**
- * We don't use {@link DeferredRegister} here because of the way {@link SpawnEggItem}s are
- * registered.
- */
 public class ModEntityTypes {
 
-  private static final List<EntityType<?>> toRegister = new ArrayList<>();
+  public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+      DeferredRegister.create(ForgeRegistries.ENTITIES, CraftingDead.ID);
 
-  public static EntityType<AdvancedZombieEntity> advancedZombie;
-  public static EntityType<FastZombieEntity> fastZombie;
-  public static EntityType<TankZombieEntity> tankZombie;
-  public static EntityType<WeakZombieEntity> weakZombie;
-  public static EntityType<AdvancedZombieEntity> policeZombie;
-  public static EntityType<AdvancedZombieEntity> doctorZombie;
-  public static EntityType<GiantZombieEntity> giantZombie;
+  public static final RegistryObject<EntityType<C4ExplosiveEntity>> C4_EXPLOSIVE =
+      ENTITY_TYPES.register("c4_explosive", () -> create("c4_explosive",
+          EntityType.Builder
+              .<C4ExplosiveEntity>of(C4ExplosiveEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.65F, 0.25F)
+              .setShouldReceiveVelocityUpdates(false)));
+  public static final RegistryObject<EntityType<DecoyGrenadeEntity>> DECOY_GRENADE =
+      ENTITY_TYPES.register("decoy_grenade", () -> create("decoy_grenade",
+          EntityType.Builder
+              .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.5F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-  public static EntityType<C4ExplosiveEntity> c4Explosive;
-  public static EntityType<DecoyGrenadeEntity> decoyGrenade;
-  public static EntityType<FireGrenadeEntity> fireGrenade;
-  public static EntityType<FlashGrenadeEntity> flashGrenade;
-  public static EntityType<FragGrenadeEntity> fragGrenade;
-  public static EntityType<PipeGrenadeEntity> pipeGrenade;
-  public static EntityType<SmokeGrenadeEntity> smokeGrenade;
+  public static final RegistryObject<EntityType<FireGrenadeEntity>> FIRE_GRENADE =
+      ENTITY_TYPES.register("fire_grenade", () -> create("fire_grenade",
+          EntityType.Builder
+              .<FireGrenadeEntity>of(FireGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.5F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-  public static EntityType<SupplyDropEntity> supplyDrop;
+  public static final RegistryObject<EntityType<FlashGrenadeEntity>> FLASH_GRENADE =
+      ENTITY_TYPES.register("flash_grenade", () -> create("flash_grenade",
+          EntityType.Builder
+              .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.5F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-  public static void initialize() {
-    c4Explosive = add("c4_explosive",
-        EntityType.Builder
-            .<C4ExplosiveEntity>of(C4ExplosiveEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.65F, 0.25F)
-            .setShouldReceiveVelocityUpdates(false));
+  public static final RegistryObject<EntityType<FragGrenadeEntity>> FRAG_GRENADE =
+      ENTITY_TYPES.register("frag_grenade", () -> create("frag_grenade",
+          EntityType.Builder
+              .<FragGrenadeEntity>of(FragGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.25F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-    decoyGrenade = add("decoy_grenade",
-        EntityType.Builder
-            .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
+  public static final RegistryObject<EntityType<PipeGrenadeEntity>> PIPE_GRENADE =
+      ENTITY_TYPES.register("pipe_grenade", () -> create("pipe_grenade",
+          EntityType.Builder
+              .<PipeGrenadeEntity>of(PipeGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.5F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-    fireGrenade = add("fire_grenade",
-        EntityType.Builder
-            .<FireGrenadeEntity>of(FireGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
+  public static final RegistryObject<EntityType<SmokeGrenadeEntity>> SMOKE_GRENADE =
+      ENTITY_TYPES.register("smoke_grenade", () -> create("smoke_grenade",
+          EntityType.Builder
+              .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, EntityClassification.MISC)
+              .setTrackingRange(64)
+              .setUpdateInterval(4)
+              .sized(0.25F, 0.5F)
+              .setShouldReceiveVelocityUpdates(false)));
 
-    flashGrenade = add("flash_grenade",
-        EntityType.Builder
-            .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
+  public static final RegistryObject<EntityType<SupplyDropEntity>> SUPPLY_DROP =
+      ENTITY_TYPES.register("supply_drop", () -> create("supply_drop", EntityType.Builder
+          .of(SupplyDropEntity::new, EntityClassification.MISC)));
 
-    fragGrenade = add("frag_grenade",
-        EntityType.Builder
-            .<FragGrenadeEntity>of(FragGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.25F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    pipeGrenade = add("pipe_grenade",
-        EntityType.Builder
-            .<PipeGrenadeEntity>of(PipeGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    smokeGrenade = add("smoke_grenade",
-        EntityType.Builder
-            .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, EntityClassification.MISC)
-            .setTrackingRange(64)
-            .setUpdateInterval(4)
-            .sized(0.25F, 0.5F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    advancedZombie = add("advanced_zombie",
-        EntityType.Builder
-            .<AdvancedZombieEntity>of(AdvancedZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    fastZombie = add("fast_zombie",
-        EntityType.Builder
-            .<FastZombieEntity>of(FastZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    tankZombie = add("tank_zombie",
-        EntityType.Builder
-            .<TankZombieEntity>of(TankZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    weakZombie = add("weak_zombie",
-        EntityType.Builder
-            .<WeakZombieEntity>of(WeakZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    policeZombie = add("police_zombie",
-        EntityType.Builder
-            .<AdvancedZombieEntity>of(PoliceZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    doctorZombie = add("doctor_zombie",
-        EntityType.Builder
-            .<AdvancedZombieEntity>of(DoctorZombieEntity::new, EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(0.6F, 1.95F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    giantZombie = add("giant_zombie",
-        EntityType.Builder
-            .<GiantZombieEntity>of(GiantZombieEntity::new,
-                EntityClassification.MONSTER)
-            .setTrackingRange(64)
-            .setUpdateInterval(3)
-            .sized(3.6F, 12.0F)
-            .setShouldReceiveVelocityUpdates(false));
-
-    supplyDrop = add("supply_drop", EntityType.Builder
-        .<SupplyDropEntity>of(SupplyDropEntity::new, EntityClassification.MISC));
-
-    // Spawn placement rules
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.advancedZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
-
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.fastZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
-
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.tankZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
-
-    EntitySpawnPlacementRegistry.register(ModEntityTypes.weakZombie,
-        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
-  }
-
-  public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
-    toRegister.forEach(event.getRegistry()::register);
-  }
-
-  private static <T extends Entity> EntityType<T> add(String registryName,
+  private static <T extends Entity> EntityType<T> create(String registryName,
       EntityType.Builder<T> builder) {
-    ResourceLocation resourceLocation = new ResourceLocation(CraftingDead.ID, registryName);
-    EntityType<T> entityType = builder.build(resourceLocation.toString());
-    entityType.setRegistryName(resourceLocation);
-    toRegister.add(entityType);
-    return entityType;
+    return builder.build(new ResourceLocation(CraftingDead.ID, registryName).toString());
   }
 }

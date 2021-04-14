@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/ballistic_helmet",
       "textures": {
-        "base": "craftingdead:models/hats/green_ballistic_helmet"
+        "base": "craftingdead:hats/green_ballistic_helmet"
       }
     }
   }

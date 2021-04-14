@@ -24,9 +24,8 @@ import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.combatitem.CombatItemImpl;
 import com.craftingdead.core.entity.grenade.GrenadeEntity;
-import com.craftingdead.core.inventory.CombatSlotType;
+import com.craftingdead.core.item.combatslot.CombatSlotType;
 import com.craftingdead.core.util.Text;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -43,6 +42,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class GrenadeItem extends Item {
 
@@ -58,18 +58,16 @@ public class GrenadeItem extends Item {
   @Override
   public void appendHoverText(ItemStack stack, @Nullable World world,
       List<ITextComponent> texts, ITooltipFlag tooltipFlag) {
-    texts
-        .add(Text.translate("item_lore.grenade").withStyle(TextFormatting.GRAY));
+    texts.add(Text.translate("item_lore.grenade").withStyle(TextFormatting.GRAY));
   }
 
   @Override
   public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn,
       Hand handIn) {
     ItemStack itemStack = playerIn.getItemInHand(handIn);
-    worldIn
-        .playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
-            SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
-            0.4F / (random.nextFloat() * 0.4F + 0.8F));
+    worldIn.playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
+        SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
+        0.4F / (random.nextFloat() * 0.4F + 0.8F));
     if (!worldIn.isClientSide) {
       GrenadeEntity grenadeEntity = this.grenadeEntitySupplier.apply(playerIn, worldIn);
 
@@ -93,8 +91,8 @@ public class GrenadeItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(new CombatItemImpl(CombatSlotType.GRENADE),
-        () -> ModCapabilities.COMBAT_ITEM);
+    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> () -> CombatSlotType.GRENADE),
+        () -> ModCapabilities.COMBAT_SLOT_PROVIDER);
   }
 
   public static class Properties extends Item.Properties {

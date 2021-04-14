@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.game.shop;
 
 import java.util.List;
-import com.craftingdead.core.capability.living.IPlayer;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;

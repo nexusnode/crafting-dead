@@ -18,8 +18,8 @@
 
 package com.craftingdead.immerse.game.deathmatch;
 
-import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
 import net.minecraft.entity.Entity;

@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/bunny_hat",
       "textures": {
-        "base": "craftingdead:models/hats/bunny_hat"
+        "base": "craftingdead:hats/bunny_hat"
       },
       "transform": {
         "rotation": [0, 0, 0],

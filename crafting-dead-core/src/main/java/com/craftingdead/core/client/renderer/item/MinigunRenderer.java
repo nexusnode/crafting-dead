@@ -19,10 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelMinigunBarrel;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.item.gun.minigun.MinigunClient;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -35,10 +37,8 @@ public class MinigunRenderer extends GunRenderer {
 
   private final Model barrelModel = new ModelMinigunBarrel();
 
-  private float rotation = 0F;
-
   public MinigunRenderer() {
-    super(ModItems.MINIGUN);
+    super(ModItems.MINIGUN.getId(), GunTypes.MINIGUN);
   }
 
   @Override
@@ -86,8 +86,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(IGun gun,
-      MatrixStack matrixStack) {
+  protected void applyAimingTransforms(IGun gun, MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-24.0F));
@@ -105,28 +104,25 @@ public class MinigunRenderer extends GunRenderer {
   protected void renderAdditionalParts(IGun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
-    if (gun.isPerformingRightMouseAction()) {
-      this.rotation += 15.0F;
-      if (this.rotation >= 360.0F) {
-        this.rotation = 0.0F;
-      }
+    if (gun.getClient() instanceof MinigunClient) {
+      this.renderBarrel(((MinigunClient) gun.getClient()).getBarrelRotation(partialTicks),
+          partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    this.renderBarrel(partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
   }
 
-  private void renderBarrel(float partialTicks, MatrixStack matrixStack,
+  private void renderBarrel(float rotation, float partialTicks, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.pushPose();
     {
       final float x = 0.155F;
       final float y = 0.035F;
       matrixStack.translate(0, x, -y);
-      matrixStack.mulPose(Vector3f.XP.rotationDegrees(this.rotation));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(rotation));
       matrixStack.translate(0, -x, y);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.barrelModel
           .renderType(new ResourceLocation(CraftingDead.ID, "textures/gun/minigun.png")));
-      this.barrelModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
-          1.0F, 1.0F);
+      this.barrelModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F, 1.0F, 1.0F);
     }
     matrixStack.popPose();
   }

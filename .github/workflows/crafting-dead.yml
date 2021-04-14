@@ -36,3 +36,4 @@ jobs:
         path: |
           ./crafting-dead-core/build/libs/*.jar
           ./crafting-dead-immerse/build/libs/*.jar
+          ./crafting-dead-virus/build/libs/*.jar
