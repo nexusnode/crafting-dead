@@ -26,20 +26,14 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.IModDist;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.paint.IPaint;
 import com.craftingdead.core.client.audio.EffectsManager;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
+import com.craftingdead.core.client.gui.screen.inventory.EquipmentScreen;
 import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
-import com.craftingdead.core.client.gui.screen.inventory.PlayerScreen;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
-import com.craftingdead.core.client.renderer.entity.AdvancedZombieRenderer;
-import com.craftingdead.core.client.renderer.entity.GiantZombieRenderer;
 import com.craftingdead.core.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.C4ExplosiveRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
@@ -57,9 +51,12 @@ import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.item.ModItemModelsProperties;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.item.PaintItem;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.item.gun.paint.IPaint;
+import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
@@ -93,6 +90,7 @@ import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.resources.IReloadableResourceManager;
@@ -295,7 +293,6 @@ public class ClientDist implements IModDist {
   }
 
   private void handleModelRegistry(ModelRegistryEvent event) {
-    StartupMessageManager.addModMessage("Registering model loaders");
     StartupMessageManager.addModMessage("Gathering item renderers");
     this.itemRendererManager.gatherItemRenderers();
     StartupMessageManager.addModMessage("Registering special models");
@@ -307,7 +304,12 @@ public class ClientDist implements IModDist {
   }
 
   private void handleClientSetup(FMLClientSetupEvent event) {
-    ModItemModelsProperties.register();
+    ItemModelsProperties.registerGeneric(new ResourceLocation("wearing"),
+        (itemStack, world, entity) -> entity.getCapability(ModCapabilities.LIVING)
+            .filter(living -> living.getItemHandler()
+                .getStackInSlot(InventorySlotType.HAT.getIndex()) == itemStack)
+            .map(__ -> 1.0F)
+            .orElse(0.0F));
 
     StartupMessageManager.addModMessage("Registering tooltips");
 
@@ -323,7 +325,7 @@ public class ClientDist implements IModDist {
 
     StartupMessageManager.addModMessage("Registering container screen factories");
 
-    ScreenManager.register(ModContainerTypes.EQUIPMENT.get(), PlayerScreen::new);
+    ScreenManager.register(ModContainerTypes.EQUIPMENT.get(), EquipmentScreen::new);
     ScreenManager.register(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
 
     StartupMessageManager.addModMessage("Registering key bindings");
@@ -336,35 +338,21 @@ public class ClientDist implements IModDist {
 
     StartupMessageManager.addModMessage("Registering entity renderers");
 
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.advancedZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fastZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.tankZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.weakZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.policeZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.doctorZombie,
-        AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.giantZombie,
-        GiantZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.supplyDrop,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.c4Explosive,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.C4_EXPLOSIVE.get(),
         C4ExplosiveRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fireGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FIRE_GRENADE.get(),
         CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.fragGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FRAG_GRENADE.get(),
         FragGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.pipeGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.PIPE_GRENADE.get(),
         CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.decoyGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.DECOY_GRENADE.get(),
         SlimGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.smokeGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SMOKE_GRENADE.get(),
         CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.flashGrenade,
+    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FLASH_GRENADE.get(),
         SlimGrenadeRenderer::new);
 
     StartupMessageManager.addModMessage("Loading model layers");
@@ -424,20 +412,16 @@ public class ClientDist implements IModDist {
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
-    // Color for stacks with GUN_CONTROLLER capability
-    IItemColor gunColor = (stack,
-        tintIndex) -> stack
-            .getCapability(ModCapabilities.GUN)
-            .map(gunController -> gunController
-                .getPaintStack()
-                .getCapability(ModCapabilities.PAINT)
-                .map(IPaint::getColour)
-                .orElse(Optional.empty()))
-            .orElse(Optional.empty())
-            .orElse(0xFFFFFF) | 0xFF << 24;
+    IItemColor gunColor = (stack, tintIndex) -> stack
+        .getCapability(ModCapabilities.GUN)
+        .resolve()
+        .flatMap(gunController -> gunController
+            .getPaintStack()
+            .getCapability(ModCapabilities.PAINT)
+            .resolve()
+            .flatMap(IPaint::getColour))
+        .orElse(0xFFFFFF) | 0xFF << 24;
 
-
-    // Registers the color for every matching CD item
     ModItems.ITEMS
         .getEntries()
         .stream()
@@ -445,20 +429,18 @@ public class ClientDist implements IModDist {
         .filter(item -> item instanceof GunItem)
         .forEach(item -> event.getItemColors().register(gunColor, item));
 
-    // Color for stacks with PAINT_COLOR capability
-    IItemColor paintStackColor = (stack, tintIndex) -> stack
+    IItemColor paintColor = (stack, tintIndex) -> stack
         .getCapability(ModCapabilities.PAINT)
-        .map(IPaint::getColour)
-        .orElse(Optional.empty())
+        .resolve()
+        .flatMap(IPaint::getColour)
         .orElse(Integer.MAX_VALUE);
 
-    // Registers the color for every matching CD item
     ModItems.ITEMS
         .getEntries()
         .stream()
         .map(RegistryObject::get)
         .filter(item -> item instanceof PaintItem)
-        .forEach(item -> event.getItemColors().register(paintStackColor, () -> item));
+        .forEach(item -> event.getItemColors().register(paintColor, () -> item));
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
@@ -763,8 +745,8 @@ public class ClientDist implements IModDist {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     // Prevents current GUI being closed before new one opens.
-    if (this.minecraft.screen instanceof PlayerScreen && event.getGui() == null
-        && ((PlayerScreen) this.minecraft.screen).isTransitioning()) {
+    if (this.minecraft.screen instanceof EquipmentScreen && event.getGui() == null
+        && ((EquipmentScreen) this.minecraft.screen).isTransitioning()) {
       event.setCanceled(true);
     }
   }

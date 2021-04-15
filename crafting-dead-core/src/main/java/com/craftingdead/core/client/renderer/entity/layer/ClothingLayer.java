@@ -19,8 +19,8 @@
 package com.craftingdead.core.client.renderer.entity.layer;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.inventory.InventorySlotType;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;

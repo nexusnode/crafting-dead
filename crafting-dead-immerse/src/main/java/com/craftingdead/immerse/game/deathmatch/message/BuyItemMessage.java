@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.deathmatch.message;
 
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;

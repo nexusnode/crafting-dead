@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.IItemHandler;
 

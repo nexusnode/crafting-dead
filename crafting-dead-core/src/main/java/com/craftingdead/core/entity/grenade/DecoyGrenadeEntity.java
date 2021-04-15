@@ -43,7 +43,7 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   }
 
   public DecoyGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.decoyGrenade, thrower, worldIn);
+    super(ModEntityTypes.DECOY_GRENADE.get(), thrower, worldIn);
   }
 
   @Override
@@ -89,12 +89,12 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   }
 
   public boolean canShoot() {
-    final long fireDelayMs = this.gunItem.getFireDelayMs();
+    final long fireDelayMs = this.gunItem.getGunType().getFireDelayMs();
     return (Util.getMillis() - this.lastShotMs) >= fireDelayMs;
   }
 
   public void playFakeShoot() {
-    this.playSound(this.gunItem.getShootSound().get(), 1.5F, 1F);
+    this.playSound(this.gunItem.getGunType().getShootSound().get(), 1.5F, 1F);
     this.lastShotMs = Util.getMillis();
   }
 

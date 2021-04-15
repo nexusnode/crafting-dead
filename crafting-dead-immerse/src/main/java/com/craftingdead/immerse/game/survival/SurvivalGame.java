@@ -18,8 +18,8 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.capability.living.PlayerImpl;
 import com.craftingdead.core.event.LivingEvent;
+import com.craftingdead.core.living.PlayerImpl;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.IGame;

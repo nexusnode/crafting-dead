@@ -19,11 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,13 +39,13 @@ public class P250Renderer extends GunRenderer {
   private final Model ironSight2 = new ModelPistolIS2();
 
   public P250Renderer() {
-    super(ModItems.P250);
+    super(ModItems.P250.getId(), GunTypes.P250);
   }
-  
+
   @Override
   protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
     matrixStack.scale(1.75F, 1.75F, 1.75F);
-    matrixStack.translate(-0.3, -0.25, 0);       
+    matrixStack.translate(-0.3, -0.25, 0);
   }
 
   @Override
@@ -126,7 +127,8 @@ public class P250Renderer extends GunRenderer {
       matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is1.png")));
-      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();
@@ -142,7 +144,8 @@ public class P250Renderer extends GunRenderer {
       matrixStack.mulPose(Vector3f.YP.rotationDegrees(90));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is2.png")));
-      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();

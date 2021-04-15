@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionTypes;
-import com.craftingdead.core.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.magazine.IMagazine;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.inventory.InventorySlotType;
+import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.item.gun.magazine.IMagazine;
+import com.craftingdead.core.living.ILiving;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import com.tiviacz.travelersbackpack.inventory.TravelersBackpackInventory;
@@ -118,8 +118,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
       for (int i = 0; i < itemHandler.getSlots(); ++i) {
         ItemStack itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
-            && !itemStack
-                .getCapability(ModCapabilities.MAGAZINE)
+            && !itemStack.getCapability(ModCapabilities.MAGAZINE)
                 .map(IMagazine::isEmpty)
                 .orElse(true)) {
           return Optional.of(new MagazineLocation(itemHandler, i));

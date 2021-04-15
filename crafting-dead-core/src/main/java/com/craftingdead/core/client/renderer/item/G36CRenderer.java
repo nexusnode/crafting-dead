@@ -19,11 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS1;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,7 +39,7 @@ public class G36CRenderer extends GunRenderer {
   private final Model ironSight2 = new ModelM4A1IS2();
 
   public G36CRenderer() {
-    super(ModItems.G36C);
+    super(ModItems.G36C.getId(), GunTypes.G36C);
   }
 
   @Override
@@ -146,7 +147,8 @@ public class G36CRenderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m4a1_is1.png")));
-      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
 
     }
@@ -163,7 +165,8 @@ public class G36CRenderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m4a1_is2.png")));
-      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();

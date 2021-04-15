@@ -40,8 +40,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public abstract class GrenadeEntity extends BounceableProjectileEntity {
 

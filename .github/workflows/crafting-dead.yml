@@ -29,10 +29,11 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: |
-       ./gradlew jar
+       ./gradlew build
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead
         path: |
           ./crafting-dead-core/build/libs/*.jar
           ./crafting-dead-immerse/build/libs/*.jar
+          ./crafting-dead-virus/build/libs/*.jar

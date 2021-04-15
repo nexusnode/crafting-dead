@@ -22,6 +22,7 @@ import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.HitMarker;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig {
@@ -30,11 +31,13 @@ public class ClientConfig {
 
   public final ForgeConfigSpec.EnumValue<HitMarker.Mode> hitMarkerMode;
 
-  public final ForgeConfigSpec.BooleanValue playKillSound;
+  public final ForgeConfigSpec.BooleanValue killSoundEnabled;
 
-  public final ForgeConfigSpec.EnumValue<ModTutorialSteps> tutorialStep;
+  public final ForgeConfigSpec.ConfigValue<String> killSound;
 
   public final ForgeConfigSpec.ConfigValue<String> crosshair;
+
+  public final ForgeConfigSpec.EnumValue<ModTutorialSteps> tutorialStep;
 
   public ClientConfig(ForgeConfigSpec.Builder builder) {
     builder.push("client");
@@ -45,9 +48,13 @@ public class ClientConfig {
       this.hitMarkerMode = builder
           .translation("options.craftingdead.client.hit_marker_mode")
           .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
-      this.playKillSound = builder
-          .translation("options.craftingdead.client.play_kill_sound")
-          .define("playKillSound", true);
+      this.killSoundEnabled = builder
+          .translation("options.craftingdead.client.kill_sound_enabled")
+          .define("killSoundEnabled", true);
+      this.killSound = builder
+          .translation("options.craftingdead.client.kill_sound")
+          .define("killSound", SoundEvents.TRIDENT_RETURN.getRegistryName().toString(),
+              v -> v instanceof String && ResourceLocation.isValidResourceLocation((String) v));
       this.tutorialStep = builder
           .comment("Internal")
           .defineEnum("tutorialStep", ModTutorialSteps.OPEN_EQUIPMENT_MENU);

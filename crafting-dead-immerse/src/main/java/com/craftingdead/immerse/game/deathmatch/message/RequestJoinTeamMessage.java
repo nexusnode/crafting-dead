@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.deathmatch.message;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;

@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.block.ModBlocks;
 import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.IGame;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
@@ -36,6 +34,7 @@ import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
+import com.craftingdead.immerse.util.DependencyLoader;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -53,8 +52,6 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {
@@ -97,10 +94,10 @@ public class CraftingDeadImmerse {
   @Nullable
   private LogicalServer logicalServer;
 
-  private final Supplier<IForgeRegistry<GameType>> gameTypeRegistry;
-
   public CraftingDeadImmerse() {
     instance = this;
+
+    DependencyLoader.loadDependencies();
 
     this.modDir = FMLPaths.CONFIGDIR.get().resolve(ID);
     if (!Files.exists(this.modDir)) {
@@ -120,8 +117,6 @@ public class CraftingDeadImmerse {
     ModBlocks.BLOCKS.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
-
-    this.gameTypeRegistry = GameTypes.GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new);
     GameTypes.GAME_TYPES.register(modEventBus);
 
     modEventBus.addListener(this::handleCommonSetup);
@@ -131,10 +126,6 @@ public class CraftingDeadImmerse {
     // SchematicFormats.SCHEMATIC_FORMATS.register(modEventBus);
     //
     // ModDimensions.MOD_DIMENSIONS.register(modEventBus);
-  }
-
-  public IForgeRegistry<GameType> getGameTypeRegistry() {
-    return this.gameTypeRegistry.get();
   }
 
   @Nullable

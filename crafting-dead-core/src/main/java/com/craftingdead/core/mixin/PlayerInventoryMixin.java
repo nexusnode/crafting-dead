@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import net.minecraft.entity.player.PlayerInventory;
 
 @Mixin(PlayerInventory.class)

@@ -48,7 +48,8 @@ public class ContainerMixin {
   private void broadcastChanges(CallbackInfo callbackInfo) {
     Container container = (Container) (Object) this;
     for (Slot slot : container.slots) {
-      slot.getItem().getCapability(ModCapabilities.GUN).filter(IBufferSerializable::requiresSync)
+      slot.getItem().getCapability(ModCapabilities.GUN)
+          .filter(IBufferSerializable::requiresSync)
           .ifPresent(gun -> {
             for (IContainerListener listener : this.containerListeners) {
               if (listener instanceof ServerPlayerEntity) {

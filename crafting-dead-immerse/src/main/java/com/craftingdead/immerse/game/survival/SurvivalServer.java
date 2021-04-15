@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.immerse.game.IGameServer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 

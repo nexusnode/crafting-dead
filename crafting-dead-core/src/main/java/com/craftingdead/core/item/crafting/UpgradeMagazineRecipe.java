@@ -19,9 +19,10 @@
 package com.craftingdead.core.item.crafting;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.magazine.IMagazine;
+import com.craftingdead.core.item.gun.magazine.IMagazine;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -36,72 +37,47 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
 
   @Override
   public boolean matches(CraftingInventory inventory, World world) {
-    ItemStack magazineStack = ItemStack.EMPTY;
-    int ironNuggetCount = 0;
     for (int i = 0; i < inventory.getContainerSize(); ++i) {
-      ItemStack itemStack = inventory.getItem(i);
-      boolean isSingleMagazine = itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()
-          && itemStack.getCount() == 1 && i == (inventory.getContainerSize()) / 2;
-      boolean isIronNuggets = Tags.Items.NUGGETS_IRON.contains(itemStack.getItem());
-      if (isSingleMagazine) {
-        if (!magazineStack.isEmpty()) {
-          return false;
-        } else {
-          magazineStack = itemStack;
-        }
-      } else if (isIronNuggets) {
-        ironNuggetCount++;
-      } else if (!itemStack.isEmpty()) {
-        return false;
+      switch (i) {
+        case 4: // Middle slot
+          ItemStack itemStack = inventory.getItem(i);
+          if (itemStack.getCapability(ModCapabilities.MAGAZINE)
+              .map(IMagazine::getNextTier)
+              .map(item -> item == Items.AIR)
+              .orElse(true)) {
+            return false;
+          }
+          break;
+        default: // All other slots
+          if (!Tags.Items.NUGGETS_IRON.contains(inventory.getItem(i).getItem())) {
+            return false;
+          }
+          break;
       }
     }
-
-    boolean isValidMagazine = magazineStack.getCapability(ModCapabilities.MAGAZINE).isPresent();
-    boolean canUpgrade = ironNuggetCount >= 8 && !magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::getNextTier)
-        .map(ItemStack::new)
-        .orElse(ItemStack.EMPTY)
-        .isEmpty();
-    return isValidMagazine && canUpgrade;
+    return true;
   }
 
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
-    ItemStack magazineStack = ItemStack.EMPTY;
-    int ironNuggetCount = 0;
-    for (int i = 0; i < inventory.getContainerSize(); ++i) {
-      ItemStack itemStack = inventory.getItem(i);
-      if (itemStack.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
-        magazineStack = itemStack;
-      } else if (Tags.Items.NUGGETS_IRON.contains(itemStack.getItem())) {
-        ironNuggetCount++;
-      }
-    }
+    IMagazine magazine = ModCapabilities.getExpected(
+        ModCapabilities.MAGAZINE,
+        inventory.getItem(4),
+        IMagazine.class);
 
-    int tiers = ironNuggetCount / 8;
+    ItemStack nextTier = magazine.getNextTier().getDefaultInstance();
 
-    ItemStack nextTier = magazineStack
-        .getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::getNextTier)
-        .map(ItemStack::new)
-        .orElse(ItemStack.EMPTY);
-    int oldSize =
-        magazineStack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::getSize).orElse(0);
-    while (tiers > 0 && !nextTier.isEmpty()) {
-      magazineStack = nextTier;
-      magazineStack
-          .getCapability(ModCapabilities.MAGAZINE)
-          .ifPresent(magazine -> magazine.setSize(oldSize));
-      tiers--;
-    }
+    ModCapabilities.getExpected(
+        ModCapabilities.MAGAZINE,
+        nextTier,
+        IMagazine.class).setSize(magazine.getSize());
 
-    return magazineStack.copy();
+    return nextTier;
   }
 
   @Override
   public boolean canCraftInDimensions(int width, int height) {
-    return width * height >= 9;
+    return width * height == 9;
   }
 
   @Override

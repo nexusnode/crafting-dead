@@ -1,0 +1,25 @@
+{
+  "enchantment.craftingdeadvirus.infection": "Infecção",
+
+  "effect.craftingdeadvirus.infected":"Infectado",
+
+  "entity.craftingdeadvirus.advanced_zombie": "Zumbi Avançado",
+  "entity.craftingdeadvirus.fast_zombie": "Zumbi Rápido",
+  "entity.craftingdeadvirus.tank_zombie": "Zumbi Tanque",
+  "entity.craftingdeadvirus.weak_zombie": "Zumbi Fraco",
+  "entity.craftingdeadvirus.police_zombie": "Zumbi Policial",
+  "entity.craftingdeadvirus.doctor_zombie": "Zumbi Médico",
+  "entity.craftingdeadvirus.giant_zombie": "Zumbi Gigante",
+
+  "message.infected": "Você foi infectado com RBI.",
+
+  "item.craftingdeadvirus.rbi_syringe": "Seringa RBI",
+  "item.craftingdeadvirus.cure_syringe": "Seringa de Cura da RBI",
+  
+  "item.craftingdeadvirus.advanced_zombie_spawn_egg": "Ovo gerador de Zumbi Avançado",
+  "item.craftingdeadvirus.fast_zombie_spawn_egg": "Ovo gerador de Zumbi Rápido",
+  "item.craftingdeadvirus.tank_zombie_spawn_egg": "Ovo gerador de Zumbi Tanque",
+  "item.craftingdeadvirus.weak_zombie_spawn_egg": "Ovo gerador de Zumbi Fraco",
+  "item.craftingdeadvirus.police_zombie_spawn_egg": "Ovo gerador de Zumbi Policial",
+  "item.craftingdeadvirus.doctor_zombie_spawn_egg": "Ovo gerador de Zumbi Médico"
+}

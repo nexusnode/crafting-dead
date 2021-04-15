@@ -19,11 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelScarhIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,7 +39,7 @@ public class P90Renderer extends GunRenderer {
   private final Model ironSight2 = new ModelScarhIS2();
 
   public P90Renderer() {
-    super(ModItems.P90);
+    super(ModItems.P90.getId(), GunTypes.P90);
   }
 
   @Override
@@ -125,7 +126,8 @@ public class P90Renderer extends GunRenderer {
       matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is1.png")));
-      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();
@@ -141,7 +143,8 @@ public class P90Renderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/p90_is2.png")));
-      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();

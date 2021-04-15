@@ -44,7 +44,7 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   }
 
   public C4ExplosiveEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.c4Explosive, thrower, worldIn);
+    super(ModEntityTypes.C4_EXPLOSIVE.get(), thrower, worldIn);
   }
 
   @Override

@@ -19,11 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelAKMIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelAKMIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,7 +39,7 @@ public class RPKRenderer extends GunRenderer {
   private final Model ironSight2 = new ModelAKMIS2();
 
   public RPKRenderer() {
-    super(ModItems.RPK);
+    super(ModItems.RPK.getId(), GunTypes.RPK);
   }
 
   @Override
@@ -132,7 +133,8 @@ public class RPKRenderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/rpk_is1.png")));
-      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();
@@ -148,7 +150,8 @@ public class RPKRenderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/rpk_is2.png")));
-      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();

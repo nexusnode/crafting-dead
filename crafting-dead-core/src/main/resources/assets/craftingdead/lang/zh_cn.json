@@ -1,7 +1,7 @@
 {
   "container.equipment": "设备",
   "enchantment.craftingdead.armor_penetration": "护甲穿透",
-  
+
   "key.reload": "装填弹药",
   "key.remove_magazine": "移除弹夹",
   "key.toggle_fire_mode": "喷火模式",
@@ -13,8 +13,9 @@
   
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
-  "death.attack.dehydration":"%1$s died of dehydration",
-  "death.attack.bleeding":"%1$s bled to death",
+
+  "death.attack.dehydration":"%1$s 因脱水而死",
+  "death.attack.bleeding":"%1$s 因失血过多而死",
   
   "options.craftingdead.client.display_blood": "显示血液",
   "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
@@ -22,16 +23,19 @@
   "options.craftingdead.client.crosshair": "十字准星",
   "options.craftingdead.client.kill_sound": "击杀音效",
 
+  "options.craftingdead.client.display_blood": "显示血液",
+  "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
+  "options.craftingdead.client.kill_sound_enabled": "砍杀声音",
+
   "options.craftingdead.server.hydration_enabled":"水化已启用",
   "options.craftingdead.server.broken_legs_enabled":"骨折已启用",
   "options.craftingdead.server.bleeding_enabled":"流血已启用",
   "effect.craftingdead.broken_leg": "骨折",
   "effect.craftingdead.dehydration": "脱水",
   "effect.craftingdead.bleeding":"流血",
-  "effect.craftingdead.infection":"尸毒",
   "effect.craftingdead.adrenaline":"肾上腺素",
   "effect.craftingdead.flash_blindness":"闪光失明",
-  
+
   "entity.craftingdead.supply_drop": "空投物品",
   "entity.craftingdead.c4_explosive": "C4炸药",
   "entity.craftingdead.decoy_grenade": "诱饵弹",
@@ -66,7 +70,7 @@
   "action.craftingdead.use_blood_syringe.message":"输血中",
   "action.craftingdead.use_bandage.message":"使用绷带",
   "action.craftingdead.wash_rag.message":"清洗绷带",
- 
+
   "itemGroup.craftingdead.cosmetics": "行尸走肉 衣物",
   "itemGroup.craftingdead.misc": "行尸走肉 杂项",
   "itemGroup.craftingdead.medical": "行尸走肉 药品",

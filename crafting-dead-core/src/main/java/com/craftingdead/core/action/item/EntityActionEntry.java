@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import com.craftingdead.core.util.RayTraceUtil;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/gas_mask",
       "textures": {
-        "base": "craftingdead:models/hats/gas_mask"
+        "base": "craftingdead:hats/gas_mask"
       },
       "transform": {
         "rotation": [0, 0, 0],

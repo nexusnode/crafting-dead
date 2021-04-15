@@ -39,9 +39,6 @@ public class ModEffects {
   public static final RegistryObject<Effect> BROKEN_LEG =
       EFFECTS.register("broken_leg", BrokenLegEffect::new);
 
-  public static final RegistryObject<Effect> INFECTION =
-      EFFECTS.register("infection", InfectionEffect::new);
-
   public static final RegistryObject<Effect> HYDRATE =
       EFFECTS.register("hydrate", HydrateEffect::new);
 

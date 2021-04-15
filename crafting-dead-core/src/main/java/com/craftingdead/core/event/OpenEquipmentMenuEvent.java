@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.event;
 
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 

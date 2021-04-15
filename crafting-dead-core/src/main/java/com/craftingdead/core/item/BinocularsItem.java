@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.scope.DefaultScope;
+import com.craftingdead.core.item.scope.SimpleScope;
 import com.craftingdead.core.util.ModSoundEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.PointOfView;
@@ -35,6 +35,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class BinocularsItem extends Item {
 
@@ -66,7 +67,7 @@ public class BinocularsItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
-        new DefaultScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack),
+        LazyOptional.of(() -> new SimpleScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack)),
         () -> ModCapabilities.SCOPE);
   }
 }

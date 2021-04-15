@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.util;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import net.minecraft.block.BlockState;
@@ -39,7 +40,7 @@ import net.minecraftforge.common.ForgeMod;
 
 public class RayTraceUtil {
 
-  public static Iterable<Entity> filterEntities(Entity fromEntity, Vector3d scaledLook) {
+  public static List<Entity> filterEntities(Entity fromEntity, Vector3d scaledLook) {
     return fromEntity
         .getCommandSenderWorld()
         .getEntities(fromEntity,
@@ -172,8 +173,7 @@ public class RayTraceUtil {
     Vector3d end = start.add(scaledLook);
 
     Optional<BlockRayTraceResult> blockRayTraceResult =
-        rayTraceBlocksPiercing(start, distance, look,
-            fromEntity.getCommandSenderWorld());
+        rayTraceBlocksPiercing(start, distance, look, fromEntity.level);
 
     final double sqrDistance = blockRayTraceResult.isPresent()
         ? blockRayTraceResult.get().getLocation().distanceToSqr(start)

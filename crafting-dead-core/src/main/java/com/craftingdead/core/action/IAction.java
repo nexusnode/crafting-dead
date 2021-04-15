@@ -19,7 +19,7 @@
 package com.craftingdead.core.action;
 
 import java.util.Optional;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 
 public interface IAction {
 

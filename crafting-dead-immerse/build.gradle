@@ -1,31 +1,10 @@
 repositories {
-	mavenCentral()
-	maven {
-		name 'jitpack'
-		url 'https://jitpack.io' 
-	}
-	maven {
-      	url 'http://maven.ferenyr.info/artifactory/ourten'
-    }
+    mavenCentral()
     google()
-    maven {
-    	url 'https://maven.enginehub.org/repo'
-    }
-}
-
-jar {
-    manifest {
-        attributes([
-        	"Implementation-Title": project.name,
-        	"Implementation-Version": project.version,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": 'craftingdeadimmerse.mixins.json'
-        ])
-    }
 }
 
 mixin {
-	add sourceSets.main, "craftingdeadimmerse.refmap.json"
+    add sourceSets.main, 'craftingdeadimmerse.refmap.json'
 }
 
 minecraft {
@@ -33,12 +12,12 @@ minecraft {
 
     runs {
         client {
-        	taskName 'runImmerseClient'
-        
-            workingDirectory project.file('client')
+            taskName 'runImmerseClient'
+
+            workingDirectory project.file('run/client')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            
+
             args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
 
             mods {
@@ -52,13 +31,13 @@ minecraft {
         }
 
         server {
-        	taskName 'runImmerseServer'
-        
-            workingDirectory project.file('server')
+            taskName 'runImmerseServer'
+
+            workingDirectory project.file('run/server')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            
-            args '--mixin', 'craftingdeadimmerse.mixins.json'
+
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
 
             mods {
                 craftingdeadimmerse {
@@ -72,16 +51,28 @@ minecraft {
     }
 }
 
+def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
+
 dependencies {
     shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
-	compileOnly project(':crafting-dead-core')
-	shaded group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}"
-	shaded "org.lwjgl:lwjgl-yoga::${lwjgl_natives}"
+    compileOnly project(':crafting-dead-core')
+    shaded (group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
+        exclude group: 'org.lwjgl', module: 'lwjgl'
+    }
+    lwjgl_natives.each {
+        shaded ("org.lwjgl:lwjgl-yoga::${it}") {
+            exclude group: 'org.lwjgl', module: 'lwjgl'
+        }
+    }
 }
 
-eclipse {
-    classpath {
-    	// Temp hack - see https://github.com/eclipse/buildship/issues/939
-        plusConfigurations += [ configurations.compileOnly ]
-   	}
+jar {
+    manifest {
+        attributes([
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'MixinConfigs': 'craftingdeadimmerse.mixins.json'
+        ])
+    }
 }

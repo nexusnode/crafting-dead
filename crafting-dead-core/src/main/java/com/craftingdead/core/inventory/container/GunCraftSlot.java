@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.inventory.container;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import com.craftingdead.core.capability.ModCapabilities;
@@ -48,13 +49,15 @@ public class GunCraftSlot extends Slot {
 
   @Override
   public void set(ItemStack itemStack) {
-    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
-      gunController.getAttachments().forEach(attachment -> {
-        this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
-            new ItemStack(attachment));
-      });
+    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      gun.getAttachments().forEach(
+          attachment -> this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
+              new ItemStack(attachment)));
+      gun.setAttachments(Collections.emptySet());
+
       this.craftingInventory.setItem(CraftingInventorySlotType.PAINT.getIndex(),
-          gunController.getPaintStack());
+          gun.getPaintStack());
+      gun.setPaintStack(ItemStack.EMPTY);
     });
     super.set(itemStack);
   }

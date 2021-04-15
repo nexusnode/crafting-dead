@@ -21,7 +21,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.gun.IGun;
+import com.craftingdead.core.item.gun.IGun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;

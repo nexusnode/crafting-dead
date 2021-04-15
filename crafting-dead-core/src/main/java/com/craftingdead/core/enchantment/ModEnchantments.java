@@ -30,11 +30,8 @@ public class ModEnchantments {
   public static final DeferredRegister<Enchantment> ENCHANTMENTS =
       DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, CraftingDead.ID);
 
-  public static final RegistryObject<InfectionEnchantment> INFECTION = ENCHANTMENTS
-      .register("infection",
-          () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlotType.MAINHAND));
-  public static final RegistryObject<ArmorPenetrationEnchantment> ARMOR_PENETRATION = ENCHANTMENTS
-      .register("armor_penetration",
+  public static final RegistryObject<ArmorPenetrationEnchantment> ARMOR_PENETRATION =
+      ENCHANTMENTS.register("armor_penetration",
           () -> new ArmorPenetrationEnchantment(Enchantment.Rarity.COMMON,
               EquipmentSlotType.MAINHAND));
 }

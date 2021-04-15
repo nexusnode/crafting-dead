@@ -20,7 +20,7 @@ package com.craftingdead.core.event;
 
 import java.lang.reflect.Type;
 import com.craftingdead.core.action.IAction;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IGenericEvent;

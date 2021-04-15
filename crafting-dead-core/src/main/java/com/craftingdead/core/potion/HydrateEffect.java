@@ -20,7 +20,7 @@ package com.craftingdead.core.potion;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

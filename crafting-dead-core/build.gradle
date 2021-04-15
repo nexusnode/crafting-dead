@@ -6,7 +6,6 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
-    google()
 }
 
 dependencies {
@@ -37,7 +36,7 @@ minecraft {
         client {
             taskName 'runCoreClient'
  
-            workingDirectory project.file('client')
+            workingDirectory project.file('run/client')
 
             property 'forge.logging.console.level', 'debug'
             
@@ -53,7 +52,7 @@ minecraft {
         server {
             taskName 'runCoreServer'
         
-            workingDirectory project.file('server')
+            workingDirectory project.file('run/server')
 
             property 'forge.logging.console.level', 'debug'
             
@@ -69,7 +68,7 @@ minecraft {
         data {
             taskName 'runCoreData'
       
-            workingDirectory project.file('data')
+            workingDirectory project.file('run/data')
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'

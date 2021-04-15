@@ -127,9 +127,9 @@ public class EquipmentContainer extends Container {
   @Override
   public void removed(PlayerEntity playerEntity) {
     super.removed(playerEntity);
-    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
-      this.clearContainer(playerEntity, playerEntity.getCommandSenderWorld(), this.craftingInventory);
-      this.clearContainer(playerEntity, playerEntity.getCommandSenderWorld(), this.outputInventory);
+    if (!playerEntity.level.isClientSide()) {
+      this.clearContainer(playerEntity, playerEntity.level, this.craftingInventory);
+      this.clearContainer(playerEntity, playerEntity.level, this.outputInventory);
     }
   }
 
@@ -146,15 +146,16 @@ public class EquipmentContainer extends Container {
   }
 
   public boolean isCraftable() {
-    return this.getGunStack().getCapability(ModCapabilities.GUN).map(gunController -> {
-      for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
-        ItemStack itemStack = this.craftingInventory.getItem(i);
-        if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {
-          return false;
-        }
-      }
-      return true;
-    }).orElse(false);
+    return this.getGunStack().getCapability(ModCapabilities.GUN)
+        .map(gunController -> {
+          for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
+            ItemStack itemStack = this.craftingInventory.getItem(i);
+            if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {
+              return false;
+            }
+          }
+          return true;
+        }).orElse(false);
   }
 
   @Override

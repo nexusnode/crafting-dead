@@ -18,21 +18,13 @@
 
 package com.craftingdead.core;
 
-import java.util.ListIterator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.action.ActionTypes;
-import com.craftingdead.core.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.hydration.DefaultHydration;
-import com.craftingdead.core.capability.hydration.PresetHydration;
-import com.craftingdead.core.capability.living.ILiving;
-import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.living.LivingImpl;
-import com.craftingdead.core.capability.living.PlayerImpl;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.command.Commands;
 import com.craftingdead.core.data.ModItemTagsProvider;
@@ -40,18 +32,18 @@ import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.enchantment.ModEnchantments;
 import com.craftingdead.core.entity.ModEntityTypes;
-import com.craftingdead.core.entity.monster.AdvancedZombieEntity;
-import com.craftingdead.core.entity.monster.DoctorZombieEntity;
-import com.craftingdead.core.entity.monster.FastZombieEntity;
-import com.craftingdead.core.entity.monster.GiantZombieEntity;
-import com.craftingdead.core.entity.monster.PoliceZombieEntity;
-import com.craftingdead.core.entity.monster.TankZombieEntity;
-import com.craftingdead.core.entity.monster.WeakZombieEntity;
 import com.craftingdead.core.event.CombatPickupEvent;
-import com.craftingdead.core.inventory.CombatSlotType;
 import com.craftingdead.core.inventory.container.ModContainerTypes;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.combatslot.CombatSlotType;
 import com.craftingdead.core.item.crafting.ModRecipeSerializers;
+import com.craftingdead.core.item.gun.ammoprovider.AmmoProviderTypes;
+import com.craftingdead.core.item.hydration.DefaultHydration;
+import com.craftingdead.core.item.hydration.PresetHydration;
+import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.living.LivingImpl;
+import com.craftingdead.core.living.PlayerImpl;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncLivingMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
@@ -62,8 +54,6 @@ import com.craftingdead.core.util.ModSoundEvents;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -72,19 +62,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.data.ForgeBlockTagsProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -94,7 +83,6 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -109,7 +97,6 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -118,21 +105,21 @@ public class CraftingDead {
 
   public static final String VERSION;
 
-  public static final CommonConfig commonConfig;
-  public static final ForgeConfigSpec commonConfigSpec;
+  private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
+
+  public static final ServerConfig serverConfig;
+  public static final ForgeConfigSpec serverConfigSpec;
 
   static {
     VERSION = JarVersionLookupHandler
         .getImplementationVersion(CraftingDead.class)
         .orElse("[version]");
 
-    final Pair<CommonConfig, ForgeConfigSpec> commonConfigPair =
-        new ForgeConfigSpec.Builder().configure(CommonConfig::new);
-    commonConfigSpec = commonConfigPair.getRight();
-    commonConfig = commonConfigPair.getLeft();
+    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
+        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    serverConfigSpec = serverConfigPair.getRight();
+    serverConfig = serverConfigPair.getLeft();
   }
-
-  private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
 
   /**
    * Logger.
@@ -159,11 +146,8 @@ public class CraftingDead {
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
     modEventBus.addListener(this::handleGatherData);
-    modEventBus.addListener(this::handleEntityAttributeCreation);
 
-    ModEntityTypes.initialize();
-    modEventBus.addGenericListener(EntityType.class, ModEntityTypes::registerAll);
-
+    ModEntityTypes.ENTITY_TYPES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     ModContainerTypes.CONTAINERS.register(modEventBus);
@@ -171,11 +155,7 @@ public class CraftingDead {
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
-
-    ActionTypes.ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new);
     ActionTypes.ACTION_TYPES.register(modEventBus);
-
-    AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_types", RegistryBuilder::new);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
 
     // Should be registered after ITEMS registration
@@ -183,7 +163,7 @@ public class CraftingDead {
 
     MinecraftForge.EVENT_BUS.register(this);
 
-    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonConfigSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
   }
 
   public IModDist getModDist() {
@@ -212,19 +192,15 @@ public class CraftingDead {
   private void handleCommonSetup(FMLCommonSetupEvent event) {
     logger.info("Starting Crafting Dead, version {}", VERSION);
     NetworkChannel.loadChannels();
-    event.enqueueWork(() -> {
-      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
-          Ingredient.of(Tags.Items.DUSTS_REDSTONE),
-          new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
-      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
-          Ingredient.of(Items.ENCHANTED_GOLDEN_APPLE),
-          new ItemStack(ModItems.CURE_SYRINGE.get()));
-    });
-
     this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
     if (this.travelersBackpacksLoaded) {
       logger.info("Adding integration for " + TRAVELERS_BACKPACK_ID);
     }
+    event.enqueueWork(() -> {
+      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
+          Ingredient.of(Items.REDSTONE),
+          new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
+    });
   }
 
   private void handleGatherData(GatherDataEvent event) {
@@ -236,16 +212,6 @@ public class CraftingDead {
       dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
       dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
     }
-  }
-
-  private void handleEntityAttributeCreation(EntityAttributeCreationEvent event) {
-    event.put(ModEntityTypes.advancedZombie, AdvancedZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.doctorZombie, DoctorZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.fastZombie, FastZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.giantZombie, GiantZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.policeZombie, PoliceZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.tankZombie, TankZombieEntity.registerAttributes().build());
-    event.put(ModEntityTypes.weakZombie, WeakZombieEntity.registerAttributes().build());
   }
 
   // ================================================================================
@@ -271,28 +237,6 @@ public class CraftingDead {
             }
           }
         });
-  }
-
-  @SubscribeEvent
-  public void handleBiomeLoading(BiomeLoadingEvent event) {
-    ListIterator<MobSpawnInfo.Spawners> iterator =
-        event.getSpawns().getSpawner(EntityClassification.MONSTER).listIterator();
-    while (iterator.hasNext()) {
-      MobSpawnInfo.Spawners spawnEntry = iterator.next();
-      if (spawnEntry.type == EntityType.ZOMBIE) {
-        iterator.add(new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie,
-            spawnEntry.weight * 3, 2, 8));
-        iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.fastZombie, spawnEntry.weight / 2, 2, 4));
-        iterator
-            .add(new MobSpawnInfo.Spawners(ModEntityTypes.tankZombie, spawnEntry.weight / 2, 2,
-                4));
-        iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.advancedZombie, spawnEntry.weight, 3, 8));
-        iterator.add(
-            new MobSpawnInfo.Spawners(ModEntityTypes.weakZombie, spawnEntry.weight, 3, 12));
-      }
-    }
   }
 
   @SubscribeEvent
@@ -401,7 +345,7 @@ public class CraftingDead {
           ? new PlayerImpl<>((PlayerEntity) event.getObject())
           : new LivingImpl<>((LivingEntity) event.getObject());
       event.addCapability(ILiving.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
-          living, () -> ModCapabilities.LIVING));
+          LazyOptional.of(() -> living), () -> ModCapabilities.LIVING, CompoundNBT::new));
       living.load();
     }
   }
@@ -409,7 +353,7 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
     final Item item = event.getObject().getItem();
-    int hydration = -1;
+    final int hydration;
     if (item == Items.APPLE || item == Items.RABBIT_STEW) {
       hydration = 2;
     } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.HONEY_BOTTLE) {
@@ -422,14 +366,17 @@ public class CraftingDead {
       hydration = 5;
     } else if (item == Items.GOLDEN_CARROT) {
       hydration = 6;
+    } else {
+      hydration = -1;
     }
+
     if (hydration != -1) {
       event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-          new SimpleCapabilityProvider<>(new PresetHydration(hydration),
+          new SimpleCapabilityProvider<>(LazyOptional.of(() -> new PresetHydration(hydration)),
               () -> ModCapabilities.HYDRATION));
     } else if (item == Items.POTION) {
       event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-          new SimpleCapabilityProvider<>(new DefaultHydration(),
+          new SimpleCapabilityProvider<>(LazyOptional.of(DefaultHydration::new),
               () -> ModCapabilities.HYDRATION));
     }
   }

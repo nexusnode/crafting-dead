@@ -20,8 +20,8 @@ package com.craftingdead.core.entity.grenade;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.hat.IHat;
 import com.craftingdead.core.entity.ModEntityTypes;
+import com.craftingdead.core.hat.IHat;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.ModItems;
@@ -49,7 +49,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   }
 
   public FlashGrenadeEntity(LivingEntity thrower, World worldIn) {
-    super(ModEntityTypes.flashGrenade, thrower, worldIn);
+    super(ModEntityTypes.FLASH_GRENADE.get(), thrower, worldIn);
   }
 
   @Override

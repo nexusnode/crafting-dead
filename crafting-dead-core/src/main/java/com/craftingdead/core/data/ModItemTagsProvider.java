@@ -20,7 +20,7 @@ package com.craftingdead.core.data;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.tags.ModItemTags;
+import com.craftingdead.core.tag.ModItemTags;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;
@@ -36,8 +36,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
   @Override
   public void addTags() {
     this.tag(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
-        ModItems.SYRINGE.get(), ModItems.BLOOD_SYRINGE.get(), ModItems.RBI_SYRINGE.get(),
-        ModItems.CURE_SYRINGE.get());
+        ModItems.SYRINGE.get(), ModItems.BLOOD_SYRINGE.get());
     this.tag(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),
         ModItems.ARMY_DESERT_CLOTHING.get(), ModItems.ARMY_MEDIC_CLOTHING.get(),
         ModItems.BLUE_DUSK_CLOTHING.get(), ModItems.BUILDER_CLOTHING.get(),

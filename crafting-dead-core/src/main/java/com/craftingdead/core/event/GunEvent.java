@@ -21,11 +21,16 @@ package com.craftingdead.core.event;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.core.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.item.AttachmentItem;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.living.ILiving;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -47,18 +52,26 @@ public abstract class GunEvent extends Event {
     return itemStack;
   }
 
-  @Cancelable
-  public static class TriggerPressed extends GunEvent {
+  public static class Living extends GunEvent {
 
     private final ILiving<?, ?> living;
 
-    public TriggerPressed(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
+    public Living(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
       super(gun, itemStack);
+
       this.living = living;
     }
 
     public ILiving<?, ?> getLiving() {
       return living;
+    }
+  }
+
+  @Cancelable
+  public static class TriggerPressed extends Living {
+
+    public TriggerPressed(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
+      super(gun, itemStack, living);
     }
   }
 
@@ -86,6 +99,86 @@ public abstract class GunEvent extends Event {
 
     public Set<AttachmentItem> getAttachments() {
       return Collections.unmodifiableSet(this.attachments);
+    }
+  }
+
+
+
+  @Cancelable
+  public static class HitBlock extends Living {
+
+    private final Block block;
+    private final BlockPos blockPos;
+    private final World world;
+
+    public HitBlock(IGun gun, ItemStack itemStack, Block block, BlockPos blockPos,
+        ILiving<?, ?> living, World world) {
+      super(gun, itemStack, living);
+
+      this.block = block;
+      this.blockPos = blockPos;
+      this.world = world;
+    }
+
+    public Block getBlock() {
+      return block;
+    }
+
+    public BlockPos getBlockPos() {
+      return blockPos;
+    }
+
+    public World getWorld() {
+      return world;
+    }
+  }
+
+  @Cancelable
+  public static class HitEntity extends Living {
+
+    private final Entity target;
+    private final Vector3d hitPos;
+    private float damage;
+    private boolean headshot;
+
+    public HitEntity(
+        IGun gun,
+        ItemStack itemStack,
+        ILiving<?, ?> living,
+        Entity target,
+        float damage,
+        Vector3d hitPos,
+        boolean headshot) {
+      super(gun, itemStack, living);
+
+      this.target = target;
+      this.hitPos = hitPos;
+      this.damage = damage;
+      this.headshot = headshot;
+    }
+
+    public Entity getTarget() {
+      return target;
+    }
+
+    public Vector3d getHitPos() {
+      return hitPos;
+    }
+
+    public boolean isHeadshot() {
+      return headshot;
+    }
+
+    public void setHeadshot(boolean headshot) {
+      this.headshot = headshot;
+    }
+
+    public float getDamage() {
+      return damage;
+    }
+
+    public void setDamage(float damage) {
+      this.damage = damage;
     }
   }
 

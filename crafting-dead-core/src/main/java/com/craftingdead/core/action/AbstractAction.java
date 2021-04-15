@@ -20,7 +20,7 @@ package com.craftingdead.core.action;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;

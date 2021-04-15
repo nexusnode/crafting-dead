@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/fireman_hat",
       "textures": {
-        "base": "craftingdead:models/hats/fireman_hat"
+        "base": "craftingdead:hats/fireman_hat"
       },
       "transform": {
         "rotation": [0, 0, 0],

@@ -27,6 +27,7 @@ import com.craftingdead.core.action.reload.MagazineReloadAction;
 import com.craftingdead.core.action.reload.RefillableReloadAction;
 import com.craftingdead.core.item.ModItems;
 import com.craftingdead.core.potion.ModEffects;
+import com.craftingdead.core.tag.ModItemTags;
 import com.craftingdead.core.util.ModDamageSource;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
@@ -39,8 +40,11 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 public class ActionTypes {
 
@@ -48,10 +52,13 @@ public class ActionTypes {
   public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
       DeferredRegister.create((Class<ActionType<?>>) (Class<?>) ActionType.class, CraftingDead.ID);
 
-  public static final RegistryObject<ActionType<?>> MAGAZINE_RELOAD = ACTION_TYPES.register(
-      "magazine_reload",
-      () -> new ActionType<>((actionType, performer, target) -> new MagazineReloadAction(performer),
-          true));
+  public static final Lazy<IForgeRegistry<ActionType<?>>> REGISTRY =
+      Lazy.of(ACTION_TYPES.makeRegistry("action_types", RegistryBuilder::new));
+
+  public static final RegistryObject<ActionType<?>> MAGAZINE_RELOAD =
+      ACTION_TYPES.register("magazine_reload",
+          () -> new ActionType<>(
+              (actionType, performer, target) -> new MagazineReloadAction(performer), true));
 
   public static final RegistryObject<ActionType<?>> REFILLABLE_RELOAD =
       ACTION_TYPES.register("refillable_reload",
@@ -61,17 +68,6 @@ public class ActionTypes {
   public static final RegistryObject<ActionType<?>> REMOVE_MAGAZINE =
       ACTION_TYPES.register("remove_magazine", () -> new ActionType<>(
           (actionType, performer, target) -> new RemoveMagazineAction(performer), true));
-
-  public static final RegistryObject<ActionType<UseItemAction>> USE_CURE_SYRINGE =
-      ACTION_TYPES.register("use_cure_syringe", () -> new ActionType<>(
-          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
-              .setHeldItemPredicate(item -> item == ModItems.CURE_SYRINGE.get())
-              .setTotalDurationTicks(16)
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .setReturnItem(ModItems.SYRINGE)))
-              .build(),
-          false));
 
   public static final RegistryObject<ActionType<UseItemAction>> USE_CLEAN_RAG =
       ACTION_TYPES.register("use_clean_rag", () -> new ActionType<>(
@@ -109,10 +105,11 @@ public class ActionTypes {
                       EntityActionEntry.TargetSelector.OTHERS_ONLY.ofType(ZombieEntity.class))
                   .setCustomAction(Pair.of(
                       t -> t.getEntity().hurt(ModDamageSource.BLEEDING, 2.0F), 0.25F))
-                  .setReturnItem(ModItems.RBI_SYRINGE)))
+                  .setReturnItem(ModItemTags.VIRUS_SYRINGE.getValues().get(0))),
+                  () -> !ModItemTags.VIRUS_SYRINGE.getValues().isEmpty())
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
                   .setTargetSelector((p, t) -> {
-                    if (t == null) {
+                    if (t == null || p == t) {
                       return null;
                     }
                     LivingEntity targetEntity = t.getEntity();
@@ -136,18 +133,6 @@ public class ActionTypes {
               .build(),
           false));
 
-  public static final RegistryObject<ActionType<UseItemAction>> USE_RBI_SYRINGE =
-      ACTION_TYPES.register("use_rbi_syringe", () -> new ActionType<>(
-          (actionType, performer, target) -> UseItemAction.builder(actionType, performer, target)
-              .setHeldItemPredicate(item -> item == ModItems.RBI_SYRINGE.get())
-              .setTotalDurationTicks(16)
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .addEffect(Pair.of(new EffectInstance(ModEffects.INFECTION.get(), 9999999), 1.0F))
-                  .setReturnItem(ModItems.SYRINGE)))
-              .build(),
-          false));
-
   public static final RegistryObject<ActionType<UseItemAction>> USE_FIRST_AID_KIT =
       ACTION_TYPES.register("use_first_aid_kit", () -> new ActionType<>(
           (actionType, performer, target) -> UseItemAction
@@ -167,10 +152,11 @@ public class ActionTypes {
               .setHeldItemPredicate(item -> item == ModItems.ADRENALINE_SYRINGE.get())
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
+                  .setReturnItemInCreative(false)
                   .addEffect(
-                      Pair.of(new EffectInstance(ModEffects.ADRENALINE.get(), (20 * 20), 1),
-                          1.0F))))
+                      Pair.of(new EffectInstance(ModEffects.ADRENALINE.get(), 20 * 20, 1), 1.0F))))
               .build(),
           false));
 
@@ -180,6 +166,7 @@ public class ActionTypes {
               .setHeldItemPredicate(item -> item == ModItems.BLOOD_SYRINGE.get())
               .setTotalDurationTicks(16)
               .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
                   .addEffect(Pair.of(new EffectInstance(Effects.HEAL, 1, 0), 1.0F))))

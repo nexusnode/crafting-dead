@@ -21,12 +21,14 @@ package com.craftingdead.core.data;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.tag.ModItemTags;
 import com.craftingdead.core.world.storage.loot.ModLootTables;
 import net.minecraft.loot.BinomialRange;
 import net.minecraft.loot.ConstantRange;
 import net.minecraft.loot.ItemLootEntry;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.TagLootEntry;
 import net.minecraft.loot.functions.SetCount;
 import net.minecraft.util.ResourceLocation;
 
@@ -46,10 +48,8 @@ public class ModChestLootTables
                 .apply(SetCount.setCount(BinomialRange.binomial(6, 0.12F))))
             .add(ItemLootEntry.lootTableItem(ModItems.ADRENALINE_SYRINGE.get())
                 .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.CURE_SYRINGE.get())
+            .add(TagLootEntry.expandTag(ModItemTags.SYRINGES)
                 .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.RBI_SYRINGE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
             .add(ItemLootEntry.lootTableItem(ModItems.SPLINT.get())
                 .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
             .add(ItemLootEntry.lootTableItem(ModItems.ARMY_MEDIC_CLOTHING.get())

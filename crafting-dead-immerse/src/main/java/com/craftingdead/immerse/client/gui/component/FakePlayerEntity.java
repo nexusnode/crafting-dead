@@ -30,7 +30,7 @@ import net.minecraft.world.GameType;
 public class FakePlayerEntity extends AbstractClientPlayerEntity {
 
   public FakePlayerEntity(GameProfile gameProfile) {
-    super(FakeWorld.getInstance(), gameProfile);
+    super(FakeLevel.getInstance(), gameProfile);
   }
 
   @Override

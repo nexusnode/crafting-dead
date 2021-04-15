@@ -24,10 +24,10 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.capability.storage.DefaultStorage;
-import com.craftingdead.core.capability.storage.IStorage;
 import com.craftingdead.core.inventory.InventorySlotType;
 import com.craftingdead.core.inventory.container.GenericContainer;
+import com.craftingdead.core.storage.DefaultStorage;
+import com.craftingdead.core.storage.IStorage;
 import com.craftingdead.core.util.Text;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.util.ITooltipFlag;
@@ -40,6 +40,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class StorageItem extends Item {
@@ -49,17 +51,18 @@ public class StorageItem extends Item {
   public static final Supplier<IStorage> VEST =
       () -> new DefaultStorage(2 * 9, InventorySlotType.VEST, GenericContainer::createVest);
 
-  private final Supplier<IStorage> storageContainer;
+  private final NonNullSupplier<IStorage> storageContainer;
 
-  public StorageItem(Supplier<IStorage> storageContainer, Properties properties) {
+  public StorageItem(NonNullSupplier<IStorage> storageContainer, Properties properties) {
     super(properties);
     this.storageContainer = storageContainer;
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(this.storageContainer.get(), ImmutableSet
-        .of(() -> ModCapabilities.STORAGE, () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY));
+    return new SerializableCapabilityProvider<>(LazyOptional.of(this.storageContainer), ImmutableSet
+        .of(() -> ModCapabilities.STORAGE, () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
+        CompoundNBT::new);
   }
 
   @Override

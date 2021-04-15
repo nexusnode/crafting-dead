@@ -20,7 +20,6 @@ package com.craftingdead.immerse.game;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.util.Text;
-import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -33,8 +32,8 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class GameType extends ForgeRegistryEntry<GameType> {
 
   public final static Codec<GameType> CODEC =
-      ResourceLocation.CODEC.xmap(registryName -> CraftingDeadImmerse.getInstance()
-          .getGameTypeRegistry().getValue(registryName), GameType::getRegistryName);
+      ResourceLocation.CODEC.xmap(registryName -> GameTypes.REGISTRY.get().getValue(registryName),
+          GameType::getRegistryName);
 
   private final Codec<? extends IGameServer> gameServerCodec;
   private final Supplier<SafeCallable<IGameClient>> gameClientFactory;

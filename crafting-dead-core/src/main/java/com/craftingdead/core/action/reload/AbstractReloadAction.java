@@ -22,11 +22,10 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.action.ActionType;
 import com.craftingdead.core.action.TimedAction;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.animationprovider.gun.AnimationType;
-import com.craftingdead.core.capability.animationprovider.gun.GunAnimationController;
-import com.craftingdead.core.capability.animationprovider.gun.reload.GunAnimationReload;
-import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.item.animation.gun.AnimationType;
+import com.craftingdead.core.item.animation.gun.reload.GunAnimationReload;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
@@ -90,8 +89,7 @@ public abstract class AbstractReloadAction extends TimedAction {
         .map(animation -> (GunAnimationReload) animation)
         .ifPresent(animation -> {
           animation.setEjectingClip(unload);
-          this.gun.getClient()
-              .getAnimationController().ifPresent(c -> c.addAnimation(animation, callback));
+          this.gun.getClient().getAnimationController().addAnimation(animation, callback);
         });
   }
 
@@ -123,8 +121,7 @@ public abstract class AbstractReloadAction extends TimedAction {
         Minecraft.getInstance().getSoundManager()
             .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
       }
-      this.gun.getClient().getAnimationController()
-          .ifPresent(GunAnimationController::removeCurrentAnimation);
+      this.gun.getClient().getAnimationController().removeCurrentAnimation();
     }
 
     // Revert all changes as we've been cancelled

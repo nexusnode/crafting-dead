@@ -23,10 +23,12 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class HitMessage {
 
@@ -56,11 +58,16 @@ public class HitMessage {
         ClientDist clientDist = CraftingDead.getInstance().getClientDist();
         ClientDist.clientConfig.hitMarkerMode.get().createHitMarker(msg.hitPos, msg.dead)
             .ifPresent(clientDist.getIngameGui()::displayHitMarker);
-        if (msg.dead && ClientDist.clientConfig.playKillSound.get()) {
+        if (msg.dead && ClientDist.clientConfig.killSoundEnabled.get()) {
           // Plays a sound that follows the player
           PlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
-          playerEntity.getCommandSenderWorld().playSound(clientDist.getExpectedPlayer().getEntity(),
-              playerEntity, SoundEvents.TRIDENT_RETURN, SoundCategory.HOSTILE, 5.0F, 1.5F);
+          SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS
+              .getValue(new ResourceLocation(ClientDist.clientConfig.killSound.get()));
+          if (soundEvent != null) {
+            playerEntity.getCommandSenderWorld().playSound(
+                clientDist.getExpectedPlayer().getEntity(), playerEntity, soundEvent,
+                SoundCategory.HOSTILE, 5.0F, 1.5F);
+          }
         }
       });
     }

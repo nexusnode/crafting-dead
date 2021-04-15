@@ -19,19 +19,19 @@
 package com.craftingdead.core.data;
 
 import java.util.function.Consumer;
-
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.item.ModItems;
-import com.google.gson.JsonObject;
-import net.minecraft.data.*;
+import com.craftingdead.core.item.crafting.ModRecipeSerializers;
+import net.minecraft.data.CustomRecipeBuilder;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.data.RecipeProvider;
+import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
-
-import javax.annotation.Nullable;
 
 public class ModRecipeProvider extends RecipeProvider {
 
@@ -41,42 +41,10 @@ public class ModRecipeProvider extends RecipeProvider {
 
   @Override
   protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
-    consumer.accept(new IFinishedRecipe() {
-
-      @Override
-      public JsonObject serializeRecipe() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("type", getId().toString());
-        return jsonObject;
-      }
-
-      @Override
-      public void serializeRecipeData(JsonObject json) {
-
-      }
-
-      @Override
-      public ResourceLocation getId() {
-        return new ResourceLocation(CraftingDead.ID, "upgrade_magazine");
-      }
-
-      @Override
-      public IRecipeSerializer<?> getType() {
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public JsonObject serializeAdvancement() {
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public ResourceLocation getAdvancementId() {
-        return null;
-      }
-    });
+    CustomRecipeBuilder.special(ModRecipeSerializers.UPGRADE_MAGAZINE.get())
+        .save(consumer, CraftingDead.ID + ":upgrade_magazine");
+    CustomRecipeBuilder.special(ModRecipeSerializers.DUPLICATE_MAGAZINE.get())
+        .save(consumer, CraftingDead.ID + ":duplicate_magazine");
 
     // ================================================================================
     // Attachments

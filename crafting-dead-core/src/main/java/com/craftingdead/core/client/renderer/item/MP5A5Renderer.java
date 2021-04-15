@@ -19,11 +19,12 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,7 +39,7 @@ public class MP5A5Renderer extends GunRenderer {
   private final Model ironSight2 = new ModelPistolIS2();
 
   public MP5A5Renderer() {
-    super(ModItems.MP5A5);
+    super(ModItems.MP5A5.getId(), GunTypes.MP5A5);
   }
 
   @Override
@@ -132,7 +133,8 @@ public class MP5A5Renderer extends GunRenderer {
       matrixStack.mulPose(Vector3f.YP.rotationDegrees(180));
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight1.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/g18_is1.png")));
-      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight1.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();
@@ -147,7 +149,8 @@ public class MP5A5Renderer extends GunRenderer {
       matrixStack.scale(scale, scale + 0.5F, scale);
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight2.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/m1911_is2.png")));
-      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight2.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();

@@ -22,12 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.action.ActionType;
 import com.craftingdead.core.action.TimedAction;
-import com.craftingdead.core.capability.living.ILiving;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -108,13 +109,11 @@ public class UseItemAction extends TimedAction {
     boolean finished = super.tick();
     final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
 
-    final boolean usingItem;
-    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
+    boolean usingItem = true;
+    if (this.performer.getEntity().level.isClientSide()) {
       ClientDist clientDist = CraftingDead.getInstance().getClientDist();
       usingItem =
-          clientDist.isLocalPlayer(this.performer.getEntity()) && clientDist.isRightMouseDown();
-    } else {
-      usingItem = true;
+          !clientDist.isLocalPlayer(this.performer.getEntity()) || clientDist.isRightMouseDown();
     }
 
     if (!this.selectedEntry.canPerform(this.performer, this.target, heldStack) || !usingItem) {
@@ -153,7 +152,11 @@ public class UseItemAction extends TimedAction {
     }
 
     public Builder addEntry(IActionEntry entry) {
-      if (!this.entries.contains(entry)) {
+      return this.addEntry(entry, () -> true);
+    }
+
+    public Builder addEntry(IActionEntry entry, Supplier<Boolean> condition) {
+      if (condition.get() && !this.entries.contains(entry)) {
         this.entries.add(entry);
       }
       return this;

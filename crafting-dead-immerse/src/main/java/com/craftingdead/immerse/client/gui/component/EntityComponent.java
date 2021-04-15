@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Arrays;
+import com.craftingdead.core.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.noties.tumbleweed.TweenType;
@@ -50,7 +51,7 @@ public class EntityComponent extends Component<EntityComponent> {
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-    this.minecraft.getEntityRenderDispatcher().prepare(FakeWorld.getInstance(),
+    this.minecraft.getEntityRenderDispatcher().prepare(FakeLevel.getInstance(),
         this.minecraft.gameRenderer.getMainCamera(), null);
     matrixStack.pushPose();
     {
@@ -86,8 +87,7 @@ public class EntityComponent extends Component<EntityComponent> {
           this.minecraft.renderBuffers().bufferSource();
 
       RenderSystem.runAsFancy(() -> entityRendererManager.render(this.livingEntity, 0.0D, 0.0D,
-          0.0D, 0.0F, 1.0F, matrixStack,
-          renderTypeBufferImpl, 0xF000F0));
+          0.0D, 0.0F, 1.0F, matrixStack, renderTypeBufferImpl, RenderUtil.FULL_LIGHT));
 
       renderTypeBufferImpl.endBatch();
       entityRendererManager.setRenderShadow(false);

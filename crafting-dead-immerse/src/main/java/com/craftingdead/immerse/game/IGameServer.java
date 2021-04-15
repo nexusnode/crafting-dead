@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game;
 
 import java.util.Optional;
-import com.craftingdead.core.capability.living.IPlayer;
+import com.craftingdead.core.living.IPlayer;
 import com.mojang.serialization.Codec;
 import net.minecraft.entity.player.ServerPlayerEntity;
 

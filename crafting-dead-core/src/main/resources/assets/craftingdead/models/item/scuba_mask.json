@@ -11,7 +11,7 @@
     "head": {
       "parent": "craftingdead:hats/scuba_mask",
       "textures": {
-        "base": "craftingdead:models/hats/scuba_mask"
+        "base": "craftingdead:hats/scuba_mask"
       },
       "transform": {
         "rotation": [0, 90, 0],

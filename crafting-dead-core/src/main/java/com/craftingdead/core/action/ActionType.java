@@ -19,7 +19,7 @@
 package com.craftingdead.core.action;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.living.ILiving;
+import com.craftingdead.core.living.ILiving;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class ActionType<T extends IAction> extends ForgeRegistryEntry<ActionType<?>> {

@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.ammoprovider.IAmmoProvider;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.gun.IGun;
-import com.craftingdead.core.capability.living.IPlayer;
-import com.craftingdead.core.capability.magazine.IMagazine;
-import com.craftingdead.core.capability.scope.IScope;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.item.GrenadeItem;
 import com.craftingdead.core.item.GunItem;
+import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.item.gun.magazine.IMagazine;
+import com.craftingdead.core.item.scope.IScope;
+import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.util.KillFeedEntry;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -204,7 +204,8 @@ public class IngameGui {
       }
 
       // Only render when air level is not being rendered
-      if (!playerEntity.isEyeInFluid(FluidTags.WATER)
+      if (CraftingDead.serverConfig.hydrationEnabled.get()
+          && !playerEntity.isEyeInFluid(FluidTags.WATER)
           && playerEntity.getAirSupply() == playerEntity.getMaxAirSupply()) {
         renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
             RenderUtil.ICONS);

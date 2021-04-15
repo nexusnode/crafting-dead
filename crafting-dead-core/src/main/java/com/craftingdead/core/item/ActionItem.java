@@ -18,28 +18,34 @@
 
 package com.craftingdead.core.item;
 
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import com.craftingdead.core.action.ActionType;
+import com.craftingdead.core.action.IAction;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.capability.actionprovider.IActionProvider;
+import com.craftingdead.core.living.ILiving;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ActionItem extends Item {
 
-  private final IActionProvider actionProvider;
+  @Nullable
+  private final BiFunction<ILiving<?, ?>, BlockPos, IAction> blockActionFactory;
+  @Nullable
+  private final BiFunction<ILiving<?, ?>, ILiving<?, ?>, IAction> entityActionFactory;
 
-  public ActionItem(Properties properties, IActionProvider actionProvider) {
+  public ActionItem(Properties properties) {
     super(properties);
-    this.actionProvider = actionProvider;
+    this.blockActionFactory = properties.blockActionFactory;
+    this.entityActionFactory = properties.entityActionFactory;
   }
 
   @Override
@@ -60,20 +66,40 @@ public class ActionItem extends Item {
     return new ActionResult<>(ActionResultType.PASS, playerEntity.getItemInHand(hand));
   }
 
-  private void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
-    if (this.actionProvider != null) {
+  public void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
+    if (this.entityActionFactory != null) {
       performerEntity.getCapability(ModCapabilities.LIVING)
-          .ifPresent(performer -> this.actionProvider
-              .getEntityAction(performer,
-                  targetEntity == null ? null
-                      : targetEntity.getCapability(ModCapabilities.LIVING).orElse(null))
-              .ifPresent(action -> performer.performAction(action, false, true)));
+          .ifPresent(performer -> performer.performAction(
+              this.entityActionFactory.apply(performer, targetEntity == null
+                  ? null
+                  : targetEntity.getCapability(ModCapabilities.LIVING).orElse(null)),
+              false, true));
     }
   }
 
-  @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(this.actionProvider,
-        () -> ModCapabilities.ACTION_PROVIDER);
+  public static class Properties extends Item.Properties {
+
+    @Nullable
+    private BiFunction<ILiving<?, ?>, BlockPos, IAction> blockActionFactory;
+    @Nullable
+    private BiFunction<ILiving<?, ?>, ILiving<?, ?>, IAction> entityActionFactory;
+
+    public Properties setAction(Supplier<? extends ActionType<?>> actionType) {
+      // Can't use method reference because don't want to resolve the supplier too early.
+      this.entityActionFactory =
+          (performer, target) -> actionType.get().createAction(performer, target);
+      return this;
+    }
+
+    public Properties setBlockFactory(BiFunction<ILiving<?, ?>, BlockPos, IAction> blockFactory) {
+      this.blockActionFactory = blockFactory;
+      return this;
+    }
+
+    public Properties setEntityFactory(
+        BiFunction<ILiving<?, ?>, ILiving<?, ?>, IAction> entityFactory) {
+      this.entityActionFactory = entityFactory;
+      return this;
+    }
   }
 }

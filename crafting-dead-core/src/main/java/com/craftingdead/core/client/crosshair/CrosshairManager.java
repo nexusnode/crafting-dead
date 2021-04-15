@@ -18,34 +18,33 @@
 
 package com.craftingdead.core.client.crosshair;
 
-import com.craftingdead.core.CraftingDead;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.CraftingDead;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Crosshair>> {
 
   public static final ResourceLocation DEFAULT_CROSSHAIR =
       new ResourceLocation(CraftingDead.ID, "standard");
 
-  private static final Gson GSON = new GsonBuilder()
-      .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer()).create();
+  private static final Gson gson = new Gson();
 
-  private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger logger = LogManager.getLogger();
 
-  private final Map<ResourceLocation, Crosshair> loadedCrosshairs = Maps.newHashMap();
+  private final Map<ResourceLocation, Crosshair> loadedCrosshairs = new HashMap<>();
 
   public Crosshair getCrosshair(ResourceLocation crosshairLocation) {
     Crosshair crosshair = this.loadedCrosshairs.get(crosshairLocation);
@@ -55,27 +54,27 @@ public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Cross
   @Override
   protected Map<ResourceLocation, Crosshair> prepare(IResourceManager resourceManager,
       IProfiler profiler) {
-    Map<ResourceLocation, Crosshair> allCrosshairs = Maps.newHashMap();
+    ImmutableMap.Builder<ResourceLocation, Crosshair> crosshairs = ImmutableMap.builder();
     for (String domain : resourceManager.getNamespaces()) {
+      ResourceLocation fileLocation = new ResourceLocation(domain, "crosshairs.json");
       try {
-        resourceManager.getResources(new ResourceLocation(domain, "crosshairs.json"))
+        resourceManager.getResources(fileLocation)
             .forEach((resource) -> {
-              try (InputStream input = resource.getInputStream()) {
-                Crosshair[] crosshairs = JSONUtils.fromJson(GSON,
-                    new InputStreamReader(input, StandardCharsets.UTF_8), Crosshair[].class);
-                for (Crosshair crosshair : crosshairs) {
-                  allCrosshairs.put(crosshair.getName(), crosshair);
-                }
+              try (InputStreamReader reader = new InputStreamReader(resource.getInputStream())) {
+                Codec.list(Crosshair.CODEC)
+                    .parse(JsonOps.INSTANCE, gson.fromJson(reader, JsonElement.class))
+                    .getOrThrow(false, message -> logger.warn("Failed to parse {} Reason: ",
+                        fileLocation.toString(), message))
+                    .forEach(crosshair -> crosshairs.put(crosshair.getName(), crosshair));
               } catch (IOException e) {
-                LOGGER.warn("Invalid crosshairs.json in resourcepack: '{}'", resource.getSourceName(),
-                    e);
+                logger.warn("Failed to read {}", fileLocation.toString(), e);
               }
             });
       } catch (IOException e) {
         ;
       }
     }
-    return allCrosshairs;
+    return crosshairs.build();
   }
 
   @Override

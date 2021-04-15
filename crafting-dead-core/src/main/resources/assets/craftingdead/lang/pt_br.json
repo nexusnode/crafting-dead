@@ -1,7 +1,6 @@
 {
   "enchantment.craftingdead.explosion":"Explosão",
   "enchantment.craftingdead.incendiary":"Incendiário",
-  "enchantment.craftingdead.infection":"Infecção",
 
   "message.switch_fire_mode":"Trocado para %s",
   
@@ -15,21 +14,13 @@
   "tutorial.open_equipment_menu.title":"Abra o menu do Crafting Dead",
   "death.attack.bullet": "%1$s foi baleado",
   "death.attack.bullet.headshot": "%1$s foi baleado na cabeça",
-  "options.craftingdead.client": "Cliente",
-  "options.craftingdead.client.apply_branding": "Aplicar Marca",
-  "options.craftingdead.client.enable_discord_rpc": "Habilitar Discord RPC",
+
   "options.craftingdead.client.display_blood": "Mostrar Sangue",
+
   "effect.craftingdead.broken_leg": "Perna Quebrada",
   "effect.craftingdead.dehydration": "Desidratação",
   "effect.craftingdead.bleeding":"Sangramento",
-  "effect.craftingdead.infected":"Infectado",
-  "entity.craftingdead.advanced_zombie": "Zumbi Avançado",
-  "entity.craftingdead.fast_zombie": "Zumbi Rápido",
-  "entity.craftingdead.tank_zombie": "Zumbi Tanque",
-  "entity.craftingdead.weak_zombie": "Zumbi Fraco",
-  "entity.craftingdead.police_zombie": "Zumbi Policial",
-  "entity.craftingdead.doctor_zombie": "Zumbi Médico",
-  "entity.craftingdead.giant_zombie": "Zumbi Gigante",
+
   "entity.craftingdead.supply_drop": "Caixa de Suprimentos",
   "entity.craftingdead.c4_explosive": "Explosivo C4",
   "entity.craftingdead.decoy_grenade": "Granada de Som",
@@ -40,16 +31,15 @@
   "entity.craftingdead.smoke_grenade": "Granada de Fumaça",
   "message.broken_leg": "Ai! Você quebrou sua perna.",
   "message.bleeding": "Você está sangrando!",
-  "message.infected": "Você foi infectado com RBI.",
-  "itemGroup.craftingdead.clothing": "Crafting Dead: Roupas",
-  "itemGroup.craftingdead.misc": "Crafting Dead: Miscelânea",
-  "itemGroup.craftingdead.med": "Crafting Dead: Medicamentos",
-  "itemGroup.craftingdead.combat": "Crafting Dead: Combate",
+
+  "itemGroup.craftingdead.cosmetics": "Crafting Dead Roupas",
+  "itemGroup.craftingdead.misc": "Crafting Dead Miscelânea",
+  "itemGroup.craftingdead.medical": "Crafting Dead Medicamentos",
+  "itemGroup.craftingdead.combat": "Crafting Dead Combate",
+
   "item.craftingdead.first_aid_kit": "Kit de Primeiros Socorros",
   "item.craftingdead.adrenaline_syringe": "Seringa de Adrenalina",
   "item.craftingdead.syringe": "Seringa Vazia",
-  "item.craftingdead.rbi_syringe": "Seringa RBI",
-  "item.craftingdead.cure_syringe": "Seringa de Cura da RBI",
   "item.craftingdead.dirty_rag": "Tecido Sujo",
   "item.craftingdead.bloody_rag": "Tecido Ensanguentado",
   "item.craftingdead.clean_rag": "Tecido Limpo",
@@ -85,11 +75,6 @@
   "item.craftingdead.bandage": "Bandagem",
   "item.craftingdead.splint": "Tala Improvisada",
 
-  "item.craftingdead.advanced_zombie_spawn_egg": "Ovo gerador de Zumbi Avançado",
-  "item.craftingdead.fast_zombie_spawn_egg": "Ovo gerador de Zumbi Rápido",
-  "item.craftingdead.tank_zombie_spawn_egg": "Ovo gerador de Zumbi Tanque",
-  "item.craftingdead.weak_zombie_spawn_egg": "Ovo gerador de Zumbi Fraco",  "item.craftingdead.police_zombie_spawn_egg": "Ovo gerador de Zumbi Policial",
-  "item.craftingdead.doctor_zombie_spawn_egg": "Ovo gerador de Zumbi Médico",
   "item.craftingdead.contractor_clothing": "Roupa Contractor",
   "item.craftingdead.ddpat_clothing": "Roupa da Marinha DDPAT",
   "item.craftingdead.scuba_clothing": "Roupa de Mergulho",
@@ -213,9 +198,6 @@
   "item.craftingdead.lovelace_paint": "Tinta Lovelace",
 
   "item.craftingdead.stanag_20_round_magazine": "Pente STANAG x20",
-  "item.craftingdead.explosive_stanag_20_round_magazine":"Pente STANAG Explosivo x20",
-  "item.craftingdead.incendiary_stanag_20_round_magazine":"Pente STANAG Incendiário x20",
-  "item.craftingdead.infected_stanag_20_round_magazine":"Pente STANAG Infectado x20",
   "item.craftingdead.stanag_30_round_magazine": "Pente STANAG x30",
   "item.craftingdead.stanag_drum_magazine": "Tambor STANAG",
   "item.craftingdead.stanag_box_magazine": "Caixa STANAG",

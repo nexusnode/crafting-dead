@@ -19,10 +19,11 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.gun.IGun;
 import com.craftingdead.core.client.renderer.item.model.ModelScarhIS2;
 import com.craftingdead.core.item.AttachmentItem;
 import com.craftingdead.core.item.ModItems;
+import com.craftingdead.core.item.gun.GunTypes;
+import com.craftingdead.core.item.gun.IGun;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -36,7 +37,7 @@ public class TrenchgunRenderer extends GunRenderer {
   private final Model ironSight = new ModelScarhIS2();
 
   public TrenchgunRenderer() {
-    super(ModItems.TRENCHGUN);
+    super(ModItems.TRENCHGUN.getId(), GunTypes.TRENCHGUN);
   }
 
   @Override
@@ -121,7 +122,8 @@ public class TrenchgunRenderer extends GunRenderer {
 
       IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(this.ironSight.renderType(
           new ResourceLocation(CraftingDead.ID, "textures/attachment/scarh_is2.png")));
-      this.ironSight.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F, 1.0F,
+      this.ironSight.renderToBuffer(matrixStack, vertexBuilder, packedLight, packedOverlay, 1.0F,
+          1.0F,
           1.0F, 1.0F);
     }
     matrixStack.popPose();
