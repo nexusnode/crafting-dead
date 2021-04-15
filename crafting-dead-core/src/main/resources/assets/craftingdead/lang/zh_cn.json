@@ -1,37 +1,37 @@
 {
   "container.equipment": "设备",
   "enchantment.craftingdead.armor_penetration": "护甲穿透",
-  "enchantment.craftingdead.infection": "尸毒",
-
+  
   "key.reload": "装填弹药",
   "key.remove_magazine": "移除弹夹",
   "key.toggle_fire_mode": "喷火模式",
   "key.equipment_menu":"打开/关闭设备菜单",
   "key.toggle_combat_mode":"切换战斗模式",												
-
+  
   "tutorial.open_equipment_menu.title":"打开设备菜单",
-
+  "tutorial.open_equipment_menu.description": "按 %s",
+  
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
-
-  "options.craftingdead.client": "客户端",
+  "death.attack.dehydration":"%1$s died of dehydration",
+  "death.attack.bleeding":"%1$s bled to death",
+  
   "options.craftingdead.client.display_blood": "显示血液",
   "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
-  "options.craftingdead.client.play_kill_sound": "砍杀声音",
+  "options.craftingdead.client.play_kill_sound": "砍杀声音已启用",
+  "options.craftingdead.client.crosshair": "十字准星",
+  "options.craftingdead.client.kill_sound": "击杀音效",
 
+  "options.craftingdead.server.hydration_enabled":"水化已启用",
+  "options.craftingdead.server.broken_legs_enabled":"骨折已启用",
+  "options.craftingdead.server.bleeding_enabled":"流血已启用",
   "effect.craftingdead.broken_leg": "骨折",
   "effect.craftingdead.dehydration": "脱水",
   "effect.craftingdead.bleeding":"流血",
   "effect.craftingdead.infection":"尸毒",
   "effect.craftingdead.adrenaline":"肾上腺素",
-
-  "entity.craftingdead.advanced_zombie": "高级丧尸",
-  "entity.craftingdead.fast_zombie": "快速丧尸",
-  "entity.craftingdead.tank_zombie": "坦克丧尸",
-  "entity.craftingdead.weak_zombie": "柔弱丧尸",
-  "entity.craftingdead.police_zombie": "警察丧尸",
-  "entity.craftingdead.doctor_zombie": "医生丧尸",
-  "entity.craftingdead.giant_zombie": "巨型丧尸",
+  "effect.craftingdead.flash_blindness":"闪光失明",
+  
   "entity.craftingdead.supply_drop": "空投物品",
   "entity.craftingdead.c4_explosive": "C4炸药",
   "entity.craftingdead.decoy_grenade": "诱饵弹",
@@ -44,7 +44,6 @@
   "message.switch_fire_mode": "切换到%s",
   "message.broken_leg": "你骨折了.",
   "message.bleeding": "你流血了!",
-  "message.infected": "你已被丧尸病毒感染.",
   "message.low_health": "%1$s的生命值很低!",
   
   "fire_mode.auto":"自动模式",
@@ -59,20 +58,18 @@
   "action.craftingdead.magazine_reload.message":"上弹中",
   "action.craftingdead.refillable_reload.message":"上弹中",
   "action.craftingdead.remove_magazine.message":"移除弹夹",
-  "action.craftingdead.use_cure_syringe.message":"注射丧尸病毒解药",
   "action.craftingdead.use_clean_rag.message":"包扎",
   "action.craftingdead.use_splint.message":"使用夹板",
   "action.craftingdead.use_syringe.message":"抽出液体",
-  "action.craftingdead.use_rbi_syringe.message":"注射丧尸病毒",
   "action.craftingdead.use_first_aid_kit.message":"治疗中",
   "action.craftingdead.use_adrenaline_syringe.message":"注射肾上腺素",
   "action.craftingdead.use_blood_syringe.message":"输血中",
   "action.craftingdead.use_bandage.message":"使用绷带",
   "action.craftingdead.wash_rag.message":"清洗绷带",
-
-  "itemGroup.craftingdead.clothing": "行尸走肉 衣物",
+ 
+  "itemGroup.craftingdead.cosmetics": "行尸走肉 衣物",
   "itemGroup.craftingdead.misc": "行尸走肉 杂项",
-  "itemGroup.craftingdead.med": "行尸走肉 药品",
+  "itemGroup.craftingdead.medical": "行尸走肉 药品",
   "itemGroup.craftingdead.combat": "行尸走肉 战斗物品",
 
   "item.craftingdead.vulcan_paint": "火神喷漆",
@@ -215,18 +212,9 @@
   "item.craftingdead.bandage": "绷带",
   "item.craftingdead.clean_rag": "干净的破布",
   "item.craftingdead.syringe": "空注射器",
-  "item.craftingdead.rbi_syringe": "带有尸毒的针",
   "item.craftingdead.splint": "夹板",
-  "item.craftingdead.cure_syringe": "治疗尸毒的药剂",
   "item.craftingdead.dirty_rag": "脏破布",
   "item.craftingdead.bloody_rag": "带血的破布",
-
-  "item.craftingdead.advanced_zombie_spawn_egg": "生成 高级丧尸",
-  "item.craftingdead.fast_zombie_spawn_egg": "生成 快速丧尸",
-  "item.craftingdead.tank_zombie_spawn_egg": "生成 坦克丧尸",
-  "item.craftingdead.weak_zombie_spawn_egg": "生成 柔弱丧尸",
-  "item.craftingdead.police_zombie_spawn_egg": "生成 警察丧尸",
-  "item.craftingdead.doctor_zombie_spawn_egg": "生成 医生丧尸",
 
   "item.craftingdead.contractor_clothing": "忍者神龟服装",
   "item.craftingdead.ddpat_clothing": "海军服装",
