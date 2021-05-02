@@ -53,6 +53,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
           .setNameFormat("Server Provider #%d")
           .setDaemon(true)
           .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
+          .setPriority(Thread.MAX_PRIORITY)
           .build());
 
   public ServerListComponent(IServerEntryReader serverEntryProvider) {
