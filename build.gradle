@@ -50,6 +50,7 @@ subprojects {
         minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
         implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
         annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
+	testAnnotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
     }
 
     jar {
