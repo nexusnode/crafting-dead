@@ -95,7 +95,7 @@ public class ServerItemComponent extends ParentComponent<ServerItemComponent> {
 
   public void connect() {
     this.minecraft.setScreen(
-        new ConnectingScreen(this.getScreen(), this.minecraft, this.serverEntry.getHostName(),
+        new ConnectingScreen(this.minecraft.screen, this.minecraft, this.serverEntry.getHostName(),
             this.serverEntry.getPort()));
   }
 
@@ -142,13 +142,13 @@ public class ServerItemComponent extends ParentComponent<ServerItemComponent> {
   }
 
   @Override
-  protected void mouseEntered(double mouseX, double mouseY) {
+  public void mouseEntered(double mouseX, double mouseY) {
     super.mouseEntered(mouseX, mouseY);
     this.updateBorder();
   }
 
   @Override
-  protected void mouseLeft(double mouseX, double mouseY) {
+  public void mouseLeft(double mouseX, double mouseY) {
     super.mouseLeft(mouseX, mouseY);
     this.updateBorder();
   }

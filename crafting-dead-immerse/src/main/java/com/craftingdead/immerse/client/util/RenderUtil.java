@@ -30,9 +30,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.shader.Shader;
-import net.minecraft.client.shader.ShaderDefault;
-import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -42,17 +39,6 @@ import net.minecraft.util.text.ITextComponent;
 public class RenderUtil {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
-
-  public static void updateUniform(String name, float value, ShaderGroup shaderGroup) {
-    if (shaderGroup != null) {
-      for (Shader shader : shaderGroup.passes) {
-        ShaderDefault variable = shader.getEffect().getUniform(name);
-        if (variable != null) {
-          variable.set(value);
-        }
-      }
-    }
-  }
 
   public static void renderTextRight(FontRenderer fontRenderer, MatrixStack matrixStack, float x,
       float y, ITextComponent text, int colour, boolean shadow) {
@@ -96,15 +82,24 @@ public class RenderUtil {
     fill(x, y, x + width, y + height, colour);
   }
 
-  public static void fill2(double x, double y, double width, double height, int colour) {
+  public static void fillWidthHeight(double x, double y, double width, double height, int colour) {
     fill(x, y, x + width, y + height, colour);
   }
 
   public static void fill(double x, double y, double x2, double y2, long colour) {
-    RenderUtil.fill(x, y, x2, y2, colour, 0D);
+    fill(x, y, 0.0D, x2, y2, colour);
   }
 
-  public static void fill(double x, double y, double x2, double y2, long colour, double z) {
+  public static void fill(double x, double y, double z, double x2, double y2, long colour) {
+    float alpha = (float) (colour >> 24 & 255) / 255.0F;
+    float red = (float) (colour >> 16 & 255) / 255.0F;
+    float green = (float) (colour >> 8 & 255) / 255.0F;
+    float blue = (float) (colour & 255) / 255.0F;
+    fill(x, y, z, x2, y2, red, green, blue, alpha);
+  }
+
+  public static void fill(double x, double y, double z, double x2, double y2, float red,
+      float green, float blue, float alpha) {
     if (x < x2) {
       double i = x;
       x = x2;
@@ -115,10 +110,6 @@ public class RenderUtil {
       y = y2;
       y2 = j;
     }
-    float alpha = (float) (colour >> 24 & 255) / 255.0F;
-    float red = (float) (colour >> 16 & 255) / 255.0F;
-    float green = (float) (colour >> 8 & 255) / 255.0F;
-    float blue = (float) (colour & 255) / 255.0F;
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder builder = tessellator.getBuilder();
     RenderSystem.enableBlend();
@@ -132,41 +123,6 @@ public class RenderUtil {
     tessellator.end();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
-  }
-
-  @SuppressWarnings("deprecation")
-  public static void fillGradient(double x, double y, double x2, double y2, int startColor,
-      int endColor) {
-    RenderSystem.disableTexture();
-    RenderSystem.enableBlend();
-    RenderSystem.disableAlphaTest();
-    RenderSystem.defaultBlendFunc();
-    RenderSystem.shadeModel(GL11.GL_SMOOTH);
-
-    Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder builder = tessellator.getBuilder();
-    builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-    float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
-    float startRed = (float) (startColor >> 16 & 255) / 255.0F;
-    float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
-    float startBlue = (float) (startColor & 255) / 255.0F;
-
-    float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
-    float endRed = (float) (endColor >> 16 & 255) / 255.0F;
-    float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
-    float endBlue = (float) (endColor & 255) / 255.0F;
-
-    builder.vertex(x, y2, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    builder.vertex(x2, y2, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    builder.vertex(x2, y, 0.0D).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    builder.vertex(x, y, 0.0D).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    tessellator.end();
-
-    RenderSystem.shadeModel(GL11.GL_FLAT);
-    RenderSystem.enableAlphaTest();
-    RenderSystem.disableBlend();
-    RenderSystem.enableTexture();
   }
 
   public static void blit(MatrixStack matrixStack, float x, float y, float width,
@@ -251,20 +207,20 @@ public class RenderUtil {
     final int columnSpacing = 1;
     final int textYOffset = 1 + (height - minecraft.font.lineHeight) / 2;
 
-    fill2(x, y, pingWidth, height, 0xB4000000);
+    fillWidthHeight(x, y, pingWidth, height, 0xB4000000);
     AbstractGui.drawCenteredString(matrixStack, minecraft.font, ping,
         x + 13, y + textYOffset, 0xFFFFFFFF);
 
     int usernameColumnWidth =
         width - pingWidth - columnSpacing - (stats.length * (statWidth));
-    fill2(x + pingWidth + columnSpacing, y, usernameColumnWidth, height, 0xB4000000);
+    fillWidthHeight(x + pingWidth + columnSpacing, y, usernameColumnWidth, height, 0xB4000000);
     minecraft.font.drawShadow(matrixStack, username, x + 54, y + textYOffset,
         0xFFFFFFFF);
 
     int statsX = x + pingWidth - 8 + usernameColumnWidth;
     for (int i = 0; i < stats.length; i++) {
       ITextComponent stat = stats[i];
-      RenderUtil.fill2(statsX + 10 + (i * 31), y, 30, height, 0xB4000000);
+      RenderUtil.fillWidthHeight(statsX + 10 + (i * 31), y, 30, height, 0xB4000000);
       AbstractGui.drawCenteredString(matrixStack, minecraft.font, stat,
           statsX + 10 + (i * 31) + 16, y + textYOffset, 0xFFFFFFFF);
     }

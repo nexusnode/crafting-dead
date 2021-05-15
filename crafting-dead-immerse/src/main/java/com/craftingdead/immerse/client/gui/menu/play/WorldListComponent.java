@@ -25,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
 import com.craftingdead.immerse.client.gui.component.ParentComponent;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
 import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
@@ -44,7 +43,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final ContainerComponent worldListContainer;
+  private final ParentComponent<?> worldListContainer;
 
   public WorldListComponent() {
     this.setHeight(250F)
@@ -53,7 +52,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
         .setFlexDirection(FlexDirection.COLUMN)
         .setAlignItems(Align.CENTER);
 
-    this.worldListContainer = new ContainerComponent()
+    this.worldListContainer = new ParentComponent<>()
         .setHeight(50F)
         .setFlexGrow(1F)
         .setFlexDirection(FlexDirection.COLUMN)
@@ -63,7 +62,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
         .setOverflow(Overflow.SCROLL);
     this.loadWorlds();
 
-    ContainerComponent playButton = this.newDefaultStyleButton()
+    ParentComponent<?> playButton = this.newDefaultStyleButton()
         .setRightMargin(7F)
         .setBackgroundColour(new Colour(PlayComponent.GREEN))
         .addHoverAnimation(Component.BACKGROUND_COLOUR,
@@ -74,19 +73,19 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
             .findAny()
             .ifPresent(WorldItemComponent::joinWorld));
 
-    ContainerComponent createButton = this.newDefaultStyleButton()
+    ParentComponent<?> createButton = this.newDefaultStyleButton()
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.create"))
         .addListener(ActionEvent.class, (c, e) -> this.minecraft
-            .setScreen(CreateWorldScreen.create(this.getScreen())));
+            .setScreen(CreateWorldScreen.create(this.minecraft.screen)));
 
-    ContainerComponent editButton = this.newDefaultStyleButton()
+    ParentComponent<?> editButton = this.newDefaultStyleButton()
         .setRightMargin(5.7F)
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.edit"))
         .addListener(ActionEvent.class, (c, e) -> this.streamItems()
             .filter(WorldItemComponent::isSelected)
             .findAny()
             .ifPresent(WorldItemComponent::editWorld));
-    ContainerComponent deleteButton = this.newDefaultStyleButton()
+    ParentComponent<?> deleteButton = this.newDefaultStyleButton()
         .setRightMargin(5.7F)
         .setBackgroundColour(new Colour(PlayComponent.RED))
         .addHoverAnimation(Component.BACKGROUND_COLOUR,
@@ -96,19 +95,19 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
             .filter(WorldItemComponent::isSelected)
             .findAny()
             .ifPresent(WorldItemComponent::deleteWorld));
-    ContainerComponent recreateButton = this.newDefaultStyleButton()
+    ParentComponent<?> recreateButton = this.newDefaultStyleButton()
         .addChild(newDefaultStyleButtonText("menu.play.world_list.button.recreate"))
         .addListener(ActionEvent.class, (c, e) -> this.streamItems()
             .filter(WorldItemComponent::isSelected)
             .findAny()
             .ifPresent(WorldItemComponent::recreateWorld));
 
-    ContainerComponent controlsContainer = new ContainerComponent()
+    ParentComponent<?> controlsContainer = new ParentComponent<>()
         .setFlexDirection(FlexDirection.COLUMN)
         .setBackgroundColour(new Colour(0x40121212))
         .setHeight(56F)
         .setAlignItems(Align.CENTER)
-        .addChild(new ContainerComponent()
+        .addChild(new ParentComponent<>()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER)
             .setWidth(220F)
@@ -116,7 +115,7 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
             .setTopPadding(2F)
             .addChild(playButton)
             .addChild(createButton))
-        .addChild(new ContainerComponent()
+        .addChild(new ParentComponent<>()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER)
             .setWidth(220F)
@@ -130,8 +129,8 @@ public class WorldListComponent extends ParentComponent<WorldListComponent> {
     this.addChild(controlsContainer);
   }
 
-  private ContainerComponent newDefaultStyleButton() {
-    return new ContainerComponent()
+  private ParentComponent<?> newDefaultStyleButton() {
+    return new ParentComponent<>()
         .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
         .setWidth(30F)
         .setHeight(20F)

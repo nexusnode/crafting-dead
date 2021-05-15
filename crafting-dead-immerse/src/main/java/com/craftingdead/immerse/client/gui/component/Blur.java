@@ -64,7 +64,7 @@ public class Blur implements AutoCloseable {
 
   public void setRadius(float radius) {
     if (radius > -1) {
-      RenderUtil.updateUniform("Radius", radius, this.blurShader);
+      com.craftingdead.core.client.util.RenderUtil.updateUniform("Radius", radius, this.blurShader);
     }
   }
 

@@ -19,25 +19,27 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.util.yoga.Yoga;
-import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
 import com.craftingdead.immerse.client.gui.component.type.Align;
 import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
 import com.craftingdead.immerse.client.gui.component.type.FlexWrap;
 import com.craftingdead.immerse.client.gui.component.type.Justify;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
 
-public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extends Component<SELF>
+public class ParentComponent<SELF extends ParentComponent<SELF>> extends Component<SELF>
     implements IParentView {
 
   private final List<Component<?>> children = new ArrayList<>();
-  private int prevChildIndex = -1;
+  private Component<?>[] sortedChildren = new Component[0];
+
+  private final Set<Component<?>> pendingRemoval = new HashSet<>();
 
   protected final long contentNode;
 
@@ -49,17 +51,55 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.contentNode = Yoga.YGNodeNew();
   }
 
+  public SELF addChild(Component<?> child) {
+    if (this.pendingRemoval.remove(child)) {
+      child.pendingRemoval = false;
+    }
+
+    child.index = this.children.size();
+    this.children.add(child);
+    this.sortedChildren = this.children.toArray(new Component[0]);
+    this.sortChildren();
+
+    Yoga.YGNodeInsertChild(this.contentNode, child.node, child.index);
+    child.parent = this;
+    child.added();
+
+    return this.self();
+  }
+
+  private void removeChild(Component<?> childComponent) {
+    childComponent.removed(() -> {
+      childComponent.pendingRemoval = true;
+      this.pendingRemoval.add(childComponent);
+    });
+  }
+
+  public SELF clearChildren() {
+    this.children.forEach(this::removeChild);
+    return this.self();
+  }
+
+  public SELF closeChildren() {
+    this.children.forEach(Component::close);
+    return this.self();
+  }
+
+  public List<Component<?>> getChildComponents() {
+    return this.children;
+  }
+
   @Override
-  public float getActualContentHeight() {
-    return Math.max(
-        (float) (this.children
-            .stream()
-            .mapToDouble(
-                c -> c.getY() + c.getHeight() + c.getBottomMargin())
-            .max()
-            .orElse(0.0F)
-            - super.getContentY()),
-        0);
+  public float computeFullHeight() {
+    final float height = (float) (this.children
+        .stream()
+        .mapToDouble(
+            c -> c.getY() + c.getHeight() + c.getBottomMargin())
+        .max()
+        .orElse(0.0F)
+        - super.getScaledContentY());
+
+    return Math.max(height, 0);
   }
 
   @Override
@@ -72,25 +112,50 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   @Override
   public void tick() {
+    if (!this.pendingRemoval.isEmpty()) {
+      this.pendingRemoval.forEach((component) -> {
+        this.children.remove(component);
+        component.parent = null;
+        Yoga.YGNodeRemoveChild(this.contentNode, component.node);
+        component.pendingRemoval = false;
+      });
+      this.pendingRemoval.clear();
+
+      for (int i = 0; i < this.children.size(); i++) {
+        this.children.get(i).index = i;
+      }
+
+      this.sortedChildren = this.children.toArray(new Component[0]);
+      this.sortChildren();
+    }
+
     super.tick();
+
     this.children.forEach(Component::tick);
   }
 
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    this.children.forEach(component -> component.render(matrixStack, mouseX, mouseY, partialTicks));
+    for (Component<?> component : this.sortedChildren) {
+      component.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
+  }
+
+  @Override
+  public void close() {
+    this.closeChildren();
+    super.close();
+  }
+
+  @Override
+  public void sortChildren() {
+    Arrays.sort(this.sortedChildren);
   }
 
   @Override
   public List<? extends IGuiEventListener> children() {
-    return this.children.stream()
-        .sorted(Collections.reverseOrder())
-        .collect(Collectors.toList());
-  }
-
-  public List<Component<?>> getChildComponents() {
-    return this.children;
+    return Lists.reverse(Arrays.asList(this.sortedChildren));
   }
 
   @Override
@@ -151,12 +216,6 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.dragging = dragging;
   }
 
-  @Override
-  public void close() {
-    this.closeChildren();
-    super.close();
-  }
-
   @Nullable
   @Override
   public IGuiEventListener getFocused() {
@@ -165,10 +224,7 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
 
   @Override
   public boolean changeFocus(boolean focus) {
-    if (!super.changeFocus(focus)) {
-      return IParentView.super.changeFocus(focus);
-    }
-    return true;
+    return super.changeFocus(focus) || IParentView.super.changeFocus(focus);
   }
 
   @Override
@@ -176,78 +232,10 @@ public abstract class ParentComponent<SELF extends ParentComponent<SELF>> extend
     this.focusedListener = focusedListener;
   }
 
-  public SELF addChild(Component<?> child) {
-    int zLevel = ++this.prevChildIndex;
-    IParentView parent = this;
-    while (parent != null) {
-      zLevel += parent.getZLevel();
-      parent = parent.getParent();
-    }
-    child.zLevel = zLevel;
-
-    this.children.add(child);
-    this.childAdded(child, this.children.size() - 1);
-    return this.self();
-  }
-
-  private void sortChildren() {
-    this.children.sort(Comparator.naturalOrder());
-  }
-
-  protected void childAdded(Component<?> child, int index) {
-    Yoga.YGNodeInsertChild(this.contentNode, child.node, index);
-    child.addListener(ZLevelChangeEvent.class,
-        (component, zLevelChangeEvent) -> this.sortChildren());
-    // TODO how to unregister the listener
-    child.parent = this;
-    this.sortChildren();
-    child.added();
-  }
-
-  public SELF removeChild(Component<?> childComponent) {
-    this.children.stream()
-        .filter(childComponent::equals)
-        .findAny()
-        .ifPresent(child -> {
-          this.childRemoved(child);
-          this.children.remove(child);
-        });
-    return this.self();
-  }
-
-  protected void childRemoved(Component<?> child) {
-    Yoga.YGNodeRemoveChild(this.contentNode, child.node);
-    child.removed();
-    child.parent = null;
-  }
-
-  public SELF clearChildren() {
-    this.children.forEach(this::childRemoved);
-    this.children.clear();
-    return this.self();
-  }
-
-  public SELF closeChildren() {
-    this.children.forEach(Component::close);
-    return this.self();
-  }
-
-  public SELF clearChildrenClosing() {
-    for (Component<?> child : this.children) {
-      this.childRemoved(child);
-      child.close();
-    }
-    this.children.clear();
-    return this.self();
-  }
-
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     this.setDragging(false);
-    if (this.getFocused() != null) {
-      return this.getFocused().mouseReleased(mouseX, mouseY, button);
-    }
-    return false;
+    return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
   }
 
   public final SELF setFlexDirection(FlexDirection flexDirection) {

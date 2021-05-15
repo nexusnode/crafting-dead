@@ -37,7 +37,7 @@ public class GameButton extends Button {
 
   @Override
   public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    RenderUtil.fill2(this.x, this.y, this.width, this.height,
+    RenderUtil.fillWidthHeight(this.x, this.y, this.width, this.height,
         TextFormatting.DARK_RED.getColor() + ((this.isHovered() ? 255 : 128) << 24));
 
     this.font.drawShadow(matrixStack, this.getMessage(),
@@ -48,10 +48,10 @@ public class GameButton extends Button {
     if (this.isHovered()) {
       final int size = 1;
       final int color = 0xFFFFBA00;
-      RenderUtil.fill2(this.x - size, this.y, size, this.height, color);
-      RenderUtil.fill2(this.x + this.width, this.y, size, this.height, color);
-      RenderUtil.fill2(this.x - size, this.y - size, this.width + (size * 2), size, color);
-      RenderUtil.fill2(this.x - size, this.y + this.height, this.width + (size * 2), size, color);
+      RenderUtil.fillWidthHeight(this.x - size, this.y, size, this.height, color);
+      RenderUtil.fillWidthHeight(this.x + this.width, this.y, size, this.height, color);
+      RenderUtil.fillWidthHeight(this.x - size, this.y - size, this.width + (size * 2), size, color);
+      RenderUtil.fillWidthHeight(this.x - size, this.y + this.height, this.width + (size * 2), size, color);
     }
   }
 }

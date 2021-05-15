@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.client.gui;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
@@ -43,6 +43,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -74,7 +75,7 @@ public class IngameGui {
 
   private final ClientDist client;
 
-  private final List<KillFeedEntry> killFeedMessages = new ArrayList<>();
+  private final List<KillFeedEntry> killFeedMessages = new LinkedList<>();
 
   private ResourceLocation crosshairLocation;
 
@@ -131,7 +132,7 @@ public class IngameGui {
         final float flashHeight = 300;
         RenderSystem.translatef((x - x * scale), y - y * scale, 0.0F);
         RenderSystem.scalef(scale, scale, 1.0F);
-        RenderUtil.drawTexturedRectangle(x - flashWidth / 2, y - flashHeight / 2, flashWidth,
+        RenderUtil.blit(x - flashWidth / 2, y - flashHeight / 2, flashWidth,
             flashHeight);
         RenderSystem.disableBlend();
       }
@@ -152,7 +153,7 @@ public class IngameGui {
           overlayTextureHeight *= scale;
           RenderSystem.enableBlend();
           RenderUtil
-              .drawTexturedRectangle(width / 2 - overlayTextureWidth / 2,
+              .blit(width / 2 - overlayTextureWidth / 2,
                   height / 2 - overlayTextureHeight / 2, overlayTextureWidth,
                   overlayTextureHeight);
           RenderSystem.disableBlend();
@@ -263,15 +264,13 @@ public class IngameGui {
   @SuppressWarnings("deprecation")
   private void renderKillFeedEntry(KillFeedEntry entry, MatrixStack matrixStack, float x, float y,
       float alpha) {
-    final Minecraft minecraft = Minecraft.getInstance();
-
     final String playerEntityName = entry.getKillerEntity().getDisplayName().getString();
     final String deadEntityName = entry.getDeadEntity().getDisplayName().getString();
     final int playerEntityNameWidth = minecraft.font.width(playerEntityName);
     final int deadEntityNameWidth = minecraft.font.width(deadEntityName);
 
     int spacing = 20;
-    alpha *= minecraft.player == entry.getKillerEntity() ? 0.7F : 0.5F;
+    alpha *= this.minecraft.player == entry.getKillerEntity() ? 0.7F : 0.5F;
 
     switch (entry.getType()) {
       case WALLBANG_HEADSHOT:
@@ -293,10 +292,10 @@ public class IngameGui {
     RenderUtil.drawGradientRectangle(x, y,
         x + playerEntityNameWidth + deadEntityNameWidth + spacing, y + 11, colour, colour);
 
-    minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         entry.getKillerEntity().getDisplayName().getString(),
         x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(matrixStack,
         entry.getDeadEntity().getDisplayName().getString(),
         x + playerEntityNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
 
@@ -305,23 +304,23 @@ public class IngameGui {
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 17, y - 1, 12, 12);
+        RenderUtil.blit(x + playerEntityNameWidth + 17, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG:
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderUtil.blit(x + playerEntityNameWidth + 35, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG_HEADSHOT:
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderUtil.blit(x + playerEntityNameWidth + 35, y - 1, 12, 12);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.drawTexturedRectangle(x + playerEntityNameWidth + 35 + 14, y - 1, 12, 12);
+        RenderUtil.blit(x + playerEntityNameWidth + 35 + 14, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       default:
@@ -351,7 +350,7 @@ public class IngameGui {
           RenderSystem.translated(4, 1, 0);
         }
 
-        RenderUtil.renderItemIntoGUI(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
+        RenderUtil.renderGuiItem(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
       }
       RenderSystem.popMatrix();
     }
@@ -433,7 +432,7 @@ public class IngameGui {
 
     RenderUtil.bind(res);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
-    RenderUtil.drawTexturedRectangle(0, 0, width, height);
+    RenderUtil.blit(0, 0, width, height);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.enableAlphaTest();
     RenderSystem.disableBlend();
@@ -448,15 +447,15 @@ public class IngameGui {
 
     for (int i = 0; i < 10; i++) {
       // Draw droplet outline
-      RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 0, 32);
+      RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 0, 32);
 
       float scaledWater = 10.0F * waterPercentage;
       if (i + 1 <= scaledWater) {
         // Draw full droplet
-        RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 9, 32);
+        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 9, 32);
       } else if (scaledWater >= i + 0.5F) {
         // Draw half droplet
-        RenderUtil.drawTexturedRectangle(x - i * 8 - 9, y, 9, 9, 18, 32);
+        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 18, 32);
       }
     }
     RenderSystem.disableBlend();
@@ -487,9 +486,8 @@ public class IngameGui {
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
     RenderSystem.scalef(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderItemIntoGUI(primaryStack, 0, 0, 0xFFFFFFFF, true);
+    RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemCameraTransforms.TransformType.FIXED);
     RenderSystem.popMatrix();
-
 
     // Render secondary
     ItemStack secondaryStack = inventory.getItem(1);
@@ -504,7 +502,8 @@ public class IngameGui {
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
     RenderSystem.scalef(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderItemIntoGUI(secondaryStack, 0, 0, 0xFFFFFFFF, true);
+    RenderUtil.renderGuiItem(secondaryStack, 0, 0, 0xFFFFFFFF,
+        ItemCameraTransforms.TransformType.FIXED);
     RenderSystem.popMatrix();
 
     // Render melee
@@ -520,7 +519,8 @@ public class IngameGui {
     RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
     RenderSystem.scalef(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderItemIntoGUI(meleeStack, 0, 0, 0xFFFFFFFF, true);
+    RenderUtil.renderGuiItem(meleeStack, 0, 0, 0xFFFFFFFF,
+        ItemCameraTransforms.TransformType.FIXED);
     RenderSystem.popMatrix();
 
 
@@ -539,8 +539,8 @@ public class IngameGui {
 
       RenderSystem.pushMatrix();
 
-      RenderUtil.renderItemIntoGUI(extraStack, boxX + boxWidth / 2 - 16 / 2,
-          boxY + (boxHeight / 2) - 6, 0xFFFFFFFF, false);
+      RenderUtil.renderGuiItem(extraStack, boxX + boxWidth / 2 - 16 / 2,
+          boxY + (boxHeight / 2) - 6, 0xFFFFFFFF);
       RenderSystem.popMatrix();
 
       boxX += 28;
@@ -566,7 +566,7 @@ public class IngameGui {
 
     RenderUtil.bind(HEALTH);
     RenderSystem.enableBlend();
-    RenderUtil.drawTexturedRectangle(5, height - healthBoxHeight / 2 - 8, 16, 16);
+    RenderUtil.blit(5, height - healthBoxHeight / 2 - 8, 16, 16);
     RenderSystem.disableBlend();
 
     AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
@@ -580,7 +580,7 @@ public class IngameGui {
       int armourX = healthWidth / 2 + 7;
       RenderUtil.bind(SHIELD);
       RenderSystem.enableBlend();
-      RenderUtil.drawTexturedRectangle(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);
+      RenderUtil.blit(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);
       RenderSystem.disableBlend();
 
       AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
@@ -611,19 +611,19 @@ public class IngameGui {
       RenderSystem.enableBlend();
 
       RenderUtil.bind(crosshair.getMiddle());
-      RenderUtil.drawTexturedRectangle(x, y, imageWidth, imageHeight);
+      RenderUtil.blit(x, y, imageWidth, imageHeight);
 
       RenderUtil.bind(crosshair.getTop());
-      RenderUtil.drawTexturedRectangle(x, y - lerpSpread, imageWidth, imageHeight);
+      RenderUtil.blit(x, y - lerpSpread, imageWidth, imageHeight);
 
       RenderUtil.bind(crosshair.getBottom());
-      RenderUtil.drawTexturedRectangle(x, y + lerpSpread, imageWidth, imageHeight);
+      RenderUtil.blit(x, y + lerpSpread, imageWidth, imageHeight);
 
       RenderUtil.bind(crosshair.getLeft());
-      RenderUtil.drawTexturedRectangle(x - lerpSpread, y, imageWidth, imageHeight);
+      RenderUtil.blit(x - lerpSpread, y, imageWidth, imageHeight);
 
       RenderUtil.bind(crosshair.getRight());
-      RenderUtil.drawTexturedRectangle(x + lerpSpread, y, imageWidth, imageHeight);
+      RenderUtil.blit(x + lerpSpread, y, imageWidth, imageHeight);
       RenderSystem.disableBlend();
     }
     RenderSystem.popMatrix();

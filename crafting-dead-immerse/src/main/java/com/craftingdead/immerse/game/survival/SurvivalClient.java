@@ -51,17 +51,17 @@ public class SurvivalClient extends SurvivalGame implements IGameClient {
     RenderSystem.enableBlend();
 
     RenderUtil.bind(DAYS_SURVIVED);
-    RenderUtil.drawTexturedRectangle(x, y - 20, 16, 16);
+    RenderUtil.blit(x, y - 20, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
     RenderUtil.bind(ZOMBIES_KILLED);
-    RenderUtil.drawTexturedRectangle(x, y, 16, 16);
+    RenderUtil.blit(x, y, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
     RenderUtil.bind(PLAYERS_KILLED);
-    RenderUtil.drawTexturedRectangle(x, y + 20, 16, 16);
+    RenderUtil.blit(x, y + 20, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 

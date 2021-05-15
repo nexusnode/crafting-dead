@@ -32,12 +32,11 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 public class GameTypes {
 
-  @SuppressWarnings("unchecked")
   public static final DeferredRegister<GameType> GAME_TYPES =
-      DeferredRegister.create((Class<GameType>) (Class<?>) GameType.class, CraftingDeadImmerse.ID);
+      DeferredRegister.create(GameType.class, CraftingDeadImmerse.ID);
 
   public static final Lazy<IForgeRegistry<GameType>> REGISTRY =
-      Lazy.of(GameTypes.GAME_TYPES.makeRegistry("game_types", RegistryBuilder::new));
+      Lazy.of(GAME_TYPES.makeRegistry("game_types", RegistryBuilder::new));
 
   public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("survival",
       () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new));

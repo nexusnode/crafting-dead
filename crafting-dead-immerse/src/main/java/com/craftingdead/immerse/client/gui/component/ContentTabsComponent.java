@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.component;
 
 import java.util.HashMap;
+import com.craftingdead.immerse.client.gui.component.type.PositionType;
 
 public class ContentTabsComponent extends TabsComponent {
 
@@ -26,7 +27,6 @@ public class ContentTabsComponent extends TabsComponent {
   private ParentComponent<?> contentContainer;
 
   public ContentTabsComponent(ParentComponent<?> contentContainer) {
-    super();
     this.contentContainer = contentContainer;
     this.addTabChangeListener(this::onTabChanged);
   }
@@ -39,14 +39,17 @@ public class ContentTabsComponent extends TabsComponent {
 
   public ContentTabsComponent addTab(Tab tab, Component<?> content) {
     super.addTab(tab);
-    tabContent.put(tab, content);
+    this.tabContent.put(tab, content);
     return this;
   }
 
   public void onTabChanged(Tab newTab) {
-      contentContainer.clearChildren();
-      contentContainer.addChild(tabContent.get(newTab));
-      contentContainer.layout();
+    this.contentContainer
+        .clearChildren()
+        .addChild(this.tabContent.get(newTab)
+            .setWidthPercent(100)
+            .setHeightPercent(100)
+            .setPositionType(PositionType.ABSOLUTE))
+        .layout();
   }
-
 }

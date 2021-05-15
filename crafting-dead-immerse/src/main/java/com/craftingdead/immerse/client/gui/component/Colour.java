@@ -103,7 +103,9 @@ public class Colour {
   }
 
   public float[] getColour4f() {
-    return this.colour4f;
+    float[] result = new float[this.colour4f.length];
+    System.arraycopy(this.colour4f, 0, result, 0, 4);
+    return result;
   }
 
   public void setColour4f(float[] value4f) {

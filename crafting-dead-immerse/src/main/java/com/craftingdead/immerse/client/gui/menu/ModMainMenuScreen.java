@@ -35,16 +35,22 @@
  */
 package com.craftingdead.immerse.client.gui.menu;
 
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import com.craftingdead.core.item.GunItem;
+import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
 import com.craftingdead.immerse.client.gui.component.ComponentScreen;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
+import com.craftingdead.immerse.client.gui.component.EntityComponent;
+import com.craftingdead.immerse.client.gui.component.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.component.FogComponent;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
-import com.craftingdead.immerse.client.gui.component.RectangleComponent;
+import com.craftingdead.immerse.client.gui.component.ParentComponent;
+import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
 import com.craftingdead.immerse.client.gui.component.Tooltip;
 import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.component.type.Align;
@@ -54,17 +60,23 @@ import com.craftingdead.immerse.client.gui.component.type.PositionType;
 import com.craftingdead.immerse.client.gui.menu.play.PlayComponent;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.util.ModSoundEvents;
+import io.netty.util.internal.ThreadLocalRandom;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModMainMenuScreen extends ComponentScreen {
 
-  private final ContainerComponent contentContainer = new ContainerComponent().setFlex(1);
+  private final ParentComponent<?> contentContainer = new ParentComponent<>().setFlex(1);
 
   private Page currentPage;
 
@@ -112,14 +124,14 @@ public class ModMainMenuScreen extends ComponentScreen {
         .setHeightPercent(100)
         .setWidthPercent(100));
 
-    ContainerComponent sideBar = new ContainerComponent()
+    ParentComponent<?> sideBar = new ParentComponent<>()
         .setBackgroundColour(new Colour(0x70777777))
         .setBackgroundBlur(50.0F)
         .setHeightPercent(100.0F)
         .setWidth(30.0F)
         .setAlignItems(Align.CENTER);
 
-    sideBar.addChild(new RectangleComponent()
+    sideBar.addChild(new Component<>()
         .setUnscaleWidth()
         .setPositionType(PositionType.ABSOLUTE)
         .setRight(0.0F)
@@ -139,7 +151,7 @@ public class ModMainMenuScreen extends ComponentScreen {
         .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
 
-    sideBar.addChild(new RectangleComponent()
+    sideBar.addChild(new Component<>()
         .setUnscaleHeight()
         .setHeight(1)
         .setWidthPercent(100.0F)
@@ -192,6 +204,32 @@ public class ModMainMenuScreen extends ComponentScreen {
         .setFocusable(true)
         .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));
 
+    final FakePlayerEntity fakePlayerEntity =
+        new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
+
+
+    List<Item> gunItems = ForgeRegistries.ITEMS.getValues()
+        .stream()
+        .filter(item -> item instanceof GunItem)
+        .collect(Collectors.toList());
+    Item randomGunItem = gunItems.get(ThreadLocalRandom.current().nextInt(gunItems.size()));
+    fakePlayerEntity.setItemInHand(Hand.MAIN_HAND, new ItemStack(randomGunItem));
+
+    this.getRoot().addChild(new ParentComponent<>()
+        .setScale(1.0F)
+        .setWidthPercent(10)
+        .setHeightPercent(50)
+        .setBottomPercent(15)
+        .setLeftPercent(75)
+        .setPositionType(PositionType.ABSOLUTE)
+        .setAlignItems(Align.CENTER)
+        .addChild(new TextBlockComponent(
+            Text.of(this.minecraft.getUser().getName())
+                .withStyle(TextFormatting.BOLD, TextFormatting.DARK_RED))
+                    .setCentered(true))
+        .addChild(new EntityComponent(fakePlayerEntity)
+            .setAspectRatio(1)));
+
     this.getRoot().addChild(this.contentContainer);
 
     this.getRoot().addChild(sideBar);
@@ -207,21 +245,25 @@ public class ModMainMenuScreen extends ComponentScreen {
     }
     this.currentPage = page;
     this.contentContainer
-        .clearChildrenClosing()
-        .addChild(page.create().setFlex(1))
+        .clearChildren()
+        .addChild(page.create()
+            .setWidthPercent(100.0F)
+            .setHeightPercent(100.0F)
+            .setPositionType(PositionType.ABSOLUTE))
         .layout();
   }
 
   public static enum Page {
+
     HOME(HomeComponent::new), PLAY(PlayComponent::new);
 
-    private final Supplier<ContainerComponent> factory;
+    private final Supplier<ParentComponent<?>> factory;
 
-    private Page(Supplier<ContainerComponent> factory) {
+    private Page(Supplier<ParentComponent<?>> factory) {
       this.factory = factory;
     }
 
-    public ContainerComponent create() {
+    public ParentComponent<?> create() {
       return this.factory.get();
     }
   }

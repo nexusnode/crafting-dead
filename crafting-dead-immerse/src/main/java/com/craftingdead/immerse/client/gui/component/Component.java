@@ -18,7 +18,9 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.yoga.YGMeasureFunc;
@@ -33,8 +35,9 @@ import com.craftingdead.immerse.client.gui.component.event.KeyEvent;
 import com.craftingdead.immerse.client.gui.component.event.MouseEnterEvent;
 import com.craftingdead.immerse.client.gui.component.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.component.event.MouseLeaveEvent;
-import com.craftingdead.immerse.client.gui.component.event.ZLevelChangeEvent;
+import com.craftingdead.immerse.client.gui.component.event.ZOffsetChangeEvent;
 import com.craftingdead.immerse.client.gui.component.type.Align;
+import com.craftingdead.immerse.client.gui.component.type.Display;
 import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
 import com.craftingdead.immerse.client.gui.component.type.Overflow;
 import com.craftingdead.immerse.client.gui.component.type.PositionType;
@@ -50,8 +53,8 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraftforge.eventbus.api.BusBuilder;
@@ -59,32 +62,29 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
-public abstract class Component<SELF extends Component<SELF>> extends AbstractGui
-    implements IView, Comparable<Component<?>> {
+public class Component<SELF extends Component<SELF>> extends AbstractGui
+    implements IView {
 
   public static final TweenType<Component<?>> X_SCALE =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) Component::getXScale,
-          (SimpleTweenType.FloatSetter<Component<?>>) Component::setXScale);
+      new SimpleTweenType<>(Component::getXScale, Component::setXScale);
+
   public static final TweenType<Component<?>> Y_SCALE =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) Component::getYScale,
-          (SimpleTweenType.FloatSetter<Component<?>>) Component::setYScale);
+      new SimpleTweenType<>(Component::getYScale, Component::setYScale);
+
   public static final TweenType<Component<?>> X_TRANSLATION =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.xTranslation,
-          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.xTranslation = v);
+      new SimpleTweenType<>(c -> c.xOffset, Component::setXOffset);
+
   public static final TweenType<Component<?>> Y_TRANSLATION =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.yTranslation,
-          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.yTranslation = v);
+      new SimpleTweenType<>(c -> c.yOffset, Component::setYOffset);
+
   public static final TweenType<Component<?>> BORDER_WIDTH_BOTTOM =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.bottomBorderWidth,
-          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.bottomBorderWidth = v);
+      new SimpleTweenType<>(c -> c.bottomBorderWidth,
+          (Component<?> c, float v) -> c.bottomBorderWidth = v);
+
   public static final TweenType<Component<?>> BACKGROUND_COLOUR =
       new SimpleTweenType<>(4, t -> t.backgroundColour.getColour4f(),
           (t, v) -> t.backgroundColour.setColour4f(v));
+
   public static final TweenType<Component<?>> BORDER_WIDTH =
       new SimpleTweenType<>(4,
           t -> new float[] {t.topBorderWidth, t.rightBorderWidth, t.bottomBorderWidth,
@@ -95,10 +95,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
             t.bottomBorderWidth = v[2];
             t.leftBorderWidth = v[3];
           });
+
+  public static final TweenType<Component<?>> ALPHA =
+      new SimpleTweenType<>(c -> c.alpha, Component::setAlpha);
+
   private static final TweenType<Component<?>> SCROLL_OFFSET =
-      new SimpleTweenType<>(
-          (SimpleTweenType.FloatGetter<Component<?>>) c -> c.scrollOffset,
-          (SimpleTweenType.FloatSetter<Component<?>>) (c, v) -> c.scrollOffset = v);
+      new SimpleTweenType<>(c -> c.scrollOffset, (Component<?> c, float v) -> c.scrollOffset = v);
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -106,11 +108,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private static final float SCROLL_MOMENTUM_DAMPING = 3F;
 
-  private float lastScrollOffset;
-  private float scrollOffset;
-  private float scrollVelocity;
-
-  private float lerpedScrollOffset;
+  private static final int DOUBLE_CLICK_DURATION_MS = 500;
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
@@ -123,10 +121,26 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   private final TweenManager tweenManager = TweenManager.create();
 
+  protected final long node;
+
+  @Nullable
+  IParentView parent;
+  int index;
+
+  private float lastScrollOffset;
+  private float scrollOffset;
+  private float scrollVelocity;
+
+  private float fullHeight;
+
   private float xScale = 1.0F;
   private float yScale = 1.0F;
-  private float xTranslation = 0.0F;
-  private float yTranslation = 0.0F;
+  private float xOffset = 0.0F;
+
+  private float yOffset = 0.0F;
+  private float zOffset = 0.0F;
+
+  private float alpha = 1.0F;
 
   private float topBorderWidth = 0F;
   private Colour topBorderColour = Colour.WHITE;
@@ -137,8 +151,6 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   private float leftBorderWidth = 0F;
   private Colour leftBorderColour = Colour.WHITE;
 
-  protected final long node;
-
   @Nullable
   private Tooltip tooltip;
 
@@ -148,28 +160,17 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @Nullable
   private Blur backgroundBlur;
 
-  protected IParentView parent;
-  protected int insertionIndex;
+  protected boolean pendingRemoval;
 
   private boolean hovered;
-
-  private float lastTime = 0F;
-
   protected boolean focused;
+  protected boolean focusable;
 
   private boolean unscaleWidth;
   private boolean unscaleHeight;
 
-  private int zLevelOffset = 0;
-
-  private float actualContentHeight;
-
-  protected boolean focusable;
-
-  protected int zLevel;
-
   private boolean doubleClick;
-  private int doubleClickTicks = 0;
+  private long lastClickTimeMs;
 
   public Component() {
     this.node = Yoga.YGNodeNew();
@@ -185,20 +186,18 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return new Vector2f(width, height);
   }
 
-  protected float getActualContentHeight() {
+  protected float computeFullHeight() {
     return this.getContentHeight();
-  }
-
-  protected void zLevelChanged() {
-    this.post(new ZLevelChangeEvent());
   }
 
   protected void added() {}
 
-  protected void removed() {}
+  protected void removed(Runnable remove) {
+    remove.run();
+  }
 
   protected void layout() {
-    this.actualContentHeight = this.getActualContentHeight();
+    this.fullHeight = this.computeFullHeight();
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
     Yoga.YGNodeMarkDirty(this.node);
   }
@@ -214,7 +213,7 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.scrollOffset += this.scrollVelocity;
 
     if (this.scrollOffset < 0.0F
-        || this.scrollOffset > this.actualContentHeight - this.getHeight()) {
+        || this.scrollOffset > this.fullHeight - this.getHeight()) {
       this.scrollVelocity = 0.0F;
     }
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
@@ -222,78 +221,77 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     if (this.backgroundBlur != null) {
       this.backgroundBlur.tick();
     }
-
-    if (this.doubleClickTicks > 0) {
-      this.doubleClickTicks--;
-    }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    float currentTime = this.lastTime + partialTicks;
-    float deltaTime = (currentTime - this.lastTime) * 50;
-    this.lastTime = currentTime;
-    this.tweenManager.update(deltaTime);
+    if (this.pendingRemoval) {
+      return;
+    }
+
+    this.tweenManager.update(partialTicks * 100.0F);
 
     if (this.backgroundBlur != null) {
+      RenderSystem.enableBlend();
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.getAlpha());
       this.backgroundBlur.render(matrixStack, this.getScaledX(), this.getScaledY(),
           this.getScaledWidth(), this.getScaledHeight(), partialTicks);
+      RenderSystem.disableBlend();
     }
 
     if (this.backgroundColour != null) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+      RenderSystem.enableBlend();
+      float[] colour = this.backgroundColour.getColour4f();
+      colour[3] *= this.getAlpha();
+      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getZOffset(),
           this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.getScaledHeight(), this.backgroundColour.getHexColour());
+          this.getScaledY() + this.getScaledHeight(), colour[0], colour[1], colour[2], colour[3]);
+      RenderSystem.disableBlend();
     }
 
-    RenderSystem.enableDepthTest();
     if (this.topBorderWidth > 0F) {
       RenderUtil.fill(this.getScaledX(), this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour(), 0.5D);
+          this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour());
     }
     if (this.rightBorderWidth > 0F) {
       RenderUtil.fill(this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
-          this.rightBorderColour.getHexColour(), 0.5D);
+          this.rightBorderColour.getHexColour());
     }
     if (this.bottomBorderWidth > 0F) {
       RenderUtil.fill(this.getScaledX(),
           this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
-          this.bottomBorderColour.getHexColour(), 0.5D);
+          this.bottomBorderColour.getHexColour());
     }
     if (this.leftBorderWidth > 0F) {
       RenderUtil.fill(this.getScaledX(), this.getScaledY(),
           this.getScaledX() + this.leftBorderWidth,
-          this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour(), 0.5D);
+          this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour());
     }
-    RenderSystem.disableDepthTest();
 
     if (this.tooltip != null && this.isHovered()) {
       this.tooltip.render(this.minecraft.font, matrixStack,
           10.0D + this.getX() + this.getWidth(), this.getY());
     }
 
-    // For some reason the partial ticks passed to us isn't correct.
-    this.lerpedScrollOffset =
-        MathHelper.lerp(Minecraft.getInstance().getFrameTime(), this.lastScrollOffset,
-            this.scrollOffset);
-
-
     // ---- Render Content----
 
     final double scale = this.minecraft.getWindow().getGuiScale();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
+
     if (scissor) {
-      double lowerBound = this.getBotScissorBoundScaled() * scale;
       RenderSystem.enableScissor((int) (this.getScaledContentX() * scale),
-          (int) (this.mainWindow.getHeight() - lowerBound),
+          (int) (this.mainWindow.getHeight()
+              - (this.getScaledY() + this.getScaledHeight()) * scale),
           (int) (this.getScaledContentWidth() * scale),
-          (int) (lowerBound - this.getTopScissorBoundScaled() * scale));
+          (int) (this.getScaledHeight() * scale));
     }
+
     this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
       RenderSystem.disableScissor();
@@ -302,9 +300,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     // ---- Render Scrollbar ----
 
     if (this.isScrollbarEnabled()) {
-      RenderUtil.roundedFill(this.getScrollbarX(), this.getY(),
+      RenderUtil.roundedFill(this.getScrollbarX(), this.getScaledY(),
           this.getScrollbarX() + SCROLLBAR_WIDTH,
-          this.getY() + this.getHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
+          this.getScaledY() + this.getScaledHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
       RenderUtil.roundedFill(this.getScrollbarX(), this.getScrollbarY(),
           this.getScrollbarX() + SCROLLBAR_WIDTH, this.getScrollbarY() + this.getScrollbarHeight(),
           0x4CFFFFFF, SCROLLBAR_WIDTH / 2.0F);
@@ -329,25 +327,32 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return Math.min(bound, ((ParentComponent<?>) this.parent).getBotScissorBoundScaled());
   }
 
-  protected boolean isScrollbarEnabled() {
-    return this.getOverflow() == Overflow.SCROLL && this.actualContentHeight > this.getHeight();
+  protected final boolean isScrollbarEnabled() {
+    return this.getOverflow() == Overflow.SCROLL && this.fullHeight > this.getHeight();
   }
 
   protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {}
 
-
   private final double getScrollbarX() {
-    return this.getX() + this.getWidth() - SCROLLBAR_WIDTH;
+    return this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH;
   }
 
   private final double getScrollbarY() {
-    return this.getY() + (this.lerpedScrollOffset / this.actualContentHeight) * this.getHeight();
+    return this.getScaledY()
+        + (this.getScrollOffset(this.minecraft.getFrameTime()) / this.fullHeight)
+            * this.getScaledHeight();
+  }
+
+  private final float getScrollOffset(float partialTicks) {
+    return MathHelper.lerp(partialTicks, this.lastScrollOffset, this.scrollOffset);
   }
 
   private final float getScrollbarHeight() {
-    return MathHelper.clamp(this.getHeight() * (this.getHeight() / this.actualContentHeight), 10.0F,
-        this.getHeight());
+    return MathHelper.clamp(
+        this.getScaledHeight() * (this.getContentHeight() / this.fullHeight),
+        10.0F,
+        this.getScaledHeight());
   }
 
   private final void scrollTo(float y, float duration) {
@@ -358,10 +363,11 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   }
 
   private final float clampScrollOffset(float scrollOffset) {
-    return MathHelper.clamp(scrollOffset, 0.0F, this.actualContentHeight - this.getHeight());
+    return MathHelper.clamp(scrollOffset, 0.0F, this.fullHeight - this.getContentHeight());
   }
 
-  protected void mouseEntered(double mouseX, double mouseY) {
+  @Override
+  public void mouseEntered(double mouseX, double mouseY) {
     this.hovered = true;
     if (this.tooltip != null) {
       Timeline.createParallel(150)
@@ -377,7 +383,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     this.post(new MouseEnterEvent());
   }
 
-  protected void mouseLeft(double mouseX, double mouseY) {
+  @Override
+  public void mouseLeft(double mouseX, double mouseY) {
     this.hovered = false;
     if (this.tooltip != null) {
       Timeline.createParallel(250)
@@ -397,35 +404,38 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (this.isHovered()) {
-      // Clicked on scrollbar region
-      if (this.isScrollbarEnabled() && mouseX >= this.getX() + this.getWidth() - SCROLLBAR_WIDTH
-          && mouseX <= this.getX() + this.getWidth() && mouseY >= this.getY()
-          && mouseY <= this.getY() + this.getHeight()) {
-        // Clicked on actual scrollbar
-        if (mouseX >= this.getScrollbarX() && mouseX <= this.getScrollbarX() + SCROLLBAR_WIDTH
-            && mouseY >= this.getScrollbarY()
-            && mouseY <= this.getScrollbarY() + this.getScrollbarHeight()) {
-        } else {
-          this.scrollTo(this.scrollOffset
-              + (mouseY > this.getScrollbarY() ? this.getHeight() : -this.getHeight()), 200);
-        }
-        return true;
-      }
-
-      if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
-          GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
-        return true;
-      }
-
-      if ((!this.doubleClick || this.doubleClickTicks > 0)
-          && this.post(new ActionEvent()) == Event.Result.ALLOW) {
-        return true;
-      } else if (this.doubleClick) {
-        this.doubleClickTicks = 4;
-      }
+    if (!this.isHovered()) {
+      return false;
     }
-    return false;
+
+    // Clicked on scrollbar region
+    if (this.isScrollbarEnabled()
+        && mouseX >= this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH
+        && mouseX <= this.getScaledX() + this.getScaledWidth() && mouseY >= this
+            .getScaledY()
+        && mouseY <= this.getScaledY() + this.getScaledHeight()) {
+      // Clicked on actual scrollbar
+      if (mouseX >= this.getScrollbarX() && mouseX <= this.getScrollbarX() + SCROLLBAR_WIDTH
+          && mouseY >= this.getScrollbarY()
+          && mouseY <= this.getScrollbarY() + this.getScrollbarHeight()) {
+      } else {
+        this.scrollTo(this.scrollOffset
+            + (mouseY > this.getScrollbarY() ? this.getScaledHeight() : -this.getScaledHeight()),
+            200);
+      }
+      return true;
+    }
+
+    if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
+        GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
+      return true;
+    }
+
+    long currentTime = Util.getMillis();
+    long deltaTime = currentTime - this.lastClickTimeMs;
+    this.lastClickTimeMs = currentTime;
+    return (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
+        && this.post(new ActionEvent()) == Event.Result.ALLOW;
   }
 
   @Override
@@ -437,9 +447,9 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    if (mouseY >= this.getY() && mouseY <= this.getY() + this.getHeight()) {
-      this.scrollOffset = this.clampScrollOffset((float) (this.scrollOffset
-          + deltaY * this.actualContentHeight / (this.getHeight())));
+    if (mouseY >= this.getScaledY() && mouseY <= this.getScaledY() + this.getScaledHeight()) {
+      this.scrollOffset = this.clampScrollOffset(this.scrollOffset
+          + ((float) deltaY) * this.fullHeight / this.getScaledHeight());
       return true;
     }
     return this.post(
@@ -451,13 +461,14 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     if (this.isScrollbarEnabled()) {
       this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
     }
-    return this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
+    return this.post(
+        new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
   }
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (this
-        .post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
+    if (this.post(
+        new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
       return true;
     }
 
@@ -470,8 +481,8 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
 
   @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return this
-        .post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers)) == Event.Result.ALLOW;
+    return this.post(
+        new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers)) == Event.Result.ALLOW;
   }
 
   @Override
@@ -506,18 +517,12 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
    */
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    return mouseX > this.getX() && mouseX < this.getX() + this.getWidth()
-        && mouseY > this.getY() && mouseY < this.getY() + this.getHeight();
+    return mouseX > this.getScaledX() && mouseX < this.getScaledX() + this.getScaledWidth()
+        && mouseY > this.getScaledY() && mouseY < this.getScaledY() + this.getScaledHeight();
   }
 
-  /**
-   * Similar to {@link #isMouseOver(double, double)} but checks for components over it
-   * 
-   * @return {@code false} if mouse is not over the component or if there's another component over
-   *         it
-   * @see #isMouseOver(double, double)
-   */
-  protected boolean isHovered() {
+  @Override
+  public boolean isHovered() {
     return this.hovered;
   }
 
@@ -596,59 +601,76 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return event.getResult();
   }
 
-  public final float getScaledX() {
-    return this.getX() + (this.getWidth() - this.getScaledWidth()) / 2.0F;
-  }
-
   public final float getScaledContentX() {
     return this.getContentX()
-        + (this.getContentWidth() - this.getScaledContentWidth()) / 2.0F;
+        + (this.getContentWidth() - (this.getContentWidth() * this.xScale)) / 2.0F;
   }
 
   @Override
   public float getContentX() {
-    return this.getX() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft);
+    return this.getX()
+        + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft) * this.getXScale();
+  }
+
+  public final float getScaledX() {
+    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale)) / 2.0F;
   }
 
   public final float getX() {
-    return (float) (Yoga.YGNodeLayoutGetLeft(this.node) + this.xTranslation
-        + (this.parent == null ? 0f : this.parent.getContentX())
-        + (this.unscaleWidth ? this.getWidth() * this.mainWindow.getGuiScale() : 0.0F));
+    final float left = Yoga.YGNodeLayoutGetLeft(this.node);
+    return left
+        + (left * this.getXScale()) - (left * this.xScale)
+        + this.xOffset
+        + (this.parent == null
+            ? 0.0F
+            : this.parent.getScaledContentX())
+        + (this.unscaleWidth
+            ? this.getWidth() * (float) this.mainWindow.getGuiScale()
+            : 0.0F);
   }
 
   public final float getScaledContentY() {
     return this.getContentY()
-        + (this.getContentHeight() - this.getScaledContentHeight()) / 2.0F;
-  }
-
-  public final float getScaledY() {
-    return this.getY() + (this.getHeight() - this.getScaledHeight()) / 2.0F;
+        + (this.getContentHeight() - (this.getContentHeight() * this.yScale)) / 2.0F;
   }
 
   @Override
   public float getContentY() {
-    return this.getY() + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop)
-        + (this.actualContentHeight > this.getHeight() ? -this.lerpedScrollOffset : 0.0F);
+    return this.getY()
+        + Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeTop) * this.getYScale()
+        - (this.fullHeight > this.getHeight()
+            ? this.getScrollOffset(this.minecraft.getFrameTime())
+            : 0.0F);
+  }
+
+  public final float getScaledY() {
+    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale)) / 2.0F;
   }
 
   public final float getY() {
-    return (float) (Yoga.YGNodeLayoutGetTop(this.node) + this.yTranslation
-        + (this.parent == null ? 0f : this.parent.getContentY())
-        + (this.unscaleHeight ? this.getHeight() / 2.0F * this.mainWindow.getGuiScale()
-            : 0.0F));
-  }
-
-  public final float getScaledWidth() {
-    return this.getWidth() * this.xScale;
+    final float top = Yoga.YGNodeLayoutGetTop(this.node);
+    return top
+        + (top * this.getYScale()) - (top * this.yScale)
+        + this.yOffset
+        + (this.parent == null
+            ? 0.0F
+            : this.parent.getScaledContentY())
+        + (this.unscaleHeight
+            ? this.getHeight() * (float) this.mainWindow.getGuiScale()
+            : 0.0F);
   }
 
   public final float getScaledContentWidth() {
-    return this.getContentWidth() * this.xScale;
+    return this.getContentWidth() * this.getXScale();
   }
 
   public float getContentWidth() {
-    return this.getWidth() - Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeRight)
+    return this.getWidth() - this.getRightPadding()
         - (this.isScrollbarEnabled() ? SCROLLBAR_WIDTH : 0.0F);
+  }
+
+  public final float getScaledWidth() {
+    return this.getWidth() * this.getXScale();
   }
 
   public final float getWidth() {
@@ -656,16 +678,16 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
         / (this.unscaleWidth ? this.mainWindow.getGuiScale() : 1.0F));
   }
 
-  public float getScaledHeight() {
-    return this.getHeight() * this.yScale;
-  }
-
   public final float getScaledContentHeight() {
-    return this.getContentHeight() * this.yScale;
+    return this.getContentHeight() * this.getYScale();
   }
 
   public final float getContentHeight() {
     return this.getHeight() - this.getBottomPadding();
+  }
+
+  public float getScaledHeight() {
+    return this.getHeight() * this.getYScale();
   }
 
   public final float getHeight() {
@@ -673,20 +695,35 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
         / (this.unscaleHeight ? this.mainWindow.getGuiScale() : 1.0F));
   }
 
-  public final float getXScale() {
-    return this.xScale;
+  public final SELF setXOffset(float xOffset) {
+    this.xOffset = xOffset;
+    return this.self();
   }
 
-  public SELF setZLevelOffset(int zLevelOffset) {
-    if (this.zLevelOffset != zLevelOffset) {
-      this.zLevelOffset = zLevelOffset;
-      this.zLevelChanged();
+  public final SELF setYOffset(float yOffset) {
+    this.yOffset = yOffset;
+    return this.self();
+  }
+
+  @Override
+  public final float getZOffset() {
+    return this.index + this.zOffset;
+  }
+
+  public final SELF setZOffset(float zOffset) {
+    if (this.zOffset != zOffset) {
+      this.zOffset = zOffset;
+      if (this.parent != null) {
+        this.parent.sortChildren();
+      }
+      this.post(new ZOffsetChangeEvent());
     }
     return this.self();
   }
 
-  public int getZLevel() {
-    return this.zLevel + this.zLevelOffset;
+  @Override
+  public final float getXScale() {
+    return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.xScale;
   }
 
   public final SELF setXScale(float xScale) {
@@ -694,8 +731,14 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
+  @Override
   public final float getYScale() {
-    return this.yScale;
+    return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.yScale;
+  }
+
+  public final SELF setYScale(float yScale) {
+    this.yScale = yScale;
+    return this.self();
   }
 
   public final Overflow getOverflow() {
@@ -739,10 +782,6 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft);
   }
 
-  public final SELF setYScale(float yScale) {
-    this.yScale = yScale;
-    return this.self();
-  }
 
   public final SELF setScale(float scale) {
     return this.setXScale(scale).setYScale(scale);
@@ -1098,30 +1137,28 @@ public abstract class Component<SELF extends Component<SELF>> extends AbstractGu
     return this.self();
   }
 
-  public final Screen getScreen() {
-    return this.parent.getScreen();
+  @Override
+  public final float getAlpha() {
+    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha;
+  }
+
+  public final SELF setAlpha(float alpha) {
+    this.alpha = alpha;
+    return this.self();
+  }
+
+  public final SELF configure(Consumer<SELF> configurer) {
+    configurer.accept(this.self());
+    return this.self();
   }
 
   @Override
-  public IParentView getParent() {
-    return this.parent;
+  public final Optional<IParentView> getParent() {
+    return Optional.ofNullable(this.parent);
   }
 
   @SuppressWarnings("unchecked")
   protected final SELF self() {
     return (SELF) this;
-  }
-
-  @Override
-  public int compareTo(Component<?> another) {
-    if (another == null) {
-      return 1;
-    }
-    if (this.getZLevel() < another.getZLevel()) {
-      return -1;
-    } else if (this.getZLevel() > another.getZLevel()) {
-      return 1;
-    }
-    return 0;
   }
 }

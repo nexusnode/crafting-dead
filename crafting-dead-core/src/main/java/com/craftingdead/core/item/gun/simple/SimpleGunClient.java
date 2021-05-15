@@ -185,19 +185,23 @@ public class SimpleGunClient<T extends AbstractGun<?, ?>> implements IGunClient 
   @Override
   public void handleHitEntityPost(ILiving<?, ?> living, Entity hitEntity,
       Vector3d hitPos, boolean playSound, boolean headshot) {
-    World world = hitEntity.getCommandSenderWorld();
-    Entity entity = living.getEntity();
+    if (!(hitEntity instanceof LivingEntity)) {
+      return;
+    }
+
+    final World level = hitEntity.level;
 
     if (headshot) {
       final int particleCount = 12;
       for (int i = 0; i < particleCount; ++i) {
-        world.addParticle(
+        level.addParticle(
             new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState()),
             hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
       }
     }
 
-    world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
+    level.playSound(
+        living.getEntity() instanceof PlayerEntity ? (PlayerEntity) living.getEntity() : null,
         hitEntity.blockPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
         1.0F, 1.0F);
 
@@ -208,7 +212,7 @@ public class SimpleGunClient<T extends AbstractGun<?, ?>> implements IGunClient 
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
-      world.addParticle(
+      level.addParticle(
           new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
           hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
     }

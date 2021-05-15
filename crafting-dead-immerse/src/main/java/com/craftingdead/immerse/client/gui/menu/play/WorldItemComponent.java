@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.Colour;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
 import com.craftingdead.immerse.client.gui.component.ImageComponent;
 import com.craftingdead.immerse.client.gui.component.ParentComponent;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
@@ -100,7 +99,8 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
       worldIcon = UNKOWN_SERVER_ICON;
     }
 
-    this.setFlexDirection(FlexDirection.ROW)
+    this
+        .setFlexDirection(FlexDirection.ROW)
         .setHeight(46F)
         .setTopMargin(6F)
         .setMaxWidth(300F)
@@ -114,7 +114,7 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
             .setHeight(38F)
             .setWidth(38F)
             .setRightMargin(5F))
-        .addChild(new ContainerComponent()
+        .addChild(new ParentComponent<>()
             .setWidth(120F)
             .setFlexGrow(1F)
             .setFlexDirection(FlexDirection.COLUMN)
@@ -164,13 +164,13 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
   }
 
   @Override
-  protected void mouseEntered(double mouseX, double mouseY) {
+  public void mouseEntered(double mouseX, double mouseY) {
     super.mouseEntered(mouseX, mouseY);
     this.updateBorder();
   }
 
   @Override
-  protected void mouseLeft(double mouseX, double mouseY) {
+  public void mouseLeft(double mouseX, double mouseY) {
     super.mouseLeft(mouseX, mouseY);
     this.updateBorder();
   }
@@ -222,7 +222,7 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
         ITextComponent itextcomponent1 = new TranslationTextComponent("selectWorld.backupWarning",
             this.worldSummary.getWorldVersionName(), SharedConstants.getCurrentVersion().getName());
         this.minecraft.setScreen(
-            new ConfirmBackupScreen(this.getScreen(), (p_214436_1_, p_214436_2_) -> {
+            new ConfirmBackupScreen(this.minecraft.screen, (p_214436_1_, p_214436_2_) -> {
               if (p_214436_1_) {
                 String s = this.worldSummary.getLevelName();
 
@@ -245,12 +245,12 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
             } catch (Exception exception) {
               logger.error("Failure to open 'future world'", (Throwable) exception);
               this.minecraft.setScreen(new AlertScreen(() -> {
-                this.minecraft.setScreen(this.getScreen());
+                this.minecraft.setScreen(this.minecraft.screen);
               }, new TranslationTextComponent("selectWorld.futureworld.error.title"),
                   new TranslationTextComponent("selectWorld.futureworld.error.text")));
             }
           } else {
-            this.minecraft.setScreen(this.getScreen());
+            this.minecraft.setScreen(this.minecraft.screen);
           }
 
         }, new TranslationTextComponent("selectWorld.versionQuestion"),
@@ -285,7 +285,7 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
         } catch (IOException ioexception1) {
           logger.error("Failed to unlock level {}", fileName, ioexception1);
         }
-        Screen screen = this.getScreen();
+        Screen screen = this.minecraft.screen;
         this.parentWorldList.reloadWorlds();
         this.minecraft.setScreen(screen);
       }, levelSave));
@@ -301,7 +301,7 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
    */
   public void deleteWorld() {
     this.minecraft.setScreen(new ConfirmScreen((confirmed) -> {
-      Screen screen = this.getScreen();
+      Screen screen = this.minecraft.screen;
       if (confirmed) {
         this.minecraft.setScreen(new WorkingScreen());
         SaveFormat levelSource = this.minecraft.getLevelSource();
@@ -346,20 +346,21 @@ public class WorldItemComponent extends ParentComponent<WorldItemComponent> {
       if (worldGenSettings.isOldCustomizedWorld()) {
         this.minecraft.setScreen(new ConfirmScreen((p_239095_6_) -> {
           this.minecraft.setScreen(p_239095_6_
-              ? new CreateWorldScreen(this.getScreen(), levelSettings,
+              ? new CreateWorldScreen(this.minecraft.screen, levelSettings,
                   worldGenSettings, path, dataPackCodec, dynamicRegistries)
-              : this.getScreen());
+              : this.minecraft.screen);
         }, new TranslationTextComponent("selectWorld.recreate.customized.title"),
             new TranslationTextComponent("selectWorld.recreate.customized.text"),
             DialogTexts.GUI_PROCEED, DialogTexts.GUI_CANCEL));
       } else {
-        this.minecraft.setScreen(new CreateWorldScreen(this.getScreen(), levelSettings,
+        this.minecraft.setScreen(new CreateWorldScreen(this.minecraft.screen, levelSettings,
             worldGenSettings, path, dataPackCodec, dynamicRegistries));
       }
     } catch (Exception e) {
       logger.error("Unable to recreate world", e);
+      Screen screen = this.minecraft.screen;
       this.minecraft.setScreen(new AlertScreen(() -> {
-        this.minecraft.setScreen(this.getScreen());
+        this.minecraft.setScreen(screen);
       }, new TranslationTextComponent("selectWorld.recreate.error.title"),
           new TranslationTextComponent("selectWorld.recreate.error.text")));
     }

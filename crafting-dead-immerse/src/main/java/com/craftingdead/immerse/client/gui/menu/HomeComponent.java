@@ -19,66 +19,58 @@
 package com.craftingdead.immerse.client.gui.menu;
 
 import java.io.File;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.Colour;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
-import com.craftingdead.immerse.client.gui.component.EntityComponent;
-import com.craftingdead.immerse.client.gui.component.FakePlayerEntity;
-import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
-import com.craftingdead.immerse.client.gui.component.type.Align;
-import com.craftingdead.immerse.client.gui.component.type.FlexDirection;
+import com.craftingdead.immerse.client.gui.component.Component;
+import com.craftingdead.immerse.client.gui.component.ComponentUtil;
+import com.craftingdead.immerse.client.gui.component.ParentComponent;
 import com.craftingdead.immerse.client.gui.component.type.Justify;
 import com.craftingdead.immerse.client.gui.component.type.Overflow;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.registries.ForgeRegistries;
+import io.noties.tumbleweed.Timeline;
+import io.noties.tumbleweed.Tween;
+import io.noties.tumbleweed.TweenCallback;
+import io.noties.tumbleweed.equations.Expo;
 
-public class HomeComponent extends ContainerComponent {
+public class HomeComponent extends ParentComponent<HomeComponent> {
 
-  private static final Random random = new Random();
+  private final Component<?> newsComponent;
 
   public HomeComponent() {
-    this.setFlexDirection(FlexDirection.ROW);
-    this.setAlignItems(Align.CENTER);
     this.setJustifyContent(Justify.SPACE_AROUND);
-
-    this.addChild(new ContainerComponent()
-        .setWidthPercent(50.0F)
+    this.newsComponent = new ParentComponent<>()
+        .setWidthPercent(45.0F)
         .setHeightPercent(75.0F)
         .setBackgroundColour(new Colour(0x70777777))
         .setBackgroundBlur(50.0F)
-        .addChild(new ContainerComponent()
-            .setPadding(10.0F)
-            .setOverflow(Overflow.SCROLL)
-            .addAll(new File("news.xml"))));
+        .setPadding(10.0F)
+        .setLeftMarginPercent(10.0F)
+        .setOverflow(Overflow.SCROLL)
+        .configure(c -> ComponentUtil.addAll(c, new File("news.xml")));
+    this.addChild(this.newsComponent);
+  }
 
-    final FakePlayerEntity fakePlayerEntity =
-        new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
+  @Override
+  protected void added() {
+    this.newsComponent.setScale(0.3F);
+    Timeline.createParallel(1000.0F)
+        .push(Tween.to(this.newsComponent, X_SCALE)
+            .ease(Expo.OUT)
+            .target(1.0F))
+        .push(Tween.to(this.newsComponent, Y_SCALE)
+            .ease(Expo.OUT)
+            .target(1.0F))
+        .start(this.getTweenManager());
+  }
 
-
-    List<Item> gunItems = ForgeRegistries.ITEMS.getValues()
-        .stream()
-        .filter(item -> item instanceof GunItem)
-        .collect(Collectors.toList());
-    Item randomGunItem = gunItems.get(random.nextInt(gunItems.size()));
-    fakePlayerEntity.setItemInHand(Hand.MAIN_HAND, new ItemStack(randomGunItem));
-
-    this.addChild(new ContainerComponent()
-        .setAlignItems(Align.CENTER)
-        .setWidthPercent(30.0F)
-        .setHeightPercent(45.0F)
-        .addChild(new TextBlockComponent(
-            Text.of(this.minecraft.getUser().getName()).withStyle(TextFormatting.BOLD,
-                TextFormatting.DARK_RED)))
-        .addChild(new EntityComponent(fakePlayerEntity)
-            .setWidthPercent(100.0F)
-            .setAspectRatio(0.95F)));
-
+  @Override
+  protected void removed(Runnable remove) {
+    Timeline.createParallel(800.0F)
+        .push(Tween.to(this.newsComponent, X_SCALE)
+            .ease(Expo.IN)
+            .target(0.1F))
+        .push(Tween.to(this.newsComponent, Y_SCALE)
+            .ease(Expo.IN)
+            .target(0.1F))
+        .addCallback(TweenCallback.COMPLETE, (type, source) -> remove.run())
+        .start(this.getTweenManager());
   }
 }

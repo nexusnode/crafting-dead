@@ -177,17 +177,17 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
     ITextComponent timer = this.getTimer();
 
     // Render Red Score
-    RenderUtil.fill2(middleWidth - 19, 15, 18, 11, 0x99000000);
+    RenderUtil.fillWidthHeight(middleWidth - 19, 15, 18, 11, 0x99000000);
     AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, redScore,
         middleWidth - 9, 17, 0);
 
     // Render Blue Score
-    RenderUtil.fill2(middleWidth + 1, 15, 18, 11, 0x99000000);
+    RenderUtil.fillWidthHeight(middleWidth + 1, 15, 18, 11, 0x99000000);
     AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, blueScore,
         middleWidth + 10, 17, 0);
 
     // Render Time
-    RenderUtil.fill2(middleWidth - 19, 1, 38, 13, 0x99000000);
+    RenderUtil.fillWidthHeight(middleWidth - 19, 1, 38, 13, 0x99000000);
     AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, timer, middleWidth + 1,
         4, 0);
 
@@ -205,9 +205,9 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         int x = middleWidth - 21 - headWidth - (i * (headWidth + 3));
         int y = 2;
 
-        RenderUtil.fill2(x - 1, y - 1, headWidth + 2, headHeight + 2, 0x80000000);
+        RenderUtil.fillWidthHeight(x - 1, y - 1, headWidth + 2, headHeight + 2, 0x80000000);
         if (playerData.isDead()) {
-          RenderUtil.fill2(x, y, headWidth, headHeight, 0x80000000);
+          RenderUtil.fillWidthHeight(x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
           RenderUtil.bind(DEAD);
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
@@ -217,7 +217,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
               x, y, headWidth, headHeight);
         }
 
-        RenderUtil.fill2(x - 1, y + headHeight + 2, headWidth + 2,
+        RenderUtil.fillWidthHeight(x - 1, y + headHeight + 2, headWidth + 2,
             this.minecraft.font.lineHeight + 2,
             0x80000000);
         AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
@@ -237,9 +237,9 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         int x = middleWidth + 21 + (i * (headWidth + 3));
         int y = 2;
 
-        RenderUtil.fill2(x - 1, y - 1, headWidth + 2, headHeight + 2, 0x80000000);
+        RenderUtil.fillWidthHeight(x - 1, y - 1, headWidth + 2, headHeight + 2, 0x80000000);
         if (playerData.isDead()) {
-          RenderUtil.fill2(x, y, headWidth, headHeight, 0x80000000);
+          RenderUtil.fillWidthHeight(x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
           RenderUtil.bind(DEAD);
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
@@ -249,7 +249,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
               x, y, headWidth, headHeight);
         }
 
-        RenderUtil.fill2(x - 1, y + headHeight + 2, headWidth + 2,
+        RenderUtil.fillWidthHeight(x - 1, y + headHeight + 2, headWidth + 2,
             this.minecraft.font.lineHeight + 2,
             0x80000000);
         AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
@@ -271,8 +271,8 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
     int sby = mheight - (sbheight / 2) - 18;
 
     // Render SB Header
-    RenderUtil.fill2(sbx, sby, sbwidth, 40, 0xCC000000);
-    RenderUtil.fill2(sbx, sby + 3, sbwidth, 34, 0x33FFFFFF);
+    RenderUtil.fillWidthHeight(sbx, sby, sbwidth, 40, 0xCC000000);
+    RenderUtil.fillWidthHeight(sbx, sby + 3, sbwidth, 34, 0x33FFFFFF);
 
     // Render Logo
     RenderSystem.enableBlend();
@@ -304,7 +304,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         sby + 24, 0);
 
     // Render Teams and Player Information
-    RenderUtil.fill2(sbx, sby + 41, sbwidth, 193, 0x80000000);
+    RenderUtil.fillWidthHeight(sbx, sby + 41, sbwidth, 193, 0x80000000);
     RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 41, sbwidth, 13, Text.of("Ping"),
         Text.of("Username"), Text.of("K"), Text.of("A"), Text.of("D"), Text.of("Score"));
 
@@ -342,6 +342,6 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
       }
     }
 
-    RenderUtil.fill2(sbx + 4, sby + 144, sbwidth - 8, 1, 0x80FFFFFF);
+    RenderUtil.fillWidthHeight(sbx + 4, sby + 144, sbwidth - 8, 1, 0x80FFFFFF);
   }
 }

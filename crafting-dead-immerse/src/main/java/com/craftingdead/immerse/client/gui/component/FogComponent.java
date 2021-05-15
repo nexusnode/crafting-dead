@@ -54,7 +54,7 @@ public class FogComponent extends Component<FogComponent> {
     {
       matrixStack.scale(4F, 4F, 4F);
       RenderSystem.enableBlend();
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 0.3F);
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 0.3F * this.getAlpha());
 
       RenderUtil.bind(SMOKE_TEXTURE);
 

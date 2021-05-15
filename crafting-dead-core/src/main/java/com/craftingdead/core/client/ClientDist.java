@@ -759,7 +759,7 @@ public class ClientDist implements IModDist {
     // Applies the flash effect at client side for a better delay compensation
     // and better FOV calculation
     int duration = flashGrenadeEntity.calculateDuration(this.minecraft.player,
-        RenderUtil.isInsideGameFOV(flashGrenadeEntity, false));
+        RenderUtil.isInsideFrustum(flashGrenadeEntity, false));
     if (duration > 0) {
       EffectInstance flashEffect = new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
       ModEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);

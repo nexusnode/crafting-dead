@@ -114,7 +114,6 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     public static final boolean DEFAULT_CENTERED = true;
 
     private boolean selected = false;
-    private boolean hovered = false;
 
     private Colour underscoreColor;
     private double underscoreHeight;
@@ -136,18 +135,6 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
     }
 
     @Override
-    protected void mouseEntered(double mouseX, double mouseY) {
-      super.mouseEntered(mouseX, mouseY);
-      this.hovered = true;
-    }
-
-    @Override
-    protected void mouseLeft(double mouseX, double mouseY) {
-      super.mouseLeft(mouseX, mouseY);
-      this.hovered = false;
-    }
-
-    @Override
     public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
       super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
@@ -158,7 +145,7 @@ public class TabsComponent extends ParentComponent<TabsComponent> {
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
             this.underscoreColor.getHexColour());
-      } else if (this.hovered) {
+      } else if (this.isHovered()) {
         RenderUtil.fill(this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5D
                 + this.underscoreYOffset,

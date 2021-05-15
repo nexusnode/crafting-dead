@@ -25,7 +25,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 
 public interface IGameServer extends IGame {
 
-  static final Codec<IGameServer> CODEC =
+  Codec<IGameServer> CODEC =
       GameType.CODEC.dispatch(IGameServer::getGameType, GameType::getGameServerCodec);
 
   default boolean disableBlockBurning() {

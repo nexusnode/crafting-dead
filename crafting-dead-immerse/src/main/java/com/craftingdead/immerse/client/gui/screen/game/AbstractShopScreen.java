@@ -27,6 +27,7 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.game.shop.IShop;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -165,8 +166,9 @@ public abstract class AbstractShopScreen extends Screen {
     PlayerInventory inventory = this.player.getEntity().inventory;
     for (int i = 0; i < 7; i++) {
       ItemStack itemStack = inventory.getItem(i);
-      com.craftingdead.core.client.util.RenderUtil.renderItemIntoGUI(itemStack, mx + 120,
-          my - 60 + inventoryYOffset + (i * 21), 0xFFFFFFFF, true);
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(itemStack, mx + 120,
+          my - 60 + inventoryYOffset + (i * 21), 0xFFFFFFFF,
+          ItemCameraTransforms.TransformType.FIXED);
     }
   }
 }

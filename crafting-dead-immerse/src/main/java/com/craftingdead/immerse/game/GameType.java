@@ -31,7 +31,7 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GameType extends ForgeRegistryEntry<GameType> {
 
-  public final static Codec<GameType> CODEC =
+  public static final Codec<GameType> CODEC =
       ResourceLocation.CODEC.xmap(registryName -> GameTypes.REGISTRY.get().getValue(registryName),
           GameType::getRegistryName);
 

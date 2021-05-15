@@ -731,6 +731,29 @@ public class ModRecipeProvider extends RecipeProvider {
         .define('b', ModItems.MEDIUM_BOLT.get())
         .unlockedBy("has_medium_bolt", has(ModItems.MEDIUM_BOLT.get()))
         .save(consumer);
+
+    // ================================================================================
+    // Supply Drop Radios
+    // ================================================================================
+
+    ShapedRecipeBuilder.shaped(ModItems.MILITARY_DROP_RADIO.get())
+        .pattern("iti")
+        .pattern("igi")
+        .pattern("iii")
+        .define('t', Items.REDSTONE_TORCH)
+        .define('i', Items.IRON_INGOT)
+        .define('g', Items.GOLD_INGOT)
+        .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
+        .save(consumer);
+    ShapedRecipeBuilder.shaped(ModItems.MEDICAL_DROP_RADIO.get())
+        .pattern("iti")
+        .pattern("ifi")
+        .pattern("iii")
+        .define('t', Items.REDSTONE_TORCH)
+        .define('i', Items.IRON_INGOT)
+        .define('f', ModItems.FIRST_AID_KIT.get())
+        .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
+        .save(consumer);
   }
 
   @Override

@@ -18,12 +18,32 @@
 
 package com.craftingdead.immerse.client.gui.component;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
-import net.minecraft.client.gui.screen.Screen;
 
-public interface IView extends IGuiEventListener, IRenderable {
+public interface IView extends IGuiEventListener, IRenderable, Comparable<IView> {
+
+  /**
+   * Similar to {@link #isMouseOver(double, double)} but is aware of z-offset.
+   * 
+   * @return {@code false} if mouse is not over the component or if there's another component over
+   *         it
+   * @see #isMouseOver(double, double)
+   */
+  boolean isHovered();
+
+  void mouseEntered(double mouseX, double mouseY);
+
+  void mouseLeft(double mouseX, double mouseY);
+
+  default float getScaledContentX() {
+    return 0.0F;
+  }
+
+  default float getScaledContentY() {
+    return 0.0F;
+  }
 
   default float getContentX() {
     return 0.0F;
@@ -36,11 +56,33 @@ public interface IView extends IGuiEventListener, IRenderable {
   float getWidth();
 
   float getHeight();
-  
-  int getZLevel();
 
-  @Nullable
-  IParentView getParent();
+  float getZOffset();
 
-  Screen getScreen();
+  default float getAlpha() {
+    return 1.0F;
+  }
+
+  default float getXScale() {
+    return 1.0F;
+  }
+
+  default float getYScale() {
+    return 1.0F;
+  }
+
+  Optional<IParentView> getParent();
+
+  @Override
+  default int compareTo(IView another) {
+    if (another == null) {
+      return 1;
+    }
+    if (this.getZOffset() < another.getZOffset()) {
+      return -1;
+    } else if (this.getZOffset() > another.getZOffset()) {
+      return 1;
+    }
+    return 0;
+  }
 }

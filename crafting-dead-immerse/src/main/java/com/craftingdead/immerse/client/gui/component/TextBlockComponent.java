@@ -21,11 +21,11 @@ package com.craftingdead.immerse.client.gui.component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.gui.component.type.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.RenderComponentsUtil;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IReorderingProcessor;
@@ -104,27 +104,29 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   private void generateLines(int width) {
-    this.lines = RenderComponentsUtil.wrapComponents(this.text, width, this.font);
+    this.lines = this.font.split(this.text, width);
   }
 
   @Override
-  public float getActualContentHeight() {
+  public float computeFullHeight() {
     return this.lines.size() * this.font.lineHeight;
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     return super.mouseClicked(mouseX, mouseY, button)
-        || this.componentStyleAtWidth(mouseX, mouseY).map(this.getScreen()::handleComponentClicked)
+        || this.componentStyleAtWidth(mouseX, mouseY)
+            .map(this.minecraft.screen::handleComponentClicked)
             .orElse(false);
   }
 
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+
     matrixStack.pushPose();
     {
-      matrixStack.translate(this.getContentX(), this.getContentY(), 0.0D);
+      matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
           IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
@@ -133,9 +135,12 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
         matrixStack.pushPose();
         {
           matrixStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
-          float x = this.centered ? (this.getWidth() - this.font.width(line)) / 2F : 0;
-          this.font.drawInBatch(line, x, 0, 0xFFFFFFFF, this.shadow,
-              matrixStack.last().pose(), renderTypeBuffer, false, 0, 0xF000F0);
+          float x = this.centered
+              ? (this.getContentWidth() - this.font.width(line)) / 2.0F
+              : 0;
+          this.font.drawInBatch(line, x, 0, 0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
+              this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
+              RenderUtil.FULL_LIGHT);
         }
         matrixStack.popPose();
       }
@@ -145,18 +150,16 @@ public class TextBlockComponent extends Component<TextBlockComponent> {
   }
 
   public Optional<Style> componentStyleAtWidth(double mouseX, double mouseY) {
-    int offsetMouseX = MathHelper.floor(mouseX - this.getScaledContentX());
-    int offsetMouseY = MathHelper.floor(mouseY - this.getScaledContentY());
-    if (offsetMouseX >= 0 && offsetMouseY >= 0) {
-      final int lines = this.lines.size();
-      if (offsetMouseX <= this.getScaledContentWidth()
-          && offsetMouseY < this.font.lineHeight * lines + lines) {
-        int maxLines = offsetMouseY / this.font.lineHeight;
-        if (maxLines >= 0 && maxLines < this.lines.size()) {
-          IReorderingProcessor line = this.lines.get(maxLines);
-          return Optional.ofNullable(
-              this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
-        }
+    int offsetMouseX = MathHelper.floor((mouseX - this.getContentX()) / this.getXScale());
+    int offsetMouseY = MathHelper.floor((mouseY - this.getContentY()) / this.getYScale());
+    final int lines = this.lines.size();
+    if (offsetMouseX >= 0 && offsetMouseY >= 0 && offsetMouseX <= this.getContentWidth()
+        && offsetMouseY < (this.font.lineHeight * lines + lines)) {
+      int maxLines = offsetMouseY / this.font.lineHeight;
+      if (maxLines >= 0 && maxLines < this.lines.size()) {
+        IReorderingProcessor line = this.lines.get(maxLines);
+        return Optional.ofNullable(
+            this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
       }
     }
     return Optional.empty();

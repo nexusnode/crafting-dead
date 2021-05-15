@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.lwjgl.util.yoga.Yoga;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
@@ -29,10 +30,12 @@ import net.minecraft.util.text.ITextComponent;
 
 public class ComponentScreen extends Screen implements IParentView {
 
-  private final ContainerComponent container;
+  private final ParentComponent<?> container;
   private final long node;
 
-  private Component<?> hovered;
+  private boolean hovered;
+
+  private IView lastHovered;
 
   protected ComponentScreen(ITextComponent title) {
     super(title);
@@ -40,12 +43,12 @@ public class ComponentScreen extends Screen implements IParentView {
     this.minecraft = Minecraft.getInstance();
     this.width = this.minecraft.getWindow().getGuiScaledWidth();
     this.height = this.minecraft.getWindow().getGuiScaledHeight();
-    this.container = new ContainerComponent();
+    this.container = new ParentComponent<>();
     this.container.parent = this;
     Yoga.YGNodeInsertChild(this.node, this.container.node, 0);
   }
 
-  protected final ContainerComponent getRoot() {
+  protected final ParentComponent<?> getRoot() {
     return this.container;
   }
 
@@ -57,19 +60,19 @@ public class ComponentScreen extends Screen implements IParentView {
         / (double) this.minecraft.getWindow().getWidth();
     double mouseY = this.minecraft.mouseHandler.ypos() * (double) this.height
         / (double) this.minecraft.getWindow().getHeight();
-    this.container.mouseMoved(mouseX, mouseY);
+    this.mouseMoved(mouseX, mouseY);
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     this.container.mouseMoved(mouseX, mouseY);
 
-    Component<?> hovered = this.container.isMouseOver(mouseX, mouseY) ? this.container : null;
+    IView hovered = this.container.isMouseOver(mouseX, mouseY) ? this.container : null;
     while (hovered instanceof ParentComponent) {
-      Component<?> nextHovered = ((ParentComponent<?>) hovered)
+      IView nextHovered = ((ParentComponent<?>) hovered)
           .getChildAt(mouseX, mouseY)
-          .filter(listener -> listener instanceof Component)
-          .map(listener -> (Component<?>) listener)
+          .filter(listener -> listener instanceof IView)
+          .map(listener -> (IView) listener)
           .orElse(null);
 
       if (nextHovered == null) {
@@ -83,14 +86,13 @@ public class ComponentScreen extends Screen implements IParentView {
       }
     }
 
-    while (this.hovered != null && (!this.hovered.isMouseOver(mouseX, mouseY)
-        || (hovered != null && hovered.compareTo(this.hovered) == 1))) {
-      this.hovered.mouseLeft(mouseX, mouseY);
-      this.hovered =
-          this.hovered.parent instanceof Component ? (Component<?>) this.hovered.parent : null;
+    while (this.lastHovered != null && (!this.lastHovered.isMouseOver(mouseX, mouseY)
+        || (hovered != null && hovered.compareTo(this.lastHovered) > 0))) {
+      this.lastHovered.mouseLeft(mouseX, mouseY);
+      this.lastHovered = this.lastHovered.getParent().orElse(null);
     }
 
-    this.hovered = hovered;
+    this.lastHovered = hovered;
   }
 
   @Override
@@ -109,6 +111,16 @@ public class ComponentScreen extends Screen implements IParentView {
   }
 
   @Override
+  public void mouseEntered(double mouseX, double mouseY) {
+    this.hovered = true;
+  }
+
+  @Override
+  public void mouseLeft(double mouseX, double mouseY) {
+    this.hovered = false;
+  }
+
+  @Override
   public float getWidth() {
     return this.width;
   }
@@ -119,17 +131,17 @@ public class ComponentScreen extends Screen implements IParentView {
   }
 
   @Override
-  public Screen getScreen() {
-    return this;
+  public float getZOffset() {
+    return 0.0F;
   }
 
   @Override
-  public int getZLevel() {
-    return 0;
+  public Optional<IParentView> getParent() {
+    return Optional.empty();
   }
 
   @Override
-  public IParentView getParent() {
-    return null;
+  public boolean isHovered() {
+    return this.hovered;
   }
 }

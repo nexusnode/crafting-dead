@@ -50,17 +50,17 @@ public class EntityComponent extends Component<EntityComponent> {
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-
     this.minecraft.getEntityRenderDispatcher().prepare(FakeLevel.getInstance(),
         this.minecraft.gameRenderer.getMainCamera(), null);
     matrixStack.pushPose();
     {
       matrixStack.translate(0, 0, 1050.0F);
       matrixStack.scale(1.0F, 1.0F, -1.0F);
-
-      matrixStack.translate(this.getScaledContentX() + this.getScaledContentWidth() / 2.0F,
+      matrixStack.translate(
+          this.getScaledContentX() + this.getScaledContentWidth() / 2.0F,
           this.getScaledContentY() + this.getScaledContentHeight(), 1000.0D);
-      matrixStack.scale(this.getScaledContentWidth() / 2.0F, this.getScaledContentHeight() / 2.0F,
+      matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
+      matrixStack.scale(this.getContentWidth() / 2.0F, this.getContentHeight() / 2.0F,
           1.0F);
       matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 

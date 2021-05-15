@@ -27,10 +27,12 @@ import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -74,7 +76,7 @@ public class DropdownComponent extends Component<DropdownComponent>
     this.itemBackgroundColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
     this.selectedItemBackgroundColour = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR;
     this.hoveredItemBackgroundColour = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR;
-    this.setZLevelOffset(DEFAULT_Z_LEVEL);
+    this.setZOffset(DEFAULT_Z_LEVEL);
     this.arrowWidth = DEFAULT_ARROW_WIDTH;
     this.arrowHeight = DEFAULT_ARROW_HEIGHT;
     this.arrowLineWidth = DEFAULT_ARROW_LINE_WIDTH;
@@ -172,11 +174,6 @@ public class DropdownComponent extends Component<DropdownComponent>
   }
 
   @Override
-  public int getZLevel() {
-    return super.getZLevel() + (this.expanded ? 1 : 0);
-  }
-
-  @Override
   public boolean changeFocus(boolean forward) {
     if (this.expanded) {
       if (!IParentView.super.changeFocus(forward)) {
@@ -201,7 +198,7 @@ public class DropdownComponent extends Component<DropdownComponent>
 
   protected void toggleExpanded() {
     this.expanded = !this.expanded;
-    this.zLevelChanged();
+    this.setZOffset(this.expanded ? 1.0F : 0.0F);
   }
 
   @Override
@@ -219,7 +216,7 @@ public class DropdownComponent extends Component<DropdownComponent>
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-    this.items.get(this.selectedItemIndex).render(Type.SELECTED);
+    this.items.get(this.selectedItemIndex).render(matrixStack, Type.SELECTED);
     this.renderArrow();
 
     if (this.expanded) {
@@ -235,7 +232,7 @@ public class DropdownComponent extends Component<DropdownComponent>
           type = Type.NONE;
         }
 
-        item.render(type);
+        item.render(matrixStack, type);
       }
     }
   }
@@ -296,7 +293,7 @@ public class DropdownComponent extends Component<DropdownComponent>
       this.actionListener = actionListener;
     }
 
-    private void render(Type type) {
+    private void render(MatrixStack matrixStack, Type type) {
       float y = this.getY();
 
       int backgroundColour = DropdownComponent.this.itemBackgroundColour;
@@ -322,22 +319,25 @@ public class DropdownComponent extends Component<DropdownComponent>
           break;
       }
 
-      this.render(DropdownComponent.this.getScaledContentX(), y,
+      this.render(matrixStack, DropdownComponent.this.getScaledContentX(), y,
           DropdownComponent.this.getScaledContentWidth(), DropdownComponent.this.getItemHeight(),
           backgroundColour, textColour);
     }
 
-    private void render(float x, float y, float width, float height, int backgroundColour,
-        int textColour) {
+    private void render(MatrixStack matrixStack, float x, float y, float width, float height,
+        int backgroundColour, int textColour) {
       float x2 = x + width;
       float y2 = y + height;
 
       RenderUtil.fill(x, y, x2, y2, backgroundColour);
 
-      DropdownComponent.this.minecraft.font.drawWordWrap(this.text,
-          (int) x + 3,
-          (int) (y + (height - DropdownComponent.this.minecraft.font.lineHeight) / 2 + 1),
-          (int) width, textColour);
+      FontRenderer font = DropdownComponent.this.minecraft.font;
+
+      float textY = y + (height - DropdownComponent.this.minecraft.font.lineHeight) / 2 + 1;
+      for (IReorderingProcessor line : font.split(this.text, (int) width)) {
+        font.draw(matrixStack, line, x + 3, textY, textColour);
+        textY += DropdownComponent.this.minecraft.font.lineHeight;
+      }
     }
 
     private void click() {
@@ -408,4 +408,7 @@ public class DropdownComponent extends Component<DropdownComponent>
   public void setFocused(@Nullable IGuiEventListener focusedListener) {
     this.focusedListener = focusedListener;
   }
+
+  @Override
+  public void sortChildren() {}
 }

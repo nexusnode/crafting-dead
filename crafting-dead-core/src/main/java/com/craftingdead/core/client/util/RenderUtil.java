@@ -21,16 +21,16 @@ package com.craftingdead.core.client.util;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
-import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.renderer.item.IItemRenderer;
-import com.craftingdead.core.client.renderer.item.IRendererProvider;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BreakableBlock;
 import net.minecraft.block.StainedGlassPaneBlock;
@@ -47,17 +47,11 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.ItemModelGenerator;
-import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderDefault;
@@ -73,6 +67,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.TransformationMatrix;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
@@ -80,9 +75,33 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class RenderUtil {
 
-  public static final int FULL_LIGHT = 0xF000F0;
+  public static final Codec<Vector3f> VECTOR_3F_CODEC =
+      Codec.FLOAT.listOf().comapFlatMap((list) -> {
+        if (list.size() > 3) {
+          return DataResult.error("Input is not a list of 3 floats");
+        } else {
+          return DataResult
+              .success(new Vector3f(list.get(0), list.get(1), list.get(2)));
+        }
+      }, (vector) -> Lists.newArrayList(vector.x(), vector.y(), vector.z()));
 
-  private static final ItemModelGenerator MODEL_GENERATOR = new ItemModelGenerator();
+  public static final Codec<Quaternion> QUATERNION_CODEC = VECTOR_3F_CODEC
+      .xmap(t -> new Quaternion(t.x(), t.y(), t.z(), true), RenderUtil::toEulerAngles);
+
+  public static final Codec<TransformationMatrix> TRANSFORMATION_MATRIX_CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(
+              VECTOR_3F_CODEC.optionalFieldOf("translation", new Vector3f())
+                  .forGetter(TransformationMatrix::getTranslation),
+              QUATERNION_CODEC.optionalFieldOf("rotation", Quaternion.ONE.copy())
+                  .forGetter(TransformationMatrix::getLeftRotation),
+              VECTOR_3F_CODEC.optionalFieldOf("scale", new Vector3f(1.0F, 1.0F, 1.0F))
+                  .forGetter(TransformationMatrix::getScale),
+              QUATERNION_CODEC.optionalFieldOf("post-rotation", Quaternion.ONE.copy())
+                  .forGetter(TransformationMatrix::getRightRot))
+          .apply(instance, TransformationMatrix::new));
+
+  public static final int FULL_LIGHT = 0xF000F0;
 
   public static final ResourceLocation ICONS =
       new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
@@ -111,6 +130,29 @@ public class RenderUtil {
         }
       }
     }
+  }
+
+  public static Vector3f toEulerAngles(Quaternion quat) {
+    // roll (x-axis rotation)
+    float sinRollCosPitch = 2 * (quat.i() * quat.j() + quat.k() * quat.r());
+    float cosRollCosPitch = 1 - 2 * (quat.j() * quat.j() + quat.k() * quat.k());
+    float roll = (float) MathHelper.atan2(sinRollCosPitch, cosRollCosPitch);
+
+    // pitch (y-axis rotation)
+    float sinPitch = 2 * (quat.i() * quat.k() - quat.r() * quat.j());
+    float pitch;
+    if (MathHelper.abs(sinPitch) >= 1) {
+      pitch = (float) Math.copySign(Math.PI / 2, sinPitch); // use 90 degrees if out of range
+    } else {
+      pitch = (float) Math.asin(sinPitch);
+    }
+
+    // yaw (z-axis rotation)
+    float sinYawCosPitch = 2 * (quat.i() * quat.r() + quat.j() * quat.k());
+    float cosYawCosPitch = 1 - 2 * (quat.k() * quat.k() + quat.r() * quat.r());
+    float yaw = (float) MathHelper.atan2(sinYawCosPitch, cosYawCosPitch);
+
+    return new Vector3f(roll, pitch, yaw);
   }
 
   public static Optional<Vector2f> projectToPlayerView(double x, double y, double z,
@@ -165,17 +207,17 @@ public class RenderUtil {
   }
 
   /**
-   * Checks whether the entity is inside the FOV of the game client. The size of the game window is
-   * also considered. Blocks in front of player's view are not considered.
+   * Checks whether the entity is inside the viewing frustum. The size of the game window is also
+   * considered. Blocks in front of player's view are not considered.
    *
-   * @param target - The entity to test from the player's view
-   * @return <code>true</code> if the entity can be directly seen. <code>false</code> otherwise.
+   * @param target - the entity to test for
+   * @return <code>true</code> if the entity is visible, <code>false</code> otherwise.
    */
-  public static boolean isInsideGameFOV(Entity target, boolean firstPerson) {
-    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getMainCamera();
-    Vector3d projectedViewVec3d =
-        firstPerson ? target.position().add(0, target.getEyeHeight(), 0)
-            : activerenderinfo.getPosition();
+  public static boolean isInsideFrustum(Entity target, boolean firstPerson) {
+    ActiveRenderInfo camera = minecraft.gameRenderer.getMainCamera();
+    Vector3d projectedViewVec3d = firstPerson
+        ? target.position().add(0, target.getEyeHeight(), 0)
+        : camera.getPosition();
     double viewerX = projectedViewVec3d.x();
     double viewerY = projectedViewVec3d.y();
     double viewerZ = projectedViewVec3d.z();
@@ -194,36 +236,38 @@ public class RenderUtil {
           target.getZ() + 2.0D);
     }
 
-    return RenderUtil.createClippingHelper(1F, firstPerson)
-        .isVisible(renderBoundingBox);
+    return RenderUtil.createFrustum(1.0F, firstPerson).isVisible(renderBoundingBox);
   }
 
-  public static ClippingHelper createClippingHelper(float partialTicks, boolean firstPerson) {
+  public static ClippingHelper createFrustum(float partialTicks, boolean firstPerson) {
     GameRenderer gameRenderer = minecraft.gameRenderer;
-    ActiveRenderInfo activerenderinfo = minecraft.gameRenderer.getMainCamera();
-    Vector3d projectedViewVec3d =
-        firstPerson ? minecraft.player.position().add(0, minecraft.player.getEyeHeight(), 0)
-            : activerenderinfo.getPosition();
+    ActiveRenderInfo camera = minecraft.gameRenderer.getMainCamera();
+    Vector3d projectedViewVec3d = firstPerson
+        ? minecraft.player.position().add(0, minecraft.player.getEyeHeight(), 0)
+        : camera.getPosition();
     double viewerX = projectedViewVec3d.x();
     double viewerY = projectedViewVec3d.y();
     double viewerZ = projectedViewVec3d.z();
-    float pitch = firstPerson ? minecraft.player.xRot : activerenderinfo.getXRot();
-    float yaw = firstPerson ? minecraft.player.yRot : activerenderinfo.getYRot();
+    float pitch = firstPerson ? minecraft.player.xRot : camera.getXRot();
+    float yaw = firstPerson ? minecraft.player.yRot : camera.getYRot();
 
-    MatrixStack cameraRotationStack = new MatrixStack();
-    // Reminder: At 1.15.2, roll cannot be get from ActiveRenderInfo
+    MatrixStack poseStack = new MatrixStack();
+    // As of writing this, Camera does not contain a roll
     // cameraRotationStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rollHere));
-    cameraRotationStack.mulPose(Vector3f.XP.rotationDegrees(pitch));
-    cameraRotationStack.mulPose(Vector3f.YP.rotationDegrees(yaw + 180.0F));
+    poseStack.mulPose(Vector3f.XP.rotationDegrees(pitch));
+    poseStack.mulPose(Vector3f.YP.rotationDegrees(yaw + 180.0F));
 
-    Matrix4f fovAndWindowMatrix = new MatrixStack().last().pose();
-    fovAndWindowMatrix.multiply(gameRenderer.getProjectionMatrix(activerenderinfo, partialTicks, true));
+    Matrix4f projectionMatrix = new Matrix4f();
+    projectionMatrix.setIdentity();
 
-    ClippingHelper clippingHelper =
-        new ClippingHelper(cameraRotationStack.last().pose(), fovAndWindowMatrix);
-    clippingHelper.prepare(viewerX, viewerY, viewerZ);
+    projectionMatrix
+        .multiply(gameRenderer.getProjectionMatrix(camera, partialTicks, true));
 
-    return clippingHelper;
+    ClippingHelper frustum =
+        new ClippingHelper(poseStack.last().pose(), projectionMatrix);
+    frustum.prepare(viewerX, viewerY, viewerZ);
+
+    return frustum;
   }
 
   public static void fill(MatrixStack matrixStack, int x, int y, int width, int height,
@@ -277,56 +321,26 @@ public class RenderUtil {
     matrix.translate(0F, 0.2F, -0.1F);
   }
 
-  /**
-   * Checks whether the model has a generation marker. This means the model may be waiting to be
-   * generated.
-   */
-  public static boolean hasGenerationMarker(BlockModel blockModel) {
-    return blockModel.getRootModel().name.equals("generation marker");
-  }
-
-  /**
-   * Generates a model for the sprite (texture) of the item. This can be used to generate simple
-   * item models.
-   *
-   * @param blockModel The unbaked model of the item
-   * @throws IllegalArgumentException Throws if the model does not have a generation marker. It is a
-   *         good practice to check if the item has a generation marker before trying to generating
-   *         the model.
-   * @return The {@link IBakedModel} of this item, ready to be rendered.
-   */
-  public static IBakedModel generateSpriteModel(BlockModel blockModel, ModelBakery bakery,
-      Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
-      ResourceLocation modelLocation) throws IllegalArgumentException {
-
-    // It is a good practice check if the model can be generated before trying to generate.
-    Validate.isTrue(hasGenerationMarker(blockModel), "The model does not have a generation marker");
-
-    return MODEL_GENERATOR
-        .generateBlockModel(spriteGetter, blockModel)
-        .bake(bakery, blockModel, spriteGetter, modelTransform, modelLocation, false);
-  }
-
-  public static void drawTexturedRectangle(double x, double y, float width, float height,
+  public static void blit(double x, double y, float width, float height,
       float textureX, float textureY) {
-    drawTexturedRectangle(x, y, x + width, y + height, textureX, textureY, textureX + width,
+    blit(x, y, x + width, y + height, textureX, textureY, textureX + width,
         textureY + height, 256, 256);
   }
 
-  public static void drawTexturedRectangle(double x, double y, double x2, double y2, float textureX,
+  public static void blit(double x, double y, double x2, double y2, float textureX,
       float textureY, float textureX2, float textureY2, float width, float height) {
     float u = textureX / width;
     float u2 = textureX2 / width;
     float v = textureY / height;
     float v2 = textureY2 / height;
-    drawTexturedRectangle(x, y, x2, y2, u, v, u2, v2);
+    blit(x, y, x2, y2, u, v, u2, v2);
   }
 
-  public static void drawTexturedRectangle(double x, double y, double width, double height) {
-    drawTexturedRectangle(x, y, x + width, y + height, 0.0F, 1.0F, 1.0F, 0.0F);
+  public static void blit(double x, double y, double width, double height) {
+    blit(x, y, x + width, y + height, 0.0F, 1.0F, 1.0F, 0.0F);
   }
 
-  public static void drawTexturedRectangle(double x, double y, double x2, double y2, float u,
+  public static void blit(double x, double y, double x2, double y2, float u,
       float v, float u2, float v2) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder bufferbuilder = tessellator.getBuilder();
@@ -346,20 +360,21 @@ public class RenderUtil {
     double widthScale = minecraft.getWindow().getScreenWidth() / imageWidth;
     double heightScale = minecraft.getWindow().getScreenHeight() / imageHeight;
     final double scale =
-        imageHeight * widthScale < minecraft.getWindow().getScreenHeight() ? heightScale : widthScale;
+        imageHeight * widthScale < minecraft.getWindow().getScreenHeight() ? heightScale
+            : widthScale;
     return scale / minecraft.getWindow().getGuiScale();
   }
 
-  public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour) {
-    renderItemModelIntoGUI(itemStack, x, y, colour,
-        minecraft.getItemRenderer().getModel(itemStack, null, null), false);
+  public static void renderGuiItem(ItemStack itemStack, int x, int y, int colour) {
+    renderGuiItem(itemStack, x, y, colour,
+        minecraft.getItemRenderer().getModel(itemStack, null, null),
+        ItemCameraTransforms.TransformType.GUI);
   }
 
-  public static void renderItemIntoGUI(ItemStack itemStack, int x, int y, int colour,
-      boolean useCustomRenderer) {
-    renderItemModelIntoGUI(itemStack, x, y, colour,
-        minecraft.getItemRenderer().getModel(itemStack, null, null),
-        useCustomRenderer);
+  public static void renderGuiItem(ItemStack itemStack, int x, int y, int colour,
+      ItemCameraTransforms.TransformType transformType) {
+    renderGuiItem(itemStack, x, y, colour,
+        minecraft.getItemRenderer().getModel(itemStack, null, null), transformType);
   }
 
   /**
@@ -367,8 +382,8 @@ public class RenderUtil {
    * colour.
    */
   @SuppressWarnings("deprecation")
-  public static void renderItemModelIntoGUI(ItemStack itemStack, int x, int y,
-      int colour, IBakedModel bakedmodel, boolean useCustomRenderer) {
+  public static void renderGuiItem(ItemStack itemStack, int x, int y,
+      int colour, IBakedModel bakedmodel, ItemCameraTransforms.TransformType transformType) {
     RenderSystem.pushMatrix();
     minecraft.textureManager.bind(AtlasTexture.LOCATION_BLOCKS);
     minecraft.textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(
@@ -391,13 +406,12 @@ public class RenderUtil {
       RenderHelper.setupForFlatItems();
     }
 
-    if (useCustomRenderer && itemStack.getItem() instanceof IRendererProvider) {
-      IItemRenderer itemRenderer = ((IRendererProvider) itemStack.getItem()).getRenderer();
-      itemRenderer.renderGeneric(itemStack, new MatrixStack(),
-          renderTypeBuffer, FULL_LIGHT, OverlayTexture.NO_OVERLAY);
-    } else {
-      renderItemColour(itemStack, ItemCameraTransforms.TransformType.GUI, false, new MatrixStack(),
+    if (colour > -1) {
+      renderItemColour(itemStack, transformType, false, new MatrixStack(),
           renderTypeBuffer, colour, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
+    } else {
+      minecraft.getItemRenderer().render(itemStack, transformType, false, new MatrixStack(),
+          renderTypeBuffer, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
     }
 
     renderTypeBuffer.endBatch();
@@ -523,5 +537,22 @@ public class RenderUtil {
    */
   public static float easeInOutSine(float value) {
     return -(MathHelper.cos((float) Math.PI * value) - 1) / 2;
+  }
+
+  public static float easeIn(float value, float damperPct) {
+    return 1.0F - MathHelper.cos((float) ((value * Math.PI) / (2.0F * damperPct)));
+  }
+
+  public static float easeOut(float value, float damperPct) {
+    return MathHelper.sin((float) ((value * Math.PI) / (2.0F * damperPct)));
+  }
+
+  public static float easeOutElastic(float x) {
+    float c4 = (float) ((2.0F * Math.PI) / 3.0F);
+    return x == 0
+        ? 0
+        : x == 1
+            ? 1
+            : (float) Math.pow(2.0F, -10.0F * x) * MathHelper.sin((x * 10 - 0.75F) * c4) + 1;
   }
 }

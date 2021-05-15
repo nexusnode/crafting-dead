@@ -139,13 +139,11 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
   private static final Random random = new Random();
 
-  // @formatter:off
   private static final ExecutorService executorService = Executors.newCachedThreadPool(
       new ThreadFactoryBuilder()
           .setNameFormat("gun-pool-%s")
           .setDaemon(true)
           .build());
-  // @formatter:on
 
   private static final DataParameter<ItemStack> PAINT_STACK =
       new DataParameter<>(0x01, DataSerializers.ITEM_STACK);
@@ -204,7 +202,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   private boolean ammoProviderChanged;
 
   @Nullable
-  private Future<?> currentWorkHandle;
+  private Future<?> gunLoopFuture;
 
   @SuppressWarnings("unchecked")
   public AbstractGun(T type, ItemStack gunStack) {
@@ -269,8 +267,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     this.setTriggerPressed(triggerPressed);
 
     if (this.isTriggerPressed()
-        && (this.currentWorkHandle == null || this.currentWorkHandle.isDone())) {
-      this.currentWorkHandle = executorService.submit(() -> this.startGunLoop(living));
+        && (this.gunLoopFuture == null || this.gunLoopFuture.isDone())) {
+      this.gunLoopFuture = executorService.submit(() -> this.startGunLoop(living));
     } else {
       // Resets the counter
       this.shotCount = 0;
@@ -670,16 +668,14 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
 
     if (sendUpdate) {
-      PacketTarget target =
-          living.getEntity().level.isClientSide()
-              ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+      PacketTarget target = living.getEntity().level.isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY
           .getSimpleChannel()
           .send(target, new SetFireModeMessage(living.getEntity().getId(), this.fireMode));
     }
   }
-
 
   @Override
   public boolean hasCrosshair() {
@@ -717,7 +713,6 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   public RightMouseActionTriggerType getRightMouseActionTriggerType() {
     return this.type.getRightMouseActionTriggerType();
   }
-
 
   @Override
   public Optional<SoundEvent> getReloadSound() {

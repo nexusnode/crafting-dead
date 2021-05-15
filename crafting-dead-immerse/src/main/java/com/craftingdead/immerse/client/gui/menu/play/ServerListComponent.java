@@ -25,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.client.gui.component.Colour;
 import com.craftingdead.immerse.client.gui.component.Component;
-import com.craftingdead.immerse.client.gui.component.ContainerComponent;
 import com.craftingdead.immerse.client.gui.component.ParentComponent;
 import com.craftingdead.immerse.client.gui.component.TextBlockComponent;
 import com.craftingdead.immerse.client.gui.component.event.ActionEvent;
@@ -46,7 +45,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
 
   private final IServerEntryReader serverEntryProvider;
 
-  private final ContainerComponent listContainer;
+  private final ParentComponent<?> listContainer;
 
   private static final Executor executor = Executors.newFixedThreadPool(5,
       new ThreadFactoryBuilder()
@@ -61,7 +60,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
     this.setFlexGrow(1F);
     this.setFlexDirection(FlexDirection.COLUMN);
 
-    this.listContainer = new ContainerComponent()
+    this.listContainer = new ParentComponent<>()
         .addChild(this.firstTableRow())
         .setFlexDirection(FlexDirection.COLUMN)
         .setAlignItems(Align.CENTER)
@@ -80,13 +79,13 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
   }
 
   protected Component<?> controlsContainer() {
-    return new ContainerComponent()
+    return new ParentComponent<>()
         .setHeight(30F)
         .setJustifyContent(Justify.CENTER)
         .setAlignItems(Align.CENTER)
         .setFlexDirection(FlexDirection.ROW)
         .setBackgroundColour(new Colour(0x40121212))
-        .addChild(new ContainerComponent()
+        .addChild(new ParentComponent<>()
             .addChild(new TextBlockComponent(
                 new TranslationTextComponent("menu.play.server_list.button.refresh"))
                     .setShadow(false)
@@ -103,7 +102,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
             .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
             .setFocusable(true)
             .addListener(ActionEvent.class, (c, e) -> this.refresh()))
-        .addChild(new ContainerComponent()
+        .addChild(new ParentComponent<>()
             .addChild(new TextBlockComponent(
                 new TranslationTextComponent("menu.play.server_list.button.play"))
                     .setShadow(false)
@@ -123,7 +122,7 @@ public class ServerListComponent extends ParentComponent<ServerListComponent> {
   }
 
   private Component<?> firstTableRow() {
-    return new ContainerComponent()
+    return new ParentComponent<>()
         .setTopMargin(5F)
         .setBottomMargin(1F)
         .setLeftMargin(7F)

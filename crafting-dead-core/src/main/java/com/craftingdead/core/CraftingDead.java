@@ -360,9 +360,12 @@ public class CraftingDead {
       hydration = 1;
     } else if (item == Items.CHORUS_FRUIT || item == Items.SWEET_BERRIES) {
       hydration = 3;
-    } else if (item == Items.ENCHANTED_GOLDEN_APPLE || item == Items.GOLDEN_APPLE
-        || item == Items.MUSHROOM_STEW || item == Items.SUSPICIOUS_STEW
-        || item == Items.BEETROOT_SOUP || item == Items.MELON_SLICE) {
+    } else if (item == Items.ENCHANTED_GOLDEN_APPLE
+        || item == Items.GOLDEN_APPLE
+        || item == Items.MUSHROOM_STEW
+        || item == Items.SUSPICIOUS_STEW
+        || item == Items.BEETROOT_SOUP
+        || item == Items.MELON_SLICE) {
       hydration = 5;
     } else if (item == Items.GOLDEN_CARROT) {
       hydration = 6;
@@ -382,15 +385,23 @@ public class CraftingDead {
   }
 
   @SubscribeEvent
+  public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    startTracking(event.getPlayer(), (ServerPlayerEntity) event.getPlayer());
+  }
+
+  @SubscribeEvent
   public void handlePlayerStartTracking(PlayerEvent.StartTracking event) {
-    event.getTarget().getCapability(ModCapabilities.LIVING)
-        .ifPresent(living -> {
-          living.onStartTracking((ServerPlayerEntity) event.getPlayer());
-          PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-          living.encode(data, true);
-          NetworkChannel.PLAY.getSimpleChannel().send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()),
-              new SyncLivingMessage(living.getEntity().getId(), data));
-        });
+    startTracking(event.getTarget(), (ServerPlayerEntity) event.getPlayer());
+  }
+
+  private static void startTracking(Entity targetEntity, ServerPlayerEntity playerEntity) {
+    targetEntity.getCapability(ModCapabilities.LIVING).ifPresent(trackedLiving -> {
+      trackedLiving.onStartTracking(playerEntity);
+      PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+      trackedLiving.encode(data, true);
+      NetworkChannel.PLAY.getSimpleChannel().send(
+          PacketDistributor.PLAYER.with(() -> playerEntity),
+          new SyncLivingMessage(trackedLiving.getEntity().getId(), data));
+    });
   }
 }

@@ -22,6 +22,8 @@ import net.minecraft.client.gui.INestedGuiEventHandler;
 
 public interface IParentView extends IView, INestedGuiEventHandler {
 
+  default void sortChildren() {}
+
   @Override
   default void mouseMoved(double mouseX, double mouseY) {
     this.children().forEach(listener -> listener.mouseMoved(mouseX, mouseY));

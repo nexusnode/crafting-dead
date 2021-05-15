@@ -16,29 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.component;
+package com.craftingdead.immerse.client.gui.component.event;
 
-import org.lwjgl.util.yoga.Yoga;
 
-public enum Display {
-  FLEX(Yoga.YGDisplayFlex), NONE(Yoga.YGDisplayNone);
+import net.minecraftforge.eventbus.api.Event;
 
-  private final int yogaType;
-
-  Display(int yogaType) {
-    this.yogaType = yogaType;
-  }
-
-  public int getYogaType() {
-    return this.yogaType;
-  }
-
-  public static Display fromYogaType(int yogaType) {
-    for (Display display : values()) {
-      if (display.yogaType == yogaType) {
-        return display;
-      }
-    }
-    throw new IllegalArgumentException("Invalid yoga type");
-  }
+public class ZOffsetChangeEvent extends Event {
 }

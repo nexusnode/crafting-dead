@@ -28,6 +28,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
@@ -77,8 +78,8 @@ public class ItemButton extends GameButton implements IInfoPanel {
     RenderSystem.translatef(x + 10, y - 40, 0);
     double scale = 1.2D;
     RenderSystem.scaled(scale, scale, scale);
-    com.craftingdead.core.client.util.RenderUtil.renderItemIntoGUI(this.itemStack, 0, 0,
-        0xFFFFFFFF, true);
+    com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
+        0xFFFFFFFF, ItemCameraTransforms.TransformType.FIXED);
     RenderSystem.popMatrix();
 
     List<ITextComponent> itemInfo = new ArrayList<>();
