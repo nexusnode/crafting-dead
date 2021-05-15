@@ -143,6 +143,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
       new ThreadFactoryBuilder()
           .setNameFormat("gun-pool-%s")
           .setDaemon(true)
+          .setPriority(Thread.MAX_PRIORITY)
           .build());
 
   private static final DataParameter<ItemStack> PAINT_STACK =

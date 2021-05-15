@@ -7,20 +7,34 @@
   "key.toggle_fire_mode": "喷火模式",
   "key.equipment_menu":"打开/关闭设备菜单",
   "key.toggle_combat_mode":"切换战斗模式",												
-
+  
   "tutorial.open_equipment_menu.title":"打开设备菜单",
-
+  "tutorial.open_equipment_menu.description": "按 %s",
+  
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
+
+  "death.attack.dehydration":"%1$s 因脱水而死",
+  "death.attack.bleeding":"%1$s 因失血过多而死",
+  
+  "options.craftingdead.client.display_blood": "显示血液",
+  "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
+  "options.craftingdead.client.play_kill_sound": "砍杀声音已启用",
+  "options.craftingdead.client.crosshair": "十字准星",
+  "options.craftingdead.client.kill_sound": "击杀音效",
 
   "options.craftingdead.client.display_blood": "显示血液",
   "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
   "options.craftingdead.client.kill_sound_enabled": "砍杀声音",
 
+  "options.craftingdead.server.hydration_enabled":"水化已启用",
+  "options.craftingdead.server.broken_legs_enabled":"骨折已启用",
+  "options.craftingdead.server.bleeding_enabled":"流血已启用",
   "effect.craftingdead.broken_leg": "骨折",
   "effect.craftingdead.dehydration": "脱水",
   "effect.craftingdead.bleeding":"流血",
   "effect.craftingdead.adrenaline":"肾上腺素",
+  "effect.craftingdead.flash_blindness":"闪光失明",
 
   "entity.craftingdead.supply_drop": "空投物品",
   "entity.craftingdead.c4_explosive": "C4炸药",
