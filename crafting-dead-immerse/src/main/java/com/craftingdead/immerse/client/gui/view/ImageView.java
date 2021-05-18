@@ -19,10 +19,10 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Optional;
-import com.craftingdead.immerse.client.gui.tween.FloatArrayTweenType;
+import org.lwjgl.opengl.GL11;
+import com.craftingdead.immerse.client.gui.tween.ColourTweenType;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -34,8 +34,7 @@ import net.minecraft.util.math.vector.Vector2f;
 
 public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
 
-  public static final TweenType<ImageView<?>> COLOUR =
-      new FloatArrayTweenType<>(4, t -> t.colour.getColour4f(), (t, v) -> t.colour.setColour4f(v));
+  public static final TweenType<ImageView<?>> COLOUR = new ColourTweenType<>(ImageView::getColour);
 
   private ResourceLocation image;
   private FitType fitType = FitType.FILL;
