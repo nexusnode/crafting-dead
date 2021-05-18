@@ -19,7 +19,7 @@
 package com.craftingdead.virus.client.renderer.entity;
 
 import com.craftingdead.virus.client.renderer.entity.model.AdvancedZombieModel;
-import com.craftingdead.virus.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.virus.world.entity.monster.AdvancedZombieEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 
 public class AdvancedZombieRenderer extends

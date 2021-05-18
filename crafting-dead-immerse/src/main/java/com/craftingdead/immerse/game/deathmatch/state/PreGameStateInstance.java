@@ -21,13 +21,13 @@ package com.craftingdead.immerse.game.deathmatch.state;
 import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
-import com.craftingdead.immerse.game.state.IState;
+import com.craftingdead.immerse.game.state.State;
 import com.craftingdead.immerse.game.state.TimedStateInstance;
 import com.craftingdead.immerse.util.ModSoundEvents;
 
 public class PreGameStateInstance extends TimedStateInstance<DeathmatchServer> {
 
-  public PreGameStateInstance(IState<?> state, DeathmatchServer context) {
+  public PreGameStateInstance(State<?> state, DeathmatchServer context) {
     super(state, context, context.getPreGameDuration());
   }
 

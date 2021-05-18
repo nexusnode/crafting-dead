@@ -20,8 +20,8 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.living.ILiving;
 import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -49,7 +49,7 @@ public class RightMouseAction {
     NetworkUtil.getEntity(ctx.get(), message.entityId)
         .filter(e -> e instanceof LivingEntity)
         .map(e -> (LivingEntity) e)
-        .<ILiving<LivingEntity, ?>>flatMap(ILiving::getOptional) // Need to cast this or else compiler complains
+        .<LivingExtension<LivingEntity, ?>>flatMap(LivingExtension::getOptional) // Need to cast this or else compiler complains
         .ifPresent(living -> {
           living.getEntity().getMainHandItem()
               .getCapability(ModCapabilities.GUN)

@@ -24,18 +24,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.immerse.block.ModBlocks;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.GameTypes;
-import com.craftingdead.immerse.game.IGame;
+import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
-import com.craftingdead.immerse.item.ModItems;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.util.DependencyLoader;
 import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.world.item.ModItems;
+import com.craftingdead.immerse.world.level.block.ModBlocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -87,7 +87,7 @@ public class CraftingDeadImmerse {
   /**
    * Mod distribution.
    */
-  private final IModDist modDist;
+  private final ModDist modDist;
 
   private final Path modDir;
 
@@ -133,7 +133,7 @@ public class CraftingDeadImmerse {
     return this.logicalServer;
   }
 
-  public IModDist getModDist() {
+  public ModDist getModDist() {
     return this.modDist;
   }
 
@@ -148,7 +148,7 @@ public class CraftingDeadImmerse {
     return this.modDir;
   }
 
-  public IGame getGame(LogicalSide side) {
+  public Game getGame(LogicalSide side) {
     switch (side) {
       case CLIENT:
         return this.getClientDist().getGameClient();

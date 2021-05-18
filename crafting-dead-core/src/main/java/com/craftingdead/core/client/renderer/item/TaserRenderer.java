@@ -18,10 +18,10 @@
 
 package com.craftingdead.core.client.renderer.item;
 
-import com.craftingdead.core.item.AttachmentItem;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.gun.GunTypes;
-import com.craftingdead.core.item.gun.IGun;
+import com.craftingdead.core.world.gun.GunTypes;
+import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.item.ItemStack;

@@ -24,9 +24,8 @@ import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.IModDist;
+import com.craftingdead.core.ModDist;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.audio.EffectsManager;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.EquipmentScreen;
@@ -42,29 +41,29 @@ import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layer.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layer.EquipmentLayer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
-import com.craftingdead.core.client.tutorial.IModTutorialStep;
+import com.craftingdead.core.client.sounds.EffectsManager;
+import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.entity.ModEntityTypes;
-import com.craftingdead.core.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.event.RenderArmClothingEvent;
-import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.ModContainerTypes;
-import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.PaintItem;
-import com.craftingdead.core.item.gun.IGun;
-import com.craftingdead.core.item.gun.paint.IPaint;
-import com.craftingdead.core.living.ILiving;
-import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
-import com.craftingdead.core.potion.ModEffects;
-import com.craftingdead.core.util.ArbitraryTooltips;
-import com.craftingdead.core.util.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.util.MutableVector2f;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.effect.ModMobEffects;
+import com.craftingdead.core.world.entity.ModEntityTypes;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
+import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModMenuTypes;
+import com.craftingdead.core.world.item.ArbitraryTooltips;
+import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
+import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.PaintItem;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -100,6 +99,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -131,7 +131,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-public class ClientDist implements IModDist {
+public class ClientDist implements ModDist {
 
   public static final KeyBinding RELOAD =
       new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
@@ -253,17 +253,17 @@ public class ClientDist implements IModDist {
   }
 
   @SuppressWarnings("unchecked")
-  public Optional<IPlayer<ClientPlayerEntity>> getPlayer() {
+  public Optional<PlayerExtension<ClientPlayerEntity>> getPlayer() {
     return Optional.ofNullable(this.minecraft.player)
         .flatMap(p -> p.getCapability(ModCapabilities.LIVING).resolve())
-        .filter(living -> living instanceof IPlayer)
-        .map(living -> (IPlayer<ClientPlayerEntity>) living);
+        .filter(living -> living instanceof PlayerExtension)
+        .map(living -> (PlayerExtension<ClientPlayerEntity>) living);
   }
 
   @SuppressWarnings("unchecked")
-  public IPlayer<ClientPlayerEntity> getExpectedPlayer() {
+  public PlayerExtension<ClientPlayerEntity> getExpectedPlayer() {
     return ModCapabilities.getExpected(ModCapabilities.LIVING, this.minecraft.player,
-        IPlayer.class);
+        PlayerExtension.class);
   }
 
   public boolean isRightMouseDown() {
@@ -314,29 +314,23 @@ public class ClientDist implements IModDist {
     StartupMessageManager.addModMessage("Registering tooltips");
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
-        (stack, world, tooltipFlags) -> Text
-            .translate("item_lore.clothing_item.water_breathing")
-            .withStyle(TextFormatting.GRAY));
+        (stack, world,
+            tooltipFlags) -> new TranslationTextComponent("item_lore.clothing_item.water_breathing")
+                .withStyle(TextFormatting.GRAY));
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
-        (stack, world, tooltipFlags) -> Text
-            .translate("item_lore.clothing_item.water_speed")
-            .withStyle(TextFormatting.GRAY));
+        (stack, world,
+            tooltipFlags) -> new TranslationTextComponent("item_lore.clothing_item.water_speed")
+                .withStyle(TextFormatting.GRAY));
 
-    StartupMessageManager.addModMessage("Registering container screen factories");
-
-    ScreenManager.register(ModContainerTypes.EQUIPMENT.get(), EquipmentScreen::new);
-    ScreenManager.register(ModContainerTypes.VEST.get(), GenericContainerScreen::new);
-
-    StartupMessageManager.addModMessage("Registering key bindings");
+    ScreenManager.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
+    ScreenManager.register(ModMenuTypes.VEST.get(), GenericContainerScreen::new);
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_EQUIPMENT_MENU);
     ClientRegistry.registerKeyBinding(TOGGLE_COMBAT_MODE);
-
-    StartupMessageManager.addModMessage("Registering entity renderers");
 
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
@@ -354,8 +348,6 @@ public class ClientDist implements IModDist {
         CylinderGrenadeRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FLASH_GRENADE.get(),
         SlimGrenadeRenderer::new);
-
-    StartupMessageManager.addModMessage("Loading model layers");
 
     this.registerPlayerLayer(ClothingLayer::new);
     this.registerPlayerLayer(
@@ -475,7 +467,7 @@ public class ClientDist implements IModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+        PlayerExtension<ClientPlayerEntity> player = this.getPlayer().orElse(null);
         if (player != null) {
           ItemStack heldStack = player.getEntity().getMainHandItem();
           IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
@@ -532,8 +524,8 @@ public class ClientDist implements IModDist {
           // Update tutorial
           while (OPEN_EQUIPMENT_MENU.consumeClick()) {
             NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
-            if (this.minecraft.getTutorial().instance instanceof IModTutorialStep) {
-              ((IModTutorialStep) this.minecraft.getTutorial().instance).openModInventory();
+            if (this.minecraft.getTutorial().instance instanceof ModTutorialStepInstance) {
+              ((ModTutorialStepInstance) this.minecraft.getTutorial().instance).openEquipmentMenu();
             }
           }
           TutorialSteps currentTutorialStep = this.minecraft.options.tutorialStep;
@@ -545,7 +537,7 @@ public class ClientDist implements IModDist {
           }
 
           // Update adrenaline effects
-          if (this.minecraft.player.hasEffect(ModEffects.ADRENALINE.get())) {
+          if (this.minecraft.player.hasEffect(ModMobEffects.ADRENALINE.get())) {
             this.wasAdrenalineActive = true;
             this.effectsManager.setHighpassLevels(1.0F, 0.015F);
             this.effectsManager.setDirectHighpassForAll();
@@ -563,7 +555,7 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    IPlayer<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+    PlayerExtension<ClientPlayerEntity> player = this.getPlayer().orElse(null);
     if (player != null && this.minecraft.overlay == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
       ItemStack heldStack = player.getEntity().getMainHandItem();
@@ -617,10 +609,10 @@ public class ClientDist implements IModDist {
 
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    IPlayer<AbstractClientPlayerEntity> player =
+    PlayerExtension<AbstractClientPlayerEntity> player =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
             ? this.minecraft.getCameraEntity().getCapability(ModCapabilities.LIVING)
-                .<IPlayer<AbstractClientPlayerEntity>>cast()
+                .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;
     if (player == null) {
@@ -721,7 +713,7 @@ public class ClientDist implements IModDist {
     final boolean shaderLoaded = gameRenderer.currentEffect() != null
         && gameRenderer.currentEffect().getName()
             .equals(ADRENALINE_SHADER.toString());
-    if (this.minecraft.player.hasEffect(ModEffects.ADRENALINE.get())) {
+    if (this.minecraft.player.hasEffect(ModMobEffects.ADRENALINE.get())) {
       final long currentTime = Util.getMillis();
       if (this.adrenalineShaderStartTime == 0L) {
         this.adrenalineShaderStartTime = currentTime;
@@ -761,8 +753,9 @@ public class ClientDist implements IModDist {
     int duration = flashGrenadeEntity.calculateDuration(this.minecraft.player,
         RenderUtil.isInsideFrustum(flashGrenadeEntity, false));
     if (duration > 0) {
-      EffectInstance flashEffect = new EffectInstance(ModEffects.FLASH_BLINDNESS.get(), duration);
-      ModEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);
+      EffectInstance flashEffect =
+          new EffectInstance(ModMobEffects.FLASH_BLINDNESS.get(), duration);
+      ModMobEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);
     }
   }
 
@@ -779,7 +772,7 @@ public class ClientDist implements IModDist {
       ModelRenderer armwearRenderer) {
 
     ResourceLocation clothingTexture = playerEntity.getCapability(ModCapabilities.LIVING)
-        .map(ILiving::getItemHandler)
+        .map(LivingExtension::getItemHandler)
         .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
         .flatMap(clothingStack -> clothingStack.getCapability(ModCapabilities.CLOTHING).resolve())
         .map(clothing -> clothing.getTexture(playerEntity.getModelName()))

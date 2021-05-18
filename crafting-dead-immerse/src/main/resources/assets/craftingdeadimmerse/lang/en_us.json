@@ -22,7 +22,11 @@
     "gui.screen.shop.buy_time": "Buy time: %s",
     "gui.screen.shop.selected": "Selected",
     "gui.screen.shop.inventory":"Inventory",
+
     "gui.screen.select_team.title":"Select Team",
+    "gui.screen.select_team.join_red": "Join Red",
+    "gui.screen.select_team.join_blue": "Join Blue",
+    "gui.screen.select_team.spectate": "Spectate",
 
     "narrator.screen.start": "Start",
 

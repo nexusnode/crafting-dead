@@ -21,11 +21,10 @@ package com.craftingdead.core.client.gui.screen.inventory;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
-import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.inventory.container.EquipmentContainer;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.inventory.EquipmentMenu;
+import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -34,11 +33,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-public class EquipmentScreen extends DisplayEffectsScreen<EquipmentContainer> {
+public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
 
   private static final ResourceLocation BACKGROUND =
       new ResourceLocation(CraftingDead.ID, "textures/gui/container/equipment.png");
+
+  private static final ITextComponent ARROW = new StringTextComponent(">");
 
   private int oldMouseX;
   private int oldMouseY;
@@ -47,16 +49,16 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentContainer> {
 
   private boolean transitioning = false;
 
-  public EquipmentScreen(EquipmentContainer container, PlayerInventory playerInventory,
+  public EquipmentScreen(EquipmentMenu menu, PlayerInventory playerInventory,
       ITextComponent title) {
-    super(container, playerInventory, title);
+    super(menu, playerInventory, title);
   }
 
   @Override
   public void init() {
     super.init();
     this.vestButton =
-        new SimpleButton(this.leftPos + 98, this.topPos + 61, 10, 17, Text.of(">"), (button) -> {
+        new SimpleButton(this.leftPos + 98, this.topPos + 61, 10, 17, ARROW, (button) -> {
           NetworkChannel.PLAY.getSimpleChannel()
               .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));
           this.transitioning = true;

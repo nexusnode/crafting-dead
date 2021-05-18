@@ -1,0 +1,80 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.craftingdead.core.world.item;
+
+import java.util.List;
+import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
+
+public class RemoteDetonatorItem extends Item {
+
+  public static final int RANGE = 50;
+
+  public RemoteDetonatorItem(Properties properties) {
+    super(properties);
+  }
+
+  @Override
+  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
+      Hand hand) {
+    ItemStack itemstack = playerEntity.getItemInHand(hand);
+    playerEntity.startUsingItem(hand);
+
+    if (world instanceof ServerWorld) {
+      ServerWorld serverWorld = (ServerWorld) world;
+
+      serverWorld.playSound(null, playerEntity, SoundEvents.UI_BUTTON_CLICK,
+          SoundCategory.PLAYERS, 0.8F, 1.2F);
+
+      serverWorld.getEntities(playerEntity,
+          playerEntity.getBoundingBox().inflate(RANGE), (entity) -> {
+            if (!(entity instanceof GrenadeEntity)) {
+              return false;
+            }
+            GrenadeEntity grenadeEntity = (GrenadeEntity) entity;
+
+            boolean isOwner =
+                grenadeEntity.getThrower().map(thrower -> thrower == playerEntity).orElse(false);
+
+            return isOwner && grenadeEntity.canBeRemotelyActivated();
+          }).forEach(entity -> ((GrenadeEntity) entity).setActivated(true));
+    }
+    return ActionResult.consume(itemstack);
+  }
+
+  @Override
+  public void appendHoverText(ItemStack stack, World world,
+      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+    super.appendHoverText(stack, world, lines, tooltipFlag);
+    lines.add(new TranslationTextComponent("item_lore." + this.getRegistryName().getPath(), RANGE)
+        .withStyle(TextFormatting.GRAY));
+  }
+}

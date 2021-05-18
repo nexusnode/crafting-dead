@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

@@ -29,9 +29,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.IGameServer;
+import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
@@ -66,7 +66,7 @@ public class LogicalServer extends WorldSavedData {
 
   private final Path gamePath;
 
-  private IGameServer gameServer;
+  private GameServer gameServer;
   private String currentGameName;
 
   public LogicalServer(MinecraftServer minecraftServer) {
@@ -127,10 +127,10 @@ public class LogicalServer extends WorldSavedData {
       return false;
     }
 
-    IGameServer gameServer;
+    GameServer gameServer;
     try (FileReader fileReader = new FileReader(gameFile)) {
       gameServer =
-          IGameServer.CODEC.parse(JsonOps.INSTANCE, gson.fromJson(fileReader, JsonElement.class))
+          GameServer.CODEC.parse(JsonOps.INSTANCE, gson.fromJson(fileReader, JsonElement.class))
               .getOrThrow(false, logger::error);
     } catch (Throwable t) {
       logger.error("Failed to load game file '{}'", gameFile.toString(), t);
@@ -142,13 +142,13 @@ public class LogicalServer extends WorldSavedData {
     return true;
   }
 
-  private void loadGame(IGameServer gameServer) {
+  private void loadGame(GameServer gameServer) {
     List<ServerPlayerEntity> players = this.minecraftServer.getPlayerList().getPlayers();
 
-    IGameServer oldGameServer = this.gameServer;
+    GameServer oldGameServer = this.gameServer;
     if (this.gameServer != null) {
       logger.info("Unloading current game");
-      players.stream().map(IPlayer::getExpected).forEach(this::removePlayerFromGame);
+      players.stream().map(PlayerExtension::getExpected).forEach(this::removePlayerFromGame);
       this.gameServer.unload();
     }
 
@@ -168,7 +168,7 @@ public class LogicalServer extends WorldSavedData {
       }
     }
 
-    players.stream().map(IPlayer::getExpected).forEach(this::addPlayerToGame);
+    players.stream().map(PlayerExtension::getExpected).forEach(this::addPlayerToGame);
 
     // Respawn all players - keep data if new game uses persisted player data, otherwise discard
     // player data.
@@ -195,13 +195,13 @@ public class LogicalServer extends WorldSavedData {
         this.minecraftServer.getPlayerList().respawn(playerEntity, keepData);
   }
 
-  private void addPlayerToGame(IPlayer<ServerPlayerEntity> player) {
+  private void addPlayerToGame(PlayerExtension<ServerPlayerEntity> player) {
     NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.PLAYER.with(player::getEntity),
         new SyncGameMessage(this.gameServer, true));
     this.gameServer.addPlayer(player);
   }
 
-  private void removePlayerFromGame(IPlayer<ServerPlayerEntity> player) {
+  private void removePlayerFromGame(PlayerExtension<ServerPlayerEntity> player) {
     this.gameServer.removePlayer(player);
   }
 
@@ -209,7 +209,7 @@ public class LogicalServer extends WorldSavedData {
     return this.minecraftServer;
   }
 
-  public IGameServer getGameServer() {
+  public GameServer getGameServer() {
     return this.gameServer;
   }
 
@@ -217,7 +217,7 @@ public class LogicalServer extends WorldSavedData {
   public void load(CompoundNBT nbt) {
     CompoundNBT gameNbt = nbt.getCompound("game");
     if (!gameNbt.isEmpty()) {
-      this.loadGame(IGameServer.CODEC.parse(NBTDynamicOps.INSTANCE, gameNbt)
+      this.loadGame(GameServer.CODEC.parse(NBTDynamicOps.INSTANCE, gameNbt)
           .getOrThrow(false, logger::error));
     }
   }
@@ -225,7 +225,7 @@ public class LogicalServer extends WorldSavedData {
   @Override
   public CompoundNBT save(CompoundNBT nbt) {
     if (this.gameServer.save()) {
-      nbt.put("game", IGameServer.CODEC.encodeStart(NBTDynamicOps.INSTANCE, this.gameServer)
+      nbt.put("game", GameServer.CODEC.encodeStart(NBTDynamicOps.INSTANCE, this.gameServer)
           .getOrThrow(false, logger::error));
     }
     return nbt;
@@ -244,8 +244,8 @@ public class LogicalServer extends WorldSavedData {
           this.loadNextGame();
         } else {
           if (this.gameServer.requiresSync()) {
-            this.minecraftServer.getPlayerList()
-                .broadcastAll(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+            this.minecraftServer.getPlayerList().broadcastAll(
+                NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
                     new SyncGameMessage(this.gameServer, false), NetworkDirection.PLAY_TO_CLIENT));
           }
         }
@@ -257,11 +257,11 @@ public class LogicalServer extends WorldSavedData {
 
   @SubscribeEvent
   public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-    this.addPlayerToGame(IPlayer.getExpected((ServerPlayerEntity) event.getPlayer()));
+    this.addPlayerToGame(PlayerExtension.getExpected((ServerPlayerEntity) event.getPlayer()));
   }
 
   @SubscribeEvent
   public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-    this.removePlayerFromGame(IPlayer.getExpected((ServerPlayerEntity) event.getPlayer()));
+    this.removePlayerFromGame(PlayerExtension.getExpected((ServerPlayerEntity) event.getPlayer()));
   }
 }

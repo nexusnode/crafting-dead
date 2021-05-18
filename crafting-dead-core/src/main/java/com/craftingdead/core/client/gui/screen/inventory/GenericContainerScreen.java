@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.client.gui.screen.inventory;
 
-import com.craftingdead.core.inventory.container.GenericContainer;
+import com.craftingdead.core.world.inventory.GenericMenu;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IHasContainer;
@@ -27,17 +27,17 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class GenericContainerScreen extends ContainerScreen<GenericContainer>
-    implements IHasContainer<GenericContainer> {
+public class GenericContainerScreen extends ContainerScreen<GenericMenu>
+    implements IHasContainer<GenericMenu> {
 
   private static final ResourceLocation GENERIC_CONTAINER_TEXTURE =
       new ResourceLocation("textures/gui/container/generic_54.png");
 
   private static final int TITLE_TEXT_COLOUR = 0x404040;
 
-  public GenericContainerScreen(GenericContainer container, PlayerInventory playerInventory,
+  public GenericContainerScreen(GenericMenu menu, PlayerInventory playerInventory,
       ITextComponent title) {
-    super(container, playerInventory, title);
+    super(menu, playerInventory, title);
     this.passEvents = false;
     this.imageHeight = 114 + this.menu.getRowCount() * 18;
   }

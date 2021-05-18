@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.network.util.NetworkDataManager;
-import com.craftingdead.core.util.IBufferSerializable;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -34,8 +34,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class TeamInstance<T extends Enum<T> & ITeam>
-    implements INBTSerializable<CompoundNBT>, IBufferSerializable {
+public class TeamInstance<T extends Enum<T> & Team>
+    implements INBTSerializable<CompoundNBT>, BufferSerializable {
 
   protected final NetworkDataManager dataManager = new NetworkDataManager();
 

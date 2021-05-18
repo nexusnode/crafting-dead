@@ -19,7 +19,6 @@
 package com.craftingdead.immerse.game;
 
 import org.apache.commons.lang3.StringUtils;
-import com.craftingdead.core.util.Text;
 import net.minecraft.network.play.server.STitlePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
@@ -28,25 +27,26 @@ import net.minecraft.util.Util;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class GameUtil {
 
   private static final String SQUARE_UTF_8 = "\u2588";
   private static final ITextComponent CHAT_SEPERATOR =
-      Text.of(StringUtils.repeat(SQUARE_UTF_8, 30));
-  public static final ITextComponent NEW_LINE = Text.of("\n\n");
+      new StringTextComponent(StringUtils.repeat(SQUARE_UTF_8, 30));
+  public static final ITextComponent NEW_LINE = new StringTextComponent("\n\n");
 
   public static ITextComponent formatMessage(ITextComponent message) {
-    // @formatter:off
-    return Text.translate("message.game").withStyle(TextFormatting.AQUA)
-        .append(Text.of(" >>> ")
+    return new TranslationTextComponent("message.game")
+        .withStyle(TextFormatting.AQUA)
+        .append(new StringTextComponent(" >>> ")
             .withStyle(style -> style
                 .withBold(true)
                 .withColor(Color.fromRgb(0xFFFFFF))))
         .append(message.copy().withStyle(TextFormatting.GRAY));
-    // @formatter:on
   }
 
   public static void sendGameMessageToAll(ITextComponent message, MinecraftServer minecraftServer) {
@@ -61,7 +61,6 @@ public class GameUtil {
 
   public static void sendChatAnnouncement(ITextComponent title, ITextComponent body,
       MinecraftServer minecraftServer) {
-    // @formatter:off
     final ITextComponent announcement = CHAT_SEPERATOR.copy()
         .append(NEW_LINE)
         .append(title.copy().withStyle(Style.EMPTY.withBold(true)))
@@ -69,7 +68,6 @@ public class GameUtil {
         .append(body)
         .append(NEW_LINE)
         .append(CHAT_SEPERATOR);
-    // @formatter:on
     minecraftServer.getPlayerList().broadcastMessage(announcement, ChatType.SYSTEM,
         Util.NIL_UUID);
   }

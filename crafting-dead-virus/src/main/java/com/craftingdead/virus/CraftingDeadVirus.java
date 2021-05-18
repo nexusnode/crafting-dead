@@ -21,24 +21,24 @@ package com.craftingdead.virus;
 import java.util.ListIterator;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.event.GunEvent;
-import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.virus.action.VirusActionTypes;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.virus.client.ClientDist;
 import com.craftingdead.virus.data.VirusItemTagsProvider;
-import com.craftingdead.virus.enchantment.VirusEnchantments;
-import com.craftingdead.virus.entity.ModEntityTypes;
-import com.craftingdead.virus.entity.monster.AdvancedZombieEntity;
-import com.craftingdead.virus.entity.monster.DoctorZombieEntity;
-import com.craftingdead.virus.entity.monster.FastZombieEntity;
-import com.craftingdead.virus.entity.monster.GiantZombieEntity;
-import com.craftingdead.virus.entity.monster.PoliceZombieEntity;
-import com.craftingdead.virus.entity.monster.TankZombieEntity;
-import com.craftingdead.virus.entity.monster.WeakZombieEntity;
-import com.craftingdead.virus.item.VirusItems;
-import com.craftingdead.virus.potion.VirusEffects;
 import com.craftingdead.virus.server.ServerDist;
+import com.craftingdead.virus.world.action.VirusActionTypes;
+import com.craftingdead.virus.world.effect.VirusEffects;
+import com.craftingdead.virus.world.entity.ModEntityTypes;
+import com.craftingdead.virus.world.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.virus.world.entity.monster.DoctorZombieEntity;
+import com.craftingdead.virus.world.entity.monster.FastZombieEntity;
+import com.craftingdead.virus.world.entity.monster.GiantZombieEntity;
+import com.craftingdead.virus.world.entity.monster.PoliceZombieEntity;
+import com.craftingdead.virus.world.entity.monster.TankZombieEntity;
+import com.craftingdead.virus.world.entity.monster.WeakZombieEntity;
+import com.craftingdead.virus.world.item.VirusItems;
+import com.craftingdead.virus.world.item.enchantment.VirusEnchantments;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityClassification;
@@ -161,8 +161,8 @@ public class CraftingDeadVirus {
   @SubscribeEvent
   public void handleGunHitEntity(GunEvent.HitEntity event) {
     event.getTarget().getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof IPlayer)
-        .map(living -> (IPlayer<?>) living)
+        .filter(living -> living instanceof PlayerExtension)
+        .map(living -> (PlayerExtension<?>) living)
         .ifPresent(living -> {
           float clothingProtectionPct = living.getItemHandler()
               .getStackInSlot(InventorySlotType.CLOTHING.getIndex())

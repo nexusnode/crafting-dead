@@ -20,10 +20,10 @@ package com.craftingdead.immerse.game.deathmatch.state;
 
 import java.util.function.BiFunction;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
-import com.craftingdead.immerse.game.state.IState;
+import com.craftingdead.immerse.game.state.State;
 import com.craftingdead.immerse.game.state.StateInstance;
 
-public enum DeathmatchState implements IState<DeathmatchServer> {
+public enum DeathmatchState implements State<DeathmatchServer> {
 
   IDLE(StateInstance::new), PRE_GAME(PreGameStateInstance::new), GAME(
       GameStateInstance::new), POST_GAME(PostGameStateInstance::new);

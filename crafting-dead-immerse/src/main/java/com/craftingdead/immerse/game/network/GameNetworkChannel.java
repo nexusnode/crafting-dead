@@ -23,7 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.IGame;
+import com.craftingdead.immerse.game.Game;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.IPacket;
@@ -59,7 +59,7 @@ public class GameNetworkChannel {
   }
 
   private static void handleClientPayload(NetworkEvent.ClientCustomPayloadEvent event) {
-    IGame game = CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
+    Game game = CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
     try {
       game.getNetworkProtocol().process(event.getPayload(), event.getSource().get());
     } catch (IOException e) {
@@ -69,7 +69,7 @@ public class GameNetworkChannel {
   }
 
   private static void handleServerPayload(NetworkEvent.ServerCustomPayloadEvent event) {
-    IGame game = CraftingDeadImmerse.getInstance().getClientDist().getGameClient();
+    Game game = CraftingDeadImmerse.getInstance().getClientDist().getGameClient();
     try {
       game.getNetworkProtocol().process(event.getPayload(), event.getSource().get());
     } catch (IOException e) {
@@ -92,7 +92,7 @@ public class GameNetworkChannel {
   }
 
   public static <MSG> IPacket<?> toVanillaPacket(MSG message, NetworkDirection direction) {
-    IGame game = CraftingDeadImmerse.getInstance().getGame(direction.getOriginationSide());
+    Game game = CraftingDeadImmerse.getInstance().getGame(direction.getOriginationSide());
     try {
       return direction
           .buildPacket(Pair.of(game.getNetworkProtocol().encode(message), Integer.MIN_VALUE),

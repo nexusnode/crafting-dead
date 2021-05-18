@@ -18,17 +18,17 @@
 
 package com.craftingdead.immerse.client.gui.screen.game;
 
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.immerse.game.shop.IShopCategory;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.shop.ShopCategory;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
 
-public class CategoryButton extends GameButton implements IInfoPanel {
+public class CategoryButton extends GameButton implements InfoPanel {
 
   private final ITextComponent info;
 
-  public CategoryButton(AbstractShopScreen screen, IPlayer<?> player, IShopCategory category) {
+  public CategoryButton(AbstractShopScreen screen, PlayerExtension<?> player, ShopCategory category) {
     super(0, 0, 0, 0, category.getDisplayName(),
         btn -> Minecraft.getInstance()
             .setScreen(new CategoryScreen(screen, player, category)));

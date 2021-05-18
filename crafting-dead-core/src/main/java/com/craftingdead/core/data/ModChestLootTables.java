@@ -20,9 +20,9 @@ package com.craftingdead.core.data;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.tag.ModItemTags;
-import com.craftingdead.core.world.storage.loot.ModLootTables;
+import com.craftingdead.core.tags.ModItemTags;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.level.storage.loot.ModLootTables;
 import net.minecraft.loot.BinomialRange;
 import net.minecraft.loot.ConstantRange;
 import net.minecraft.loot.ItemLootEntry;

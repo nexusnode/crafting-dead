@@ -20,10 +20,9 @@ package com.craftingdead.immerse.client.gui.screen.game;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.game.shop.IShop;
+import com.craftingdead.immerse.game.shop.Shop;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -32,18 +31,19 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-public class ItemButton extends GameButton implements IInfoPanel {
+public class ItemButton extends GameButton implements InfoPanel {
 
   private final FontRenderer font = Minecraft.getInstance().font;
 
-  private final IPlayer<?> player;
-  private final IShop shop;
+  private final PlayerExtension<?> player;
+  private final Shop shop;
   private final ItemStack itemStack;
   private final int price;
 
-  public ItemButton(ItemStack itemStack, IPlayer<?> player, IShop shop, int price) {
+  public ItemButton(ItemStack itemStack, PlayerExtension<?> player, Shop shop, int price) {
     super(0, 0, 0, 0, itemStack.getDisplayName(), btn -> shop.buyItem(player, itemStack));
     this.player = player;
     this.shop = shop;
@@ -52,9 +52,10 @@ public class ItemButton extends GameButton implements IInfoPanel {
   }
 
   private ITextComponent getFormattedPrice() {
-    return Text.of("$" + this.price).withStyle(this.shop.canAfford(this.player, this.price)
-        ? TextFormatting.GREEN
-        : TextFormatting.RED);
+    return new StringTextComponent("$" + this.price)
+        .withStyle(this.shop.canAfford(this.player, this.price)
+            ? TextFormatting.GREEN
+            : TextFormatting.RED);
   }
 
   @Override

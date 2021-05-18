@@ -31,17 +31,17 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.client.animation.gun.GunAnimation;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.item.AttachmentItem;
-import com.craftingdead.core.item.MagazineItem;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.PaintItem;
-import com.craftingdead.core.item.animation.gun.GunAnimation;
-import com.craftingdead.core.item.gun.AbstractGunType;
-import com.craftingdead.core.item.gun.IGun;
-import com.craftingdead.core.item.gun.paint.IPaint;
-import com.craftingdead.core.item.scope.IScope;
+import com.craftingdead.core.world.gun.AbstractGunType;
+import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.item.MagazineItem;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.PaintItem;
+import com.craftingdead.core.world.item.scope.Scope;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -163,8 +163,8 @@ public abstract class GunRenderer implements IItemRenderer {
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
     final boolean scopeOverlayActive =
-        gun instanceof IScope && ((IScope) gun).isAiming(entity)
-            && ((IScope) gun).getOverlayTexture(entity).isPresent();
+        gun instanceof Scope && ((Scope) gun).isAiming(entity)
+            && ((Scope) gun).getOverlayTexture(entity).isPresent();
     if (scopeOverlayActive) {
       return;
     }
@@ -343,7 +343,7 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedOverlay) {
 
     final boolean aiming =
-        gun instanceof IScope && ((IScope) gun).isAiming(playerEntity);
+        gun instanceof Scope && ((Scope) gun).isAiming(playerEntity);
     final boolean flash = gun.getClient().isFlashing();
     if (flash) {
       packedLight = RenderUtil.FULL_LIGHT;

@@ -22,17 +22,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.event.LivingExtensionEvent;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.game.IGameClient;
+import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchGame;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchPlayerData;
+import com.craftingdead.immerse.game.deathmatch.DeathmatchPlayerHandler;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchShop;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
 import com.craftingdead.immerse.game.deathmatch.state.DeathmatchState;
-import com.craftingdead.immerse.game.shop.IShop;
+import com.craftingdead.immerse.game.shop.Shop;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -42,12 +43,14 @@ import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class DeathmatchClient extends DeathmatchGame implements IGameClient {
+public class DeathmatchClient extends DeathmatchGame implements GameClient {
 
   private static final ResourceLocation STOPWATCH =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/stopwatch.png");
@@ -62,7 +65,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
   private DeathmatchState lastGameState;
 
-  private final IShop shop = new DeathmatchShop(true);
+  private final Shop shop = new DeathmatchShop(true);
 
   private boolean sentInitialTeamRequest = false;
 
@@ -90,8 +93,8 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         break;
     }
 
-    return Text.of(mins + ":" + (seconds < 10 ? "0" : "") + seconds).withStyle(TextFormatting.BOLD,
-        colour);
+    return new StringTextComponent(mins + ":" + (seconds < 10 ? "0" : "") + seconds)
+        .withStyle(TextFormatting.BOLD, colour);
   }
 
   @Override
@@ -100,20 +103,28 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
   }
 
   @SubscribeEvent
+  public void handleLivingLoad(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtension
+        && event.getLiving().getEntity().level.isClientSide()) {
+      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
+      player.registerHandler(DeathmatchPlayerHandler.ID,
+          new DeathmatchPlayerHandler(this, player));
+    }
+  }
+
+  @SubscribeEvent
   public void handleRenderNameplate(RenderNameplateEvent event) {
     if (event.getEntity() instanceof PlayerEntity
         && this.minecraft.player instanceof PlayerEntity) {
-      // @formatter:off
       DeathmatchTeam playerTeam =
-          this.getPlayerTeam(IPlayer.getExpected((PlayerEntity) event.getEntity()))
+          this.getPlayerTeam(PlayerExtension.getExpected((PlayerEntity) event.getEntity()))
               .orElse(null);
       DeathmatchTeam ourTeam = this.minecraft.getCameraEntity()
           .getCapability(ModCapabilities.LIVING)
-          .<IPlayer<?>>cast()
+          .<PlayerExtension<?>>cast()
           .resolve()
           .flatMap(this::getPlayerTeam)
           .orElse(null);
-      // @formatter:on
       if (playerTeam != ourTeam) {
         event.setResult(Event.Result.DENY);
       }
@@ -121,14 +132,14 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
   }
 
   @Override
-  public Optional<IShop> getShop() {
+  public Optional<Shop> getShop() {
     return Optional.of(this.shop);
   }
 
   @Override
   public void tick() {
     if (this.getGameState() != this.lastGameState && this.minecraft.player != null
-        && this.getPlayerTeam(IPlayer.getExpected(this.minecraft.player)).isPresent()) {
+        && this.getPlayerTeam(PlayerExtension.getExpected(this.minecraft.player)).isPresent()) {
       this.lastGameState = this.getGameState();
 
 
@@ -136,18 +147,21 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         case PRE_GAME:
           this.minecraft.gui.resetTitleTimes();
           this.minecraft.gui.setTitles(
-              Text.translate("title.warm_up").withStyle(TextFormatting.YELLOW), null, -1, -1, -1);
+              new TranslationTextComponent("title.warm_up").withStyle(TextFormatting.YELLOW), null,
+              -1, -1, -1);
           break;
         case GAME:
           this.minecraft.gui.resetTitleTimes();
           this.minecraft.gui.setTitles(
-              Text.translate("title.game_start").withStyle(TextFormatting.AQUA), null, -1, -1,
+              new TranslationTextComponent("title.game_start").withStyle(TextFormatting.AQUA), null,
+              -1, -1,
               -1);
           break;
         case POST_GAME:
           this.minecraft.gui.resetTitleTimes();
           this.minecraft.gui.setTitles(
-              Text.translate("title.game_over").withStyle(TextFormatting.RED), null, -1, -1, -1);
+              new TranslationTextComponent("title.game_over").withStyle(TextFormatting.RED), null,
+              -1, -1, -1);
           break;
         default:
           break;
@@ -161,18 +175,20 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
   }
 
   @Override
-  public void renderOverlay(IPlayer<? extends AbstractClientPlayerEntity> player,
+  public void renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
       MatrixStack matrixStack, int width,
       int height, float partialTicks) {
 
     final int middleWidth = width / 2;
 
     ITextComponent redScore =
-        Text.of(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.RED)))
-            .withStyle(DeathmatchTeam.RED.getColourStyle());
+        new StringTextComponent(
+            String.valueOf(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.RED))))
+                .withStyle(DeathmatchTeam.RED.getColourStyle());
     ITextComponent blueScore =
-        Text.of(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.BLUE)))
-            .withStyle(DeathmatchTeam.BLUE.getColourStyle());
+        new StringTextComponent(
+            String.valueOf(DeathmatchTeam.getScore(this.getTeamInstance(DeathmatchTeam.BLUE))))
+                .withStyle(DeathmatchTeam.BLUE.getColourStyle());
 
     ITextComponent timer = this.getTimer();
 
@@ -260,7 +276,7 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
   }
 
   @Override
-  public void renderPlayerList(IPlayer<? extends AbstractClientPlayerEntity> player,
+  public void renderPlayerList(PlayerExtension<? extends AbstractClientPlayerEntity> player,
       MatrixStack matrixStack, int width, int height, float partialTicks) {
     int mwidth = width / 2;
     int mheight = height / 2;
@@ -288,7 +304,8 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
         sbx + sbwidth - 3 - this.minecraft.font.width(gameTitle),
         sby + 9, 0);
 
-    ITextComponent mapTitle = Text.of(this.getDisplayName()).withStyle(TextFormatting.GRAY);
+    ITextComponent mapTitle =
+        new StringTextComponent(this.getDisplayName()).withStyle(TextFormatting.GRAY);
     this.minecraft.font.drawShadow(matrixStack, mapTitle,
         sbx + sbwidth - 3 - this.minecraft.font.width(mapTitle),
         sby + 20, 0);
@@ -305,8 +322,11 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
 
     // Render Teams and Player Information
     RenderUtil.fillWidthHeight(sbx, sby + 41, sbwidth, 193, 0x80000000);
-    RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 41, sbwidth, 13, Text.of("Ping"),
-        Text.of("Username"), Text.of("K"), Text.of("A"), Text.of("D"), Text.of("Score"));
+    RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 41, sbwidth, 13,
+        new StringTextComponent("Ping"),
+        new StringTextComponent("Username"), new StringTextComponent("K"),
+        new StringTextComponent("A"), new StringTextComponent("D"),
+        new StringTextComponent("Score"));
 
     List<UUID> blueMembers = this.getTeamInstance(DeathmatchTeam.BLUE).getMembers();
     for (int i = 0; i < blueMembers.size(); i++) {
@@ -314,14 +334,16 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           this.minecraft.getConnection().getPlayerInfo(blueMembers.get(i));
       if (playerInfo != null) {
         ITextComponent username =
-            playerInfo.getTabListDisplayName() == null ? Text.of(playerInfo.getProfile().getName())
+            playerInfo.getTabListDisplayName() == null
+                ? new StringTextComponent(playerInfo.getProfile().getName())
                 : playerInfo.getTabListDisplayName();
         DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 55 + (i * 11), sbwidth, 10,
-            Text.of(String.valueOf(playerInfo.getLatency())),
-            username, Text.of(playerData.getKills()), Text.of(playerData.getAssists()),
-            Text.of(playerData.getDeaths()),
-            Text.of(playerData.getScore()));
+            new StringTextComponent(String.valueOf(playerInfo.getLatency())),
+            username, new StringTextComponent(String.valueOf(playerData.getKills())),
+            new StringTextComponent(String.valueOf(playerData.getAssists())),
+            new StringTextComponent(String.valueOf(playerData.getDeaths())),
+            new StringTextComponent(String.valueOf(playerData.getScore())));
       }
     }
 
@@ -331,14 +353,16 @@ public class DeathmatchClient extends DeathmatchGame implements IGameClient {
           this.minecraft.getConnection().getPlayerInfo(redMembers.get(i));
       if (playerInfo != null) {
         ITextComponent username =
-            playerInfo.getTabListDisplayName() == null ? Text.of(playerInfo.getProfile().getName())
+            playerInfo.getTabListDisplayName() == null
+                ? new StringTextComponent(playerInfo.getProfile().getName())
                 : playerInfo.getTabListDisplayName();
         DeathmatchPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 147 + (i * 11), sbwidth, 10,
-            Text.of(String.valueOf(playerInfo.getLatency())),
-            username, Text.of(playerData.getKills()), Text.of(playerData.getAssists()),
-            Text.of(playerData.getDeaths()),
-            Text.of(playerData.getScore()));
+            new StringTextComponent(String.valueOf(playerInfo.getLatency())),
+            username, new StringTextComponent(String.valueOf(playerData.getKills())),
+            new StringTextComponent(String.valueOf(playerData.getAssists())),
+            new StringTextComponent(String.valueOf(playerData.getDeaths())),
+            new StringTextComponent(String.valueOf(playerData.getScore())));
       }
     }
 

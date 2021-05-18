@@ -19,10 +19,10 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.action.ActionType;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.living.ILiving;
 import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -54,9 +54,9 @@ public class PerformActionMessage {
 
   public static boolean handle(PerformActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.performerEntityId).ifPresent(performerEntity -> {
-      ILiving<?, ?> performer =
+      LivingExtension<?, ?> performer =
           performerEntity.getCapability(ModCapabilities.LIVING).orElse(null);
-      ILiving<?, ?> target = msg.targetEntityId == -1 ? null
+      LivingExtension<?, ?> target = msg.targetEntityId == -1 ? null
           : performerEntity.getCommandSenderWorld().getEntity(msg.targetEntityId)
               .getCapability(ModCapabilities.LIVING).orElse(null);
       final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();

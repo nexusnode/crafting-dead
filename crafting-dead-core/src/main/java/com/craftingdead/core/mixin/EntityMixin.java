@@ -22,8 +22,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.living.ILiving;
-import com.craftingdead.core.living.Visibility;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.entity.extension.Visibility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +34,8 @@ public class EntityMixin {
   @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
   private void isInvisible(CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    if (entity instanceof LivingEntity && ILiving.getOptional((LivingEntity) entity)
-        .map(ILiving::getVisibility)
+    if (entity instanceof LivingEntity && LivingExtension.getOptional((LivingEntity) entity)
+        .map(LivingExtension::getVisibility)
         .map(v -> v == Visibility.INVISIBLE || v == Visibility.PARTIALLY_VISIBLE)
         .orElse(false)) {
       callbackInfo.setReturnValue(true);
@@ -46,8 +46,8 @@ public class EntityMixin {
   private void isInvisibleTo(PlayerEntity playerEntity,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    if (entity instanceof LivingEntity && ILiving.getOptional((LivingEntity) entity)
-        .map(ILiving::getVisibility)
+    if (entity instanceof LivingEntity && LivingExtension.getOptional((LivingEntity) entity)
+        .map(LivingExtension::getVisibility)
         .map(Visibility.PARTIALLY_VISIBLE::equals)
         .orElse(false)) {
       callbackInfo.setReturnValue(false);

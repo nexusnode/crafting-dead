@@ -20,10 +20,10 @@ package com.craftingdead.immerse.game.team;
 
 import java.util.EnumMap;
 import java.util.Map;
-import com.craftingdead.core.util.IBufferSerializable;
+import com.craftingdead.core.network.BufferSerializable;
 import net.minecraft.network.PacketBuffer;
 
-public abstract class AbstractTeamGame<K extends Enum<K> & ITeam> implements ITeamGame<K> {
+public abstract class AbstractTeamGame<K extends Enum<K> & Team> implements TeamGame<K> {
 
   private final Class<K> teamType;
   private final Map<K, TeamInstance<K>> teams;
@@ -78,6 +78,6 @@ public abstract class AbstractTeamGame<K extends Enum<K> & ITeam> implements ITe
 
   @Override
   public boolean requiresSync() {
-    return this.teams.values().stream().anyMatch(IBufferSerializable::requiresSync);
+    return this.teams.values().stream().anyMatch(BufferSerializable::requiresSync);
   }
 }

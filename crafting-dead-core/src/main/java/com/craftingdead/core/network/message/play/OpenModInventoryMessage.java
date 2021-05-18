@@ -19,7 +19,7 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -32,7 +32,7 @@ public class OpenModInventoryMessage {
   }
 
   public static boolean handle(OpenModInventoryMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    IPlayer.getExpected(ctx.get().getSender()).openEquipmentMenu();
+    PlayerExtension.getExpected(ctx.get().getSender()).openEquipmentMenu();
     return true;
   }
 }

@@ -18,7 +18,7 @@
 
 package com.craftingdead.virus.client.renderer.entity.model;
 
-import com.craftingdead.virus.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.virus.world.entity.monster.AdvancedZombieEntity;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraft.client.renderer.entity.model.ZombieModel;

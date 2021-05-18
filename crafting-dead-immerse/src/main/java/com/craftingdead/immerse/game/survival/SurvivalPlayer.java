@@ -18,10 +18,10 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.living.IPlayerExtension;
-import com.craftingdead.core.living.PlayerImpl;
 import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
+import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.game.GameTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -33,7 +33,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ResourceLocation;
 
-public class SurvivalPlayer implements IPlayerExtension {
+public class SurvivalPlayer implements PlayerHandler {
 
   public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
 
@@ -44,11 +44,11 @@ public class SurvivalPlayer implements IPlayerExtension {
   private static final DataParameter<Integer> PLAYERS_KILLED =
       new DataParameter<>(0x02, DataSerializers.INT);
 
-  private final IPlayer<?> player;
+  private final PlayerExtension<?> player;
 
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
-  public SurvivalPlayer(PlayerImpl<?> player) {
+  public SurvivalPlayer(PlayerExtensionImpl<?> player) {
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);
@@ -107,9 +107,9 @@ public class SurvivalPlayer implements IPlayerExtension {
   }
 
   @Override
-  public void copyFrom(IPlayer<?> that, boolean wasDeath) {
+  public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
     if (!wasDeath) {
-      that.getExtension(GameTypes.SURVIVAL.getId())
+      that.getHandler(GameTypes.SURVIVAL.getId())
           .map(extension -> (SurvivalPlayer) extension)
           .ifPresent(extension -> {
             this.setZombiesKilled(extension.getZombiesKilled());

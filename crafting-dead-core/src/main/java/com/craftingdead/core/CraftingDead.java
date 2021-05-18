@@ -21,36 +21,36 @@ package com.craftingdead.core;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.action.ActionTypes;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.command.Commands;
+import com.craftingdead.core.commands.Commands;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
-import com.craftingdead.core.enchantment.ModEnchantments;
-import com.craftingdead.core.entity.ModEntityTypes;
 import com.craftingdead.core.event.CombatPickupEvent;
-import com.craftingdead.core.inventory.container.ModContainerTypes;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.combatslot.CombatSlotType;
-import com.craftingdead.core.item.crafting.ModRecipeSerializers;
-import com.craftingdead.core.item.gun.ammoprovider.AmmoProviderTypes;
-import com.craftingdead.core.item.hydration.DefaultHydration;
-import com.craftingdead.core.item.hydration.PresetHydration;
-import com.craftingdead.core.living.ILiving;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.living.LivingImpl;
-import com.craftingdead.core.living.PlayerImpl;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncLivingMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
-import com.craftingdead.core.potion.ModEffects;
 import com.craftingdead.core.server.ServerDist;
-import com.craftingdead.core.util.ArbitraryTooltips;
-import com.craftingdead.core.util.ModSoundEvents;
+import com.craftingdead.core.sounds.ModSoundEvents;
+import com.craftingdead.core.world.action.ActionTypes;
+import com.craftingdead.core.world.effect.ModMobEffects;
+import com.craftingdead.core.world.entity.ModEntityTypes;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.entity.extension.LivingExtensionImpl;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderTypes;
+import com.craftingdead.core.world.inventory.ModMenuTypes;
+import com.craftingdead.core.world.item.ArbitraryTooltips;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
+import com.craftingdead.core.world.item.enchantment.ModEnchantments;
+import com.craftingdead.core.world.item.hydration.DefaultHydration;
+import com.craftingdead.core.world.item.hydration.PresetHydration;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
@@ -134,7 +134,7 @@ public class CraftingDead {
   /**
    * Mod distribution.
    */
-  private final IModDist modDist;
+  private final ModDist modDist;
 
   private boolean travelersBackpacksLoaded;
 
@@ -150,8 +150,8 @@ public class CraftingDead {
     ModEntityTypes.ENTITY_TYPES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
-    ModContainerTypes.CONTAINERS.register(modEventBus);
-    ModEffects.EFFECTS.register(modEventBus);
+    ModMenuTypes.MENUS.register(modEventBus);
+    ModMobEffects.MOB_EFFECTS.register(modEventBus);
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
@@ -166,7 +166,7 @@ public class CraftingDead {
     ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
   }
 
-  public IModDist getModDist() {
+  public ModDist getModDist() {
     return this.modDist;
   }
 
@@ -220,8 +220,8 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    event.getPlayer().getCapability(ModCapabilities.LIVING).<IPlayer<?>>cast()
-        .filter(IPlayer::isCombatModeEnabled).ifPresent(living -> {
+    event.getPlayer().getCapability(ModCapabilities.LIVING).<PlayerExtension<?>>cast()
+        .filter(PlayerExtension::isCombatModeEnabled).ifPresent(living -> {
           final ItemStack itemStack = event.getItem().getItem();
           CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
           CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlotType);
@@ -248,7 +248,7 @@ public class CraftingDead {
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
     if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
       MobEntity mobEntity = (MobEntity) event.getEntityLiving();
-      if (mobEntity.hasEffect(ModEffects.FLASH_BLINDNESS.get())) {
+      if (mobEntity.hasEffect(ModMobEffects.FLASH_BLINDNESS.get())) {
         mobEntity.setTarget(null);
       }
     }
@@ -296,7 +296,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    IPlayer.getExpected(event.getPlayer()).copyFrom(IPlayer.getExpected(event.getOriginal()),
+    PlayerExtension.getExpected(event.getPlayer()).copyFrom(PlayerExtension.getExpected(event.getOriginal()),
         event.isWasDeath());
   }
 
@@ -307,7 +307,7 @@ public class CraftingDead {
         .map(hydration -> hydration.getHydration(event.getItem()))
         .ifPresent(hydration -> event
             .getEntityLiving()
-            .addEffect(new EffectInstance(ModEffects.HYDRATE.get(), 1, hydration)));
+            .addEffect(new EffectInstance(ModMobEffects.HYDRATE.get(), 1, hydration)));
   }
 
   @SubscribeEvent
@@ -329,9 +329,9 @@ public class CraftingDead {
     switch (event.phase) {
       case END:
         event.player.getCapability(ModCapabilities.LIVING)
-            .filter(living -> living instanceof IPlayer)
-            .map(living -> (IPlayer<?>) living)
-            .ifPresent(IPlayer::playerTick);
+            .filter(living -> living instanceof PlayerExtension)
+            .map(living -> (PlayerExtension<?>) living)
+            .ifPresent(PlayerExtension::playerTick);
         break;
       default:
         break;
@@ -341,10 +341,10 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof LivingEntity) {
-      ILiving<?, ?> living = event.getObject() instanceof PlayerEntity
-          ? new PlayerImpl<>((PlayerEntity) event.getObject())
-          : new LivingImpl<>((LivingEntity) event.getObject());
-      event.addCapability(ILiving.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
+      LivingExtension<?, ?> living = event.getObject() instanceof PlayerEntity
+          ? new PlayerExtensionImpl<>((PlayerEntity) event.getObject())
+          : new LivingExtensionImpl<>((LivingEntity) event.getObject());
+      event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
           LazyOptional.of(() -> living), () -> ModCapabilities.LIVING, CompoundNBT::new));
       living.load();
     }

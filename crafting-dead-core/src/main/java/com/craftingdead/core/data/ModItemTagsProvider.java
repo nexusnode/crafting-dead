@@ -19,8 +19,8 @@
 package com.craftingdead.core.data;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.tag.ModItemTags;
+import com.craftingdead.core.tags.ModItemTags;
+import com.craftingdead.core.world.item.ModItems;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;

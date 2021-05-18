@@ -20,10 +20,10 @@ package com.craftingdead.virus.client.renderer.entity;
 
 import com.craftingdead.core.client.renderer.entity.layer.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layer.EquipmentLayer;
-import com.craftingdead.core.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.virus.CraftingDeadVirus;
 import com.craftingdead.virus.client.renderer.entity.model.AdvancedZombieModel;
-import com.craftingdead.virus.entity.monster.AdvancedZombieEntity;
+import com.craftingdead.virus.world.entity.monster.AdvancedZombieEntity;
 import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;

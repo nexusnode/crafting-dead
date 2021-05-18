@@ -20,7 +20,7 @@ package com.craftingdead.core.client.renderer.entity.grenade;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.entity.model.C4ExplosiveModel;
-import com.craftingdead.core.entity.grenade.GrenadeEntity;
+import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

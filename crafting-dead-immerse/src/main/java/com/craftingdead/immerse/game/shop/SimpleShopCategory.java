@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.shop;
 import java.util.List;
 import net.minecraft.util.text.ITextComponent;
 
-public class SimpleShopCategory implements IShopCategory {
+public class SimpleShopCategory implements ShopCategory {
 
   private final ITextComponent displayName;
   private final ITextComponent info;

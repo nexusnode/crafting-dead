@@ -20,7 +20,7 @@ package com.craftingdead.core.client.renderer.entity;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.entity.model.SupplyDropModel;
-import com.craftingdead.core.entity.SupplyDropEntity;
+import com.craftingdead.core.world.entity.SupplyDropEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

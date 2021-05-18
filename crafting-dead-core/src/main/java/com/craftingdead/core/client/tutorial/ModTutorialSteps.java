@@ -23,8 +23,8 @@ import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.tutorial.ITutorialStep;
 
 public enum ModTutorialSteps {
-  OPEN_EQUIPMENT_MENU("open_equipment_menu", OpenEquipmentMenuStep::new), NONE("none",
-      CompletedModTutorialStep::new);
+  OPEN_EQUIPMENT_MENU("open_equipment_menu", OpenEquipmentMenuTutorialStepInstance::new), NONE("none",
+      CompletedModTutorialStepInstance::new);
 
   private final String name;
   private final Function<ClientDist, ? extends ITutorialStep> tutorial;

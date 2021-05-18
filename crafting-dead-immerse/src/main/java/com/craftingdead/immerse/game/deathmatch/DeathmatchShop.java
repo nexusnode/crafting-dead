@@ -19,14 +19,14 @@
 package com.craftingdead.immerse.game.deathmatch;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.item.combatslot.CombatSlotType;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.item.combatslot.CombatSlotType;
 import com.craftingdead.immerse.game.deathmatch.message.BuyItemMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
-import com.craftingdead.immerse.game.shop.IShop;
+import com.craftingdead.immerse.game.shop.Shop;
 import net.minecraft.item.ItemStack;
 
-public class DeathmatchShop implements IShop {
+public class DeathmatchShop implements Shop {
 
   private final boolean client;
 
@@ -35,12 +35,12 @@ public class DeathmatchShop implements IShop {
   }
 
   @Override
-  public int getPlayerMoney(IPlayer<?> player) {
+  public int getPlayerMoney(PlayerExtension<?> player) {
     return -1;
   }
 
   @Override
-  public void buyItem(IPlayer<?> player, ItemStack itemStack) {
+  public void buyItem(PlayerExtension<?> player, ItemStack itemStack) {
     if (this.client) {
       GameNetworkChannel.sendToServer(new BuyItemMessage(itemStack));
     } else if (this.getBuyTimeSeconds(player) > 0) {
@@ -52,8 +52,8 @@ public class DeathmatchShop implements IShop {
   }
 
   @Override
-  public int getBuyTimeSeconds(IPlayer<?> player) {
-    return ((DeathmatchPlayerExtension) player
-        .getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID)).getRemainingBuyTimeSeconds();
+  public int getBuyTimeSeconds(PlayerExtension<?> player) {
+    return ((DeathmatchPlayerHandler) player
+        .getExpectedHandler(DeathmatchPlayerHandler.ID)).getRemainingBuyTimeSeconds();
   }
 }

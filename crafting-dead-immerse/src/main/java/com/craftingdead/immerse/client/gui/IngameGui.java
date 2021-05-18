@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.client.gui;
 
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -34,7 +34,7 @@ public class IngameGui {
 
   private KilledMessage killedMessage;
 
-  public void renderOverlay(IPlayer<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+  public void renderOverlay(PlayerExtension<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
       int width, int height, float partialTicks) {
     this.renderKilledMessage(matrixStack, width, height);
   }

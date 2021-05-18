@@ -18,9 +18,9 @@
 
 package com.craftingdead.virus.data;
 
-import com.craftingdead.core.tag.ModItemTags;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.virus.CraftingDeadVirus;
-import com.craftingdead.virus.item.VirusItems;
+import com.craftingdead.virus.world.item.VirusItems;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;

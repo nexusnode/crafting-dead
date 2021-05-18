@@ -20,11 +20,11 @@ package com.craftingdead.immerse.client.renderer.entity.layer;
 
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.renderer.entity.layer.AbstractClothingLayer;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.IGameClient;
-import com.craftingdead.immerse.game.team.ITeam;
-import com.craftingdead.immerse.game.team.ITeamGame;
+import com.craftingdead.immerse.game.GameClient;
+import com.craftingdead.immerse.game.team.Team;
+import com.craftingdead.immerse.game.team.TeamGame;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;
@@ -39,14 +39,14 @@ public class TeamClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
 
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
-    IGameClient game = CraftingDeadImmerse.getInstance().getClientDist().getGameClient();
-    if (game instanceof ITeamGame) {
+    GameClient game = CraftingDeadImmerse.getInstance().getClientDist().getGameClient();
+    if (game instanceof TeamGame) {
       // We need to have team as a variable because Java doesn't like it if we use flatMap on
       // ITeam.getSkin because of something to do with generics.
-      ITeam team = livingEntity.getCapability(ModCapabilities.LIVING)
-          .<IPlayer<?>>cast()
+      Team team = livingEntity.getCapability(ModCapabilities.LIVING)
+          .<PlayerExtension<?>>cast()
           .resolve()
-          .flatMap(((ITeamGame<?>) game)::getPlayerTeam)
+          .flatMap(((TeamGame<?>) game)::getPlayerTeam)
           .orElse(null);
       return team == null ? null : team.getSkin().orElse(null);
     }

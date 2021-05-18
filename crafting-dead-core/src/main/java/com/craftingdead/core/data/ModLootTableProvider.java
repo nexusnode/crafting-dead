@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import com.craftingdead.core.world.storage.loot.ModLootTables;
+import com.craftingdead.core.world.level.storage.loot.ModLootTables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;

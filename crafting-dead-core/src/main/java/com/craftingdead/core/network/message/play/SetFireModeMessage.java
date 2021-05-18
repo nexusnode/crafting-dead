@@ -20,8 +20,8 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.item.gun.FireMode;
 import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.world.gun.FireMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;

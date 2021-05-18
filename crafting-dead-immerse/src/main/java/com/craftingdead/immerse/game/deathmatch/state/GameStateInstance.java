@@ -18,20 +18,25 @@
 
 package com.craftingdead.immerse.game.deathmatch.state;
 
-import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
-import com.craftingdead.immerse.game.state.IState;
+import com.craftingdead.immerse.game.state.State;
 import com.craftingdead.immerse.game.state.TimedStateInstance;
 import com.craftingdead.immerse.game.team.TeamInstance;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
 
-  public GameStateInstance(IState<?> state, DeathmatchServer context) {
+  private static final ITextComponent TIE_GAME = new StringTextComponent("Tie Game!");
+  private static final ITextComponent SPACE = new StringTextComponent(" ");
+  private static final ITextComponent WON = new StringTextComponent("Won!");
+  private static final ITextComponent DEATHMATCH = new StringTextComponent("Deathmatch");
+
+  public GameStateInstance(State<?> state, DeathmatchServer context) {
     super(state, context, context.getGameDuration());
   }
 
@@ -67,15 +72,17 @@ public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
     ITextComponent winnerText;
 
     if (winningTeam == null) {
-      winnerText = Text.of("Tie Game!").withStyle(TextFormatting.AQUA, TextFormatting.BOLD);
+      winnerText = TIE_GAME.copy().withStyle(TextFormatting.AQUA, TextFormatting.BOLD);
       redTeam.broadcastVictorySounds(ModSoundEvents.RED_VICTORY.get(),
           this.getContext().getMinecraftServer());
       blueTeam.broadcastVictorySounds(ModSoundEvents.BLUE_VICTORY.get(),
           this.getContext().getMinecraftServer());
     } else {
       winnerText =
-          winningTeam.getDisplayName().copy().withStyle(TextFormatting.BOLD)
-              .append(Text.of(" Won!"));
+          winningTeam.getDisplayName().copy()
+              .withStyle(TextFormatting.BOLD)
+              .append(SPACE)
+              .append(WON);
       switch (winningTeam) {
         case RED:
           redTeam.broadcastVictorySounds(ModSoundEvents.RED_VICTORY.get(),
@@ -99,10 +106,13 @@ public class GameStateInstance extends TimedStateInstance<DeathmatchServer> {
   }
 
   private void sendWinAnnoucement(ITextComponent winnerText, int redScore, int blueScore) {
-    ITextComponent scores = Text.of("Red: " + redScore + "    Blue: " + blueScore)
+    ITextComponent scores = new StringTextComponent("Red: " + redScore + "    Blue: " + blueScore)
         .withStyle(TextFormatting.RESET, TextFormatting.ITALIC);
-    GameUtil.sendChatAnnouncement(Text.of("Deathmatch"),
-        Text.copyAndJoin(winnerText, GameUtil.NEW_LINE, scores),
+    GameUtil.sendChatAnnouncement(DEATHMATCH,
+        winnerText
+            .copy()
+            .append(GameUtil.NEW_LINE)
+            .append(scores),
         this.getContext().getMinecraftServer());
   }
 }

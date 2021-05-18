@@ -21,7 +21,7 @@ package com.craftingdead.virus.client;
 import com.craftingdead.virus.IModDist;
 import com.craftingdead.virus.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.virus.client.renderer.entity.GiantZombieRenderer;
-import com.craftingdead.virus.entity.ModEntityTypes;
+import com.craftingdead.virus.world.entity.ModEntityTypes;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

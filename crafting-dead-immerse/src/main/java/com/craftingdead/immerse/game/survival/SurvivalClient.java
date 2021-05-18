@@ -19,16 +19,16 @@
 package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.IGameClient;
+import com.craftingdead.immerse.game.GameClient;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 
-public class SurvivalClient extends SurvivalGame implements IGameClient {
+public class SurvivalClient extends SurvivalGame implements GameClient {
 
   private static final ResourceLocation DAYS_SURVIVED =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/days_survived.png");
@@ -41,10 +41,10 @@ public class SurvivalClient extends SurvivalGame implements IGameClient {
 
   @Override
   public void renderOverlay(
-      IPlayer<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
       int height, float partialTicks) {
     SurvivalPlayer survivalPlayer =
-        (SurvivalPlayer) player.getExpectedExtension(SurvivalPlayer.EXTENSION_ID);
+        (SurvivalPlayer) player.getExpectedHandler(SurvivalPlayer.EXTENSION_ID);
     int y = height / 2;
     int x = 4;
 
@@ -70,7 +70,7 @@ public class SurvivalClient extends SurvivalGame implements IGameClient {
 
   @Override
   public void renderPlayerList(
-      IPlayer<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
       int height, float partialTicks) {
     this.minecraft.gui.getTabList().render(matrixStack, width,
         this.minecraft.level.getScoreboard(),

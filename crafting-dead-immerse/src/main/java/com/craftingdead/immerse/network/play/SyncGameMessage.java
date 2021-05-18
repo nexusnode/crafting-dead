@@ -21,7 +21,7 @@ package com.craftingdead.immerse.network.play;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.game.IGame;
+import com.craftingdead.immerse.game.Game;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -30,7 +30,7 @@ public class SyncGameMessage {
 
   private final PacketBuffer gameData;
 
-  public SyncGameMessage(IGame game, boolean writeAll) {
+  public SyncGameMessage(Game game, boolean writeAll) {
     PacketBuffer gameData = new PacketBuffer(Unpooled.buffer());
     game.encode(gameData, writeAll);
     this.gameData = gameData;

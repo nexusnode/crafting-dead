@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import com.google.common.collect.Lists;
 
-public class StateMachine<T extends IState<CTX>, CTX> {
+public class StateMachine<T extends State<CTX>, CTX> {
 
   private final CTX context;
   private final Iterator<T> states;

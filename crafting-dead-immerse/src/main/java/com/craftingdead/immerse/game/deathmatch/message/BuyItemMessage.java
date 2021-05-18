@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.deathmatch.message;
 
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -42,6 +42,6 @@ public class BuyItemMessage {
 
   public static void handle(BuyItemMessage message, NetworkEvent.Context ctx) {
     CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer().getExpectedShop()
-        .buyItem(IPlayer.getExpected(ctx.getSender()), message.itemStack);
+        .buyItem(PlayerExtension.getExpected(ctx.getSender()), message.itemStack);
   }
 }

@@ -21,10 +21,10 @@ package com.craftingdead.core.event;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.core.item.AttachmentItem;
-import com.craftingdead.core.item.gun.IGun;
-import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.item.AttachmentItem;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -52,25 +52,25 @@ public abstract class GunEvent extends Event {
     return itemStack;
   }
 
-  public static class Living extends GunEvent {
+  public static class Action extends GunEvent {
 
-    private final ILiving<?, ?> living;
+    private final LivingExtension<?, ?> living;
 
-    public Living(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
+    public Action(IGun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
       super(gun, itemStack);
 
       this.living = living;
     }
 
-    public ILiving<?, ?> getLiving() {
+    public LivingExtension<?, ?> getLiving() {
       return living;
     }
   }
 
   @Cancelable
-  public static class TriggerPressed extends Living {
+  public static class TriggerPressed extends Action {
 
-    public TriggerPressed(IGun gun, ItemStack itemStack, ILiving<?, ?> living) {
+    public TriggerPressed(IGun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
       super(gun, itemStack, living);
     }
   }
@@ -105,14 +105,14 @@ public abstract class GunEvent extends Event {
 
 
   @Cancelable
-  public static class HitBlock extends Living {
+  public static class HitBlock extends Action {
 
     private final Block block;
     private final BlockPos blockPos;
     private final World world;
 
     public HitBlock(IGun gun, ItemStack itemStack, Block block, BlockPos blockPos,
-        ILiving<?, ?> living, World world) {
+        LivingExtension<?, ?> living, World world) {
       super(gun, itemStack, living);
 
       this.block = block;
@@ -134,7 +134,7 @@ public abstract class GunEvent extends Event {
   }
 
   @Cancelable
-  public static class HitEntity extends Living {
+  public static class HitEntity extends Action {
 
     private final Entity target;
     private final Vector3d hitPos;
@@ -144,7 +144,7 @@ public abstract class GunEvent extends Event {
     public HitEntity(
         IGun gun,
         ItemStack itemStack,
-        ILiving<?, ?> living,
+        LivingExtension<?, ?> living,
         Entity target,
         float damage,
         Vector3d hitPos,

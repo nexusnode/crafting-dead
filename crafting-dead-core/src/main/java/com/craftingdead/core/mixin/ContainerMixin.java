@@ -26,9 +26,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncGunContainerSlotMessage;
-import com.craftingdead.core.util.IBufferSerializable;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
@@ -49,7 +49,7 @@ public class ContainerMixin {
     Container container = (Container) (Object) this;
     for (Slot slot : container.slots) {
       slot.getItem().getCapability(ModCapabilities.GUN)
-          .filter(IBufferSerializable::requiresSync)
+          .filter(BufferSerializable::requiresSync)
           .ifPresent(gun -> {
             for (IContainerListener listener : this.containerListeners) {
               if (listener instanceof ServerPlayerEntity) {

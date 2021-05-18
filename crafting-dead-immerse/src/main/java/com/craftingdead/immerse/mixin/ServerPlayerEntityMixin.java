@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.SpawnPoint;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -60,6 +60,6 @@ public class ServerPlayerEntityMixin {
   @Nullable
   private SpawnPoint getSpawnPoint() {
     return CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer()
-        .getSpawnPoint(IPlayer.getExpected((ServerPlayerEntity) (Object) this)).orElse(null);
+        .getSpawnPoint(PlayerExtension.getExpected((ServerPlayerEntity) (Object) this)).orElse(null);
   }
 }

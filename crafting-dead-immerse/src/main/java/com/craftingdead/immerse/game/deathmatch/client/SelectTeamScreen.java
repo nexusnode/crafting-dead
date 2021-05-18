@@ -18,21 +18,31 @@
 
 package com.craftingdead.immerse.game.deathmatch.client;
 
-import com.craftingdead.core.util.Text;
-import com.craftingdead.immerse.client.gui.component.Blur;
 import com.craftingdead.immerse.client.gui.screen.game.GameButton;
+import com.craftingdead.immerse.client.gui.view.Blur;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
 import com.craftingdead.immerse.game.deathmatch.message.RequestJoinTeamMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class SelectTeamScreen extends Screen {
+
+  private static final ITextComponent TITLE =
+      new TranslationTextComponent("gui.screen.select_team.title");
+  private static final ITextComponent JOIN_RED =
+      new TranslationTextComponent("gui.screen.select_team.join_red");
+  private static final ITextComponent JOIN_BLUE =
+      new TranslationTextComponent("gui.screen.select_team.join_blue");
+  private static final ITextComponent SPECTATE =
+      new TranslationTextComponent("gui.screen.select_team.spectate");
 
   private final Blur blur = new Blur();
 
   public SelectTeamScreen() {
-    super(Text.translate("gui.screen.select_team.title"));
+    super(TITLE);
   }
 
   @Override
@@ -41,7 +51,7 @@ public class SelectTeamScreen extends Screen {
 
     this.addButton(new GameButton((int) (this.width * 0.25F) - 50,
         (int) (this.height * 0.5F), 100, 20,
-        Text.of("Join Red"),
+        JOIN_RED,
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.RED));
           this.onClose();
@@ -49,7 +59,7 @@ public class SelectTeamScreen extends Screen {
 
     this.addButton(new GameButton(this.width - (int) (this.width * 0.25F) - 50,
         (int) (this.height * 0.5F), 100, 20,
-        Text.of("Join Blue"),
+        JOIN_BLUE,
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.BLUE));
           this.onClose();
@@ -57,7 +67,7 @@ public class SelectTeamScreen extends Screen {
 
     this.addButton(new GameButton(this.width - (int) (this.width * 0.5F) - 25,
         (int) (this.height * 0.75F), 50, 10,
-        Text.of("Spectate"),
+        SPECTATE,
         btn -> {
           GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(null));
           this.onClose();
@@ -80,7 +90,7 @@ public class SelectTeamScreen extends Screen {
     matrixStack.pushPose();
     matrixStack.translate(this.width / 2, this.height / 4, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
-    drawCenteredString(matrixStack, this.font, Text.of("Select a Team"), 0, 0, 0xFFFFFFFF);
+    drawCenteredString(matrixStack, this.font, TITLE, 0, 0, 0xFFFFFFFF);
     matrixStack.popPose();
   }
 }

@@ -18,16 +18,16 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.event.LivingEvent;
-import com.craftingdead.core.living.PlayerImpl;
+import com.craftingdead.core.event.LivingExtensionEvent;
+import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
-import com.craftingdead.immerse.game.IGame;
+import com.craftingdead.immerse.game.Game;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class SurvivalGame implements IGame {
+public class SurvivalGame implements Game {
 
   @Override
   public void load() {
@@ -43,11 +43,11 @@ public class SurvivalGame implements IGame {
   public void tick() {}
 
   @SubscribeEvent
-  public void handleAttachLivingExtensions(LivingEvent.Load event) {
-    if (event.getLiving() instanceof PlayerImpl
-        && !event.getLiving().getExtension(SurvivalPlayer.EXTENSION_ID).isPresent()) {
-      PlayerImpl<?> player = (PlayerImpl<?>) event.getLiving();
-      player.registerExtension(SurvivalPlayer.EXTENSION_ID, new SurvivalPlayer(player));
+  public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtensionImpl
+        && !event.getLiving().getHandler(SurvivalPlayer.EXTENSION_ID).isPresent()) {
+      PlayerExtensionImpl<?> player = (PlayerExtensionImpl<?>) event.getLiving();
+      player.registerHandler(SurvivalPlayer.EXTENSION_ID, new SurvivalPlayer(player));
     }
   }
 

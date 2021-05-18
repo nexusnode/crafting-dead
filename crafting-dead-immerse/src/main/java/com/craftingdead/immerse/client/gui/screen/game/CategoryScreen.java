@@ -18,13 +18,13 @@
 
 package com.craftingdead.immerse.client.gui.screen.game;
 
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.immerse.game.shop.IShopCategory;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.shop.ShopCategory;
 import com.craftingdead.immerse.game.shop.ShopItem;
 
 public class CategoryScreen extends AbstractShopScreen {
 
-  public CategoryScreen(AbstractShopScreen shopScreen, IPlayer<?> player, IShopCategory category) {
+  public CategoryScreen(AbstractShopScreen shopScreen, PlayerExtension<?> player, ShopCategory category) {
     super(shopScreen, shopScreen.getShop(), player);
     for (ShopItem shopItem : category.getItems()) {
       this.addShopButton(new ItemButton(shopItem.getItemStack(), player, this.getShop(),

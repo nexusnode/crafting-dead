@@ -18,10 +18,10 @@
 
 package com.craftingdead.immerse.server;
 
-import com.craftingdead.immerse.IModDist;
+import com.craftingdead.immerse.ModDist;
 import net.minecraft.server.MinecraftServer;
 
-public class ServerDist implements IModDist {
+public class ServerDist implements ModDist {
 
   @Override
   public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {

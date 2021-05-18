@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.deathmatch.message;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
@@ -50,7 +50,7 @@ public class RequestJoinTeamMessage {
   public static void handle(RequestJoinTeamMessage message, NetworkEvent.Context ctx) {
     DeathmatchServer gameServer =
         (DeathmatchServer) CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
-    gameServer.setPlayerTeam(IPlayer.getExpected(ctx.getSender()),
+    gameServer.setPlayerTeam(PlayerExtension.getExpected(ctx.getSender()),
         message.team == null ? null : gameServer.getTeamInstance(message.team));
     ctx.setPacketHandled(true);
   }

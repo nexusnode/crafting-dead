@@ -20,10 +20,10 @@ package com.craftingdead.immerse.game.state;
 
 public class StateInstance<CTX> {
 
-  private final IState<?> state;
+  private final State<?> state;
   private final CTX context;
 
-  public StateInstance(IState<?> state, CTX context) {
+  public StateInstance(State<?> state, CTX context) {
     this.state = state;
     this.context = context;
   }
@@ -32,7 +32,7 @@ public class StateInstance<CTX> {
     return false;
   }
 
-  public IState<?> getState() {
+  public State<?> getState() {
     return this.state;
   }
 

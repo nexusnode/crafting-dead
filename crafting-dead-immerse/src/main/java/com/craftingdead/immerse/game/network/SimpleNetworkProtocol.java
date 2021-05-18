@@ -30,7 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class SimpleNetworkProtocol implements INetworkProtocol {
+public class SimpleNetworkProtocol implements NetworkProtocol {
 
   private final Map<Byte, ObjectEntry<?>> objectIndicies = new Byte2ObjectArrayMap<>();
   private final Map<Class<?>, ObjectEntry<?>> objectTypes = new Object2ObjectArrayMap<>();

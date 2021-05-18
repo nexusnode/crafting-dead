@@ -19,13 +19,13 @@
 package com.craftingdead.immerse.game.deathmatch;
 
 import java.util.function.Consumer;
+import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.network.util.NetworkDataManager;
-import com.craftingdead.core.util.IBufferSerializable;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 
-public class DeathmatchPlayerData implements IBufferSerializable {
+public class DeathmatchPlayerData implements BufferSerializable {
 
   private static final DataParameter<Integer> SCORE =
       new DataParameter<>(0x00, DataSerializers.INT);

@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.IGameServer;
+import com.craftingdead.immerse.game.GameServer;
 import net.minecraft.block.FireBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -52,7 +52,7 @@ public class FireBlockMixin {
   }
 
   private boolean blockBurningDisabled() {
-    IGameServer gameServer = CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
+    GameServer gameServer = CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
     return gameServer != null && gameServer.disableBlockBurning();
   }
 }

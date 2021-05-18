@@ -19,7 +19,7 @@
 package com.craftingdead.virus.client.renderer.entity;
 
 import com.craftingdead.virus.client.renderer.entity.model.AdvancedZombieModel;
-import com.craftingdead.virus.entity.monster.GiantZombieEntity;
+import com.craftingdead.virus.world.entity.monster.GiantZombieEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 

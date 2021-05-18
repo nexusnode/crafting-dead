@@ -22,21 +22,21 @@ import java.time.Duration;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.event.GunEvent;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.combatslot.CombatSlotType;
-import com.craftingdead.core.living.ILivingExtension;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.event.LivingExtensionEvent;
+import com.craftingdead.core.world.entity.extension.LivingHandler;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.combatslot.CombatSlotType;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.SpawnPoint;
 import com.craftingdead.immerse.game.deathmatch.state.DeathmatchState;
 import com.craftingdead.immerse.game.deathmatch.state.GameStateInstance;
-import com.craftingdead.immerse.game.shop.IShop;
+import com.craftingdead.immerse.game.shop.Shop;
 import com.craftingdead.immerse.game.state.StateInstance;
 import com.craftingdead.immerse.game.state.StateMachine;
 import com.craftingdead.immerse.game.state.TimedStateInstance;
-import com.craftingdead.immerse.game.team.ITeamGameServer;
+import com.craftingdead.immerse.game.team.TeamGameServer;
 import com.craftingdead.immerse.game.team.TeamInstance;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.mojang.serialization.Codec;
@@ -44,7 +44,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.BooleanValue;
@@ -57,7 +59,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<DeathmatchTeam> {
+public class DeathmatchServer extends DeathmatchGame implements TeamGameServer<DeathmatchTeam> {
 
   public static final Codec<DeathmatchServer> CODEC = RecordCodecBuilder.create(instance -> instance
       .group(
@@ -85,10 +87,13 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
           SpawnPoint.CODEC.fieldOf("blueSpawnPoint").forGetter(DeathmatchServer::getBlueSpawnPoint))
       .apply(instance, DeathmatchServer::new));
 
+  private static final ITextComponent NO_SWITCH_TEAM =
+      new TranslationTextComponent("message.no_switch_team");
+
   private final LogicalServer logicalServer = CraftingDeadImmerse.getInstance().getLogicalServer();
 
   private final StateMachine<DeathmatchState, DeathmatchServer> stateMachine;
-  private final IShop shop = new DeathmatchShop(false);
+  private final Shop shop = new DeathmatchShop(false);
 
   private final int maxScore;
   private final Duration preGameDuration;
@@ -177,13 +182,12 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   }
 
   public void resetBuyTimes() {
-    // @formatter:off
     this.getMinecraftServer().getPlayerList().getPlayers()
         .stream()
-        .<IPlayer<?>>map(IPlayer::getExpected)
-        .map(player -> (DeathmatchServerPlayerExtension) player.getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID))
-        .forEach(DeathmatchServerPlayerExtension::resetBuyTime);
-    // @formatter:on
+        .<PlayerExtension<?>>map(PlayerExtension::getExpected)
+        .map(player -> (DeathmatchServerPlayerHandler) player
+            .getExpectedHandler(DeathmatchPlayerHandler.ID))
+        .forEach(DeathmatchServerPlayerHandler::resetBuyTime);
   }
 
   public void resetPlayerData() {
@@ -199,18 +203,13 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   }
 
   @Override
-  public Optional<SpawnPoint> getSpawnPoint(IPlayer<ServerPlayerEntity> player) {
+  public Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayerEntity> player) {
     return this.getPlayerTeam(player).map(
         team -> team == DeathmatchTeam.RED ? this.getRedSpawnPoint() : this.getBlueSpawnPoint());
   }
 
   @Override
-  protected DeathmatchPlayerExtension createPlayerExtension(IPlayer<?> player) {
-    return new DeathmatchServerPlayerExtension(this, player);
-  }
-
-  @Override
-  public Optional<IShop> getShop() {
+  public Optional<Shop> getShop() {
     return Optional.of(this.shop);
   }
 
@@ -291,8 +290,8 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
     this.getMinecraftServer().setDifficulty(this.oldDifficulty, true);
 
     for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
-      ((DeathmatchServerPlayerExtension) IPlayer.getExpected(playerEntity)
-          .getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID)).invalidate();
+      ((DeathmatchServerPlayerHandler) PlayerExtension.getExpected(playerEntity)
+          .getExpectedHandler(DeathmatchPlayerHandler.ID)).invalidate();
     }
 
     MinecraftForge.EVENT_BUS.unregister(this);
@@ -304,7 +303,8 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   }
 
   @Override
-  public boolean switchTeam(IPlayer<?> player, @Nullable TeamInstance<DeathmatchTeam> oldTeam,
+  public boolean switchTeam(PlayerExtension<?> player,
+      @Nullable TeamInstance<DeathmatchTeam> oldTeam,
       @Nullable TeamInstance<DeathmatchTeam> newTeam) {
 
     if (oldTeam != null && newTeam != null) {
@@ -318,15 +318,14 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
           || stateInstance.getState() == DeathmatchState.POST_GAME;
 
       if (scoresClose || tooLate) {
-        player.getEntity().sendMessage(
-            GameUtil.formatMessage(Text.translate("message.no_switch_team")), Util.NIL_UUID);
+        player.getEntity().sendMessage(GameUtil.formatMessage(NO_SWITCH_TEAM), Util.NIL_UUID);
         return false;
       }
     }
 
-    DeathmatchPlayerExtension deathmatchPlayer =
-        ((DeathmatchPlayerExtension) player
-            .getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID));
+    DeathmatchPlayerHandler deathmatchPlayer =
+        ((DeathmatchPlayerHandler) player
+            .getExpectedHandler(DeathmatchPlayerHandler.ID));
     deathmatchPlayer.setTeam(newTeam == null ? null : newTeam.getTeam());
 
     if (newTeam == null) {
@@ -335,7 +334,8 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
       player.getEntity().setGameMode(GameType.ADVENTURE);
       this.logicalServer.respawnPlayer((ServerPlayerEntity) player.getEntity(), false);
       GameUtil.sendGameMessageToAll(
-          Text.translate("message.joined_team", player.getEntity().getDisplayName().getString(),
+          new TranslationTextComponent("message.joined_team",
+              player.getEntity().getDisplayName().getString(),
               newTeam.getTeam().getDisplayName().getString()),
           this.getMinecraftServer());
     }
@@ -344,20 +344,32 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
   }
 
   @Override
-  public void addPlayer(IPlayer<ServerPlayerEntity> player) {
+  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {
     this.setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
-        Text.translate("message.joined", player.getEntity().getDisplayName().getString()),
+        new TranslationTextComponent("message.joined",
+            player.getEntity().getDisplayName().getString()),
         this.getMinecraftServer());
   }
 
   @Override
-  public void removePlayer(IPlayer<ServerPlayerEntity> player) {
+  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {
     this.setPlayerTeam(player, null);
     this.deletePlayerData(player.getEntity().getUUID());
     GameUtil.sendGameMessageToAll(
-        Text.translate("message.left", player.getEntity().getDisplayName().getString()),
+        new TranslationTextComponent("message.left",
+            player.getEntity().getDisplayName().getString()),
         this.getMinecraftServer());
+  }
+
+  @SubscribeEvent
+  public void handleLivingLoad(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtension
+        && !event.getLiving().getEntity().level.isClientSide()) {
+      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
+      player.registerHandler(DeathmatchPlayerHandler.ID,
+          new DeathmatchServerPlayerHandler(this, player));
+    }
   }
 
   @SubscribeEvent
@@ -365,22 +377,20 @@ public class DeathmatchServer extends DeathmatchGame implements ITeamGameServer<
     if (this.getGameState() == DeathmatchState.GAME
         && event.getSource().getEntity() instanceof ServerPlayerEntity
         && event.getEntityLiving() instanceof ServerPlayerEntity && !this.firstBloodDrawn) {
-      GameUtil.sendGameMessageToAll(Text
-          .translate("message.first_blood_drawn",
-              event.getSource().getEntity().getDisplayName().getString())
-          .withStyle(TextFormatting.DARK_RED), this.getMinecraftServer());
+      GameUtil.sendGameMessageToAll(new TranslationTextComponent("message.first_blood_drawn",
+          event.getSource().getEntity().getDisplayName().getString())
+              .withStyle(TextFormatting.DARK_RED),
+          this.getMinecraftServer());
       this.firstBloodDrawn = true;
     }
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
-    ILivingExtension handler =
-        event.getLiving().getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID);
-    if (handler != null) {
-      DeathmatchPlayerExtension player = (DeathmatchPlayerExtension) handler;
-      player.setRemainingSpawnProtectionSeconds(0);
-    }
+    LivingHandler handler =
+        event.getLiving().getExpectedHandler(DeathmatchPlayerHandler.ID);
+    DeathmatchPlayerHandler player = (DeathmatchPlayerHandler) handler;
+    player.setRemainingSpawnProtectionSeconds(0);
   }
 
   @SubscribeEvent

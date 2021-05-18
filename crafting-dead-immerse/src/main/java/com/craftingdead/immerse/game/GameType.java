@@ -19,11 +19,11 @@
 package com.craftingdead.immerse.game;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.util.Text;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.DistExecutor.SafeCallable;
@@ -35,21 +35,21 @@ public class GameType extends ForgeRegistryEntry<GameType> {
       ResourceLocation.CODEC.xmap(registryName -> GameTypes.REGISTRY.get().getValue(registryName),
           GameType::getRegistryName);
 
-  private final Codec<? extends IGameServer> gameServerCodec;
-  private final Supplier<SafeCallable<IGameClient>> gameClientFactory;
+  private final Codec<? extends GameServer> gameServerCodec;
+  private final Supplier<SafeCallable<GameClient>> gameClientFactory;
 
-  public GameType(Codec<? extends IGameServer> gameServerCodec,
-      Supplier<SafeCallable<IGameClient>> gameClientFactory) {
+  public GameType(Codec<? extends GameServer> gameServerCodec,
+      Supplier<SafeCallable<GameClient>> gameClientFactory) {
     this.gameServerCodec = gameServerCodec;
     this.gameClientFactory = gameClientFactory;
   }
 
-  public Codec<? extends IGameServer> getGameServerCodec() {
+  public Codec<? extends GameServer> getGameServerCodec() {
     return this.gameServerCodec;
   }
 
-  public IGameClient createGameClient() {
-    IGameClient gameClient = DistExecutor.safeCallWhenOn(Dist.CLIENT, this.gameClientFactory);
+  public GameClient createGameClient() {
+    GameClient gameClient = DistExecutor.safeCallWhenOn(Dist.CLIENT, this.gameClientFactory);
     if (gameClient == null) {
       throw new IllegalStateException("Attempting to create game client on a server!");
     }
@@ -57,6 +57,6 @@ public class GameType extends ForgeRegistryEntry<GameType> {
   }
 
   public ITextComponent getDisplayName() {
-    return Text.translate(Util.makeDescriptionId("game", this.getRegistryName()));
+    return new TranslationTextComponent(Util.makeDescriptionId("game", this.getRegistryName()));
   }
 }

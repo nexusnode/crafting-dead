@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.entity.player.PlayerInventory;
 
 @Mixin(PlayerInventory.class)
@@ -32,7 +32,7 @@ public class PlayerInventoryMixin {
   @Inject(at = @At("HEAD"), method = "swapPaint", cancellable = true)
   private void swapPaint(double direction, CallbackInfo callbackInfo) {
     if (CraftingDead.getInstance().getClientDist().getPlayer()
-        .map(IPlayer::isCombatModeEnabled)
+        .map(PlayerExtension::isCombatModeEnabled)
         .orElse(false)) {
       callbackInfo.cancel();
 

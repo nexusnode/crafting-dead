@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.deathmatch;
 import java.util.Optional;
 import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.team.ITeam;
+import com.craftingdead.immerse.game.team.Team;
 import com.craftingdead.immerse.game.team.TeamInstance;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -29,7 +29,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
-public enum DeathmatchTeam implements ITeam {
+public enum DeathmatchTeam implements Team {
 
   // @formatter:off
   RED("Red", TextFormatting.RED.getColor(),

@@ -24,18 +24,17 @@ import java.util.Set;
 import java.util.UUID;
 import com.craftingdead.core.event.CombatPickupEvent;
 import com.craftingdead.core.event.GunEvent;
-import com.craftingdead.core.event.LivingEvent;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.gun.ammoprovider.RefillableAmmoProvider;
-import com.craftingdead.core.living.IPlayer;
 import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
+import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.deathmatch.message.BuyItemMessage;
 import com.craftingdead.immerse.game.deathmatch.message.RequestJoinTeamMessage;
 import com.craftingdead.immerse.game.deathmatch.state.DeathmatchState;
-import com.craftingdead.immerse.game.network.INetworkProtocol;
+import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.craftingdead.immerse.game.network.SimpleNetworkProtocol;
 import com.craftingdead.immerse.game.team.AbstractTeamGame;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -99,14 +98,14 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
   }
 
   @Override
-  public INetworkProtocol getNetworkProtocol() {
+  public NetworkProtocol getNetworkProtocol() {
     return PROTOCOL;
   }
 
   @Override
-  public Optional<DeathmatchTeam> getPlayerTeam(IPlayer<?> player) {
-    return ((DeathmatchPlayerExtension) player
-        .getExpectedExtension(DeathmatchPlayerExtension.EXTENSION_ID)).getTeam();
+  public Optional<DeathmatchTeam> getPlayerTeam(PlayerExtension<?> player) {
+    return ((DeathmatchPlayerHandler) player
+        .getExpectedHandler(DeathmatchPlayerHandler.ID)).getTeam();
   }
 
   @Override
@@ -149,20 +148,6 @@ public abstract class DeathmatchGame extends AbstractTeamGame<DeathmatchTeam> {
   public boolean requiresSync() {
     return super.requiresSync() || this.dataManager.isDirty()
         || !this.dirtyPlayerData.isEmpty();
-  }
-
-  @SubscribeEvent
-  public void handleLivingLoad(LivingEvent.Load event) {
-    if (event.getLiving() instanceof IPlayer
-        && !event.getLiving().getExtension(DeathmatchPlayerExtension.EXTENSION_ID).isPresent()) {
-      IPlayer<?> player = (IPlayer<?>) event.getLiving();
-      player.registerExtension(DeathmatchPlayerExtension.EXTENSION_ID,
-          this.createPlayerExtension(player));
-    }
-  }
-
-  protected DeathmatchPlayerExtension createPlayerExtension(IPlayer<?> player) {
-    return new DeathmatchPlayerExtension(this, player);
   }
 
   @SubscribeEvent

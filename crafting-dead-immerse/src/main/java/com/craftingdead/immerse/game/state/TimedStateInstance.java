@@ -25,11 +25,11 @@ public class TimedStateInstance<CTX> extends StateInstance<CTX> {
   private final long durationTicks;
   private long timeRemainingTicks;
 
-  public TimedStateInstance(IState<?> state, CTX context, Duration duration) {
+  public TimedStateInstance(State<?> state, CTX context, Duration duration) {
     this(state, context, duration.getSeconds() * 20);
   }
 
-  public TimedStateInstance(IState<?> state, CTX context, long durationTicks) {
+  public TimedStateInstance(State<?> state, CTX context, long durationTicks) {
     super(state, context);
     this.durationTicks = durationTicks;
     this.timeRemainingTicks = durationTicks;

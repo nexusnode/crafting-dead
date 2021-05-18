@@ -27,15 +27,15 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.item.GrenadeItem;
-import com.craftingdead.core.item.GunItem;
-import com.craftingdead.core.item.gun.IGun;
-import com.craftingdead.core.item.gun.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.item.gun.magazine.IMagazine;
-import com.craftingdead.core.item.scope.IScope;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.potion.ModEffects;
-import com.craftingdead.core.util.KillFeedEntry;
+import com.craftingdead.core.world.damagesource.KillFeedEntry;
+import com.craftingdead.core.world.effect.ModMobEffects;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.item.GrenadeItem;
+import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.scope.Scope;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -140,7 +140,7 @@ public class IngameGui {
     }
   }
 
-  private static void renderScopeOverlay(AbstractClientPlayerEntity playerEntity, IScope scope,
+  private static void renderScopeOverlay(AbstractClientPlayerEntity playerEntity, Scope scope,
       int width,
       int height) {
     scope.getOverlayTexture(playerEntity)
@@ -160,7 +160,7 @@ public class IngameGui {
         });
   }
 
-  public void renderOverlay(IPlayer<AbstractClientPlayerEntity> player, ItemStack heldStack,
+  public void renderOverlay(PlayerExtension<AbstractClientPlayerEntity> player, ItemStack heldStack,
       @Nullable IGun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
 
     // TODO Fixes Minecraft bug when using post-processing shaders.
@@ -183,7 +183,7 @@ public class IngameGui {
     // Draws Flashbang effect
     EffectInstance flashEffect =
         player.getEntity()
-            .getEffect(ModEffects.FLASH_BLINDNESS.get());
+            .getEffect(ModMobEffects.FLASH_BLINDNESS.get());
     if (flashEffect != null) {
       int alpha = (int) (255F
           * (MathHelper.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
@@ -200,7 +200,7 @@ public class IngameGui {
     if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
       float healthPercentage = playerEntity.getHealth() / playerEntity.getMaxHealth();
       if (ClientDist.clientConfig.displayBlood.get() && healthPercentage < 1.0F
-          && playerEntity.hasEffect(ModEffects.BLEEDING.get())) {
+          && playerEntity.hasEffect(ModMobEffects.BLEEDING.get())) {
         renderBlood(width, height, healthPercentage);
       }
 
@@ -462,7 +462,7 @@ public class IngameGui {
   }
 
   @SuppressWarnings("deprecation")
-  private void renderCombatMode(IPlayer<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+  private void renderCombatMode(PlayerExtension<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
       int width, int height) {
     final PlayerInventory inventory = player.getEntity().inventory;
 

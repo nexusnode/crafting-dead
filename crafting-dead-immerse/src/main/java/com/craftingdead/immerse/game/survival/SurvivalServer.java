@@ -18,11 +18,11 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.immerse.game.IGameServer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.GameServer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
-public class SurvivalServer extends SurvivalGame implements IGameServer {
+public class SurvivalServer extends SurvivalGame implements GameServer {
 
   @Override
   public boolean persistPlayerData() {
@@ -40,8 +40,8 @@ public class SurvivalServer extends SurvivalGame implements IGameServer {
   }
 
   @Override
-  public void addPlayer(IPlayer<ServerPlayerEntity> player) {}
+  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {}
 
   @Override
-  public void removePlayer(IPlayer<ServerPlayerEntity> player) {}
+  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {}
 }

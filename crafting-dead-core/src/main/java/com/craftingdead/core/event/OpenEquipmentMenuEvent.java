@@ -18,20 +18,20 @@
 
 package com.craftingdead.core.event;
 
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
 @Cancelable
 public class OpenEquipmentMenuEvent extends Event {
 
-  private final IPlayer<?> player;
+  private final PlayerExtension<?> player;
 
-  public OpenEquipmentMenuEvent(IPlayer<?> player) {
+  public OpenEquipmentMenuEvent(PlayerExtension<?> player) {
     this.player = player;
   }
 
-  public IPlayer<?> getPlayer() {
+  public PlayerExtension<?> getPlayer() {
     return this.player;
   }
 }

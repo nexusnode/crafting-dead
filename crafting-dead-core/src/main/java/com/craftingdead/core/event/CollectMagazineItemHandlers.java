@@ -22,21 +22,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.IItemHandler;
 
 public class CollectMagazineItemHandlers extends Event {
 
-  private final ILiving<?, ?> living;
+  private final LivingExtension<?, ?> living;
 
   private final List<IItemHandler> itemHandlers = new ArrayList<>();
 
-  public CollectMagazineItemHandlers(ILiving<?, ?> living) {
+  public CollectMagazineItemHandlers(LivingExtension<?, ?> living) {
     this.living = living;
   }
 
-  public ILiving<?, ?> getLiving() {
+  public LivingExtension<?, ?> getLiving() {
     return living;
   }
 

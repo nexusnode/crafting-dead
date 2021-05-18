@@ -28,25 +28,24 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.event.RenderArmClothingEvent;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.IModDist;
+import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
-import com.craftingdead.immerse.client.gui.menu.ModMainMenuScreen;
 import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
+import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
+import com.craftingdead.immerse.client.util.ServerPinger;
+import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameUtil;
-import com.craftingdead.immerse.game.IGameClient;
 import com.craftingdead.immerse.game.deathmatch.client.SelectTeamScreen;
 import com.craftingdead.immerse.game.team.AbstractTeamGame;
-import com.craftingdead.immerse.game.team.ITeam;
-import com.craftingdead.immerse.game.team.ITeamGame;
-import com.craftingdead.immerse.network.ServerPinger;
+import com.craftingdead.immerse.game.team.Team;
+import com.craftingdead.immerse.game.team.TeamGame;
 import com.craftingdead.immerse.server.LogicalServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -75,7 +74,7 @@ import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 
-public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
+public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
   public static final KeyBinding SWITCH_TEAMS =
       new KeyBinding("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
@@ -83,8 +82,6 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
 
   public static final ResourceLocation BLUR_SHADER =
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
-
-  // private static final String DISCORD_CLIENT_ID = "475405055302828034";
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -97,7 +94,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @Nullable
   private LogicalServer logicalServer;
 
-  private IGameClient gameClient;
+  private GameClient gameClient;
 
   private final SpectatorRenderer spectatorRenderer;
 
@@ -147,7 +144,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
     return this.deltaTime;
   }
 
-  public IGameClient getGameClient() {
+  public GameClient getGameClient() {
     return this.gameClient;
   }
 
@@ -191,12 +188,13 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
 
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    final IPlayer<ClientPlayerEntity> player =
+    final PlayerExtension<ClientPlayerEntity> player =
         CraftingDead.getInstance().getClientDist().getPlayer().orElse(null);
-    final IPlayer<AbstractClientPlayerEntity> viewingPlayer =
+    final PlayerExtension<AbstractClientPlayerEntity> viewingPlayer =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
             ? ((AbstractClientPlayerEntity) this.minecraft.getCameraEntity())
-                .getCapability(ModCapabilities.LIVING).<IPlayer<AbstractClientPlayerEntity>>cast()
+                .getCapability(ModCapabilities.LIVING)
+                .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;
 
@@ -227,7 +225,7 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     if (event.getGui() instanceof MainMenuScreen) {
-      event.setGui(new ModMainMenuScreen(ModMainMenuScreen.Page.HOME));
+      event.setGui(MainMenuView.createScreen(MainMenuView.Page.HOME));
     }
   }
 
@@ -258,18 +256,18 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
               // Consume key event
               while (this.minecraft.options.keyInventory.consumeClick()) {
                 if (!this.minecraft.player.isSpectator()) {
-                  IPlayer<?> player = IPlayer.getExpected(this.minecraft.player);
+                  PlayerExtension<?> player = PlayerExtension.getExpected(this.minecraft.player);
                   if (shop.getBuyTimeSeconds(player) > 0) {
                     this.minecraft.setScreen(new ShopScreen(null, shop, player));
                   } else {
-                    this.minecraft.gui.getChat().addMessage(
-                        GameUtil.formatMessage(Text.translate("message.buy_time_expired")));
+                    this.minecraft.gui.getChat().addMessage(GameUtil.formatMessage(
+                        new TranslationTextComponent("message.buy_time_expired")));
                   }
                 }
               }
             });
 
-            if (this.gameClient instanceof ITeamGame) {
+            if (this.gameClient instanceof TeamGame) {
               while (SWITCH_TEAMS.consumeClick()) {
                 this.minecraft.setScreen(new SelectTeamScreen());
               }
@@ -302,9 +300,9 @@ public class ClientDist implements IModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleRenderArmClothing(RenderArmClothingEvent event) {
     if (this.gameClient instanceof AbstractTeamGame) {
-      ITeam team = event.getPlayerEntity()
+      Team team = event.getPlayerEntity()
           .getCapability(ModCapabilities.LIVING)
-          .<IPlayer<?>>cast()
+          .<PlayerExtension<?>>cast()
           .resolve()
           .flatMap(((AbstractTeamGame<?>) this.gameClient)::getPlayerTeam)
           .orElse(null);

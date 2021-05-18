@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.item.gun.PendingHit;
-import com.craftingdead.core.living.EntitySnapshot;
-import com.craftingdead.core.living.IPlayer;
+import com.craftingdead.core.world.entity.extension.EntitySnapshot;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.gun.PendingHit;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.Entity;
@@ -74,7 +74,7 @@ public class ValidatePendingHitMessage {
 
   public static boolean handle(ValidatePendingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
     ServerPlayerEntity playerEntity = ctx.get().getSender();
-    IPlayer<ServerPlayerEntity> player = IPlayer.getExpected(playerEntity);
+    PlayerExtension<ServerPlayerEntity> player = PlayerExtension.getExpected(playerEntity);
     ItemStack heldStack = playerEntity.getMainHandItem();
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {

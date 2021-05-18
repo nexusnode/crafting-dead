@@ -19,8 +19,8 @@
 package com.craftingdead.core.client.renderer.entity.layer;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.inventory.InventorySlotType;
-import com.craftingdead.core.living.ILiving;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.InventorySlotType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;
@@ -37,7 +37,7 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
     // @formatter:off
     return livingEntity.getCapability(ModCapabilities.LIVING)
-        .map(ILiving::getItemHandler)
+        .map(LivingExtension::getItemHandler)
         .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
         .flatMap(clothingStack -> clothingStack.getCapability(ModCapabilities.CLOTHING).resolve())
         .map(clothing -> clothing.getTexture(skinType))

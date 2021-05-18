@@ -18,7 +18,6 @@
 
 package com.craftingdead.immerse.client.gui;
 
-import com.craftingdead.core.util.Text;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -27,6 +26,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class KilledMessage {
 
@@ -53,8 +53,9 @@ public class KilledMessage {
     matrixStack.translate(x + 5, y + 5, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
     fontRenderer.drawShadow(matrixStack,
-        Text.translate("gui.killed_message.killed_by", this.killerEntity.getDisplayName())
-            .withStyle(TextFormatting.DARK_RED),
+        new TranslationTextComponent("gui.killed_message.killed_by",
+            this.killerEntity.getDisplayName())
+                .withStyle(TextFormatting.DARK_RED),
         0, 0, 0);
     matrixStack.popPose();
 
@@ -65,7 +66,7 @@ public class KilledMessage {
     matrixStack.translate(x + 5, y + 24, 0);
     matrixStack.scale(1.5F, 1.5F, 1.5F);
     fontRenderer.drawShadow(matrixStack,
-        Text.translate("gui.killed_message.hp", this.killerEntity.getHealth()), 0, 0,
+        new TranslationTextComponent("gui.killed_message.hp", this.killerEntity.getHealth()), 0, 0,
         0xFFFFFFFF);
     matrixStack.popPose();
 

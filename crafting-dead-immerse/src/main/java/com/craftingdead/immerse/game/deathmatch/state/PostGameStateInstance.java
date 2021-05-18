@@ -19,12 +19,12 @@
 package com.craftingdead.immerse.game.deathmatch.state;
 
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
-import com.craftingdead.immerse.game.state.IState;
+import com.craftingdead.immerse.game.state.State;
 import com.craftingdead.immerse.game.state.TimedStateInstance;
 
 public class PostGameStateInstance extends TimedStateInstance<DeathmatchServer> {
 
-  public PostGameStateInstance(IState<?> state, DeathmatchServer context) {
+  public PostGameStateInstance(State<?> state, DeathmatchServer context) {
     super(state, context, context.getPostGameDuration());
   }
 

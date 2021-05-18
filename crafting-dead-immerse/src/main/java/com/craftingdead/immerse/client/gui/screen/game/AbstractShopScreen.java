@@ -21,31 +21,36 @@ package com.craftingdead.immerse.client.gui.screen.game;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.core.living.IPlayer;
-import com.craftingdead.core.util.Text;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.game.shop.IShop;
+import com.craftingdead.immerse.game.shop.Shop;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class AbstractShopScreen extends Screen {
+
+  private static final ITextComponent TITLE =
+      new TranslationTextComponent("gui.screen.shop.title");
 
   private final List<GameButton> shopButtons = new ArrayList<>();
 
   private final Screen lastScreen;
 
-  private final IShop shop;
+  private final Shop shop;
 
-  private final IPlayer<?> player;
+  private final PlayerExtension<?> player;
 
   private int cachedBuyTime = -1;
 
-  public AbstractShopScreen(Screen lastScreen, IShop shop, IPlayer<?> player) {
-    super(Text.translate("gui.screen.shop.title"));
+  public AbstractShopScreen(Screen lastScreen, Shop shop, PlayerExtension<?> player) {
+    super(TITLE);
     this.lastScreen = lastScreen;
     this.shop = shop;
     this.player = player;
@@ -55,7 +60,7 @@ public abstract class AbstractShopScreen extends Screen {
     this.shopButtons.add(shopButton);
   }
 
-  public IShop getShop() {
+  public Shop getShop() {
     return this.shop;
   }
 
@@ -111,7 +116,7 @@ public abstract class AbstractShopScreen extends Screen {
     RenderUtil.fillWithShadow(0, this.height - 30, this.width, 30, 0x80000000);
 
     drawCenteredString(matrixStack, font,
-        Text.translate("gui.screen.shop.back", "B").withStyle(TextFormatting.ITALIC),
+        new TranslationTextComponent("gui.screen.shop.back", "B").withStyle(TextFormatting.ITALIC),
         mx - 150, 18, 0xFFFFFFFF);
 
     drawCenteredString(matrixStack, this.font,
@@ -119,9 +124,10 @@ public abstract class AbstractShopScreen extends Screen {
         mx, 10, 0xFFFFFFFF);
 
     RenderUtil.renderTextRight(this.font, matrixStack, mx + 150, 18,
-        Text.translate("gui.screen.shop.buy_time", Text.of(this.cachedBuyTime)
-            .withStyle(TextFormatting.RED))
-            .withStyle(TextFormatting.ITALIC),
+        new TranslationTextComponent("gui.screen.shop.buy_time",
+            new StringTextComponent(String.valueOf(this.cachedBuyTime))
+                .withStyle(TextFormatting.RED))
+                    .withStyle(TextFormatting.ITALIC),
         0xFFFFFFFF, true);
 
     // render slots and background
@@ -133,12 +139,12 @@ public abstract class AbstractShopScreen extends Screen {
     // render info of item over
     RenderUtil.fillWithShadow(mx - 25, my - 80, 115, 160, 0x80000000);
     this.font.drawShadow(matrixStack,
-        Text.translate("gui.screen.shop.selected").withStyle(TextFormatting.BOLD),
+        new TranslationTextComponent("gui.screen.shop.selected").withStyle(TextFormatting.BOLD),
         mx - 20, my - 75, 0xFFFFFFFF);
 
     for (GameButton shopButton : this.shopButtons) {
-      if (shopButton instanceof IInfoPanel && shopButton.isHovered()) {
-        ((IInfoPanel) shopButton).renderInfo(mx, my, matrixStack, mouseX, mouseY, partialTicks);
+      if (shopButton instanceof InfoPanel && shopButton.isHovered()) {
+        ((InfoPanel) shopButton).renderInfo(mx, my, matrixStack, mouseX, mouseY, partialTicks);
       }
     }
 
@@ -149,8 +155,8 @@ public abstract class AbstractShopScreen extends Screen {
     if (renderMoney) {
       RenderUtil.fillWithShadow(mx + 95, my - 80, 69, moneyHeight, 0x80000000);
       this.font.drawShadow(matrixStack,
-          Text.of("$" + this.shop.getPlayerMoney(this.player)).withStyle(TextFormatting.BOLD,
-              TextFormatting.GREEN),
+          new StringTextComponent("$" + this.shop.getPlayerMoney(this.player))
+              .withStyle(TextFormatting.BOLD, TextFormatting.GREEN),
           mx + 100, my - 76, 0);
     }
 
@@ -159,7 +165,7 @@ public abstract class AbstractShopScreen extends Screen {
 
     RenderUtil.fillWithShadow(mx + 95, my - 80 + inventoryYOffset, 69, 140, 0x80000000);
     this.font.drawShadow(matrixStack,
-        Text.translate("gui.screen.shop.inventory").withStyle(TextFormatting.BOLD),
+        new TranslationTextComponent("gui.screen.shop.inventory").withStyle(TextFormatting.BOLD),
         mx + 100, my - 75 + inventoryYOffset, 0xFFFFFFFF);
 
 

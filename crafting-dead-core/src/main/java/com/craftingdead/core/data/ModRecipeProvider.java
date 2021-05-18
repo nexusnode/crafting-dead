@@ -20,8 +20,8 @@ package com.craftingdead.core.data;
 
 import java.util.function.Consumer;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.item.ModItems;
-import com.craftingdead.core.item.crafting.ModRecipeSerializers;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
