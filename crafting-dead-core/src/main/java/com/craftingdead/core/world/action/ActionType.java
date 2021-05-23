@@ -24,12 +24,12 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class ActionType<T extends Action> extends ForgeRegistryEntry<ActionType<?>> {
 
-  private final IFactory<T> factory;
   private final boolean triggeredByClient;
+  private final IFactory<T> factory;
 
-  public ActionType(IFactory<T> factory, boolean triggeredByClient) {
-    this.factory = factory;
+  public ActionType(boolean triggeredByClient, IFactory<T> factory) {
     this.triggeredByClient = triggeredByClient;
+    this.factory = factory;
   }
 
   public T createAction(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target) {
@@ -41,6 +41,7 @@ public class ActionType<T extends Action> extends ForgeRegistryEntry<ActionType<
   }
 
   public interface IFactory<T extends Action> {
-    T create(ActionType<T> actionType, LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target);
+    T create(ActionType<T> actionType, LivingExtension<?, ?> performer,
+        @Nullable LivingExtension<?, ?> target);
   }
 }

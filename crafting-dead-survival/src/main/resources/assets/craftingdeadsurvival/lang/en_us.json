@@ -1,0 +1,53 @@
+{
+  "options.craftingdeadsurvival.server.broken_legs_enabled":"Broken Legs Enabled",
+  "options.craftingdeadsurvival.server.bleeding_enabled":"Bleeding Enabled",
+
+  "options.craftingdeadsurvival.client.display_blood": "Display Blood",
+
+  "enchantment.craftingdeadsurvival.infection": "Infection",
+
+  "effect.craftingdeadsurvival.infection":"Infected",
+  "effect.craftingdeadsurvival.broken_leg": "Broken Leg",
+  "effect.craftingdeadsurvival.bleeding":"Bleeding",
+
+  "entity.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
+  "entity.craftingdeadsurvival.advanced_zombie": "Advanced Zombie",
+  "entity.craftingdeadsurvival.fast_zombie": "Fast Zombie",
+  "entity.craftingdeadsurvival.tank_zombie": "Tank Zombie",
+  "entity.craftingdeadsurvival.weak_zombie": "Weak Zombie",
+  "entity.craftingdeadsurvival.police_zombie": "Police Zombie",
+  "entity.craftingdeadsurvival.doctor_zombie": "Doctor Zombie",
+  "entity.craftingdeadsurvival.giant_zombie": "Giant Zombie",
+
+  "message.infected": "You've been infected with RBI.",
+  "message.broken_leg": "Ouch! You broke your leg.",
+  "message.bleeding": "You're bleeding out!",
+
+  "death.attack.infection":"%1$s died from RBI",
+  "death.attack.bleeding":"%1$s bled to death",
+
+  "action.craftingdeadsurvival.use_clean_rag.message":"Cleaning wound",
+  "action.craftingdeadsurvival.use_splint.message":"Applying splint",
+  "action.craftingdeadsurvival.wash_rag.message":"Washing rag",
+  "action.craftingdeadsurvival.use_cure_syringe.message":"Injecting cure",
+  "action.craftingdeadsurvival.use_rbi_syringe.message":"Injecting RBI",
+  "action.craftingdeadsurvival.shred_clothing.message":"Shredding clothes",
+
+  "itemGroup.craftingdeadsurvival": "Crafting Dead Survival",
+
+  "item.craftingdeadsurvival.rbi_syringe": "RBI Syringe",
+  "item.craftingdeadsurvival.cure_syringe": "RBI Cure Syringe",
+  "item.craftingdeadsurvival.splint": "Makeshift Splint",
+  "item.craftingdeadsurvival.dirty_rag": "Dirty Rag",
+  "item.craftingdeadsurvival.bloody_rag": "Bloody Rag",
+  "item.craftingdeadsurvival.clean_rag": "Clean Rag",
+
+  "item.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
+
+  "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",
+  "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Fast Zombie Spawn Egg",
+  "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",
+  "item.craftingdeadsurvival.weak_zombie_spawn_egg": "Weak Zombie Spawn Egg",
+  "item.craftingdeadsurvival.police_zombie_spawn_egg": "Police Zombie Spawn Egg",
+  "item.craftingdeadsurvival.doctor_zombie_spawn_egg": "Doctor Zombie Spawn Egg"
+}

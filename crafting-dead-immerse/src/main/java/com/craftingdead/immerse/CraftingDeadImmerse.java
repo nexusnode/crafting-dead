@@ -25,8 +25,8 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.Game;
+import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
@@ -34,7 +34,6 @@ import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.util.DependencyLoader;
 import com.craftingdead.immerse.util.ModSoundEvents;
-import com.craftingdead.immerse.world.item.ModItems;
 import com.craftingdead.immerse.world.level.block.ModBlocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -115,7 +114,6 @@ public class CraftingDeadImmerse {
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
     ModBlocks.BLOCKS.register(modEventBus);
-    ModItems.ITEMS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     GameTypes.GAME_TYPES.register(modEventBus);
 

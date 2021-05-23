@@ -13,26 +13,13 @@
   
   "death.attack.bullet": "%1$s 被射杀",
   "death.attack.bullet.headshot": "%1$s 被爆头",
-
-  "death.attack.dehydration":"%1$s 因脱水而死",
-  "death.attack.bleeding":"%1$s 因失血过多而死",
   
-  "options.craftingdead.client.display_blood": "显示血液",
-  "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
   "options.craftingdead.client.play_kill_sound": "砍杀声音已启用",
   "options.craftingdead.client.crosshair": "十字准星",
   "options.craftingdead.client.kill_sound": "击杀音效",
-
-  "options.craftingdead.client.display_blood": "显示血液",
   "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
   "options.craftingdead.client.kill_sound_enabled": "砍杀声音",
 
-  "options.craftingdead.server.hydration_enabled":"水化已启用",
-  "options.craftingdead.server.broken_legs_enabled":"骨折已启用",
-  "options.craftingdead.server.bleeding_enabled":"流血已启用",
-  "effect.craftingdead.broken_leg": "骨折",
-  "effect.craftingdead.dehydration": "脱水",
-  "effect.craftingdead.bleeding":"流血",
   "effect.craftingdead.adrenaline":"肾上腺素",
   "effect.craftingdead.flash_blindness":"闪光失明",
 
@@ -42,12 +29,9 @@
   "entity.craftingdead.fire_grenade": "燃烧弹",
   "entity.craftingdead.flash_grenade": "闪光弹",
   "entity.craftingdead.flag_grenade": "破片手榴弹",
-  "entity.craftingdead.pipe_grenade": "黏土炸弹",
   "entity.craftingdead.smoke_grenade": "烟雾弹",
 
   "message.switch_fire_mode": "切换到%s",
-  "message.broken_leg": "你骨折了.",
-  "message.bleeding": "你流血了!",
   "message.low_health": "%1$s的生命值很低!",
   
   "fire_mode.auto":"自动模式",
@@ -62,14 +46,11 @@
   "action.craftingdead.magazine_reload.message":"上弹中",
   "action.craftingdead.refillable_reload.message":"上弹中",
   "action.craftingdead.remove_magazine.message":"移除弹夹",
-  "action.craftingdead.use_clean_rag.message":"包扎",
-  "action.craftingdead.use_splint.message":"使用夹板",
   "action.craftingdead.use_syringe.message":"抽出液体",
   "action.craftingdead.use_first_aid_kit.message":"治疗中",
   "action.craftingdead.use_adrenaline_syringe.message":"注射肾上腺素",
   "action.craftingdead.use_blood_syringe.message":"输血中",
   "action.craftingdead.use_bandage.message":"使用绷带",
-  "action.craftingdead.wash_rag.message":"清洗绷带",
 
   "itemGroup.craftingdead.cosmetics": "行尸走肉 衣物",
   "itemGroup.craftingdead.misc": "行尸走肉 杂项",
@@ -214,11 +195,7 @@
   "item.craftingdead.adrenaline_syringe": "肾上腺素注射器",
   "item.craftingdead.blood_syringe": "血液注射器",
   "item.craftingdead.bandage": "绷带",
-  "item.craftingdead.clean_rag": "干净的破布",
   "item.craftingdead.syringe": "空注射器",
-  "item.craftingdead.splint": "夹板",
-  "item.craftingdead.dirty_rag": "脏破布",
-  "item.craftingdead.bloody_rag": "带血的破布",
 
   "item.craftingdead.contractor_clothing": "忍者神龟服装",
   "item.craftingdead.ddpat_clothing": "海军服装",
@@ -268,7 +245,6 @@
   "item.craftingdead.fire_grenade": "燃烧弹",
   "item.craftingdead.flash_grenade": "闪光弹",
   "item.craftingdead.frag_grenade": "破片手榴弹",
-  "item.craftingdead.pipe_grenade": "粘土炸弹",
   "item.craftingdead.smoke_grenade": "烟雾弹",
   "item.craftingdead.green_ballistic_helmet": "丛林防弹头盔",
   "item.craftingdead.sheep_mask": "绵羊面具",
@@ -368,9 +344,5 @@
 
   "attachment_multiplier_type.damage": "伤害",
   "attachment_multiplier_type.accuracy": "精确度",
-  "attachment_multiplier_type.zoom": "放大",
-
-  "commands.craftingdead.hydrate.success.operator": "已解渴",
-  "commands.craftingdead.hydrate.success.confirmation": "饥渴值已回复",
-  "commands.craftingdead.hydrate.failure.not_used": "没有人饥渴"
+  "attachment_multiplier_type.zoom": "放大"
 }

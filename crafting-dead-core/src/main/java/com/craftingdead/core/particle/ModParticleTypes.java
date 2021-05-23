@@ -31,14 +31,14 @@ public class ModParticleTypes {
   public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
       DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CraftingDead.ID);
 
-  public static final RegistryObject<ParticleType<RGBFlashParticleData>> RGB_FLASH =
-      PARTICLE_TYPES.register("rgb_flash",
-          () -> create(true, RGBFlashParticleData.DESERIALIZER, RGBFlashParticleData.CODEC));
-
   public static final RegistryObject<ParticleType<GrenadeSmokeParticleData>> GRENADE_SMOKE =
       PARTICLE_TYPES.register("grenade_smoke",
           () -> create(true, GrenadeSmokeParticleData.DESERIALIZER,
               GrenadeSmokeParticleData.CODEC));
+
+  public static final RegistryObject<ParticleType<RGBFlashParticleData>> RGB_FLASH =
+      PARTICLE_TYPES.register("rgb_flash",
+          () -> create(true, RGBFlashParticleData.DESERIALIZER, RGBFlashParticleData.CODEC));
 
   private static <T extends IParticleData> ParticleType<T> create(boolean alwaysShow,
       @SuppressWarnings("deprecation") IParticleData.IDeserializer<T> deserializer,

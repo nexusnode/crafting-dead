@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "craftingdeadsurvival:item/cure_syringe"
+  }
+}

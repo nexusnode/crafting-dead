@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "bib",
+    "igi",
+    "bib"
+  ],
+  "key": {
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "b": {
+      "item": "craftingdeadsurvival:bloody_rag"
+    },
+    "g": {
+      "tag": "forge:gunpowder"
+    }
+  },
+  "result": {
+    "item": "craftingdeadsurvival:pipe_grenade"
+  }
+}

@@ -29,7 +29,6 @@ import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
@@ -541,15 +540,6 @@ public class ModRecipeProvider extends RecipeProvider {
         .define('g', Tags.Items.GUNPOWDER)
         .unlockedBy("has_gunpowder", has(Tags.Items.GUNPOWDER))
         .save(consumer);
-    ShapedRecipeBuilder.shaped(ModItems.PIPE_GRENADE.get())
-        .pattern("bib")
-        .pattern("igi")
-        .pattern("bib")
-        .define('i', Tags.Items.INGOTS_IRON)
-        .define('b', ModItems.BLOODY_RAG.get())
-        .define('g', Tags.Items.GUNPOWDER)
-        .unlockedBy("has_bloody_rag", has(ModItems.BLOODY_RAG.get()))
-        .save(consumer);
     ShapedRecipeBuilder.shaped(ModItems.C4.get())
         .pattern(" i ")
         .pattern("iti")
@@ -577,6 +567,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .pattern("sss")
         .define('s', Items.STRING)
         .define('a', Items.APPLE)
+        .unlockedBy("has_string", has(Items.STRING))
         .unlockedBy("has_apple", has(Items.APPLE))
         .save(consumer);
     ShapedRecipeBuilder.shaped(ModItems.SYRINGE.get())
@@ -588,24 +579,9 @@ public class ModRecipeProvider extends RecipeProvider {
         .unlockedBy("has_glass", has(Items.GLASS))
         .save(consumer);
     ShapelessRecipeBuilder.shapeless(ModItems.BANDAGE.get())
-        .requires(ModItems.CLEAN_RAG.get())
-        .requires(ModItems.CLEAN_RAG.get())
-        .unlockedBy("has_clean_rag", has(Items.APPLE))
-        .save(consumer);
-    ShapedRecipeBuilder.shaped(ModItems.CLEAN_RAG.get())
-        .pattern("sss")
-        .pattern("sss")
-        .pattern("sss")
-        .define('s', Items.STRING)
+        .requires(Items.STRING)
+        .requires(Items.STRING)
         .unlockedBy("has_string", has(Items.STRING))
-        .save(consumer);
-    ShapedRecipeBuilder.shaped(ModItems.SPLINT.get())
-        .pattern("rs ")
-        .pattern("srs")
-        .pattern(" sr")
-        .define('s', Items.STICK)
-        .define('r', Ingredient.of(ModItems.CLEAN_RAG.get(), ModItems.DIRTY_RAG.get()))
-        .unlockedBy("has_stick", has(Items.STICK))
         .save(consumer);
 
     // ================================================================================

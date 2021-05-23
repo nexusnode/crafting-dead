@@ -18,37 +18,33 @@
 
 package com.craftingdead.core.world.clothing;
 
-import java.util.Optional;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.util.ResourceLocation;
 
 public class DefaultClothing implements Clothing {
 
-  private final boolean enhancedProtection;
-  private final Integer slownessAmplifier;
+  private final Multimap<Attribute, AttributeModifier> attributeModifiers;
   private final boolean fireImmunity;
   private final ResourceLocation texture;
 
   public DefaultClothing() {
-    this(false, null, false, TextureManager.INTENTIONAL_MISSING_TEXTURE);
+    this(ImmutableMultimap.of(), false, TextureManager.INTENTIONAL_MISSING_TEXTURE);
   }
 
-  public DefaultClothing(boolean enhancedProtection, Integer slownessAmplifier,
+  public DefaultClothing(Multimap<Attribute, AttributeModifier> attributeModifiers,
       boolean fireImmunity, ResourceLocation texture) {
-    this.enhancedProtection = enhancedProtection;
-    this.slownessAmplifier = slownessAmplifier;
+    this.attributeModifiers = attributeModifiers;
     this.fireImmunity = fireImmunity;
     this.texture = texture;
   }
 
   @Override
-  public boolean hasEnhancedProtection() {
-    return this.enhancedProtection;
-  }
-
-  @Override
-  public Optional<Integer> getSlownessAmplifier() {
-    return Optional.ofNullable(this.slownessAmplifier);
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers() {
+    return this.attributeModifiers;
   }
 
   @Override

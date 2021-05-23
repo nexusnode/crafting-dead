@@ -34,15 +34,6 @@ public class ModMobEffects {
   public static final RegistryObject<Effect> SCUBA =
       MOB_EFFECTS.register("scuba", ScubaMobEffect::new);
 
-  public static final RegistryObject<Effect> BLEEDING =
-      MOB_EFFECTS.register("bleeding", BleedingMobEffect::new);
-
-  public static final RegistryObject<Effect> BROKEN_LEG =
-      MOB_EFFECTS.register("broken_leg", BrokenLegMobEffect::new);
-
-  public static final RegistryObject<Effect> HYDRATE =
-      MOB_EFFECTS.register("hydrate", HydrateMobEffect::new);
-
   public static final RegistryObject<Effect> FLASH_BLINDNESS =
       MOB_EFFECTS.register("flash_blindness", FlashBlindnessMobEffect::new);
 

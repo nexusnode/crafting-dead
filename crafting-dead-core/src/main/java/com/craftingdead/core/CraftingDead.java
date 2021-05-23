@@ -18,14 +18,11 @@
 
 package com.craftingdead.core;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.commands.Commands;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
@@ -49,8 +46,6 @@ import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.combatslot.CombatSlotType;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
-import com.craftingdead.core.world.item.hydration.DefaultHydration;
-import com.craftingdead.core.world.item.hydration.PresetHydration;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
@@ -64,21 +59,16 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -89,9 +79,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -107,18 +95,10 @@ public class CraftingDead {
 
   private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
 
-  public static final ServerConfig serverConfig;
-  public static final ForgeConfigSpec serverConfigSpec;
-
   static {
     VERSION = JarVersionLookupHandler
         .getImplementationVersion(CraftingDead.class)
         .orElse("[version]");
-
-    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
-        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
-    serverConfigSpec = serverConfigPair.getRight();
-    serverConfig = serverConfigPair.getLeft();
   }
 
   /**
@@ -162,8 +142,6 @@ public class CraftingDead {
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
     MinecraftForge.EVENT_BUS.register(this);
-
-    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
   }
 
   public ModDist getModDist() {
@@ -239,11 +217,6 @@ public class CraftingDead {
         });
   }
 
-  @SubscribeEvent
-  public void handleRegisterCommands(RegisterCommandsEvent event) {
-    Commands.register(event.getDispatcher());
-  }
-
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
     if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
@@ -296,18 +269,9 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    PlayerExtension.getExpected(event.getPlayer()).copyFrom(PlayerExtension.getExpected(event.getOriginal()),
+    PlayerExtension.getExpected(event.getPlayer()).copyFrom(
+        PlayerExtension.getExpected(event.getOriginal()),
         event.isWasDeath());
-  }
-
-  @SubscribeEvent
-  public void handleUseItem(LivingEntityUseItemEvent.Finish event) {
-    event.getItem()
-        .getCapability(ModCapabilities.HYDRATION)
-        .map(hydration -> hydration.getHydration(event.getItem()))
-        .ifPresent(hydration -> event
-            .getEntityLiving()
-            .addEffect(new EffectInstance(ModMobEffects.HYDRATE.get(), 1, hydration)));
   }
 
   @SubscribeEvent
@@ -347,40 +311,6 @@ public class CraftingDead {
       event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
           LazyOptional.of(() -> living), () -> ModCapabilities.LIVING, CompoundNBT::new));
       living.load();
-    }
-  }
-
-  @SubscribeEvent
-  public void handleAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-    final Item item = event.getObject().getItem();
-    final int hydration;
-    if (item == Items.APPLE || item == Items.RABBIT_STEW) {
-      hydration = 2;
-    } else if (item == Items.CARROT || item == Items.BEETROOT || item == Items.HONEY_BOTTLE) {
-      hydration = 1;
-    } else if (item == Items.CHORUS_FRUIT || item == Items.SWEET_BERRIES) {
-      hydration = 3;
-    } else if (item == Items.ENCHANTED_GOLDEN_APPLE
-        || item == Items.GOLDEN_APPLE
-        || item == Items.MUSHROOM_STEW
-        || item == Items.SUSPICIOUS_STEW
-        || item == Items.BEETROOT_SOUP
-        || item == Items.MELON_SLICE) {
-      hydration = 5;
-    } else if (item == Items.GOLDEN_CARROT) {
-      hydration = 6;
-    } else {
-      hydration = -1;
-    }
-
-    if (hydration != -1) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-          new SimpleCapabilityProvider<>(LazyOptional.of(() -> new PresetHydration(hydration)),
-              () -> ModCapabilities.HYDRATION));
-    } else if (item == Items.POTION) {
-      event.addCapability(new ResourceLocation(CraftingDead.ID, "hydration"),
-          new SimpleCapabilityProvider<>(LazyOptional.of(DefaultHydration::new),
-              () -> ModCapabilities.HYDRATION));
     }
   }
 

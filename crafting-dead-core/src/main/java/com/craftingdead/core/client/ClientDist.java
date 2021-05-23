@@ -340,8 +340,6 @@ public class ClientDist implements ModDist {
         CylinderGrenadeRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FRAG_GRENADE.get(),
         FragGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.PIPE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.DECOY_GRENADE.get(),
         SlimGrenadeRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SMOKE_GRENADE.get(),
@@ -397,10 +395,9 @@ public class ClientDist implements ModDist {
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
     final ParticleManager particleManager = this.minecraft.particleEngine;
-    particleManager.register(ModParticleTypes.RGB_FLASH.get(),
-        RGBFlashParticle.Factory::new);
     particleManager.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
+    particleManager.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {

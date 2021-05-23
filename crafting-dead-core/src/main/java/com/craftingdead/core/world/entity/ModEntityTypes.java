@@ -24,7 +24,6 @@ import com.craftingdead.core.world.entity.grenade.DecoyGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FragGrenadeEntity;
-import com.craftingdead.core.world.entity.grenade.PipeGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -81,15 +80,6 @@ public class ModEntityTypes {
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.25F)
-              .setShouldReceiveVelocityUpdates(false)));
-
-  public static final RegistryObject<EntityType<PipeGrenadeEntity>> PIPE_GRENADE =
-      ENTITY_TYPES.register("pipe_grenade", () -> create("pipe_grenade",
-          EntityType.Builder
-              .<PipeGrenadeEntity>of(PipeGrenadeEntity::new, EntityClassification.MISC)
-              .setTrackingRange(64)
-              .setUpdateInterval(4)
-              .sized(0.25F, 0.5F)
               .setShouldReceiveVelocityUpdates(false)));
 
   public static final RegistryObject<EntityType<SmokeGrenadeEntity>> SMOKE_GRENADE =

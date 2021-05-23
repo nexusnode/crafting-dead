@@ -76,14 +76,14 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
   public boolean finish(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target,
       ItemStack heldStack) {
     if (this.customAction != null
-        && UseItemAction.random.nextFloat() < this.customAction.getRight()) {
+        && ItemAction.random.nextFloat() < this.customAction.getRight()) {
       this.customAction.getLeft().accept(this.selectedTarget);
     }
 
     this.selectedTarget.getEntity().curePotionEffects(heldStack);
 
     for (Pair<EffectInstance, Float> pair : this.effects) {
-      if (pair.getLeft() != null && UseItemAction.random.nextFloat() < pair.getRight()) {
+      if (pair.getLeft() != null && ItemAction.random.nextFloat() < pair.getRight()) {
         EffectInstance effectInstance = pair.getLeft();
         if (effectInstance.getEffect().isInstantenous()) {
           effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),

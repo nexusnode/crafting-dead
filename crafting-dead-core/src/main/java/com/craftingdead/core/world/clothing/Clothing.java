@@ -18,14 +18,17 @@
 
 package com.craftingdead.core.world.clothing;
 
-import java.util.Optional;
+import java.util.UUID;
+import com.google.common.collect.Multimap;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.util.ResourceLocation;
 
 public interface Clothing {
 
-  boolean hasEnhancedProtection();
+  UUID MODIFIER_ID = UUID.fromString("c14e5f26-bbe9-11eb-8529-0242ac130003");
 
-  Optional<Integer> getSlownessAmplifier();
+  Multimap<Attribute, AttributeModifier> getAttributeModifiers();
 
   boolean hasFireImmunity();
 

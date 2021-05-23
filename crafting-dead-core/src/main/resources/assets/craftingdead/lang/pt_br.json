@@ -15,22 +15,13 @@
   "death.attack.bullet": "%1$s foi baleado",
   "death.attack.bullet.headshot": "%1$s foi baleado na cabeça",
 
-  "options.craftingdead.client.display_blood": "Mostrar Sangue",
-
-  "effect.craftingdead.broken_leg": "Perna Quebrada",
-  "effect.craftingdead.dehydration": "Desidratação",
-  "effect.craftingdead.bleeding":"Sangramento",
-
   "entity.craftingdead.supply_drop": "Caixa de Suprimentos",
   "entity.craftingdead.c4_explosive": "Explosivo C4",
   "entity.craftingdead.decoy_grenade": "Granada de Som",
   "entity.craftingdead.fire_grenade": "Granada de Fogo",
   "entity.craftingdead.flash_grenade": "Granada de Flash",
   "entity.craftingdead.flag_grenade": "Granada de Fragmentação",
-  "entity.craftingdead.pipe_grenade": "Granada Improvisada",
   "entity.craftingdead.smoke_grenade": "Granada de Fumaça",
-  "message.broken_leg": "Ai! Você quebrou sua perna.",
-  "message.bleeding": "Você está sangrando!",
 
   "itemGroup.craftingdead.cosmetics": "Crafting Dead Roupas",
   "itemGroup.craftingdead.misc": "Crafting Dead Miscelânea",
@@ -40,9 +31,6 @@
   "item.craftingdead.first_aid_kit": "Kit de Primeiros Socorros",
   "item.craftingdead.adrenaline_syringe": "Seringa de Adrenalina",
   "item.craftingdead.syringe": "Seringa Vazia",
-  "item.craftingdead.dirty_rag": "Tecido Sujo",
-  "item.craftingdead.bloody_rag": "Tecido Ensanguentado",
-  "item.craftingdead.clean_rag": "Tecido Limpo",
   "item.craftingdead.crowbar": "Pé de Cabra",
   "item.craftingdead.katana": "Katana",
   "item.craftingdead.fire_axe": "Machado de Bombeiro",
@@ -73,7 +61,6 @@
 
   "item.craftingdead.blood_syringe": "Seringa de Sangue",
   "item.craftingdead.bandage": "Bandagem",
-  "item.craftingdead.splint": "Tala Improvisada",
 
   "item.craftingdead.contractor_clothing": "Roupa Contractor",
   "item.craftingdead.ddpat_clothing": "Roupa da Marinha DDPAT",
@@ -123,7 +110,6 @@
   "item.craftingdead.fire_grenade": "Granada de Fogo",
   "item.craftingdead.flash_grenade": "Granada de Flash",
   "item.craftingdead.frag_grenade": "Granada de Fragmentação",
-  "item.craftingdead.pipe_grenade": "Granada Improvisada",
   "item.craftingdead.smoke_grenade": "Granada de Fumaça",
   "item.craftingdead.green_ballistic_helmet": "Capacete Balístico Verde",
   "item.craftingdead.sheep_mask": "Máscara de Ovelha",
@@ -320,9 +306,5 @@
 
   "attachment_multiplier_type.damage": "Dano",
   "attachment_multiplier_type.accuracy": "Precisão",
-  "attachment_multiplier_type.zoom": "Zoom",
-
-  "commands.craftingdead.hydrate.success.operator": "Sede saciada com sucesso",
-  "commands.craftingdead.hydrate.success.confirmation": "Você foi totalmente hidratado",
-  "commands.craftingdead.hydrate.failure.not_used": "Ninguém estava com sede"
+  "attachment_multiplier_type.zoom": "Zoom"
 }

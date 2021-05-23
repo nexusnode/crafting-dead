@@ -24,20 +24,6 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
-            }
-          ],
-          "name": "craftingdead:clean_rag"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
                 "n": 6,
                 "p": 0.12,
                 "type": "minecraft:binomial"
@@ -74,20 +60,6 @@
           ],
           "name": "craftingdead:syringes",
           "expand": true
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
-            }
-          ],
-          "name": "craftingdead:splint"
         },
         {
           "type": "minecraft:item",
@@ -144,20 +116,6 @@
             }
           ],
           "name": "craftingdead:g18_magazine"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
-            }
-          ],
-          "name": "craftingdead:pipe_grenade"
         },
         {
           "type": "minecraft:item",

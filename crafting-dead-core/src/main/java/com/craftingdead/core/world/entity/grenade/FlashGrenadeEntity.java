@@ -109,8 +109,9 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   }
 
   /**
-   * Calculates the amount of ticks that must be used in a {@link FlashBlindnessMobEffect} in according
-   * to the possible variables, like blocks in front of view, resistance from equipments and others.
+   * Calculates the amount of ticks that must be used in a {@link FlashBlindnessMobEffect} in
+   * according to the possible variables, like blocks in front of view, resistance from equipments
+   * and others.
    *
    * @return int - The amount in ticks. Zero if it should not be applied.
    */

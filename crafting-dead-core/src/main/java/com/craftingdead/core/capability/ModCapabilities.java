@@ -50,9 +50,6 @@ public class ModCapabilities {
   @CapabilityInject(Storage.class)
   public static final Capability<Storage> STORAGE = null;
 
-  @CapabilityInject(Hydration.class)
-  public static final Capability<Hydration> HYDRATION = null;
-
   @CapabilityInject(Clothing.class)
   public static final Capability<Clothing> CLOTHING = null;
 
@@ -78,7 +75,8 @@ public class ModCapabilities {
   public static final Capability<IMagazine> MAGAZINE = null;
 
   static {
-    CapabilityManager.INSTANCE.register(LivingExtension.class, new EmptyStorage<>(), LivingExtensionImpl::new);
+    CapabilityManager.INSTANCE.register(LivingExtension.class, new EmptyStorage<>(),
+        LivingExtensionImpl::new);
     CapabilityManager.INSTANCE.register(Storage.class, new EmptyStorage<>(),
         ItemStackHandlerStorage::new);
     CapabilityManager.INSTANCE.register(Hydration.class, new EmptyStorage<>(),

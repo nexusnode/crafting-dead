@@ -27,7 +27,7 @@ import net.minecraft.util.IItemProvider;
 import net.minecraft.util.SoundEvent;
 
 public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properties<P>>
-    implements IActionEntry {
+    implements ActionEntry {
 
   private final boolean shrinkStack;
   @Nullable

@@ -1,0 +1,47 @@
+{
+  "options.craftingdeadsurvival.client.display_blood": "显示血液",
+  "options.craftingdeadsurvival.server.broken_legs_enabled":"骨折已启用",
+  "options.craftingdeadsurvival.server.bleeding_enabled":"流血已启用",
+
+  "enchantment.craftingdeadsurvival.infection": "尸毒",
+
+  "effect.craftingdeadsurvival.infection":"尸毒",
+  "effect.craftingdeadsurvival.broken_leg": "骨折",
+  "effect.craftingdeadsurvival.bleeding":"流血",
+
+  "entity.craftingdeadsurvival.pipe_grenade": "黏土炸弹",
+  "entity.craftingdeadsurvival.advanced_zombie": "高级丧尸",
+  "entity.craftingdeadsurvival.fast_zombie": "快速丧尸",
+  "entity.craftingdeadsurvival.tank_zombie": "坦克丧尸",
+  "entity.craftingdeadsurvival.weak_zombie": "柔弱丧尸",
+  "entity.craftingdeadsurvival.police_zombie": "警察丧尸",
+  "entity.craftingdeadsurvival.doctor_zombie": "医生丧尸",
+  "entity.craftingdeadsurvival.giant_zombie": "巨型丧尸",
+
+  "message.infected": "你已被丧尸病毒感染.",
+  "message.broken_leg": "你骨折了.",
+  "message.bleeding": "你流血了!",
+
+  "death.attack.bleeding":"%1$s 因失血过多而死",
+
+  "action.craftingdeadsurvival.use_cure_syringe.message":"注射丧尸病毒解药",
+  "action.craftingdeadsurvival.use_rbi_syringe.message":"注射丧尸病毒",
+  "action.craftingdeadsurvival.wash_rag.message":"清洗绷带",
+  "action.craftingdeadsurvival.use_clean_rag.message":"包扎",
+  "action.craftingdeadsurvival.use_splint.message":"使用夹板",
+
+  "item.craftingdeadsurvival.rbi_syringe": "带有尸毒的针",
+  "item.craftingdeadsurvival.cure_syringe": "治疗尸毒的药剂",
+  "item.craftingdeadsurvival.splint": "夹板",
+  "item.craftingdeadsurvival.clean_rag": "干净的破布",
+  "item.craftingdeadsurvival.dirty_rag": "脏破布",
+  "item.craftingdeadsurvival.bloody_rag": "带血的破布",
+
+  "item.craftingdeadsurvival.pipe_grenade": "粘土炸弹",
+  "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "生成 高级丧尸",
+  "item.craftingdeadsurvival.fast_zombie_spawn_egg": "生成 快速丧尸",
+  "item.craftingdeadsurvival.tank_zombie_spawn_egg": "生成 坦克丧尸",
+  "item.craftingdeadsurvival.weak_zombie_spawn_egg": "生成 柔弱丧尸",
+  "item.craftingdeadsurvival.police_zombie_spawn_egg": "生成 警察丧尸",
+  "item.craftingdeadsurvival.doctor_zombie_spawn_egg": "生成 医生丧尸"
+}

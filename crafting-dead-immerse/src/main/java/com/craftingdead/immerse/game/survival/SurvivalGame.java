@@ -20,9 +20,9 @@ package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
+import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
-import com.craftingdead.immerse.game.Game;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,9 +45,9 @@ public class SurvivalGame implements Game {
   @SubscribeEvent
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtensionImpl
-        && !event.getLiving().getHandler(SurvivalPlayer.EXTENSION_ID).isPresent()) {
+        && !event.getLiving().getHandler(SurvivalPlayerHandler.EXTENSION_ID).isPresent()) {
       PlayerExtensionImpl<?> player = (PlayerExtensionImpl<?>) event.getLiving();
-      player.registerHandler(SurvivalPlayer.EXTENSION_ID, new SurvivalPlayer(player));
+      player.registerHandler(SurvivalPlayerHandler.EXTENSION_ID, new SurvivalPlayerHandler(player));
     }
   }
 

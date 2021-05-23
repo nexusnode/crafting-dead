@@ -2,4 +2,4 @@ rootProject.name = 'crafting-dead'
 
 include 'crafting-dead-core'
 include 'crafting-dead-immerse'
-include 'crafting-dead-virus'
+include 'crafting-dead-survival'

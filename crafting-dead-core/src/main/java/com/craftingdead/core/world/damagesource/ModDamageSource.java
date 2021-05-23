@@ -32,10 +32,6 @@ public class ModDamageSource {
   public static final String BULLET_HEADSHOT_DAMAGE_TYPE = "bullet.headshot";
   public static final String BULLET_BODY_DAMAGE_TYPE = "bullet";
 
-  public static final DamageSource DEHYDRATION =
-      new DamageSource("dehydration").bypassArmor();
-  public static final DamageSource BLEEDING = new DamageSource("bleeding").bypassArmor();
-
   public static DamageSource causeGunDamage(LivingEntity source, ItemStack gunStack,
       boolean headshot) {
     return new KillFeedDamageSource(

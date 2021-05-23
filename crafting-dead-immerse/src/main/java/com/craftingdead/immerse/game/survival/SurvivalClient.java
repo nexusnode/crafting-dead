@@ -41,10 +41,11 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
 
   @Override
   public void renderOverlay(
-      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+      int width,
       int height, float partialTicks) {
-    SurvivalPlayer survivalPlayer =
-        (SurvivalPlayer) player.getExpectedHandler(SurvivalPlayer.EXTENSION_ID);
+    SurvivalPlayerHandler survivalPlayer =
+        (SurvivalPlayerHandler) player.getExpectedHandler(SurvivalPlayerHandler.EXTENSION_ID);
     int y = height / 2;
     int x = 4;
 
@@ -70,7 +71,8 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
 
   @Override
   public void renderPlayerList(
-      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack, int width,
+      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+      int width,
       int height, float partialTicks) {
     this.minecraft.gui.getTabList().render(matrixStack, width,
         this.minecraft.level.getScoreboard(),

@@ -48,7 +48,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -58,11 +57,6 @@ import net.minecraft.util.text.TextFormatting;
 public class IngameGui {
 
   private static final Random random = new Random();
-
-  private static final ResourceLocation BLOOD =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
-  private static final ResourceLocation BLOOD_2 =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
 
   private static final ResourceLocation HEALTH =
       new ResourceLocation(CraftingDead.ID, "textures/gui/health.png");
@@ -195,23 +189,6 @@ public class IngameGui {
         .ifPresent(observer -> renderProgress(matrixStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
-
-    // Only draw in survival
-    if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
-      float healthPercentage = playerEntity.getHealth() / playerEntity.getMaxHealth();
-      if (ClientDist.clientConfig.displayBlood.get() && healthPercentage < 1.0F
-          && playerEntity.hasEffect(ModMobEffects.BLEEDING.get())) {
-        renderBlood(width, height, healthPercentage);
-      }
-
-      // Only render when air level is not being rendered
-      if (CraftingDead.serverConfig.hydrationEnabled.get()
-          && !playerEntity.isEyeInFluid(FluidTags.WATER)
-          && playerEntity.getAirSupply() == playerEntity.getMaxAirSupply()) {
-        renderWater(width, height, (float) player.getWater() / (float) player.getMaxWater(),
-            RenderUtil.ICONS);
-      }
-    }
 
     if (gun != null) {
       this.renderGunFlash(playerEntity, gun, width, height, partialTicks);
@@ -424,45 +401,8 @@ public class IngameGui {
   }
 
   @SuppressWarnings("deprecation")
-  private static void renderBlood(int width, int height, float healthPercentage) {
-    ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
-
-    RenderSystem.enableBlend();
-    RenderSystem.disableAlphaTest();
-
-    RenderUtil.bind(res);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
-    RenderUtil.blit(0, 0, width, height);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.enableAlphaTest();
-    RenderSystem.disableBlend();
-  }
-
-  private static void renderWater(int width, int height, float waterPercentage,
-      ResourceLocation resourceLocation) {
-    final int y = height - 49;
-    final int x = width / 2 + 91;
-    RenderSystem.enableBlend();
-    RenderUtil.bind(resourceLocation);
-
-    for (int i = 0; i < 10; i++) {
-      // Draw droplet outline
-      RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 0, 32);
-
-      float scaledWater = 10.0F * waterPercentage;
-      if (i + 1 <= scaledWater) {
-        // Draw full droplet
-        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 9, 32);
-      } else if (scaledWater >= i + 0.5F) {
-        // Draw half droplet
-        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 18, 32);
-      }
-    }
-    RenderSystem.disableBlend();
-  }
-
-  @SuppressWarnings("deprecation")
-  private void renderCombatMode(PlayerExtension<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+  private void renderCombatMode(PlayerExtension<AbstractClientPlayerEntity> player,
+      MatrixStack matrixStack,
       int width, int height) {
     final PlayerInventory inventory = player.getEntity().inventory;
 

@@ -6,6 +6,16 @@
     ]
   },
   "criteria": {
+    "has_string": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:string"
+          }
+        ]
+      }
+    },
     "has_apple": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
@@ -25,6 +35,7 @@
   },
   "requirements": [
     [
+      "has_string",
       "has_apple",
       "has_the_recipe"
     ]

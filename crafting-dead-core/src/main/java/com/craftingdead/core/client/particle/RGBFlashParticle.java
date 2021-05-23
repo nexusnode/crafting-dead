@@ -30,7 +30,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
 
 public class RGBFlashParticle extends SpriteTexturedParticle {
-  private RGBFlashParticle(RGBFlashParticleData data, ClientWorld world, double x, double y, double z) {
+
+  private RGBFlashParticle(RGBFlashParticleData data, ClientWorld world, double x, double y,
+      double z) {
     super(world, x, y, z);
     this.lifetime = 4;
     this.rCol = data.getRed();
@@ -58,6 +60,7 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
   }
 
   public static class Factory implements IParticleFactory<RGBFlashParticleData> {
+
     private final IAnimatedSprite animatedSprite;
 
     public Factory(IAnimatedSprite animatedSprite) {
@@ -65,8 +68,8 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public Particle createParticle(RGBFlashParticleData data, ClientWorld world, double xPos, double yPos,
-        double zPos, double xVelocity, double yVelocity, double zVelocity) {
+    public Particle createParticle(RGBFlashParticleData data, ClientWorld world, double xPos,
+        double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
       RGBFlashParticle flashParticle = new RGBFlashParticle(data, world, xPos, yPos, zPos);
       flashParticle.pickSprite(this.animatedSprite);
       return flashParticle;

@@ -33,14 +33,6 @@ public interface PlayerExtension<E extends PlayerEntity>
 
   void openStorage(InventorySlotType slotType);
 
-  int getWater();
-
-  void setWater(int water);
-
-  int getMaxWater();
-
-  void setMaxWater(int maxWater);
-
   @SuppressWarnings("unchecked")
   public static <E extends PlayerEntity> PlayerExtension<E> getExpected(E livingEntity) {
     return livingEntity.getCapability(ModCapabilities.LIVING)

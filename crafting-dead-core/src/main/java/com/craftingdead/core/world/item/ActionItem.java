@@ -60,7 +60,7 @@ public class ActionItem extends Item {
   @Override
   public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
       Hand hand) {
-    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
+    if (!playerEntity.level.isClientSide()) {
       this.performAction(playerEntity, null);
     }
     return new ActionResult<>(ActionResultType.PASS, playerEntity.getItemInHand(hand));
@@ -91,7 +91,8 @@ public class ActionItem extends Item {
       return this;
     }
 
-    public Properties setBlockFactory(BiFunction<LivingExtension<?, ?>, BlockPos, Action> blockFactory) {
+    public Properties setBlockFactory(
+        BiFunction<LivingExtension<?, ?>, BlockPos, Action> blockFactory) {
       this.blockActionFactory = blockFactory;
       return this;
     }

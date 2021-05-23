@@ -1,0 +1,37 @@
+{
+  "options.craftingdeadsurvival.client.display_blood": "Mostrar Sangue",
+
+  "enchantment.craftingdeadsurvival.infection": "Infecção",
+
+  "effect.craftingdeadsurvival.infected":"Infectado",
+  "effect.craftingdead.broken_leg": "Perna Quebrada",
+  "effect.craftingdead.bleeding":"Sangramento",
+
+  "entity.craftingdeadsurvival.pipe_grenade": "Granada Improvisada",
+  "entity.craftingdeadsurvival.advanced_zombie": "Zumbi Avançado",
+  "entity.craftingdeadsurvival.fast_zombie": "Zumbi Rápido",
+  "entity.craftingdeadsurvival.tank_zombie": "Zumbi Tanque",
+  "entity.craftingdeadsurvival.weak_zombie": "Zumbi Fraco",
+  "entity.craftingdeadsurvival.police_zombie": "Zumbi Policial",
+  "entity.craftingdeadsurvival.doctor_zombie": "Zumbi Médico",
+  "entity.craftingdeadsurvival.giant_zombie": "Zumbi Gigante",
+
+  "message.infected": "Você foi infectado com RBI.",
+  "message.broken_leg": "Ai! Você quebrou sua perna.",
+  "message.bleeding": "Você está sangrando!",
+
+  "item.craftingdeadsurvival.pipe_grenade": "Granada Improvisada",
+  "item.craftingdeadsurvival.rbi_syringe": "Seringa RBI",
+  "item.craftingdeadsurvival.cure_syringe": "Seringa de Cura da RBI",
+  "item.craftingdeadsurvival.splint": "Tala Improvisada",
+  "item.craftingdeadsurvival.dirty_rag": "Tecido Sujo",
+  "item.craftingdeadsurvival.bloody_rag": "Tecido Ensanguentado",
+  "item.craftingdeadsurvival.clean_rag": "Tecido Limpo",
+  
+  "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Ovo gerador de Zumbi Avançado",
+  "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Ovo gerador de Zumbi Rápido",
+  "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Ovo gerador de Zumbi Tanque",
+  "item.craftingdeadsurvival.weak_zombie_spawn_egg": "Ovo gerador de Zumbi Fraco",
+  "item.craftingdeadsurvival.police_zombie_spawn_egg": "Ovo gerador de Zumbi Policial",
+  "item.craftingdeadsurvival.doctor_zombie_spawn_egg": "Ovo gerador de Zumbi Médico"
+}

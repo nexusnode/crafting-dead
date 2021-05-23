@@ -6,12 +6,12 @@
     ]
   },
   "criteria": {
-    "has_clean_rag": {
+    "has_string": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:apple"
+            "item": "minecraft:string"
           }
         ]
       }
@@ -25,7 +25,7 @@
   },
   "requirements": [
     [
-      "has_clean_rag",
+      "has_string",
       "has_the_recipe"
     ]
   ]

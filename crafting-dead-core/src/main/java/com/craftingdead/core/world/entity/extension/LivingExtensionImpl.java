@@ -31,6 +31,7 @@ import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.core.world.item.ModItems;
 import io.netty.buffer.Unpooled;
@@ -103,6 +104,8 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   private boolean moving;
 
   private Visibility cachedVisibility = Visibility.VISIBLE;
+
+  private ItemStack lastClothingStack = ItemStack.EMPTY;
 
   public LivingExtensionImpl() {
     throw new IllegalStateException("No entity provided");
@@ -251,7 +254,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
         .orElseGet(LazyOptional::empty)
         .ifPresent(c -> c.tick(this.getEntity(), heldStack));
 
-    this.updateGeneralClothingEffects();
+    this.updateClothing();
     this.updateScubaClothing();
     this.updateScubaMask();
 
@@ -314,10 +317,22 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
     }
   }
 
-  private void updateGeneralClothingEffects() {
+  private void updateClothing() {
     ItemStack clothingStack =
         this.itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-    clothingStack.getCapability(ModCapabilities.CLOTHING).ifPresent(clothing -> {
+    Clothing clothing = clothingStack.getCapability(ModCapabilities.CLOTHING).orElse(null);
+
+    if (clothingStack != this.lastClothingStack) {
+      this.lastClothingStack.getCapability(ModCapabilities.CLOTHING)
+          .map(Clothing::getAttributeModifiers)
+          .ifPresent(this.entity.getAttributes()::removeAttributeModifiers);
+      if (clothing != null) {
+        this.entity.getAttributes()
+            .addTransientAttributeModifiers(clothing.getAttributeModifiers());
+      }
+    }
+
+    if (clothing != null) {
       // Fire immunity
       if (clothing.hasFireImmunity()) {
         if (this.entity.getRemainingFireTicks() > 0) {
@@ -327,12 +342,9 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
         this.entity.addEffect(
             new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
+    }
 
-      // Movement speed
-      clothing.getSlownessAmplifier()
-          .ifPresent(amplifier -> this.entity.addEffect(
-              new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 2, amplifier, false, false, false)));
-    });
+    this.lastClothingStack = clothingStack;
   }
 
 
@@ -480,6 +492,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
         out.writeShort(i);
         out.writeItem(this.itemHandler.getStackInSlot(i));
       }
+      this.dirtySlots.clear();
     }
     out.writeShort(255);
 
