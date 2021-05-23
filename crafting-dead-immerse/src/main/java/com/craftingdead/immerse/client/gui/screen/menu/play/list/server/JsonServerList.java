@@ -18,17 +18,24 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.function.Consumer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class JsonServerList implements ServerEntryReader {
+public class JsonServerList implements ServerProvider {
+
+  private static final Logger logger = LogManager.getLogger();
+
 
   private static final Gson gson = new Gson();
 
@@ -40,15 +47,34 @@ public class JsonServerList implements ServerEntryReader {
 
   @Override
   public void read(Consumer<ServerEntry> entryConsumer) {
-    try (BufferedReader reader = Files.newBufferedReader(this.serverListFile)) {
-      JsonArray serverListJson = gson.fromJson(reader, JsonArray.class);
-      for (JsonElement jsonElement : serverListJson) {
-        JsonObject serverJson = jsonElement.getAsJsonObject();
-        entryConsumer.accept(new ServerEntry(serverJson.get("map").getAsString(),
-            serverJson.get("hostName").getAsString(), serverJson.get("port").getAsInt()));
-      }
+    AsynchronousFileChannel fileChannel;
+    try {
+      fileChannel = AsynchronousFileChannel.open(
+          this.serverListFile, StandardOpenOption.READ);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.warn("Failed to read server list file", e);
+      return;
     }
+
+    ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+    fileChannel.read(buffer, 0, null, new CompletionHandler<Integer, Void>() {
+
+      @Override
+      public void completed(Integer result, Void attachment) {
+        buffer.flip();
+        JsonArray serverListJson = gson.fromJson(new String(buffer.array()), JsonArray.class);
+        for (JsonElement jsonElement : serverListJson) {
+          JsonObject serverJson = jsonElement.getAsJsonObject();
+          entryConsumer.accept(new ServerEntry(serverJson.get("map").getAsString(),
+              serverJson.get("hostName").getAsString(), serverJson.get("port").getAsInt()));
+        }
+      }
+
+      @Override
+      public void failed(Throwable exc, Void attachment) {
+        logger.warn("Failed to read server list file", exc);
+      }
+    });
   }
 }

@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
+import java.util.Iterator;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.Overflow;
@@ -29,17 +30,15 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.ServerPinger;
+import com.google.common.collect.Iterators;
 import net.minecraft.client.gui.screen.ConnectingScreen;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 
-public class ServerItemView
-    extends ParentView<ServerItemView, YogaLayout, YogaLayout> {
+class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> {
 
-  private static final ITextComponent SERVER_LIST_FAILED =
-      new TranslationTextComponent("menu.play.server_list.failed_to_load");
+  private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
 
   private final ServerEntry serverEntry;
 
@@ -49,23 +48,26 @@ public class ServerItemView
 
   private boolean selected = false;
 
-  public ServerItemView(ServerEntry serverEntry) {
-    super(new YogaLayout()
-        .setTopMargin(3F)
-        .setLeftMargin(7F)
-        .setRightMargin(7F)
-        .setLeftPadding(10F)
-        .setRightPadding(20F)
-        .setHeight(22F)
-        .setMaxWidth(520F),
-        new YogaLayoutParent().setFlexDirection(FlexDirection.ROW)
+  private long lastAnimationUpdateMs;
+
+  ServerItemView(ServerEntry serverEntry) {
+    super(
+        new YogaLayout()
+            .setTopMargin(3F)
+            .setLeftMargin(7F)
+            .setRightMargin(7F)
+            .setLeftPadding(10F)
+            .setRightPadding(20F)
+            .setHeight(22F)
+            .setMaxWidth(520F),
+        new YogaLayoutParent()
+            .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER));
     this.serverEntry = serverEntry;
 
-    // TODO replace the loading with animation?
     this.motdComponent = new TextView<>(new YogaLayout()
         .setFlex(2)
-        .setHeight(8), "???")
+        .setHeight(8), "...")
             .setOverflow(Overflow.HIDDEN)
             .setShadow(false)
             .setCentered(true);
@@ -73,13 +75,13 @@ public class ServerItemView
         new TextView<>(new YogaLayout()
             .setWidth(60F)
             .setLeftMargin(10F)
-            .setHeight(8), "???")
+            .setHeight(8), "...")
                 .setShadow(false)
                 .setCentered(true);
     this.playersAmountComponent = new TextView<>(new YogaLayout()
         .setWidth(60F)
         .setLeftMargin(10F)
-        .setHeight(8), "???")
+        .setHeight(8), "...")
             .setShadow(false)
             .setCentered(true);
 
@@ -101,13 +103,34 @@ public class ServerItemView
     this.ping();
   }
 
+  @Override
+  public void tick() {
+    super.tick();
+    long currentTime = Util.getMillis();
+    if (this.lastAnimationUpdateMs != -1L && currentTime - this.lastAnimationUpdateMs >= 100L) {
+      this.lastAnimationUpdateMs = currentTime;
+      this.motdComponent.setText(new StringTextComponent(this.animation.next()));
+    }
+  }
+
   public void connect() {
-    this.getScreen().keepOpenAndSetScreen(
+    // Call this before creating a ConnectingScreen instance.
+    this.getScreen().keepOpen();
+    this.minecraft.setScreen(
         new ConnectingScreen(this.getScreen(), this.minecraft, this.serverEntry.getHostName(),
             this.serverEntry.getPort()));
   }
 
+  public ServerEntry getServerEntry() {
+    return this.serverEntry;
+  }
+
   public void ping() {
+    this.motdComponent.setText(new StringTextComponent("..."));
+    this.pingComponent.setText(new StringTextComponent("..."));
+    this.playersAmountComponent.setText(new StringTextComponent("..."));
+    this.lastAnimationUpdateMs = 0;
+
     ServerPinger.INSTANCE.ping(this.serverEntry.getHostName(), this.serverEntry.getPort(),
         (pingData) -> this.minecraft.execute(() -> this.updateServerInfo(pingData)));
   }
@@ -128,9 +151,10 @@ public class ServerItemView
       }
       this.pingComponent.setText(new StringTextComponent(pingText));
     } else {
-      this.pingComponent.setText(SERVER_LIST_FAILED);
+      this.pingComponent.setText(new StringTextComponent("?"));
     }
     this.playersAmountComponent.setText(pingData.getPlayersAmount());
+    this.lastAnimationUpdateMs = -1L;
   }
 
   @Override
@@ -162,9 +186,11 @@ public class ServerItemView
 
   private void updateBorder() {
     if (this.selected) {
-      this.setBorderWidth(1.5F);
+      this.setBorderWidth(1.0F);
+      this.setBorderColour(Colour.WHITE);
     } else if (this.isHovered() || this.isFocused()) {
       this.setBorderWidth(0.7F);
+      this.setBorderColour(Colour.GRAY);
     } else {
       this.setBorderWidth(0F);
     }
@@ -176,18 +202,16 @@ public class ServerItemView
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
-    }
+    boolean consume = super.mouseClicked(mouseX, mouseY, button);
 
     if (this.isHovered()) {
       this.selected = true;
       this.updateBorder();
-      return true;
     } else {
       this.selected = false;
       this.updateBorder();
     }
-    return false;
+
+    return consume;
   }
 }

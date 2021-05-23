@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.screen.game;
+package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,8 +112,8 @@ public abstract class AbstractShopScreen extends Screen {
     int my = this.height / 2;
 
     // Render Top and Bottom margins
-    RenderUtil.fillWithShadow(0, 0, this.width, 30, 0x80000000);
-    RenderUtil.fillWithShadow(0, this.height - 30, this.width, 30, 0x80000000);
+    RenderUtil.fillWithShadow(matrixStack, 0, 0, this.width, 30, 0x80000000);
+    RenderUtil.fillWithShadow(matrixStack, 0, this.height - 30, this.width, 30, 0x80000000);
 
     drawCenteredString(matrixStack, font,
         new TranslationTextComponent("gui.screen.shop.back", "B").withStyle(TextFormatting.ITALIC),
@@ -132,12 +132,12 @@ public abstract class AbstractShopScreen extends Screen {
 
     // render slots and background
     int bh = this.shopButtons.size() * 22;
-    RenderUtil.fillWithShadow(mx - 150, my - 80, 120, bh + 15, 0x80000000);
+    RenderUtil.fillWithShadow(matrixStack, mx - 150, my - 80, 120, bh + 15, 0x80000000);
 
     super.render(matrixStack, mouseX, mouseY, partialTicks);
 
     // render info of item over
-    RenderUtil.fillWithShadow(mx - 25, my - 80, 115, 160, 0x80000000);
+    RenderUtil.fillWithShadow(matrixStack, mx - 25, my - 80, 115, 160, 0x80000000);
     this.font.drawShadow(matrixStack,
         new TranslationTextComponent("gui.screen.shop.selected").withStyle(TextFormatting.BOLD),
         mx - 20, my - 75, 0xFFFFFFFF);
@@ -153,7 +153,7 @@ public abstract class AbstractShopScreen extends Screen {
 
     boolean renderMoney = this.shop.getPlayerMoney(this.player) > -1;
     if (renderMoney) {
-      RenderUtil.fillWithShadow(mx + 95, my - 80, 69, moneyHeight, 0x80000000);
+      RenderUtil.fillWithShadow(matrixStack, mx + 95, my - 80, 69, moneyHeight, 0x80000000);
       this.font.drawShadow(matrixStack,
           new StringTextComponent("$" + this.shop.getPlayerMoney(this.player))
               .withStyle(TextFormatting.BOLD, TextFormatting.GREEN),
@@ -163,7 +163,8 @@ public abstract class AbstractShopScreen extends Screen {
     int inventoryYOffset = renderMoney ? moneyHeight + spacing : 0;
 
 
-    RenderUtil.fillWithShadow(mx + 95, my - 80 + inventoryYOffset, 69, 140, 0x80000000);
+    RenderUtil.fillWithShadow(matrixStack, mx + 95, my - 80 + inventoryYOffset, 69, 140,
+        0x80000000);
     this.font.drawShadow(matrixStack,
         new TranslationTextComponent("gui.screen.shop.inventory").withStyle(TextFormatting.BOLD),
         mx + 100, my - 75 + inventoryYOffset, 0xFFFFFFFF);

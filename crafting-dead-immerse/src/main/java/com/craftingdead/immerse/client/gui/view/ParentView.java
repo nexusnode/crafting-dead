@@ -18,12 +18,13 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.google.common.collect.Lists;
@@ -39,9 +40,9 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   @SuppressWarnings("unchecked")
   private View<?, C>[] sortedChildren = new View[0];
 
-  private final Set<View<?, C>> pendingRemoval = new HashSet<>();
+  private final Deque<Pair<View<?, C>, Runnable>> pendingRemoval = new ArrayDeque<>();
 
-  protected final LayoutParent<C> layoutParent;
+  private final LayoutParent<C> layoutParent;
 
   @Nullable
   private IGuiEventListener focusedListener;
@@ -52,41 +53,143 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     this.layoutParent = layoutParent;
   }
 
+  public final List<? extends View<?, C>> getChildViews() {
+    return this.children;
+  }
+
+  public final LayoutParent<C> getLayoutParent() {
+    return this.layoutParent;
+  }
+
   @SuppressWarnings("unchecked")
-  public SELF addChild(View<?, C> child) {
+  public final SELF addChild(View<?, C> view) {
+    if (view.parent != null) {
+      return this.self();
+    }
+
     this.updatePendingRemoval();
 
-    child.index = this.children.size();
-    this.children.add(child);
+    view.index = this.children.size();
+    this.children.add(view);
     this.sortedChildren = this.children.toArray(new View[0]);
     this.sortChildren();
 
-    this.layoutParent.addChild(child.getLayout(), child.index);
-    child.parent = this;
-    child.added();
+    this.layoutParent.addChild(view.getLayout(), view.index);
+    view.parent = this;
+    view.added();
 
     return this.self();
   }
 
-  private void removeChild(View<?, C> childComponent) {
-    childComponent.removed(() -> {
-      childComponent.pendingRemoval = true;
-      this.pendingRemoval.add(childComponent);
+  /**
+   * Forces a child to be removed. If the child is not present an {@link IllegalArgumentException}
+   * will be thrown.
+   * 
+   * @param view - child to remove
+   * @return ourself
+   */
+  public final SELF removeChild(View<?, C> view) {
+    this.assertChildPresent(view);
+    this.prepareForRemoval(view);
+    this.children.remove(view);
+    this.indexAndSortChildren();
+    return this.self();
+  }
+
+  /**
+   * Forces all children to be removed.
+   * 
+   * @return ourself
+   */
+  @SuppressWarnings("unchecked")
+  public final SELF clearChildren() {
+    this.children.forEach(this::prepareForRemoval);
+    this.children.clear();
+    this.sortedChildren = new View[0];
+    return this.self();
+  }
+
+  /**
+   * No callback version of {@link #queueChildForRemoval(View, Runnable)}.
+   * 
+   * @param view - child to remove
+   */
+  public final void queueChildForRemoval(View<?, C> view) {
+    this.queueChildForRemoval(view, null);
+  }
+
+  /**
+   * Queues a child to be removed, this will notify the child and the child will be able to choose
+   * when it's actually removed via a callback in {@link View#queueRemoval(Runnable)}. If the child
+   * is not present an {@link IllegalArgumentException} will be thrown.
+   * 
+   * @param view - child to remove
+   * @param callback - executed upon removal
+   */
+  public final void queueChildForRemoval(View<?, C> view, Runnable callback) {
+    this.assertChildPresent(view);
+    view.queueRemoval(() -> {
+      view.pendingRemoval = true;
+      this.pendingRemoval.add(Pair.of(view, callback));
     });
   }
 
-  public SELF clearChildren() {
-    this.children.forEach(this::removeChild);
+  /**
+   * Queues all children for removal.
+   * 
+   * @see #queueChildForRemoval(View, Runnable)
+   * 
+   * @return ourself
+   */
+  public final SELF queueAllForRemoval() {
+    this.children.forEach(this::queueChildForRemoval);
     return this.self();
   }
 
-  public SELF closeChildren() {
-    this.children.forEach(View::close);
-    return this.self();
+  /**
+   * Performs appropriate logic to remove child but <b>does not actually remove the child from
+   * {@link #children}</b>.
+   * 
+   * @param view - child to remove
+   */
+  private void prepareForRemoval(View<?, C> view) {
+    view.removed();
+    view.parent = null;
+    this.layoutParent.removeChild(view.getLayout());
+    view.pendingRemoval = false;
   }
 
-  public List<? extends View<?, C>> getChildComponents() {
-    return this.children;
+  private final void assertChildPresent(View<?, C> view) {
+    if (this.children.size() <= view.index || this.children.get(view.index) != view) {
+      throw new IllegalArgumentException("View not added");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void indexAndSortChildren() {
+    for (int i = 0; i < this.children.size(); i++) {
+      this.children.get(i).index = i;
+    }
+
+    this.sortedChildren = this.children.toArray(new View[0]);
+    this.sortChildren();
+  }
+
+  private void updatePendingRemoval() {
+    if (!this.pendingRemoval.isEmpty()) {
+      this.pendingRemoval.forEach(pair -> {
+        View<?, C> view = pair.getLeft();
+        this.prepareForRemoval(view);
+        this.children.remove(view);
+        Runnable callback = pair.getRight();
+        if (callback != null) {
+          callback.run();
+        }
+      });
+      this.pendingRemoval.clear();
+
+      this.indexAndSortChildren();
+    }
   }
 
   @Override
@@ -108,27 +211,6 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     super.layout();
   }
 
-  @SuppressWarnings("unchecked")
-  private void updatePendingRemoval() {
-    if (!this.pendingRemoval.isEmpty()) {
-      this.pendingRemoval.forEach((component) -> {
-        this.children.remove(component);
-        component.parent = null;
-        this.layoutParent.removeChild(component.getLayout());
-        component.pendingRemoval = false;
-      });
-      this.pendingRemoval.clear();
-
-      for (int i = 0; i < this.children.size(); i++) {
-        this.children.get(i).index = i;
-      }
-
-      this.sortedChildren = this.children.toArray(new View[0]);
-      this.sortChildren();
-    }
-  }
-
-
   @Override
   public void tick() {
     this.updatePendingRemoval();
@@ -139,14 +221,17 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    for (View<?, ?> component : this.sortedChildren) {
-      component.render(matrixStack, mouseX, mouseY, partialTicks);
+    for (View<?, ?> view : this.sortedChildren) {
+      if (!view.pendingRemoval) {
+        view.render(matrixStack, mouseX, mouseY, partialTicks);
+      }
     }
   }
 
   @Override
   public void close() {
-    this.closeChildren();
+    this.children.forEach(View::close);
+    this.layoutParent.close();
     super.close();
   }
 
@@ -163,14 +248,16 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   public void mouseMoved(double mouseX, double mouseY) {
     this.children().forEach(listener -> listener.mouseMoved(mouseX, mouseY));
     super.mouseMoved(mouseX, mouseY);
-
   }
 
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    return this.children().stream()
-        .anyMatch(listener -> listener.isMouseOver(mouseX, mouseY))
-        || super.isMouseOver(mouseX, mouseY);
+    for (IGuiEventListener eventListener : this.children()) {
+      if (eventListener.isMouseOver(mouseX, mouseY)) {
+        return true;
+      }
+    }
+    return super.isMouseOver(mouseX, mouseY);
   }
 
   @Override

@@ -18,11 +18,9 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
+import java.util.function.Consumer;
 
-public class MutableServerListComponent<L extends Layout> extends ServerListView<L> {
+public interface ServerProvider {
 
-  public MutableServerListComponent(L layout, ServerEntryReader serverEntryProvider) {
-    super(layout, serverEntryProvider);
-  }
+  void read(Consumer<ServerEntry> entryConsumer);
 }

@@ -20,15 +20,16 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.world;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.Overflow;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
@@ -36,10 +37,10 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.storage.WorldSummary;
 
@@ -48,12 +49,20 @@ public class WorldListView<L extends Layout>
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final ParentView<?, YogaLayout, YogaLayout> worldListContainer;
+  private final ParentView<?, YogaLayout, YogaLayout> listView;
+
+  @Nullable
+  private WorldItemView selectedItem;
+
+  private final View<?, YogaLayout> playButton;
+  private final View<?, YogaLayout> editButton;
+  private final View<?, YogaLayout> deleteButton;
+  private final View<?, YogaLayout> recreateButton;
 
   public WorldListView(L layout) {
     super(layout, new YogaLayoutParent().setFlexDirection(FlexDirection.COLUMN));
 
-    this.worldListContainer = new ParentView<>(
+    this.listView = new ParentView<>(
         new YogaLayout()
             .setFlex(1)
             .setTopPadding(4F)
@@ -64,45 +73,43 @@ public class WorldListView<L extends Layout>
                 .setOverflow(Overflow.SCROLL);
     this.loadWorlds();
 
-    ParentView<?, YogaLayout, YogaLayout> playButton = this.newDefaultStyleButton()
-        .configure(b -> b.getLayout().setRightMargin(7F))
-        .setBackgroundColour(new Colour(PlayView.GREEN))
-        .addHoverAnimation(View.BACKGROUND_COLOUR,
-            RenderUtil.getColour4f(RenderUtil.getColour4i(PlayView.GREEN_HIGHLIGHTED)), 60F)
-        .addChild(newDefaultStyleButtonText("menu.play.world_list.button.play"))
-        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
-            .filter(WorldItemView::isSelected)
-            .findAny()
-            .ifPresent(WorldItemView::joinWorld));
+    this.playButton =
+        createButton(new Colour(PlayView.GREEN), new Colour(PlayView.GREEN_HIGHLIGHTED),
+            new TranslationTextComponent("view.world_list.button.play"),
+            () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
+                .setDisabledBackgroundColour(new Colour(PlayView.GREEN_DISABLED), 150F)
+                .configure(view -> view.getLayout().setMargin(3F))
+                .setEnabled(false);
 
-    ParentView<?, YogaLayout, YogaLayout> createButton = this.newDefaultStyleButton()
-        .addChild(newDefaultStyleButtonText("menu.play.world_list.button.create"))
-        .addListener(ActionEvent.class, (c, e) -> this.getScreen()
-            .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())));
+    View<?, YogaLayout> createButton =
+        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+            new TranslationTextComponent("view.world_list.button.create"), () -> this.getScreen()
+                .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())))
+                    .configure(view -> view.getLayout().setMargin(3F));
 
-    ParentView<?, YogaLayout, YogaLayout> editButton = this.newDefaultStyleButton()
-        .configure(b -> b.getLayout().setRightMargin(5.7F))
-        .addChild(newDefaultStyleButtonText("menu.play.world_list.button.edit"))
-        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
-            .filter(WorldItemView::isSelected)
-            .findAny()
-            .ifPresent(WorldItemView::editWorld));
-    ParentView<?, YogaLayout, YogaLayout> deleteButton = this.newDefaultStyleButton()
-        .configure(b -> b.getLayout().setRightMargin(5.7F))
-        .setBackgroundColour(new Colour(PlayView.RED))
-        .addHoverAnimation(View.BACKGROUND_COLOUR,
-            RenderUtil.getColour4f(RenderUtil.getColour4i(PlayView.RED_HIGHLIGHTED)), 60F)
-        .addChild(newDefaultStyleButtonText("menu.play.world_list.button.delete"))
-        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
-            .filter(WorldItemView::isSelected)
-            .findAny()
-            .ifPresent(WorldItemView::deleteWorld));
-    ParentView<?, YogaLayout, YogaLayout> recreateButton = this.newDefaultStyleButton()
-        .addChild(newDefaultStyleButtonText("menu.play.world_list.button.recreate"))
-        .addListener(ActionEvent.class, (c, e) -> this.streamItems()
-            .filter(WorldItemView::isSelected)
-            .findAny()
-            .ifPresent(WorldItemView::recreateWorld));
+    this.editButton =
+        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+            new TranslationTextComponent("view.world_list.button.edit"),
+            () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
+                .setDisabledBackgroundColour(new Colour(PlayView.BLUE_DISABLED), 150F)
+                .configure(view -> view.getLayout().setMargin(3))
+                .setEnabled(false);
+
+    this.deleteButton =
+        createButton(new Colour(PlayView.RED), new Colour(PlayView.RED_HIGHLIGHTED),
+            new TranslationTextComponent("view.world_list.button.delete"),
+            () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
+                .setDisabledBackgroundColour(new Colour(PlayView.RED_DISABLED), 150F)
+                .configure(view -> view.getLayout().setMargin(3))
+                .setEnabled(false);
+
+    this.recreateButton =
+        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+            new TranslationTextComponent("view.world_list.button.recreate"),
+            () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
+                .setDisabledBackgroundColour(new Colour(PlayView.BLUE_DISABLED), 150F)
+                .configure(view -> view.getLayout().setMargin(3))
+                .setEnabled(false);
 
     ParentView<?, YogaLayout, YogaLayout> controlsContainer =
         new ParentView<>(
@@ -119,7 +126,7 @@ public class WorldListView<L extends Layout>
                         new YogaLayoutParent()
                             .setFlexDirection(FlexDirection.ROW)
                             .setAlignItems(Align.CENTER))
-                                .addChild(playButton)
+                                .addChild(this.playButton)
                                 .addChild(createButton))
                     .addChild(new ParentView<>(
                         new YogaLayout()
@@ -128,16 +135,17 @@ public class WorldListView<L extends Layout>
                         new YogaLayoutParent()
                             .setFlexDirection(FlexDirection.ROW)
                             .setAlignItems(Align.CENTER))
-                                .addChild(deleteButton)
-                                .addChild(editButton)
-                                .addChild(recreateButton));
+                                .addChild(this.deleteButton)
+                                .addChild(this.editButton)
+                                .addChild(this.recreateButton));
 
-    this.addChild(this.worldListContainer);
+    this.addChild(this.listView);
     this.addChild(controlsContainer);
 
   }
 
-  private ParentView<?, YogaLayout, YogaLayout> newDefaultStyleButton() {
+  private static ParentView<?, YogaLayout, YogaLayout> createButton(Colour colour,
+      Colour hoveredColour, ITextComponent text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)
@@ -147,17 +155,35 @@ public class WorldListView<L extends Layout>
             .setJustifyContent(Justify.CENTER)
             .setAlignItems(Align.CENTER))
                 .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
-                .setBackgroundColour(new Colour(PlayView.BLUE))
+                .setBackgroundColour(colour)
                 .setFocusable(true)
-                .addHoverAnimation(View.BACKGROUND_COLOUR,
-                    RenderUtil.getColour4f(RenderUtil.getColour4i(PlayView.BLUE_HIGHLIGHTED)),
-                    60F);
+                .addBackgroundHoverAnimation(hoveredColour, 150F)
+                .addListener(ActionEvent.class, (c, e) -> actionListener.run())
+                .addChild(new TextView<>(new YogaLayout().setTopMargin(1F), text)
+                    .setShadow(false)
+                    .setCentered(true));
   }
 
-  private TextView<YogaLayout> newDefaultStyleButtonText(String translationKey) {
-    return new TextView<>(new YogaLayout().setTopMargin(1F),
-        new TranslationTextComponent(translationKey))
-            .setShadow(false).setCentered(true);
+  @Override
+  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    boolean result = super.mouseClicked(mouseX, mouseY, button);
+    this.updateSelected();
+    return result;
+  }
+
+  protected void updateSelected() {
+    this.selectedItem = this.listView.getChildViews().stream()
+        .filter(child -> child instanceof WorldItemView)
+        .map(child -> (WorldItemView) child)
+        .filter(WorldItemView::isSelected)
+        .findAny()
+        .orElse(null);
+
+    boolean enabled = this.selectedItem != null;
+    this.playButton.setEnabled(enabled);
+    this.editButton.setEnabled(enabled);
+    this.deleteButton.setEnabled(enabled);
+    this.recreateButton.setEnabled(enabled);
   }
 
   private void loadWorlds() {
@@ -165,7 +191,7 @@ public class WorldListView<L extends Layout>
       List<WorldSummary> saveList = this.minecraft.getLevelSource().getLevelList();
       Collections.sort(saveList);
       for (WorldSummary worldSummary : saveList) {
-        this.worldListContainer.addChild(new WorldItemView(worldSummary, this));
+        this.listView.addChild(new WorldItemView(worldSummary, this));
       }
     } catch (AnvilConverterException e) {
       logger.error("Unable to load save list", e);
@@ -173,13 +199,13 @@ public class WorldListView<L extends Layout>
   }
 
   public void reloadWorlds() {
-    this.worldListContainer.clearChildren();
+    this.listView.clearChildren();
+    this.selectedItem = null;
+    this.updateSelected();
     this.loadWorlds();
   }
 
-  private Stream<WorldItemView> streamItems() {
-    return this.worldListContainer.getChildComponents().stream()
-        .filter(child -> child instanceof WorldItemView)
-        .map(child -> (WorldItemView) child);
+  private Optional<WorldItemView> getSelectedItem() {
+    return Optional.ofNullable(this.selectedItem);
   }
 }

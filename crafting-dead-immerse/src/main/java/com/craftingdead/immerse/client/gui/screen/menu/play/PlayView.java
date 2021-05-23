@@ -19,15 +19,18 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play;
 
 import java.nio.file.Paths;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
+import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
+import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NBTMutableServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.DropdownView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.TabsView;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import io.noties.tumbleweed.Tween;
@@ -37,10 +40,13 @@ import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
+  public static final long RED_DISABLED = 0x3394434b;
   public static final long RED = 0x66ff7583;
   public static final long RED_HIGHLIGHTED = 0x66ff8c98;
+  public static final long GREEN_DISABLED = 0x3330916e;
   public static final long GREEN = 0x6652F2B7;
   public static final long GREEN_HIGHLIGHTED = 0x6692F0CE;
+  public static final long BLUE_DISABLED = 0x330761b0;
   public static final long BLUE = 0x6674b9f7;
   public static final long BLUE_HIGHLIGHTED = 0x6691cbff;
 
@@ -50,38 +56,44 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
   public PlayView() {
     super(new YogaLayout(), new YogaLayoutParent());
 
-    ParentView<?, YogaLayout, YogaLayout> officialParent =
+    ParentView<?, YogaLayout, YogaLayout> officialView =
         new ParentView<>(new YogaLayout(), new YogaLayoutParent());
 
-    ParentView<?, YogaLayout, YogaLayout> serverListParent =
-        new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent());
+    ParentView<?, YogaLayout, YogaLayout> officialServerListView =
+        new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent())
+            .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
 
-    View<?, YogaLayout> survivalServerList = new ServerListView<>(
+    View<?, YogaLayout> survivalServerListView = new ServerListView<>(
         new YogaLayout().setTopMargin(1F),
         new JsonServerList(
-            Paths.get(System.getProperty("user.dir"), "survival_servers.json")))
-                .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+            Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
 
-    View<?, YogaLayout> deathmatchServerList = new ServerListView<>(
+    View<?, YogaLayout> deathmatchServerListView = new ServerListView<>(
         new YogaLayout().setTopMargin(1F),
         new JsonServerList(
-            Paths.get(System.getProperty("user.dir"), "tdm_servers.json")))
-                .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+            Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
 
-    officialParent
+    officialView
         .addChild(new TabsView<>(new YogaLayout().setHeight(20))
+            .setZOffset(5)
             .addTab(new TabsView.Tab(new TranslationTextComponent("menu.play.tab.survival"),
-                () -> serverListParent.clearChildren().addChild(survivalServerList)
+                () -> officialServerListView.queueAllForRemoval().addChild(survivalServerListView)
                     .layout()))
             .addTab(new TabsView.Tab(new TranslationTextComponent("menu.play.tab.tdm"),
-                () -> serverListParent.clearChildren().addChild(deathmatchServerList)
+                () -> officialServerListView.queueAllForRemoval().addChild(deathmatchServerListView)
                     .layout())))
-        .addChild(serverListParent);
+        .addChild(officialServerListView);
 
-    ParentView<?, YogaLayout, YogaLayout> singleplayerParent =
-        new WorldListView<>(new YogaLayout()
-            .setFlexShrink(0)
-            .setFlexGrow(1));
+    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout()
+        .setFlexShrink(0)
+        .setFlexGrow(1))
+            .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+
+    View<?, YogaLayout> customServerListView = new MutableServerListView<>(
+        new YogaLayout(),
+        new NBTMutableServerList(
+            CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")))
+                .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
 
     this
         .setBackgroundColour(new Colour(0x50777777))
@@ -99,13 +111,14 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
         .addChild(new DropdownView<>(new YogaLayout()
             .setWidth(100F)
             .setHeight(21F)
-            .setTopMargin(2)
-            .setBottomPadding(1)
+            .setMargin(2)
             .setLeftMargin(10F))
                 .addItem(new TranslationTextComponent("menu.play.dropdown.official"),
-                    () -> this.displayContent(officialParent))
+                    () -> this.displayContent(officialView))
                 .addItem(new TranslationTextComponent("menu.play.dropdown.singleplayer"),
-                    () -> this.displayContent(singleplayerParent)))
+                    () -> this.displayContent(singleplayerView))
+                .addItem(new TranslationTextComponent("menu.play.dropdown.custom"),
+                    () -> this.displayContent(customServerListView)))
         .addChild(this.newSeparator())
         .addChild(this.dropdownContent);
   }
@@ -118,7 +131,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
   private void displayContent(View<?, YogaLayout> content) {
     this.dropdownContent
-        .clearChildren()
+        .queueAllForRemoval()
         .addChild(content)
         .layout();
   }
@@ -133,7 +146,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
   }
 
   @Override
-  protected void removed(Runnable remove) {
+  protected void queueRemoval(Runnable remove) {
     Tween.to(this, X_TRANSLATION, 800.0F)
         .ease(Expo.OUT)
         .target(-this.minecraft.screen.width)

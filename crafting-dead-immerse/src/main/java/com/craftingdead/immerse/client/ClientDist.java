@@ -32,7 +32,8 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
-import com.craftingdead.immerse.client.gui.screen.game.ShopScreen;
+import com.craftingdead.immerse.client.gui.screen.game.SelectTeamScreen;
+import com.craftingdead.immerse.client.gui.screen.game.shop.ShopScreen;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
@@ -42,7 +43,6 @@ import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameUtil;
-import com.craftingdead.immerse.game.deathmatch.client.SelectTeamScreen;
 import com.craftingdead.immerse.game.team.AbstractTeamGame;
 import com.craftingdead.immerse.game.team.Team;
 import com.craftingdead.immerse.game.team.TeamGame;
@@ -225,7 +225,7 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
     if (event.getGui() instanceof MainMenuScreen) {
-      event.setGui(MainMenuView.createScreen(MainMenuView.Page.HOME));
+      event.setGui(MainMenuView.createScreen());
     }
   }
 

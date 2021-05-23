@@ -36,9 +36,7 @@
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
@@ -47,11 +45,11 @@ import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ImageView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.Tooltip;
+import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -59,7 +57,6 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.FitType;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import io.netty.util.internal.ThreadLocalRandom;
 import io.noties.tumbleweed.Timeline;
@@ -84,11 +81,21 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
   private final ParentView<?, YogaLayout, YogaLayout> contentContainer =
       new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
-  private Page currentPage;
-
-  public MainMenuView(ViewScreen screen, Page page) {
+  public MainMenuView(ViewScreen screen) {
     super(screen,
         new YogaLayoutParent().setFlexDirection(FlexDirection.ROW_REVERSE));
+
+    HomeView homeView = new HomeView()
+        .configure(view -> view.getLayout()
+            .setWidthPercent(100)
+            .setHeightPercent(100)
+            .setPositionType(PositionType.ABSOLUTE));
+
+    PlayView playView = new PlayView()
+        .configure(view -> view.getLayout()
+            .setWidthPercent(100)
+            .setHeightPercent(100)
+            .setPositionType(PositionType.ABSOLUTE));
 
     ImageView<YogaLayout> backgroundComponent =
         new ImageView<>(new YogaLayout()
@@ -148,10 +155,9 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setWidth(20)
         .setAspectRatio(1))
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"))
-            .addHoverAnimation(ImageView.COLOUR,
-                RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF666666)), 150.0F)
+            .addColourHoverAnimation(new Colour(0xFF666666), 150.0F)
             .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
-            .addListener(ActionEvent.class, (c, e) -> this.displayPage(Page.HOME))
+            .addListener(ActionEvent.class, (c, e) -> this.setContentView(homeView))
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
 
@@ -167,12 +173,11 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setAspectRatio(1))
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"))
             .setBilinearFiltering(true)
-            .addHoverAnimation(ImageView.COLOUR,
-                RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+            .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
             .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
-            .addListener(ActionEvent.class, (c, e) -> this.displayPage(Page.PLAY))
+            .addListener(ActionEvent.class, (c, e) -> this.setContentView(playView))
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslationTextComponent("menu.play_button"))));
 
@@ -182,8 +187,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setAspectRatio(1))
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"))
             .setBilinearFiltering(true)
-            .addHoverAnimation(ImageView.COLOUR,
-                RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+            .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
             .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
@@ -199,8 +203,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setAspectRatio(1))
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"))
             .setBilinearFiltering(true)
-            .addHoverAnimation(ImageView.COLOUR,
-                RenderUtil.getColour4f(RenderUtil.getColour4i(0xFF181818)), 150.0F)
+            .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
             .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
@@ -236,38 +239,21 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
 
     this.addChild(sideBar);
 
-    this.displayPage(page);
+    this.setContentView(homeView);
   }
 
-  public void displayPage(@Nonnull Page page) {
-    if (this.currentPage == page) {
+  private void setContentView(View<?, YogaLayout> view) {
+    // Already added
+    if (view.getParent() == this.contentContainer) {
       return;
     }
-    this.currentPage = page;
     this.contentContainer
-        .clearChildren()
-        .addChild(page.create()
-            .configure(view -> view.getLayout().setWidthPercent(100).setHeightPercent(100)
-                .setPositionType(PositionType.ABSOLUTE)))
+        .queueAllForRemoval()
+        .addChild(view)
         .layout();
   }
 
-  public static enum Page {
-
-    HOME(HomeView::new), PLAY(PlayView::new);
-
-    private final Supplier<ParentView<?, YogaLayout, ?>> factory;
-
-    private Page(Supplier<ParentView<?, YogaLayout, ?>> factory) {
-      this.factory = factory;
-    }
-
-    public ParentView<?, YogaLayout, ?> create() {
-      return this.factory.get();
-    }
-  }
-
-  public static Screen createScreen(Page page) {
-    return new ViewScreen(TITLE, screen -> new MainMenuView(screen, page));
+  public static Screen createScreen() {
+    return new ViewScreen(TITLE, MainMenuView::new);
   }
 }

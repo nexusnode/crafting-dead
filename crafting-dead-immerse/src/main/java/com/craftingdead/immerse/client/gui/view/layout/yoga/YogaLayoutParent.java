@@ -63,4 +63,9 @@ public class YogaLayoutParent implements LayoutParent<YogaLayout> {
   public void layout(float width, float height) {
     Yoga.YGNodeCalculateLayout(this.node, width, height, Yoga.YGDirectionLTR);
   }
+
+  @Override
+  public void close() {
+    Yoga.YGNodeFree(this.node);
+  }
 }

@@ -57,48 +57,55 @@ public class RenderUtil {
         shadow);
   }
 
-  public static void drawRoundedFrame(double x, double y, double x2, double y2, int colour,
+  public static void drawRoundedFrame(MatrixStack matrixStack, double x, double y, double x2,
+      double y2, int colour,
       float radius) {
     ShaderLinkHelper.glUseProgram(RoundedFrameShader.INSTANCE.getId());
     RoundedFrameShader.INSTANCE.setRadius(radius - 1);
     RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
         (float) x2 - radius, (float) y2 - radius);
-    fill(x, y, x2, y2, colour);
+    fill(matrixStack, x, y, x2, y2, colour);
     ShaderLinkHelper.glUseProgram(0);
   }
 
-  public static void roundedFill(double x, double y, double x2, double y2, int colour,
+  public static void roundedFill(MatrixStack matrixStack, double x, double y, double x2, double y2,
+      int colour,
       float radius) {
     ShaderLinkHelper.glUseProgram(RoundedRectShader.INSTANCE.getId());
     RoundedRectShader.INSTANCE.setRadius(radius - 1); // we have feather radius 1px
     RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
         (float) x2 - radius, (float) y2 - radius);
-    fill(x, y, x2, y2, colour);
+    fill(matrixStack, x, y, x2, y2, colour);
     ShaderLinkHelper.glUseProgram(0);
   }
 
-  public static void fillWithShadow(double x, double y, double width, double height, int colour) {
-    fill(x - 1, y - 1, x + width + 1, y + height + 1, 0x4D000000);
-    fill(x, y, x + width, y + height, colour);
+  public static void fillWithShadow(MatrixStack matrixStack, double x, double y, double width,
+      double height, int colour) {
+    fill(matrixStack, x - 1, y - 1, x + width + 1, y + height + 1, 0x4D000000);
+    fill(matrixStack, x, y, x + width, y + height, colour);
   }
 
-  public static void fillWidthHeight(double x, double y, double width, double height, int colour) {
-    fill(x, y, x + width, y + height, colour);
+  public static void fillWidthHeight(MatrixStack matrixStack, double x, double y, double width,
+      double height, int colour) {
+    fill(matrixStack, x, y, x + width, y + height, colour);
   }
 
-  public static void fill(double x, double y, double x2, double y2, long colour) {
-    fill(x, y, 0.0D, x2, y2, colour);
+  public static void fill(MatrixStack matrixStack, double x, double y, double x2, double y2,
+      long colour) {
+    fill(matrixStack, x, y, 0.0D, x2, y2, colour);
   }
 
-  public static void fill(double x, double y, double z, double x2, double y2, long colour) {
+  public static void fill(MatrixStack matrixStack, double x, double y, double z, double x2,
+      double y2, long colour) {
     float alpha = (float) (colour >> 24 & 255) / 255.0F;
     float red = (float) (colour >> 16 & 255) / 255.0F;
     float green = (float) (colour >> 8 & 255) / 255.0F;
     float blue = (float) (colour & 255) / 255.0F;
-    fill(x, y, z, x2, y2, red, green, blue, alpha);
+    fill(matrixStack.last().pose(), x, y, z, x2, y2, red, green, blue, alpha);
   }
 
-  public static void fill(double x, double y, double z, double x2, double y2, float red,
+  public static void fill(Matrix4f matrix, double x, double y, double z, double x2, double y2,
+      float red,
       float green, float blue, float alpha) {
     if (x < x2) {
       double i = x;
@@ -207,20 +214,21 @@ public class RenderUtil {
     final int columnSpacing = 1;
     final int textYOffset = 1 + (height - minecraft.font.lineHeight) / 2;
 
-    fillWidthHeight(x, y, pingWidth, height, 0xB4000000);
+    fillWidthHeight(matrixStack, x, y, pingWidth, height, 0xB4000000);
     AbstractGui.drawCenteredString(matrixStack, minecraft.font, ping,
         x + 13, y + textYOffset, 0xFFFFFFFF);
 
     int usernameColumnWidth =
         width - pingWidth - columnSpacing - (stats.length * (statWidth));
-    fillWidthHeight(x + pingWidth + columnSpacing, y, usernameColumnWidth, height, 0xB4000000);
+    fillWidthHeight(matrixStack, x + pingWidth + columnSpacing, y, usernameColumnWidth, height,
+        0xB4000000);
     minecraft.font.drawShadow(matrixStack, username, x + 54, y + textYOffset,
         0xFFFFFFFF);
 
     int statsX = x + pingWidth - 8 + usernameColumnWidth;
     for (int i = 0; i < stats.length; i++) {
       ITextComponent stat = stats[i];
-      RenderUtil.fillWidthHeight(statsX + 10 + (i * 31), y, 30, height, 0xB4000000);
+      RenderUtil.fillWidthHeight(matrixStack, statsX + 10 + (i * 31), y, 30, height, 0xB4000000);
       AbstractGui.drawCenteredString(matrixStack, minecraft.font, stat,
           statsX + 10 + (i * 31) + 16, y + textYOffset, 0xFFFFFFFF);
     }

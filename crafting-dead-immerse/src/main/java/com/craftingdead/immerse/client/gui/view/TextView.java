@@ -27,7 +27,6 @@ import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector2f;
@@ -117,10 +116,14 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
 
     matrixStack.pushPose();
     {
-      matrixStack.translate(this.getScaledContentX(), this.getScaledContentY(), 0.0D);
+      matrixStack.translate(this.getScaledContentX(),
+          this.getScaledContentY() + (this.centered
+              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.5F
+              : 0.0F),
+          400.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
-          IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
+          this.minecraft.renderBuffers().bufferSource();
       for (int i = 0; i < this.lines.size(); i++) {
         IReorderingProcessor line = this.lines.get(i);
         matrixStack.pushPose();
@@ -129,7 +132,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
           float x = this.centered
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
-          this.font.drawInBatch(line, x, 0, 0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
+          this.font.drawInBatch(line, x, 0.0F, 0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
               this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
               RenderUtil.FULL_LIGHT);
         }

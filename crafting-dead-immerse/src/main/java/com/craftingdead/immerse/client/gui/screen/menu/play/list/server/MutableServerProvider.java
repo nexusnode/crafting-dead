@@ -16,19 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.screen.game;
+package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.immerse.game.shop.Shop;
-import com.craftingdead.immerse.game.shop.ShopCategory;
-import net.minecraft.client.gui.screen.Screen;
+public interface MutableServerProvider extends ServerProvider {
 
-public class ShopScreen extends AbstractShopScreen {
+  void write(ServerEntry serverEntry);
 
-  public ShopScreen(Screen lastScreen, Shop shop, PlayerExtension<?> player) {
-    super(lastScreen, shop, player);
-    for (ShopCategory category : this.getShop().getCategories(player)) {
-      this.addShopButton(new CategoryButton(this, player, category));
-    }
-  }
+  void delete(ServerEntry serverEntry);
 }

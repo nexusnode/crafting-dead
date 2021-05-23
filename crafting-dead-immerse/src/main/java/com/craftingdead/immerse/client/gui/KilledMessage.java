@@ -47,7 +47,7 @@ public class KilledMessage {
     int x = width / 2 - (boxWidth / 2);
     int y = height / 2 + 10;
 
-    RenderUtil.fillWithShadow(x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
+    RenderUtil.fillWithShadow(matrixStack, x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
 
     matrixStack.pushPose();
     matrixStack.translate(x + 5, y + 5, 0);
@@ -59,7 +59,8 @@ public class KilledMessage {
         0, 0, 0);
     matrixStack.popPose();
 
-    RenderUtil.fillWithShadow(x, y + boxTitleHeight, boxWidth, boxContentsHeight - boxTitleHeight,
+    RenderUtil.fillWithShadow(matrixStack, x, y + boxTitleHeight, boxWidth,
+        boxContentsHeight - boxTitleHeight,
         0xDD000000);
 
     matrixStack.pushPose();

@@ -187,9 +187,11 @@ class WorldItemView
 
   private void updateBorder() {
     if (this.selected) {
-      this.setBorderWidth(1.5F);
+      this.setBorderWidth(1.0F);
+      this.setBorderColour(Colour.WHITE);
     } else if (this.isHovered() || this.isFocused()) {
       this.setBorderWidth(0.7F);
+      this.setBorderColour(Colour.GRAY);
     } else {
       this.setBorderWidth(0F);
     }
@@ -206,20 +208,17 @@ class WorldItemView
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
-    }
+    boolean consume = super.mouseClicked(mouseX, mouseY, button);
 
     if (this.isHovered()) {
       this.selected = true;
       this.updateBorder();
-      return true;
     } else {
       this.selected = false;
       this.updateBorder();
     }
 
-    return false;
+    return consume;
   }
 
   /**
@@ -245,14 +244,14 @@ class WorldItemView
               }
 
               this.loadWorld();
-              this.getScreen().close();
+              this.getScreen().removed();
             }, backupQuestion, backupWarning, false));
       } else if (this.worldSummary.askToOpenWorld()) {
         this.getScreen().keepOpenAndSetScreen(new ConfirmScreen((confirm) -> {
           if (confirm) {
             try {
               this.loadWorld();
-              this.getScreen().close();
+              this.getScreen().removed();
             } catch (Exception exception) {
               logger.error("Failure to open 'future world'", (Throwable) exception);
               this.minecraft.setScreen(new AlertScreen(() -> {
@@ -291,13 +290,15 @@ class WorldItemView
     try {
       SaveFormat.LevelSave levelSave = this.minecraft.getLevelSource().createAccess(fileName);
       ViewScreen screen = this.getScreen();
-      screen.keepOpenAndSetScreen(new EditWorldScreen((backupFailed) -> {
+      screen.keepOpenAndSetScreen(new EditWorldScreen(confirm -> {
         try {
           levelSave.close();
         } catch (IOException ioexception1) {
           logger.error("Failed to unlock level {}", fileName, ioexception1);
         }
-        this.parentWorldList.reloadWorlds();
+        if (confirm) {
+          this.parentWorldList.reloadWorlds();
+        }
         this.minecraft.setScreen(screen);
       }, levelSave));
     } catch (IOException ioexception) {
@@ -311,7 +312,8 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
   public void deleteWorld() {
-    this.getScreen().keepOpenAndSetScreen(new ConfirmScreen((confirmed) -> {
+    ViewScreen screen = this.getScreen();
+    screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
         this.minecraft.setScreen(new WorkingScreen());
         SaveFormat levelSource = this.minecraft.getLevelSource();
@@ -324,7 +326,7 @@ class WorldItemView
         }
         this.parentWorldList.reloadWorlds();
       }
-      this.minecraft.setScreen(this.getScreen());
+      this.minecraft.setScreen(screen);
     }, new TranslationTextComponent("selectWorld.deleteQuestion"),
         new TranslationTextComponent("selectWorld.deleteWarning",
             this.worldSummary.getLevelName()),

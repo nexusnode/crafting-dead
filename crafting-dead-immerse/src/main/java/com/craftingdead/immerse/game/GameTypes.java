@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.game;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.game.deathmatch.DeathmatchClient;
 import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
-import com.craftingdead.immerse.game.deathmatch.client.DeathmatchClient;
 import com.craftingdead.immerse.game.survival.SurvivalClient;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.mojang.serialization.Codec;

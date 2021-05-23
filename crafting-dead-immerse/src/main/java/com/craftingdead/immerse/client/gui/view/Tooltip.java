@@ -46,14 +46,19 @@ public class Tooltip {
     final double height = 14;
 
     RenderSystem.enableBlend();
-    RenderUtil.roundedFill(
+    RenderUtil.roundedFill(matrixStack,
         x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24), 3.0F);
 
     final int textOpacity = Math.min((int) (this.textAlpha * 255.0F), 255);
     if (textOpacity >= 8) {
-      fontRenderer.drawShadow(matrixStack, this.text,
-          (float) (x + (width - fontRenderer.width(this.text)) / 2), (float) y + 4,
-          0xFFFFFF + (textOpacity << 24));
+      matrixStack.pushPose();
+      {
+        matrixStack.translate(0.0D, 0.0D, 400.0D);
+        fontRenderer.drawShadow(matrixStack, this.text,
+            (float) (x + (width - fontRenderer.width(this.text)) / 2), (float) y + 4,
+            0xFFFFFF + (textOpacity << 24));
+      }
+      matrixStack.popPose();
     }
 
     RenderSystem.disableBlend();

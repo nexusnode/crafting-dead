@@ -25,4 +25,6 @@ public interface LayoutParent<L extends Layout> {
   void removeChild(L layout);
 
   void layout(float width, float height);
+
+  void close();
 }

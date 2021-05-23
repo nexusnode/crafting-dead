@@ -16,12 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.screen.game;
+package com.craftingdead.immerse.client.gui.view.event;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraftforge.eventbus.api.Event;
 
-public interface InfoPanel {
-
-  void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks);
-}
+public class EnabledChangedEvent extends Event {}

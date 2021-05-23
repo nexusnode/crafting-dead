@@ -75,7 +75,7 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
   }
 
   @Override
-  protected void removed(Runnable remove) {
+  protected void queueRemoval(Runnable remove) {
     Timeline.createParallel(600.0F)
         .push(Tween.to(this.newsComponent, X_SCALE)
             .ease(Sine.OUT)

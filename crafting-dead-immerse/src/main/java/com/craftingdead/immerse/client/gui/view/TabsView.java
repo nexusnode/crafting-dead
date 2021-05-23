@@ -137,14 +137,14 @@ public class TabsView<L extends Layout>
       super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
       if (this.selected) {
-        RenderUtil.fill(this.getScaledX(),
+        RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight
                 + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
             this.underscoreColor.getHexColour());
       } else if (this.isHovered()) {
-        RenderUtil.fill(this.getScaledX(),
+        RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5D
                 + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),

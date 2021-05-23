@@ -18,8 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.CraftingDeadImmerse;
@@ -29,6 +31,7 @@ import com.craftingdead.immerse.client.gui.tween.FloatArrayTweenType;
 import com.craftingdead.immerse.client.gui.tween.FloatTweenType;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
+import com.craftingdead.immerse.client.gui.view.event.EnabledChangedEvent;
 import com.craftingdead.immerse.client.gui.view.event.FocusChangedEvent;
 import com.craftingdead.immerse.client.gui.view.event.KeyEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseEnterEvent;
@@ -75,7 +78,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
       new FloatTweenType<>(c -> c.yOffset, View::setYOffset);
 
   public static final TweenType<View<?, ?>> BACKGROUND_COLOUR =
-      new ColourTweenType<>(t -> t.backgroundColour);
+      new ColourTweenType<>(t -> t.modifiedBackgroundColour);
 
   public static final TweenType<View<?, ?>> BORDER_WIDTH =
       new FloatArrayTweenType<>(4,
@@ -120,7 +123,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   ViewScreen screen;
 
   @Nullable
-  ParentView<?, ?, ? super L> parent;
+  ParentView<?, ?, ? extends L> parent;
   int index;
 
   private float lastScrollOffset;
@@ -131,6 +134,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   private float xScale = 1.0F;
   private float yScale = 1.0F;
+
   private float xOffset = 0.0F;
   private float yOffset = 0.0F;
   private float zOffset = 0.0F;
@@ -152,6 +156,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   private Tooltip tooltip;
 
   @Nullable
+  private Colour modifiedBackgroundColour;
+  @Nullable
   private Colour backgroundColour;
 
   @Nullable
@@ -169,9 +175,12 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   private boolean doubleClick;
   private long lastClickTimeMs;
 
+  private boolean enabled = true;
+
   public View(L layout) {
     this.layout = layout;
     this.layout.setMeasureFunction(this::measure);
+    this.eventBus.start();
   }
 
   protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
@@ -185,7 +194,9 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   protected void added() {}
 
-  protected void removed(Runnable remove) {
+  protected void removed() {}
+
+  protected void queueRemoval(Runnable remove) {
     remove.run();
   }
 
@@ -219,10 +230,6 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   @SuppressWarnings("deprecation")
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    if (this.pendingRemoval) {
-      return;
-    }
-
     this.tweenManager.update(partialTicks * 100.0F);
 
     if (this.backgroundBlur != null) {
@@ -234,35 +241,37 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
       RenderSystem.disableBlend();
     }
 
-    if (this.backgroundColour != null) {
+    if (this.modifiedBackgroundColour != null) {
       RenderSystem.enableBlend();
-      float[] colour = this.backgroundColour.getColour4f();
+      float[] colour = this.modifiedBackgroundColour.getColour4f();
       colour[3] *= this.getAlpha();
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(), this.getZOffset(),
+      RenderUtil.fill(matrixStack.last().pose(), this.getScaledX(), this.getScaledY(),
+          this.getZOffset(),
           this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.getScaledHeight(), colour[0], colour[1], colour[2], colour[3]);
       RenderSystem.disableBlend();
     }
 
     if (this.topBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour());
     }
     if (this.rightBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
           this.rightBorderColour.getHexColour());
     }
     if (this.bottomBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(),
+      RenderUtil.fill(matrixStack, this.getScaledX(),
           this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
           this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
           this.bottomBorderColour.getHexColour());
     }
     if (this.leftBorderWidth > 0F) {
-      RenderUtil.fill(this.getScaledX(), this.getScaledY(),
+      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
           this.getScaledX() + this.leftBorderWidth,
           this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour());
     }
@@ -294,10 +303,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     // ---- Render Scrollbar ----
 
     if (this.isScrollbarEnabled()) {
-      RenderUtil.roundedFill(this.getScrollbarX(), this.getScaledY(),
+      RenderUtil.roundedFill(matrixStack, this.getScrollbarX(), this.getScaledY(),
           this.getScrollbarX() + SCROLLBAR_WIDTH,
           this.getScaledY() + this.getScaledHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
-      RenderUtil.roundedFill(this.getScrollbarX(), this.getScrollbarY(),
+      RenderUtil.roundedFill(matrixStack, this.getScrollbarX(), this.getScrollbarY(),
           this.getScrollbarX() + SCROLLBAR_WIDTH, this.getScrollbarY() + this.getScrollbarHeight(),
           0x4CFFFFFF, SCROLLBAR_WIDTH / 2.0F);
     }
@@ -308,7 +317,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {}
+      float partialTicks) {
+    // RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
+    // this.getScaledContentWidth(), this.getScaledContentHeight(), 0x11FFF000);
+  }
 
   private final double getScrollbarX() {
     return this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH;
@@ -408,7 +420,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     long currentTime = Util.getMillis();
     long deltaTime = currentTime - this.lastClickTimeMs;
     this.lastClickTimeMs = currentTime;
-    return (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
+    return this.enabled && (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
         && this.post(new ActionEvent()) == Event.Result.ALLOW;
   }
 
@@ -514,31 +526,54 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     this.layout.close();
   }
 
-  /**
-   * Helper method to add an animation triggered by {@link MouseEnterEvent} that will be reversed
-   * upon {@link MouseLeaveEvent}.
-   * 
-   * @param tweenType - the {@link TweenType} to animate
-   * @param to - the target value
-   * @param duration - the duration of the animation
-   * @return instance of self for easy construction
-   */
-  public final SELF addHoverAnimation(TweenType<? super SELF> tweenType, float[] to,
+  public final SELF addHoverAnimation(TweenType<View<?, ?>> tweenType, float[] target,
       float duration) {
-    float[] from = new float[tweenType.getValuesSize()];
-    tweenType.getValues(this.self(), from);
-    this
-        .addListener(MouseEnterEvent.class,
-            (component, event) -> Tween
+    float[] original = new float[tweenType.getValuesSize()];
+    tweenType.getValues(this, original);
+    return this.addHoverAnimation(tweenType, target, __ -> original, duration);
+  }
+
+  public final SELF addBackgroundHoverAnimation(Colour colour, float duration) {
+    return this.addHoverAnimation(BACKGROUND_COLOUR, colour.getColour4f(),
+        view -> view.getBackgroundColour().map(Colour::getColour4f).get(), duration);
+  }
+
+  public final SELF addHoverAnimation(TweenType<View<?, ?>> tweenType, float[] target,
+      Function<SELF, float[]> original, float duration) {
+    return this
+        .addListener(MouseEnterEvent.class, (view, event) -> {
+          if (this.enabled) {
+            Tween
                 .to(this.self(), tweenType, duration)
-                .target(to)
-                .start(this.tweenManager))
-        .addListener(MouseLeaveEvent.class,
-            (component, event) -> Tween
+                .target(target)
+                .start(this.tweenManager);
+          }
+        })
+        .addListener(MouseLeaveEvent.class, (view, event) -> {
+          if (this.enabled) {
+            Tween
                 .to(this.self(), tweenType, duration)
-                .target(from)
-                .start(this.tweenManager));
-    return this.self();
+                .target(original.apply(this.self()))
+                .start(this.tweenManager);
+          }
+        });
+  }
+
+  public final SELF setDisabledBackgroundColour(Colour colour, float duration) {
+    return this
+        .addListener(EnabledChangedEvent.class, (view, event) -> {
+          if (!this.enabled) {
+            Tween
+                .to(this.self(), BACKGROUND_COLOUR, duration)
+                .target(colour.getColour4f())
+                .start(this.tweenManager);
+          } else {
+            Tween
+                .to(this.self(), BACKGROUND_COLOUR, duration)
+                .target(this.backgroundColour.getColour4f())
+                .start(this.tweenManager);
+          }
+        });
   }
 
   public final SELF addActionSound(SoundEvent soundEvent) {
@@ -597,7 +632,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             ? 0.0F
             : this.parent.getScaledContentX())
         + (this.unscaleWidth
-            ? this.getWidth() * (float) this.mainWindow.getGuiScale()
+            ? this.getWidth() * (float) this.mainWindow.getGuiScale() - this.getWidth()
             : 0.0F);
   }
 
@@ -610,7 +645,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.getY()
         + this.layout.getTopPadding() * this.getYScale()
         - (this.fullHeight > this.getHeight()
-            ? this.getScrollOffset(this.minecraft.getFrameTime())
+            ? this.getScrollOffset(this.minecraft.getFrameTime()) * this.getYScale()
             : 0.0F);
   }
 
@@ -627,7 +662,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             ? 0.0F
             : this.parent.getScaledContentY())
         + (this.unscaleHeight
-            ? this.getHeight() * (float) this.mainWindow.getGuiScale()
+            ? this.getHeight() * (float) this.mainWindow.getGuiScale() - this.getHeight()
             : 0.0F);
   }
 
@@ -777,15 +812,33 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.self();
   }
 
+  public final boolean isEnabled() {
+    return this.enabled;
+  }
 
+  public final SELF setEnabled(boolean enabled) {
+    if (this.enabled == enabled) {
+      return this.self();
+    }
+
+    this.enabled = enabled;
+    this.post(new EnabledChangedEvent());
+
+    return this.self();
+  }
 
   public final SELF setTooltip(@Nullable Tooltip tooltip) {
     this.tooltip = tooltip;
     return this.self();
   }
 
+  public Optional<Colour> getBackgroundColour() {
+    return Optional.ofNullable(this.backgroundColour);
+  }
+
   public final SELF setBackgroundColour(@Nullable Colour backgroundColour) {
     this.backgroundColour = backgroundColour;
+    this.modifiedBackgroundColour = new Colour(backgroundColour);
     return this.self();
   }
 
@@ -849,7 +902,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.screen;
   }
 
-  public final ParentView<?, ?, ? super L> getParent() {
+  public final ParentView<?, ?, ? extends L> getParent() {
     return this.parent;
   }
 

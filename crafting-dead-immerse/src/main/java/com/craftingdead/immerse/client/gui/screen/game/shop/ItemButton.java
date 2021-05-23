@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.screen.game;
+package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import java.util.ArrayList;
 import java.util.List;

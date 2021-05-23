@@ -21,6 +21,8 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.Optional;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.gui.tween.ColourTweenType;
+import com.craftingdead.immerse.client.gui.view.event.MouseEnterEvent;
+import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.FitType;
@@ -28,19 +30,23 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.noties.tumbleweed.Tween;
 import io.noties.tumbleweed.TweenType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector2f;
 
 public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
 
-  public static final TweenType<ImageView<?>> COLOUR = new ColourTweenType<>(ImageView::getColour);
+  public static final TweenType<ImageView<?>> COLOUR =
+      new ColourTweenType<>(view -> view.modifiedColour);
 
   private ResourceLocation image;
   private FitType fitType = FitType.FILL;
   private boolean depthTest = false;
   private boolean bilinearFiltering = false;
+
   private Colour colour = new Colour();
+  private Colour modifiedColour = new Colour();
 
   private Vector2f fittedImageSize;
 
@@ -48,27 +54,47 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     super(layout);
   }
 
-  public ImageView<L> setImage(ResourceLocation image) {
+  public final ImageView<L> addColourHoverAnimation(Colour colour, float duration) {
+    return this
+        .addListener(MouseEnterEvent.class, (view, event) -> {
+          if (this.isEnabled()) {
+            Tween
+                .to(this.self(), COLOUR, duration)
+                .target(colour.getColour4f())
+                .start(this.getTweenManager());
+          }
+        })
+        .addListener(MouseLeaveEvent.class, (view, event) -> {
+          if (this.isEnabled()) {
+            Tween
+                .to(this.self(), COLOUR, duration)
+                .target(this.colour.getColour4f())
+                .start(this.getTweenManager());
+          }
+        });
+  }
+
+  public final ImageView<L> setImage(ResourceLocation image) {
     this.image = image;
     return this;
   }
 
-  public ImageView<L> setFitType(FitType fitType) {
+  public final ImageView<L> setFitType(FitType fitType) {
     this.fitType = fitType;
     return this;
   }
 
-  public ImageView<L> setColour(Colour colour) {
-    this.colour = colour;
+  public final ImageView<L> setColour(Colour colour) {
+    this.colour = this.modifiedColour = colour;
     return this;
   }
 
-  public ImageView<L> setDepthTest(boolean depthTest) {
+  public final ImageView<L> setDepthTest(boolean depthTest) {
     this.depthTest = depthTest;
     return this;
   }
 
-  public ImageView<L> setBilinearFiltering(boolean bilinearFiltering) {
+  public final ImageView<L> setBilinearFiltering(boolean bilinearFiltering) {
     this.bilinearFiltering = bilinearFiltering;
     return this;
   }
@@ -105,10 +131,6 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
         .orElse(new Vector2f(width, height));
   }
 
-  public Colour getColour() {
-    return this.colour;
-  }
-
   private boolean bind() {
     if (this.image != null) {
       RenderUtil.bind(this.image);
@@ -126,7 +148,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     if (this.depthTest) {
       RenderSystem.enableDepthTest();
     }
-    final float[] colour = this.colour.getColour4f();
+    final float[] colour = this.modifiedColour.getColour4f();
     RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
     if (this.bind()) {
       if (this.bilinearFiltering) {
@@ -136,7 +158,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
       RenderUtil.blit(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
     } else {
-      RenderUtil.fill(this.getScaledContentX(), this.getScaledContentY(),
+      RenderUtil.fill(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledX() + this.getScaledContentWidth(),
           this.getScaledContentY() + this.getScaledContentHeight(),
           0xFFFFFFFF);

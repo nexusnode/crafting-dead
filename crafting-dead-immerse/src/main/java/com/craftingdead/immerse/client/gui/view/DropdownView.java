@@ -336,17 +336,20 @@ public class DropdownView<L extends Layout> extends View<DropdownView<L>, L>
 
     private void render(MatrixStack matrixStack, float x, float y, float width, float height,
         int backgroundColour, int textColour) {
-      float x2 = x + width;
-      float y2 = y + height;
-      RenderUtil.fill(x, y, x2, y2, backgroundColour);
+      RenderUtil.fillWidthHeight(matrixStack, x, y, width, height, backgroundColour);
 
       FontRenderer font = DropdownView.this.minecraft.font;
 
-      float textY = y + (height - DropdownView.this.minecraft.font.lineHeight) / 2 + 1;
-      for (IReorderingProcessor line : font.split(this.text, (int) width)) {
-        font.draw(matrixStack, line, x + 3, textY, textColour);
-        textY += DropdownView.this.minecraft.font.lineHeight;
+      matrixStack.pushPose();
+      {
+        matrixStack.translate(0.0D, 0.0D, 400.0D);
+        float textY = y + (height - DropdownView.this.minecraft.font.lineHeight) / 2 + 1;
+        for (IReorderingProcessor line : font.split(this.text, (int) width)) {
+          font.draw(matrixStack, line, x + 3, textY, textColour);
+          textY += DropdownView.this.minecraft.font.lineHeight;
+        }
       }
+      matrixStack.popPose();
     }
 
     private void click() {

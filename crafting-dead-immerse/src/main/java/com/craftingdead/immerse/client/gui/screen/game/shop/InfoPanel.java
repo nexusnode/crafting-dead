@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
+package com.craftingdead.immerse.client.gui.screen.game.shop;
 
-import java.util.function.Consumer;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
-public interface ServerEntryReader {
+public interface InfoPanel {
 
-  void read(Consumer<ServerEntry> entryConsumer);
+  void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks);
 }

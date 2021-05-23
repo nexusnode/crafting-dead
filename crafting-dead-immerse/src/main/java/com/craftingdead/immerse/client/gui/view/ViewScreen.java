@@ -81,6 +81,7 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
     // Update hovered views
 
+    boolean keepLastHovered = false;
     View<?, ?> hovered = this.view.isMouseOver(mouseX, mouseY) ? this.view : null;
     while (hovered instanceof ParentView) {
       View<?, ?> nextHovered = ((ParentView<?, ?, ?>) hovered)
@@ -95,15 +96,22 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
       hovered = nextHovered;
 
+      if (hovered == this.lastHovered) {
+        keepLastHovered = true;
+      }
+
       if (!hovered.isHovered()) {
         hovered.mouseEntered(mouseX, mouseY);
       }
     }
 
-    while (this.lastHovered != null && (!this.lastHovered.isMouseOver(mouseX, mouseY)
-        || (hovered != null && hovered.compareTo(this.lastHovered) > 0))) {
-      this.lastHovered.mouseLeft(mouseX, mouseY);
-      this.lastHovered = this.lastHovered.getParent();
+    if (!keepLastHovered) {
+      while (this.lastHovered != null
+          && (!this.lastHovered.isMouseOver(mouseX, mouseY)
+              || (hovered != null && hovered.compareTo(this.lastHovered) > 0))) {
+        this.lastHovered.mouseLeft(mouseX, mouseY);
+        this.lastHovered = this.lastHovered.getParent();
+      }
     }
 
     this.lastHovered = hovered;
