@@ -23,15 +23,15 @@ import com.craftingdead.core.client.animation.gun.AnimationType;
 import com.craftingdead.core.client.animation.gun.GunAnimationController;
 import com.craftingdead.core.client.animation.gun.reload.GunAnimationReload;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public class RemoveMagazineAction extends TimedAction {
 
-  private final IGun gun;
+  private final Gun gun;
 
   private final ItemStack oldMagazineStack;
 
@@ -41,7 +41,7 @@ public class RemoveMagazineAction extends TimedAction {
     super(ActionTypes.REMOVE_MAGAZINE.get(), performer, null);
     this.gun = performer.getEntity().getMainHandItem().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
-    IAmmoProvider ammoProvider = this.gun.getAmmoProvider();
+    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
     }

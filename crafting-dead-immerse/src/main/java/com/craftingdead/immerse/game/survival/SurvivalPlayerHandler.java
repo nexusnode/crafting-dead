@@ -20,7 +20,6 @@ package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.game.GameTypes;
 import net.minecraft.entity.Entity;
@@ -48,7 +47,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
-  public SurvivalPlayerHandler(PlayerExtensionImpl<?> player) {
+  public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);

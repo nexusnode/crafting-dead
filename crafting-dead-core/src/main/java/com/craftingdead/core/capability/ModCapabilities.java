@@ -19,22 +19,14 @@
 package com.craftingdead.core.capability;
 
 import com.craftingdead.core.client.animation.AnimationProvider;
-import com.craftingdead.core.client.animation.DefaultAnimationProvider;
 import com.craftingdead.core.world.clothing.Clothing;
-import com.craftingdead.core.world.clothing.DefaultClothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.entity.extension.LivingExtensionImpl;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
-import com.craftingdead.core.world.gun.magazine.MagazineImpl;
-import com.craftingdead.core.world.gun.paint.DefaultPaint;
-import com.craftingdead.core.world.gun.paint.IPaint;
-import com.craftingdead.core.world.hat.DefaultHat;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.magazine.Magazine;
+import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.hat.Hat;
-import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import com.craftingdead.core.world.item.hydration.DefaultHydration;
 import com.craftingdead.core.world.item.hydration.Hydration;
 import com.craftingdead.core.world.item.scope.Scope;
 import net.minecraftforge.common.capabilities.Capability;
@@ -59,11 +51,11 @@ public class ModCapabilities {
   @CapabilityInject(AnimationProvider.class)
   public static final Capability<AnimationProvider<?>> ANIMATION_PROVIDER = null;
 
-  @CapabilityInject(IGun.class)
-  public static final Capability<IGun> GUN = null;
+  @CapabilityInject(Gun.class)
+  public static final Capability<Gun> GUN = null;
 
-  @CapabilityInject(IPaint.class)
-  public static final Capability<IPaint> PAINT = null;
+  @CapabilityInject(Paint.class)
+  public static final Capability<Paint> PAINT = null;
 
   @CapabilityInject(Scope.class)
   public static final Capability<Scope> SCOPE = null;
@@ -71,30 +63,31 @@ public class ModCapabilities {
   @CapabilityInject(CombatSlotProvider.class)
   public static final Capability<CombatSlotProvider> COMBAT_SLOT_PROVIDER = null;
 
-  @CapabilityInject(IMagazine.class)
-  public static final Capability<IMagazine> MAGAZINE = null;
+  @CapabilityInject(Magazine.class)
+  public static final Capability<Magazine> MAGAZINE = null;
 
   static {
-    CapabilityManager.INSTANCE.register(LivingExtension.class, new EmptyStorage<>(),
-        LivingExtensionImpl::new);
-    CapabilityManager.INSTANCE.register(Storage.class, new EmptyStorage<>(),
-        ItemStackHandlerStorage::new);
-    CapabilityManager.INSTANCE.register(Hydration.class, new EmptyStorage<>(),
-        DefaultHydration::new);
-    CapabilityManager.INSTANCE.register(Clothing.class, new EmptyStorage<>(),
-        DefaultClothing::new);
-    CapabilityManager.INSTANCE.register(Hat.class, new EmptyStorage<>(), DefaultHat::new);
-    CapabilityManager.INSTANCE.register(AnimationProvider.class, new EmptyStorage<>(),
-        DefaultAnimationProvider::new);
-    CapabilityManager.INSTANCE.register(CombatSlotProvider.class, new EmptyStorage<>(),
+    CapabilityManager.INSTANCE.register(LivingExtension.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
-    CapabilityManager.INSTANCE.register(IGun.class, EmptyStorage.getInstance(),
+    CapabilityManager.INSTANCE.register(Storage.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
-    CapabilityManager.INSTANCE.register(IPaint.class, EmptyStorage.getInstance(),
-        DefaultPaint::new);
-    CapabilityManager.INSTANCE.register(IMagazine.class, EmptyStorage.getInstance(),
-        MagazineImpl::new);
-    CapabilityManager.INSTANCE.register(Scope.class, new EmptyStorage<>(),
+    CapabilityManager.INSTANCE.register(Hydration.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Clothing.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Hat.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(AnimationProvider.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(CombatSlotProvider.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Gun.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Paint.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Magazine.class, EmptyStorage.getInstance(),
+        ModCapabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Scope.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
   }
 

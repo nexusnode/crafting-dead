@@ -27,7 +27,7 @@ import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.world.gun.AbstractGun;
 import com.craftingdead.core.world.gun.AbstractGunType;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -101,7 +101,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
       ITextComponent ammoCount =
           new StringTextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
-              .map(IMagazine::getSize)
+              .map(Magazine::getSize)
               .orElse(0))).withStyle(TextFormatting.RED);
       ITextComponent damageText =
           new StringTextComponent(String.valueOf(this.gunType.getDamage()))

@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item.crafting;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -42,7 +42,7 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
         case 4: // Middle slot
           ItemStack itemStack = inventory.getItem(i);
           if (itemStack.getCapability(ModCapabilities.MAGAZINE)
-              .map(IMagazine::getNextTier)
+              .map(Magazine::getNextTier)
               .map(item -> item == Items.AIR)
               .orElse(true)) {
             return false;
@@ -60,17 +60,17 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
 
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
-    IMagazine magazine = ModCapabilities.getExpected(
+    Magazine magazine = ModCapabilities.getExpected(
         ModCapabilities.MAGAZINE,
         inventory.getItem(4),
-        IMagazine.class);
+        Magazine.class);
 
     ItemStack nextTier = magazine.getNextTier().getDefaultInstance();
 
     ModCapabilities.getExpected(
         ModCapabilities.MAGAZINE,
         nextTier,
-        IMagazine.class).setSize(magazine.getSize());
+        Magazine.class).setSize(magazine.getSize());
 
     return nextTier;
   }

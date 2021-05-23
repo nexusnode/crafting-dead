@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.AttachmentItem;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -36,15 +36,15 @@ import net.minecraftforge.eventbus.api.Event;
 
 public abstract class GunEvent extends Event {
 
-  private final IGun gun;
+  private final Gun gun;
   private final ItemStack itemStack;
 
-  public GunEvent(IGun gun, ItemStack itemStack) {
+  public GunEvent(Gun gun, ItemStack itemStack) {
     this.gun = gun;
     this.itemStack = itemStack;
   }
 
-  public IGun getGun() {
+  public Gun getGun() {
     return gun;
   }
 
@@ -56,7 +56,7 @@ public abstract class GunEvent extends Event {
 
     private final LivingExtension<?, ?> living;
 
-    public Action(IGun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
+    public Action(Gun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
       super(gun, itemStack);
 
       this.living = living;
@@ -70,7 +70,7 @@ public abstract class GunEvent extends Event {
   @Cancelable
   public static class TriggerPressed extends Action {
 
-    public TriggerPressed(IGun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
+    public TriggerPressed(Gun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
       super(gun, itemStack, living);
     }
   }
@@ -78,18 +78,18 @@ public abstract class GunEvent extends Event {
   public static class Initialize extends GunEvent {
 
     private final Set<AttachmentItem> attachments = new HashSet<>();
-    private IAmmoProvider ammoProvider;
+    private AmmoProvider ammoProvider;
 
-    public Initialize(IGun gun, ItemStack itemStack, IAmmoProvider ammoProvider) {
+    public Initialize(Gun gun, ItemStack itemStack, AmmoProvider ammoProvider) {
       super(gun, itemStack);
       this.ammoProvider = ammoProvider;
     }
 
-    public void setAmmoProvider(IAmmoProvider ammoProvider) {
+    public void setAmmoProvider(AmmoProvider ammoProvider) {
       this.ammoProvider = ammoProvider;
     }
 
-    public IAmmoProvider getAmmoProvider() {
+    public AmmoProvider getAmmoProvider() {
       return this.ammoProvider;
     }
 
@@ -111,7 +111,7 @@ public abstract class GunEvent extends Event {
     private final BlockPos blockPos;
     private final World world;
 
-    public HitBlock(IGun gun, ItemStack itemStack, Block block, BlockPos blockPos,
+    public HitBlock(Gun gun, ItemStack itemStack, Block block, BlockPos blockPos,
         LivingExtension<?, ?> living, World world) {
       super(gun, itemStack, living);
 
@@ -142,7 +142,7 @@ public abstract class GunEvent extends Event {
     private boolean headshot;
 
     public HitEntity(
-        IGun gun,
+        Gun gun,
         ItemStack itemStack,
         LivingExtension<?, ?> living,
         Entity target,
@@ -187,7 +187,7 @@ public abstract class GunEvent extends Event {
     private ItemStack oldMagazineStack;
     private ItemStack newMagazineStack;
 
-    public ReloadFinish(IGun gun, ItemStack itemStack, ItemStack oldMagazineStack,
+    public ReloadFinish(Gun gun, ItemStack itemStack, ItemStack oldMagazineStack,
         ItemStack newMagazineStack) {
       super(gun, itemStack);
       this.oldMagazineStack = oldMagazineStack;

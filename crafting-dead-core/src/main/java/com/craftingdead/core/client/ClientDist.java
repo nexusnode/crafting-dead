@@ -55,8 +55,8 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
@@ -408,7 +408,7 @@ public class ClientDist implements ModDist {
             .getPaintStack()
             .getCapability(ModCapabilities.PAINT)
             .resolve()
-            .flatMap(IPaint::getColour))
+            .flatMap(Paint::getColour))
         .orElse(0xFFFFFF) | 0xFF << 24;
 
     ModItems.ITEMS
@@ -421,7 +421,7 @@ public class ClientDist implements ModDist {
     IItemColor paintColor = (stack, tintIndex) -> stack
         .getCapability(ModCapabilities.PAINT)
         .resolve()
-        .flatMap(IPaint::getColour)
+        .flatMap(Paint::getColour)
         .orElse(Integer.MAX_VALUE);
 
     ModItems.ITEMS
@@ -467,7 +467,7 @@ public class ClientDist implements ModDist {
         PlayerExtension<ClientPlayerEntity> player = this.getPlayer().orElse(null);
         if (player != null) {
           ItemStack heldStack = player.getEntity().getMainHandItem();
-          IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
+          Gun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
 
           boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.overlay == null
               && (this.minecraft.screen == null);
@@ -556,7 +556,7 @@ public class ClientDist implements ModDist {
     if (player != null && this.minecraft.overlay == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
       ItemStack heldStack = player.getEntity().getMainHandItem();
-      IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
+      Gun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
@@ -616,7 +616,7 @@ public class ClientDist implements ModDist {
       return;
     }
     ItemStack heldStack = player.getEntity().getMainHandItem();
-    IGun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
+    Gun gun = heldStack.getCapability(ModCapabilities.GUN).orElse(null);
     switch (event.getType()) {
       case HEALTH:
       case HOTBAR:

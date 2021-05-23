@@ -58,18 +58,18 @@ import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler>
-    implements LivingExtension<L, E> {
+class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
+    implements LivingExtension<E, H> {
 
   /**
    * The vanilla entity.
    */
-  protected final L entity;
+  protected final E entity;
 
-  protected final Object2ObjectOpenHashMap<ResourceLocation, E> handlers =
+  protected final Object2ObjectOpenHashMap<ResourceLocation, H> handlers =
       new Object2ObjectOpenHashMap<>();
 
-  protected final Object2ObjectOpenHashMap<ResourceLocation, E> dirtyHandlers =
+  protected final Object2ObjectOpenHashMap<ResourceLocation, H> dirtyHandlers =
       new Object2ObjectOpenHashMap<>();
 
   /**
@@ -107,11 +107,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
 
   private ItemStack lastClothingStack = ItemStack.EMPTY;
 
-  public LivingExtensionImpl() {
-    throw new IllegalStateException("No entity provided");
-  }
-
-  public LivingExtensionImpl(L entity) {
+  LivingExtensionImpl(E entity) {
     this.entity = entity;
   }
 
@@ -121,7 +117,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   }
 
   @Override
-  public void registerHandler(ResourceLocation id, E extension) {
+  public void registerHandler(ResourceLocation id, H extension) {
     if (this.handlers.containsKey(id)) {
       throw new IllegalArgumentException(
           "Handler with id " + id.toString() + " already registered");
@@ -130,13 +126,13 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   }
 
   @Override
-  public Optional<E> getHandler(ResourceLocation id) {
+  public Optional<H> getHandler(ResourceLocation id) {
     return Optional.ofNullable(this.handlers.get(id));
   }
 
   @Override
-  public E getExpectedHandler(ResourceLocation id) {
-    E handler = this.handlers.get(id);
+  public H getExpectedHandler(ResourceLocation id) {
+    H handler = this.handlers.get(id);
     if (handler == null) {
       throw new IllegalStateException("Missing handler with ID: " + id.toString());
     }
@@ -267,17 +263,17 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
     this.moving = !this.entity.position().equals(this.lastPos);
     this.lastPos = this.entity.position();
 
-    for (Map.Entry<ResourceLocation, E> entry : this.handlers.entrySet()) {
-      this.tickExtension(entry.getKey(), entry.getValue());
+    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
+      this.tickHandler(entry.getKey(), entry.getValue());
     }
   }
 
-  protected void tickExtension(ResourceLocation extensionId, E extension) {
-    extension.tick();
+  protected void tickHandler(ResourceLocation handlerId, H handler) {
+    handler.tick();
 
     // Precedence = (1) INVISIBLE (2) PARTIALLY_VISIBLE (3) VISIBLE
     this.cachedVisibility = Visibility.VISIBLE;
-    switch (extension.getVisibility()) {
+    switch (handler.getVisibility()) {
       case INVISIBLE:
         this.cachedVisibility = Visibility.INVISIBLE;
       case PARTIALLY_VISIBLE:
@@ -289,12 +285,12 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
         break;
     }
 
-    if (extension.isMovementBlocked()) {
+    if (handler.isMovementBlocked()) {
       this.movementBlocked = true;
     }
 
-    if (extension.requiresSync()) {
-      this.dirtyHandlers.put(extensionId, extension);
+    if (handler.requiresSync()) {
+      this.dirtyHandlers.put(handlerId, handler);
     }
   }
 
@@ -439,7 +435,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   }
 
   @Override
-  public L getEntity() {
+  public E getEntity() {
     return this.entity;
   }
 
@@ -447,7 +443,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("inventory", this.itemHandler.serializeNBT());
-    for (Map.Entry<ResourceLocation, E> entry : this.handlers.entrySet()) {
+    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
       CompoundNBT extensionNbt = entry.getValue().serializeNBT();
       if (!extensionNbt.isEmpty()) {
         nbt.put(entry.getKey().toString(), extensionNbt);
@@ -459,7 +455,7 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
     this.itemHandler.deserializeNBT(nbt.getCompound("inventory"));
-    for (Map.Entry<ResourceLocation, E> entry : this.handlers.entrySet()) {
+    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
       CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
       if (!extensionNbt.isEmpty()) {
         entry.getValue().deserializeNBT(extensionNbt);
@@ -475,8 +471,8 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj)
-        || (obj instanceof LivingExtensionImpl
-            && ((LivingExtensionImpl<?, ?>) obj).entity.equals(this.entity));
+        || (obj instanceof LivingExtension
+            && ((LivingExtension<?, ?>) obj).getEntity().equals(this.entity));
   }
 
   @Override
@@ -496,16 +492,16 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
     }
     out.writeShort(255);
 
-    // Extensions
-    ObjectSet<Map.Entry<ResourceLocation, E>> extensionsToSend =
+    // Handlers
+    ObjectSet<Map.Entry<ResourceLocation, H>> handlersToSend =
         writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
-    out.writeVarInt(extensionsToSend.size());
-    for (Map.Entry<ResourceLocation, E> entry : extensionsToSend) {
+    out.writeVarInt(handlersToSend.size());
+    for (Map.Entry<ResourceLocation, H> entry : handlersToSend) {
       out.writeResourceLocation(entry.getKey());
-      PacketBuffer extensionData = new PacketBuffer(Unpooled.buffer());
-      entry.getValue().encode(extensionData, writeAll);
-      out.writeVarInt(extensionData.readableBytes());
-      out.writeBytes(extensionData);
+      PacketBuffer handlerData = new PacketBuffer(Unpooled.buffer());
+      entry.getValue().encode(handlerData, writeAll);
+      out.writeVarInt(handlerData.readableBytes());
+      out.writeBytes(handlerData);
     }
     this.dirtyHandlers.clear();
   }
@@ -518,17 +514,17 @@ public class LivingExtensionImpl<L extends LivingEntity, E extends LivingHandler
       this.itemHandler.setStackInSlot(slot, in.readItem());
     }
 
-    // Extensions
-    int extensionsSize = in.readVarInt();
-    for (int x = 0; x < extensionsSize; x++) {
+    // Handlers
+    int handlersSize = in.readVarInt();
+    for (int x = 0; x < handlersSize; x++) {
       ResourceLocation id = in.readResourceLocation();
       int dataSize = in.readVarInt();
-      E extension = this.handlers.get(id);
-      if (extension == null) {
+      H handler = this.handlers.get(id);
+      if (handler == null) {
         in.readerIndex(in.readerIndex() + dataSize);
         continue;
       }
-      extension.decode(in);
+      handler.decode(in);
     }
   }
 

@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.event.LivingExtensionEvent;
-import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
@@ -43,10 +43,10 @@ public class SurvivalGame implements Game {
   public void tick() {}
 
   @SubscribeEvent
-  public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtensionImpl
+  public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtension
         && !event.getLiving().getHandler(SurvivalPlayerHandler.EXTENSION_ID).isPresent()) {
-      PlayerExtensionImpl<?> player = (PlayerExtensionImpl<?>) event.getLiving();
+      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
       player.registerHandler(SurvivalPlayerHandler.EXTENSION_ID, new SurvivalPlayerHandler(player));
     }
   }

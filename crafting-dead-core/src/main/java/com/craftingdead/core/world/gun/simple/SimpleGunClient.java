@@ -31,7 +31,7 @@ import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.AbstractGun;
-import com.craftingdead.core.world.gun.IGunClient;
+import com.craftingdead.core.world.gun.GunClient;
 import com.craftingdead.core.world.gun.PendingHit;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.google.common.collect.Multimap;
@@ -57,7 +57,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class SimpleGunClient<T extends AbstractGun<?, ?>> implements IGunClient {
+public class SimpleGunClient<T extends AbstractGun<?, ?>> implements GunClient {
 
   private static final int MUZZLE_FLASH_DURATION_TICKS = 2;
 

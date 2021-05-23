@@ -25,6 +25,18 @@ import net.minecraft.entity.player.PlayerEntity;
 public interface PlayerExtension<E extends PlayerEntity>
     extends LivingExtension<E, PlayerHandler>, PlayerHandler {
 
+  static <E extends PlayerEntity> PlayerExtension<E> create(E entity) {
+    return new PlayerExtensionImpl<>(entity);
+  }
+
+  @SuppressWarnings("unchecked")
+  static <E extends PlayerEntity> PlayerExtension<E> getExpected(E livingEntity) {
+    return livingEntity.getCapability(ModCapabilities.LIVING)
+        .filter(living -> living instanceof PlayerExtension)
+        .map(living -> (PlayerExtension<E>) living)
+        .orElseThrow(() -> new IllegalStateException("Missing living capability"));
+  }
+
   boolean isCombatModeEnabled();
 
   void setCombatModeEnabled(boolean combatModeEnabled);
@@ -32,12 +44,4 @@ public interface PlayerExtension<E extends PlayerEntity>
   void openEquipmentMenu();
 
   void openStorage(InventorySlotType slotType);
-
-  @SuppressWarnings("unchecked")
-  public static <E extends PlayerEntity> PlayerExtension<E> getExpected(E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
-        .filter(living -> living instanceof PlayerExtension)
-        .map(living -> (PlayerExtension<E>) living)
-        .orElseThrow(() -> new IllegalStateException("Missing living capability"));
-  }
 }

@@ -18,6 +18,6 @@
 
 package com.craftingdead.survival.server;
 
-import com.craftingdead.survival.IModDist;
+import com.craftingdead.survival.ModDist;
 
-public class ServerDist implements IModDist {}
+public class ServerDist implements ModDist {}

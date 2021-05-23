@@ -37,7 +37,7 @@ public class CollectMagazineItemHandlers extends Event {
   }
 
   public LivingExtension<?, ?> getLiving() {
-    return living;
+    return this.living;
   }
 
   public void addItemHandler(IItemHandler itemHandler) {

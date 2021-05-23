@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item.crafting;
 
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -82,7 +82,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
     ItemStack result = inventory.getItem(4).copy();
-    ModCapabilities.getExpected(ModCapabilities.MAGAZINE, result, IMagazine.class).setSize(0);
+    ModCapabilities.getExpected(ModCapabilities.MAGAZINE, result, Magazine.class).setSize(0);
     return result;
   }
 

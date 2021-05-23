@@ -35,8 +35,8 @@ import com.craftingdead.core.client.animation.gun.GunAnimation;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.gun.AbstractGunType;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.MagazineItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -128,7 +128,7 @@ public abstract class GunRenderer implements IItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
+    final Gun gun = itemStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
     matrixStack.pushPose();
@@ -159,7 +159,7 @@ public abstract class GunRenderer implements IItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final IGun gun = itemStack.getCapability(ModCapabilities.GUN)
+    final Gun gun = itemStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
     final boolean scopeOverlayActive =
@@ -255,7 +255,7 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   private final void renderFirstPersonArms(AbstractClientPlayerEntity playerEntity,
-      ItemStack itemStack, IGun gun, ItemCameraTransforms.TransformType transformType,
+      ItemStack itemStack, Gun gun, ItemCameraTransforms.TransformType transformType,
       float partialTicks, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer,
       int packedLight) {
@@ -299,7 +299,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private void renderFlash(IGun gun, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+  private void renderFlash(Gun gun, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedOverlay) {
     matrixStack.pushPose();
     {
@@ -337,7 +337,7 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   private final void renderFirstPerson(AbstractClientPlayerEntity playerEntity,
-      ItemStack itemStack, IGun gun, ItemCameraTransforms.TransformType transformType,
+      ItemStack itemStack, Gun gun, ItemCameraTransforms.TransformType transformType,
       float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
@@ -401,7 +401,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private final void renderThirdPerson(LivingEntity livingEntity, ItemStack itemStack, IGun gun,
+  private final void renderThirdPerson(LivingEntity livingEntity, ItemStack itemStack, Gun gun,
       ItemCameraTransforms.TransformType transformType, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
@@ -421,7 +421,7 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   public void renderOnBack(LivingEntity entity, boolean glint,
-      IGun gun, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+      Gun gun, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay) {
     matrixStack.pushPose();
     {
@@ -462,7 +462,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private final void renderGunModel(boolean glint, IGun gun,
+  private final void renderGunModel(boolean glint, Gun gun,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.pushPose();
@@ -471,7 +471,7 @@ public abstract class GunRenderer implements IItemRenderer {
       IBakedModel bakedModel = this.getBakedModel(this.getGunModelLocation(),
           gun.getPaint()
               .resolve()
-              .flatMap(IPaint::getSkin)
+              .flatMap(Paint::getSkin)
               .map(skin -> ImmutableMap.of("base",
                   Either.<RenderMaterial, String>left(new RenderMaterial(
                       PlayerContainer.BLOCK_ATLAS,
@@ -481,19 +481,19 @@ public abstract class GunRenderer implements IItemRenderer {
       this.renderBakedModel(bakedModel, glint,
           gun.getPaint()
               .resolve()
-              .flatMap(IPaint::getColour)
+              .flatMap(Paint::getColour)
               .orElse(-1),
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.popPose();
   }
 
-  protected final RenderMaterial getGunMaterial(IGun gun) {
+  protected final RenderMaterial getGunMaterial(Gun gun) {
     IUnbakedModel unbakedModel =
         ModelLoader.instance().getModelOrMissing(this.getGunModelLocation());
     ResourceLocation skin = gun.getPaint()
         .resolve()
-        .flatMap(IPaint::getSkin)
+        .flatMap(Paint::getSkin)
         .orElse(null);
     if (unbakedModel instanceof BlockModel) {
       if (skin != null) {
@@ -527,7 +527,7 @@ public abstract class GunRenderer implements IItemRenderer {
         });
   }
 
-  private void renderMainGunAttachments(IGun gun, boolean glint,
+  private void renderMainGunAttachments(Gun gun, boolean glint,
       ItemCameraTransforms.TransformType transformType, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
@@ -556,7 +556,7 @@ public abstract class GunRenderer implements IItemRenderer {
           this.renderBakedModel(bakedModel, glint,
               gun.getPaint()
                   .resolve()
-                  .flatMap(IPaint::getColour)
+                  .flatMap(Paint::getColour)
                   .orElse(-1),
               transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
         }
@@ -566,7 +566,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private void renderMainGunAmmo(IGun gun, boolean glint,
+  private void renderMainGunAmmo(Gun gun, boolean glint,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     ItemStack magazineStack = gun.getAmmoProvider().getMagazineStack();
@@ -594,7 +594,7 @@ public abstract class GunRenderer implements IItemRenderer {
         this.renderBakedModel(magazineBakedModel, glint,
             gun.getPaint()
                 .resolve()
-                .flatMap(IPaint::getColour)
+                .flatMap(Paint::getColour)
                 .orElse(-1),
             transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
       }
@@ -602,26 +602,26 @@ public abstract class GunRenderer implements IItemRenderer {
     }
   }
 
-  protected abstract void renderAdditionalParts(IGun gun,
+  protected abstract void renderAdditionalParts(Gun gun,
       float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay);
 
-  protected abstract void applyGenericTransforms(IGun gun, MatrixStack matrixStack);
+  protected abstract void applyGenericTransforms(Gun gun, MatrixStack matrixStack);
 
-  protected abstract void applyThirdPersonTransforms(IGun gun, MatrixStack matrixStack);
+  protected abstract void applyThirdPersonTransforms(Gun gun, MatrixStack matrixStack);
 
-  protected abstract void applyFirstPersonTransforms(IGun gun, MatrixStack matrixStack);
+  protected abstract void applyFirstPersonTransforms(Gun gun, MatrixStack matrixStack);
 
-  protected abstract void applyAimingTransforms(IGun gun, MatrixStack matrixStack);
+  protected abstract void applyAimingTransforms(Gun gun, MatrixStack matrixStack);
 
-  protected abstract void applyWearingTransforms(IGun gun, MatrixStack matrixStack);
+  protected abstract void applyWearingTransforms(Gun gun, MatrixStack matrixStack);
 
   protected abstract void applyMagazineTransforms(ItemStack magazineStack, MatrixStack matrixStack);
 
   protected abstract void applyAttachmentTransforms(AttachmentItem attachmentItem,
       MatrixStack matrixStack);
 
-  protected abstract void applyHandTransforms(IGun gun, boolean rightHanded,
+  protected abstract void applyHandTransforms(Gun gun, boolean rightHanded,
       MatrixStack matrixStack);
 
   protected void applySprintingTransforms(MatrixStack matrixStack, float pct) {

@@ -23,7 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
-public class MagazineImpl implements IMagazine {
+public class MagazineImpl implements Magazine {
 
   private final MagazineItem magazineItem;
   private int size;

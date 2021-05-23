@@ -25,7 +25,7 @@ import com.craftingdead.core.client.ClientConfig;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.survival.IModDist;
+import com.craftingdead.survival.ModDist;
 import com.craftingdead.survival.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.survival.client.renderer.entity.GiantZombieRenderer;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
@@ -45,7 +45,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-public class ClientDist implements IModDist {
+public class ClientDist implements ModDist {
 
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;

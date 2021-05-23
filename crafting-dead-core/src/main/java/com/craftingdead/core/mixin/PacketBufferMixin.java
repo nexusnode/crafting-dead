@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -38,7 +38,7 @@ public class PacketBufferMixin {
   private void writeItemStack(ItemStack itemStack, boolean limitedTag,
       CallbackInfoReturnable<PacketBuffer> callbackInfo) {
     PacketBuffer packetBuffer = (PacketBuffer) (Object) this;
-    IGun gun = itemStack.getCapability(ModCapabilities.GUN).orElse(null);
+    Gun gun = itemStack.getCapability(ModCapabilities.GUN).orElse(null);
 
     if (gun == null) {
       packetBuffer.writeVarInt(0);
@@ -57,7 +57,7 @@ public class PacketBufferMixin {
     byte[] data = new byte[packetBuffer.readVarInt()];
     if (data.length > 0) {
       packetBuffer.readBytes(data);
-      IGun gun = itemStack.getCapability(ModCapabilities.GUN).orElse(null);
+      Gun gun = itemStack.getCapability(ModCapabilities.GUN).orElse(null);
       if (gun != null) {
         gun.decode(new PacketBuffer(Unpooled.wrappedBuffer(data)));
       }

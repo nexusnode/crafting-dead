@@ -25,9 +25,9 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
@@ -48,7 +48,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   public MagazineReloadAction(LivingExtension<?, ?> performer) {
     super(ActionTypes.MAGAZINE_RELOAD.get(), performer);
-    IAmmoProvider ammoProvider = this.gun.getAmmoProvider();
+    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
     }
@@ -119,7 +119,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
         ItemStack itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
             && !itemStack.getCapability(ModCapabilities.MAGAZINE)
-                .map(IMagazine::isEmpty)
+                .map(Magazine::isEmpty)
                 .orElse(true)) {
           return Optional.of(new MagazineLocation(itemHandler, i));
         }

@@ -28,8 +28,8 @@ import com.craftingdead.core.client.animation.gun.GunAnimationController;
 import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -38,7 +38,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.LazyOptional;
 
-public interface IGun extends CombatSlotProvider, BufferSerializable,
+public interface Gun extends CombatSlotProvider, BufferSerializable,
     AnimationProvider<GunAnimationController> {
 
   void tick(LivingExtension<?, ?> living);
@@ -68,7 +68,7 @@ public interface IGun extends CombatSlotProvider, BufferSerializable,
 
   ItemStack getPaintStack();
 
-  default LazyOptional<IPaint> getPaint() {
+  default LazyOptional<Paint> getPaint() {
     return this.getPaintStack().getCapability(ModCapabilities.PAINT);
   }
 
@@ -101,11 +101,11 @@ public interface IGun extends CombatSlotProvider, BufferSerializable,
 
   Optional<GunAnimation> getAnimation(AnimationType animationType);
 
-  IGunClient getClient();
+  GunClient getClient();
 
-  IAmmoProvider getAmmoProvider();
+  AmmoProvider getAmmoProvider();
 
-  void setAmmoProvider(IAmmoProvider ammoProvider);
+  void setAmmoProvider(AmmoProvider ammoProvider);
 
   Set<? extends Item> getAcceptedMagazines();
 

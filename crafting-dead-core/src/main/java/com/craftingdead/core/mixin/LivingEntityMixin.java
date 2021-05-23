@@ -27,7 +27,7 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -59,7 +59,7 @@ public abstract class LivingEntityMixin {
     for (EquipmentSlotType slotType : EquipmentSlotType.values()) {
       if (currentStack == livingEntity.getItemBySlot(slotType)) {
         currentStack.getCapability(ModCapabilities.GUN)
-            .filter(IGun::requiresSync)
+            .filter(Gun::requiresSync)
             .ifPresent(gun -> NetworkChannel.PLAY.getSimpleChannel().send(
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
                 new SyncGunEquipmentSlotMessage(livingEntity.getId(), slotType, gun, false)));

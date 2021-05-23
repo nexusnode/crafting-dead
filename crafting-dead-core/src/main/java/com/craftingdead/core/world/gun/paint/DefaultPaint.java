@@ -23,7 +23,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 
-public class DefaultPaint implements IPaint {
+public class DefaultPaint implements Paint {
 
   private final Optional<ResourceLocation> skin;
   private Optional<Integer> colour;

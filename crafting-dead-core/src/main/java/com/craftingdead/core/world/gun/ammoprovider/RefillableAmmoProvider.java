@@ -20,13 +20,13 @@ package com.craftingdead.core.world.gun.ammoprovider;
 
 import com.craftingdead.core.world.action.reload.RefillableReloadAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants;
 
-public class RefillableAmmoProvider implements IAmmoProvider {
+public class RefillableAmmoProvider implements AmmoProvider {
 
   private ItemStack magazineStack;
   private int reserveSize;
@@ -42,7 +42,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
       boolean infiniteAmmo) {
     this.magazineStack = magazineStack;
     this.reserveSize =
-        this.getMagazine().map(IMagazine::getMaxSize).orElse(0) * reserveMagazineCount;
+        this.getMagazine().map(Magazine::getMaxSize).orElse(0) * reserveMagazineCount;
     this.infiniteAmmo = infiniteAmmo;
   }
 
@@ -51,7 +51,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
   }
 
   public void refillMagazine() {
-    IMagazine magazine = this.getExpectedMagazine();
+    Magazine magazine = this.getExpectedMagazine();
     this.moveAmmoToReserve(magazine.getSize());
     this.moveAmmoToMagazine(this.infiniteAmmo ? magazine.getMaxSize()
         : Math.min(magazine.getMaxSize(), this.reserveSize));
@@ -62,7 +62,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
       return false;
     }
 
-    IMagazine magazine = this.getExpectedMagazine();
+    Magazine magazine = this.getExpectedMagazine();
     int ammoToLoad = Math.min(magazine.getMaxSize(), amount);
     magazine.setSize(ammoToLoad);
     if (!this.infiniteAmmo) {
@@ -73,7 +73,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
   }
 
   public boolean moveAmmoToReserve(int amount) {
-    IMagazine magazine = this.getExpectedMagazine();
+    Magazine magazine = this.getExpectedMagazine();
     int currentSize = magazine.getSize();
     if (currentSize < amount) {
       return false;
@@ -142,7 +142,7 @@ public class RefillableAmmoProvider implements IAmmoProvider {
 
   @Override
   public boolean requiresSync() {
-    return this.reserveSizeChanged || this.getMagazine().map(IMagazine::requiresSync).orElse(false);
+    return this.reserveSizeChanged || this.getMagazine().map(Magazine::requiresSync).orElse(false);
   }
 
   @Override

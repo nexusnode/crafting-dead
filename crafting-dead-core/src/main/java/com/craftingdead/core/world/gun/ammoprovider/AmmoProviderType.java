@@ -23,13 +23,13 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class AmmoProviderType extends ForgeRegistryEntry<AmmoProviderType> {
 
-  private final Supplier<IAmmoProvider> factory;
+  private final Supplier<AmmoProvider> factory;
 
-  public AmmoProviderType(Supplier<IAmmoProvider> factory) {
+  public AmmoProviderType(Supplier<AmmoProvider> factory) {
     this.factory = factory;
   }
 
-  public IAmmoProvider create() {
+  public AmmoProvider create() {
     return this.factory.get();
   }
 }

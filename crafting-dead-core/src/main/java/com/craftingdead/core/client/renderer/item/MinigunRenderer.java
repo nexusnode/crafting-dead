@@ -21,7 +21,7 @@ package com.craftingdead.core.client.renderer.item;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelMinigunBarrel;
 import com.craftingdead.core.world.gun.GunTypes;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.minigun.MinigunClient;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -42,13 +42,13 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyGenericTransforms(Gun gun, MatrixStack matrixStack) {
     matrixStack.scale(1.2F, 1.2F, 1.2F);
     matrixStack.translate(-0.8F, -0.15F, 0);
   }
 
   @Override
-  protected void applyThirdPersonTransforms(IGun gun,
+  protected void applyThirdPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(190));
@@ -65,7 +65,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(IGun gun,
+  protected void applyFirstPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.2F;
@@ -86,7 +86,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyAimingTransforms(Gun gun, MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-24.0F));
@@ -101,7 +101,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(IGun gun, float partialTicks,
+  protected void renderAdditionalParts(Gun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     if (gun.getClient() instanceof MinigunClient) {
@@ -128,7 +128,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyWearingTransforms(IGun gun,
+  protected void applyWearingTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
@@ -148,7 +148,7 @@ public class MinigunRenderer extends GunRenderer {
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyHandTransforms(IGun gun,
+  protected void applyHandTransforms(Gun gun,
       boolean rightHand, MatrixStack matrixStack) {
     if (rightHand) {
       matrixStack.translate(-0.1F, -0.15F, -0.3F);

@@ -30,9 +30,9 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.gun.IGun;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.scope.Scope;
@@ -105,7 +105,7 @@ public class IngameGui {
   }
 
   @SuppressWarnings("deprecation")
-  private void renderGunFlash(AbstractClientPlayerEntity playerEntity, IGun gun, int width,
+  private void renderGunFlash(AbstractClientPlayerEntity playerEntity, Gun gun, int width,
       int height,
       float partialTicks) {
     if (gun.getClient().isFlashing()) {
@@ -155,7 +155,7 @@ public class IngameGui {
   }
 
   public void renderOverlay(PlayerExtension<AbstractClientPlayerEntity> player, ItemStack heldStack,
-      @Nullable IGun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
+      @Nullable Gun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
 
     // TODO Fixes Minecraft bug when using post-processing shaders.
     RenderSystem.enableTexture();
@@ -334,7 +334,7 @@ public class IngameGui {
   }
 
   private void renderAmmo(MatrixStack matrixStack, int width,
-      int height, IGun gun) {
+      int height, Gun gun) {
 
     int x = width - 115;
     int boxHeight = 25;
@@ -347,8 +347,8 @@ public class IngameGui {
         0x55000000);
     AbstractGui.fill(matrixStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
 
-    IAmmoProvider ammoProvider = gun.getAmmoProvider();
-    int ammoCount = ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0);
+    AmmoProvider ammoProvider = gun.getAmmoProvider();
+    int ammoCount = ammoProvider.getMagazine().map(Magazine::getSize).orElse(0);
     int reserveSize = ammoProvider.getReserveSize();
     boolean empty = ammoCount == 0 && reserveSize == 0;
 

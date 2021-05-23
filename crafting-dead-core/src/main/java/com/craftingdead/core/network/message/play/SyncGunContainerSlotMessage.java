@@ -21,7 +21,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -35,7 +35,7 @@ public class SyncGunContainerSlotMessage {
   private final int slot;
   private final PacketBuffer data;
 
-  public SyncGunContainerSlotMessage(int entityId, int slot, IGun gun, boolean writeAll) {
+  public SyncGunContainerSlotMessage(int entityId, int slot, Gun gun, boolean writeAll) {
     this(entityId, slot, new PacketBuffer(Unpooled.buffer()));
     gun.encode(this.data, writeAll);
   }

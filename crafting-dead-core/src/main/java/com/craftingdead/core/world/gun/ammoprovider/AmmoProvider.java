@@ -21,13 +21,13 @@ package com.craftingdead.core.world.gun.ammoprovider;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public interface IAmmoProvider extends INBTSerializable<CompoundNBT>, BufferSerializable {
+public interface AmmoProvider extends INBTSerializable<CompoundNBT>, BufferSerializable {
 
   void reload(LivingExtension<?, ?> living);
 
@@ -37,12 +37,12 @@ public interface IAmmoProvider extends INBTSerializable<CompoundNBT>, BufferSeri
 
   ItemStack getMagazineStack();
 
-  default IMagazine getExpectedMagazine() {
+  default Magazine getExpectedMagazine() {
     return this.getMagazine()
         .orElseThrow(() -> new IllegalStateException("No magazine capability"));
   }
 
-  default LazyOptional<IMagazine> getMagazine() {
+  default LazyOptional<Magazine> getMagazine() {
     return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE);
   }
 

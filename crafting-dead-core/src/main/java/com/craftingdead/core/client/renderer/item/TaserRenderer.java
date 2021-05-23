@@ -19,7 +19,7 @@
 package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.world.gun.GunTypes;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -34,13 +34,13 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyGenericTransforms(Gun gun, MatrixStack matrixStack) {
     matrixStack.scale(1.3F, 1.3F, 1.3F);
     matrixStack.translate(0.4, -0.3, 0);
   }
 
   @Override
-  protected void applyThirdPersonTransforms(IGun gun,
+  protected void applyThirdPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.translate(0.0F, 0.0F, -0.05F);
@@ -58,7 +58,7 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(IGun gun,
+  protected void applyFirstPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
@@ -72,7 +72,7 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(IGun gun,
+  protected void applyAimingTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
@@ -86,12 +86,12 @@ public class TaserRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(IGun gun, float partialTicks,
+  protected void renderAdditionalParts(Gun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {}
 
   @Override
-  protected void applyWearingTransforms(IGun gun,
+  protected void applyWearingTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
@@ -119,7 +119,7 @@ public class TaserRenderer extends GunRenderer {
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyHandTransforms(IGun gun,
+  protected void applyHandTransforms(Gun gun,
       boolean rightHand, MatrixStack matrixStack) {
     matrixStack.translate(0.02F, 0.04F, -0.12F);
   }

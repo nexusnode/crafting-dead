@@ -22,7 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS2;
 import com.craftingdead.core.client.renderer.item.model.ModelScarhIS1;
 import com.craftingdead.core.world.gun.GunTypes;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -43,13 +43,13 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyGenericTransforms(Gun gun, MatrixStack matrixStack) {
     matrixStack.scale(1.4F, 1.4F, 1.4F);
     matrixStack.translate(-0.8, -0.2, 0);
   }
 
   @Override
-  protected void applyThirdPersonTransforms(IGun gun,
+  protected void applyThirdPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
@@ -66,7 +66,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(IGun gun,
+  protected void applyFirstPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.5F;
@@ -87,7 +87,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(IGun gun,
+  protected void applyAimingTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
@@ -109,7 +109,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(IGun gun, float partialTicks,
+  protected void renderAdditionalParts(Gun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
@@ -154,7 +154,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyWearingTransforms(IGun gun,
+  protected void applyWearingTransforms(Gun gun,
       MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
@@ -208,7 +208,7 @@ public class M240BRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyHandTransforms(IGun gun,
+  protected void applyHandTransforms(Gun gun,
       boolean rightHand, MatrixStack matrixStack) {
     if (rightHand) {
       matrixStack.translate(-0.1F, -0.15F, -0.3F);

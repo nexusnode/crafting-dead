@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.gun.paint.DefaultPaint;
-import com.craftingdead.core.world.gun.paint.IPaint;
+import com.craftingdead.core.world.gun.paint.Paint;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,7 +59,7 @@ public class PaintItem extends Item {
       ITooltipFlag tooltipFlag) {
     stack.getCapability(ModCapabilities.PAINT)
         .resolve()
-        .flatMap(IPaint::getColour)
+        .flatMap(Paint::getColour)
         .map(colour -> new StringTextComponent("#" + Integer.toHexString(colour))
             .withStyle(TextFormatting.GRAY))
         .ifPresent(lines::add);
@@ -77,7 +77,7 @@ public class PaintItem extends Item {
   public CompoundNBT getShareTag(ItemStack stack) {
     CompoundNBT nbt = super.getShareTag(stack);
     CompoundNBT paintNbt = stack.getCapability(ModCapabilities.PAINT)
-        .map(IPaint::serializeNBT)
+        .map(Paint::serializeNBT)
         .orElse(null);
     if (paintNbt != null) {
       if (nbt == null) {

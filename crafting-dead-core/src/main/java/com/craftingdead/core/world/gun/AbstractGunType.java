@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import com.craftingdead.core.client.animation.gun.AnimationType;
 import com.craftingdead.core.client.animation.gun.GunAnimation;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.gun.simple.SimpleGunClient;
 import com.craftingdead.core.world.item.AttachmentItem;
@@ -126,12 +126,12 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
   /**
    * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
    */
-  private final IGun.RightMouseActionTriggerType rightMouseActionTriggerType;
+  private final Gun.RightMouseActionTriggerType rightMouseActionTriggerType;
 
   /**
    * A {@link Predicate} used to determine if the gun can shoot or not.
    */
-  private final Predicate<IGun> triggerPredicate;
+  private final Predicate<Gun> triggerPredicate;
 
   /**
    * Sound to be played when performing the right mouse action.
@@ -150,7 +150,7 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
   private final CombatSlotType combatSlotType;
 
-  private final Function<T, ? extends IGunClient> clientFactory;
+  private final Function<T, ? extends GunClient> clientFactory;
 
   protected AbstractGunType(Builder<T, ?> builder) {
     this.fireDelayMs = builder.fireDelayMs;
@@ -178,7 +178,7 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
     this.clientFactory = builder.clientFactory;
   }
 
-  public Function<T, ? extends IGunClient> getClientFactory() {
+  public Function<T, ? extends GunClient> getClientFactory() {
     return this.clientFactory;
   }
 
@@ -240,8 +240,8 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
     return this.animations;
   }
 
-  public IAmmoProvider createAmmoProvider() {
-    IAmmoProvider ammoProvider =
+  public AmmoProvider createAmmoProvider() {
+    AmmoProvider ammoProvider =
         new MagazineAmmoProvider(this.getDefaultMagazine().get().getDefaultInstance());
     ammoProvider.getExpectedMagazine().setSize(0);
     return ammoProvider;
@@ -263,11 +263,11 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
     return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
-  public IGun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
+  public Gun.RightMouseActionTriggerType getRightMouseActionTriggerType() {
     return this.rightMouseActionTriggerType;
   }
 
-  public Predicate<IGun> getTriggerPredicate() {
+  public Predicate<Gun> getTriggerPredicate() {
     return this.triggerPredicate;
   }
 
@@ -322,10 +322,10 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
     private final Set<Supplier<PaintItem>> acceptedPaints = new HashSet<>();
 
-    private IGun.RightMouseActionTriggerType rightMouseActionTriggerType =
-        IGun.RightMouseActionTriggerType.CLICK;
+    private Gun.RightMouseActionTriggerType rightMouseActionTriggerType =
+        Gun.RightMouseActionTriggerType.CLICK;
 
-    private Predicate<IGun> triggerPredicate = gun -> true;
+    private Predicate<Gun> triggerPredicate = gun -> true;
 
     private Supplier<SoundEvent> rightMouseActionSound = () -> null;
 
@@ -333,7 +333,7 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
     private CombatSlotType combatSlotType = CombatSlotType.PRIMARY;
 
-    private Function<T, ? extends IGunClient> clientFactory = SimpleGunClient::new;
+    private Function<T, ? extends GunClient> clientFactory = SimpleGunClient::new;
 
     public Builder(Function<SELF, AbstractGunType<?>> factory) {
       this.factory = factory;
@@ -428,12 +428,12 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
     }
 
     public SELF setRightMouseActionTriggerType(
-        IGun.RightMouseActionTriggerType rightMouseActionTriggerType) {
+        Gun.RightMouseActionTriggerType rightMouseActionTriggerType) {
       this.rightMouseActionTriggerType = rightMouseActionTriggerType;
       return this.self();
     }
 
-    public SELF setTriggerPredicate(Predicate<IGun> triggerPredicate) {
+    public SELF setTriggerPredicate(Predicate<Gun> triggerPredicate) {
       this.triggerPredicate = triggerPredicate;
       return this.self();
     }
@@ -454,7 +454,7 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
       return this.self();
     }
 
-    public SELF setClientFactory(Function<T, ? extends IGunClient> clientFactory) {
+    public SELF setClientFactory(Function<T, ? extends GunClient> clientFactory) {
       this.clientFactory = clientFactory;
       return this.self();
     }

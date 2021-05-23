@@ -51,8 +51,8 @@ import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderType;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.inventory.InventorySlotType;
@@ -120,7 +120,7 @@ import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends AbstractGun<T, SELF>>
-    implements IGun, INBTSerializable<CompoundNBT> {
+    implements Gun, INBTSerializable<CompoundNBT> {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -194,12 +194,12 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
   private boolean performingRightMouseAction;
 
-  private final IGunClient client;
+  private final GunClient client;
 
   // Used to ensure the gun thread gets killed if we're not being ticked anymore.
   private volatile long lastTickMs;
 
-  private IAmmoProvider ammoProvider;
+  private AmmoProvider ammoProvider;
   private boolean ammoProviderChanged;
 
   @Nullable
@@ -367,7 +367,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
           living.getEntity().level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
       ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
-      if (this.ammoProvider.getMagazine().map(IMagazine::getSize).orElse(0) <= 0) {
+      if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
         if (side.isServer()) {
           executor.execute(() -> {
             living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
@@ -752,17 +752,17 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public IGunClient getClient() {
+  public GunClient getClient() {
     return this.client;
   }
 
   @Override
-  public IAmmoProvider getAmmoProvider() {
+  public AmmoProvider getAmmoProvider() {
     return this.ammoProvider;
   }
 
   @Override
-  public void setAmmoProvider(IAmmoProvider ammoProvider) {
+  public void setAmmoProvider(AmmoProvider ammoProvider) {
     this.ammoProvider = ammoProvider;
     this.ammoProviderChanged = true;
   }

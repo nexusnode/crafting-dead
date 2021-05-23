@@ -24,7 +24,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 
-public interface IGunClient {
+public interface GunClient {
 
   void handleTick(LivingExtension<?, ?> living);
 

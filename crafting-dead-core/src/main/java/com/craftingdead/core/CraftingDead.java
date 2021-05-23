@@ -36,9 +36,7 @@ import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.entity.extension.LivingExtensionImpl;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.entity.extension.PlayerExtensionImpl;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
@@ -306,8 +304,8 @@ public class CraftingDead {
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof LivingEntity) {
       LivingExtension<?, ?> living = event.getObject() instanceof PlayerEntity
-          ? new PlayerExtensionImpl<>((PlayerEntity) event.getObject())
-          : new LivingExtensionImpl<>((LivingEntity) event.getObject());
+          ? PlayerExtension.create((PlayerEntity) event.getObject())
+          : LivingExtension.create((LivingEntity) event.getObject());
       event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
           LazyOptional.of(() -> living), () -> ModCapabilities.LIVING, CompoundNBT::new));
       living.load();

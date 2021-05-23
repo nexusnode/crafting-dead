@@ -39,8 +39,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-public class PlayerExtensionImpl<L extends PlayerEntity>
-    extends LivingExtensionImpl<L, PlayerHandler> implements PlayerExtension<L> {
+class PlayerExtensionImpl<E extends PlayerEntity>
+    extends LivingExtensionImpl<E, PlayerHandler> implements PlayerExtension<E> {
 
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
@@ -49,7 +49,7 @@ public class PlayerExtensionImpl<L extends PlayerEntity>
 
   private boolean cachedCombatModeEnabled;
 
-  public PlayerExtensionImpl(L entity) {
+  PlayerExtensionImpl(E entity) {
     super(entity);
     this.dataManager.register(COMBAT_MODE_ENABLED, false);
   }
@@ -61,8 +61,8 @@ public class PlayerExtensionImpl<L extends PlayerEntity>
   }
 
   @Override
-  protected void tickExtension(ResourceLocation extensionId, PlayerHandler extension) {
-    super.tickExtension(extensionId, extension);
+  protected void tickHandler(ResourceLocation extensionId, PlayerHandler extension) {
+    super.tickHandler(extensionId, extension);
     if (extension.isCombatModeEnabled()) {
       this.cachedCombatModeEnabled = true;
     }

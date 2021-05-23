@@ -23,7 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IMagazine extends INBTSerializable<CompoundNBT>, BufferSerializable {
+public interface Magazine extends INBTSerializable<CompoundNBT>, BufferSerializable {
 
   float getArmorPenetration();
 

@@ -20,7 +20,7 @@ package com.craftingdead.core.world.action.reload;
 
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.ammoprovider.IAmmoProvider;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
 
 public class RefillableReloadAction extends AbstractReloadAction {
@@ -31,7 +31,7 @@ public class RefillableReloadAction extends AbstractReloadAction {
 
   public RefillableReloadAction(LivingExtension<?, ?> performer) {
     super(ActionTypes.REFILLABLE_RELOAD.get(), performer);
-    IAmmoProvider ammoProvider = this.gun.getAmmoProvider();
+    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof RefillableAmmoProvider)) {
       throw new IllegalStateException("No RefillableAmmoProvider present");
     }

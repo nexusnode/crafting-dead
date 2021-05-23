@@ -31,13 +31,17 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface LivingExtension<T extends LivingEntity, E extends LivingHandler>
+public interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
     extends LivingHandler {
 
   /**
    * @see {@link net.minecraftforge.event.AttachCapabilitiesEvent}
    */
   static final ResourceLocation CAPABILITY_KEY = new ResourceLocation(CraftingDead.ID, "living");
+
+  static <E extends LivingEntity> LivingExtension<E, ?> create(E entity) {
+    return new LivingExtensionImpl<>(entity);
+  }
 
   /**
    * Load this {@link LivingExtension} - called upon capability attachment.
@@ -50,7 +54,7 @@ public interface LivingExtension<T extends LivingEntity, E extends LivingHandler
    * @param id - the handler's ID
    * @return an {@link Optional} handler
    */
-  Optional<E> getHandler(ResourceLocation id);
+  Optional<H> getHandler(ResourceLocation id);
 
   /**
    * Get an expected handler.
@@ -60,7 +64,7 @@ public interface LivingExtension<T extends LivingEntity, E extends LivingHandler
    * @return the handler
    */
   @Nonnull
-  E getExpectedHandler(ResourceLocation id) throws IllegalStateException;
+  H getExpectedHandler(ResourceLocation id) throws IllegalStateException;
 
   /**
    * Register a handler.
@@ -68,7 +72,7 @@ public interface LivingExtension<T extends LivingEntity, E extends LivingHandler
    * @param id - the handler's ID
    * @param handler - the handler to attach
    */
-  void registerHandler(ResourceLocation id, E handler);
+  void registerHandler(ResourceLocation id, H handler);
 
   /**
    * Perform an unforced action.
@@ -198,7 +202,7 @@ public interface LivingExtension<T extends LivingEntity, E extends LivingHandler
    * 
    * @return the {@link LivingEntity}
    */
-  T getEntity();
+  E getEntity();
 
   /**
    * Get an expected {@link LivingExtension} instance.

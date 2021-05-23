@@ -21,13 +21,13 @@ package com.craftingdead.core.world.gun.ammoprovider;
 import com.craftingdead.core.world.action.RemoveMagazineAction;
 import com.craftingdead.core.world.action.reload.MagazineReloadAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants;
 
-public class MagazineAmmoProvider implements IAmmoProvider {
+public class MagazineAmmoProvider implements AmmoProvider {
 
   private ItemStack magazineStack;
   private boolean stackChanged;
@@ -77,7 +77,7 @@ public class MagazineAmmoProvider implements IAmmoProvider {
 
   @Override
   public boolean requiresSync() {
-    return this.getMagazine().map(IMagazine::requiresSync).orElse(false) || this.stackChanged;
+    return this.getMagazine().map(Magazine::requiresSync).orElse(false) || this.stackChanged;
   }
 
   @Override

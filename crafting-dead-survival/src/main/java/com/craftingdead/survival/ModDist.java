@@ -18,4 +18,4 @@
 
 package com.craftingdead.survival;
 
-public interface IModDist {}
+public interface ModDist {}

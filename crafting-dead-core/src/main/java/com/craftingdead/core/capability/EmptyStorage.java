@@ -31,6 +31,8 @@ public class EmptyStorage<C> implements Capability.IStorage<C> {
     return (EmptyStorage<C>) INSTANCE;
   }
 
+  private EmptyStorage() {}
+
   @Override
   public INBT writeNBT(Capability<C> capability, C instance, Direction side) {
     return null;

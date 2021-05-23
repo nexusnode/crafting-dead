@@ -84,7 +84,7 @@ public class CraftingDeadSurvival {
 
   private static CraftingDeadSurvival instance;
 
-  private final IModDist modDist;
+  private final ModDist modDist;
 
   public CraftingDeadSurvival() {
     instance = this;
@@ -110,7 +110,7 @@ public class CraftingDeadSurvival {
     SurvivalEntityTypes.ENTITY_TYPES.register(modEventBus);
   }
 
-  public IModDist getModDist() {
+  public ModDist getModDist() {
     return this.modDist;
   }
 

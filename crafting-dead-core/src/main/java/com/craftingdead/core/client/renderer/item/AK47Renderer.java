@@ -22,7 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelAKMIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelAKMIS2;
 import com.craftingdead.core.world.gun.GunTypes;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -43,13 +43,13 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applyGenericTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyGenericTransforms(Gun gun, MatrixStack matrixStack) {
     matrixStack.scale(0.315F, 0.315F, 0.315F);
     matrixStack.translate(1.5, -0.85, 0);
   }
 
   @Override
-  protected void applyThirdPersonTransforms(IGun gun,
+  protected void applyThirdPersonTransforms(Gun gun,
       MatrixStack matrixStack) {
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(180));
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15));
@@ -66,7 +66,7 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyFirstPersonTransforms(Gun gun, MatrixStack matrixStack) {
     this.muzzleFlashX = 0.1F;
     this.muzzleFlashY = -0.1F;
     this.muzzleFlashZ = -2.19F;
@@ -83,7 +83,7 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAimingTransforms(IGun gun, MatrixStack matrixStack) {
+  protected void applyAimingTransforms(Gun gun, MatrixStack matrixStack) {
 
     matrixStack.translate(0F, 0F, -0.002F);
 
@@ -113,7 +113,7 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  protected void renderAdditionalParts(IGun gun, float partialTicks,
+  protected void renderAdditionalParts(Gun gun, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
     this.renderIronSight1(matrixStack, renderTypeBuffer, packedLight, packedOverlay);
@@ -159,7 +159,7 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applyWearingTransforms(IGun gun,
+  protected void applyWearingTransforms(Gun gun,
       MatrixStack matrixStack) {
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90));
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(90));
@@ -227,7 +227,7 @@ public class AK47Renderer extends GunRenderer {
   }
 
   @Override
-  public void applyHandTransforms(IGun gun, boolean rightHand, MatrixStack matrixStack) {
+  public void applyHandTransforms(Gun gun, boolean rightHand, MatrixStack matrixStack) {
     if (rightHand) {
       matrixStack.translate(-0.1F, -0.23F, -0.3F);
     } else {

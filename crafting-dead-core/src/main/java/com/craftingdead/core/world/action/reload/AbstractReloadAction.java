@@ -25,7 +25,7 @@ import com.craftingdead.core.client.animation.gun.reload.GunAnimationReload;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.IGun;
+import com.craftingdead.core.world.gun.Gun;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
@@ -34,7 +34,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   protected final ItemStack gunStack;
 
-  protected final IGun gun;
+  protected final Gun gun;
 
   protected final ItemStack oldMagazineStack;
 

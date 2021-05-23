@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.world.gun.magazine.IMagazine;
+import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.gun.magazine.MagazineImpl;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -93,7 +93,7 @@ public class MagazineItem extends Item {
   public int getDamage(ItemStack itemStack) {
     return this.size - itemStack
         .getCapability(ModCapabilities.MAGAZINE)
-        .map(IMagazine::getSize)
+        .map(Magazine::getSize)
         .orElse(this.size);
   }
 
@@ -117,7 +117,7 @@ public class MagazineItem extends Item {
     // Shows the current amount if the maximum size is higher than 1
     if (this.getSize() > 1) {
       int currentAmount =
-          stack.getCapability(ModCapabilities.MAGAZINE).map(IMagazine::getSize).orElse(0);
+          stack.getCapability(ModCapabilities.MAGAZINE).map(Magazine::getSize).orElse(0);
 
       ITextComponent amountText = new StringTextComponent(currentAmount + "/" + this.getSize())
           .withStyle(TextFormatting.RED);
