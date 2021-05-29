@@ -30,6 +30,7 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
+import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
@@ -46,6 +47,7 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
 import net.minecraft.client.gui.screen.MainMenuScreen;
+import net.minecraft.client.gui.screen.MultiplayerScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.resources.IReloadableResourceManager;
@@ -55,10 +57,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -176,6 +180,13 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   // ================================================================================
 
   @SubscribeEvent
+  public void handleRenderNameplate(RenderNameplateEvent event) {
+    if (event.getEntity() instanceof FakePlayerEntity) {
+      event.setResult(Event.Result.DENY);
+    }
+  }
+
+  @SubscribeEvent
   public void handlePlayerLoggedOut(ClientPlayerNetworkEvent.LoggedOutEvent event) {
     if (this.gameWrapper != null) {
       this.gameWrapper.unload();
@@ -222,7 +233,8 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
   @SubscribeEvent
   public void handleGuiOpen(GuiOpenEvent event) {
-    if (event.getGui() instanceof MainMenuScreen) {
+    if (event.getGui() instanceof MainMenuScreen
+        || event.getGui() instanceof MultiplayerScreen) {
       event.setGui(MainMenuView.createScreen());
     }
   }

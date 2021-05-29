@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.function.Consumer;
@@ -63,7 +64,11 @@ public class JsonServerList implements ServerProvider {
       @Override
       public void completed(Integer result, Void attachment) {
         buffer.flip();
-        JsonArray serverListJson = gson.fromJson(new String(buffer.array()), JsonArray.class);
+        byte[] bytes = new byte[buffer.limit()];
+        buffer.get(bytes);
+        String jsonString = new String(bytes, StandardCharsets.UTF_8).trim();
+        JsonArray serverListJson =
+            gson.fromJson(jsonString, JsonArray.class);
         for (JsonElement jsonElement : serverListJson) {
           JsonObject serverJson = jsonElement.getAsJsonObject();
           entryConsumer.accept(new ServerEntry(serverJson.get("map").getAsString(),

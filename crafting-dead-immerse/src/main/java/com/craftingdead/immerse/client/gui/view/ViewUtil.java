@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
@@ -37,6 +38,7 @@ import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
 import com.google.common.base.Strings;
 import com.mojang.datafixers.util.Either;
+import net.minecraft.util.Util;
 import net.minecraftforge.common.ForgeHooks;
 
 public class ViewUtil {
@@ -58,25 +60,39 @@ public class ViewUtil {
    * Add all the {@link View}s specified in the passed {@link File}.
    * 
    * @param file - the {@link File} to read {@link View}s from
-   * @param configurer - a {@link Consumer} used to configure {@link View}s before they're
-   *        added
+   * @param configurer - a {@link Consumer} used to configure {@link View}s before they're added
    * @return ourself
    */
   public static <T extends ParentView<?, ?, YogaLayout>> T addAll(T parentView, File file,
       Consumer<View<?, YogaLayout>> configurer) {
     DocumentBuilder builder;
-    Document document;
+    CompletableFuture<Document> documentFuture;
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setIgnoringElementContentWhitespace(true);
       builder = factory.newDocumentBuilder();
       builder.setErrorHandler(LoggingErrorHandler.INSTANCE);
-      document = builder.parse(file);
-    } catch (IOException | ParserConfigurationException | SAXException e) {
-      logger.warn("Failed to parse xml {} {}", file.getAbsolutePath(), e);
+      documentFuture = CompletableFuture.supplyAsync(() -> {
+        try {
+          return builder.parse(file);
+        } catch (IOException | SAXException e) {
+          logger.warn("Failed to parse xml {} {}", file.getAbsolutePath(), e);
+          return null;
+        }
+      }, Util.backgroundExecutor());
+    } catch (ParserConfigurationException e) {
+      logger.warn("Failed to create document builder", e);
       return parentView;
     }
 
+    documentFuture.thenAcceptAsync(
+        document -> parseDocument(document, file, parentView, configurer), parentView.minecraft);
+
+    return parentView;
+  }
+
+  private static <T extends ParentView<?, ?, YogaLayout>> void parseDocument(Document document,
+      File file, T parentView, Consumer<View<?, YogaLayout>> configurer) {
     NodeList nodes = document.getDocumentElement().getChildNodes();
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
@@ -184,7 +200,7 @@ public class ViewUtil {
           break;
       }
     }
-    return parentView;
+    parentView.layout();
   }
 
   @Nullable

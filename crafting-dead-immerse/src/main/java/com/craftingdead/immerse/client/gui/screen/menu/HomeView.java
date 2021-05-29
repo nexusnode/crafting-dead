@@ -57,7 +57,7 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
             .setBackgroundColour(new Colour(0x70777777))
             .setBackgroundBlur(50.0F)
             .setOverflow(Overflow.SCROLL)
-            .configure(c -> ViewUtil.addAll(c, new File("news.xml")));
+            .configure(view -> ViewUtil.addAll(view, new File("news.xml")));
     this.addChild(this.newsComponent);
   }
 

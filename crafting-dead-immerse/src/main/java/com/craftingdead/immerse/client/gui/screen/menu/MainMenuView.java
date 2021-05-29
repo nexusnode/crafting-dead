@@ -37,7 +37,10 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
@@ -46,7 +49,6 @@ import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.Tooltip;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
@@ -65,12 +67,8 @@ import io.noties.tumbleweed.paths.CatmullRom;
 import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -214,13 +212,16 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
     final FakePlayerEntity fakePlayerEntity =
         new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
 
-
-    List<Item> gunItems = ForgeRegistries.ITEMS.getValues()
+    List<Item> hatItems = ForgeRegistries.ITEMS.getValues()
         .stream()
-        .filter(item -> item instanceof GunItem)
+        .filter(item -> item instanceof HatItem)
         .collect(Collectors.toList());
-    Item randomGunItem = gunItems.get(ThreadLocalRandom.current().nextInt(gunItems.size()));
-    fakePlayerEntity.setItemInHand(Hand.MAIN_HAND, new ItemStack(randomGunItem));
+    Item randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
+
+    LivingExtension<?, ?> livingExtension = ModCapabilities.getExpected(ModCapabilities.LIVING,
+        fakePlayerEntity, LivingExtension.class);
+    livingExtension.getItemHandler().insertItem(InventorySlotType.HAT.getIndex(),
+        randomHatItem.getDefaultInstance(), false);
 
     this.addChild(new ParentView<>(new YogaLayout()
         .setWidthPercent(10)
@@ -229,10 +230,6 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setLeftPercent(75)
         .setPositionType(PositionType.ABSOLUTE), new YogaLayoutParent().setAlignItems(Align.CENTER))
             .setScale(1.0F)
-            .addChild(new TextView<>(new YogaLayout().setWidth(100),
-                new StringTextComponent(this.minecraft.getUser().getName())
-                    .withStyle(TextFormatting.BOLD, TextFormatting.DARK_RED))
-                        .setCentered(true))
             .addChild(new EntityView<>(new YogaLayout().setAspectRatio(1), fakePlayerEntity)));
 
     this.addChild(this.contentContainer);

@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.client.renderer.entity.grenade;
 
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.model.CylinderGrenadeModel;
 import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -54,13 +53,13 @@ public class CylinderGrenadeRenderer extends EntityRenderer<GrenadeEntity> {
 
     IVertexBuilder vertexBuilder =
         renderTypeBuffer.getBuffer(model.renderType(this.getTextureLocation(entity)));
-    this.model.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F,
-        1.0F, 1.0F, 0.15F);
+    this.model.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY,
+        1.0F, 1.0F, 1.0F, 0.15F);
   }
 
   @Override
   public ResourceLocation getTextureLocation(GrenadeEntity entity) {
-    return new ResourceLocation(CraftingDead.ID,
+    return new ResourceLocation(entity.getType().getRegistryName().getNamespace(),
         "textures/entity/grenade/" + entity.getType().getRegistryName().getPath() + ".png");
   }
 }

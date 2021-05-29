@@ -18,30 +18,97 @@
 
 package com.craftingdead.immerse.client.fake;
 
+import java.util.Map;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.play.server.SPlayerListItemPacket;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.GameType;
 
 public class FakePlayerEntity extends AbstractClientPlayerEntity {
+
+  private final Map<Type, ResourceLocation> textureLocations = Maps.newEnumMap(Type.class);
+  private boolean pendingTextures;
+  private String skinModel;
 
   public FakePlayerEntity(GameProfile gameProfile) {
     super(FakeLevel.getInstance(), gameProfile);
   }
 
   @Override
+  public String getModelName() {
+    return this.skinModel == null
+        ? DefaultPlayerSkin.getSkinModelName(this.getGameProfile().getId())
+        : this.skinModel;
+  }
+
+  @Override
+  public boolean isSkinLoaded() {
+    return this.textureLocations.containsKey(Type.SKIN);
+  }
+
+  @Override
+  public ResourceLocation getSkinTextureLocation() {
+    this.registerTextures();
+    return MoreObjects.firstNonNull(this.textureLocations.get(Type.SKIN),
+        DefaultPlayerSkin.getDefaultSkin(this.getGameProfile().getId()));
+  }
+
+  @Override
+  public boolean isCapeLoaded() {
+    return this.textureLocations.containsKey(Type.CAPE);
+  }
+
+  @Override
+  public ResourceLocation getCloakTextureLocation() {
+    this.registerTextures();
+    return this.textureLocations.get(Type.CAPE);
+  }
+
+  @Override
+  public boolean isElytraLoaded() {
+    return this.textureLocations.containsKey(Type.ELYTRA);
+  }
+
+  @Override
+  public ResourceLocation getElytraTextureLocation() {
+    this.registerTextures();
+    return this.textureLocations.get(Type.ELYTRA);
+  }
+
+  private void registerTextures() {
+    synchronized (this) {
+      if (!this.pendingTextures) {
+        this.pendingTextures = true;
+        Minecraft.getInstance().getSkinManager().registerSkins(this.getGameProfile(),
+            (type, textureLocation, texture) -> {
+              this.textureLocations.put(type, textureLocation);
+              if (type == Type.SKIN) {
+                this.skinModel = texture.getMetadata("model");
+                if (this.skinModel == null) {
+                  this.skinModel = "default";
+                }
+              }
+            }, true);
+      }
+    }
+  }
+
+  @Override
   public Vector3d position() {
-    return new Vector3d(99.0D, 99.0D, 99.0D);
+    return new Vector3d(0.0D, 0.0D, 0.0D);
   }
 
   @Override
   protected NetworkPlayerInfo getPlayerInfo() {
-    return new NetworkPlayerInfo(new SPlayerListItemPacket().new AddPlayerData(
-        this.getGameProfile(), 0, GameType.NOT_SET, null));
+    return null;
   }
 
   @Override
