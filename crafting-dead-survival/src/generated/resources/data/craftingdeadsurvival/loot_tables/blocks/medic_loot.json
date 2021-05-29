@@ -1,0 +1,190 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdeadsurvival:bloody_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdeadsurvival:dirty_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 70,
+          "name": "craftingdeadsurvival:clean_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 70,
+          "name": "craftingdeadsurvival:splint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 80,
+          "name": "craftingdead:first_aid_kit"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdead:adrenaline_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdead:syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdead:blood_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdeadsurvival:rbi_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdeadsurvival:cure_syringe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 60,
+          "name": "craftingdead:bandage"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:doctor_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:hazmat_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:knight_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:scuba_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:hazmat_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:doctor_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:army_medic_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:m9_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:p250_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:p90_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "craftingdead:mp5a5_21_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "craftingdead:mp5a5_35_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:m9"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:p250"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "craftingdead:p90"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "craftingdead:mp5a5"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 80,
+          "name": "minecraft:bread"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:apple"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "minecraft:mushroom_stew"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 80,
+          "name": "minecraft:cooked_porkchop"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:cookie"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:melon_slice"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:carrot"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "minecraft:cooked_chicken"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:baked_potato"
+        }
+      ]
+    }
+  ]
+}

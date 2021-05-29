@@ -18,7 +18,7 @@
 
 package com.craftingdead.survival.client.renderer.entity;
 
-import com.craftingdead.survival.client.renderer.entity.model.AdvancedZombieModel;
+import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombieEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 

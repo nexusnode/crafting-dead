@@ -21,24 +21,23 @@ package com.craftingdead.immerse.game.network;
 import java.io.IOException;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public interface NetworkProtocol {
 
   static final NetworkProtocol EMPTY = new NetworkProtocol() {
 
     @Override
-    public <T> PacketBuffer encode(T object) throws IOException {
+    public <T> void encode(PacketBuffer buf, T payload) throws IOException {
       throw new UnsupportedOperationException("Empty protocol");
     }
 
     @Override
-    public <T> void process(PacketBuffer buf, Context ctx) throws IOException {
+    public <T> T decode(PacketBuffer buf, NetworkEvent.Context context) throws IOException {
       throw new UnsupportedOperationException("Empty protocol");
     }
   };
 
-  <T> PacketBuffer encode(T object) throws IOException;
+  <T> void encode(PacketBuffer buf, T payload) throws IOException;
 
-  <T> void process(PacketBuffer buf, NetworkEvent.Context ctx) throws IOException;
+  <T> T decode(PacketBuffer buf, NetworkEvent.Context context) throws IOException;
 }

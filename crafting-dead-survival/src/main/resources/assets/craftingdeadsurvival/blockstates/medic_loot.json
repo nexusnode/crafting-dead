@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "":  { "model": "craftingdeadsurvival:block/loot/medic_loot" }
+  }
+}

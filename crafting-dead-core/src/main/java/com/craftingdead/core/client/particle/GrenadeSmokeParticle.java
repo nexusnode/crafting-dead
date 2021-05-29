@@ -31,6 +31,7 @@ import net.minecraft.util.math.MathHelper;
  * Lightweight smoke particle for grenades.
  */
 public class GrenadeSmokeParticle extends SpriteTexturedParticle {
+
   private final IAnimatedSprite animatedSprite;
 
   private GrenadeSmokeParticle(GrenadeSmokeParticleData data, IAnimatedSprite animatedSprite,
@@ -75,6 +76,7 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
   }
 
   public static class Factory implements IParticleFactory<GrenadeSmokeParticleData> {
+
     private final IAnimatedSprite spriteSet;
 
     public Factory(IAnimatedSprite animatedSprite) {

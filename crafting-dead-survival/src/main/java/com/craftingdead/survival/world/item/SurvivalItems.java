@@ -24,9 +24,13 @@ import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
 import com.craftingdead.survival.world.entity.grenade.PipeGrenadeEntity;
+import com.craftingdead.survival.world.level.block.SurvivalBlocks;
+import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -44,6 +48,85 @@ public class SurvivalItems {
       return new ItemStack(RBI_SYRINGE::get);
     }
   };
+  
+  // ================================================================================
+  // Loot
+  // ================================================================================
+
+  public static final RegistryObject<Item> MILITARY_LOOT_ITEM =
+      ITEMS.register("military_loot",
+          () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT.get(), new Item.Properties()
+              .rarity(Rarity.EPIC)
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> MEDIC_LOOT_ITEM =
+      ITEMS.register("medic_loot",
+          () -> new BlockItem(SurvivalBlocks.MEDIC_LOOT.get(), new Item.Properties()
+              .rarity(Rarity.EPIC)
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> CIVILIAN_LOOT_ITEM =
+      ITEMS.register("civilian_loot",
+          () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT.get(), new Item.Properties()
+              .rarity(Rarity.EPIC)
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_ITEM =
+      ITEMS.register("civilian_rare_loot",
+          () -> new BlockItem(SurvivalBlocks.CIVILIAN_RARE_LOOT.get(), new Item.Properties()
+              .rarity(Rarity.EPIC)
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> POLICE_LOOT_ITEM =
+      ITEMS.register("police_loot",
+          () -> new BlockItem(SurvivalBlocks.POLICE_LOOT.get(), new Item.Properties()
+              .rarity(Rarity.EPIC)
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> MILITARY_LOOT_GEN_ITEM =
+      ITEMS.register("military_loot_gen",
+          () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT_GEN.get(), new Item.Properties()
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> MEDIC_LOOT_GEN_ITEM =
+      ITEMS.register("medic_loot_gen",
+          () -> new BlockItem(SurvivalBlocks.MEDIC_LOOT_GEN.get(), new Item.Properties()
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> CIVILIAN_LOOT_GEN_ITEM =
+      ITEMS.register("civilian_loot_gen",
+          () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT_GEN.get(), new Item.Properties()
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_GEN_ITEM =
+      ITEMS.register("civilian_rare_loot_gen",
+          () -> new BlockItem(SurvivalBlocks.CIVILIAN_RARE_LOOT_GEN.get(), new Item.Properties()
+              .tab(TAB)));
+
+  public static final RegistryObject<Item> POLICE_LOOT_GEN_ITEM =
+      ITEMS.register("police_loot_gen",
+          () -> new BlockItem(SurvivalBlocks.POLICE_LOOT_GEN.get(), new Item.Properties()
+              .tab(TAB)));
+
+  // ================================================================================
+  // Supply Drop Radio
+  // ================================================================================
+
+  public static final RegistryObject<Item> MEDICAL_DROP_RADIO =
+      ITEMS.register("medical_drop_radio",
+          () -> new SupplyDropRadioItem(
+              (SupplyDropRadioItem.Properties) new SupplyDropRadioItem.Properties()
+                  .setLootTable(BuiltInLootTables.MEDICAL_SUPPLY_DROP)
+                  .stacksTo(1)
+                  .tab(TAB)));
+
+  public static final RegistryObject<Item> MILITARY_DROP_RADIO =
+      ITEMS.register("military_drop_radio",
+          () -> new SupplyDropRadioItem(
+              (SupplyDropRadioItem.Properties) new SupplyDropRadioItem.Properties()
+                  .setLootTable(BuiltInLootTables.MILITARY_SUPPLY_DROP)
+                  .stacksTo(1)
+                  .tab(TAB)));
 
   // ================================================================================
   // Virus

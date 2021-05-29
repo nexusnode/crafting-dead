@@ -61,7 +61,7 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   public void onGrenadeTick() {}
 
   @Override
-  public void onActivationStateChange(boolean activated) {
+  public void activatedChanged(boolean activated) {
     if (activated) {
       if (!this.level.isClientSide()) {
         this.remove();

@@ -29,9 +29,6 @@ public interface BufferSerializable {
 
   void decode(PacketBuffer in);
 
-  /**
-   * Whether this capability's data is 'dirty' and needs to be sent to the client.
-   */
   boolean requiresSync();
 
   default void encodeNbt(CompoundNBT nbt, boolean writeAll) {

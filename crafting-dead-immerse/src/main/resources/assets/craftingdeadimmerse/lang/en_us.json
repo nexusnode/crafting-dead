@@ -1,4 +1,7 @@
 {    
+    "commands.game.restart":"Restarting game",
+    "commands.game.reload_rotation":"Reloading game rotation",
+
     "message.first_blood_drawn": "%s drew first blood",
     "message.joined": "%s has joined the game",
     "message.left": "%s has left the game",
@@ -30,7 +33,7 @@
 
     "narrator.screen.start": "Start",
 
-    "game.craftingdeadimmerse.deathmatch":"Team Deathmatch",
+    "game.craftingdeadimmerse.tdm":"Team Deathmatch",
 
     "gui.screen.start.message": "Press the space bar to start",
 

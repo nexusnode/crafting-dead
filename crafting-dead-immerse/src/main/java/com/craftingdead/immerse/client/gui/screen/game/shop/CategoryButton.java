@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.immerse.game.shop.ShopCategory;
+import com.craftingdead.immerse.game.module.shop.ShopCategory;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;

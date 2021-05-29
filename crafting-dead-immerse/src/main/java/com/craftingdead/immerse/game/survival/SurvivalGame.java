@@ -23,11 +23,12 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.game.module.Module;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class SurvivalGame implements Game {
+public abstract class SurvivalGame<M extends Module> implements Game<M> {
 
   @Override
   public void load() {
@@ -52,6 +53,11 @@ public class SurvivalGame implements Game {
   }
 
   @Override
+  public GameType getGameType() {
+    return GameTypes.SURVIVAL.get();
+  }
+
+  @Override
   public void encode(PacketBuffer out, boolean writeAll) {}
 
   @Override
@@ -60,10 +66,5 @@ public class SurvivalGame implements Game {
   @Override
   public boolean requiresSync() {
     return false;
-  }
-
-  @Override
-  public GameType getGameType() {
-    return GameTypes.SURVIVAL.get();
   }
 }

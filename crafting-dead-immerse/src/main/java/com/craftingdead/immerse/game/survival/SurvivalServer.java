@@ -20,9 +20,10 @@ package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.GameServer;
+import com.craftingdead.immerse.game.module.ServerModule;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
-public class SurvivalServer extends SurvivalGame implements GameServer {
+public class SurvivalServer extends SurvivalGame<ServerModule> implements GameServer {
 
   @Override
   public boolean persistPlayerData() {

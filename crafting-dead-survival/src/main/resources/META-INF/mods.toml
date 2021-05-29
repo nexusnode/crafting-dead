@@ -4,8 +4,8 @@ loaderVersion = "[27,)"
 modLoader = "javafml"
 
 [[mods]]
-authors = "Sm0keySa1m0n"
-credits = "Sm0keySa1m0n"
+authors = "Sm0keySa1m0n, Hallzmine"
+credits = "Sm0keySa1m0n, Hallzmine"
 displayName = "Crafting Dead Survival"
 displayURL = "www.craftingdead.com"
 modId = "craftingdeadsurvival"

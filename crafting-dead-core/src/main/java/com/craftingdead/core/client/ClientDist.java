@@ -33,13 +33,13 @@ import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
-import com.craftingdead.core.client.renderer.entity.SupplyDropRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.C4ExplosiveRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.FragGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
-import com.craftingdead.core.client.renderer.entity.layer.ClothingLayer;
-import com.craftingdead.core.client.renderer.entity.layer.EquipmentLayer;
+import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
+import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
+import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
@@ -332,8 +332,6 @@ public class ClientDist implements ModDist {
     ClientRegistry.registerKeyBinding(OPEN_EQUIPMENT_MENU);
     ClientRegistry.registerKeyBinding(TOGGLE_COMBAT_MODE);
 
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SUPPLY_DROP.get(),
-        SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.C4_EXPLOSIVE.get(),
         C4ExplosiveRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FIRE_GRENADE.get(),
@@ -347,6 +345,7 @@ public class ClientDist implements ModDist {
     RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FLASH_GRENADE.get(),
         SlimGrenadeRenderer::new);
 
+    this.registerPlayerLayer(ParachuteLayer::new);
     this.registerPlayerLayer(ClothingLayer::new);
     this.registerPlayerLayer(
         renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
@@ -394,10 +393,10 @@ public class ClientDist implements ModDist {
   }
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    final ParticleManager particleManager = this.minecraft.particleEngine;
-    particleManager.register(ModParticleTypes.GRENADE_SMOKE.get(),
+    ParticleManager particleEngine = this.minecraft.particleEngine;
+    particleEngine.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
-    particleManager.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
+    particleEngine.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {

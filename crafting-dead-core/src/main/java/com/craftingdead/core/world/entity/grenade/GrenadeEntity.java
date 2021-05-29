@@ -52,6 +52,8 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   private int activatedTicksCount = 0;
   private int deactivatedTicksCount = 0;
 
+  private boolean lastActivated;
+
   public GrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
     super(entityIn, worldIn);
   }
@@ -72,11 +74,24 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   /**
    * Called after the activation state is changed.
    */
-  public abstract void onActivationStateChange(boolean activated);
+  public abstract void activatedChanged(boolean activated);
 
   @Override
   public void tick() {
     super.tick();
+
+    boolean activated = this.getEntityData().get(ACTIVATED);
+    if (this.lastActivated != activated) {
+      this.lastActivated = activated;
+
+      if (!activated) {
+        this.deactivatedTicksCount = 0;
+      } else {
+        this.activatedTicksCount = 0;
+      }
+
+      this.activatedChanged(activated);
+    }
 
     if (this.isAlive()) {
       if (this.isActivated()) {
@@ -173,19 +188,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
   }
 
   public void setActivated(boolean activated) {
-    boolean previousValue = this.getEntityData().get(ACTIVATED);
     this.getEntityData().set(ACTIVATED, activated);
-
-    // has changed
-    if (activated != previousValue) {
-      if (!activated) {
-        this.deactivatedTicksCount = 0;
-      } else {
-        this.activatedTicksCount = 0;
-      }
-
-      this.onActivationStateChange(activated);
-    }
   }
 
   /**

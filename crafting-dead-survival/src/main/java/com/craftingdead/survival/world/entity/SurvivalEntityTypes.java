@@ -74,6 +74,11 @@ public class SurvivalEntityTypes {
               .sized(0.25F, 0.5F)
               .setShouldReceiveVelocityUpdates(false)));
 
+  public static final RegistryObject<EntityType<SupplyDropEntity>> SUPPLY_DROP =
+      ENTITY_TYPES.register("supply_drop",
+          () -> create("supply_drop",
+              EntityType.Builder.of(SupplyDropEntity::new, EntityClassification.MISC)));
+
   /*
    * We don't use {@link DeferredRegister} here because of the way {@link SpawnEggItem}s are
    * registered.

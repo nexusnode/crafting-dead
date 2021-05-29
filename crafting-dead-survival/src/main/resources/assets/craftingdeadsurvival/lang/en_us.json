@@ -1,15 +1,28 @@
 {
   "options.craftingdeadsurvival.server.broken_legs_enabled":"Broken Legs Enabled",
   "options.craftingdeadsurvival.server.bleeding_enabled":"Bleeding Enabled",
+  "options.craftingdeadsurvival.server.disable_zombies":"Disable Zombies",
 
   "options.craftingdeadsurvival.client.display_blood": "Display Blood",
 
   "enchantment.craftingdeadsurvival.infection": "Infection",
 
+  "block.craftingdeadsurvival.military_loot_gen": "Military Loot Generator",
+  "block.craftingdeadsurvival.military_loot": "Military Loot",
+  "block.craftingdeadsurvival.police_loot_gen": "Police Loot Generator",
+  "block.craftingdeadsurvival.police_loot": "Police Loot",
+  "block.craftingdeadsurvival.medic_loot_gen": "Medical Loot Generator",
+  "block.craftingdeadsurvival.medic_loot": "Medical Loot",
+  "block.craftingdeadsurvival.civilian_loot_gen": "Civilian Loot Generator",
+  "block.craftingdeadsurvival.civilian_loot": "Civilian Loot",
+  "block.craftingdeadsurvival.civilian_rare_loot_gen": "Rare Civilian Loot Generator",
+  "block.craftingdeadsurvival.civilian_rare_loot": "Rare Civilian Loot",
+
   "effect.craftingdeadsurvival.infection":"Infected",
   "effect.craftingdeadsurvival.broken_leg": "Broken Leg",
   "effect.craftingdeadsurvival.bleeding":"Bleeding",
 
+  "entity.craftingdeadsurvival.supply_drop": "Supply Drop",
   "entity.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
   "entity.craftingdeadsurvival.advanced_zombie": "Advanced Zombie",
   "entity.craftingdeadsurvival.fast_zombie": "Fast Zombie",
@@ -43,7 +56,8 @@
   "item.craftingdeadsurvival.clean_rag": "Clean Rag",
 
   "item.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
-
+  "item.craftingdeadsurvival.military_drop_radio": "Military Supply Drop Radio",
+  "item.craftingdeadsurvival.medical_drop_radio": "Medical Supply Drop Radio",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",
   "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Fast Zombie Spawn Egg",
   "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",

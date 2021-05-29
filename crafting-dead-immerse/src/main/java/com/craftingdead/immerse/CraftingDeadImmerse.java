@@ -25,8 +25,10 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.ClientDist;
+import com.craftingdead.immerse.command.Commands;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.game.module.ModuleTypes;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
@@ -37,6 +39,7 @@ import com.craftingdead.immerse.util.ModSoundEvents;
 import com.craftingdead.immerse.world.level.block.ModBlocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -113,11 +116,13 @@ public class CraftingDeadImmerse {
 
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+    modEventBus.addListener(this::handleCommonSetup);
+
     ModBlocks.BLOCKS.register(modEventBus);
     ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     GameTypes.GAME_TYPES.register(modEventBus);
+    ModuleTypes.MODULE_TYPES.register(modEventBus);
 
-    modEventBus.addListener(this::handleCommonSetup);
     MinecraftForge.EVENT_BUS.register(this);
 
     // SchematicFormats.SCHEMATIC_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
@@ -146,12 +151,12 @@ public class CraftingDeadImmerse {
     return this.modDir;
   }
 
-  public Game getGame(LogicalSide side) {
+  public Game<?> getGame(LogicalSide side) {
     switch (side) {
       case CLIENT:
         return this.getClientDist().getGameClient();
       case SERVER:
-        return this.getLogicalServer().getGameServer();
+        return this.getLogicalServer().getGame();
       default:
         throw new IllegalArgumentException("Unkown side: " + side.toString());
     }
@@ -168,6 +173,11 @@ public class CraftingDeadImmerse {
   public void handleCommonSetup(FMLCommonSetupEvent event) {
     NetworkChannel.loadChannels();
     GameNetworkChannel.load();
+  }
+
+  @SubscribeEvent
+  public void handleRegisterCommands(RegisterCommandsEvent event) {
+    Commands.register(event.getDispatcher());
   }
 
   @SubscribeEvent

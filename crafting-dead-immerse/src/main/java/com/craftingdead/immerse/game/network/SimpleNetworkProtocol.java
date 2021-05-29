@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.network.PacketBuffer;
@@ -32,63 +30,58 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class SimpleNetworkProtocol implements NetworkProtocol {
 
-  private final Map<Byte, ObjectEntry<?>> objectIndicies = new Byte2ObjectArrayMap<>();
-  private final Map<Class<?>, ObjectEntry<?>> objectTypes = new Object2ObjectArrayMap<>();
+  private final Map<Byte, Codec<?>> codecIndicies = new Byte2ObjectArrayMap<>();
+  private final Map<Class<?>, Codec<?>> codecTypes = new Object2ObjectArrayMap<>();
 
-  public <T> ObjectEntryBuilder<T> messageBuilder(int index, Class<T> type) {
-    return new ObjectEntryBuilder<>(index, type);
+  public <T> CodecBuilder<T> codecBuilder(int index, Class<T> type) {
+    return new CodecBuilder<>(index, type);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> PacketBuffer encode(T object) throws IOException {
-    ObjectEntry<T> entry = (ObjectEntry<T>) this.objectTypes.get(object.getClass());
+  public <T> void encode(PacketBuffer buf, T payload) throws IOException {
+    Codec<T> entry = (Codec<T>) this.codecTypes.get(payload.getClass());
     if (entry == null) {
-      throw new IOException("Unknown message type " + object.getClass().getName());
+      throw new IOException("Unknown payload type " + payload.getClass().getName());
     }
-    PacketBuffer out = new PacketBuffer(Unpooled.buffer());
-    out.writeByte(entry.index);
-    entry.encoder.accept(object, out);
-    return out;
+    buf.writeByte(entry.index);
+    entry.encoder.accept(payload, buf);
   }
 
   @Override
-  public <T> void process(PacketBuffer buf, NetworkEvent.Context ctx) throws IOException {
+  public <T> T decode(PacketBuffer buf, NetworkEvent.Context ctx) throws IOException {
     byte index = buf.readByte();
     @SuppressWarnings("unchecked")
-    ObjectEntry<T> entry = (ObjectEntry<T>) this.objectIndicies.get(index);
+    Codec<T> entry = (Codec<T>) this.codecIndicies.get(index);
     if (entry != null) {
-      entry.handler.accept(entry.decoder.apply(buf), ctx);
+      return entry.decoder.apply(buf);
     } else {
-      throw new IOException("Unknown message index " + index);
+      throw new IOException("Unknown payload index " + index);
     }
   }
 
-  private class ObjectEntry<T> {
+  private static class Codec<T> {
 
     private final byte index;
     private final BiConsumer<T, PacketBuffer> encoder;
     private final Function<PacketBuffer, T> decoder;
-    private final BiConsumer<T, NetworkEvent.Context> handler;
 
-    public ObjectEntry(byte index, BiConsumer<T, PacketBuffer> encoder,
-        Function<PacketBuffer, T> decoder, BiConsumer<T, NetworkEvent.Context> handler) {
+    private Codec(byte index, BiConsumer<T, PacketBuffer> encoder,
+        Function<PacketBuffer, T> decoder) {
       this.index = index;
       this.encoder = encoder;
       this.decoder = decoder;
-      this.handler = handler;
     }
   }
 
-  public class ObjectEntryBuilder<T> {
+  public class CodecBuilder<T> {
 
     private final byte index;
     private final Class<T> type;
     private BiConsumer<T, PacketBuffer> encoder;
     private Function<PacketBuffer, T> decoder;
-    private BiConsumer<T, NetworkEvent.Context> handler;
 
-    private ObjectEntryBuilder(int index, Class<T> type) {
+    private CodecBuilder(int index, Class<T> type) {
       if (index >= 256) {
         throw new IllegalArgumentException("Index larger than unsigned byte, must be below 256");
       }
@@ -96,51 +89,42 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
       this.type = type;
     }
 
-    public ObjectEntryBuilder<T> encoder(BiConsumer<T, PacketBuffer> encoder) {
+    public CodecBuilder<T> emptyEncoder() {
+      return this.encoder((x, y) -> {
+      });
+    }
+
+    public CodecBuilder<T> encoder(BiConsumer<T, PacketBuffer> encoder) {
       this.encoder = encoder;
       return this;
     }
 
-    public ObjectEntryBuilder<T> decoder(Function<PacketBuffer, T> decoder) {
+    public CodecBuilder<T> unitDecoder(Supplier<T> value) {
+      return this.decoder(in -> value.get());
+    }
+
+    public CodecBuilder<T> decoder(Function<PacketBuffer, T> decoder) {
       this.decoder = decoder;
       return this;
     }
 
-    public ObjectEntryBuilder<T> handler(BiConsumer<T, NetworkEvent.Context> handler) {
-      this.handler = handler;
-      return this;
-    }
-
     public SimpleNetworkProtocol register() {
-      ObjectEntry<T> entry =
-          new ObjectEntry<>(this.index, this.encoder, this.decoder, this.handler);
+      Codec<T> entry =
+          new Codec<>(this.index, this.encoder, this.decoder);
 
-      if (SimpleNetworkProtocol.this.objectIndicies.containsKey(this.index)) {
+      if (SimpleNetworkProtocol.this.codecIndicies.containsKey(this.index)) {
         throw new IllegalArgumentException(
-            "Object with index " + this.index + " already registered");
+            "Codec with index " + this.index + " already registered");
       }
-      SimpleNetworkProtocol.this.objectIndicies.put(this.index, entry);
+      SimpleNetworkProtocol.this.codecIndicies.put(this.index, entry);
 
-      if (SimpleNetworkProtocol.this.objectTypes.containsKey(this.type)) {
+      if (SimpleNetworkProtocol.this.codecTypes.containsKey(this.type)) {
         throw new IllegalArgumentException(
-            "Object of type " + this.type.getName() + " already registered");
+            "Codec with type " + this.type.getName() + " already registered");
       }
-      SimpleNetworkProtocol.this.objectTypes.put(this.type, entry);
-
-      if (this.handler == null) {
-        throw new IllegalArgumentException("No handler specified");
-      }
+      SimpleNetworkProtocol.this.codecTypes.put(this.type, entry);
 
       return SimpleNetworkProtocol.this;
     }
-  }
-
-  public static <T> BiConsumer<T, ByteBuf> emptyEncoder() {
-    return (x, y) -> {
-    };
-  }
-
-  public static <T> Function<ByteBuf, T> supplierDecoder(Supplier<T> value) {
-    return in -> value.get();
   }
 }

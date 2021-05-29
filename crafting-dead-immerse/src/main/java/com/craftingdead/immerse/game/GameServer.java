@@ -20,10 +20,11 @@ package com.craftingdead.immerse.game;
 
 import java.util.Optional;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.module.ServerModule;
 import com.mojang.serialization.Codec;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
-public interface GameServer extends Game {
+public interface GameServer extends Game<ServerModule> {
 
   Codec<GameServer> CODEC =
       GameType.CODEC.dispatch(GameServer::getGameType, GameType::getGameServerCodec);
@@ -32,9 +33,9 @@ public interface GameServer extends Game {
     return false;
   }
 
-  void addPlayer(PlayerExtension<ServerPlayerEntity> player);
+  default void addPlayer(PlayerExtension<ServerPlayerEntity> player) {}
 
-  void removePlayer(PlayerExtension<ServerPlayerEntity> player);
+  default void removePlayer(PlayerExtension<ServerPlayerEntity> player) {}
 
   /**
    * Determine if the game has finished.

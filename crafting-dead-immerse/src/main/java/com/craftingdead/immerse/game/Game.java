@@ -18,30 +18,23 @@
 
 package com.craftingdead.immerse.game;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 import com.craftingdead.core.network.BufferSerializable;
-import com.craftingdead.immerse.game.network.NetworkProtocol;
-import com.craftingdead.immerse.game.shop.Shop;
+import com.craftingdead.immerse.game.module.Module;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public interface Game extends BufferSerializable {
+public interface Game<M extends Module> extends BufferSerializable {
+
+  default void registerModules(Consumer<M> registar) {};
 
   /**
-   * A {@link NetworkProtocol} which allows games to send and receive custom packets.
+   * Handle messages sent to this game.
    * 
-   * @return the {@link NetworkProtocol}
-   * @see com.craftingdead.immerse.game.network.SimpleNetworkProtocol
+   * @param <MSG> - type of message
+   * @param message - the message
+   * @param context - sender context
    */
-  default NetworkProtocol getNetworkProtocol() {
-    return NetworkProtocol.EMPTY;
-  }
-
-  default Optional<Shop> getShop() {
-    return Optional.empty();
-  }
-
-  default Shop getExpectedShop() {
-    return this.getShop().orElseThrow(() -> new IllegalStateException("Expecting shop"));
-  }
+  default <MSG> void handleMessage(MSG message, NetworkEvent.Context context) {}
 
   /**
    * Prepare the game to be played.

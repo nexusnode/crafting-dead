@@ -7,6 +7,7 @@
   "effect.craftingdead.broken_leg": "Perna Quebrada",
   "effect.craftingdead.bleeding":"Sangramento",
 
+  "entity.craftingdeadsurvival.supply_drop": "Caixa de Suprimentos",
   "entity.craftingdeadsurvival.pipe_grenade": "Granada Improvisada",
   "entity.craftingdeadsurvival.advanced_zombie": "Zumbi Avançado",
   "entity.craftingdeadsurvival.fast_zombie": "Zumbi Rápido",
@@ -27,7 +28,8 @@
   "item.craftingdeadsurvival.dirty_rag": "Tecido Sujo",
   "item.craftingdeadsurvival.bloody_rag": "Tecido Ensanguentado",
   "item.craftingdeadsurvival.clean_rag": "Tecido Limpo",
-  
+  "item.craftingdeadsurvival.military_drop_radio": "Rádio de Suprimentos Militares",
+  "item.craftingdeadsurvival.medical_drop_radio": "Rádio de Suprimentos Médicos",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Ovo gerador de Zumbi Avançado",
   "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Ovo gerador de Zumbi Rápido",
   "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Ovo gerador de Zumbi Tanque",

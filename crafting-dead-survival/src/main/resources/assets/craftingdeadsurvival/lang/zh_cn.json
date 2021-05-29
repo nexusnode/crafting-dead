@@ -17,6 +17,7 @@
   "entity.craftingdeadsurvival.police_zombie": "警察丧尸",
   "entity.craftingdeadsurvival.doctor_zombie": "医生丧尸",
   "entity.craftingdeadsurvival.giant_zombie": "巨型丧尸",
+  "entity.craftingdeadsurvival.supply_drop": "空投物品",
 
   "message.infected": "你已被丧尸病毒感染.",
   "message.broken_leg": "你骨折了.",
@@ -36,7 +37,8 @@
   "item.craftingdeadsurvival.clean_rag": "干净的破布",
   "item.craftingdeadsurvival.dirty_rag": "脏破布",
   "item.craftingdeadsurvival.bloody_rag": "带血的破布",
-
+  "item.craftingdeadsurvival.military_drop_radio": "军用空投召唤器",
+  "item.craftingdeadsurvival.medical_drop_radio": "医用空投召唤器",
   "item.craftingdeadsurvival.pipe_grenade": "粘土炸弹",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "生成 高级丧尸",
   "item.craftingdeadsurvival.fast_zombie_spawn_egg": "生成 快速丧尸",

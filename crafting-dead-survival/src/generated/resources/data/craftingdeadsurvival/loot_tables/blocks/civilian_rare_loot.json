@@ -1,0 +1,775 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdeadsurvival:bloody_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdeadsurvival:dirty_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdeadsurvival:clean_rag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:first_aid_kit"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:bandage"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdeadsurvival:splint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:riot_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:beanie_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:chief_fireman_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:blue_hard_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:bunny_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:clone_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:cookie_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:cow_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:creeper_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:deadpool_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:doctor_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:fireman_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:gas_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:green_hard_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:hacker_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:knight_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:ninja_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:orange_hard_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:payday_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:payday2_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:pumpkin_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:radar_cap"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:santa_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:scuba_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:sheep_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:ski_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:top_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:trapper_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:ushanka_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:yellow_hard_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:zombie_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:camo_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:space_suit_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:fireman_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:smart_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:casual_green_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:builder_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:business_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:sec_guard_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:red_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:clone_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:cookie_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:deadpool_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:ninja_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:president_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:yellow_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:orange_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:green_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:white_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:purple_dusk_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:scuba_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:contractor_clothing"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:vulcan_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:asmo_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:candy_apple_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:cyrex_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:diamond_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:dragon_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:fade_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:fury_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:gem_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:inferno_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:ruby_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:scorched_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:slaughter_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:uv_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:hyper_beast_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:emperor_dragon_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:nuclear_winter_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:multi_paint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdead:stanag_20_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:stanag_30_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdead:ak47_30_round_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:fnfal_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:m1911_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdead:g18_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 35,
+          "name": "craftingdead:m9_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:desert_eagle_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdead:p250_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:magnum_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:fn57_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:mac10_extended_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdead:mac10_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:sporter22_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 25,
+          "name": "craftingdead:m1garand_magazine"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:trenchgun_shells"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:mossberg_shells"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:red_dot_sight"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdead:lp_scope"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdead:hp_scope"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:suppressor"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:tactical_grip"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:bipod"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdead:eotech_sight"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdead:m4a1"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:ak47"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:fnfal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdead:m1garand"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:sporter22"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:m1911"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:g18"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "craftingdead:m9"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 35,
+          "name": "craftingdead:desert_eagle"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 50,
+          "name": "craftingdead:p250"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 75,
+          "name": "craftingdead:magnum"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdead:fn57"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "craftingdead:mac10"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 60,
+          "name": "craftingdead:trenchgun"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 60,
+          "name": "craftingdead:mossberg"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "craftingdeadsurvival:pipe_grenade"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:crowbar"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:bat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:katana"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:pipe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:rusty_pipe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:fire_axe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:chainsaw"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:bowie_knife"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:golf_club"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:night_stick"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:sledgehammer"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:nail_bat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:shovel"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:hatchet"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:broadsword"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:machete"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:weaponized_scythe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:scythe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:pickaxe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:bo_staff"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:wrench"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:frying_pan"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:bolt_cutters"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:katana"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:combat_knife"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:steel_bat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:cleaver"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:broken_bottle"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 80,
+          "name": "minecraft:bread"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:apple"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 30,
+          "name": "minecraft:mushroom_stew"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 80,
+          "name": "minecraft:cooked_porkchop"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:cookie"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:melon_slice"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:carrot"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 40,
+          "name": "minecraft:cooked_chicken"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "name": "minecraft:baked_potato"
+        }
+      ]
+    }
+  ]
+}

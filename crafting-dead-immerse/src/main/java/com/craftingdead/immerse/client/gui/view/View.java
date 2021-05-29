@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.gui.tween.ColourTweenType;
@@ -283,21 +284,35 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
     // ---- Render Content----
 
-    final double scale = this.minecraft.getWindow().getGuiScale();
     final boolean scissor =
         this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
 
     if (scissor) {
-      RenderSystem.enableScissor((int) (this.getScaledContentX() * scale),
-          (int) (this.mainWindow.getHeight()
-              - (this.getScaledY() + this.getScaledHeight()) * scale),
-          (int) (this.getScaledContentWidth() * scale),
-          (int) (this.getScaledHeight() * scale));
+      if (!this.minecraft.getMainRenderTarget().isStencilEnabled()) {
+        this.minecraft.getMainRenderTarget().enableStencil();
+      }
+
+      GL11.glEnable(GL11.GL_STENCIL_TEST);
+      RenderSystem.colorMask(false, false, false, false);
+      RenderSystem.stencilFunc(GL11.GL_NEVER, 1, 0xFF);
+      RenderSystem.stencilOp(GL11.GL_REPLACE, GL11.GL_KEEP, GL11.GL_KEEP); // draw 1s on test fail
+
+      RenderSystem.stencilMask(0xFF);
+      RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, false); // needs mask=0xFF
+
+      RenderUtil.fillWidthHeight(matrixStack, this.getScaledX(), this.getScaledY(),
+          this.getScaledWidth(), this.getScaledHeight(), 0);
+
+      RenderSystem.colorMask(true, true, true, true);
+      RenderSystem.stencilMask(0x00);
+
+      // draw only where stencil's value is 1
+      RenderSystem.stencilFunc(GL11.GL_EQUAL, 1, 0xFF);
     }
 
     this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     if (scissor) {
-      RenderSystem.disableScissor();
+      GL11.glDisable(GL11.GL_STENCIL_TEST);
     }
 
     // ---- Render Scrollbar ----
@@ -563,15 +578,25 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this
         .addListener(EnabledChangedEvent.class, (view, event) -> {
           if (!this.enabled) {
-            Tween
-                .to(this.self(), BACKGROUND_COLOUR, duration)
-                .target(colour.getColour4f())
-                .start(this.tweenManager);
+            if (this.parent == null) {
+              // Not added yet so just set the colour without animating.
+              this.modifiedBackgroundColour.setColour4f(colour.getColour4f());
+            } else {
+              Tween
+                  .to(this.self(), BACKGROUND_COLOUR, duration)
+                  .target(colour.getColour4f())
+                  .start(this.tweenManager);
+            }
           } else {
-            Tween
-                .to(this.self(), BACKGROUND_COLOUR, duration)
-                .target(this.backgroundColour.getColour4f())
-                .start(this.tweenManager);
+            if (this.parent == null) {
+              // Not added yet so just set the colour without animating.
+              this.modifiedBackgroundColour.setColour4f(this.backgroundColour.getColour4f());
+            } else {
+              Tween
+                  .to(this.self(), BACKGROUND_COLOUR, duration)
+                  .target(this.backgroundColour.getColour4f())
+                  .start(this.tweenManager);
+            }
           }
         });
   }

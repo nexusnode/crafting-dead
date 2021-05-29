@@ -28,6 +28,8 @@ import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.client.ClientDist;
 import com.craftingdead.survival.data.SurvivalItemTagsProvider;
 import com.craftingdead.survival.data.SurvivalRecipeProvider;
+import com.craftingdead.survival.data.loot.SurvivalLootTableProvider;
+import com.craftingdead.survival.particles.SurvivalParticleTypes;
 import com.craftingdead.survival.server.ServerDist;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
@@ -42,18 +44,23 @@ import com.craftingdead.survival.world.entity.monster.TankZombieEntity;
 import com.craftingdead.survival.world.entity.monster.WeakZombieEntity;
 import com.craftingdead.survival.world.item.SurvivalItems;
 import com.craftingdead.survival.world.item.enchantment.SurvivalEnchantments;
+import com.craftingdead.survival.world.level.block.SurvivalBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.data.ForgeBlockTagsProvider;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
@@ -71,6 +78,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class CraftingDeadSurvival {
 
   public static final String ID = "craftingdeadsurvival";
+
+  private static final String H_CD_SERVER_CORE_ID = "hcdservercore";
 
   public static final ServerConfig serverConfig;
   public static final ForgeConfigSpec serverConfigSpec;
@@ -108,6 +117,8 @@ public class CraftingDeadSurvival {
     SurvivalItems.ITEMS.register(modEventBus);
     SurvivalMobEffects.MOB_EFFECTS.register(modEventBus);
     SurvivalEntityTypes.ENTITY_TYPES.register(modEventBus);
+    SurvivalParticleTypes.PARTICLE_TYPES.register(modEventBus);
+    SurvivalBlocks.BLOCKS.register(modEventBus);
   }
 
   public ModDist getModDist() {
@@ -146,12 +157,33 @@ public class CraftingDeadSurvival {
           new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
           event.getExistingFileHelper()));
       dataGenerator.addProvider(new SurvivalRecipeProvider(dataGenerator));
+      dataGenerator.addProvider(new SurvivalLootTableProvider(dataGenerator));
     }
   }
 
   // ================================================================================
   // Common Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handleMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {
+    event.getMappings(H_CD_SERVER_CORE_ID).forEach(mapping -> {
+      Block newBlock = mapping.registry.getValue(new ResourceLocation(ID, mapping.key.getPath()));
+      if (newBlock != null) {
+        mapping.remap(newBlock);
+      }
+    });
+  }
+
+  @SubscribeEvent
+  public void handleMissingItemMappings(RegistryEvent.MissingMappings<Item> event) {
+    event.getMappings(H_CD_SERVER_CORE_ID).forEach(mapping -> {
+      Item newItem = mapping.registry.getValue(new ResourceLocation(ID, mapping.key.getPath()));
+      if (newItem != null) {
+        mapping.remap(newItem);
+      }
+    });
+  }
 
   @SubscribeEvent
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
@@ -189,22 +221,25 @@ public class CraftingDeadSurvival {
 
   @SubscribeEvent
   public void handleBiomeLoading(BiomeLoadingEvent event) {
+    if (serverConfig.disableZombies.get()) {
+      return;
+    }
+
     ListIterator<MobSpawnInfo.Spawners> iterator =
         event.getSpawns().getSpawner(EntityClassification.MONSTER).listIterator();
     while (iterator.hasNext()) {
       MobSpawnInfo.Spawners spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
-        iterator.add(new MobSpawnInfo.Spawners(SurvivalEntityTypes.advancedZombie,
-            spawnEntry.weight * 3, 2, 8));
-        iterator.add(
-            new MobSpawnInfo.Spawners(SurvivalEntityTypes.fastZombie, spawnEntry.weight / 2, 2, 4));
-        iterator
-            .add(new MobSpawnInfo.Spawners(SurvivalEntityTypes.tankZombie, spawnEntry.weight / 2, 2,
-                4));
-        iterator.add(
-            new MobSpawnInfo.Spawners(SurvivalEntityTypes.advancedZombie, spawnEntry.weight, 3, 8));
-        iterator.add(
-            new MobSpawnInfo.Spawners(SurvivalEntityTypes.weakZombie, spawnEntry.weight, 3, 12));
+        iterator.add(new MobSpawnInfo.Spawners(
+            SurvivalEntityTypes.advancedZombie, spawnEntry.weight * 3, 2, 8));
+        iterator.add(new MobSpawnInfo.Spawners(
+            SurvivalEntityTypes.fastZombie, spawnEntry.weight / 2, 2, 4));
+        iterator.add(new MobSpawnInfo.Spawners(
+            SurvivalEntityTypes.tankZombie, spawnEntry.weight / 2, 2, 4));
+        iterator.add(new MobSpawnInfo.Spawners(
+            SurvivalEntityTypes.advancedZombie, spawnEntry.weight, 3, 8));
+        iterator.add(new MobSpawnInfo.Spawners(
+            SurvivalEntityTypes.weakZombie, spawnEntry.weight, 3, 12));
       }
     }
   }

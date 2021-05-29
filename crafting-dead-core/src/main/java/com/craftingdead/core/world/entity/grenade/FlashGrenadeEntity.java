@@ -53,7 +53,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
   }
 
   @Override
-  public void onActivationStateChange(boolean activated) {
+  public void activatedChanged(boolean activated) {
     if (activated) {
       this.flash();
     } else {

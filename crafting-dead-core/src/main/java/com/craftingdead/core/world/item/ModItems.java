@@ -62,7 +62,6 @@ import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.world.gun.GunTypes;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.AttachmentItem.MultiplierType;
-import com.craftingdead.core.world.level.storage.loot.ModLootTables;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.AxeItem;
@@ -102,14 +101,6 @@ public class ModItems {
     @Override
     public ItemStack makeIcon() {
       return new ItemStack(ModItems.FIRST_AID_KIT::get);
-    }
-  };
-
-  public static final ItemGroup MISC_TAB = new ItemGroup("craftingdead.misc") {
-
-    @Override
-    public ItemStack makeIcon() {
-      return new ItemStack(ModItems.MEDICAL_DROP_RADIO::get);
     }
   };
 
@@ -945,7 +936,7 @@ public class ModItems {
           .durability(40)
           .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> BROADSWORD = ITEMS.register("broad_sword",
+  public static final RegistryObject<Item> BROADSWORD = ITEMS.register("broadsword",
       () -> new MeleeWeaponItem(14, -2.4F, new Item.Properties()
           .durability(55)
           .tab(COMBAT_TAB)));
@@ -1315,55 +1306,60 @@ public class ModItems {
   // Clothing
   // ================================================================================
 
-  public static final RegistryObject<Item> ARMY_CLOTHING = ITEMS.register("army_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> ARMY_CLOTHING =
+      ITEMS.register("army_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SAS_CLOTHING = ITEMS.register("sas_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SAS_CLOTHING =
+      ITEMS.register("sas_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SPETSNAZ_CLOTHING = ITEMS.register("spetsnaz_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SPETSNAZ_CLOTHING =
+      ITEMS.register("spetsnaz_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> POLICE_CLOTHING = ITEMS.register("police_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> POLICE_CLOTHING =
+      ITEMS.register("police_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> CAMO_CLOTHING = ITEMS.register("camo_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> CAMO_CLOTHING =
+      ITEMS.register("camo_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> COMBAT_BDU_CLOTHING =
       ITEMS.register("combat_bdu_clothing",
@@ -1398,26 +1394,28 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> PILOT_CLOTHING = ITEMS.register("pilot_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              1,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> PILOT_CLOTHING =
+      ITEMS.register("pilot_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  1,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> HAZMAT_CLOTHING = ITEMS.register("hazmat_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .setFireImmunity(true)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> HAZMAT_CLOTHING =
+      ITEMS.register("hazmat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .setFireImmunity(true)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> TAC_GHILLIE_CLOTHING =
       ITEMS.register("tac_ghillie_clothing",
@@ -1430,15 +1428,16 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SWAT_CLOTHING = ITEMS.register("swat_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SWAT_CLOTHING =
+      ITEMS.register("swat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SPACE_SUIT_CLOTHING =
       ITEMS.register("space_suit_clothing",
@@ -1451,15 +1450,16 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SHERIFF_CLOTHING = ITEMS.register("sheriff_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              1,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SHERIFF_CLOTHING =
+      ITEMS.register("sheriff_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  1,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> JUGGERNAUT_CLOTHING =
       ITEMS.register("juggernaut_clothing",
@@ -1478,26 +1478,29 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> FIREMAN_CLOTHING = ITEMS.register("fireman_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              3,
-              AttributeModifier.Operation.ADDITION))
-          .setFireImmunity(true)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> FIREMAN_CLOTHING =
+      ITEMS.register("fireman_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  3,
+                  AttributeModifier.Operation.ADDITION))
+              .setFireImmunity(true)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> DOCTOR_CLOTHING = ITEMS.register("doctor_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> DOCTOR_CLOTHING =
+      ITEMS.register("doctor_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SMART_CLOTHING = ITEMS.register("smart_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SMART_CLOTHING =
+      ITEMS.register("smart_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CASUAL_GREEN_CLOTHING =
       ITEMS.register("casual_green_clothing",
@@ -1505,25 +1508,28 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> BUILDER_CLOTHING = ITEMS.register("builder_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> BUILDER_CLOTHING =
+      ITEMS.register("builder_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> BUSINESS_CLOTHING = ITEMS.register("business_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> BUSINESS_CLOTHING =
+      ITEMS.register("business_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SEC_GUARD_CLOTHING = ITEMS.register("sec_guard_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              1,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SEC_GUARD_CLOTHING =
+      ITEMS.register("sec_guard_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  1,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> MIL_HAZMAT_CLOTHING =
       ITEMS.register("mil_hazmat_clothing",
@@ -1548,50 +1554,55 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> RED_DUSK_CLOTHING = ITEMS.register("red_dusk_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> RED_DUSK_CLOTHING =
+      ITEMS.register("red_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> CLONE_CLOTHING = ITEMS.register("clone_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> CLONE_CLOTHING =
+      ITEMS.register("clone_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> COOKIE_CLOTHING = ITEMS.register("cookie_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> COOKIE_CLOTHING =
+      ITEMS.register("cookie_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> DEADPOOL_CLOTHING = ITEMS.register("deadpool_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> DEADPOOL_CLOTHING =
+      ITEMS.register("deadpool_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> NINJA_CLOTHING = ITEMS.register("ninja_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              1,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> NINJA_CLOTHING =
+      ITEMS.register("ninja_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  1,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> ARMY_MEDIC_CLOTHING =
       ITEMS.register("army_medic_clothing",
@@ -1604,20 +1615,22 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> BLUE_DUSK_CLOTHING = ITEMS.register("blue_dusk_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> BLUE_DUSK_CLOTHING =
+      ITEMS.register("blue_dusk_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> PRESIDENT_CLOTHING = ITEMS.register("president_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> PRESIDENT_CLOTHING =
+      ITEMS.register("president_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> YELLOW_DUSK_CLOTHING =
       ITEMS.register("yellow_dusk_clothing",
@@ -1674,25 +1687,27 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SCUBA_CLOTHING = ITEMS.register("scuba_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              1,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SCUBA_CLOTHING =
+      ITEMS.register("scuba_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  1,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> DDPAT_CLOTHING = ITEMS.register("ddpat_clothing",
-      () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-          .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-              Clothing.MODIFIER_ID,
-              "Armor modifier",
-              2,
-              AttributeModifier.Operation.ADDITION))
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> DDPAT_CLOTHING =
+      ITEMS.register("ddpat_clothing",
+          () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
+              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  Clothing.MODIFIER_ID,
+                  "Armor modifier",
+                  2,
+                  AttributeModifier.Operation.ADDITION))
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CONTRACTOR_CLOTHING =
       ITEMS.register("contractor_clothing",
@@ -1706,103 +1721,99 @@ public class ModItems {
               .tab(COSMETICS_TAB)));
 
   // ================================================================================
-  // Air Drop Radio
-  // ================================================================================
-
-  public static final RegistryObject<Item> MEDICAL_DROP_RADIO = ITEMS.register("medical_drop_radio",
-      () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
-          .setLootTable(ModLootTables.MEDICAL_SUPPLY_DROP)
-          .stacksTo(1)
-          .tab(MISC_TAB)));
-
-  public static final RegistryObject<Item> MILITARY_DROP_RADIO =
-      ITEMS.register("military_drop_radio",
-          () -> new AirDropRadioItem((AirDropRadioItem.Properties) new AirDropRadioItem.Properties()
-              .setLootTable(ModLootTables.MILITARY_SUPPLY_DROP)
-              .stacksTo(1)
-              .tab(MISC_TAB)));
-
-  // ================================================================================
   // Gun Parts
   // ================================================================================
 
   public static final RegistryObject<Item> SMALL_BARREL = ITEMS.register("small_barrel",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MEDIUM_BARREL = ITEMS.register("medium_barrel",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_BARREL = ITEMS.register("heavy_barrel",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SMALL_BODY = ITEMS.register("small_body",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MEDIUM_BODY = ITEMS.register("medium_body",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_BODY = ITEMS.register("heavy_body",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SMALL_HANDLE = ITEMS.register("small_handle",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MEDIUM_HANDLE = ITEMS.register("medium_handle",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_HANDLE = ITEMS.register("heavy_handle",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SMALL_STOCK = ITEMS.register("small_stock",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MEDIUM_STOCK = ITEMS.register("medium_stock",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MEDIUM_BOLT = ITEMS.register("medium_bolt",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_BOLT = ITEMS.register("heavy_bolt",
-      () -> new Item(new Item.Properties().tab(MISC_TAB)));
-
-  // ================================================================================
-  // Medical
-  // ================================================================================
-
-  public static final RegistryObject<Item> FIRST_AID_KIT = ITEMS.register("first_aid_kit",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setAction(ActionTypes.USE_FIRST_AID_KIT)
-          .stacksTo(1)
-          .tab(MEDICAL_TAB)));
-
-  public static final RegistryObject<Item> ADRENALINE_SYRINGE = ITEMS.register("adrenaline_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setAction(ActionTypes.USE_ADRENALINE_SYRINGE)
-          .stacksTo(1)
-          .tab(MEDICAL_TAB)));
-
-  public static final RegistryObject<Item> SYRINGE = ITEMS.register("syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setAction(ActionTypes.USE_SYRINGE)
-          .stacksTo(1)
-          .tab(MEDICAL_TAB)));
-
-  public static final RegistryObject<Item> BLOOD_SYRINGE = ITEMS.register("blood_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setAction(ActionTypes.USE_BLOOD_SYRINGE)
-          .stacksTo(1)
-          .tab(MEDICAL_TAB)));
-
-  public static final RegistryObject<Item> BANDAGE = ITEMS.register("bandage",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .setAction(ActionTypes.USE_BANDAGE)
-          .stacksTo(1)
-          .tab(MEDICAL_TAB)));
+      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   // ================================================================================
   // Miscellaneous
   // ================================================================================
 
-  public static final RegistryObject<Item> BINOCULARS = ITEMS.register("binoculars",
-      () -> new BinocularsItem(new Item.Properties().tab(MISC_TAB)));
+  public static final RegistryObject<Item> BINOCULARS =
+      ITEMS.register("binoculars",
+          () -> new BinocularsItem(new Item.Properties()
+              .tab(COMBAT_TAB)));
+
+  public static final RegistryObject<Item> PARACHUTE =
+      ITEMS.register("parachute",
+          () -> new ParachuteItem(new Item.Properties()
+              .stacksTo(1)
+              .tab(COMBAT_TAB)));
+
+  // ================================================================================
+  // Medical
+  // ================================================================================
+
+  public static final RegistryObject<Item> FIRST_AID_KIT =
+      ITEMS.register("first_aid_kit",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setAction(ActionTypes.USE_FIRST_AID_KIT)
+              .stacksTo(1)
+              .tab(MEDICAL_TAB)));
+
+  public static final RegistryObject<Item> ADRENALINE_SYRINGE =
+      ITEMS.register("adrenaline_syringe",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setAction(ActionTypes.USE_ADRENALINE_SYRINGE)
+              .stacksTo(1)
+              .tab(MEDICAL_TAB)));
+
+  public static final RegistryObject<Item> SYRINGE =
+      ITEMS.register("syringe",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setAction(ActionTypes.USE_SYRINGE)
+              .stacksTo(1)
+              .tab(MEDICAL_TAB)));
+
+  public static final RegistryObject<Item> BLOOD_SYRINGE =
+      ITEMS.register("blood_syringe",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setAction(ActionTypes.USE_BLOOD_SYRINGE)
+              .stacksTo(1)
+              .tab(MEDICAL_TAB)));
+
+  public static final RegistryObject<Item> BANDAGE =
+      ITEMS.register("bandage",
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .setAction(ActionTypes.USE_BANDAGE)
+              .stacksTo(1)
+              .tab(MEDICAL_TAB)));
 }

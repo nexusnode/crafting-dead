@@ -28,68 +28,69 @@ public class CameraManager {
 
   private static final Random random = new Random();
 
-  private static final float LOOK_ROTATION_DECELERATION = 10.0F;
+  private static final float LOOK_ROTATION_DECELERATION_PER_SECOND = 100.0F;
+  private static final float JOLT_DECELERATION_PER_TICK = 1.0F;
 
-  private VelocitySmoother lookPitchSmoother = new VelocitySmoother(0.5F);
-  private VelocitySmoother lookYawSmoother = new VelocitySmoother(0.5F);
+  private FloatSmoother lookPitchSmoother = new FloatSmoother(0.5F);
+  private FloatSmoother lookYawSmoother = new FloatSmoother(0.5F);
 
   private float lastLookTime = Float.MIN_VALUE;
 
-  private VelocitySmoother pitchSmoother = new VelocitySmoother(1F);
+  private FloatSmoother joltPitchSmoother = new FloatSmoother(1.1F);
 
-  private float pitch;
-  private float lastPitch;
+  private float joltPitch;
+  private float lastJoltPitch;
 
-  private VelocitySmoother rollSmoother = new VelocitySmoother(1F);
+  private FloatSmoother joltRollSmoother = new FloatSmoother(0.75F);
 
-  private float roll;
-  private float lastRoll;
+  private float joltRoll;
+  private float lastJoltRoll;
 
-  public void joltCamera(float amountPercent, boolean modifyLookPosition) {
-    if (amountPercent == 0.0F) {
-      return;
+  public void randomRecoil(float pitchOffset, boolean modifyLookPosition) {
+    this.joltCamera(pitchOffset, pitchOffset * (random.nextBoolean() ? 1.0F : -1.0F) * 0.5F,
+        modifyLookPosition);
+  }
+
+  public void joltCamera(float pitchOffset, float yawOffset, boolean moveLookPosition) {
+    if (moveLookPosition) {
+      this.lookPitchSmoother.add(-pitchOffset);
+      this.lookYawSmoother.add(yawOffset);
     }
-    float randomAmount = amountPercent * (random.nextFloat() + 1.0F) / 2.0F;
-    float randomNegativeAmount = randomAmount * (random.nextBoolean() ? 1.0F : -1.0F);
-    if (modifyLookPosition) {
-      this.lookPitchSmoother.add(-randomAmount * 25.0F);
-      this.lookYawSmoother.add(randomNegativeAmount * 12.5F);
-    }
 
-    this.pitchSmoother.add(-randomAmount * 12.0F);
-    this.rollSmoother.add(randomNegativeAmount * 7.5F);
+    this.joltPitchSmoother.add(-pitchOffset * 0.175F);
+    this.joltRollSmoother.add(yawOffset * 0.75F);
   }
 
   public void tick() {
-    this.lastPitch = this.pitch;
-    this.pitch = this.pitchSmoother.getAndDecelerate(0.5F);
+    this.lastJoltPitch = this.joltPitch;
+    this.joltPitch = this.joltPitchSmoother.getAndDecelerate(JOLT_DECELERATION_PER_TICK);
 
-    this.lastRoll = this.roll;
-    this.roll = this.rollSmoother.getAndDecelerate(0.5F);
+    this.lastJoltRoll = this.joltRoll;
+    this.joltRoll = this.joltRollSmoother.getAndDecelerate(0.5F);
   }
 
   public void getLookRotationDelta(MutableVector2f result) {
     float currentTime = (float) NativeUtil.getTime();
-    float timeDelta = currentTime - this.lastLookTime;
+    float timeDelta = Math.min(currentTime - this.lastLookTime, 0.1F);
     this.lastLookTime = currentTime;
-    final float deceleration = timeDelta * LOOK_ROTATION_DECELERATION;
+    final float deceleration = timeDelta * LOOK_ROTATION_DECELERATION_PER_SECOND;
     result.set(this.lookPitchSmoother.getAndDecelerate(deceleration),
         this.lookYawSmoother.getAndDecelerate(deceleration));
   }
 
   public void getCameraRotations(float partialTicks, Vector3f result) {
-    result.set(this.lerpPitch(partialTicks), 0, this.lerpRoll(partialTicks));
+    result.set(this.lerpPitch(partialTicks), 0.0F, this.lerpRoll(partialTicks));
   }
 
   public float getFov(float partialTicks) {
-    return -this.lerpPitch(partialTicks) * 0.015F;
+    return -this.lerpPitch(partialTicks) * 0.025F;
   }
 
   private float lerpPitch(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastPitch, this.pitch);
+    return MathHelper.lerp(partialTicks, this.lastJoltPitch, this.joltPitch);
   }
 
   private float lerpRoll(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastRoll, this.roll);
+    return MathHelper.lerp(partialTicks, this.lastJoltRoll, this.joltRoll);
   }
 }

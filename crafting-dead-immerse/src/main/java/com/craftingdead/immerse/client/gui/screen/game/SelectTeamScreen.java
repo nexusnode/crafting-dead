@@ -20,9 +20,9 @@ package com.craftingdead.immerse.client.gui.screen.game;
 
 import com.craftingdead.immerse.client.gui.screen.game.shop.GameButton;
 import com.craftingdead.immerse.client.gui.view.Blur;
-import com.craftingdead.immerse.game.deathmatch.DeathmatchTeam;
-import com.craftingdead.immerse.game.deathmatch.message.RequestJoinTeamMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
+import com.craftingdead.immerse.game.tdm.TdmTeam;
+import com.craftingdead.immerse.game.tdm.message.RequestJoinTeamMessage;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
@@ -53,7 +53,7 @@ public class SelectTeamScreen extends Screen {
         (int) (this.height * 0.5F), 100, 20,
         JOIN_RED,
         btn -> {
-          GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.RED));
+          GameNetworkChannel.sendToServer(null, new RequestJoinTeamMessage(TdmTeam.RED));
           this.onClose();
         }));
 
@@ -61,7 +61,7 @@ public class SelectTeamScreen extends Screen {
         (int) (this.height * 0.5F), 100, 20,
         JOIN_BLUE,
         btn -> {
-          GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(DeathmatchTeam.BLUE));
+          GameNetworkChannel.sendToServer(null, new RequestJoinTeamMessage(TdmTeam.BLUE));
           this.onClose();
         }));
 
@@ -69,7 +69,7 @@ public class SelectTeamScreen extends Screen {
         (int) (this.height * 0.75F), 50, 10,
         SPECTATE,
         btn -> {
-          GameNetworkChannel.sendToServer(new RequestJoinTeamMessage(null));
+          GameNetworkChannel.sendToServer(null, new RequestJoinTeamMessage(null));
           this.onClose();
         }));
   }

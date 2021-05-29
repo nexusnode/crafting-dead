@@ -20,16 +20,15 @@ package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.game.shop.Shop;
+import com.craftingdead.immerse.game.module.shop.ClientShopModule;
+import com.craftingdead.immerse.game.module.shop.ShopItem;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -38,22 +37,18 @@ public class ItemButton extends GameButton implements InfoPanel {
 
   private final FontRenderer font = Minecraft.getInstance().font;
 
-  private final PlayerExtension<?> player;
-  private final Shop shop;
-  private final ItemStack itemStack;
-  private final int price;
+  private final ClientShopModule shop;
+  private final ShopItem item;
 
-  public ItemButton(ItemStack itemStack, PlayerExtension<?> player, Shop shop, int price) {
-    super(0, 0, 0, 0, itemStack.getDisplayName(), btn -> shop.buyItem(player, itemStack));
-    this.player = player;
+  public ItemButton(ClientShopModule shop, ShopItem item) {
+    super(0, 0, 0, 0, item.getItemStack().getDisplayName(), btn -> shop.buyItem(item.getId()));
     this.shop = shop;
-    this.itemStack = itemStack;
-    this.price = price;
+    this.item = item;
   }
 
   private ITextComponent getFormattedPrice() {
-    return new StringTextComponent("$" + this.price)
-        .withStyle(this.shop.canAfford(this.player, this.price)
+    return new StringTextComponent("$" + this.item.getPrice())
+        .withStyle(this.shop.canAfford(this.item.getPrice())
             ? TextFormatting.GREEN
             : TextFormatting.RED);
   }
@@ -61,7 +56,7 @@ public class ItemButton extends GameButton implements InfoPanel {
   @Override
   public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
-    if (this.price > 0) {
+    if (this.item.getPrice() > 0) {
       RenderUtil.renderTextRight(this.font, matrixStack, x + width - 2, y + 7,
           this.getFormattedPrice(), 0, true);
     }
@@ -79,12 +74,13 @@ public class ItemButton extends GameButton implements InfoPanel {
     RenderSystem.translatef(x + 10, y - 40, 0);
     double scale = 1.2D;
     RenderSystem.scaled(scale, scale, scale);
-    com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
+    com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.item.getItemStack(), 0, 0,
         0xFFFFFFFF, ItemCameraTransforms.TransformType.FIXED);
     RenderSystem.popMatrix();
 
     List<ITextComponent> itemInfo = new ArrayList<>();
-    this.itemStack.getItem().appendHoverText(this.itemStack, null, itemInfo, TooltipFlags.NORMAL);
+    this.item.getItemStack().getItem().appendHoverText(this.item.getItemStack(), null, itemInfo,
+        TooltipFlags.NORMAL);
 
     for (int i = 0; i < itemInfo.size(); i++) {
       ITextComponent info = itemInfo.get(i);

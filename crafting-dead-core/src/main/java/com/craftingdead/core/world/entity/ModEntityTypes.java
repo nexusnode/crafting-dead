@@ -91,9 +91,6 @@ public class ModEntityTypes {
               .sized(0.25F, 0.5F)
               .setShouldReceiveVelocityUpdates(false)));
 
-  public static final RegistryObject<EntityType<SupplyDropEntity>> SUPPLY_DROP =
-      ENTITY_TYPES.register("supply_drop", () -> create("supply_drop", EntityType.Builder
-          .of(SupplyDropEntity::new, EntityClassification.MISC)));
 
   private static <T extends Entity> EntityType<T> create(String registryName,
       EntityType.Builder<T> builder) {

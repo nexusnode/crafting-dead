@@ -22,13 +22,14 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameClient;
+import com.craftingdead.immerse.game.module.Module;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 
-public class SurvivalClient extends SurvivalGame implements GameClient {
+public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
 
   private static final ResourceLocation DAYS_SURVIVED =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/days_survived.png");
@@ -40,10 +41,8 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
   private final Minecraft minecraft = Minecraft.getInstance();
 
   @Override
-  public void renderOverlay(
-      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack,
-      int width,
-      int height, float partialTicks) {
+  public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
+      MatrixStack matrixStack, int width, int height, float partialTicks) {
     SurvivalPlayerHandler survivalPlayer =
         (SurvivalPlayerHandler) player.getExpectedHandler(SurvivalPlayerHandler.EXTENSION_ID);
     int y = height / 2;
@@ -67,15 +66,7 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
         String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 
     RenderSystem.disableBlend();
-  }
 
-  @Override
-  public void renderPlayerList(
-      PlayerExtension<? extends AbstractClientPlayerEntity> player, MatrixStack matrixStack,
-      int width,
-      int height, float partialTicks) {
-    this.minecraft.gui.getTabList().render(matrixStack, width,
-        this.minecraft.level.getScoreboard(),
-        this.minecraft.level.getScoreboard().getDisplayObjective(0));
+    return false;
   }
 }

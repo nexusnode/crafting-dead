@@ -133,9 +133,7 @@ public class SimpleGunClient<T extends AbstractGun<?, ?>> implements GunClient {
     this.lastShotCount = this.gun.getShotCount();
 
     if (entity == this.minecraft.getCameraEntity()) {
-      final float baseJolt = 0.05F;
-      this.client.getCameraManager()
-          .joltCamera(1.0F - this.gun.getAccuracy(living) + baseJolt, true);
+      this.client.getCameraManager().randomRecoil(this.gun.getType().getRecoil(), true);
     }
 
     this.gun.getAnimation(AnimationType.SHOOT).ifPresent(animation -> {
@@ -207,7 +205,7 @@ public class SimpleGunClient<T extends AbstractGun<?, ?>> implements GunClient {
 
     // If local player
     if (hitEntity == this.minecraft.getCameraEntity()) {
-      this.client.getCameraManager().joltCamera(1.5F, false);
+      this.client.getCameraManager().randomRecoil(1.5F, false);
     }
 
     final int particleCount = 12;
@@ -221,32 +219,34 @@ public class SimpleGunClient<T extends AbstractGun<?, ?>> implements GunClient {
   @Override
   public void handleHitBlock(LivingExtension<?, ?> living,
       BlockRayTraceResult rayTrace, boolean playSound) {
-    final Entity entity = living.getEntity();
+    Entity entity = living.getEntity();
     Vector3d hitVec3d = rayTrace.getLocation();
     BlockPos blockPos = rayTrace.getBlockPos();
-    BlockState blockState = entity.getCommandSenderWorld().getBlockState(blockPos);
-    World world = entity.getCommandSenderWorld();
+    World level = entity.level;
+    BlockState blockState = level.getBlockState(blockPos);
 
-    // Gets the hit sound to be played
-    SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
-    Material blockMaterial = blockState.getMaterial();
-    if (blockMaterial == Material.WOOD) {
-      hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
-    } else if (blockMaterial == Material.STONE) {
-      hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
-    } else if (blockMaterial == Material.METAL) {
-      hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
-          : ModSoundEvents.BULLET_IMPACT_METAL2.get();
-    } else if (blockMaterial == Material.GLASS) {
-      hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
+    if (playSound) {
+      // Gets the hit sound to be played
+      SoundEvent hitSound = ModSoundEvents.BULLET_IMPACT_DIRT.get();
+      Material blockMaterial = blockState.getMaterial();
+      if (blockMaterial == Material.WOOD) {
+        hitSound = ModSoundEvents.BULLET_IMPACT_WOOD.get();
+      } else if (blockMaterial == Material.STONE) {
+        hitSound = ModSoundEvents.BULLET_IMPACT_STONE.get();
+      } else if (blockMaterial == Material.METAL) {
+        hitSound = Math.random() > 0.5D ? ModSoundEvents.BULLET_IMPACT_METAL.get()
+            : ModSoundEvents.BULLET_IMPACT_METAL2.get();
+      } else if (blockMaterial == Material.GLASS) {
+        hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
+      }
+
+      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
+          hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
-
-    world.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
-        hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
-      world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.x(),
+      level.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.x(),
           hitVec3d.y(), hitVec3d.z(), 0.0D, 0.0D, 0.0D);
     }
   }

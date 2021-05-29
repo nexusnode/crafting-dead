@@ -32,14 +32,14 @@ public class PlayerDataMixin {
 
   @Inject(method = "save", at = @At("HEAD"), cancellable = true)
   private void save(CallbackInfo callbackInfo) {
-    if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer().persistPlayerData()) {
+    if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGame().persistPlayerData()) {
       callbackInfo.cancel();
     }
   }
 
   @Inject(method = "load", at = @At("HEAD"), cancellable = true)
   private void load(CallbackInfoReturnable<CompoundNBT> callbackInfo) {
-    if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer().persistPlayerData()) {
+    if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGame().persistPlayerData()) {
       callbackInfo.setReturnValue(null);
     }
   }

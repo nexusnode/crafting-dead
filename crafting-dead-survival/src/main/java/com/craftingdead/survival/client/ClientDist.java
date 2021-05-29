@@ -19,21 +19,26 @@
 package com.craftingdead.survival.client;
 
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.ClientConfig;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.ModDist;
 import com.craftingdead.survival.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.survival.client.renderer.entity.GiantZombieRenderer;
+import com.craftingdead.survival.client.renderer.entity.SupplyDropRenderer;
+import com.craftingdead.survival.particles.SurvivalParticleTypes;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.particle.SpellParticle;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,16 +63,17 @@ public class ClientDist implements ModDist {
   }
 
   private static final ResourceLocation BLOOD =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/blood.png");
+      new ResourceLocation(CraftingDeadSurvival.ID, "textures/gui/blood.png");
   private static final ResourceLocation BLOOD_2 =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/blood_2.png");
+      new ResourceLocation(CraftingDeadSurvival.ID, "textures/gui/blood_2.png");
 
   private final Minecraft minecraft;
 
   public ClientDist() {
     this.minecraft = Minecraft.getInstance();
-    final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modBus.addListener(this::handleClientSetup);
+    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    modEventBus.addListener(this::handleClientSetup);
+    modEventBus.addListener(this::handleParticleFactoryRegisterEvent);
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
 
@@ -77,7 +83,8 @@ public class ClientDist implements ModDist {
   private void handleClientSetup(FMLClientSetupEvent event) {
     RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.PIPE_GRENADE.get(),
         CylinderGrenadeRenderer::new);
-
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.SUPPLY_DROP.get(),
+        SupplyDropRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.advancedZombie,
         AdvancedZombieRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.fastZombie,
@@ -92,6 +99,20 @@ public class ClientDist implements ModDist {
         AdvancedZombieRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.giantZombie,
         GiantZombieRenderer::new);
+  }
+
+  private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
+    ParticleManager particleEngine = this.minecraft.particleEngine;
+    particleEngine.register(SurvivalParticleTypes.MILITARY_LOOT_GEN.get(),
+        SpellParticle.Factory::new);
+    particleEngine.register(SurvivalParticleTypes.MEDIC_LOOT_GEN.get(),
+        SpellParticle.Factory::new);
+    particleEngine.register(SurvivalParticleTypes.CIVILIAN_LOOT_GEN.get(),
+        SpellParticle.Factory::new);
+    particleEngine.register(SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN.get(),
+        SpellParticle.Factory::new);
+    particleEngine.register(SurvivalParticleTypes.POLICE_LOOT_GEN.get(),
+        SpellParticle.Factory::new);
   }
 
   @SubscribeEvent

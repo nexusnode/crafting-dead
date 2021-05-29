@@ -52,7 +52,7 @@ public class FireBlockMixin {
   }
 
   private boolean blockBurningDisabled() {
-    GameServer gameServer = CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer();
+    GameServer gameServer = CraftingDeadImmerse.getInstance().getLogicalServer().getGame();
     return gameServer != null && gameServer.disableBlockBurning();
   }
 }

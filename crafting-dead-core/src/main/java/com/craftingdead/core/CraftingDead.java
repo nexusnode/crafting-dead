@@ -24,7 +24,6 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
-import com.craftingdead.core.data.ModLootTableProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -186,7 +185,6 @@ public class CraftingDead {
           new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
           event.getExistingFileHelper()));
       dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
-      dataGenerator.addProvider(new ModLootTableProvider(dataGenerator));
     }
   }
 

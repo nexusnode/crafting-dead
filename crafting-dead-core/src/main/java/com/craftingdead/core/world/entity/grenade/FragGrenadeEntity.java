@@ -45,7 +45,7 @@ public class FragGrenadeEntity extends GrenadeEntity {
   public void onMotionStop(int stopsCount) {}
 
   @Override
-  public void onActivationStateChange(boolean activated) {
+  public void activatedChanged(boolean activated) {
     if (activated) {
       if (!this.level.isClientSide()) {
         this.remove();

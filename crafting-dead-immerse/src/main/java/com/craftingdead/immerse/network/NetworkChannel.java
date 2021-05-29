@@ -58,22 +58,22 @@ public enum NetworkChannel {
     @Override
     protected void registerMessages(SimpleChannel simpleChannel) {
       simpleChannel
-          .messageBuilder(SyncGameMessage.class, 0x00, NetworkDirection.PLAY_TO_CLIENT)
-          .encoder(SyncGameMessage::encode)
-          .decoder(SyncGameMessage::decode)
-          .consumer(SyncGameMessage::handle)
-          .add();
-      simpleChannel
-          .messageBuilder(ChangeGameMessage.class, 0x01, NetworkDirection.PLAY_TO_CLIENT)
+          .messageBuilder(ChangeGameMessage.class, 0x00, NetworkDirection.PLAY_TO_CLIENT)
           .encoder(ChangeGameMessage::encode)
           .decoder(ChangeGameMessage::decode)
           .consumer(ChangeGameMessage::handle)
           .add();
       simpleChannel
-          .messageBuilder(DisplayKilledMessage.class, 0x02, NetworkDirection.PLAY_TO_CLIENT)
+          .messageBuilder(DisplayKilledMessage.class, 0x01, NetworkDirection.PLAY_TO_CLIENT)
           .encoder(DisplayKilledMessage::encode)
           .decoder(DisplayKilledMessage::decode)
           .consumer(DisplayKilledMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncGameMessage.class, 0x02, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncGameMessage::encode)
+          .decoder(SyncGameMessage::decode)
+          .consumer(SyncGameMessage::handle)
           .add();
     }
   };

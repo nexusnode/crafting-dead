@@ -18,13 +18,12 @@
 
 package com.craftingdead.immerse.client.renderer.entity.layer;
 
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.renderer.entity.layer.AbstractClothingLayer;
-import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.client.renderer.entity.layers.AbstractClothingLayer;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.GameClient;
-import com.craftingdead.immerse.game.team.Team;
-import com.craftingdead.immerse.game.team.TeamGame;
+import com.craftingdead.immerse.game.ClientGameWrapper;
+import com.craftingdead.immerse.game.module.ModuleTypes;
+import com.craftingdead.immerse.game.module.team.ClientTeamModule;
+import com.craftingdead.immerse.game.module.team.Team;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;
@@ -39,16 +38,17 @@ public class TeamClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
 
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
-    GameClient game = CraftingDeadImmerse.getInstance().getClientDist().getGameClient();
-    if (game instanceof TeamGame) {
-      // We need to have team as a variable because Java doesn't like it if we use flatMap on
-      // ITeam.getSkin because of something to do with generics.
-      Team team = livingEntity.getCapability(ModCapabilities.LIVING)
-          .<PlayerExtension<?>>cast()
-          .resolve()
-          .flatMap(((TeamGame<?>) game)::getPlayerTeam)
-          .orElse(null);
-      return team == null ? null : team.getSkin().orElse(null);
+    ClientGameWrapper gameWrapper =
+        CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
+    if (gameWrapper != null) {
+      ClientTeamModule<?> module =
+          (ClientTeamModule<?>) gameWrapper.getModule(ModuleTypes.TEAM.get());
+      if (module != null) {
+        // We need to have team as a variable because the compiler doesn't like it if we use flatMap
+        // on Team.getSkin because of something to do with generics.
+        Team team = module.getPlayerTeam(livingEntity.getUUID()).orElse(null);
+        return team == null ? null : team.getSkin().orElse(null);
+      }
     }
     return null;
   }

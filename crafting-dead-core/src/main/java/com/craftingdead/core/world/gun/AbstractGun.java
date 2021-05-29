@@ -258,7 +258,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public void setTriggerPressed(LivingExtension<?, ?> living, boolean triggerPressed, boolean sendUpdate) {
+  public void setTriggerPressed(LivingExtension<?, ?> living, boolean triggerPressed,
+      boolean sendUpdate) {
     if (triggerPressed && (!this.canShoot(living)
         || MinecraftForge.EVENT_BUS
             .post(new GunEvent.TriggerPressed(this, this.gunStack, living)))) {
@@ -406,10 +407,11 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   protected void processShot(LivingExtension<?, ?> living, ThreadTaskExecutor<?> executor) {
-    final Entity entity = living.getEntity();
+    Entity entity = living.getEntity();
+    World level = entity.level;
 
     // Magazine size will be synced to clients so only decrement this on the server.
-    if (!entity.level.isClientSide()
+    if (!level.isClientSide()
         && !(living.getEntity() instanceof PlayerEntity
             && ((PlayerEntity) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
@@ -423,7 +425,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     // Used to avoid playing the same hit sound more than once.
     RayTraceResult lastRayTraceResult = null;
     for (int i = 0; i < this.type.getBulletAmountToFire(); i++) {
-      final long randomSeed = entity.level.getGameTime() + i;
+      final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
       RayTraceResult rayTraceResult =
@@ -439,15 +441,14 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
             final BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) rayTraceResult;
             final boolean playSound;
             if (lastRayTraceResult instanceof BlockRayTraceResult) {
-              playSound = entity.level.getBlockState(
-                  ((BlockRayTraceResult) lastRayTraceResult).getBlockPos()) != entity.level
-                      .getBlockState(blockRayTraceResult.getBlockPos());
+              playSound =
+                  !level.getBlockState(((BlockRayTraceResult) lastRayTraceResult).getBlockPos())
+                      .equals(level.getBlockState(blockRayTraceResult.getBlockPos()));
             } else {
               playSound = true;
             }
-
             executor.execute(() -> this.hitBlock(living, (BlockRayTraceResult) rayTraceResult,
-                playSound && entity.level.isClientSide()));
+                playSound && level.isClientSide()));
             break;
           case ENTITY:
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
@@ -461,7 +462,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
               break;
             }
 
-            if (entity.level.isClientSide()) {
+            if (level.isClientSide()) {
               this.client.handleHitEntityPre(living,
                   entityRayTraceResult.getEntity(),
                   entityRayTraceResult.getLocation(),
@@ -472,7 +473,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
                 || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
                     .getRegistryName()
                     .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
-                    && entity.level.isClientSide();
+                    && level.isClientSide();
 
             executor.execute(() -> this.hitEntity(living, entityRayTraceResult.getEntity(),
                 entityRayTraceResult.getLocation(), playEntityHitSound));
@@ -568,7 +569,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
   }
 
-  private void hitBlock(LivingExtension<?, ?> living, BlockRayTraceResult rayTrace, boolean playSound) {
+  private void hitBlock(LivingExtension<?, ?> living, BlockRayTraceResult rayTrace,
+      boolean playSound) {
     final LivingEntity entity = living.getEntity();
     BlockPos blockPos = rayTrace.getBlockPos();
     BlockState blockState = entity.level.getBlockState(blockPos);

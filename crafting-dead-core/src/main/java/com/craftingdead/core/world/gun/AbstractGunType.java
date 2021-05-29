@@ -64,6 +64,11 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
   private final float accuracyPct;
 
   /**
+   * Recoil.
+   */
+  private final float recoil;
+
+  /**
    * Amount of "pellets" to be fired in a single shot. It is used by shotguns.
    */
   private final int bulletAmountToFire;
@@ -157,6 +162,7 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
     this.damage = builder.damage;
     this.reloadDurationTicks = builder.reloadDurationTicks;
     this.accuracyPct = builder.accuracy;
+    this.recoil = builder.recoil;
     this.bulletAmountToFire = builder.bulletAmountToFire;
     this.crosshair = builder.crosshair;
     this.fireModes = builder.fireModes;
@@ -202,6 +208,10 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
   public float getAccuracyPct() {
     return this.accuracyPct;
+  }
+
+  public float getRecoil() {
+    return this.recoil;
   }
 
   public double getRange() {
@@ -297,6 +307,8 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
     private float accuracy;
 
+    private float recoil;
+
     private double range;
 
     private boolean crosshair = true;
@@ -366,6 +378,11 @@ public abstract class AbstractGunType<T extends AbstractGun<?, ?>> {
 
     public SELF setAccuracy(float accuracy) {
       this.accuracy = accuracy;
+      return this.self();
+    }
+
+    public SELF setRecoil(float recoil) {
+      this.recoil = recoil;
       return this.self();
     }
 

@@ -27,31 +27,24 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.gui.IngameGui;
-import com.craftingdead.immerse.client.gui.screen.game.SelectTeamScreen;
-import com.craftingdead.immerse.client.gui.screen.game.shop.ShopScreen;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RoundedFrameShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.client.util.ServerPinger;
+import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
-import com.craftingdead.immerse.game.GameUtil;
-import com.craftingdead.immerse.game.team.AbstractTeamGame;
-import com.craftingdead.immerse.game.team.Team;
-import com.craftingdead.immerse.game.team.TeamGame;
 import com.craftingdead.immerse.server.LogicalServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -59,7 +52,7 @@ import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -87,14 +80,10 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
   private final Minecraft minecraft;
 
-  private float lastTime = 0F;
-
-  private float deltaTime;
-
   @Nullable
   private LogicalServer logicalServer;
 
-  private GameClient gameClient;
+  private ClientGameWrapper gameWrapper;
 
   private final SpectatorRenderer spectatorRenderer;
 
@@ -109,8 +98,35 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
     this.ingameGui = new IngameGui();
   }
 
+  @Nullable
+  public ClientGameWrapper getGameWrapper() {
+    return this.gameWrapper;
+  }
+
+  @Nullable
+  public GameClient getGameClient() {
+    return this.gameWrapper == null ? null : this.gameWrapper.getGame();
+  }
+
   public SpectatorRenderer getSpectatorRenderer() {
     return this.spectatorRenderer;
+  }
+
+  public IngameGui getIngameGui() {
+    return this.ingameGui;
+  }
+
+  public void loadGame(GameType gameType) {
+    logger.info("Loading game: {}", gameType.getRegistryName().toString());
+    try {
+      if (this.gameWrapper != null) {
+        this.gameWrapper.unload();
+      }
+      this.gameWrapper = new ClientGameWrapper(gameType.createGameClient());
+      this.gameWrapper.load();
+    } catch (Exception e) {
+      logger.error("Failed to load game", e);
+    }
   }
 
   @Override
@@ -118,38 +134,11 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
     return new LogicalServer(minecraftServer);
   }
 
-  public void loadGame(GameType gameType) {
-    logger.info("Loading game: {}", gameType.getRegistryName().toString());
-    try {
-      if (this.gameClient != null) {
-        this.gameClient.unload();
-      }
-      this.gameClient = gameType.createGameClient();
-      this.gameClient.load();
-    } catch (Exception e) {
-      this.minecraft.setScreen(new DisconnectedScreen(new MainMenuScreen(),
-          new TranslationTextComponent("connect.failed"),
-          new TranslationTextComponent("disconnect.genericReason", e.toString())));
-    }
-  }
-
   @Override
   public void onResourceManagerReload(IResourceManager resourceManager,
       Predicate<IResourceType> resourcePredicate) {
     RoundedRectShader.INSTANCE.compile(resourceManager);
     RoundedFrameShader.INSTANCE.compile(resourceManager);
-  }
-
-  public float getDeltaTime() {
-    return this.deltaTime;
-  }
-
-  public GameClient getGameClient() {
-    return this.gameClient;
-  }
-
-  public IngameGui getIngameGui() {
-    return this.ingameGui;
   }
 
   // ================================================================================
@@ -187,6 +176,14 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   // ================================================================================
 
   @SubscribeEvent
+  public void handlePlayerLoggedOut(ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    if (this.gameWrapper != null) {
+      this.gameWrapper.unload();
+      this.gameWrapper = null;
+    }
+  }
+
+  @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     final PlayerExtension<ClientPlayerEntity> player =
         CraftingDead.getInstance().getClientDist().getPlayer().orElse(null);
@@ -200,21 +197,22 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
     switch (event.getType()) {
       case ALL:
-        if (viewingPlayer != null && this.gameClient != null) {
+        if (viewingPlayer != null && this.getGameClient() != null) {
           this.ingameGui.renderOverlay(viewingPlayer, event.getMatrixStack(),
               event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
               event.getPartialTicks());
-          this.gameClient.renderOverlay(viewingPlayer, event.getMatrixStack(),
+          event.setCanceled(this.getGameClient().renderOverlay(viewingPlayer,
+              event.getMatrixStack(),
               event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
-              event.getPartialTicks());
+              event.getPartialTicks()));
         }
         break;
       case PLAYER_LIST:
-        if (player != null && this.gameClient != null) {
-          event.setCanceled(true);
-          this.gameClient.renderPlayerList(player, event.getMatrixStack(),
+        if (player != null && this.getGameClient() != null) {
+          event.setCanceled(this.getGameClient().renderPlayerList(player,
+              event.getMatrixStack(),
               event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
-              event.getPartialTicks());
+              event.getPartialTicks()));
         }
         break;
       default:
@@ -233,9 +231,8 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   public void handleClientTick(TickEvent.ClientTickEvent event) {
     switch (event.phase) {
       case START:
-        this.lastTime = (float) Math.ceil(this.lastTime);
-        if (this.gameClient != null) {
-          this.gameClient.tick();
+        if (this.gameWrapper != null) {
+          this.gameWrapper.tick();
         }
 
         ServerPinger.INSTANCE.pingPendingNetworks();
@@ -251,29 +248,8 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
             }
           }
 
-          if (worldFocused && this.gameClient != null) {
-            this.gameClient.getShop().ifPresent(shop -> {
-              // Consume key event
-              while (this.minecraft.options.keyInventory.consumeClick()) {
-                if (!this.minecraft.player.isSpectator()) {
-                  PlayerExtension<?> player = PlayerExtension.getExpected(this.minecraft.player);
-                  if (shop.getBuyTimeSeconds(player) > 0) {
-                    this.minecraft.setScreen(new ShopScreen(null, shop, player));
-                  } else {
-                    this.minecraft.gui.getChat().addMessage(GameUtil.formatMessage(
-                        new TranslationTextComponent("message.buy_time_expired")));
-                  }
-                }
-              }
-            });
-
-            if (this.gameClient instanceof TeamGame) {
-              while (SWITCH_TEAMS.consumeClick()) {
-                this.minecraft.setScreen(new SelectTeamScreen());
-              }
-            }
-
-            if (this.gameClient.disableSwapHands()) {
+          if (worldFocused && this.getGameClient() != null) {
+            if (this.getGameClient().disableSwapHands()) {
               while (this.minecraft.options.keySwapOffhand.consumeClick());
             }
           }
@@ -281,34 +257,6 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
         break;
       default:
         break;
-    }
-  }
-
-  @SubscribeEvent
-  public void handleRenderTick(TickEvent.RenderTickEvent event) {
-    switch (event.phase) {
-      case START:
-        float currentTime = (float) Math.floor(this.lastTime) + event.renderTickTime;
-        this.deltaTime = (currentTime - this.lastTime) * 50;
-        this.lastTime = currentTime;
-        break;
-      default:
-        break;
-    }
-  }
-
-  @SubscribeEvent
-  public void handleRenderArmClothing(RenderArmClothingEvent event) {
-    if (this.gameClient instanceof AbstractTeamGame) {
-      Team team = event.getPlayerEntity()
-          .getCapability(ModCapabilities.LIVING)
-          .<PlayerExtension<?>>cast()
-          .resolve()
-          .flatMap(((AbstractTeamGame<?>) this.gameClient)::getPlayerTeam)
-          .orElse(null);
-      if (team != null) {
-        team.getSkin().ifPresent(event::setClothingTexture);
-      }
     }
   }
 }

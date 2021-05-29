@@ -59,7 +59,7 @@ public class ServerPlayerEntityMixin {
 
   @Nullable
   private SpawnPoint getSpawnPoint() {
-    return CraftingDeadImmerse.getInstance().getLogicalServer().getGameServer()
+    return CraftingDeadImmerse.getInstance().getLogicalServer().getGame()
         .getSpawnPoint(PlayerExtension.getExpected((ServerPlayerEntity) (Object) this)).orElse(null);
   }
 }

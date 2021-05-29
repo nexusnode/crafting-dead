@@ -24,6 +24,7 @@ public class ServerConfig {
 
   public final ForgeConfigSpec.BooleanValue brokenLegsEnabled;
   public final ForgeConfigSpec.BooleanValue bleedingEnabled;
+  public final ForgeConfigSpec.BooleanValue disableZombies;
 
   public ServerConfig(ForgeConfigSpec.Builder builder) {
     builder.push("server");
@@ -34,6 +35,9 @@ public class ServerConfig {
       this.bleedingEnabled = builder
           .translation("options.craftingdeadsurvival.server.bleeding_enabled")
           .define("bleedingEnabled", true);
+      this.disableZombies = builder
+          .translation("options.craftingdeadsurvival.server.disable_zombies")
+          .define("disableZombies", false);
     }
   }
 }

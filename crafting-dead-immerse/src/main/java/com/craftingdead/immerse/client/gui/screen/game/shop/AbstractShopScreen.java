@@ -23,7 +23,7 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.craftingdead.immerse.game.shop.Shop;
+import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
@@ -43,13 +43,13 @@ public abstract class AbstractShopScreen extends Screen {
 
   private final Screen lastScreen;
 
-  private final Shop shop;
+  private final ClientShopModule shop;
 
   private final PlayerExtension<?> player;
 
   private int cachedBuyTime = -1;
 
-  public AbstractShopScreen(Screen lastScreen, Shop shop, PlayerExtension<?> player) {
+  public AbstractShopScreen(Screen lastScreen, ClientShopModule shop, PlayerExtension<?> player) {
     super(TITLE);
     this.lastScreen = lastScreen;
     this.shop = shop;
@@ -60,7 +60,7 @@ public abstract class AbstractShopScreen extends Screen {
     this.shopButtons.add(shopButton);
   }
 
-  public Shop getShop() {
+  public ClientShopModule getShop() {
     return this.shop;
   }
 
@@ -98,7 +98,7 @@ public abstract class AbstractShopScreen extends Screen {
 
   @Override
   public void tick() {
-    this.cachedBuyTime = this.shop.getBuyTimeSeconds(this.player);
+    this.cachedBuyTime = this.shop.getBuyTimeSeconds();
     if (this.cachedBuyTime <= 0) {
       this.onClose();
     }
@@ -151,11 +151,11 @@ public abstract class AbstractShopScreen extends Screen {
     final int spacing = 5;
     final int moneyHeight = 15;
 
-    boolean renderMoney = this.shop.getPlayerMoney(this.player) > -1;
+    boolean renderMoney = this.shop.getMoney() > -1;
     if (renderMoney) {
       RenderUtil.fillWithShadow(matrixStack, mx + 95, my - 80, 69, moneyHeight, 0x80000000);
       this.font.drawShadow(matrixStack,
-          new StringTextComponent("$" + this.shop.getPlayerMoney(this.player))
+          new StringTextComponent("$" + this.shop.getMoney())
               .withStyle(TextFormatting.BOLD, TextFormatting.GREEN),
           mx + 100, my - 76, 0);
     }

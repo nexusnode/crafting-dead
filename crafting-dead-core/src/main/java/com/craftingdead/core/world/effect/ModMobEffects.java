@@ -40,6 +40,9 @@ public class ModMobEffects {
   public static final RegistryObject<Effect> ADRENALINE =
       MOB_EFFECTS.register("adrenaline", AdrenalineMobEffect::new);
 
+  public static final RegistryObject<Effect> PARACHUTE =
+      MOB_EFFECTS.register("parachute", ParachuteMobEffect::new);
+
   /**
    * If the potion effect is not present, the potion effect is applied. Otherwise, overrides the
    * potion effect if its duration is longer than the current instance.

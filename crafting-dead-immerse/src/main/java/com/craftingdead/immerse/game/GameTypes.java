@@ -19,10 +19,12 @@
 package com.craftingdead.immerse.game;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.deathmatch.DeathmatchClient;
-import com.craftingdead.immerse.game.deathmatch.DeathmatchServer;
+import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.craftingdead.immerse.game.survival.SurvivalClient;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
+import com.craftingdead.immerse.game.tdm.TdmClient;
+import com.craftingdead.immerse.game.tdm.TdmNetworkProtocol;
+import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.mojang.serialization.Codec;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.RegistryObject;
@@ -39,8 +41,9 @@ public class GameTypes {
       Lazy.of(GAME_TYPES.makeRegistry("game_types", RegistryBuilder::new));
 
   public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("survival",
-      () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new));
+      () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new,
+          NetworkProtocol.EMPTY));
 
-  public static final RegistryObject<GameType> DEATHMATCH = GAME_TYPES.register("deathmatch",
-      () -> new GameType(DeathmatchServer.CODEC, () -> DeathmatchClient::new));
+  public static final RegistryObject<GameType> TEAM_DEATHMATCH = GAME_TYPES.register("tdm",
+      () -> new GameType(TdmServer.CODEC, () -> TdmClient::new, TdmNetworkProtocol.INSTANCE));
 }

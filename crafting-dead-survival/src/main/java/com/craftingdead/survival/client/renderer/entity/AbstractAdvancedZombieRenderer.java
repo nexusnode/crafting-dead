@@ -18,11 +18,11 @@
 
 package com.craftingdead.survival.client.renderer.entity;
 
-import com.craftingdead.core.client.renderer.entity.layer.ClothingLayer;
-import com.craftingdead.core.client.renderer.entity.layer.EquipmentLayer;
+import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
+import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.survival.CraftingDeadSurvival;
-import com.craftingdead.survival.client.renderer.entity.model.AdvancedZombieModel;
+import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombieEntity;
 import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

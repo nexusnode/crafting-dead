@@ -19,6 +19,7 @@
 package com.craftingdead.survival.data;
 
 import java.util.function.Consumer;
+import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.item.SurvivalItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
@@ -59,6 +60,29 @@ public class SurvivalRecipeProvider extends RecipeProvider {
         .define('s', Items.STICK)
         .define('r', Ingredient.of(SurvivalItems.CLEAN_RAG.get(), SurvivalItems.DIRTY_RAG.get()))
         .unlockedBy("has_stick", has(Items.STICK))
+        .save(consumer);
+
+    // ================================================================================
+    // Supply Drop Radios
+    // ================================================================================
+
+    ShapedRecipeBuilder.shaped(SurvivalItems.MILITARY_DROP_RADIO.get())
+        .pattern("iti")
+        .pattern("igi")
+        .pattern("iii")
+        .define('t', Items.REDSTONE_TORCH)
+        .define('i', Items.IRON_INGOT)
+        .define('g', Items.GOLD_INGOT)
+        .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
+        .save(consumer);
+    ShapedRecipeBuilder.shaped(SurvivalItems.MEDICAL_DROP_RADIO.get())
+        .pattern("iti")
+        .pattern("ifi")
+        .pattern("iii")
+        .define('t', Items.REDSTONE_TORCH)
+        .define('i', Items.IRON_INGOT)
+        .define('f', ModItems.FIRST_AID_KIT.get())
+        .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
         .save(consumer);
   }
 

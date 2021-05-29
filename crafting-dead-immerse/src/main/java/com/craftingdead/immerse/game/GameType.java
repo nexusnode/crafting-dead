@@ -19,7 +19,9 @@
 package com.craftingdead.immerse.game;
 
 import java.util.function.Supplier;
+import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
@@ -32,16 +34,24 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class GameType extends ForgeRegistryEntry<GameType> {
 
   public static final Codec<GameType> CODEC =
-      ResourceLocation.CODEC.xmap(registryName -> GameTypes.REGISTRY.get().getValue(registryName),
-          GameType::getRegistryName);
+      ResourceLocation.CODEC.flatXmap(registryName -> {
+        GameType gameType = GameTypes.REGISTRY.get().getValue(registryName);
+        return gameType == null
+            ? DataResult.error("Unknown registry key: " + registryName.toString())
+            : DataResult.success(gameType);
+      }, gameType -> DataResult.success(gameType.getRegistryName()));
 
   private final Codec<? extends GameServer> gameServerCodec;
   private final Supplier<SafeCallable<GameClient>> gameClientFactory;
 
+  private final NetworkProtocol networkProtocol;
+
   public GameType(Codec<? extends GameServer> gameServerCodec,
-      Supplier<SafeCallable<GameClient>> gameClientFactory) {
+      Supplier<SafeCallable<GameClient>> gameClientFactory,
+      NetworkProtocol networkProtocol) {
     this.gameServerCodec = gameServerCodec;
     this.gameClientFactory = gameClientFactory;
+    this.networkProtocol = networkProtocol;
   }
 
   public Codec<? extends GameServer> getGameServerCodec() {
@@ -54,6 +64,10 @@ public class GameType extends ForgeRegistryEntry<GameType> {
       throw new IllegalStateException("Attempting to create game client on a server!");
     }
     return gameClient;
+  }
+
+  public NetworkProtocol getNetworkProtocol() {
+    return this.networkProtocol;
   }
 
   public ITextComponent getDisplayName() {

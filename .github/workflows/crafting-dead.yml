@@ -29,7 +29,9 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: |
-       ./gradlew jar
+       ./gradlew crafting-dead-core:reobfJar
+       ./gradlew crafting-dead-immerse:reobfJar
+       ./gradlew crafting-dead-survival:reobfJar
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead

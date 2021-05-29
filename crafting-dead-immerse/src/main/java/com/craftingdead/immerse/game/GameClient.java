@@ -19,18 +19,48 @@
 package com.craftingdead.immerse.game;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.module.Module;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 
-public interface GameClient extends Game {
+public interface GameClient extends Game<Module> {
 
+  /**
+   * Disable off-hand usage.
+   * 
+   * @return <code>true</code> to disable, false</code> otherwise
+   */
   default boolean disableSwapHands() {
     return false;
   }
 
-  void renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks);
+  /**
+   * Render a custom in-game overlay.
+   * 
+   * @param player - the local player
+   * @param matrixStack - the {@link MatrixStack}
+   * @param width - screen width
+   * @param height - screen height
+   * @param partialTicks - partialTicks
+   * @return <code>true</code> to remove the vanilla overlay, <code>false</code> otherwise
+   */
+  default boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
+      MatrixStack matrixStack, int width, int height, float partialTicks) {
+    return false;
+  }
 
-  void renderPlayerList(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks);
+  /**
+   * Render a custom player list.
+   * 
+   * @param player - the local player
+   * @param matrixStack - the {@link MatrixStack}
+   * @param width - screen width
+   * @param height - screen height
+   * @param partialTicks - partialTicks
+   * @return <code>true</code> to remove the vanilla player list, <code>false</code> otherwise
+   */
+  default boolean renderPlayerList(PlayerExtension<? extends AbstractClientPlayerEntity> player,
+      MatrixStack matrixStack, int width, int height, float partialTicks) {
+    return false;
+  }
 }
