@@ -132,5 +132,8 @@ c4b55e91be879550397cbb6f0c7cf3e82b8161a4 data/craftingdead/recipes/trenchgun.jso
 2b7d9850d00ab828cb08e29b76a1693f83ef7988 data/craftingdead/recipes/vector.json
 90537a3b5ea70d090dcee0719e58489637988d76 data/craftingdead/tags/items/clothing.json
 c078eb6849d21a6e2ade8ce73c16a738ff2ec8f9 data/craftingdead/tags/items/hats.json
+539b1661193b0242f9275fa2156bf4ab57080d09 data/craftingdead/tags/items/magazines.json
 860c4aadd2021fa50481daebba11a73b249b5fdc data/craftingdead/tags/items/melees.json
 b1814b761dc540d346e7a2db95a258187a862e01 data/craftingdead/tags/items/syringes.json
+0219188d1bd2718fbd6ab3f9e841f85f791ee7a7 data/minecraft/advancements/recipes/building_blocks/iron_block.json
+e22e4d4aea26345861da53b3f537cebb74759c2c data/minecraft/recipes/iron_block.json

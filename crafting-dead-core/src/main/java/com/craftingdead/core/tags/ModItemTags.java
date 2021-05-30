@@ -30,6 +30,7 @@ public class ModItemTags {
   public static final IOptionalNamedTag<Item> CLOTHING = tag("clothing");
   public static final IOptionalNamedTag<Item> MELEES = tag("melees");
   public static final IOptionalNamedTag<Item> HATS = tag("hats");
+  public static final IOptionalNamedTag<Item> MAGAZINES = tag("magazines");
 
   public static final IOptionalNamedTag<Item> VIRUS_SYRINGE = tag("virus_syringe");
 

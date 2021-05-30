@@ -35,6 +35,45 @@ public class ModItemTagsProvider extends ItemTagsProvider {
 
   @Override
   public void addTags() {
+    this.tag(ModItemTags.MAGAZINES)
+        .add(ModItems.STANAG_BOX_MAGAZINE.get())
+        .add(ModItems.STANAG_DRUM_MAGAZINE.get())
+        .add(ModItems.STANAG_30_ROUND_MAGAZINE.get())
+        .add(ModItems.STANAG_20_ROUND_MAGAZINE.get())
+        .add(ModItems.MPT55_MAGAZINE.get())
+        .add(ModItems.AK47_30_ROUND_MAGAZINE.get())
+        .add(ModItems.FNFAL_MAGAZINE.get())
+        .add(ModItems.ACR_MAGAZINE.get())
+        .add(ModItems.G36C_MAGAZINE.get())
+        .add(ModItems.HK417_MAGAZINE.get())
+        .add(ModItems.M1911_MAGAZINE.get())
+        .add(ModItems.G18_MAGAZINE.get())
+        .add(ModItems.M9_MAGAZINE.get())
+        .add(ModItems.DESERT_EAGLE_MAGAZINE.get())
+        .add(ModItems.P250_MAGAZINE.get())
+        .add(ModItems.MAGNUM_MAGAZINE.get())
+        .add(ModItems.FN57_MAGAZINE.get())
+        .add(ModItems.P90_MAGAZINE.get())
+        .add(ModItems.VECTOR_MAGAZINE.get())
+        .add(ModItems.MP5A5_21_ROUND_MAGAZINE.get())
+        .add(ModItems.MP5A5_35_ROUND_MAGAZINE.get())
+        .add(ModItems.MAC10_EXTENDED_MAGAZINE.get())
+        .add(ModItems.MAC10_MAGAZINE.get())
+        .add(ModItems.SPORTER22_MAGAZINE.get())
+        .add(ModItems.M107_MAGAZINE.get())
+        .add(ModItems.AS50_MAGAZINE.get())
+        .add(ModItems.M1GARAND_MAGAZINE.get())
+        .add(ModItems.AWP_MAGAZINE.get())
+        .add(ModItems.TRENCHGUN_SHELLS.get())
+        .add(ModItems.MOSSBERG_SHELLS.get())
+        .add(ModItems.DMR_MAGAZINE.get())
+        .add(ModItems.TASER_CARTRIDGE.get())
+        .add(ModItems.M240B_MAGAZINE.get())
+        .add(ModItems.RPK_DRUM_MAGAZINE.get())
+        .add(ModItems.RPK_MAGAZINE.get())
+        .add(ModItems.MINIGUN_MAGAZINE.get())
+        .add(ModItems.MK48MOD_MAGAZINE.get());
+
     this.tag(ModItemTags.SYRINGES).add(ModItems.ADRENALINE_SYRINGE.get(),
         ModItems.SYRINGE.get(), ModItems.BLOOD_SYRINGE.get());
     this.tag(ModItemTags.CLOTHING).add(ModItems.ARMY_CLOTHING.get(),

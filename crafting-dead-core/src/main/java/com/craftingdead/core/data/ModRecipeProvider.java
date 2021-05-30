@@ -20,8 +20,10 @@ package com.craftingdead.core.data;
 
 import java.util.function.Consumer;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
+import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
@@ -29,6 +31,7 @@ import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
@@ -605,7 +608,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .save(consumer);
 
     // ================================================================================
-    // Miscellaneous
+    // Gun Parts
     // ================================================================================
 
     ShapedRecipeBuilder.shaped(ModItems.SMALL_BARREL.get())
@@ -706,6 +709,10 @@ public class ModRecipeProvider extends RecipeProvider {
         .define('i', Items.IRON_INGOT)
         .define('b', ModItems.MEDIUM_BOLT.get())
         .unlockedBy("has_medium_bolt", has(ModItems.MEDIUM_BOLT.get()))
+        .save(consumer);
+
+    CookingRecipeBuilder.smelting(Ingredient.of(ModItemTags.MAGAZINES), Items.IRON_BLOCK, 0.7F, 100)
+        .unlockedBy("has_magazine", has(ModItemTags.MAGAZINES))
         .save(consumer);
   }
 
