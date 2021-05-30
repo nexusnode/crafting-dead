@@ -67,17 +67,18 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
 
     this.motdComponent = new TextView<>(new YogaLayout()
         .setFlex(2)
+        .setWidthPercent(100)
         .setHeight(8), "...")
             .setOverflow(Overflow.HIDDEN)
             .setShadow(false)
             .setCentered(true);
-    this.pingComponent =
-        new TextView<>(new YogaLayout()
-            .setWidth(60F)
-            .setLeftMargin(10F)
-            .setHeight(8), "...")
-                .setShadow(false)
-                .setCentered(true);
+
+    this.pingComponent = new TextView<>(new YogaLayout()
+        .setWidth(60F)
+        .setLeftMargin(10F)
+        .setHeight(8), "...")
+            .setShadow(false)
+            .setCentered(true);
     this.playersAmountComponent = new TextView<>(new YogaLayout()
         .setWidth(60F)
         .setLeftMargin(10F)

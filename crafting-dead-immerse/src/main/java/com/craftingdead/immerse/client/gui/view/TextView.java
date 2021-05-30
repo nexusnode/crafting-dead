@@ -40,6 +40,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   private FontRenderer font;
   private boolean shadow;
   private boolean centered;
+
   private List<IReorderingProcessor> lines = new ArrayList<>();
 
   public TextView(L layout, ITextComponent text) {
@@ -70,15 +71,14 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   public TextView<L> setText(ITextComponent text) {
-    this.lines = null;
     this.text = text;
-    this.layout();
+    this.generateLines(this.getContentWidth());
     return this;
   }
 
   @Override
   public void layout() {
-    this.generateLines((int) this.getContentWidth());
+    this.generateLines(this.getContentWidth());
     super.layout();
   }
 
@@ -89,12 +89,12 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
       width = this.font.width(this.text.getString());
     }
 
-    this.generateLines((int) width);
+    this.generateLines(width);
     return new Vector2f(width, this.lines.size() * this.font.lineHeight);
   }
 
-  private void generateLines(int width) {
-    this.lines = this.font.split(this.text, width);
+  private void generateLines(float width) {
+    this.lines = this.font.split(this.text, MathHelper.ceil(width));
   }
 
   @Override
@@ -113,7 +113,6 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-
     matrixStack.pushPose();
     {
       matrixStack.translate(this.getScaledContentX(),
@@ -132,7 +131,8 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
           float x = this.centered
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
-          this.font.drawInBatch(line, x, 0.0F, 0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
+          this.font.drawInBatch(line, x, 0.0F,
+              0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
               this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
               RenderUtil.FULL_LIGHT);
         }

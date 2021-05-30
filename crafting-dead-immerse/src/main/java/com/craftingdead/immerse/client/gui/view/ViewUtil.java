@@ -120,11 +120,12 @@ public class ViewUtil {
           }
 
           if (text != null) {
-            View<?, YogaLayout> view =
-                new TextView<>(new YogaLayout().setWidthPercent(100.0F),
-                    ForgeHooks.newChatWithLinks(text))
-                        .setShadow(shadow)
-                        .setScale(scale);
+            View<?, YogaLayout> view = new TextView<>(
+                new YogaLayout()
+                    .setWidthPercent(100.0F),
+                ForgeHooks.newChatWithLinks(text))
+                    .setShadow(shadow)
+                    .setScale(scale);
             parentView.addChild(view);
           }
           break;
@@ -193,14 +194,19 @@ public class ViewUtil {
           DownloadUtil.downloadImageAsTexture(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {
                 view.setImage(image);
-                parentView.layout();
+                if (parentView.isAdded()) {
+                  parentView.layout();
+                }
               }), parentView.minecraft);
           break;
         default:
           break;
       }
     }
-    parentView.layout();
+
+    if (parentView.isAdded()) {
+      parentView.layout();
+    }
   }
 
   @Nullable

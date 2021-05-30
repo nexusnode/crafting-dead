@@ -931,6 +931,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.parent;
   }
 
+  public final boolean isAdded() {
+    return this.parent != null || this.screen != null;
+  }
+
   @Override
   public int compareTo(View<?, ?> another) {
     if (another == null) {

@@ -33,8 +33,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.INestedGuiEventHandler;
 
 public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C extends Layout>
-    extends View<SELF, L>
-    implements INestedGuiEventHandler {
+    extends View<SELF, L> implements INestedGuiEventHandler {
 
   private final List<View<?, C>> children = new ArrayList<>();
   @SuppressWarnings("unchecked")
@@ -76,6 +75,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
     this.layoutParent.addChild(view.getLayout(), view.index);
     view.parent = this;
+    view.layout();
     view.added();
 
     return this.self();

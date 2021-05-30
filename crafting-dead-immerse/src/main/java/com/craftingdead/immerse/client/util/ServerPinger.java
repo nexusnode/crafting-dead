@@ -94,8 +94,11 @@ public class ServerPinger {
           } else {
             this.receivedStatus = true;
             ServerStatusResponse status = packet.getStatus();
-            ITextComponent description = status.getDescription();
-            this.pingData.setMotd(description);
+            if (status.getDescription() != null) {
+              this.pingData.motd = status.getDescription();
+            } else {
+              this.pingData.motd = StringTextComponent.EMPTY;
+            }
             this.pingData.setServerVersion(
                 new StringTextComponent(status.getVersion().getName()));
             this.pingData.setVersion(status.getVersion().getProtocol());

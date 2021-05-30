@@ -158,7 +158,7 @@ public class CraftingDeadImmerse {
       case SERVER:
         return this.getLogicalServer().getGame();
       default:
-        throw new IllegalArgumentException("Unkown side: " + side.toString());
+        throw new IllegalArgumentException("Unknown side: " + side.toString());
     }
   }
 
