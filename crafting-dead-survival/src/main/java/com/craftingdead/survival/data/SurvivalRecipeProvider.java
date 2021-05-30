@@ -25,6 +25,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.common.Tags;
@@ -37,6 +38,11 @@ public class SurvivalRecipeProvider extends RecipeProvider {
 
   @Override
   protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+    ShapelessRecipeBuilder.shapeless(Items.STRING, 3)
+        .requires(Ingredient.of(SurvivalItems.CLEAN_RAG.get(), SurvivalItems.DIRTY_RAG.get()))
+        .unlockedBy("has_clean_rag", has(SurvivalItems.CLEAN_RAG.get()))
+        .unlockedBy("has_dirty_rag", has(SurvivalItems.DIRTY_RAG.get()))
+        .save(consumer);
     ShapedRecipeBuilder.shaped(SurvivalItems.PIPE_GRENADE.get())
         .pattern("bib")
         .pattern("igi")

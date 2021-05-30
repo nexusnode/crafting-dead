@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "minecraft:string"
+    ]
+  },
+  "criteria": {
+    "has_clean_rag": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdeadsurvival:clean_rag"
+          }
+        ]
+      }
+    },
+    "has_dirty_rag": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdeadsurvival:dirty_rag"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "minecraft:string"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_clean_rag",
+      "has_dirty_rag",
+      "has_the_recipe"
+    ]
+  ]
+}

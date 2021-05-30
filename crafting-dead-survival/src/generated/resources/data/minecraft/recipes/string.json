@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    [
+      {
+        "item": "craftingdeadsurvival:clean_rag"
+      },
+      {
+        "item": "craftingdeadsurvival:dirty_rag"
+      }
+    ]
+  ],
+  "result": {
+    "item": "minecraft:string",
+    "count": 3
+  }
+}
