@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.survival.world.entity;
@@ -80,7 +77,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       this.player.getEntity().removeEffect(SurvivalMobEffects.BROKEN_LEG.get());
     }
 
-    if (invulnerable && this.player.getEntity().hasEffect(SurvivalMobEffects.INFECTION.get())) {
+    if ((invulnerable || !CraftingDeadSurvival.serverConfig.infectionEnabled.get())
+        && this.player.getEntity().hasEffect(SurvivalMobEffects.INFECTION.get())) {
       this.player.getEntity().removeEffect(SurvivalMobEffects.INFECTION.get());
     }
   }
@@ -105,7 +103,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   @Override
   public boolean onAttacked(DamageSource source, float amount) {
     if (source.getEntity() instanceof ZombieEntity) {
-      infect(ZOMBIE_INFECTION_CHANCE);
+      this.infect(ZOMBIE_INFECTION_CHANCE);
     }
     return false;
   }
@@ -115,10 +113,10 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     if (!playerEntity.isCreative()
         && playerEntity.getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL
         && playerEntity.getRandom().nextFloat() < chance
-        && !playerEntity.hasEffect(SurvivalMobEffects.INFECTION.get())) {
+        && !playerEntity.hasEffect(SurvivalMobEffects.INFECTION.get())
+        && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
       playerEntity.displayClientMessage(new TranslationTextComponent("message.infected")
-          .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)),
-          true);
+          .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
       playerEntity.addEffect(new EffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
     }
   }

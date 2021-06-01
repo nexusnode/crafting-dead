@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.core.data;
@@ -23,7 +20,6 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
-import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
@@ -31,7 +27,6 @@ import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
@@ -711,7 +706,8 @@ public class ModRecipeProvider extends RecipeProvider {
         .unlockedBy("has_medium_bolt", has(ModItems.MEDIUM_BOLT.get()))
         .save(consumer);
 
-    CookingRecipeBuilder.smelting(Ingredient.of(ModItemTags.MAGAZINES), Items.IRON_BLOCK, 0.7F, 100)
+    ShapelessRecipeBuilder.shapeless(Items.IRON_INGOT, 4)
+        .requires(ModItemTags.MAGAZINES)
         .unlockedBy("has_magazine", has(ModItemTags.MAGAZINES))
         .save(consumer);
   }

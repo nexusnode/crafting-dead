@@ -50,189 +50,180 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class ServerPinger {
 
-  public static final ServerPinger INSTANCE = new ServerPinger();
+	public static final ServerPinger INSTANCE = new ServerPinger();
 
-  private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
-  private static final Executor executor = Executors.newFixedThreadPool(5,
-      new ThreadFactoryBuilder()
-          .setNameFormat("Server Pinger #%d")
-          .setDaemon(true)
-          .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
-          .build());
+	private static final Executor executor = Executors.newFixedThreadPool(5,
+			new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true)
+					.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger)).build());
 
-  private final List<NetworkManager> pendingPings =
-      Collections.synchronizedList(Lists.newArrayList());
+	private final List<NetworkManager> pendingPings = Collections.synchronizedList(Lists.newArrayList());
 
-  private ServerPinger() {}
+	private ServerPinger() {
+	}
 
-  public void ping(String hostName, int port, Consumer<PingData> callback) {
-    executor.execute(() -> {
-      NetworkManager networkManagger;
-      try {
-        networkManagger =
-            NetworkManager.connectToServer(InetAddress.getByName(hostName), port, false);
-      } catch (Throwable e) {
-        callback.accept(PingData.FAILED);
-        return;
-      }
+	public void ping(String hostName, int port, Consumer<PingData> callback) {
+		executor.execute(() -> {
+			NetworkManager networkManagger;
+			try {
+				networkManagger = NetworkManager.connectToServer(InetAddress.getByName(hostName), port, false);
+			} catch (Throwable e) {
+				callback.accept(PingData.FAILED);
+				return;
+			}
 
-      this.pendingPings.add(networkManagger);
+			this.pendingPings.add(networkManagger);
 
-      networkManagger.setListener(new IClientStatusNetHandler() {
+			networkManagger.setListener(new IClientStatusNetHandler() {
 
-        private boolean successful;
-        private boolean receivedStatus;
-        private long pingSentAt;
-        private PingData pingData = new PingData();
+				private boolean successful;
+				private boolean receivedStatus;
+				private long pingSentAt;
+				private PingData pingData = new PingData();
 
-        @Override
-        public void handleStatusResponse(SServerInfoPacket packet) {
-          if (this.receivedStatus) {
-            networkManagger
-                .disconnect(new TranslationTextComponent("multiplayer.status.unrequested"));
-          } else {
-            this.receivedStatus = true;
-            ServerStatusResponse status = packet.getStatus();
-            if (status.getDescription() != null) {
-              this.pingData.motd = status.getDescription();
-            } else {
-              this.pingData.motd = StringTextComponent.EMPTY;
-            }
-            this.pingData.setServerVersion(
-                new StringTextComponent(status.getVersion().getName()));
-            this.pingData.setVersion(status.getVersion().getProtocol());
-            this.pingData.setPlayersAmount(
-                new StringTextComponent(status.getPlayers().getNumPlayers() + "/" +
-                    status.getPlayers().getMaxPlayers()));
-            this.pingSentAt = Util.getMillis();
-            networkManagger.send(new CPingPacket(this.pingSentAt));
-            this.successful = true;
-          }
-        }
+				@Override
+				public void handleStatusResponse(SServerInfoPacket packet) {
+					if (this.receivedStatus) {
+						networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.unrequested"));
+					} else {
+						this.receivedStatus = true;
+						ServerStatusResponse status = packet.getStatus();
+						if (status.getDescription() != null) {
+							this.pingData.motd = status.getDescription();
+						} else {
+							this.pingData.motd = StringTextComponent.EMPTY;
+						}
+						this.pingData.setServerVersion(new StringTextComponent(status.getVersion().getName()));
+						this.pingData.setVersion(status.getVersion().getProtocol());
+						this.pingData.setPlayersAmount(new StringTextComponent(
+								status.getPlayers().getNumPlayers() + "/" + status.getPlayers().getMaxPlayers()));
+						this.pingSentAt = Util.getMillis();
+						networkManagger.send(new CPingPacket(this.pingSentAt));
+						this.successful = true;
+					}
+				}
 
-        @Override
-        public void handlePongResponse(SPongPacket packetIn) {
-          long i = this.pingSentAt;
-          long j = Util.getMillis();
-          pingData.setPing(j - i);
-          networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.finished"));
-        }
+				@Override
+				public void handlePongResponse(SPongPacket packetIn) {
+					long i = this.pingSentAt;
+					long j = Util.getMillis();
+					pingData.setPing(j - i);
+					networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.finished"));
+				}
 
-        @Override
-        public void onDisconnect(ITextComponent reason) {
-          if (!this.successful) {
-            logger.error("Can't ping {}:{} Reason: {}", hostName, port, reason.getString());
-            pingData.setMotd(new TranslationTextComponent("multiplayer.status.cannot_connect"));
-            pingData.setPlayersAmount(
-                new TranslationTextComponent("menu.play.server_list.failed_to_load"));
-          }
-          callback.accept(pingData);
-        }
+				@Override
+				public void onDisconnect(ITextComponent reason) {
+					if (!this.successful) {
+						logger.error("Can't ping {}:{} Reason: {}", hostName, port, reason.getString());
+						pingData.setMotd(new TranslationTextComponent("multiplayer.status.cannot_connect"));
+						pingData.setPlayersAmount(new StringTextComponent("?"));
+					}
+					callback.accept(pingData);
+				}
 
-        @Override
-        public NetworkManager getConnection() {
-          return networkManagger;
-        }
-      });
+				@Override
+				public NetworkManager getConnection() {
+					return networkManagger;
+				}
+			});
 
-      try {
-        networkManagger.send(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
-        networkManagger.send(new CServerQueryPacket());
-      } catch (Throwable t) {
-        callback.accept(PingData.FAILED);
-      }
-    });
-  }
+			try {
+				networkManagger.send(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
+				networkManagger.send(new CServerQueryPacket());
+			} catch (Throwable t) {
+				callback.accept(PingData.FAILED);
+			}
+		});
+	}
 
-  public void pingPendingNetworks() {
-    synchronized (this.pendingPings) {
-      Iterator<NetworkManager> iterator = this.pendingPings.iterator();
+	public void pingPendingNetworks() {
+		synchronized (this.pendingPings) {
+			Iterator<NetworkManager> iterator = this.pendingPings.iterator();
 
-      while (iterator.hasNext()) {
-        NetworkManager networkmanager = iterator.next();
-        if (networkmanager.isConnected()) {
-          networkmanager.tick();
-        } else {
-          iterator.remove();
-          networkmanager.handleDisconnection();
-        }
-      }
+			while (iterator.hasNext()) {
+				NetworkManager networkmanager = iterator.next();
+				if (networkmanager.isConnected()) {
+					networkmanager.tick();
+				} else {
+					iterator.remove();
+					networkmanager.handleDisconnection();
+				}
+			}
 
-    }
-  }
+		}
+	}
 
-  public void clearPendingNetworks() {
-    synchronized (this.pendingPings) {
-      Iterator<NetworkManager> iterator = this.pendingPings.iterator();
-      while (iterator.hasNext()) {
-        NetworkManager networkmanager = iterator.next();
-        if (networkmanager.isConnected()) {
-          iterator.remove();
-          networkmanager.disconnect(new TranslationTextComponent("multiplayer.status.cancelled"));
-        }
-      }
+	public void clearPendingNetworks() {
+		synchronized (this.pendingPings) {
+			Iterator<NetworkManager> iterator = this.pendingPings.iterator();
+			while (iterator.hasNext()) {
+				NetworkManager networkmanager = iterator.next();
+				if (networkmanager.isConnected()) {
+					iterator.remove();
+					networkmanager.disconnect(new TranslationTextComponent("multiplayer.status.cancelled"));
+				}
+			}
 
-    }
-  }
+		}
+	}
 
-  public static class PingData {
-    public static final PingData FAILED;
-    static {
-      FAILED = new PingData();
-      FAILED.ping = -1L;
-      FAILED.motd = new TranslationTextComponent("multiplayer.status.cannot_connect")
-          .withStyle(TextFormatting.RED);
-      FAILED.serverVersion = new TranslationTextComponent("multiplayer.status.old");
-      FAILED.version = 0;
-      FAILED.playersAmount = new StringTextComponent("?");
-    }
+	public static class PingData {
+		public static final PingData FAILED;
+		static {
+			FAILED = new PingData();
+			FAILED.ping = -1L;
+			FAILED.motd = new TranslationTextComponent("multiplayer.status.cannot_connect")
+					.withStyle(TextFormatting.RED);
+			FAILED.serverVersion = new TranslationTextComponent("multiplayer.status.old");
+			FAILED.version = 0;
+			FAILED.playersAmount = new StringTextComponent("?");
+		}
 
-    private long ping;
-    private ITextComponent motd;
-    private ITextComponent serverVersion;
-    private ITextComponent playersAmount;
-    private int version;
+		private long ping;
+		private ITextComponent motd;
+		private ITextComponent serverVersion;
+		private ITextComponent playersAmount;
+		private int version;
 
+		public long getPing() {
+			return ping;
+		}
 
-    public long getPing() {
-      return ping;
-    }
+		public void setPing(long ping) {
+			this.ping = ping;
+		}
 
-    public void setPing(long ping) {
-      this.ping = ping;
-    }
+		public ITextComponent getMotd() {
+			return motd;
+		}
 
-    public ITextComponent getMotd() {
-      return motd;
-    }
+		public void setMotd(ITextComponent motd) {
+			this.motd = motd;
+		}
 
-    public void setMotd(ITextComponent motd) {
-      this.motd = motd;
-    }
+		public ITextComponent getPlayersAmount() {
+			return playersAmount;
+		}
 
-    public ITextComponent getPlayersAmount() {
-      return playersAmount;
-    }
+		public void setPlayersAmount(ITextComponent playersAmount) {
+			this.playersAmount = playersAmount;
+		}
 
-    public void setPlayersAmount(ITextComponent playersAmount) {
-      this.playersAmount = playersAmount;
-    }
+		public ITextComponent getServerVersion() {
+			return serverVersion;
+		}
 
-    public ITextComponent getServerVersion() {
-      return serverVersion;
-    }
+		public void setServerVersion(ITextComponent serverVersion) {
+			this.serverVersion = serverVersion;
+		}
 
-    public void setServerVersion(ITextComponent serverVersion) {
-      this.serverVersion = serverVersion;
-    }
+		public int getVersion() {
+			return version;
+		}
 
-    public int getVersion() {
-      return version;
-    }
-
-    public void setVersion(int version) {
-      this.version = version;
-    }
-  }
+		public void setVersion(int version) {
+			this.version = version;
+		}
+	}
 }
