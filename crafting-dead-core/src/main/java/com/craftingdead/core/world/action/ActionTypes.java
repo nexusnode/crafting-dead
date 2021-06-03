@@ -61,7 +61,7 @@ public class ActionTypes {
           (actionType, performer, target) -> new RefillableReloadAction(performer)));
 
   public static final RegistryObject<ActionType<?>> REMOVE_MAGAZINE =
-      ACTION_TYPES.register("remove_magazine", () -> new ActionType<>(false,
+      ACTION_TYPES.register("remove_magazine", () -> new ActionType<>(true,
           (actionType, performer, target) -> new RemoveMagazineAction(performer)));
 
   public static final RegistryObject<ActionType<ItemAction>> USE_SYRINGE =

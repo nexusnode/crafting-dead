@@ -94,7 +94,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   protected void finish() {
-    if (!this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
+    if (!this.performer.getEntity().level.isClientSide()) {
       // This will be synced to the client by the gun.
       this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
       if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
