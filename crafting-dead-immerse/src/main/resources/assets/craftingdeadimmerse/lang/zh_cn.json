@@ -1,4 +1,7 @@
 {    
+    "commands.game.restart":"重启游戏中",
+    "commands.game.reload_rotation":"重新加载",
+
     "message.first_blood_drawn": "%s抽取了第一滴血",
     "message.joined": "%s已加入游戏",
     "message.left": "%s已离开游戏",
@@ -22,7 +25,11 @@
     "gui.screen.shop.buy_time": "购买时间: %s",
     "gui.screen.shop.selected": "已选择",
     "gui.screen.shop.inventory":"物品",
+
     "gui.screen.select_team.title":"选择队伍",
+    "gui.screen.select_team.join_red": "加入红队",
+    "gui.screen.select_team.join_blue": "加入蓝队",
+    "gui.screen.select_team.spectate": "旁观",
 
     "narrator.screen.start": "开始",
 
@@ -39,16 +46,22 @@
     "menu.play.dropdown.official": "官方",
     "menu.play.dropdown.singleplayer": "单机",
     "menu.play.dropdown.community": "社区",
+    "menu.play.dropdown.custom": "自定义",
     "menu.play.tab.survival": "生存",
     "menu.play.tab.tdm": "TDM",
 
-    "menu.play.server_list.motd": "公告",
-    "menu.play.server_list.map": "地图",
-    "menu.play.server_list.ping": "延迟",
-    "menu.play.server_list.players": "玩家",
-    "menu.play.server_list.failed_to_load": "?",
-    "menu.play.server_list.button.play": "开始",
-    "menu.play.server_list.button.refresh": "刷新",
+    "view.play.server_list.motd": "公告",
+    "view.play.server_list.map": "地图",
+    "view.play.server_list.ping": "延迟",
+    "view.play.server_list.players": "玩家",
+    "view.play.server_list.failed_to_load": "?",
+    "view.play.server_list.button.play": "开始",
+    "view.play.server_list.button.refresh": "刷新",
+    "view.server_list.button.quick_refresh": "快速刷新",
+    "view.mutable_server_list.button.add": "添加",
+    "view.mutable_server_list.button.edit": "编辑",
+    "view.mutable_server_list.button.remove": "移除",
+    "view.mutable_server_list.button.direct_connect": "直接连接",
 
     "menu.play.world_list.button.play": "开始",
     "menu.play.world_list.button.create": "创建",
