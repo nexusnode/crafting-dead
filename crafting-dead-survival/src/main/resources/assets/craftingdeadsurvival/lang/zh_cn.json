@@ -1,9 +1,23 @@
 {
-  "options.craftingdeadsurvival.client.display_blood": "显示血液",
   "options.craftingdeadsurvival.server.broken_legs_enabled":"骨折已启用",
   "options.craftingdeadsurvival.server.bleeding_enabled":"流血已启用",
+  "options.craftingdeadsurvival.server.disable_zombies":"关闭丧尸",
+  "options.craftingdeadsurvival.server.infectionEnabled":"尸毒已启用",
+
+  "options.craftingdeadsurvival.client.display_blood": "显示血液",
 
   "enchantment.craftingdeadsurvival.infection": "尸毒",
+
+  "block.craftingdeadsurvival.military_loot_gen": "军用物资生成器",
+  "block.craftingdeadsurvival.military_loot": "军用物资",
+  "block.craftingdeadsurvival.police_loot_gen": "警用物资生成器",
+  "block.craftingdeadsurvival.police_loot": "警用物资",
+  "block.craftingdeadsurvival.medic_loot_gen": "医用物资生成器",
+  "block.craftingdeadsurvival.medic_loot": "医用物资",
+  "block.craftingdeadsurvival.civilian_loot_gen": "平民物资生成器",
+  "block.craftingdeadsurvival.civilian_loot": "平民物资",
+  "block.craftingdeadsurvival.civilian_rare_loot_gen": "稀有的平民物资生成器",
+  "block.craftingdeadsurvival.civilian_rare_loot": "稀有的平民物资",
 
   "effect.craftingdeadsurvival.infection":"尸毒",
   "effect.craftingdeadsurvival.broken_leg": "骨折",
@@ -23,20 +37,25 @@
   "message.broken_leg": "你骨折了.",
   "message.bleeding": "你流血了!",
 
+  "death.attack.infection":"%1$s 忍受不了丧尸病毒而死",
   "death.attack.bleeding":"%1$s 因失血过多而死",
 
+  "action.craftingdeadsurvival.use_clean_rag.message":"使用干净的破布",
+  "action.craftingdeadsurvival.use_splint.message":"使用夹板",
   "action.craftingdeadsurvival.use_cure_syringe.message":"注射丧尸病毒解药",
   "action.craftingdeadsurvival.use_rbi_syringe.message":"注射丧尸病毒",
   "action.craftingdeadsurvival.wash_rag.message":"清洗绷带",
-  "action.craftingdeadsurvival.use_clean_rag.message":"包扎",
-  "action.craftingdeadsurvival.use_splint.message":"使用夹板",
+  "action.craftingdeadsurvival.shred_clothing.message":"撕碎衣服",
+
+  "itemGroup.craftingdeadsurvival": "行尸走肉生存模式",
 
   "item.craftingdeadsurvival.rbi_syringe": "带有尸毒的针",
   "item.craftingdeadsurvival.cure_syringe": "治疗尸毒的药剂",
   "item.craftingdeadsurvival.splint": "夹板",
-  "item.craftingdeadsurvival.clean_rag": "干净的破布",
   "item.craftingdeadsurvival.dirty_rag": "脏破布",
   "item.craftingdeadsurvival.bloody_rag": "带血的破布",
+  "item.craftingdeadsurvival.clean_rag": "干净的破布",
+
   "item.craftingdeadsurvival.military_drop_radio": "军用空投召唤器",
   "item.craftingdeadsurvival.medical_drop_radio": "医用空投召唤器",
   "item.craftingdeadsurvival.pipe_grenade": "粘土炸弹",

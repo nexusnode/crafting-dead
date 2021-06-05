@@ -45,6 +45,7 @@
   "action.craftingdead.magazine_reload.message":"上弹中",
   "action.craftingdead.refillable_reload.message":"上弹中",
   "action.craftingdead.remove_magazine.message":"移除弹夹",
+  
   "action.craftingdead.use_syringe.message":"抽出液体",
   "action.craftingdead.use_first_aid_kit.message":"治疗中",
   "action.craftingdead.use_adrenaline_syringe.message":"注射肾上腺素",
@@ -312,7 +313,10 @@
   "item.craftingdead.grey_tactical_vest": "灰色战术背心",
   "item.craftingdead.riot_vest": "防暴背心",
   "item.craftingdead.tan_tactical_vest": "战术背心",
-  "item.craftingdead.fuel_tank": "燃料背包",
+
+  "item.craftingdead.parachute": "降落伞",
+
+  "item.modifiers.clothing":"穿戴时:",
 
   "item_lore.hat_item.headshot_reduction": "爆头伤害减免: ",
   "item_lore.hat_item.immune_to_flashes": "免疫闪光",
@@ -322,7 +326,6 @@
   "item_lore.remote_detonator": "右键单击以在%d米内远程引爆爆炸物",
   "item_lore.clothing.enhanced_protection": "增强保护: ",
   "item_lore.clothing.movement_speed": "移动速度: ",
-  "item_lore.clothing.immune_to_fire": "免疫火焰",
   "item_lore.magazine_item.armor_penetration": "护甲穿透: ",
   "item_lore.magazine_item.amount": "数量: ",
   "item_lore.magazine_item.entity_hit_recovery_chance": "实体命中恢复几率:",
