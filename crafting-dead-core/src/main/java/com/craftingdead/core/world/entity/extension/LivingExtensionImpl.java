@@ -32,6 +32,7 @@ import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.clothing.Clothing;
+import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.core.world.item.ModItems;
 import io.netty.buffer.Unpooled;
@@ -251,8 +252,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         .ifPresent(c -> c.tick(this.getEntity(), heldStack));
 
     this.updateClothing();
-    this.updateScubaClothing();
-    this.updateScubaMask();
+    this.updateHat();
 
     if (!this.entity.getCommandSenderWorld().isClientSide()) {
       // This is called at the start of the entity tick so it's equivalent of last tick's position.
@@ -294,22 +294,14 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
   }
 
-  private void updateScubaClothing() {
-    ItemStack clothingStack =
-        this.itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-    if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
-        && this.entity.isEyeInFluid(FluidTags.WATER)) {
-      this.entity
-          .addEffect(new EffectInstance(Effects.DOLPHINS_GRACE, 2, 0, false, false, false));
-    }
-  }
-
-  private void updateScubaMask() {
+  private void updateHat() {
     ItemStack headStack = this.itemHandler.getStackInSlot(InventorySlotType.HAT.getIndex());
+    Hat hat = headStack.getCapability(ModCapabilities.HAT).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
-      this.entity
-          .addEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
+      this.entity.addEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
+    } else if (hat != null && hat.hasNightVision()) {
+      this.entity.addEffect(new EffectInstance(Effects.NIGHT_VISION, 2, 0, false, false, false));
     }
   }
 
@@ -335,9 +327,15 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
           this.entity.clearFire();
         }
 
-        this.entity.addEffect(
-            new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
+        this.entity
+            .addEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
+    }
+
+    if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
+        && this.entity.isEyeInFluid(FluidTags.WATER)) {
+      this.entity
+          .addEffect(new EffectInstance(Effects.DOLPHINS_GRACE, 2, 0, false, false, false));
     }
 
     this.lastClothingStack = clothingStack;
