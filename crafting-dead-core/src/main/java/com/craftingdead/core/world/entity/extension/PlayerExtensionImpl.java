@@ -36,6 +36,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -109,9 +110,8 @@ class PlayerExtensionImpl<E extends PlayerEntity>
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack
         .getCapability(ModCapabilities.STORAGE)
-        .ifPresent(storage -> this.getEntity()
-            .openMenu(
-                new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
+        .ifPresent(storage -> this.getEntity().openMenu(
+            new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
   }
 
 
@@ -124,6 +124,11 @@ class PlayerExtensionImpl<E extends PlayerEntity>
           new KillFeedMessage(((KillFeedProvider) source).createKillFeedEntry(this.entity)));
     }
     return false;
+  }
+
+  @Override
+  boolean keepInventory() {
+    return this.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
   }
 
   @Override

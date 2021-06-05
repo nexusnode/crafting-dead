@@ -51,7 +51,6 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -365,15 +364,14 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
-    if (this.handlers.values().stream().map(e -> e.onDeathDrops(cause, drops))
-        .anyMatch(v -> v == true)) {
+    if (this.handlers.values().stream()
+        .filter(e -> e.onDeathDrops(cause, drops))
+        .findAny()
+        .isPresent()) {
       return true;
     }
-    boolean shouldKeepInventory =
-        this.getEntity().getCommandSenderWorld().getGameRules()
-            .getBoolean(GameRules.RULE_KEEPINVENTORY);
-    if (!shouldKeepInventory) {
-      // Adds items from CD inventory
+
+    if (!this.keepInventory()) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         ItemStack itemStack =
             this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
@@ -385,6 +383,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         }
       }
     }
+    return false;
+  }
+
+  boolean keepInventory() {
     return false;
   }
 
