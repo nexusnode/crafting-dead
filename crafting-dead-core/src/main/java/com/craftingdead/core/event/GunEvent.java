@@ -24,7 +24,7 @@ import java.util.Set;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.gun.attachment.Attachment;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -77,7 +77,7 @@ public abstract class GunEvent extends Event {
 
   public static class Initialize extends GunEvent {
 
-    private final Set<AttachmentItem> attachments = new HashSet<>();
+    private final Set<Attachment> attachments = new HashSet<>();
     private AmmoProvider ammoProvider;
 
     public Initialize(Gun gun, ItemStack itemStack, AmmoProvider ammoProvider) {
@@ -93,16 +93,14 @@ public abstract class GunEvent extends Event {
       return this.ammoProvider;
     }
 
-    public void addAttachment(AttachmentItem attachment) {
+    public void addAttachment(Attachment attachment) {
       this.attachments.add(attachment);
     }
 
-    public Set<AttachmentItem> getAttachments() {
+    public Set<Attachment> getAttachments() {
       return Collections.unmodifiableSet(this.attachments);
     }
   }
-
-
 
   @Cancelable
   public static class HitBlock extends Action {

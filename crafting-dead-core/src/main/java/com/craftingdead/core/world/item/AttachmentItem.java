@@ -18,11 +18,11 @@
 
 package com.craftingdead.core.world.item;
 
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import com.craftingdead.core.world.inventory.GunCraftSlotType;
+import java.util.function.Supplier;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.AttachmentLike;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,35 +32,18 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class AttachmentItem extends Item {
+public class AttachmentItem extends Item implements AttachmentLike {
 
-  private final Map<MultiplierType, Float> multipliers;
-  private final GunCraftSlotType inventorySlot;
-  private final boolean soundSuppressor;
-  private final boolean scope;
+  private final Supplier<Attachment> attachment;
 
-  public AttachmentItem(Properties properties) {
+  public AttachmentItem(Supplier<Attachment> attachment, Properties properties) {
     super(properties);
-    this.multipliers = properties.multipliers;
-    this.inventorySlot = properties.inventorySlot;
-    this.soundSuppressor = properties.soundSuppressor;
-    this.scope = properties.scope;
+    this.attachment = attachment;
   }
 
-  public Float getMultiplier(MultiplierType multiplierType) {
-    return this.multipliers.getOrDefault(multiplierType, 1.0F);
-  }
-
-  public GunCraftSlotType getInventorySlot() {
-    return this.inventorySlot;
-  }
-
-  public boolean isSoundSuppressor() {
-    return this.soundSuppressor;
-  }
-
-  public boolean isScope() {
-    return this.scope;
+  @Override
+  public String getDescriptionId() {
+    return this.attachment.get().getDescriptionId();
   }
 
   @Override
@@ -68,7 +51,8 @@ public class AttachmentItem extends Item {
       List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
     super.appendHoverText(stack, world, lines, tooltipFlag);
 
-    for (Entry<MultiplierType, Float> entry : this.multipliers.entrySet()) {
+    for (Entry<Attachment.MultiplierType, Float> entry : this.asAttachment()
+        .getMultipliers().entrySet()) {
       lines.add(new TranslationTextComponent(entry.getKey().getTranslationKey())
           .withStyle(TextFormatting.GRAY)
           .append(new StringTextComponent(" " + entry.getValue() + "x")
@@ -76,41 +60,8 @@ public class AttachmentItem extends Item {
     }
   }
 
-  public static enum MultiplierType {
-    DAMAGE, ACCURACY, ZOOM;
-
-    private final String translationKey = "attachment_multiplier_type." + this.name().toLowerCase();
-
-    public String getTranslationKey() {
-      return this.translationKey;
-    }
-  }
-
-  public static class Properties extends Item.Properties {
-
-    private final Map<MultiplierType, Float> multipliers = new EnumMap<>(MultiplierType.class);
-    private GunCraftSlotType inventorySlot;
-    private boolean soundSuppressor;
-    private boolean scope;
-
-    public Properties addMultiplier(MultiplierType modifierType, float multiplier) {
-      this.multipliers.put(modifierType, multiplier);
-      return this;
-    }
-
-    public Properties setSoundSuppressor(boolean soundSuppressor) {
-      this.soundSuppressor = soundSuppressor;
-      return this;
-    }
-
-    public Properties setInventorySlot(GunCraftSlotType inventorySlot) {
-      this.inventorySlot = inventorySlot;
-      return this;
-    }
-
-    public Properties setScope(boolean scope) {
-      this.scope = scope;
-      return this;
-    }
+  @Override
+  public Attachment asAttachment() {
+    return this.attachment.get();
   }
 }

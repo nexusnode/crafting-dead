@@ -1,0 +1,9 @@
+{
+  "type": "craftingdead:upgrade_magazine",
+  "magazine": {
+    "item": "craftingdead:stanag_20_round_magazine"
+  },
+  "nextTier": {
+    "item": "craftingdead:stanag_30_round_magazine"
+  }
+}

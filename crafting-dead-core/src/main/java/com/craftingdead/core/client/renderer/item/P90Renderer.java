@@ -21,9 +21,10 @@ package com.craftingdead.core.client.renderer.item;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelScarhIS2;
-import com.craftingdead.core.world.gun.GunTypes;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.type.GunTypes;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -98,9 +99,9 @@ public class P90Renderer extends GunRenderer {
     float scale = 0.6F;
     matrixStack.scale(scale, scale, scale);
 
-    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+    if (gun.getAttachments().contains(Attachments.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.0585F, 0.00F);
-    } else if (gun.getAttachments().contains(ModItems.ACOG_SIGHT.get())) {
+    } else if (gun.getAttachments().contains(Attachments.ACOG_SIGHT.get())) {
       matrixStack.translate(0F, 0.0555F, 0.00F);
     }
   }
@@ -167,22 +168,22 @@ public class P90Renderer extends GunRenderer {
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(Attachment attachment,
       MatrixStack matrixStack) {
 
-    if (attachmentItem == ModItems.SUPPRESSOR.get()) {
+    if (attachment == Attachments.SUPPRESSOR.get()) {
       matrixStack.translate(16.3F, 0.0F, 1.6F);
       float scale = 1F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
+    if (attachment == Attachments.RED_DOT_SIGHT.get()) {
       matrixStack.translate(4.25D, -2.5D, 0.482D);
       float scale = 0.75F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
+    if (attachment == Attachments.ACOG_SIGHT.get()) {
 
       matrixStack.translate(6D, -2.45D, 0.78D);
       float scale = 0.55F;

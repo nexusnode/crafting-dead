@@ -19,114 +19,134 @@
 package com.craftingdead.survival.world.action;
 
 import java.util.concurrent.ThreadLocalRandom;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.item.BlockActionEntry;
 import com.craftingdead.core.world.action.item.EntityActionEntry;
-import com.craftingdead.core.world.action.item.ItemAction;
+import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.craftingdead.survival.world.item.SurvivalItems;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
 public class SurvivalActionTypes {
 
-  @SuppressWarnings("unchecked")
-  public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
-      DeferredRegister.create((Class<ActionType<?>>) (Object) ActionType.class,
-          CraftingDeadSurvival.ID);
+  public static final DeferredRegister<ActionType> ACTION_TYPES =
+      DeferredRegister.create(ActionType.class, CraftingDeadSurvival.ID);
 
-  public static final RegistryObject<ActionType<ItemAction>> SHRED_CLOTHING =
-      ACTION_TYPES.register("shred_clothing", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> SHRED_CLOTHING =
+      ACTION_TYPES.register("shred_clothing",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(
                   itemStack -> itemStack.getCapability(ModCapabilities.CLOTHING).isPresent())
-              .addEntry(new EntityActionEntry(
-                  new EntityActionEntry.Properties().setCustomAction(Pair.of(extension -> {
-
+              .addEntry(EntityActionEntry.builder()
+                  .setCustomAction(extension -> {
                     ThreadLocalRandom random = ThreadLocalRandom.current();
                     int randomRagAmount = random.nextInt(3) + 3;
 
                     for (int i = 0; i < randomRagAmount; i++) {
                       if (random.nextBoolean()) {
-                        extension.getEntity()
-                            .spawnAtLocation(new ItemStack(SurvivalItems.CLEAN_RAG::get));
+                        extension.getEntity().spawnAtLocation(
+                            new ItemStack(SurvivalItems.CLEAN_RAG::get));
                       } else {
-                        extension.getEntity()
-                            .spawnAtLocation(new ItemStack(SurvivalItems.DIRTY_RAG::get));
+                        extension.getEntity().spawnAtLocation(
+                            new ItemStack(SurvivalItems.DIRTY_RAG::get));
                       }
                     }
-                  }, 1.0F))))
-              .build()));
+                  }, 1.0F)
+                  .build())
+              .build());
 
-  public static final RegistryObject<ActionType<ItemAction>> USE_SPLINT =
-      ACTION_TYPES.register("use_splint", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> USE_SPLINT =
+      ACTION_TYPES.register("use_splint",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(itemStack -> itemStack.getItem() == SurvivalItems.SPLINT.get())
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+              .addEntry(EntityActionEntry.builder()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
                       .andThen(extension -> (extension == null
                           || !extension.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get()))
                               ? null
-                              : extension))))
-              .build()));
+                              : extension))
+                  .build())
+              .build());
 
-  public static final RegistryObject<ActionType<ItemAction>> USE_CLEAN_RAG =
-      ACTION_TYPES.register("use_clean_rag", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> USE_CLEAN_RAG =
+      ACTION_TYPES.register("use_clean_rag",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.CLEAN_RAG.get())
               .setTotalDurationTicks(16)
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+              .addEntry(EntityActionEntry.builder()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
                       .andThen(extension -> (extension == null
                           || !extension.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get()))
                               ? null
                               : extension))
-                  .setReturnItem(SurvivalItems.BLOODY_RAG)))
-              .build()));
+                  .setReturnItem(SurvivalItems.BLOODY_RAG)
+                  .build())
+              .build());
 
-  public static final RegistryObject<ActionType<ItemAction>> WASH_RAG =
-      ACTION_TYPES.register("wash_rag", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> WASH_RAG =
+      ACTION_TYPES.register("wash_rag",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.DIRTY_RAG.get()
                       || itemStack.getItem() == SurvivalItems.BLOODY_RAG.get())
-              .addEntry(new BlockActionEntry(new BlockActionEntry.Properties()
+              .addEntry(BlockActionEntry.builder()
                   .setReturnItem(SurvivalItems.CLEAN_RAG)
                   .setFinishSound(SoundEvents.BUCKET_FILL)
                   .setPredicate(
-                      blockState -> blockState.getFluidState().getType() == Fluids.WATER)))
-              .build()));
+                      blockState -> blockState.getFluidState().getType() == Fluids.WATER)
+                  .build())
+              .build());
 
-  public static final RegistryObject<ActionType<ItemAction>> USE_CURE_SYRINGE =
-      ACTION_TYPES.register("use_cure_syringe", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> USE_SYRINGE =
+      ACTION_TYPES.register("use_syringe",
+          () -> ItemActionType.builder()
+              .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.SYRINGE.get())
+              .setTotalDurationTicks(16)
+              .addEntry(EntityActionEntry.builder()
+                  .setTargetSelector(EntityActionEntry.TargetSelector.OTHERS_ONLY
+                      .ofType(ZombieEntity.class))
+                  .setCustomAction(extension -> extension.getEntity().hurt(
+                      DamageSource.mobAttack(extension.getEntity()), 2.0F), 0.25F)
+                  .setCondition(() -> !ModItemTags.VIRUS_SYRINGE.getValues().isEmpty())
+                  .setReturnItem(() -> ModItemTags.VIRUS_SYRINGE.getValues().get(0))
+                  .build())
+              .build());
+
+  public static final RegistryObject<ActionType> USE_CURE_SYRINGE =
+      ACTION_TYPES.register("use_cure_syringe",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.CURE_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+              .addEntry(EntityActionEntry.builder()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
-                  .setReturnItem(ModItems.SYRINGE)))
-              .build()));
+                  .setReturnItem(ModItems.SYRINGE)
+                  .build())
+              .build());
 
-  public static final RegistryObject<ActionType<ItemAction>> USE_RBI_SYRINGE =
-      ACTION_TYPES.register("use_rbi_syringe", () -> new ActionType<>(false,
-          (actionType, performer, target) -> ItemAction.builder(actionType, performer, target)
+  public static final RegistryObject<ActionType> USE_RBI_SYRINGE =
+      ACTION_TYPES.register("use_rbi_syringe",
+          () -> ItemActionType.builder()
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.RBI_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(new EntityActionEntry(new EntityActionEntry.Properties()
+              .addEntry(EntityActionEntry.builder()
                   .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
                   .addEffect(
-                      Pair.of(new EffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999), 1.0F))
-                  .setReturnItem(ModItems.SYRINGE)))
-              .build()));
+                      () -> new EffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999), 1.0F)
+                  .setReturnItem(ModItems.SYRINGE)
+                  .build())
+              .build());
 }

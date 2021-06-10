@@ -1,0 +1,9 @@
+{
+  "type": "craftingdead:upgrade_magazine",
+  "magazine": {
+    "item": "craftingdead:mac10_magazine"
+  },
+  "nextTier": {
+    "item": "craftingdead:mac10_extended_magazine"
+  }
+}

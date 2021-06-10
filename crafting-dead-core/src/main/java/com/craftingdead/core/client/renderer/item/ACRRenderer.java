@@ -21,9 +21,10 @@ package com.craftingdead.core.client.renderer.item;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS1;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS2;
-import com.craftingdead.core.world.gun.GunTypes;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.type.GunTypes;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -90,7 +91,7 @@ public class ACRRenderer extends GunRenderer {
 
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(10.0F));
 
-    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+    if (gun.getAttachments().contains(Attachments.RED_DOT_SIGHT.get())) {
       matrixStack.mulPose(Vector3f.ZP.rotationDegrees(0.45F));
       matrixStack.translate(0F, 0.015F, 0F);
     }
@@ -99,9 +100,9 @@ public class ACRRenderer extends GunRenderer {
     matrixStack.translate(-0.6F, 0F, 0F);
     matrixStack.translate(0F, 0.05F, 0F);
 
-    if (gun.getAttachments().contains(ModItems.RED_DOT_SIGHT.get())) {
+    if (gun.getAttachments().contains(Attachments.RED_DOT_SIGHT.get())) {
       matrixStack.translate(0F, 0.003F, 0F);
-    } else if (gun.getAttachments().contains(ModItems.EOTECH_SIGHT.get())) {
+    } else if (gun.getAttachments().contains(Attachments.EOTECH_SIGHT.get())) {
       matrixStack.translate(0F, 0.0007F, 0.0005F);
     }
   }
@@ -196,38 +197,38 @@ public class ACRRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(Attachment attachment,
       MatrixStack matrixStack) {
 
-    if (attachmentItem == ModItems.LP_SCOPE.get()) {
+    if (attachment == Attachments.LP_SCOPE.get()) {
       matrixStack.translate(-3D, -5D, 0.498D);
       float scale = 0.75F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.HP_SCOPE.get()) {
+    if (attachment == Attachments.HP_SCOPE.get()) {
       matrixStack.translate(-3D, -5D, 0.498D);
       float scale = 0.75F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
+    if (attachment == Attachments.RED_DOT_SIGHT.get()) {
       matrixStack.translate(-3D, -4D, 0.498D);
       float scale = 0.75F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.SUPPRESSOR.get()) {
+    if (attachment == Attachments.SUPPRESSOR.get()) {
       matrixStack.translate(20D, -2.70D, 1.5D);
     }
 
-    if (attachmentItem == ModItems.TACTICAL_GRIP.get()) {
+    if (attachment == Attachments.TACTICAL_GRIP.get()) {
       matrixStack.translate(9D, -1.1D, 1.5D);
       float scale = 1.1F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.EOTECH_SIGHT.get()) {
+    if (attachment == Attachments.EOTECH_SIGHT.get()) {
       matrixStack.translate(-1.2D, -4.9D, 1D);
       float scale = 0.12F;
       matrixStack.scale(scale, scale, scale);

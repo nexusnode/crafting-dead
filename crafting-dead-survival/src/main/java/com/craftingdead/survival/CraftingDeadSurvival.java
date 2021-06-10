@@ -23,6 +23,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
+import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.action.ActionTypes;
+import com.craftingdead.core.world.action.item.ItemAction;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.client.ClientDist;
@@ -50,6 +54,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -164,6 +169,19 @@ public class CraftingDeadSurvival {
   // ================================================================================
   // Common Forge Events
   // ================================================================================
+
+  @SubscribeEvent
+  public void handlePerformAction(LivingExtensionEvent.PerformAction<ItemAction> event) {
+    Action action = event.getAction();
+    LivingExtension<?, ?> target = action.getTarget().orElse(null);
+    if (action.getType() == ActionTypes.USE_SYRINGE.get()
+        && target != null
+        && target.getEntity() instanceof ZombieEntity) {
+      event.setCanceled(true);
+      event.getLiving().performAction(
+          SurvivalActionTypes.USE_SYRINGE.get().createAction(action.getPerformer(), target), true);
+    }
+  }
 
   @SubscribeEvent
   public void handleMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {

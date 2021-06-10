@@ -94,7 +94,7 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   }
 
   public void playFakeShoot() {
-    this.playSound(this.gunItem.getGunType().getShootSound().get(), 1.5F, 1F);
+    this.playSound(this.gunItem.getGunType().getShootSound(), 1.5F, 1F);
     this.lastShotMs = Util.getMillis();
   }
 
@@ -111,8 +111,8 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   private static GunItem getRandomGun(Random random) {
     List<GunItem> possibleGuns = ModItems.ITEMS.getEntries().stream()
         .map(RegistryObject::get)
-        .filter(item -> item instanceof GunItem)
-        .map(item -> ((GunItem) item))
+        .filter(GunItem.class::isInstance)
+        .map(GunItem.class::cast)
         .collect(Collectors.toList());
 
     // Supposing the list will never be empty

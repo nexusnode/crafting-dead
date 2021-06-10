@@ -21,9 +21,10 @@ package com.craftingdead.core.client.renderer.item;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS1;
 import com.craftingdead.core.client.renderer.item.model.ModelPistolIS2;
-import com.craftingdead.core.world.gun.GunTypes;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.type.GunTypes;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -171,9 +172,9 @@ public class M9Renderer extends GunRenderer {
   }
 
   @Override
-  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(Attachment attachment,
       MatrixStack matrixStack) {
-    if (attachmentItem == ModItems.SUPPRESSOR.get()) {
+    if (attachment == Attachments.SUPPRESSOR.get()) {
       matrixStack.translate(12F, -0.3F, 1.2F);
       float scale = 0.9F;
       matrixStack.scale(scale, scale, scale);

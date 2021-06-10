@@ -282,7 +282,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
     // Render Game Information
 
     ITextComponent gameTitle =
-        this.getGameType().getDisplayName().copy().withStyle(TextFormatting.WHITE,
+        this.getType().getDisplayName().copy().withStyle(TextFormatting.WHITE,
             TextFormatting.BOLD);
     this.minecraft.font.drawShadow(matrixStack, gameTitle,
         sbx + sbwidth - 3 - this.minecraft.font.width(gameTitle),
@@ -358,7 +358,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension
-        && event.getLiving().getEntity().level.isClientSide()) {
+        && event.getLiving().getLevel().isClientSide()) {
       PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
       player.registerHandler(TdmPlayerHandler.ID,
           new TdmPlayerHandler(this, player));

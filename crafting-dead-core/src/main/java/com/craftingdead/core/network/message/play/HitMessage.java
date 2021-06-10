@@ -21,10 +21,10 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -60,13 +60,11 @@ public class HitMessage {
             .ifPresent(clientDist.getIngameGui()::displayHitMarker);
         if (msg.dead && ClientDist.clientConfig.killSoundEnabled.get()) {
           // Plays a sound that follows the player
-          PlayerEntity playerEntity = clientDist.getExpectedPlayer().getEntity();
           SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS
               .getValue(new ResourceLocation(ClientDist.clientConfig.killSound.get()));
           if (soundEvent != null) {
-            playerEntity.getCommandSenderWorld().playSound(
-                clientDist.getExpectedPlayer().getEntity(), playerEntity, soundEvent,
-                SoundCategory.HOSTILE, 5.0F, 1.5F);
+            Minecraft.getInstance().getSoundManager().play(
+                SimpleSound.forUI(soundEvent, 5.0F, 1.5F));
           }
         }
       });

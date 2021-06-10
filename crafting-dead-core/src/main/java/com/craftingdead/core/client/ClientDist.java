@@ -40,6 +40,7 @@ import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
+import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
@@ -56,14 +57,13 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.PaintItem;
+import com.craftingdead.core.world.item.RegisterGunColour;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -123,13 +123,13 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements ModDist {
 
@@ -262,7 +262,7 @@ public class ClientDist implements ModDist {
 
   @SuppressWarnings("unchecked")
   public PlayerExtension<ClientPlayerEntity> getExpectedPlayer() {
-    return ModCapabilities.getExpected(ModCapabilities.LIVING, this.minecraft.player,
+    return ModCapabilities.getOrThrow(ModCapabilities.LIVING, this.minecraft.player,
         PlayerExtension.class);
   }
 
@@ -400,35 +400,10 @@ public class ClientDist implements ModDist {
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
-    IItemColor gunColor = (stack, tintIndex) -> stack
-        .getCapability(ModCapabilities.GUN)
-        .resolve()
-        .flatMap(gunController -> gunController
-            .getPaintStack()
-            .getCapability(ModCapabilities.PAINT)
-            .resolve()
-            .flatMap(Paint::getColour))
-        .orElse(0xFFFFFF) | 0xFF << 24;
-
-    ModItems.ITEMS
-        .getEntries()
-        .stream()
-        .map(RegistryObject::get)
-        .filter(item -> item instanceof GunItem)
-        .forEach(item -> event.getItemColors().register(gunColor, item));
-
-    IItemColor paintColor = (stack, tintIndex) -> stack
-        .getCapability(ModCapabilities.PAINT)
-        .resolve()
-        .flatMap(Paint::getColour)
-        .orElse(Integer.MAX_VALUE);
-
-    ModItems.ITEMS
-        .getEntries()
-        .stream()
-        .map(RegistryObject::get)
-        .filter(item -> item instanceof PaintItem)
-        .forEach(item -> event.getItemColors().register(paintColor, () -> item));
+    IItemColor gunColour = (itemStack, tintIndex) -> GunRenderer.getColour(itemStack);
+    ForgeRegistries.ITEMS.getValues().stream()
+        .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColour.class))
+        .forEach(item -> event.getItemColors().register(gunColour, item));
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
@@ -479,8 +454,8 @@ public class ClientDist implements ModDist {
               if (gun.isTriggerPressed()) {
                 gun.setTriggerPressed(player, false, true);
               }
-              if (gun.isPerformingRightMouseAction()) {
-                gun.setPerformingRightMouseAction(player, false, true);
+              if (gun.isPerformingSecondaryAction()) {
+                gun.setPerformingSecondaryAction(player, false, true);
               }
             }
             return;
@@ -564,14 +539,13 @@ public class ClientDist implements ModDist {
         }
       } else if (this.minecraft.options.keyUse.matchesMouse(event.getButton())) {
         if (gun != null) {
-          switch (gun.getRightMouseActionTriggerType()) {
+          switch (gun.getSecondaryActionTrigger()) {
             case HOLD:
-              gun.setPerformingRightMouseAction(player, event.getAction() == GLFW.GLFW_PRESS, true);
+              gun.setPerformingSecondaryAction(player, event.getAction() == GLFW.GLFW_PRESS, true);
               break;
-            case CLICK:
+            case TOGGLE:
               if (event.getAction() == GLFW.GLFW_PRESS) {
-                gun.setPerformingRightMouseAction(player, !gun.isPerformingRightMouseAction(),
-                    true);
+                gun.setPerformingSecondaryAction(player, !gun.isPerformingSecondaryAction(), true);
               }
               break;
             default:
@@ -642,7 +616,7 @@ public class ClientDist implements ModDist {
 
         if (gun != null) {
           event.setCanceled(true);
-          if (gun.hasCrosshair()) {
+          if (gun.getClient().hasCrosshair()) {
             this.ingameGui.renderCrosshairs(gun.getAccuracy(player),
                 event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
                 event.getWindow().getGuiScaledHeight());

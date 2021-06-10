@@ -381,11 +381,6 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 5,
-          "name": "craftingdead:multi_paint"
-        },
-        {
-          "type": "minecraft:item",
           "weight": 20,
           "name": "craftingdead:stanag_20_round_magazine"
         },

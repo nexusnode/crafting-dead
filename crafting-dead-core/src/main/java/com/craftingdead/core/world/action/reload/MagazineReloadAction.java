@@ -20,10 +20,11 @@ package com.craftingdead.core.world.action.reload;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
-import com.craftingdead.core.world.action.ActionTypes;
+import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
@@ -46,8 +47,9 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   private MagazineLocation magazineLocation;
 
-  public MagazineReloadAction(LivingExtension<?, ?> performer) {
-    super(ActionTypes.MAGAZINE_RELOAD.get(), performer);
+  public MagazineReloadAction(ActionType type, LivingExtension<?, ?> performer,
+      @Nullable LivingExtension<?, ?> target) {
+    super(type, performer, target);
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
@@ -57,7 +59,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   @Override
   public boolean start() {
-    Optional<MagazineLocation> result = this.findMagazine(this.performer);
+    Optional<MagazineLocation> result = this.findMagazine(this.getPerformer());
     if (!result.isPresent()) {
       return false;
     }
@@ -72,20 +74,19 @@ public class MagazineReloadAction extends AbstractReloadAction {
   @Override
   protected void loadNewMagazineStack(boolean displayOnly) {
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
-    if (!displayOnly) {
-      if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.performer.getEntity()).addItem(this.oldMagazineStack);
-      }
+    if (!displayOnly
+        && !this.oldMagazineStack.isEmpty()
+        && this.getPerformer().getEntity() instanceof PlayerEntity) {
+      ((PlayerEntity) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
     }
   }
 
   @Override
   protected void revert() {
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);
-    ItemStack remainingStack =
-        this.magazineLocation.itemHandler.insertItem(this.magazineLocation.slot, newMagazineStack,
-            false);
-    this.performer.getEntity().spawnAtLocation(remainingStack);
+    ItemStack remainingStack = this.magazineLocation.itemHandler.insertItem(
+        this.magazineLocation.slot, this.newMagazineStack, false);
+    this.getPerformer().getEntity().spawnAtLocation(remainingStack);
   }
 
   private List<IItemHandler> collectItemHandlers(LivingExtension<?, ?> living) {

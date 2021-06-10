@@ -1,0 +1,9 @@
+{
+  "type": "craftingdead:upgrade_magazine",
+  "magazine": {
+    "item": "craftingdead:rpk_magazine"
+  },
+  "nextTier": {
+    "item": "craftingdead:rpk_drum_magazine"
+  }
+}

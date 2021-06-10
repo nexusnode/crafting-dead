@@ -18,30 +18,39 @@
 
 package com.craftingdead.core.world.gun;
 
-import com.craftingdead.core.client.animation.gun.GunAnimationController;
-import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import java.util.Optional;
+import com.craftingdead.core.client.animation.AnimationType;
+import com.craftingdead.core.client.animation.GunAnimation;
+import com.craftingdead.core.client.animation.GunAnimationController;
 
 public interface GunClient {
 
-  void handleTick(LivingExtension<?, ?> living);
+  /**
+   * If a crosshair should be rendered on the HUD for this gun.
+   * 
+   * @return <code>true</code> if it should be rendered, otherwise <code>false</code>
+   */
+  boolean hasCrosshair();
 
-  void handleShoot(LivingExtension<?, ?> living);
-
-  void handleHitEntityPre(LivingExtension<?, ?> living, Entity hitEntity,
-      Vector3d hitPos, long randomSeed);
-
-  void handleHitEntityPost(LivingExtension<?, ?> living, Entity hitEntity,
-      Vector3d hitPos, boolean playSound, boolean headshot);
-
-  void handleHitBlock(LivingExtension<?, ?> living, BlockRayTraceResult rayTrace,
-      boolean playSound);
-
-  void handleToggleRightMouseAction(LivingExtension<?, ?> living);
-
+  /**
+   * If the barrel of the gun is currently 'flashing'.
+   * 
+   * @return <code>true</code> if flashing, otherwise <code>false</code>
+   */
   boolean isFlashing();
 
+  /**
+   * Get the animation associated with the specified {@link AnimationType}.
+   * 
+   * @param animationType - the {@link AnimationType} to retrieve an animation for
+   * @return an optional {@link GunAnimation}
+   */
+  Optional<GunAnimation> getAnimation(AnimationType animationType);
+
+  /**
+   * Get the {@link GunAnimationController} associated with this gun.
+   * 
+   * @return the {@link GunAnimationController}
+   */
   GunAnimationController getAnimationController();
 }

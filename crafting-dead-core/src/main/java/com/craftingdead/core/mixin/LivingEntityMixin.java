@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
-import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -39,7 +38,7 @@ public abstract class LivingEntityMixin {
   @Inject(at = @At("RETURN"), method = "isImmobile", cancellable = true)
   private void isImmobile(CallbackInfoReturnable<Boolean> callbackInfo) {
     final LivingEntity livingEntity = (LivingEntity) (Object) this;
-    LivingExtension.getOptional(livingEntity).ifPresent(living -> {
+    livingEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       if (!callbackInfo.getReturnValue() && living.isMovementBlocked()) {
         callbackInfo.setReturnValue(true);
       }

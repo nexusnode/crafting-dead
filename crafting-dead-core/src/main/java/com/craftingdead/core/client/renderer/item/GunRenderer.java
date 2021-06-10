@@ -31,16 +31,14 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.animation.gun.GunAnimation;
+import com.craftingdead.core.client.animation.GunAnimation;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.world.gun.AbstractGunType;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.gun.paint.Paint;
-import com.craftingdead.core.world.item.AttachmentItem;
-import com.craftingdead.core.world.item.MagazineItem;
-import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.PaintItem;
+import com.craftingdead.core.world.gun.GunClient;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.type.AbstractGunType;
 import com.craftingdead.core.world.item.scope.Scope;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -88,7 +86,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
   private final ResourceLocation registryName;
 
-  private final AbstractGunType<?> gunType;
+  private final AbstractGunType gunType;
 
   protected float muzzleFlashX = 0.4F;
   protected float muzzleFlashY = 0.2F;
@@ -101,9 +99,19 @@ public abstract class GunRenderer implements IItemRenderer {
 
   private boolean wasSprinting;
 
-  public GunRenderer(ResourceLocation registryName, AbstractGunType<?> gunType) {
+  public GunRenderer(ResourceLocation registryName, AbstractGunType gunType) {
     this.registryName = registryName;
     this.gunType = gunType;
+  }
+
+  public static int getColour(ItemStack itemStack) {
+    // if (itemStack.getItem() instanceof IDyeableArmorItem) {
+    // IDyeableArmorItem item = (IDyeableArmorItem) itemStack.getItem();
+    // if (item.hasCustomColor(itemStack)) {
+    // return item.getColor(itemStack);
+    // }
+    // }
+    return 0xFFFFFFFF;
   }
 
   @Override
@@ -139,12 +147,15 @@ public abstract class GunRenderer implements IItemRenderer {
 
       this.applyGenericTransforms(gun, matrixStack);
 
-      this.renderGunModel(itemStack.hasFoil(), gun, ItemCameraTransforms.TransformType.FIXED,
-          matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(gun, itemStack.hasFoil(),
+      int colour = getColour(itemStack);
+
+      this.renderGunModel(itemStack.hasFoil(), colour, gun,
+          ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, packedLight,
+          packedOverlay);
+      this.renderMainGunAmmo(gun, itemStack.hasFoil(), colour,
           ItemCameraTransforms.TransformType.FIXED,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(gun, itemStack.hasFoil(),
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(), colour,
           ItemCameraTransforms.TransformType.FIXED,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
@@ -161,6 +172,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
     final Gun gun = itemStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
+    final GunClient gunClient = gun.getClient();
 
     final boolean scopeOverlayActive =
         gun instanceof Scope && ((Scope) gun).isAiming(entity)
@@ -181,7 +193,8 @@ public abstract class GunRenderer implements IItemRenderer {
         case FIRST_PERSON_RIGHT_HAND:
           if (entity instanceof AbstractClientPlayerEntity) {
             AbstractClientPlayerEntity playerEntity = (AbstractClientPlayerEntity) entity;
-            this.renderFirstPerson(playerEntity, itemStack, gun, transformType, partialTicks,
+            this.renderFirstPerson(playerEntity, itemStack, gun, gunClient, transformType,
+                partialTicks,
                 matrixStack,
                 renderTypeBuffer,
                 packedLight, packedOverlay);
@@ -194,8 +207,8 @@ public abstract class GunRenderer implements IItemRenderer {
               packedOverlay);
           break;
         case HEAD:
-          this.renderOnBack(entity, itemStack.hasFoil(), gun, partialTicks, matrixStack,
-              renderTypeBuffer, packedLight, packedOverlay);
+          this.renderOnBack(itemStack.hasFoil(), getColour(itemStack), gun, partialTicks,
+              matrixStack, renderTypeBuffer, packedLight, packedOverlay);
           break;
         default:
           break;
@@ -255,7 +268,8 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   private final void renderFirstPersonArms(AbstractClientPlayerEntity playerEntity,
-      ItemStack itemStack, Gun gun, ItemCameraTransforms.TransformType transformType,
+      ItemStack itemStack, Gun gun, GunClient gunClient,
+      ItemCameraTransforms.TransformType transformType,
       float partialTicks, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer,
       int packedLight) {
@@ -265,7 +279,7 @@ public abstract class GunRenderer implements IItemRenderer {
     // Right Hand
     matrixStack.pushPose();
     {
-      gun.getClient().getAnimationController().applyTransforms(playerEntity, itemStack,
+      gunClient.getAnimationController().applyTransforms(playerEntity, itemStack,
           GunAnimation.RIGHT_HAND, transformType, matrixStack, partialTicks);
 
       this.minecraft.getTextureManager().bind(playerEntity.getSkinTextureLocation());
@@ -283,7 +297,7 @@ public abstract class GunRenderer implements IItemRenderer {
     // Left Hand
     matrixStack.pushPose();
     {
-      gun.getClient().getAnimationController().applyTransforms(playerEntity, itemStack,
+      gunClient.getAnimationController().applyTransforms(playerEntity, itemStack,
           GunAnimation.LEFT_HAND, transformType, matrixStack, partialTicks);
 
       this.minecraft.getTextureManager().bind(playerEntity.getSkinTextureLocation());
@@ -320,7 +334,7 @@ public abstract class GunRenderer implements IItemRenderer {
       matrixStack.mulPose(Vector3f.XP.rotationDegrees(30));
       matrixStack.scale(this.muzzleScale + scale, this.muzzleScale + scale,
           this.muzzleScale + scale);
-      if (gun.getAttachments().contains(ModItems.SUPPRESSOR.get())) {
+      if (gun.getAttachments().contains(Attachments.SUPPRESSOR.get())) {
         this.muzzleFlashZ -= 0.4;
       }
       matrixStack.translate(this.muzzleFlashX - scale * this.muzzleFlashX / 2,
@@ -337,14 +351,15 @@ public abstract class GunRenderer implements IItemRenderer {
   }
 
   private final void renderFirstPerson(AbstractClientPlayerEntity playerEntity,
-      ItemStack itemStack, Gun gun, ItemCameraTransforms.TransformType transformType,
+      ItemStack itemStack, Gun gun, GunClient gunClient,
+      ItemCameraTransforms.TransformType transformType,
       float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
 
     final boolean aiming =
         gun instanceof Scope && ((Scope) gun).isAiming(playerEntity);
-    final boolean flash = gun.getClient().isFlashing();
+    final boolean flash = gunClient.isFlashing();
     if (flash) {
       packedLight = RenderUtil.FULL_LIGHT;
     }
@@ -355,8 +370,8 @@ public abstract class GunRenderer implements IItemRenderer {
         this.applyAimingTransforms(gun, matrixStack);
       } else {
         if (!playerEntity.isSprinting()) {
-          this.renderFirstPersonArms(playerEntity, itemStack, gun, transformType, partialTicks,
-              matrixStack, renderTypeBuffer, packedLight);
+          this.renderFirstPersonArms(playerEntity, itemStack, gun, gunClient, transformType,
+              partialTicks, matrixStack, renderTypeBuffer, packedLight);
         }
 
         if (flash) {
@@ -379,23 +394,25 @@ public abstract class GunRenderer implements IItemRenderer {
       }
       this.applySprintingTransforms(matrixStack, RenderUtil.easeInOutSine(zeroToOneFadePct));
 
-      gun.getClient().getAnimationController().applyTransforms(playerEntity, itemStack,
+      gunClient.getAnimationController().applyTransforms(playerEntity, itemStack,
           GunAnimation.BODY, transformType, matrixStack, partialTicks);
 
-      this.renderGunModel(itemStack.hasFoil(), gun, transformType, matrixStack, renderTypeBuffer,
-          packedLight, packedOverlay);
+      int colour = getColour(itemStack);
+
+      this.renderGunModel(itemStack.hasFoil(), colour, gun, transformType, matrixStack,
+          renderTypeBuffer, packedLight, packedOverlay);
 
       matrixStack.pushPose();
       {
-        gun.getClient().getAnimationController().applyTransforms(playerEntity, itemStack,
+        gunClient.getAnimationController().applyTransforms(playerEntity, itemStack,
             GunAnimation.MAGAZINE, transformType, matrixStack, partialTicks);
 
-        this.renderMainGunAmmo(gun, itemStack.hasFoil(), transformType, matrixStack,
+        this.renderMainGunAmmo(gun, itemStack.hasFoil(), colour, transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
       }
       matrixStack.popPose();
 
-      this.renderMainGunAttachments(gun, itemStack.hasFoil(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(), colour, transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.popPose();
@@ -407,30 +424,31 @@ public abstract class GunRenderer implements IItemRenderer {
       int packedOverlay) {
     matrixStack.pushPose();
     {
+      int colour = getColour(itemStack);
       this.applyThirdPersonTransforms(gun, matrixStack);
       gun.getClient().getAnimationController().applyTransforms(livingEntity, itemStack,
           GunAnimation.BODY, transformType, matrixStack, this.minecraft.getFrameTime());
-      this.renderGunModel(itemStack.hasFoil(), gun,
-          transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(gun, itemStack.hasFoil(), transformType, matrixStack,
+      this.renderGunModel(itemStack.hasFoil(),
+          colour, gun, transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+      this.renderMainGunAmmo(gun, itemStack.hasFoil(), colour, transformType, matrixStack,
           renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(gun, itemStack.hasFoil(), transformType,
+      this.renderMainGunAttachments(gun, itemStack.hasFoil(), colour, transformType,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.popPose();
   }
 
-  public void renderOnBack(LivingEntity entity, boolean glint,
+  public void renderOnBack(boolean glint, int colour,
       Gun gun, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay) {
     matrixStack.pushPose();
     {
       this.applyWearingTransforms(gun, matrixStack);
-      this.renderGunModel(glint, gun, ItemCameraTransforms.TransformType.HEAD,
+      this.renderGunModel(glint, colour, gun, ItemCameraTransforms.TransformType.HEAD,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAmmo(gun, glint, ItemCameraTransforms.TransformType.HEAD,
+      this.renderMainGunAmmo(gun, glint, colour, ItemCameraTransforms.TransformType.HEAD,
           matrixStack, renderTypeBuffer, packedLight, packedOverlay);
-      this.renderMainGunAttachments(gun, glint, ItemCameraTransforms.TransformType.HEAD,
+      this.renderMainGunAttachments(gun, glint, colour, ItemCameraTransforms.TransformType.HEAD,
           partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.popPose();
@@ -462,27 +480,18 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private final void renderGunModel(boolean glint, Gun gun,
+  private final void renderGunModel(boolean glint, int colour, Gun gun,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     matrixStack.pushPose();
     {
       matrixStack.translate(0.0D, 0.05D, 0.0D);
       IBakedModel bakedModel = this.getBakedModel(this.getGunModelLocation(),
-          gun.getPaint()
-              .resolve()
-              .flatMap(Paint::getSkin)
-              .map(skin -> ImmutableMap.of("base",
-                  Either.<RenderMaterial, String>left(new RenderMaterial(
-                      PlayerContainer.BLOCK_ATLAS,
-                      new ResourceLocation(skin.getNamespace(), "gun/"
-                          + this.registryName.getPath() + "_" + skin.getPath())))))
-              .orElse(null));
-      this.renderBakedModel(bakedModel, glint,
-          gun.getPaint()
-              .resolve()
-              .flatMap(Paint::getColour)
-              .orElse(-1),
+          gun.getPaintStack().isEmpty()
+              ? null
+              : ImmutableMap.of("base", Either.left(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
+                  this.getPaintSkinLocation(gun.getPaintStack().getItem().getRegistryName())))));
+      this.renderBakedModel(bakedModel, glint, colour,
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     matrixStack.popPose();
@@ -491,10 +500,8 @@ public abstract class GunRenderer implements IItemRenderer {
   protected final RenderMaterial getGunMaterial(Gun gun) {
     IUnbakedModel unbakedModel =
         ModelLoader.instance().getModelOrMissing(this.getGunModelLocation());
-    ResourceLocation skin = gun.getPaint()
-        .resolve()
-        .flatMap(Paint::getSkin)
-        .orElse(null);
+    ResourceLocation skin =
+        gun.getPaintStack().isEmpty() ? null : gun.getPaintStack().getItem().getRegistryName();
     if (unbakedModel instanceof BlockModel) {
       if (skin != null) {
         return new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
@@ -527,7 +534,7 @@ public abstract class GunRenderer implements IItemRenderer {
         });
   }
 
-  private void renderMainGunAttachments(Gun gun, boolean glint,
+  private void renderMainGunAttachments(Gun gun, boolean glint, int colour,
       ItemCameraTransforms.TransformType transformType, float partialTicks,
       MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int packedLight,
       int packedOverlay) {
@@ -543,21 +550,16 @@ public abstract class GunRenderer implements IItemRenderer {
     {
       float scale = 0.1F;
       matrixStack.scale(scale, scale, scale);
-      for (AttachmentItem attachmentItem : gun.getAttachments()) {
+      for (Attachment attachment : gun.getAttachments()) {
         matrixStack.pushPose();
         {
-          this.applyAttachmentTransforms(attachmentItem, matrixStack);
+          this.applyAttachmentTransforms(attachment, matrixStack);
           scale = 10F;
           matrixStack.scale(scale, scale, scale);
 
-          final IBakedModel bakedModel =
-              this.getBakedModel(
-                  this.getAttachmentModelLocation(attachmentItem.getRegistryName()), null);
-          this.renderBakedModel(bakedModel, glint,
-              gun.getPaint()
-                  .resolve()
-                  .flatMap(Paint::getColour)
-                  .orElse(-1),
+          final IBakedModel bakedModel = this.getBakedModel(
+              this.getAttachmentModelLocation(attachment.getRegistryName()), null);
+          this.renderBakedModel(bakedModel, glint, colour,
               transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
         }
         matrixStack.popPose();
@@ -566,7 +568,7 @@ public abstract class GunRenderer implements IItemRenderer {
     matrixStack.popPose();
   }
 
-  private void renderMainGunAmmo(Gun gun, boolean glint,
+  private void renderMainGunAmmo(Gun gun, boolean glint, int colour,
       ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
     ItemStack magazineStack = gun.getAmmoProvider().getMagazineStack();
@@ -591,11 +593,7 @@ public abstract class GunRenderer implements IItemRenderer {
               ImmutableMap.of("base", Either.left(this.getGunMaterial(gun))));
         }
 
-        this.renderBakedModel(magazineBakedModel, glint,
-            gun.getPaint()
-                .resolve()
-                .flatMap(Paint::getColour)
-                .orElse(-1),
+        this.renderBakedModel(magazineBakedModel, glint, colour,
             transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
       }
       matrixStack.popPose();
@@ -618,8 +616,7 @@ public abstract class GunRenderer implements IItemRenderer {
 
   protected abstract void applyMagazineTransforms(ItemStack magazineStack, MatrixStack matrixStack);
 
-  protected abstract void applyAttachmentTransforms(AttachmentItem attachmentItem,
-      MatrixStack matrixStack);
+  protected abstract void applyAttachmentTransforms(Attachment attachment, MatrixStack matrixStack);
 
   protected abstract void applyHandTransforms(Gun gun, boolean rightHanded,
       MatrixStack matrixStack);
@@ -643,15 +640,19 @@ public abstract class GunRenderer implements IItemRenderer {
     return new ResourceLocation(magazineName.getNamespace(), "magazine/" + magazineName.getPath());
   }
 
+  protected ResourceLocation getPaintSkinLocation(ResourceLocation paintName) {
+    return new ResourceLocation(paintName.getNamespace(),
+        "gun/" + this.registryName.getPath() + "_" + paintName.getPath());
+  }
+
   @Override
   public Collection<ResourceLocation> getModelDependencies() {
     final Set<ResourceLocation> dependencies = new HashSet<>();
     dependencies.addAll(this.gunType.getAcceptedAttachments().stream()
-        .map(Item::getRegistryName)
+        .map(Attachment::getRegistryName)
         .map(this::getAttachmentModelLocation)
         .collect(Collectors.toSet()));
     dependencies.addAll(this.gunType.getAcceptedMagazines().stream()
-        .filter(MagazineItem::hasCustomTexture)
         .map(Item::getRegistryName)
         .map(this::getMagazineModelLocation)
         .collect(Collectors.toSet()));
@@ -663,9 +664,8 @@ public abstract class GunRenderer implements IItemRenderer {
   public Collection<ResourceLocation> getAdditionalModelTextures() {
     final Set<ResourceLocation> textures = new HashSet<>();
     textures.addAll(this.gunType.getAcceptedPaints().stream()
-        .filter(PaintItem::hasSkin)
-        .map(paintItem -> new ResourceLocation(paintItem.getRegistryName().getNamespace(),
-            "gun/" + this.registryName.getPath() + "_" + paintItem.getRegistryName().getPath()))
+        .map(Item::getRegistryName)
+        .map(this::getPaintSkinLocation)
         .collect(Collectors.toSet()));
     return textures;
   }

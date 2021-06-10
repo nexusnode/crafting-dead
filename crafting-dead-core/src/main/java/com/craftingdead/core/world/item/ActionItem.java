@@ -58,8 +58,7 @@ public class ActionItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
-      Hand hand) {
+  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
     if (!playerEntity.level.isClientSide()) {
       this.performAction(playerEntity, null);
     }
@@ -84,7 +83,7 @@ public class ActionItem extends Item {
     @Nullable
     private BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, Action> entityActionFactory;
 
-    public Properties setAction(Supplier<? extends ActionType<?>> actionType) {
+    public Properties setAction(Supplier<? extends ActionType> actionType) {
       // Can't use method reference because don't want to resolve the supplier too early.
       this.entityActionFactory =
           (performer, target) -> actionType.get().createAction(performer, target);

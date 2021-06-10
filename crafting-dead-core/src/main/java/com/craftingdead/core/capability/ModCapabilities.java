@@ -18,12 +18,10 @@
 
 package com.craftingdead.core.capability;
 
-import com.craftingdead.core.client.animation.AnimationProvider;
 import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.magazine.Magazine;
-import com.craftingdead.core.world.gun.paint.Paint;
 import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
@@ -48,14 +46,8 @@ public class ModCapabilities {
   @CapabilityInject(Hat.class)
   public static final Capability<Hat> HAT = null;
 
-  @CapabilityInject(AnimationProvider.class)
-  public static final Capability<AnimationProvider<?>> ANIMATION_PROVIDER = null;
-
   @CapabilityInject(Gun.class)
   public static final Capability<Gun> GUN = null;
-
-  @CapabilityInject(Paint.class)
-  public static final Capability<Paint> PAINT = null;
 
   @CapabilityInject(Scope.class)
   public static final Capability<Scope> SCOPE = null;
@@ -77,13 +69,9 @@ public class ModCapabilities {
         ModCapabilities::unsupported);
     CapabilityManager.INSTANCE.register(Hat.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
-    CapabilityManager.INSTANCE.register(AnimationProvider.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
     CapabilityManager.INSTANCE.register(CombatSlotProvider.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
     CapabilityManager.INSTANCE.register(Gun.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
-    CapabilityManager.INSTANCE.register(Paint.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
     CapabilityManager.INSTANCE.register(Magazine.class, EmptyStorage.getInstance(),
         ModCapabilities::unsupported);
@@ -95,7 +83,7 @@ public class ModCapabilities {
     throw new UnsupportedOperationException();
   }
 
-  public static <T, R extends T> R getExpected(Capability<T> capability,
+  public static <T, R extends T> R getOrThrow(Capability<T> capability,
       ICapabilityProvider provider, Class<R> clazz) {
     return provider.getCapability(capability)
         .filter(clazz::isInstance)

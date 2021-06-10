@@ -1,0 +1,9 @@
+{
+  "type": "craftingdead:upgrade_magazine",
+  "magazine": {
+    "item": "craftingdead:stanag_drum_magazine"
+  },
+  "nextTier": {
+    "item": "craftingdead:stanag_box_magazine"
+  }
+}

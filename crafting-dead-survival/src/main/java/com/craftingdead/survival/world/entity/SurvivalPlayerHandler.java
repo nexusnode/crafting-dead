@@ -57,7 +57,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void playerTick() {
-    if (!this.player.getEntity().level.isClientSide()) {
+    if (!this.player.getLevel().isClientSide()) {
       this.updateEffects();
       this.updateBrokenLeg();
     }
@@ -65,7 +65,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private void updateEffects() {
     boolean invulnerable = this.player.getEntity().abilities.invulnerable
-        || this.player.getEntity().level.getDifficulty() == Difficulty.PEACEFUL;
+        || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
     if ((invulnerable || !CraftingDeadSurvival.serverConfig.bleedingEnabled.get())
         && this.player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
@@ -86,7 +86,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   private void updateBrokenLeg() {
     if (!this.player.getEntity().isCreative()
         && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
-        && this.player.getEntity().level.getDifficulty() != Difficulty.PEACEFUL
+        && this.player.getLevel().getDifficulty() != Difficulty.PEACEFUL
         && !this.player.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
         && this.player.getEntity().isOnGround() && !this.player.getEntity().isInWater()
         && ((this.player.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
@@ -111,7 +111,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public void infect(float chance) {
     PlayerEntity playerEntity = this.player.getEntity();
     if (!playerEntity.isCreative()
-        && playerEntity.getCommandSenderWorld().getDifficulty() != Difficulty.PEACEFUL
+        && playerEntity.level.getDifficulty() != Difficulty.PEACEFUL
         && playerEntity.getRandom().nextFloat() < chance
         && !playerEntity.hasEffect(SurvivalMobEffects.INFECTION.get())
         && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
@@ -127,7 +127,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
     boolean isValidSource = immediateAttacker != null || source.isExplosion();
     boolean invulnerable = this.player.getEntity().abilities.invulnerable
-        || this.player.getEntity().level.getDifficulty() == Difficulty.PEACEFUL;
+        || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
     if (isValidSource && !invulnerable
         && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()) {
@@ -136,8 +136,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
           && !this.player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
         this.player.getEntity()
             .displayClientMessage(new TranslationTextComponent("message.bleeding")
-                .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)),
-                true);
+                .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
         this.player.getEntity()
             .addEffect(new EffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999));
       }

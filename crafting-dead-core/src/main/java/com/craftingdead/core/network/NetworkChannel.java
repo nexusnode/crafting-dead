@@ -26,7 +26,7 @@ import com.craftingdead.core.network.message.play.KillFeedMessage;
 import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
-import com.craftingdead.core.network.message.play.RightMouseAction;
+import com.craftingdead.core.network.message.play.SecondaryActionMessage;
 import com.craftingdead.core.network.message.play.SetFireModeMessage;
 import com.craftingdead.core.network.message.play.SyncGunContainerSlotMessage;
 import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
@@ -58,10 +58,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(RightMouseAction.class, 0x02)
-          .encoder(RightMouseAction::encode)
-          .decoder(RightMouseAction::decode)
-          .consumer(RightMouseAction::handle)
+          .messageBuilder(SecondaryActionMessage.class, 0x02)
+          .encoder(SecondaryActionMessage::encode)
+          .decoder(SecondaryActionMessage::decode)
+          .consumer(SecondaryActionMessage::handle)
           .add();
 
       simpleChannel

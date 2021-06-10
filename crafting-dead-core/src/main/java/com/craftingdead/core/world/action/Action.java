@@ -41,11 +41,11 @@ public interface Action {
 
   LivingExtension<?, ?> getPerformer();
 
-  LivingExtension.IProgressMonitor getPerformerProgress();
+  LivingExtension.ProgressMonitor getPerformerProgress();
 
   Optional<LivingExtension<?, ?>> getTarget();
 
-  LivingExtension.IProgressMonitor getTargetProgress();
+  LivingExtension.ProgressMonitor getTargetProgress();
 
-  ActionType<?> getActionType();
+  ActionType getType();
 }

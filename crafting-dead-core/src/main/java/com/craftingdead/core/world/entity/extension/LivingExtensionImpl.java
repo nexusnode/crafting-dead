@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.animation.AnimationProvider;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
@@ -52,7 +51,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -64,7 +62,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   /**
    * The vanilla entity.
    */
-  protected final E entity;
+  private final E entity;
 
   protected final Object2ObjectOpenHashMap<ResourceLocation, H> handlers =
       new Object2ObjectOpenHashMap<>();
@@ -72,12 +70,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   protected final Object2ObjectOpenHashMap<ResourceLocation, H> dirtyHandlers =
       new Object2ObjectOpenHashMap<>();
 
-  /**
-   * The last held {@link ItemStack} - used to check if the entity has switched item.
-   */
-  protected ItemStack lastHeldStack = null;
-
-  private List<Integer> dirtySlots = new IntArrayList();
+  private final List<Integer> dirtySlots = new IntArrayList();
 
   private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
@@ -91,9 +84,14 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         }
       };
 
+  /**
+   * The last held {@link ItemStack} - used to check if the entity has switched item.
+   */
+  protected ItemStack lastHeldStack = null;
+
   private Action action;
 
-  private IProgressMonitor actionProgress;
+  private ProgressMonitor actionProgress;
 
   private boolean movementBlocked;
 
@@ -131,7 +129,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public H getExpectedHandler(ResourceLocation id) {
+  public H getHandlerOrThrow(ResourceLocation id) {
     H handler = this.handlers.get(id);
     if (handler == null) {
       throw new IllegalStateException("Missing handler with ID: " + id.toString());
@@ -144,8 +142,11 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     if (MinecraftForge.EVENT_BUS.post(new LivingExtensionEvent.PerformAction<>(this, action))) {
       return false;
     }
-    final IProgressMonitor targetProgressMonitor =
-        action.getTarget().flatMap(LivingExtension::getProgressMonitor).orElse(null);
+
+    final ProgressMonitor targetProgressMonitor = action.getTarget()
+        .flatMap(LivingExtension::getProgressMonitor)
+        .orElse(null);
+
     if (this.actionProgress != null || targetProgressMonitor != null) {
       if (!force) {
         return false;
@@ -155,20 +156,25 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         targetProgressMonitor.stop();
       }
     }
+
     if ((this.action != null && !force) || !action.start()) {
       return false;
     }
+
     this.cancelAction(true);
     this.action = action;
     this.actionProgress = action.getPerformerProgress();
     action.getTarget().ifPresent(target -> target.setActionProgress(action.getTargetProgress()));
     if (sendUpdate) {
-      PacketTarget target =
-          this.getEntity().getCommandSenderWorld().isClientSide() ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+      PacketTarget target = this.getLevel().isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+      int targetId = action.getTarget()
+          .map(LivingExtension::getEntity)
+          .map(Entity::getId)
+          .orElse(-1);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new PerformActionMessage(action.getActionType(), this.getEntity().getId(),
-              action.getTarget().map(LivingExtension::getEntity).map(Entity::getId).orElse(-1)));
+          new PerformActionMessage(action.getType(), this.getEntity().getId(), targetId));
     }
     return true;
   }
@@ -181,21 +187,21 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     this.action.cancel();
     this.removeAction();
     if (sendUpdate) {
-      PacketTarget target =
-          this.getEntity().level.isClientSide() ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+      PacketTarget target = this.getLevel().isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
           new CancelActionMessage(this.getEntity().getId()));
     }
   }
 
   @Override
-  public void setActionProgress(IProgressMonitor actionProgress) {
+  public void setActionProgress(ProgressMonitor actionProgress) {
     this.actionProgress = actionProgress;
   }
 
   @Override
-  public Optional<IProgressMonitor> getProgressMonitor() {
+  public Optional<ProgressMonitor> getProgressMonitor() {
     return Optional.ofNullable(this.actionProgress);
   }
 
@@ -226,7 +232,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   public void tick() {
     ItemStack heldStack = this.entity.getMainHandItem();
     if (heldStack != this.lastHeldStack) {
-      this.getProgressMonitor().ifPresent(IProgressMonitor::stop);
+      this.getProgressMonitor().ifPresent(ProgressMonitor::stop);
       if (this.lastHeldStack != null) {
         this.lastHeldStack.getCapability(ModCapabilities.GUN)
             .ifPresent(gun -> gun.reset(this));
@@ -245,10 +251,6 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
 
     heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this));
-    heldStack.getCapability(ModCapabilities.ANIMATION_PROVIDER)
-        .lazyMap(AnimationProvider::getAnimationController)
-        .orElseGet(LazyOptional::empty)
-        .ifPresent(c -> c.tick(this.getEntity(), heldStack));
 
     this.updateClothing();
     this.updateHat();
@@ -376,7 +378,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         ItemStack itemStack =
             this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
         if (!itemStack.isEmpty()) {
-          ItemEntity itemEntity = new ItemEntity(this.getEntity().level, this.getEntity().getX(),
+          ItemEntity itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
               this.getEntity().getY(), this.getEntity().getZ(), itemStack);
           itemEntity.setDefaultPickUpDelay();
           drops.add(itemEntity);
@@ -386,7 +388,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     return false;
   }
 
-  boolean keepInventory() {
+  protected boolean keepInventory() {
     return false;
   }
 
@@ -429,9 +431,9 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
     this.crouching = crouching;
     if (sendUpdate) {
-      PacketTarget target =
-          this.getEntity().getCommandSenderWorld().isClientSide() ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+      PacketTarget target = this.getLevel().isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
           new CrouchMessage(this.getEntity().getId(), crouching));
     }

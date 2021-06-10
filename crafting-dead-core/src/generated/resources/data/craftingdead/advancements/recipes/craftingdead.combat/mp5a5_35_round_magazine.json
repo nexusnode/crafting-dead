@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:mp5a5_35_round_magazine"
+    ]
+  },
+  "criteria": {
+    "has_mp5a5_21_round_magazine": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:mp5a5_21_round_magazine"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:mp5a5_35_round_magazine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_mp5a5_21_round_magazine",
+      "has_the_recipe"
+    ]
+  ]
+}

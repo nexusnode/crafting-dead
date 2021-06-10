@@ -21,9 +21,10 @@ package com.craftingdead.core.client.renderer.item;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS1;
 import com.craftingdead.core.client.renderer.item.model.ModelM4A1IS2;
-import com.craftingdead.core.world.gun.GunTypes;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.type.GunTypes;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.item.AttachmentItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -174,46 +175,46 @@ public class FNFALRenderer extends GunRenderer {
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(Attachment attachment,
       MatrixStack matrixStack) {
 
-    if (attachmentItem == ModItems.LP_SCOPE.get()) {
+    if (attachment == Attachments.LP_SCOPE.get()) {
       matrixStack.translate(1D, -2D, 0.15D);
       float scale = 0.7F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.HP_SCOPE.get()) {
+    if (attachment == Attachments.HP_SCOPE.get()) {
       matrixStack.translate(1D, -2D, 0.15D);
       float scale = 0.7F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.RED_DOT_SIGHT.get()) {
+    if (attachment == Attachments.RED_DOT_SIGHT.get()) {
       matrixStack.translate(0.7D, -1.15D, 0.25D);
       float scale = 0.6F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.ACOG_SIGHT.get()) {
+    if (attachment == Attachments.ACOG_SIGHT.get()) {
       matrixStack.translate(2D, -1.07D, 0.47D);
       float scale = 0.5F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.SUPPRESSOR.get()) {
+    if (attachment == Attachments.SUPPRESSOR.get()) {
       matrixStack.translate(17.7D, -0.5D, 1.2D);
       float scale = 0.9F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.TACTICAL_GRIP.get()) {
+    if (attachment == Attachments.TACTICAL_GRIP.get()) {
       matrixStack.translate(10D, 0.8D, 1D);
       float scale = 0.8F;
       matrixStack.scale(scale, scale, scale);
     }
 
-    if (attachmentItem == ModItems.BIPOD.get()) {
+    if (attachment == Attachments.BIPOD.get()) {
       matrixStack.translate(9D, 0.8D, -0D);
       float scale = 0.9F;
       matrixStack.scale(scale, scale, scale);

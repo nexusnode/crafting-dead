@@ -1,0 +1,9 @@
+{
+  "type": "craftingdead:upgrade_magazine",
+  "magazine": {
+    "item": "craftingdead:mp5a5_21_round_magazine"
+  },
+  "nextTier": {
+    "item": "craftingdead:mp5a5_35_round_magazine"
+  }
+}

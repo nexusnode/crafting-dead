@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:stanag_30_round_magazine"
+    ]
+  },
+  "criteria": {
+    "has_stanag_20_round_magazine": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:stanag_20_round_magazine"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:stanag_30_round_magazine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_stanag_20_round_magazine",
+      "has_the_recipe"
+    ]
+  ]
+}

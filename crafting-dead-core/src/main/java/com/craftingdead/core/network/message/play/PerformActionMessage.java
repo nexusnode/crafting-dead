@@ -28,40 +28,40 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PerformActionMessage {
 
-  private final ActionType<?> actionType;
+  private final ActionType actionType;
   /**
    * Ignored on server reception - assumed to be the player who sent the message.
    */
   private final int performerEntityId;
   private final int targetEntityId;
 
-  public PerformActionMessage(ActionType<?> actionType, int performerEntityId,
+  public PerformActionMessage(ActionType actionType, int performerEntityId,
       int targetEntityId) {
     this.actionType = actionType;
     this.performerEntityId = performerEntityId;
     this.targetEntityId = targetEntityId;
   }
 
-  public static void encode(PerformActionMessage msg, PacketBuffer out) {
-    out.writeRegistryId(msg.actionType);
-    out.writeVarInt(msg.performerEntityId);
-    out.writeVarInt(msg.targetEntityId);
+  public void encode(PacketBuffer out) {
+    out.writeRegistryId(this.actionType);
+    out.writeVarInt(this.performerEntityId);
+    out.writeVarInt(this.targetEntityId);
   }
 
   public static PerformActionMessage decode(PacketBuffer in) {
     return new PerformActionMessage(in.readRegistryId(), in.readVarInt(), in.readVarInt());
   }
 
-  public static boolean handle(PerformActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), msg.performerEntityId).ifPresent(performerEntity -> {
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    NetworkUtil.getEntity(ctx.get(), this.performerEntityId).ifPresent(performerEntity -> {
       LivingExtension<?, ?> performer =
           performerEntity.getCapability(ModCapabilities.LIVING).orElse(null);
-      LivingExtension<?, ?> target = msg.targetEntityId == -1 ? null
-          : performerEntity.getCommandSenderWorld().getEntity(msg.targetEntityId)
+      LivingExtension<?, ?> target = this.targetEntityId == -1 ? null
+          : performerEntity.level.getEntity(this.targetEntityId)
               .getCapability(ModCapabilities.LIVING).orElse(null);
       final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();
-      if (!isServer || msg.actionType.isTriggeredByClient()) {
-        performer.performAction(msg.actionType.createAction(performer, target), isServer);
+      if (!isServer || this.actionType.isTriggeredByClient()) {
+        performer.performAction(this.actionType.createAction(performer, target), isServer);
       }
     });
     return true;

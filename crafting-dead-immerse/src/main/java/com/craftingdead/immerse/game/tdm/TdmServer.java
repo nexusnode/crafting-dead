@@ -197,7 +197,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
         .stream()
         .<PlayerExtension<?>>map(PlayerExtension::getExpected)
         .map(player -> (TdmServerPlayerHandler) player
-            .getExpectedHandler(TdmPlayerHandler.ID))
+            .getHandlerOrThrow(TdmPlayerHandler.ID))
         .forEach(TdmServerPlayerHandler::resetBuyTime);
   }
 
@@ -304,7 +304,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
     for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((TdmServerPlayerHandler) PlayerExtension.getExpected(playerEntity)
-          .getExpectedHandler(TdmPlayerHandler.ID)).invalidate();
+          .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
     }
 
     super.unload();
@@ -461,7 +461,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension
-        && !event.getLiving().getEntity().level.isClientSide()) {
+        && !event.getLiving().getLevel().isClientSide()) {
       PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
       player.registerHandler(TdmPlayerHandler.ID,
           new TdmServerPlayerHandler(this, player));
@@ -484,7 +484,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
     LivingHandler handler =
-        event.getLiving().getExpectedHandler(TdmPlayerHandler.ID);
+        event.getLiving().getHandlerOrThrow(TdmPlayerHandler.ID);
     TdmPlayerHandler player = (TdmPlayerHandler) handler;
     player.setRemainingSpawnProtectionSeconds(0);
   }

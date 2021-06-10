@@ -44,7 +44,7 @@ public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
       MatrixStack matrixStack, int width, int height, float partialTicks) {
     SurvivalPlayerHandler survivalPlayer =
-        (SurvivalPlayerHandler) player.getExpectedHandler(SurvivalPlayerHandler.EXTENSION_ID);
+        (SurvivalPlayerHandler) player.getHandlerOrThrow(SurvivalPlayerHandler.EXTENSION_ID);
     int y = height / 2;
     int x = 4;
 

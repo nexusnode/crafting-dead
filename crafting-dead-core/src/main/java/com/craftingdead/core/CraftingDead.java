@@ -37,6 +37,7 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderTypes;
+import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ModItems;
@@ -132,8 +133,10 @@ public class CraftingDead {
     ModEnchantments.ENCHANTMENTS.register(modEventBus);
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
+    Attachments.ATTACHMENTS.register(modEventBus);
 
     // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
@@ -274,7 +277,7 @@ public class CraftingDead {
   public void handleLivingUpdate(LivingUpdateEvent event) {
     event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(living -> {
       living.tick();
-      if (!living.getEntity().getCommandSenderWorld().isClientSide() && living.requiresSync()) {
+      if (!living.getLevel().isClientSide() && living.requiresSync()) {
         PacketBuffer data = new PacketBuffer(Unpooled.buffer());
         living.encode(data, false);
         NetworkChannel.PLAY.getSimpleChannel().send(

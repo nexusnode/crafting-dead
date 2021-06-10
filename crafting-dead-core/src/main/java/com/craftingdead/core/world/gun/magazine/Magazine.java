@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.gun.magazine;
 
 import com.craftingdead.core.network.BufferSerializable;
-import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -38,8 +37,6 @@ public interface Magazine extends INBTSerializable<CompoundNBT>, BufferSerializa
   }
 
   int decrementSize();
-
-  Item getNextTier();
 
   boolean hasCustomTexture();
 

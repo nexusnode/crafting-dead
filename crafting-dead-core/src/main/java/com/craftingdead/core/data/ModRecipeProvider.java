@@ -27,6 +27,7 @@ import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
@@ -38,8 +39,42 @@ public class ModRecipeProvider extends RecipeProvider {
 
   @Override
   protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
-    CustomRecipeBuilder.special(ModRecipeSerializers.UPGRADE_MAGAZINE.get())
-        .save(consumer, CraftingDead.ID + ":upgrade_magazine");
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.STANAG_DRUM_MAGAZINE.get()),
+            ModItems.STANAG_BOX_MAGAZINE.get())
+        .unlockedBy("has_stanag_drum_magazine", has(ModItems.STANAG_DRUM_MAGAZINE.get()))
+        .save(consumer);
+
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.STANAG_30_ROUND_MAGAZINE.get()),
+            ModItems.STANAG_DRUM_MAGAZINE.get())
+        .unlockedBy("has_stanag_30_round_magazine", has(ModItems.STANAG_30_ROUND_MAGAZINE.get()))
+        .save(consumer);
+
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.STANAG_20_ROUND_MAGAZINE.get()),
+            ModItems.STANAG_30_ROUND_MAGAZINE.get())
+        .unlockedBy("has_stanag_20_round_magazine", has(ModItems.STANAG_20_ROUND_MAGAZINE.get()))
+        .save(consumer);
+
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.MP5A5_21_ROUND_MAGAZINE.get()),
+            ModItems.MP5A5_35_ROUND_MAGAZINE.get())
+        .unlockedBy("has_mp5a5_21_round_magazine", has(ModItems.MP5A5_21_ROUND_MAGAZINE.get()))
+        .save(consumer);
+
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.MAC10_MAGAZINE.get()),
+            ModItems.MAC10_EXTENDED_MAGAZINE.get())
+        .unlockedBy("has_mac10_magazine", has(ModItems.MAC10_MAGAZINE.get()))
+        .save(consumer);
+
+    UpgradeMagazineRecipeBuilder
+        .create(Ingredient.of(ModItems.RPK_MAGAZINE.get()),
+            ModItems.RPK_DRUM_MAGAZINE.get())
+        .unlockedBy("has_rpk_magazine", has(ModItems.RPK_MAGAZINE.get()))
+        .save(consumer);
+
     CustomRecipeBuilder.special(ModRecipeSerializers.DUPLICATE_MAGAZINE.get())
         .save(consumer, CraftingDead.ID + ":duplicate_magazine");
 

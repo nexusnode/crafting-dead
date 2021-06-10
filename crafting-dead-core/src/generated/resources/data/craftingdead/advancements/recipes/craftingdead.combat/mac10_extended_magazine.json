@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:mac10_extended_magazine"
+    ]
+  },
+  "criteria": {
+    "has_mac10_magazine": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "craftingdead:mac10_magazine"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:mac10_extended_magazine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_mac10_magazine",
+      "has_the_recipe"
+    ]
+  ]
+}

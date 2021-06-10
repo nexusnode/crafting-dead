@@ -23,23 +23,23 @@ import javax.annotation.Nullable;
 
 public enum FireMode {
 
-  AUTO("fire_mode.auto"), BURST("fire_mode.burst", 3), SEMI("fire_mode.semi", 1);
+  AUTO("auto"), BURST("burst", 3), SEMI("semi", 1);
 
-  private final String translationKey;
+  private final String name;
   @Nullable
   private final Integer maxShots;
 
-  private FireMode(String translationKey) {
-    this(translationKey, null);
+  private FireMode(String name) {
+    this(name, null);
   }
 
-  private FireMode(String translationKey, @Nullable Integer maxShots) {
-    this.translationKey = translationKey;
+  private FireMode(String name, @Nullable Integer maxShots) {
+    this.name = name;
     this.maxShots = maxShots;
   }
 
   public String getTranslationKey() {
-    return this.translationKey;
+    return "fire_mode." + this.name;
   }
 
   /**

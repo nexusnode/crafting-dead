@@ -20,10 +20,10 @@ package com.craftingdead.core.client.renderer.item;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.model.ModelMinigunBarrel;
-import com.craftingdead.core.world.gun.GunTypes;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.gun.minigun.MinigunClient;
-import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.type.GunTypes;
+import com.craftingdead.core.world.gun.type.minigun.MinigunClient;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -48,8 +48,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyThirdPersonTransforms(Gun gun,
-      MatrixStack matrixStack) {
+  protected void applyThirdPersonTransforms(Gun gun, MatrixStack matrixStack) {
 
     matrixStack.mulPose(Vector3f.XP.rotationDegrees(190));
     matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-15));
@@ -65,8 +64,7 @@ public class MinigunRenderer extends GunRenderer {
   }
 
   @Override
-  protected void applyFirstPersonTransforms(Gun gun,
-      MatrixStack matrixStack) {
+  protected void applyFirstPersonTransforms(Gun gun, MatrixStack matrixStack) {
 
     this.muzzleFlashX = 0.2F;
     this.muzzleFlashY = -0.43F;
@@ -144,7 +142,7 @@ public class MinigunRenderer extends GunRenderer {
       MatrixStack matrixStack) {}
 
   @Override
-  protected void applyAttachmentTransforms(AttachmentItem attachmentItem,
+  protected void applyAttachmentTransforms(Attachment attachment,
       MatrixStack matrixStack) {}
 
   @Override

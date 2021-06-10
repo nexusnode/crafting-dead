@@ -28,6 +28,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -57,14 +58,14 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   Optional<H> getHandler(ResourceLocation id);
 
   /**
-   * Get an expected handler.
+   * Get a handler or throw an exception if not present.
    * 
    * @param id - the handler's ID
    * @throws IllegalStateException if not present
    * @return the handler
    */
   @Nonnull
-  H getExpectedHandler(ResourceLocation id) throws IllegalStateException;
+  H getHandlerOrThrow(ResourceLocation id) throws IllegalStateException;
 
   /**
    * Register a handler.
@@ -106,17 +107,17 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * Attach a progress monitor to this {@link LivingExtension} (will show a progress bar on the
    * client).
    * 
-   * @param actionProgress - the {@link IProgressMonitor} to attach
+   * @param actionProgress - the {@link ProgressMonitor} to attach
    */
-  void setActionProgress(IProgressMonitor actionProgress);
+  void setActionProgress(ProgressMonitor actionProgress);
 
   /**
-   * Get the currently attached {@link IProgressMonitor} monitor.
+   * Get the currently attached {@link ProgressMonitor} monitor.
    * 
    * @return an {@link Optional} progress monitor
-   * @see #setActionProgress(IProgressMonitor)
+   * @see #setActionProgress(ProgressMonitor)
    */
-  Optional<IProgressMonitor> getProgressMonitor();
+  Optional<ProgressMonitor> getProgressMonitor();
 
   /**
    * Whether this {@link LivingExtension} is currently monitoring an action.
@@ -205,6 +206,15 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   E getEntity();
 
   /**
+   * Shorthand for {@link LivingEntity#level}
+   * 
+   * @return the {@link World}
+   */
+  default World getLevel() {
+    return this.getEntity().level;
+  }
+
+  /**
    * Get an expected {@link LivingExtension} instance.
    * 
    * @param <E> - the specific type of {@link LivingEntity}
@@ -222,25 +232,9 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   }
 
   /**
-   * Get an optional {@link LivingExtension} instance.
-   * 
-   * @param <E> - the specific type of {@link LivingEntity}
-   * @param livingEntity - the {@link LivingEntity} instance
-   * @return an {@link Optional} instance
-   * @see #getExpected(LivingEntity)
-   */
-  public static <R extends LivingExtension<E, ?>, E extends LivingEntity> Optional<R> getOptional(
-      E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
-        .<R>cast()
-        .map(Optional::of)
-        .orElse(Optional.empty());
-  }
-
-  /**
    * Progress monitor used to track the progress of actions.
    */
-  public static interface IProgressMonitor {
+  public static interface ProgressMonitor {
 
     /**
      * The message to display to a {@link LivingExtension} that is monitoring the action.

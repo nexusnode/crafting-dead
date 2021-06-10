@@ -20,7 +20,7 @@ package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import net.minecraft.entity.player.PlayerEntity;
@@ -93,9 +93,9 @@ public class EquipmentMenu extends Container {
         (slot, itemStack) -> this.getGunStack().getCapability(ModCapabilities.GUN)
             .map(gun -> gun.isAcceptedPaintOrAttachment(itemStack)).orElse(false);
     final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
-        (slot, itemStack) -> itemStack.getItem() instanceof AttachmentItem
-            && ((AttachmentItem) itemStack.getItem()).getInventorySlot().getIndex() == slot
-                .getSlotIndex();
+        (slot, itemStack) -> itemStack.getItem() instanceof AttachmentLike
+            && ((AttachmentLike) itemStack.getItem())
+                .asAttachment().getInventorySlot().getIndex() == slot.getSlotIndex();
 
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.MUZZLE_ATTACHMENT.getIndex(), 104,
@@ -109,12 +109,9 @@ public class EquipmentMenu extends Container {
         GunCraftSlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, gunCraftY,
         attachmentPredicate.and(attachmentAndPaintPredicate)));
 
-    final BiPredicate<PredicateSlot, ItemStack> paintPredicate =
-        (slot, itemStack) -> itemStack.getCapability(ModCapabilities.PAINT).isPresent();
-
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.PAINT.getIndex(), 146, gunCraftY + slotSize + gunCraftSlotGap,
-        paintPredicate.and(attachmentAndPaintPredicate)));
+        attachmentAndPaintPredicate));
   }
 
   @Override

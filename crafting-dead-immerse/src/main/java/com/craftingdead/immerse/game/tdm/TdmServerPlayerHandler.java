@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.tdm;
 
-import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
@@ -112,10 +112,11 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
         this.lastSignificantDamage = playerEntity;
       }
 
-      if (LivingExtension.getOptional(playerEntity)
+      if (playerEntity.getCapability(ModCapabilities.LIVING)
+          .resolve()
           .flatMap(e -> e.getHandler(ID))
-          .map(extension -> ((TdmPlayerHandler) extension).getTeam().orElse(null) == this
-              .getTeam().orElse(null))
+          .map(extension -> ((TdmPlayerHandler) extension).getTeam().orElse(null) == this.getTeam()
+              .orElse(null))
           .orElse(false)) {
         return true;
       }
@@ -168,7 +169,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
   @Override
   public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
     TdmServerPlayerHandler extension =
-        (TdmServerPlayerHandler) that.getExpectedHandler(ID);
+        (TdmServerPlayerHandler) that.getHandlerOrThrow(ID);
     if (extension.valid) {
       this.wasGhost = extension.wasGhost;
       this.ghost = extension.ghost;

@@ -21,13 +21,13 @@ package com.craftingdead.core.world.action;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 
-public abstract class TimedAction extends AbstractAction {
+public abstract class TimedAction<T extends ActionType> extends AbstractAction<T> {
 
   private int durationTicks;
 
-  public TimedAction(ActionType<?> actionType, LivingExtension<?, ?> performer,
+  public TimedAction(T type, LivingExtension<?, ?> performer,
       @Nullable LivingExtension<?, ?> target) {
-    super(actionType, performer, target);
+    super(type, performer, target);
   }
 
   protected abstract int getTotalDurationTicks();

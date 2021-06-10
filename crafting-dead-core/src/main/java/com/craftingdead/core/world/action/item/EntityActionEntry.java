@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.util.RayTraceUtil;
@@ -33,25 +35,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.math.EntityRayTraceResult;
 
-public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Properties> {
+public final class EntityActionEntry extends AbstractActionEntry {
 
-  private BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetSelector = TargetSelector.SELF_ONLY;
-  private final List<Pair<EffectInstance, Float>> effects;
+  private final BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetSelector;
+  private final List<Pair<Supplier<EffectInstance>, Float>> effects;
   @Nullable
   private final Pair<Consumer<LivingExtension<?, ?>>, Float> customAction;
+  private final BooleanSupplier condition;
 
   private LivingExtension<?, ?> selectedTarget;
 
-  public EntityActionEntry(Properties properties) {
-    super(properties);
-    this.targetSelector = properties.targetSelector;
-    this.effects = properties.effects;
-    this.customAction = properties.customAction;
+  private EntityActionEntry(Builder builder) {
+    super(builder);
+    this.targetSelector = builder.targetSelector;
+    this.effects = builder.effects;
+    this.customAction = builder.customAction;
+    this.condition = builder.condition;
   }
 
   @Override
   public boolean canPerform(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target,
       ItemStack heldStack) {
+    if (!this.condition.getAsBoolean()) {
+      return false;
+    }
+
     if (this.selectedTarget == null) {
       this.selectedTarget = this.targetSelector.apply(performer, target);
       if (this.selectedTarget == null) {
@@ -59,7 +67,7 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
       }
     }
 
-    if (!performer.getEntity().getCommandSenderWorld().isClientSide()) {
+    if (!performer.getLevel().isClientSide()) {
       Optional<EntityRayTraceResult> entityRayTraceResult =
           RayTraceUtil.rayTraceEntities(performer.getEntity());
       if (this.selectedTarget != performer
@@ -82,9 +90,9 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
 
     this.selectedTarget.getEntity().curePotionEffects(heldStack);
 
-    for (Pair<EffectInstance, Float> pair : this.effects) {
+    for (Pair<Supplier<EffectInstance>, Float> pair : this.effects) {
       if (pair.getLeft() != null && ItemAction.random.nextFloat() < pair.getRight()) {
-        EffectInstance effectInstance = pair.getLeft();
+        EffectInstance effectInstance = pair.getLeft().get();
         if (effectInstance.getEffect().isInstantenous()) {
           effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
               this.selectedTarget.getEntity(),
@@ -98,55 +106,73 @@ public class EntityActionEntry extends AbstractActionEntry<EntityActionEntry.Pro
     return true;
   }
 
-  public static enum TargetSelector implements BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> {
-    SELF_ONLY((performer, target) -> performer), OTHERS_ONLY(
-        (performer, target) -> target), SELF_AND_OTHERS(
-            (performer, target) -> target == null ? performer : target);
+  public static enum TargetSelector
+      implements BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> {
+
+    SELF_ONLY((performer, target) -> performer),
+    OTHERS_ONLY((performer, target) -> target),
+    SELF_AND_OTHERS((performer, target) -> target == null ? performer : target);
 
     private final BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetGetter;
 
-    private TargetSelector(BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetGetter) {
+    private TargetSelector(
+        BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetGetter) {
       this.targetGetter = targetGetter;
     }
 
     @Override
-    public LivingExtension<?, ?> apply(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target) {
+    public LivingExtension<?, ?> apply(LivingExtension<?, ?> performer,
+        @Nullable LivingExtension<?, ?> target) {
       return this.targetGetter.apply(performer, target);
     }
 
-    public BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> ofType(EntityType<?> entityType) {
+    public BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> ofType(
+        EntityType<?> entityType) {
       return this.andThen(target -> target.getEntity().getType() == entityType ? target : null);
     }
 
     public BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> ofType(
         Class<? extends LivingEntity> entityType) {
       return this.andThen(
-          target -> target != null && entityType.isAssignableFrom(target.getEntity().getClass())
-              ? target
-              : null);
+          target -> target != null && entityType.isInstance(target.getEntity()) ? target : null);
     }
   }
 
-  public static class Properties extends AbstractActionEntry.Properties<Properties> {
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder extends AbstractActionEntry.Builder<Builder> {
+
     private BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetSelector =
         TargetSelector.SELF_ONLY;
-    private final List<Pair<EffectInstance, Float>> effects = new ArrayList<>();
+    private final List<Pair<Supplier<EffectInstance>, Float>> effects = new ArrayList<>();
     @Nullable
     private Pair<Consumer<LivingExtension<?, ?>>, Float> customAction;
+    private BooleanSupplier condition = () -> true;
 
-    public Properties setTargetSelector(
+    private Builder() {
+      super(EntityActionEntry::new);
+    }
+
+    public Builder setTargetSelector(
         BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, LivingExtension<?, ?>> targetSelector) {
       this.targetSelector = targetSelector;
       return this;
     }
 
-    public Properties addEffect(Pair<EffectInstance, Float> effect) {
-      this.effects.add(effect);
+    public Builder addEffect(Supplier<EffectInstance> effect, Float chance) {
+      this.effects.add(Pair.of(effect, chance));
       return this;
     }
 
-    public Properties setCustomAction(Pair<Consumer<LivingExtension<?, ?>>, Float> customAction) {
-      this.customAction = customAction;
+    public Builder setCustomAction(Consumer<LivingExtension<?, ?>> customAction, Float chance) {
+      this.customAction = Pair.of(customAction, chance);
+      return this;
+    }
+
+    public Builder setCondition(BooleanSupplier condition) {
+      this.condition = condition;
       return this;
     }
   }

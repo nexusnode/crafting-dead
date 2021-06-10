@@ -100,28 +100,29 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
   protected void renderLabels(MatrixStack matrixStack, int x, int y) {}
 
   @Override
-  protected void renderBg(MatrixStack matrixStack, float partialTicks,
-      int mouseX, int mouseY) {
+  protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
     this.renderBackground(matrixStack);
     this.minecraft.getTextureManager().bind(BACKGROUND);
 
     this.blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
     ItemStack gunStack = this.menu.getGunStack();
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
+    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
 
       final int gunSlotX = this.leftPos + 122;
       final int gunSlotY = this.topPos + 26;
 
       this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
 
-      final boolean draggingItemAccepted =
-          gunController.isAcceptedPaintOrAttachment(this.inventory.getCarried());
+      final boolean carriedItemAccepted =
+          gun.isAcceptedPaintOrAttachment(this.inventory.getCarried());
 
       if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
-          || draggingItemAccepted) {
+          || carriedItemAccepted) {
+        // Green outline
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 22, 22, 22);
-      } else if (!this.inventory.getCarried().isEmpty() && !draggingItemAccepted) {
+      } else if (!this.inventory.getCarried().isEmpty() && !carriedItemAccepted) {
+        // Red outline
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 44, 22, 22);
       }
     });

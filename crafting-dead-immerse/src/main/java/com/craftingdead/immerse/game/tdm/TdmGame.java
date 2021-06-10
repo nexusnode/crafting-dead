@@ -28,6 +28,7 @@ import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
+import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
@@ -142,7 +143,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
 
     Item item = event.getItemStack().getItem();
     if (item == ModItems.AWP.get() || item == ModItems.M107.get() || item == ModItems.AS50.get()) {
-      event.addAttachment(ModItems.LP_SCOPE.get());
+      event.addAttachment(Attachments.LP_SCOPE.get());
     }
   }
 
@@ -204,7 +205,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public GameType getGameType() {
+  public GameType getType() {
     return GameTypes.TEAM_DEATHMATCH.get();
   }
 }

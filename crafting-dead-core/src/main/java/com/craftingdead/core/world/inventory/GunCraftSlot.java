@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.world.item.AttachmentItem;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.GunItem;
-import com.craftingdead.core.world.item.PaintItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.Inventory;
@@ -63,21 +63,21 @@ public class GunCraftSlot extends Slot {
 
   @Override
   public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gunController -> {
-      gunController.setPaintStack(ItemStack.EMPTY);
-      Set<AttachmentItem> attachments = new HashSet<>();
+    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      gun.setPaintStack(ItemStack.EMPTY);
+      Set<Attachment> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
         ItemStack itemStack = this.craftingInventory.getItem(i);
-        if (gunController.isAcceptedPaintOrAttachment(itemStack)) {
-          if (itemStack.getItem() instanceof AttachmentItem) {
-            attachments.add((AttachmentItem) itemStack.getItem());
-          } else if (itemStack.getItem() instanceof PaintItem) {
-            gunController.setPaintStack(itemStack);
+        if (gun.isAcceptedPaintOrAttachment(itemStack)) {
+          if (itemStack.getItem() instanceof AttachmentLike) {
+            attachments.add(((AttachmentLike) itemStack.getItem()).asAttachment());
+          } else {
+            gun.setPaintStack(itemStack);
           }
           this.craftingInventory.setItem(i, ItemStack.EMPTY);
         }
       }
-      gunController.setAttachments(attachments);
+      gun.setAttachments(attachments);
     });
     return super.onTake(playerEntity, gunStack);
   }

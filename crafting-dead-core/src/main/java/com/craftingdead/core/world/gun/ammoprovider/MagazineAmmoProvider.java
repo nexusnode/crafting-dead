@@ -18,8 +18,7 @@
 
 package com.craftingdead.core.world.gun.ammoprovider;
 
-import com.craftingdead.core.world.action.RemoveMagazineAction;
-import com.craftingdead.core.world.action.reload.MagazineReloadAction;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
@@ -82,12 +81,12 @@ public class MagazineAmmoProvider implements AmmoProvider {
 
   @Override
   public void reload(LivingExtension<?, ?> living) {
-    living.performAction(new MagazineReloadAction(living), true);
+    living.performAction(ActionTypes.MAGAZINE_RELOAD.get().createAction(living, null), true);
   }
 
   @Override
   public void unload(LivingExtension<?, ?> living) {
-    living.performAction(new RemoveMagazineAction(living), true);
+    living.performAction(ActionTypes.REMOVE_MAGAZINE.get().createAction(living, null), true);
   }
 
   @Override

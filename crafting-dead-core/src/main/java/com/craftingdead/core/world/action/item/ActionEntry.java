@@ -18,10 +18,12 @@
 
 package com.craftingdead.core.world.action.item;
 
+import java.util.Optional;
 import javax.annotation.Nullable;
+import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.util.SoundEvent;
 
 public interface ActionEntry {
@@ -35,7 +37,8 @@ public interface ActionEntry {
    * @param heldStack - the current held stack
    * @return if the action should continue running
    */
-  boolean canPerform(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target, ItemStack heldStack);
+  boolean canPerform(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target,
+      ItemStack heldStack);
 
   /**
    * Complete the action.
@@ -45,7 +48,8 @@ public interface ActionEntry {
    * @param heldStack - the current held stack
    * @return if the action completed successfully
    */
-  boolean finish(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target, ItemStack heldStack);
+  boolean finish(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target,
+      ItemStack heldStack);
 
   /**
    * Determines if the held stack should be consumed upon completion.
@@ -59,10 +63,9 @@ public interface ActionEntry {
    * Get the item that's returned upon completion.
    * 
    * @param performer - the {@link LivingExtension} performing the {@link Action}
-   * @return an {@link IItemProvider} or null if no return item
+   * @return the optional {@link Item}
    */
-  @Nullable
-  IItemProvider getReturnItem(LivingExtension<?, ?> performer);
+  Optional<Item> getReturnItem(LivingExtension<?, ?> performer);
 
   /**
    * Get the sound to be played upon completion.

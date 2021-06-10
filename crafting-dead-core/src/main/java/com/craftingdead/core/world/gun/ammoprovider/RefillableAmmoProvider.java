@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.gun.ammoprovider;
 
-import com.craftingdead.core.world.action.reload.RefillableReloadAction;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
@@ -90,7 +90,7 @@ public class RefillableAmmoProvider implements AmmoProvider {
 
   @Override
   public void reload(LivingExtension<?, ?> living) {
-    living.performAction(new RefillableReloadAction(living), true);
+    living.performAction(ActionTypes.REFILLABLE_RELOAD.get().createAction(living, null), true);
   }
 
   @Override

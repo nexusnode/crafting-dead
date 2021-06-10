@@ -20,8 +20,8 @@ package com.craftingdead.core.world.action.reload;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.animation.gun.AnimationType;
-import com.craftingdead.core.client.animation.gun.reload.GunAnimationReload;
+import com.craftingdead.core.client.animation.AnimationType;
+import com.craftingdead.core.client.animation.reload.GunAnimationReload;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 
-public abstract class AbstractReloadAction extends TimedAction {
+public abstract class AbstractReloadAction extends TimedAction<ActionType> {
 
   protected final ItemStack gunStack;
 
@@ -38,8 +38,9 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   protected final ItemStack oldMagazineStack;
 
-  public AbstractReloadAction(ActionType<?> actionType, LivingExtension<?, ?> performer) {
-    super(actionType, performer, null);
+  public AbstractReloadAction(ActionType type, LivingExtension<?, ?> performer,
+      @Nullable LivingExtension<?, ?> target) {
+    super(type, performer, target);
     this.gunStack = performer.getEntity().getMainHandItem();
     this.gun = this.gunStack.getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
@@ -57,16 +58,15 @@ public abstract class AbstractReloadAction extends TimedAction {
       return false;
     }
 
-    if (this.gun.isPerformingRightMouseAction()) {
-      this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
+    if (this.gun.isPerformingSecondaryAction()) {
+      this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
     }
 
-    // Some guns may not have a reload sound
     this.gun.getReloadSound()
-        .ifPresent(sound -> this.performer.getEntity().getCommandSenderWorld().playSound(null,
-            this.performer.getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
+        .ifPresent(sound -> this.getPerformer().getLevel().playSound(null,
+            this.getPerformer().getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
 
-    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
+    if (this.getPerformer().getLevel().isClientSide()) {
       if (this.oldMagazineStack.isEmpty()) {
         this.playLoadAnimation(false, null);
       } else {
@@ -84,7 +84,7 @@ public abstract class AbstractReloadAction extends TimedAction {
       // Load new magazine stack into gun for animation purposes
       this.loadNewMagazineStack(true);
     }
-    this.gun.getAnimation(AnimationType.RELOAD)
+    this.gun.getClient().getAnimation(AnimationType.RELOAD)
         .filter(animation -> animation instanceof GunAnimationReload)
         .map(animation -> (GunAnimationReload) animation)
         .ifPresent(animation -> {
@@ -95,7 +95,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().getEntity().getCommandSenderWorld().isClientSide()
+    if (!this.getPerformer().getLevel().isClientSide()
         && this.getPerformer().getEntity().isSprinting()) {
       this.getPerformer().cancelAction(true);
       return false;
@@ -105,7 +105,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   protected void finish() {
-    if (this.performer.getEntity().getCommandSenderWorld().isClientSide()) {
+    if (this.getPerformer().getLevel().isClientSide()) {
       return;
     }
     // This will be synced to the client by the gun.
@@ -115,7 +115,7 @@ public abstract class AbstractReloadAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    if (this.gun.getClient() != null) {
+    if (this.getPerformer().getLevel().isClientSide()) {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound
         Minecraft.getInstance().getSoundManager()

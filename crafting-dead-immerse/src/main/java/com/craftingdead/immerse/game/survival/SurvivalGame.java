@@ -53,7 +53,7 @@ public abstract class SurvivalGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public GameType getGameType() {
+  public GameType getType() {
     return GameTypes.SURVIVAL.get();
   }
 

@@ -242,11 +242,6 @@
         {
           "type": "minecraft:item",
           "weight": 15,
-          "name": "craftingdead:multi_paint"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 15,
           "name": "craftingdead:ruby_paint"
         },
         {

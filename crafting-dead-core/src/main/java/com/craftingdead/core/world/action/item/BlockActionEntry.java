@@ -29,16 +29,16 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.ForgeMod;
 
-public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Properties> {
+public final class BlockActionEntry extends AbstractActionEntry {
 
   private final Predicate<BlockState> predicate;
 
   private BlockPos blockPosTarget;
   private BlockState blockStateTarget;
 
-  public BlockActionEntry(Properties properties) {
-    super(properties);
-    this.predicate = properties.predicate;
+  private BlockActionEntry(Builder builder) {
+    super(builder);
+    this.predicate = builder.predicate;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
         reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue(), 1.0F, true);
     if (result instanceof BlockRayTraceResult) {
       BlockPos blockPos = ((BlockRayTraceResult) result).getBlockPos();
-      BlockState blockState = performer.getEntity().getCommandSenderWorld().getBlockState(blockPos);
+      BlockState blockState = performer.getLevel().getBlockState(blockPos);
       if (this.blockPosTarget == null || this.blockStateTarget == null) {
         this.blockPosTarget = blockPos;
         this.blockStateTarget = blockState;
@@ -65,15 +65,24 @@ public class BlockActionEntry extends AbstractActionEntry<BlockActionEntry.Prope
   }
 
   @Override
-  public boolean finish(LivingExtension<?, ?> performer, LivingExtension<?, ?> target, ItemStack heldStack) {
+  public boolean finish(LivingExtension<?, ?> performer, LivingExtension<?, ?> target,
+      ItemStack heldStack) {
     return true;
   }
 
-  public static class Properties extends AbstractActionEntry.Properties<Properties> {
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder extends AbstractActionEntry.Builder<Builder> {
 
     private Predicate<BlockState> predicate;
 
-    public Properties setPredicate(Predicate<BlockState> predicate) {
+    private Builder() {
+      super(BlockActionEntry::new);
+    }
+
+    public Builder setPredicate(Predicate<BlockState> predicate) {
       this.predicate = predicate;
       return this;
     }

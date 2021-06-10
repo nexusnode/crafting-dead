@@ -82,7 +82,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
     ItemStack result = inventory.getItem(4).copy();
-    ModCapabilities.getExpected(ModCapabilities.MAGAZINE, result, Magazine.class).setSize(0);
+    ModCapabilities.getOrThrow(ModCapabilities.MAGAZINE, result, Magazine.class).setSize(0);
     return result;
   }
 

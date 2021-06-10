@@ -87,7 +87,7 @@ public class LogicalServer extends WorldSavedData {
 
   public List<Pair<String, SetupGameMessage>> generateSetupGameMessage(boolean isLocal) {
     return Collections.singletonList(Pair.of(SetupGameMessage.class.getName(),
-        new SetupGameMessage(this.getGame().getGameType())));
+        new SetupGameMessage(this.getGame().getType())));
   }
 
   public void startLoading() {}
@@ -165,7 +165,7 @@ public class LogicalServer extends WorldSavedData {
     }
 
     logger.info("Loading game type '{}'",
-        gameWrapper.getGame().getGameType().getRegistryName().toString());
+        gameWrapper.getGame().getType().getRegistryName().toString());
 
     this.gameWrapper = gameWrapper;
     gameWrapper.load();
@@ -173,7 +173,7 @@ public class LogicalServer extends WorldSavedData {
     logger.info("Loading players");
     for (ServerPlayerEntity playerEntity : players) {
       playerEntity.connection.send(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
-          new ChangeGameMessage(gameWrapper.getGame().getGameType()),
+          new ChangeGameMessage(gameWrapper.getGame().getType()),
           NetworkDirection.PLAY_TO_CLIENT));
 
       if (oldGameWrapper != null && gameWrapper.getGame().persistPlayerData()

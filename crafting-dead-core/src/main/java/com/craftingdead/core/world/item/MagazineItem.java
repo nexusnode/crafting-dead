@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.item;
 
 import java.util.List;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
@@ -28,7 +27,6 @@ import com.craftingdead.core.world.gun.magazine.MagazineImpl;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -45,14 +43,12 @@ public class MagazineItem extends Item {
 
   private final float armorPenetration;
   private final int size;
-  private final Supplier<? extends Item> nextTier;
   private final boolean customTexture;
 
   public MagazineItem(Properties properties) {
     super(properties);
     this.size = properties.size;
     this.armorPenetration = properties.armorPenetration;
-    this.nextTier = properties.nextTier;
     this.customTexture = properties.customTexture;
   }
 
@@ -62,10 +58,6 @@ public class MagazineItem extends Item {
 
   public int getSize() {
     return this.size;
-  }
-
-  public Supplier<? extends Item> getNextTier() {
-    return this.nextTier;
   }
 
   public boolean hasCustomTexture() {
@@ -163,7 +155,6 @@ public class MagazineItem extends Item {
 
     private float armorPenetration;
     private int size;
-    private Supplier<? extends Item> nextTier = () -> Items.AIR;
     private boolean customTexture;
 
     public Properties setArmorPenetration(float armorPenetration) {
@@ -173,11 +164,6 @@ public class MagazineItem extends Item {
 
     public Properties setSize(int size) {
       this.size = size;
-      return this;
-    }
-
-    public Properties setNextTier(Supplier<? extends Item> nextTier) {
-      this.nextTier = nextTier;
       return this;
     }
 

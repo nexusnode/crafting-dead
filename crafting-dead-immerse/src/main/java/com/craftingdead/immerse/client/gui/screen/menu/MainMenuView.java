@@ -218,7 +218,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .collect(Collectors.toList());
     Item randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
 
-    LivingExtension<?, ?> livingExtension = ModCapabilities.getExpected(ModCapabilities.LIVING,
+    LivingExtension<?, ?> livingExtension = ModCapabilities.getOrThrow(ModCapabilities.LIVING,
         fakePlayerEntity, LivingExtension.class);
     livingExtension.getItemHandler().insertItem(InventorySlotType.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);

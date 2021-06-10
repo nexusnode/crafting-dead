@@ -26,8 +26,9 @@ import com.craftingdead.core.capability.ModCapabilities;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.world.gun.AbstractGun;
-import com.craftingdead.core.world.gun.AbstractGunType;
+import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.magazine.Magazine;
+import com.craftingdead.core.world.gun.type.AbstractGunType;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -45,9 +46,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.DistExecutor;
 
+@RegisterGunColour
 public class GunItem extends ShootableItem implements IRendererProvider {
 
-  private final AbstractGunType<?> gunType;
+  private final AbstractGunType gunType;
 
   /**
    * A factory that creates a {@link GunRenderer} instance for this gun.
@@ -60,7 +62,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
     this.rendererFactory = properties.rendererFactory;
   }
 
-  public AbstractGunType<?> getGunType() {
+  public AbstractGunType getGunType() {
     return this.gunType;
   }
 
@@ -129,9 +131,9 @@ public class GunItem extends ShootableItem implements IRendererProvider {
           .withStyle(TextFormatting.GRAY)
           .append(headshotDamageText));
 
-      if (this.gunType.getBulletAmountToFire() > 1) {
+      if (this.gunType.getRoundsPerShot() > 1) {
         ITextComponent pelletsText =
-            new StringTextComponent(String.valueOf(this.gunType.getBulletAmountToFire()))
+            new StringTextComponent(String.valueOf(this.gunType.getRoundsPerShot()))
                 .withStyle(TextFormatting.RED);
 
         lines.add(new TranslationTextComponent("item_lore.gun_item.pellets_shot")
@@ -139,12 +141,13 @@ public class GunItem extends ShootableItem implements IRendererProvider {
             .append(pelletsText));
       }
 
-      for (AttachmentItem attachment : gun.getAttachments()) {
-        ITextComponent attachmentNameText =
-            attachment.getDescription().plainCopy().withStyle(TextFormatting.RED);
+      for (Attachment attachment : gun.getAttachments()) {
+        ITextComponent attachmentName = attachment.getDescription()
+            .plainCopy()
+            .withStyle(TextFormatting.RED);
         lines.add(new TranslationTextComponent("item_lore.gun_item.attachment")
             .withStyle(TextFormatting.GRAY)
-            .append(attachmentNameText));
+            .append(attachmentName));
       }
 
       lines.add(new TranslationTextComponent("item_lore.gun_item.rpm")
@@ -183,11 +186,11 @@ public class GunItem extends ShootableItem implements IRendererProvider {
 
   public static class Properties extends Item.Properties {
 
-    private AbstractGunType<?> gunType;
+    private AbstractGunType gunType;
 
     private Supplier<DistExecutor.SafeCallable<GunRenderer>> rendererFactory;
 
-    public Properties setGunType(AbstractGunType<?> gunType) {
+    public Properties setGunType(AbstractGunType gunType) {
       this.gunType = gunType;
       return this;
     }

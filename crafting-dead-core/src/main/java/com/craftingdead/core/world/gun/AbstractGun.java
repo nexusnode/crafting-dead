@@ -18,10 +18,10 @@
 
 package com.craftingdead.core.world.gun;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -29,18 +29,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.animation.gun.AnimationType;
-import com.craftingdead.core.client.animation.gun.GunAnimation;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.HitMessage;
-import com.craftingdead.core.network.message.play.RightMouseAction;
+import com.craftingdead.core.network.message.play.SecondaryActionMessage;
 import com.craftingdead.core.network.message.play.SetFireModeMessage;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
 import com.craftingdead.core.network.util.NetworkDataManager;
@@ -50,17 +48,14 @@ import com.craftingdead.core.world.damagesource.ModDamageSource;
 import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderType;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderType;
+import com.craftingdead.core.world.gun.attachment.Attachment;
+import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.hat.Hat;
-import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.inventory.InventorySlotType;
-import com.craftingdead.core.world.item.AttachmentItem;
-import com.craftingdead.core.world.item.AttachmentItem.MultiplierType;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.block.AbstractFireBlock;
@@ -85,9 +80,9 @@ import net.minecraft.entity.monster.WitchEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.PacketBuffer;
@@ -96,7 +91,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
 import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.util.math.BlockPos;
@@ -107,24 +101,21 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends AbstractGun<T, SELF>>
-    implements Gun, INBTSerializable<CompoundNBT> {
+public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> {
 
   private static final Logger logger = LogManager.getLogger();
 
-  @SuppressWarnings("rawtypes")
   private static final AtomicIntegerFieldUpdater<AbstractGun> triggerPressedUpdater =
       AtomicIntegerFieldUpdater.newUpdater(AbstractGun.class, "triggerPressed");
 
@@ -137,7 +128,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
   public static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
-  private static final Random random = new Random();
+  protected static final Random random = new Random();
 
   private static final ExecutorService executorService = Executors.newCachedThreadPool(
       new ThreadFactoryBuilder()
@@ -151,9 +142,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
   private final NetworkDataManager dataManager = new NetworkDataManager();
 
-  protected final T type;
-
-  protected final ItemStack gunStack;
+  protected final ItemStack itemStack;
 
   /**
    * If the gun trigger is pressed.
@@ -187,14 +176,14 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
    */
   private int shotCount;
 
-  private Set<AttachmentItem> attachments;
+  private Set<Attachment> attachments;
   private boolean attachmentsDirty;
 
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
-  private boolean performingRightMouseAction;
+  private boolean performingSecondaryAction;
 
-  private final GunClient client;
+  private final Lazy<AbstractGunClient<?>> client;
 
   // Used to ensure the gun thread gets killed if we're not being ticked anymore.
   private volatile long lastTickMs;
@@ -206,17 +195,20 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   private Future<?> gunLoopFuture;
 
   @SuppressWarnings("unchecked")
-  public AbstractGun(T type, ItemStack gunStack) {
-    this.type = type;
-    this.gunStack = gunStack;
+  public <SELF extends AbstractGun> AbstractGun(
+      Function<SELF, ? extends AbstractGunClient<? super SELF>> clientFactory,
+      ItemStack itemStack, Set<FireMode> fireModes, AmmoProvider ammoProvider) {
+    this.itemStack = itemStack;
 
-    this.fireModeInfiniteIterator = Iterables.cycle(this.type.getFireModes()).iterator();
+    this.fireModeInfiniteIterator = Iterables.cycle(fireModes).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
-    this.client = DistExecutor.unsafeCallWhenOn(Dist.CLIENT,
-        () -> () -> type.getClientFactory().apply((SELF) this));
+    this.client = FMLEnvironment.dist.isClient()
+        ? Lazy.concurrentOf(() -> clientFactory.apply((SELF) this))
+        : Lazy.of(() -> {
+          throw new IllegalStateException("Cannot accesss gun client on dedicated server");
+        });
 
-    GunEvent.Initialize event =
-        new GunEvent.Initialize(this, gunStack, type.createAmmoProvider());
+    GunEvent.Initialize event = new GunEvent.Initialize(this, itemStack, ammoProvider);
     MinecraftForge.EVENT_BUS.post(event);
 
     this.setAmmoProvider(event.getAmmoProvider());
@@ -225,35 +217,35 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     this.dataManager.register(PAINT_STACK, ItemStack.EMPTY);
   }
 
-  public T getType() {
-    return this.type;
-  }
+  protected abstract Set<FireMode> getFireModes();
+
+  protected abstract AmmoProvider createAmmoProvider();
 
   @Override
   public void tick(LivingExtension<?, ?> living) {
     this.lastTickMs = Util.getMillis();
 
-    if (!living.getEntity().level.isClientSide() && !this.isTriggerPressed()
+    if (!living.getLevel().isClientSide() && !this.isTriggerPressed()
         && this.wasTriggerPressed) {
       this.triggerPressedTicks = living.getEntity().getServer().getTickCount();
     }
     this.wasTriggerPressed = this.isTriggerPressed();
 
 
-    if (this.isPerformingRightMouseAction() && living.getEntity().isSprinting()) {
-      this.setPerformingRightMouseAction(living, false, true);
+    if (this.isPerformingSecondaryAction() && living.getEntity().isSprinting()) {
+      this.setPerformingSecondaryAction(living, false, true);
     }
 
-    if (living.getEntity().level.isClientSide()) {
-      this.client.handleTick(living);
+    if (living.getLevel().isClientSide()) {
+      this.getClient().handleTick(living);
     }
   }
 
   @Override
   public void reset(LivingExtension<?, ?> living) {
     this.setTriggerPressed(living, false, false);
-    if (this.performingRightMouseAction) {
-      this.setPerformingRightMouseAction(living, false, false);
+    if (this.performingSecondaryAction) {
+      this.setPerformingSecondaryAction(living, false, false);
     }
   }
 
@@ -262,7 +254,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
       boolean sendUpdate) {
     if (triggerPressed && (!this.canShoot(living)
         || MinecraftForge.EVENT_BUS
-            .post(new GunEvent.TriggerPressed(this, this.gunStack, living)))) {
+            .post(new GunEvent.TriggerPressed(this, this.itemStack, living)))) {
       return;
     }
 
@@ -277,15 +269,11 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
 
     if (sendUpdate) {
-      PacketTarget target =
-          living.getEntity().level.isClientSide()
-              ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
-      NetworkChannel.PLAY
-          .getSimpleChannel()
-          .send(target,
-              new TriggerPressedMessage(living.getEntity().getId(),
-                  triggerPressed));
+      PacketTarget target = living.getLevel().isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+      NetworkChannel.PLAY.getSimpleChannel().send(target,
+          new TriggerPressedMessage(living.getEntity().getId(), triggerPressed));
     }
   }
 
@@ -332,27 +320,29 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     if (!hitLiving.getEntity().isDeadOrDying()) {
       random.setSeed(pendingHit.getRandomSeed());
-      // @formatter:off
       hitSnapshot
-          .rayTrace(player.getEntity().level,
+          .rayTrace(player.getLevel(),
               playerSnapshot,
-              this.type.getRange(),
+              this.getRange(),
               this.getAccuracy(player),
               shotCount,
               random)
           .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
-      // @formatter:on
     }
   }
+
+  protected abstract double getRange();
+
+  protected abstract long getFireDelayMs();
 
   private void startGunLoop(LivingExtension<?, ?> living) {
     long time;
     while (this.isTriggerPressed() && ((time = Util.getMillis()) - this.lastTickMs < 500L)) {
       long timeDelta = time - this.lastShotMs;
-      if (timeDelta < this.type.getFireDelayMs()) {
+      if (timeDelta < this.getFireDelayMs()) {
         try {
           // Sleep to reduce CPU usage
-          Thread.sleep(this.type.getFireDelayMs() - timeDelta);
+          Thread.sleep(this.getFireDelayMs() - timeDelta);
         } catch (InterruptedException e) {
           ;
         }
@@ -365,7 +355,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
       }
 
       LogicalSide side =
-          living.getEntity().level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+          living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
       ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
       if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
@@ -392,7 +382,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
       this.processShot(living, executor);
 
       if (side.isClient()) {
-        this.client.handleShoot(living);
+        this.getClient().handleShoot(living);
       }
 
       // Allow other threads to do work (mainly the main thread as we off-load a lot of tasks to it)
@@ -400,23 +390,24 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
   }
 
-  private boolean canShoot(LivingExtension<?, ?> living) {
+  protected boolean canShoot(LivingExtension<?, ?> living) {
     return !living.getProgressMonitor().isPresent() && !living.getEntity().isSprinting()
-        && !living.getEntity().isSpectator()
-        && this.type.getTriggerPredicate().test(this);
+        && !living.getEntity().isSpectator();
   }
+
+  protected abstract int getRoundsPerShot();
 
   protected void processShot(LivingExtension<?, ?> living, ThreadTaskExecutor<?> executor) {
     Entity entity = living.getEntity();
-    World level = entity.level;
+    World level = living.getLevel();
 
     // Magazine size will be synced to clients so only decrement this on the server.
     if (!level.isClientSide()
         && !(living.getEntity() instanceof PlayerEntity
             && ((PlayerEntity) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
-          EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.gunStack);
-      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(this.gunStack, unbreakingLevel,
+          EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.itemStack);
+      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(this.itemStack, unbreakingLevel,
           random)) {
         this.ammoProvider.getExpectedMagazine().decrementSize();
       }
@@ -424,13 +415,13 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     // Used to avoid playing the same hit sound more than once.
     RayTraceResult lastRayTraceResult = null;
-    for (int i = 0; i < this.type.getBulletAmountToFire(); i++) {
+    for (int i = 0; i < this.getRoundsPerShot(); i++) {
       final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
       RayTraceResult rayTraceResult =
           CompletableFuture.supplyAsync(() -> RayTraceUtil.rayTrace(entity,
-              this.type.getRange(),
+              this.getRange(),
               this.getAccuracy(living),
               this.shotCount,
               random).orElse(null), executor).join();
@@ -463,7 +454,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
             }
 
             if (level.isClientSide()) {
-              this.client.handleHitEntityPre(living,
+              this.getClient().handleHitEntityPre(living,
                   entityRayTraceResult.getEntity(),
                   entityRayTraceResult.getLocation(),
                   randomSeed);
@@ -486,15 +477,16 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
   }
 
+  protected abstract float getDamage();
+
   private void hitEntity(LivingExtension<?, ?> living, Entity hitEntity, Vector3d hitPos,
       boolean playSound) {
     final LivingEntity entity = living.getEntity();
-    final World world = hitEntity.level;
-    float damage = this.type.getDamage();
+    float damage = this.getDamage();
 
     float armorPenetration = Math.min((1.0F
         + (EnchantmentHelper.getItemEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
-            this.gunStack) / 255.0F))
+            this.itemStack) / 255.0F))
         * this.ammoProvider.getExpectedMagazine().getArmorPenetration(), 1.0F);
     if (armorPenetration > 0 && hitEntity instanceof LivingEntity) {
       LivingEntity livingEntityHit = (LivingEntity) hitEntity;
@@ -527,7 +519,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     // Post gun hit entity event
     GunEvent.HitEntity event =
-        new GunEvent.HitEntity(this, gunStack, living, hitEntity, damage, hitPos, headshot);
+        new GunEvent.HitEntity(this, itemStack, living, hitEntity, damage, hitPos, headshot);
 
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
@@ -537,8 +529,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     headshot = event.isHeadshot();
 
     // Simulated client-side effects
-    if (world.isClientSide()) {
-      this.client.handleHitEntityPost(living, hitEntity, hitPos, playSound, headshot);
+    if (living.getLevel().isClientSide()) {
+      this.getClient().handleHitEntityPost(living, hitEntity, hitPos, playSound, headshot);
     } else {
       // Resets the temporary invincibility before causing the damage, preventing
       // previous damages from blocking the gun damage.
@@ -546,12 +538,12 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
       hitEntity.invulnerableTime = 0;
 
       ModDamageSource.causeDamageWithoutKnockback(hitEntity,
-          ModDamageSource.causeGunDamage(entity, this.gunStack, headshot), damage);
+          ModDamageSource.causeGunDamage(entity, this.itemStack, headshot), damage);
 
-      checkCreateExplosion(this.gunStack, entity, hitPos);
+      checkCreateExplosion(this.itemStack, entity, hitPos);
 
       if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
-          this.gunStack) > 0) {
+          this.itemStack) > 0) {
         hitEntity.setSecondsOnFire(100);
       }
 
@@ -579,7 +571,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     // Post gun hit block event
     GunEvent.HitBlock event =
-        new GunEvent.HitBlock(this, gunStack, block, blockPos, living, world);
+        new GunEvent.HitBlock(this, itemStack, block, blockPos, living, world);
 
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
@@ -587,7 +579,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
     // Client-side effects
     if (world.isClientSide()) {
-      this.client.handleHitBlock(living, rayTrace, playSound);
+      this.getClient().handleHitBlock(living, rayTrace, playSound);
     } else {
       if (blockState.getBlock() instanceof BellBlock) {
         ((BellBlock) blockState.getBlock()).onHit(world, blockState, rayTrace,
@@ -600,10 +592,10 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
         entity.level.removeBlock(blockPos, false);
       }
 
-      checkCreateExplosion(this.gunStack, entity, rayTrace.getLocation());
+      checkCreateExplosion(this.itemStack, entity, rayTrace.getLocation());
 
       if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
-          this.gunStack) > 0) {
+          this.itemStack) > 0) {
         if (CampfireBlock.canLight(blockState)) {
           world.setBlock(blockPos,
               blockState.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
@@ -619,19 +611,12 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public float getAccuracy(LivingExtension<?, ?> living) {
-    float accuracy =
-        this.type.getAccuracyPct() * this.getAttachmentMultiplier(MultiplierType.ACCURACY);
-    return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
+  public Set<Attachment> getAttachments() {
+    return Collections.unmodifiableSet(this.attachments);
   }
 
   @Override
-  public Set<AttachmentItem> getAttachments() {
-    return ImmutableSet.copyOf(this.attachments);
-  }
-
-  @Override
-  public void setAttachments(Set<AttachmentItem> attachments) {
+  public void setAttachments(Set<Attachment> attachments) {
     this.attachments = attachments;
   }
 
@@ -643,13 +628,6 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   @Override
   public void setPaintStack(ItemStack paintStack) {
     this.dataManager.set(PAINT_STACK, paintStack);
-  }
-
-  @Override
-  public boolean isAcceptedPaintOrAttachment(ItemStack itemStack) {
-    return itemStack != null
-        && (this.type.getAcceptedAttachments().contains(itemStack.getItem())
-            || this.type.getAcceptedPaints().contains(itemStack.getItem()));
   }
 
   @Override
@@ -671,7 +649,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
 
     if (sendUpdate) {
-      PacketTarget target = living.getEntity().level.isClientSide()
+      PacketTarget target = living.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY
@@ -681,70 +659,32 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public boolean hasCrosshair() {
-    return this.type.hasCrosshair();
+  public boolean isPerformingSecondaryAction() {
+    return this.performingSecondaryAction;
   }
 
   @Override
-  public boolean isPerformingRightMouseAction() {
-    return this.performingRightMouseAction;
-  }
-
-  @Override
-  public void setPerformingRightMouseAction(LivingExtension<?, ?> living,
-      boolean performingRightMouseAction, boolean sendUpdate) {
-    if (performingRightMouseAction && living.getEntity().isSprinting()) {
+  public void setPerformingSecondaryAction(LivingExtension<?, ?> living,
+      boolean performingAction, boolean sendUpdate) {
+    if (performingAction && living.getEntity().isSprinting()) {
       return;
     }
 
-    this.performingRightMouseAction = !this.performingRightMouseAction;
-    if (living.getEntity().level.isClientSide()) {
-      this.client.handleToggleRightMouseAction(living);
+    this.performingSecondaryAction = performingAction;
+    if (living.getLevel().isClientSide()) {
+      this.getClient().handleToggleSecondaryAction(living);
     }
 
     if (sendUpdate) {
-      PacketTarget target =
-          living.getEntity().level.isClientSide()
-              ? PacketDistributor.SERVER.noArg()
-              : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+      PacketTarget target = living.getLevel().isClientSide()
+          ? PacketDistributor.SERVER.noArg()
+          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new RightMouseAction(living.getEntity().getId(), this.performingRightMouseAction));
+          new SecondaryActionMessage(living.getEntity().getId(), this.performingSecondaryAction));
     }
   }
 
-  @Override
-  public RightMouseActionTriggerType getRightMouseActionTriggerType() {
-    return this.type.getRightMouseActionTriggerType();
-  }
-
-  @Override
-  public Optional<SoundEvent> getReloadSound() {
-    return this.type.getReloadSound();
-  }
-
-  @Override
-  public int getReloadDurationTicks() {
-    return this.type.getReloadDurationTicks();
-  }
-
-  @Override
-  public boolean hasIronSight() {
-    for (AttachmentItem attachmentItem : this.attachments) {
-      if (attachmentItem.getInventorySlot() == GunCraftSlotType.OVERBARREL_ATTACHMENT) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public Optional<GunAnimation> getAnimation(AnimationType animationType) {
-    return Optional.ofNullable(this.type.getAnimations().get(animationType))
-        .map(Supplier::get);
-  }
-
-  @Override
-  public int getShotCount() {
+  protected int getShotCount() {
     return this.shotCount;
   }
 
@@ -754,8 +694,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public GunClient getClient() {
-    return this.client;
+  public AbstractGunClient<?> getClient() {
+    return this.client.get();
   }
 
   @Override
@@ -770,13 +710,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
   }
 
   @Override
-  public Set<? extends Item> getAcceptedMagazines() {
-    return this.type.getAcceptedMagazines();
-  }
-
-  @Override
-  public ItemStack getDefaultMagazineStack() {
-    return this.type.getDefaultMagazine().get().getDefaultInstance();
+  public ItemStack getItemStack() {
+    return this.itemStack;
   }
 
   @Override
@@ -784,11 +719,12 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     CompoundNBT nbt = new CompoundNBT();
     nbt.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
     nbt.put("ammoProvider", this.ammoProvider.serializeNBT());
-    ListNBT attachmentsTag = this.attachments
-        .stream()
-        .map(attachment -> StringNBT.valueOf(attachment.getRegistryName().toString()))
+    ListNBT attachmentsNbt = this.attachments.stream()
+        .map(Attachment::getRegistryName)
+        .map(ResourceLocation::toString)
+        .map(StringNBT::valueOf)
         .collect(ListNBT::new, ListNBT::add, List::addAll);
-    nbt.put("attachments", attachmentsTag);
+    nbt.put("attachments", attachmentsNbt);
     nbt.put("paintStack", this.getPaintStack().serializeNBT());
     return nbt;
   }
@@ -803,8 +739,9 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     }
     this.setAttachments(nbt.getList("attachments", 8)
         .stream()
-        .map(tag -> (AttachmentItem) ForgeRegistries.ITEMS
-            .getValue(new ResourceLocation(tag.getAsString())))
+        .map(INBT::getAsString)
+        .map(ResourceLocation::new)
+        .map(Attachments.REGISTRY.get()::getValue)
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
   }
@@ -815,9 +752,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
         .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
     if (writeAll || this.attachmentsDirty) {
       out.writeVarInt(this.attachments.size());
-      for (Item item : this.attachments) {
-        out.writeRegistryId(item);
-      }
+      this.attachments.forEach(out::writeRegistryId);
     } else {
       out.writeVarInt(-1);
     }
@@ -841,7 +776,7 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
     if (size > -1) {
       this.attachments.clear();
       for (int i = 0; i < size; i++) {
-        this.attachments.add((AttachmentItem) in.readRegistryIdSafe(Item.class));
+        this.attachments.add(in.readRegistryIdSafe(Attachment.class));
       }
     }
 
@@ -853,13 +788,9 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
 
   @Override
   public boolean requiresSync() {
-    return this.attachmentsDirty || this.dataManager.isDirty()
+    return this.attachmentsDirty
+        || this.dataManager.isDirty()
         || this.ammoProvider.requiresSync();
-  }
-
-  @Override
-  public CombatSlotType getSlotType() {
-    return this.type.getCombatSlotType();
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
@@ -868,8 +799,8 @@ public abstract class AbstractGun<T extends AbstractGunType<SELF>, SELF extends 
         EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, magazineStack)
             / (float) Enchantments.POWER_ARROWS.getMaxLevel();
     if (explosionSize > 0) {
-      entity.level.explode(entity, position.x(), position.y(), position.z(), explosionSize,
-          Explosion.Mode.NONE);
+      entity.level.explode(
+          entity, position.x(), position.y(), position.z(), explosionSize, Explosion.Mode.NONE);
     }
   }
 }

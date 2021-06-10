@@ -25,23 +25,23 @@ import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public abstract class AbstractAction implements Action {
+public abstract class AbstractAction<T extends ActionType> implements Action {
 
-  private final ActionType<?> actionType;
-  protected final LivingExtension<?, ?> performer;
+  private final T type;
+  private final LivingExtension<?, ?> performer;
   @Nullable
-  protected LivingExtension<?, ?> target;
+  private final LivingExtension<?, ?> target;
 
-  public AbstractAction(ActionType<?> actionType, LivingExtension<?, ?> performer,
+  public AbstractAction(T type, LivingExtension<?, ?> performer,
       @Nullable LivingExtension<?, ?> target) {
-    this.actionType = actionType;
+    this.type = type;
     this.performer = performer;
     this.target = target;
   }
 
   @Override
-  public ActionType<?> getActionType() {
-    return this.actionType;
+  public T getType() {
+    return this.type;
   }
 
   @Override
@@ -50,7 +50,7 @@ public abstract class AbstractAction implements Action {
   }
 
   @Override
-  public LivingExtension.IProgressMonitor getPerformerProgress() {
+  public LivingExtension.ProgressMonitor getPerformerProgress() {
     return new ActionProgress(true);
   }
 
@@ -60,17 +60,17 @@ public abstract class AbstractAction implements Action {
   }
 
   @Override
-  public LivingExtension.IProgressMonitor getTargetProgress() {
+  public LivingExtension.ProgressMonitor getTargetProgress() {
     return new ActionProgress(false);
   }
 
   protected String getTranslationKey() {
-    return Util.makeDescriptionId("action", AbstractAction.this.actionType.getRegistryName());
+    return Util.makeDescriptionId("action", AbstractAction.this.type.getRegistryName());
   }
 
   protected abstract float getProgress(float partialTicks);
 
-  private class ActionProgress implements LivingExtension.IProgressMonitor {
+  private class ActionProgress implements LivingExtension.ProgressMonitor {
 
     private final boolean performer;
 
@@ -86,7 +86,8 @@ public abstract class AbstractAction implements Action {
     @Override
     public Optional<ITextComponent> getSubMessage() {
       return this.performer
-          ? AbstractAction.this.target == null ? Optional.empty()
+          ? AbstractAction.this.target == null
+              ? Optional.empty()
               : Optional.of(new TranslationTextComponent("action.target",
                   AbstractAction.this.target.getEntity().getDisplayName().getString()))
           : Optional.of(new TranslationTextComponent("action.performer",

@@ -56,5 +56,5 @@ public interface Game<M extends Module> extends BufferSerializable {
    * 
    * @return the {@link GameType}
    */
-  GameType getGameType();
+  GameType getType();
 }

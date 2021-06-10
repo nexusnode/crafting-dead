@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.gun.magazine;
 
 import com.craftingdead.core.world.item.MagazineItem;
-import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
@@ -28,10 +27,6 @@ public class MagazineImpl implements Magazine {
   private final MagazineItem magazineItem;
   private int size;
   private boolean dirty;
-
-  public MagazineImpl() {
-    throw new UnsupportedOperationException("Specify magazine item");
-  }
 
   public MagazineImpl(MagazineItem magazineItem) {
     this.magazineItem = magazineItem;
@@ -76,11 +71,6 @@ public class MagazineImpl implements Magazine {
   public int decrementSize() {
     this.dirty = true;
     return --this.size;
-  }
-
-  @Override
-  public Item getNextTier() {
-    return this.magazineItem.getNextTier().get();
   }
 
   @Override

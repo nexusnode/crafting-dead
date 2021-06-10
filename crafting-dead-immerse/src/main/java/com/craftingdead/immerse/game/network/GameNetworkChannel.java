@@ -87,12 +87,12 @@ public class GameNetworkChannel {
         MSG message = moduleType.getNetworkProtocol().decode(buf, context);
         module.handleMessage(message, context);
       } else {
-        MSG message = gameWrapper.getGame().getGameType().getNetworkProtocol().decode(buf, context);
+        MSG message = gameWrapper.getGame().getType().getNetworkProtocol().decode(buf, context);
         gameWrapper.getGame().handleMessage(message, context);
       }
     } catch (IOException e) {
       logger.error("Failed to process server packet for '{}'",
-          gameWrapper.getGame().getGameType().getRegistryName().toString());
+          gameWrapper.getGame().getType().getRegistryName().toString());
     }
   }
 
@@ -118,7 +118,7 @@ public class GameNetworkChannel {
       PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
       if (moduleType == null) {
         buf.writeBoolean(false);
-        game.getGameType().getNetworkProtocol().encode(buf, message);
+        game.getType().getNetworkProtocol().encode(buf, message);
       } else {
         buf.writeBoolean(true);
         buf.writeRegistryId(moduleType);
@@ -130,7 +130,7 @@ public class GameNetworkChannel {
           .getThis();
     } catch (IOException e) {
       throw new EncoderException("Failed to encode game packet for '"
-          + game.getGameType().getRegistryName().toString() + "'");
+          + game.getType().getRegistryName().toString() + "'");
     }
   }
 }

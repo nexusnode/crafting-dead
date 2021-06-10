@@ -18,54 +18,33 @@
 
 package com.craftingdead.core.world.action.item;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 
-public class ItemAction extends TimedAction {
+public class ItemAction extends TimedAction<ItemActionType> {
 
   protected static final Random random = new Random();
 
-  private final List<ActionEntry> entries;
-  private final boolean freezeMovement;
-  private final int totalDurationTicks;
-  private final Predicate<ItemStack> heldItemPredicate;
-
   private ActionEntry selectedEntry;
 
-  private ItemAction(ActionType<?> actionType, LivingExtension<?, ?> performer,
-      LivingExtension<?, ?> target,
-      List<ActionEntry> entries, boolean freezeMovement, int totalDurationTicks,
-      Predicate<ItemStack> heldItemPredicate) {
-    super(actionType, performer, target);
-    this.entries = entries;
-    this.freezeMovement = freezeMovement;
-    this.totalDurationTicks = totalDurationTicks;
-    this.heldItemPredicate = heldItemPredicate;
-  }
-
-  public static Builder builder(ActionType<?> actionType, LivingExtension<?, ?> performer,
-      LivingExtension<?, ?> target) {
-    return new Builder(actionType, performer, target);
+  ItemAction(ItemActionType type, LivingExtension<?, ?> performer, LivingExtension<?, ?> target) {
+    super(type, performer, target);
   }
 
   @Override
   public boolean start() {
-    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
-    if (this.heldItemPredicate.test(heldStack)) {
-      for (ActionEntry entry : this.entries) {
-        if (entry.canPerform(this.performer, this.target, heldStack)) {
+    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
+    if (this.getType().getHeldItemPredicate().test(heldStack)) {
+      for (ActionEntry entry : this.getType().getEntries()) {
+        if (entry.canPerform(this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
           this.selectedEntry = entry;
           return super.start();
         }
@@ -76,14 +55,16 @@ public class ItemAction extends TimedAction {
 
   @Override
   protected final void finish() {
-    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
-    if (this.selectedEntry.finish(this.performer, this.target, heldStack)) {
-      final boolean shrinkStack = this.selectedEntry.shouldShrinkStack(this.performer);
-      final ItemStack resultStack = new ItemStack(this.selectedEntry.getReturnItem(this.performer));
+    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
+    if (this.selectedEntry.finish(this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
+      final boolean shrinkStack = this.selectedEntry.shouldShrinkStack(this.getPerformer());
+      final ItemStack resultStack = this.selectedEntry.getReturnItem(this.getPerformer())
+          .map(Item::getDefaultInstance)
+          .orElse(ItemStack.EMPTY);
 
       @Nullable
-      final PlayerEntity playerEntity = this.performer.getEntity() instanceof PlayerEntity
-          ? (PlayerEntity) this.performer.getEntity()
+      final PlayerEntity playerEntity = this.getPerformer().getEntity() instanceof PlayerEntity
+          ? (PlayerEntity) this.getPerformer().getEntity()
           : null;
       if (shrinkStack && !(playerEntity != null && playerEntity.isCreative())) {
         heldStack.shrink(1);
@@ -91,15 +72,15 @@ public class ItemAction extends TimedAction {
 
       if (!resultStack.isEmpty()) {
         if (heldStack.isEmpty()) {
-          this.performer.getEntity().setItemInHand(Hand.MAIN_HAND, resultStack);
+          this.getPerformer().getEntity().setItemInHand(Hand.MAIN_HAND, resultStack);
         } else if (playerEntity != null
             && playerEntity.inventory.add(resultStack)) {
-          this.performer.getEntity().spawnAtLocation(resultStack);
+          this.getPerformer().getEntity().spawnAtLocation(resultStack);
         }
       }
 
       if (this.selectedEntry.getFinishSound() != null) {
-        this.performer.getEntity().playSound(this.selectedEntry.getFinishSound(), 1.0F, 1.0F);
+        this.getPerformer().getEntity().playSound(this.selectedEntry.getFinishSound(), 1.0F, 1.0F);
       }
     }
   }
@@ -107,24 +88,24 @@ public class ItemAction extends TimedAction {
   @Override
   public boolean tick() {
     boolean finished = super.tick();
-    final ItemStack heldStack = this.performer.getEntity().getMainHandItem();
+    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
 
     boolean usingItem = true;
-    if (this.performer.getEntity().level.isClientSide()) {
+    if (this.getPerformer().getLevel().isClientSide()) {
       ClientDist clientDist = CraftingDead.getInstance().getClientDist();
       usingItem =
-          !clientDist.isLocalPlayer(this.performer.getEntity()) || clientDist.isRightMouseDown();
+          !clientDist.isLocalPlayer(this.getPerformer().getEntity())
+              || clientDist.isRightMouseDown();
     }
 
-    if (!this.selectedEntry.canPerform(this.performer, this.target, heldStack) || !usingItem) {
-      this.performer.cancelAction(true);
+    if (!this.selectedEntry.canPerform(
+        this.getPerformer(), this.getTarget().orElse(null), heldStack) || !usingItem) {
+      this.getPerformer().cancelAction(true);
     }
 
-    if (this.freezeMovement) {
-      if (this.target != null) {
-        this.target.setMovementBlocked(true);
-      }
-      this.performer.setMovementBlocked(true);
+    if (this.getType().isFreezeMovement()) {
+      this.getTarget().ifPresent(target -> target.setMovementBlocked(true));
+      this.getPerformer().setMovementBlocked(true);
     }
 
     return finished;
@@ -132,55 +113,6 @@ public class ItemAction extends TimedAction {
 
   @Override
   protected int getTotalDurationTicks() {
-    return this.totalDurationTicks;
-  }
-
-  public static class Builder {
-
-    private final ActionType<?> actionType;
-    private final LivingExtension<?, ?> performer;
-    private final LivingExtension<?, ?> target;
-    private final List<ActionEntry> entries = new ArrayList<>();
-    private boolean freezeMovement;
-    private int totalDurationTicks = 32;
-    private Predicate<ItemStack> heldItemPredicate;
-
-    public Builder(ActionType<?> actionType, LivingExtension<?, ?> performer,
-        LivingExtension<?, ?> target) {
-      this.actionType = actionType;
-      this.performer = performer;
-      this.target = target;
-    }
-
-    public Builder addEntry(ActionEntry entry) {
-      return this.addEntry(() -> true, entry);
-    }
-
-    public Builder addEntry(Supplier<Boolean> condition, ActionEntry entry) {
-      if (condition.get() && !this.entries.contains(entry)) {
-        this.entries.add(entry);
-      }
-      return this;
-    }
-
-    public Builder setFreezeMovement(boolean freezeMovement) {
-      this.freezeMovement = freezeMovement;
-      return this;
-    }
-
-    public Builder setTotalDurationTicks(int totalDurationTicks) {
-      this.totalDurationTicks = totalDurationTicks;
-      return this;
-    }
-
-    public Builder setHeldItemPredicate(Predicate<ItemStack> heldItemPredicate) {
-      this.heldItemPredicate = heldItemPredicate;
-      return this;
-    }
-
-    public ItemAction build() {
-      return new ItemAction(this.actionType, this.performer, this.target, this.entries,
-          this.freezeMovement, this.totalDurationTicks, this.heldItemPredicate);
-    }
+    return this.getType().getTotalDurationTicks();
   }
 }

@@ -22,17 +22,20 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class ActionType<T extends Action> extends ForgeRegistryEntry<ActionType<?>> {
+public class ActionType extends ForgeRegistryEntry<ActionType> {
 
   private final boolean triggeredByClient;
-  private final IFactory<T> factory;
+  private final Factory<ActionType> factory;
 
-  public ActionType(boolean triggeredByClient, IFactory<T> factory) {
+  @SuppressWarnings("unchecked")
+  public <SELF extends ActionType> ActionType(boolean triggeredByClient,
+      Factory<? super SELF> factory) {
     this.triggeredByClient = triggeredByClient;
-    this.factory = factory;
+    this.factory = (Factory<ActionType>) factory;
   }
 
-  public T createAction(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target) {
+  public Action createAction(LivingExtension<?, ?> performer,
+      @Nullable LivingExtension<?, ?> target) {
     return this.factory.create(this, performer, target);
   }
 
@@ -40,8 +43,8 @@ public class ActionType<T extends Action> extends ForgeRegistryEntry<ActionType<
     return this.triggeredByClient;
   }
 
-  public interface IFactory<T extends Action> {
-    T create(ActionType<T> actionType, LivingExtension<?, ?> performer,
+  public interface Factory<T extends ActionType> {
+    Action create(T actionType, LivingExtension<?, ?> performer,
         @Nullable LivingExtension<?, ?> target);
   }
 }

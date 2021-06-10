@@ -81,12 +81,12 @@ class PlayerExtensionImpl<E extends PlayerEntity>
 
   @Override
   public boolean isMovementBlocked() {
-    return !this.entity.isSpectator() && super.isMovementBlocked();
+    return !this.getEntity().isSpectator() && super.isMovementBlocked();
   }
 
   @Override
   public boolean isCombatModeEnabled() {
-    return !this.entity.isSpectator()
+    return !this.getEntity().isSpectator()
         && (this.cachedCombatModeEnabled || this.dataManager.get(COMBAT_MODE_ENABLED));
   }
 
@@ -100,20 +100,19 @@ class PlayerExtensionImpl<E extends PlayerEntity>
     if (MinecraftForge.EVENT_BUS.post(new OpenEquipmentMenuEvent(this))) {
       return;
     }
-    this.getEntity().openMenu(new SimpleNamedContainerProvider((windowId, playerInventory,
-        playerEntity) -> new EquipmentMenu(windowId, this.getEntity().inventory),
+    this.getEntity().openMenu(new SimpleNamedContainerProvider(
+        (windowId, playerInventory, playerEntity) -> new EquipmentMenu(windowId,
+            this.getEntity().inventory),
         new TranslationTextComponent("container.equipment")));
   }
 
   @Override
   public void openStorage(InventorySlotType slotType) {
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
-    storageStack
-        .getCapability(ModCapabilities.STORAGE)
+    storageStack.getCapability(ModCapabilities.STORAGE)
         .ifPresent(storage -> this.getEntity().openMenu(
             new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
   }
-
 
   @Override
   public boolean onDeath(DamageSource source) {
@@ -121,21 +120,21 @@ class PlayerExtensionImpl<E extends PlayerEntity>
       return true;
     } else if (source instanceof KillFeedProvider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new KillFeedMessage(((KillFeedProvider) source).createKillFeedEntry(this.entity)));
+          new KillFeedMessage(((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
     }
     return false;
   }
 
   @Override
-  boolean keepInventory() {
-    return this.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+  protected boolean keepInventory() {
+    return this.getLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
   }
 
   @Override
   public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
     // Copies the inventory. Doesn't actually matter if it was death or not.
     // Death drops from 'that' should be cleared on death drops to prevent item duplication.
-    for (int i = 0; i < that.getItemHandler().getSlots() - 1; i++) {
+    for (int i = 0; i < that.getItemHandler().getSlots(); i++) {
       this.getItemHandler().setStackInSlot(i, that.getItemHandler().getStackInSlot(i));
     }
 
@@ -151,8 +150,8 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
     super.encode(out, writeAll);
-    NetworkDataManager
-        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    NetworkDataManager.writeEntries(
+        writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
   }
 
   @Override

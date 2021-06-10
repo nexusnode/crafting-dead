@@ -18,10 +18,10 @@
 
 package com.craftingdead.core.world.action;
 
+import javax.annotation.Nullable;
 import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.client.animation.gun.AnimationType;
-import com.craftingdead.core.client.animation.gun.GunAnimationController;
-import com.craftingdead.core.client.animation.gun.reload.GunAnimationReload;
+import com.craftingdead.core.client.animation.AnimationType;
+import com.craftingdead.core.client.animation.reload.GunAnimationReload;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
@@ -29,7 +29,7 @@ import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-public class RemoveMagazineAction extends TimedAction {
+public class RemoveMagazineAction extends TimedAction<ActionType> {
 
   private final Gun gun;
 
@@ -37,8 +37,9 @@ public class RemoveMagazineAction extends TimedAction {
 
   private final MagazineAmmoProvider ammoProvider;
 
-  public RemoveMagazineAction(LivingExtension<?, ?> performer) {
-    super(ActionTypes.REMOVE_MAGAZINE.get(), performer, null);
+  public RemoveMagazineAction(ActionType type, LivingExtension<?, ?> performer,
+      @Nullable LivingExtension<?, ?> target) {
+    super(type, performer, target);
     this.gun = performer.getEntity().getMainHandItem().getCapability(ModCapabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
@@ -57,11 +58,11 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public boolean start() {
     if (!this.getPerformer().getEntity().isSprinting() && !this.oldMagazineStack.isEmpty()) {
-      if (this.gun.isPerformingRightMouseAction()) {
-        this.gun.setPerformingRightMouseAction(this.getPerformer(), false, false);
+      if (this.gun.isPerformingSecondaryAction()) {
+        this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
       }
-      if (this.gun.getClient() != null) {
-        this.gun.getAnimation(AnimationType.RELOAD)
+      if (this.getPerformer().getLevel().isClientSide()) {
+        this.gun.getClient().getAnimation(AnimationType.RELOAD)
             .filter(animation -> animation instanceof GunAnimationReload)
             .map(animation -> (GunAnimationReload) animation)
             .ifPresent(animation -> {
@@ -87,18 +88,21 @@ public class RemoveMagazineAction extends TimedAction {
   @Override
   public void cancel() {
     super.cancel();
-    this.gun.getAnimationController().ifPresent(GunAnimationController::removeCurrentAnimation);
+    if (this.getPerformer().getLevel().isClientSide()) {
+      this.gun.getClient().getAnimationController().removeCurrentAnimation();
+    }
     // Call this on both sides as we change the client side stack for the remove animation.
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);
   }
 
   @Override
   protected void finish() {
-    if (!this.performer.getEntity().level.isClientSide()) {
+    if (!this.getPerformer().getLevel().isClientSide()) {
       // This will be synced to the client by the gun.
       this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
-      if (!this.oldMagazineStack.isEmpty() && this.performer.getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.performer.getEntity()).addItem(this.oldMagazineStack);
+      if (!this.oldMagazineStack.isEmpty()
+          && this.getPerformer().getEntity() instanceof PlayerEntity) {
+        ((PlayerEntity) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
       }
     }
   }

@@ -18,20 +18,20 @@
 
 package com.craftingdead.core.world.action.item;
 
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.util.SoundEvent;
 
-public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properties<P>>
-    implements ActionEntry {
+public abstract class AbstractActionEntry implements ActionEntry {
 
   private final boolean shrinkStack;
   @Nullable
-  private final IItemProvider returnItem;
+  private final Supplier<Item> returnItem;
   @Nullable
   private final Supplier<SoundEvent> finishSound;
 
@@ -39,12 +39,12 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
 
   private final boolean returnItemInCreative;
 
-  protected AbstractActionEntry(P properties) {
-    this.shrinkStack = properties.shrinkStack;
-    this.returnItem = properties.returnItem;
-    this.finishSound = properties.finishSound;
-    this.shrinkStackInCreative = properties.shrinkStackInCreative;
-    this.returnItemInCreative = properties.returnItemInCreative;
+  protected AbstractActionEntry(Builder<?> builder) {
+    this.shrinkStack = builder.shrinkStack;
+    this.returnItem = builder.returnItem;
+    this.finishSound = builder.finishSound;
+    this.shrinkStackInCreative = builder.shrinkStackInCreative;
+    this.returnItemInCreative = builder.returnItemInCreative;
   }
 
   @Override
@@ -54,9 +54,11 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
   }
 
   @Override
-  public IItemProvider getReturnItem(LivingExtension<?, ?> performer) {
+  public Optional<Item> getReturnItem(LivingExtension<?, ?> performer) {
     return (!this.returnItemInCreative && performer.getEntity() instanceof PlayerEntity
-        && ((PlayerEntity) performer.getEntity()).isCreative()) ? null : this.returnItem;
+        && ((PlayerEntity) performer.getEntity()).isCreative())
+            ? Optional.empty()
+            : Optional.ofNullable(this.returnItem).map(Supplier::get);
   }
 
   @Override
@@ -64,10 +66,13 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
     return this.finishSound == null ? null : this.finishSound.get();
   }
 
-  protected static abstract class Properties<SELF extends Properties<SELF>> {
+  protected static abstract class Builder<SELF extends Builder<SELF>> {
+
+    private final Function<SELF, AbstractActionEntry> factory;
+
     protected boolean shrinkStack = true;
     @Nullable
-    protected IItemProvider returnItem;
+    protected Supplier<Item> returnItem;
     @Nullable
     protected Supplier<SoundEvent> finishSound;
 
@@ -75,21 +80,16 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
 
     protected boolean returnItemInCreative = true;
 
+    protected Builder(Function<SELF, AbstractActionEntry> factory) {
+      this.factory = factory;
+    }
+
     public SELF setShrinkStack(boolean shrinkStack) {
       this.shrinkStack = shrinkStack;
       return this.self();
     }
 
     public SELF setReturnItem(Supplier<Item> returnItem) {
-      return this.setReturnItem(new IItemProvider() {
-        @Override
-        public Item asItem() {
-          return returnItem.get();
-        }
-      });
-    }
-
-    public SELF setReturnItem(IItemProvider returnItem) {
       this.returnItem = returnItem;
       return this.self();
     }
@@ -111,6 +111,10 @@ public abstract class AbstractActionEntry<P extends AbstractActionEntry.Properti
     public SELF setReturnItemInCreative(boolean returnItemInCreative) {
       this.returnItemInCreative = returnItemInCreative;
       return this.self();
+    }
+
+    public ActionEntry build() {
+      return this.factory.apply(this.self());
     }
 
     @SuppressWarnings("unchecked")
