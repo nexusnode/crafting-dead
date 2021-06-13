@@ -66,6 +66,7 @@ import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.RegisterGunColour;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
@@ -94,8 +95,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -272,6 +275,20 @@ public class ClientDist implements ModDist {
 
   public boolean isLocalPlayer(Entity entity) {
     return entity == this.minecraft.player;
+  }
+
+  public void handleHit(Vector3d hitPos, boolean dead) {
+    clientConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
+        .ifPresent(this.ingameGui::displayHitMarker);
+    if (dead && ClientDist.clientConfig.killSoundEnabled.get()) {
+      // Plays a sound that follows the player
+      SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS
+          .getValue(new ResourceLocation(ClientDist.clientConfig.killSound.get()));
+      if (soundEvent != null) {
+        Minecraft.getInstance().getSoundManager().play(
+            SimpleSound.forUI(soundEvent, 5.0F, 1.5F));
+      }
+    }
   }
 
   // ================================================================================
