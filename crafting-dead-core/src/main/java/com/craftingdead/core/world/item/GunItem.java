@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.IRendererProvider;
 import com.craftingdead.core.world.gun.AbstractGun;
@@ -100,7 +100,7 @@ public class GunItem extends ShootableItem implements IRendererProvider {
       ITooltipFlag tooltipFlag) {
     super.appendHoverText(itemStack, world, lines, tooltipFlag);
 
-    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+    itemStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
       ITextComponent ammoCount =
           new StringTextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
               .map(Magazine::getSize)

@@ -16,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.action.item;
+package com.craftingdead.core.world.action.delegated;
 
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.block.BlockState;
@@ -29,16 +28,13 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.ForgeMod;
 
-public final class BlockActionEntry extends AbstractActionEntry {
-
-  private final Predicate<BlockState> predicate;
+public final class DelegatedBlockAction extends AbstractDelegatedAction<DelegatedBlockActionType> {
 
   private BlockPos blockPosTarget;
   private BlockState blockStateTarget;
 
-  private BlockActionEntry(Builder builder) {
-    super(builder);
-    this.predicate = builder.predicate;
+  DelegatedBlockAction(DelegatedBlockActionType type) {
+    super(type);
   }
 
   @Override
@@ -54,7 +50,7 @@ public final class BlockActionEntry extends AbstractActionEntry {
       if (this.blockPosTarget == null || this.blockStateTarget == null) {
         this.blockPosTarget = blockPos;
         this.blockStateTarget = blockState;
-        if (!this.predicate.test(this.blockStateTarget)) {
+        if (!this.type.getPredicate().test(this.blockStateTarget)) {
           return false;
         }
       }
@@ -68,23 +64,5 @@ public final class BlockActionEntry extends AbstractActionEntry {
   public boolean finish(LivingExtension<?, ?> performer, LivingExtension<?, ?> target,
       ItemStack heldStack) {
     return true;
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static final class Builder extends AbstractActionEntry.Builder<Builder> {
-
-    private Predicate<BlockState> predicate;
-
-    private Builder() {
-      super(BlockActionEntry::new);
-    }
-
-    public Builder setPredicate(Predicate<BlockState> predicate) {
-      this.predicate = predicate;
-      return this;
-    }
   }
 }

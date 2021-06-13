@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.gun.magazine.MagazineImpl;
@@ -67,7 +67,7 @@ public class MagazineItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SerializableCapabilityProvider<>(LazyOptional.of(() -> new MagazineImpl(this)),
-        () -> ModCapabilities.MAGAZINE, CompoundNBT::new);
+        () -> Capabilities.MAGAZINE, CompoundNBT::new);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class MagazineItem extends Item {
   @Override
   public int getDamage(ItemStack itemStack) {
     return this.size - itemStack
-        .getCapability(ModCapabilities.MAGAZINE)
+        .getCapability(Capabilities.MAGAZINE)
         .map(Magazine::getSize)
         .orElse(this.size);
   }
@@ -92,7 +92,7 @@ public class MagazineItem extends Item {
   @Override
   public void setDamage(ItemStack itemStack, int damage) {
     itemStack
-        .getCapability(ModCapabilities.MAGAZINE)
+        .getCapability(Capabilities.MAGAZINE)
         .ifPresent(magazine -> magazine.setSize(Math.max(0, this.size - damage)));
   }
 
@@ -109,7 +109,7 @@ public class MagazineItem extends Item {
     // Shows the current amount if the maximum size is higher than 1
     if (this.getSize() > 1) {
       int currentAmount =
-          stack.getCapability(ModCapabilities.MAGAZINE).map(Magazine::getSize).orElse(0);
+          stack.getCapability(Capabilities.MAGAZINE).map(Magazine::getSize).orElse(0);
 
       ITextComponent amountText = new StringTextComponent(currentAmount + "/" + this.getSize())
           .withStyle(TextFormatting.RED);
@@ -133,7 +133,7 @@ public class MagazineItem extends Item {
     if (nbt == null) {
       nbt = new CompoundNBT();
     }
-    CompoundNBT magazineNbt = itemStack.getCapability(ModCapabilities.MAGAZINE)
+    CompoundNBT magazineNbt = itemStack.getCapability(Capabilities.MAGAZINE)
         .map(INBTSerializable::serializeNBT)
         .orElse(null);
     if (magazineNbt != null && !magazineNbt.isEmpty()) {
@@ -146,7 +146,7 @@ public class MagazineItem extends Item {
   public void readShareTag(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     super.readShareTag(itemStack, nbt);
     if (nbt != null && nbt.contains("magazine", Constants.NBT.TAG_COMPOUND)) {
-      itemStack.getCapability(ModCapabilities.MAGAZINE)
+      itemStack.getCapability(Capabilities.MAGAZINE)
           .ifPresent(magazine -> magazine.deserializeNBT(nbt.getCompound("magazine")));
     }
   }

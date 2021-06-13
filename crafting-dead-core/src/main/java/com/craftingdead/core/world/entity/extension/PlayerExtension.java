@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.entity.extension;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -31,7 +31,7 @@ public interface PlayerExtension<E extends PlayerEntity>
 
   @SuppressWarnings("unchecked")
   static <E extends PlayerEntity> PlayerExtension<E> getExpected(E livingEntity) {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
+    return livingEntity.getCapability(Capabilities.LIVING)
         .filter(living -> living instanceof PlayerExtension)
         .map(living -> (PlayerExtension<E>) living)
         .orElseThrow(() -> new IllegalStateException("Missing living capability"));

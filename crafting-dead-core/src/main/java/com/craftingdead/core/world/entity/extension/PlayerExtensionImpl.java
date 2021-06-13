@@ -18,11 +18,11 @@
 
 package com.craftingdead.core.world.entity.extension;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.KillFeedMessage;
-import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.InventorySlotType;
@@ -43,7 +43,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 class PlayerExtensionImpl<E extends PlayerEntity>
     extends LivingExtensionImpl<E, PlayerHandler> implements PlayerExtension<E> {
 
-  private final NetworkDataManager dataManager = new NetworkDataManager();
+  private final SynchedData dataManager = new SynchedData();
 
   private static final DataParameter<Boolean> COMBAT_MODE_ENABLED =
       new DataParameter<>(0x02, DataSerializers.BOOLEAN);
@@ -109,7 +109,7 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   @Override
   public void openStorage(InventorySlotType slotType) {
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
-    storageStack.getCapability(ModCapabilities.STORAGE)
+    storageStack.getCapability(Capabilities.STORAGE)
         .ifPresent(storage -> this.getEntity().openMenu(
             new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
   }
@@ -143,21 +143,21 @@ class PlayerExtensionImpl<E extends PlayerEntity>
     }
   }
 
-  public NetworkDataManager getDataManager() {
+  public SynchedData getDataManager() {
     return this.dataManager;
   }
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
     super.encode(out, writeAll);
-    NetworkDataManager.writeEntries(
+    SynchedData.writeEntries(
         writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
     super.decode(in);
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+    this.dataManager.setEntryValues(SynchedData.readEntries(in));
   }
 
   @Override

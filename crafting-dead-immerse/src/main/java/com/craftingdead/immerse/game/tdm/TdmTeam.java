@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.tdm;
 
 import java.util.Optional;
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.module.team.Team;
 import com.craftingdead.immerse.game.module.team.TeamInstance;
@@ -69,7 +69,7 @@ public enum TdmTeam implements Team {
   }
 
   @Override
-  public void registerDataParameters(NetworkDataManager dataManager) {
+  public void registerDataParameters(SynchedData dataManager) {
     dataManager.register(SCORE, 0);
   }
 

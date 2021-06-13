@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.PendingHit;
@@ -76,11 +76,11 @@ public class ValidatePendingHitMessage {
     ServerPlayerEntity playerEntity = ctx.get().getSender();
     PlayerExtension<ServerPlayerEntity> player = PlayerExtension.getExpected(playerEntity);
     ItemStack heldStack = playerEntity.getMainHandItem();
-    heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+    heldStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
       for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
         final Entity hitEntity = playerEntity.getCommandSenderWorld().getEntity(hit.getKey());
         Optional.ofNullable(hitEntity)
-            .flatMap(e -> e.getCapability(ModCapabilities.LIVING).resolve())
+            .flatMap(e -> e.getCapability(Capabilities.LIVING).resolve())
             .ifPresent(hitLiving -> {
               for (PendingHit value : hit.getValue()) {
                 gun.validatePendingHit(player, hitLiving, value);

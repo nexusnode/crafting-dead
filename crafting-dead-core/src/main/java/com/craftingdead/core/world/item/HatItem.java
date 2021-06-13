@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.hat.DefaultHat;
 import net.minecraft.client.util.ITooltipFlag;
@@ -82,7 +82,7 @@ public class HatItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(LazyOptional.of(() -> new DefaultHat(this.nightVision,
-        this.headshotReductionPercentage, this.immuneToFlashes)), () -> ModCapabilities.HAT);
+        this.headshotReductionPercentage, this.immuneToFlashes)), () -> Capabilities.HAT);
   }
 
   public static class Properties extends Item.Properties {

@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
@@ -79,9 +79,9 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
       @Override
       public boolean canUse() {
         return super.canUse()
-            && AdvancedZombieEntity.this.getCapability(ModCapabilities.LIVING)
+            && AdvancedZombieEntity.this.getCapability(Capabilities.LIVING)
                 .map(living -> AdvancedZombieEntity.this.getMainHandItem()
-                    .getCapability(ModCapabilities.GUN)
+                    .getCapability(Capabilities.GUN)
                     .isPresent())
                 .orElse(false);
       }
@@ -144,7 +144,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   protected void populateDefaultEquipmentSlots(DifficultyInstance difficulty) {
     this.entityData.set(TEXTURE_NUMBER, this.random.nextInt(23));
     this.setItemSlot(EquipmentSlotType.MAINHAND, this.getHeldStack());
-    this.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+    this.getCapability(Capabilities.LIVING).ifPresent(living -> {
       living.getItemHandler().setStackInSlot(InventorySlotType.CLOTHING.getIndex(),
           this.getClothingStack());
       living.getItemHandler().setStackInSlot(InventorySlotType.HAT.getIndex(), this.getHatStack());
@@ -198,8 +198,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   public void tick() {
     super.tick();
     if (!this.getCommandSenderWorld().isClientSide()) {
-      this.getCapability(ModCapabilities.LIVING).ifPresent(
-          living -> this.getMainHandItem().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      this.getCapability(Capabilities.LIVING).ifPresent(
+          living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.canContinueToUse() || (Util.getMillis()
                     - this.triggerPressedStartTime > 1000 + this.random.nextInt(2000)))) {
@@ -212,8 +212,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   public void performRangedAttack(LivingEntity livingEntity, float distance) {
     if (!this.level.isClientSide()) {
-      this.getCapability(ModCapabilities.LIVING).ifPresent(
-          living -> this.getMainHandItem().getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+      this.getCapability(Capabilities.LIVING).ifPresent(
+          living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
             this.triggerPressedStartTime = Util.getMillis();
             gun.setTriggerPressed(living, true, true);
           }));

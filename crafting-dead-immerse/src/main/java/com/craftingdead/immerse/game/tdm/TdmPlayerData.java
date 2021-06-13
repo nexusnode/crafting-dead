@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game.tdm;
 
 import java.util.function.Consumer;
 import com.craftingdead.core.network.BufferSerializable;
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -38,10 +38,10 @@ public class TdmPlayerData implements BufferSerializable {
   private static final DataParameter<Boolean> DEAD =
       new DataParameter<>(0x04, DataSerializers.BOOLEAN);
 
-  private final NetworkDataManager dataManager;
+  private final SynchedData dataManager;
 
   public TdmPlayerData(Consumer<TdmPlayerData> dirtyListener) {
-    this.dataManager = new NetworkDataManager(() -> dirtyListener.accept(this));
+    this.dataManager = new SynchedData(() -> dirtyListener.accept(this));
     this.dataManager.register(SCORE, 0);
     this.dataManager.register(KILLS, 0);
     this.dataManager.register(ASSISTS, 0);
@@ -92,13 +92,13 @@ public class TdmPlayerData implements BufferSerializable {
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    NetworkDataManager
+    SynchedData
         .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+    this.dataManager.setEntryValues(SynchedData.readEntries(in));
   }
 
   @Override

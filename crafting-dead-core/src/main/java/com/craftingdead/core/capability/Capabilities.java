@@ -32,7 +32,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class ModCapabilities {
+public class Capabilities {
 
   @CapabilityInject(LivingExtension.class)
   public static final Capability<LivingExtension<?, ?>> LIVING = null;
@@ -60,23 +60,23 @@ public class ModCapabilities {
 
   static {
     CapabilityManager.INSTANCE.register(LivingExtension.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Storage.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Hydration.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Clothing.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Hat.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(CombatSlotProvider.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Gun.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Magazine.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Scope.class, EmptyStorage.getInstance(),
-        ModCapabilities::unsupported);
+        Capabilities::unsupported);
   }
 
   public static <T> T unsupported() {

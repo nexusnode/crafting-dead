@@ -21,7 +21,7 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.clothing.DefaultClothing;
 import com.google.common.collect.ImmutableMultimap;
@@ -61,7 +61,7 @@ public class ClothingItem extends Item {
             this.fireImmunity,
             new ResourceLocation(this.getRegistryName().getNamespace(), "textures/clothing/"
                 + this.getRegistryName().getPath() + "_" + "default" + ".png"))),
-        () -> ModCapabilities.CLOTHING);
+        () -> Capabilities.CLOTHING);
   }
 
   @Override

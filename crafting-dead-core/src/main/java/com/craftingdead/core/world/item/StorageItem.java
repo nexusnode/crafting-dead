@@ -22,7 +22,7 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.inventory.GenericMenu;
 import com.craftingdead.core.world.inventory.InventorySlotType;
@@ -61,8 +61,10 @@ public class StorageItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SerializableCapabilityProvider<>(LazyOptional.of(this.storageContainer), ImmutableSet
-        .of(() -> ModCapabilities.STORAGE, () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
+    return new SerializableCapabilityProvider<>(LazyOptional.of(this.storageContainer),
+        ImmutableSet.of(
+            () -> Capabilities.STORAGE,
+            () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
         CompoundNBT::new);
   }
 
@@ -71,7 +73,7 @@ public class StorageItem extends Item {
       ITooltipFlag tooltipFlag) {
     super.appendHoverText(backpackStack, world, lines, tooltipFlag);
 
-    backpackStack.getCapability(ModCapabilities.STORAGE).ifPresent(storage -> {
+    backpackStack.getCapability(Capabilities.STORAGE).ifPresent(storage -> {
       if (!storage.isEmpty()) {
         lines.add(new StringTextComponent(" "));
         lines.add(new TranslationTextComponent("container.inventory")
@@ -109,7 +111,7 @@ public class StorageItem extends Item {
     if (shareTag == null) {
       shareTag = new CompoundNBT();
     }
-    CompoundNBT storageTag = stack.getCapability(ModCapabilities.STORAGE)
+    CompoundNBT storageTag = stack.getCapability(Capabilities.STORAGE)
         .map(Storage::serializeNBT)
         .orElse(null);
     if (storageTag != null && !storageTag.isEmpty()) {
@@ -121,7 +123,7 @@ public class StorageItem extends Item {
   @Override
   public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
     if (nbt != null && nbt.contains("storage", Constants.NBT.TAG_COMPOUND)) {
-      stack.getCapability(ModCapabilities.STORAGE)
+      stack.getCapability(Capabilities.STORAGE)
           .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("storage")));
     }
     super.readShareTag(stack, nbt);

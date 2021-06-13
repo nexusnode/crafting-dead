@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game.tdm;
 
 import java.util.Collection;
 import java.util.Optional;
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.core.world.entity.extension.Visibility;
@@ -47,7 +47,7 @@ public class TdmPlayerHandler implements PlayerHandler {
 
   private final PlayerExtension<?> player;
 
-  protected final NetworkDataManager dataManager = new NetworkDataManager();
+  protected final SynchedData dataManager = new SynchedData();
 
   private final TdmGame<?> game;
 
@@ -115,13 +115,13 @@ public class TdmPlayerHandler implements PlayerHandler {
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    NetworkDataManager
+    SynchedData
         .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+    this.dataManager.setEntryValues(SynchedData.readEntries(in));
   }
 
   @Override

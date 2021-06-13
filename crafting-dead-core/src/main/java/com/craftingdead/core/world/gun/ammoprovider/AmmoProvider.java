@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.gun.ammoprovider;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.BufferSerializable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.magazine.Magazine;
@@ -43,7 +43,7 @@ public interface AmmoProvider extends INBTSerializable<CompoundNBT>, BufferSeria
   }
 
   default LazyOptional<Magazine> getMagazine() {
-    return this.getMagazineStack().getCapability(ModCapabilities.MAGAZINE);
+    return this.getMagazineStack().getCapability(Capabilities.MAGAZINE);
   }
 
   AmmoProviderType getType();

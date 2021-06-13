@@ -43,6 +43,7 @@
   "action.craftingdeadsurvival.use_clean_rag.message":"Cleaning wound",
   "action.craftingdeadsurvival.use_splint.message":"Applying splint",
   "action.craftingdeadsurvival.wash_rag.message":"Washing rag",
+  "action.craftingdeadsurvival.use_syringe_on_zombie.message":"Withdrawing RBI infection",
   "action.craftingdeadsurvival.use_cure_syringe.message":"Injecting cure",
   "action.craftingdeadsurvival.use_rbi_syringe.message":"Injecting RBI",
   "action.craftingdeadsurvival.shred_clothing.message":"Shredding clothes",

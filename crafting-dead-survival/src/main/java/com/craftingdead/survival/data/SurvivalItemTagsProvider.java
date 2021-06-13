@@ -37,7 +37,6 @@ public class SurvivalItemTagsProvider extends ItemTagsProvider {
   public void addTags() {
     this.tag(ModItemTags.SYRINGES).add(SurvivalItems.RBI_SYRINGE.get(),
         SurvivalItems.CURE_SYRINGE.get());
-    this.tag(ModItemTags.VIRUS_SYRINGE).add(SurvivalItems.RBI_SYRINGE.get());
   }
 
   @Override

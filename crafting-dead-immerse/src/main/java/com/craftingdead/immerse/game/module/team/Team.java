@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.module.team;
 
 import java.util.Optional;
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.Color;
@@ -29,7 +29,7 @@ import net.minecraft.util.text.Style;
 
 public interface Team {
 
-  void registerDataParameters(NetworkDataManager dataManager);
+  void registerDataParameters(SynchedData dataManager);
 
   void save(TeamInstance<?> teamInstance, CompoundNBT nbt);
 

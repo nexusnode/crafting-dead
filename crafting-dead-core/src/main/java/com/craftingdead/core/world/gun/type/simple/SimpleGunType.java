@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.gun.type.simple;
 
 import java.util.function.Function;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.gun.type.AbstractGunType;
 import com.craftingdead.core.world.gun.type.TypedGun;
@@ -40,7 +40,7 @@ public class SimpleGunType extends AbstractGunType {
   public ICapabilityProvider createCapabilityProvider(ItemStack itemStack) {
     return new SerializableCapabilityProvider<>(
         LazyOptional.of(() -> new TypedGun<>(this.getClientFactory(), itemStack, this)),
-        ImmutableSet.of(() -> ModCapabilities.GUN, () -> ModCapabilities.COMBAT_SLOT_PROVIDER),
+        ImmutableSet.of(() -> Capabilities.GUN, () -> Capabilities.COMBAT_SLOT_PROVIDER),
         CompoundNBT::new);
   }
 

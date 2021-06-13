@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.animation.GunAnimation;
 import com.craftingdead.core.client.renderer.item.model.ModelMuzzleFlash;
 import com.craftingdead.core.client.util.RenderUtil;
@@ -136,7 +136,7 @@ public abstract class GunRenderer implements IItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final Gun gun = itemStack.getCapability(ModCapabilities.GUN)
+    final Gun gun = itemStack.getCapability(Capabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
 
     matrixStack.pushPose();
@@ -170,7 +170,7 @@ public abstract class GunRenderer implements IItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final Gun gun = itemStack.getCapability(ModCapabilities.GUN)
+    final Gun gun = itemStack.getCapability(Capabilities.GUN)
         .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
     final GunClient gunClient = gun.getClient();
 

@@ -18,7 +18,7 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
 import com.craftingdead.core.world.item.ModItems;
 import net.minecraft.entity.EntityType;
@@ -34,7 +34,7 @@ public class PoliceZombieEntity extends AdvancedZombieEntity {
   @Override
   protected ItemStack getHeldStack() {
     ItemStack gunStack = ModItems.G18.get().getDefaultInstance();
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setAmmoProvider(
+    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> gun.setAmmoProvider(
         new RefillableAmmoProvider(ModItems.G18_MAGAZINE.get().getDefaultInstance(), 0, true)));
     return gunStack;
   }

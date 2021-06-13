@@ -19,8 +19,8 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -51,9 +51,9 @@ public class TriggerPressedMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getMainHandItem();
-          livingEntity.getCapability(ModCapabilities.LIVING)
+          livingEntity.getCapability(Capabilities.LIVING)
               .ifPresent(living -> heldStack
-                  .getCapability(ModCapabilities.GUN)
+                  .getCapability(Capabilities.GUN)
                   .ifPresent(gun -> gun.setTriggerPressed(living, msg.triggerPressed,
                       ctx.get().getDirection().getReceptionSide().isServer())));
         });

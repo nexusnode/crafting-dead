@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
@@ -234,10 +234,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     if (heldStack != this.lastHeldStack) {
       this.getProgressMonitor().ifPresent(ProgressMonitor::stop);
       if (this.lastHeldStack != null) {
-        this.lastHeldStack.getCapability(ModCapabilities.GUN)
+        this.lastHeldStack.getCapability(Capabilities.GUN)
             .ifPresent(gun -> gun.reset(this));
       }
-      if (heldStack.getCapability(ModCapabilities.GUN).isPresent()) {
+      if (heldStack.getCapability(Capabilities.GUN).isPresent()) {
         this.entity.playSound(ModSoundEvents.GUN_EQUIP.get(), 0.25F, 1.0F);
       }
       this.lastHeldStack = heldStack;
@@ -250,7 +250,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
       this.removeAction();
     }
 
-    heldStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.tick(this));
+    heldStack.getCapability(Capabilities.GUN).ifPresent(gun -> gun.tick(this));
 
     this.updateClothing();
     this.updateHat();
@@ -297,7 +297,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   private void updateHat() {
     ItemStack headStack = this.itemHandler.getStackInSlot(InventorySlotType.HAT.getIndex());
-    Hat hat = headStack.getCapability(ModCapabilities.HAT).orElse(null);
+    Hat hat = headStack.getCapability(Capabilities.HAT).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity.addEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
@@ -309,10 +309,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   private void updateClothing() {
     ItemStack clothingStack =
         this.itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
-    Clothing clothing = clothingStack.getCapability(ModCapabilities.CLOTHING).orElse(null);
+    Clothing clothing = clothingStack.getCapability(Capabilities.CLOTHING).orElse(null);
 
     if (clothingStack != this.lastClothingStack) {
-      this.lastClothingStack.getCapability(ModCapabilities.CLOTHING)
+      this.lastClothingStack.getCapability(Capabilities.CLOTHING)
           .map(Clothing::getAttributeModifiers)
           .ifPresent(this.entity.getAttributes()::removeAttributeModifiers);
       if (clothing != null) {

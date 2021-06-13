@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.item.crafting;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
@@ -67,11 +67,11 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
 
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
-    Magazine magazine = ModCapabilities.getOrThrow(
-        ModCapabilities.MAGAZINE, inventory.getItem(MIDDLE_SLOT_INDEX), Magazine.class);
+    Magazine magazine = Capabilities.getOrThrow(
+        Capabilities.MAGAZINE, inventory.getItem(MIDDLE_SLOT_INDEX), Magazine.class);
 
-    ModCapabilities.getOrThrow(
-        ModCapabilities.MAGAZINE, this.nextTier, Magazine.class).setSize(magazine.getSize());
+    Capabilities.getOrThrow(
+        Capabilities.MAGAZINE, this.nextTier, Magazine.class).setSize(magazine.getSize());
 
     return this.nextTier;
   }

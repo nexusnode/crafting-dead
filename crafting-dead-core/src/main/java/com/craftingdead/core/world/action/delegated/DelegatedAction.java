@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.action.item;
+package com.craftingdead.core.world.action.delegated;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -26,10 +26,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvent;
 
-public interface ActionEntry {
+public interface DelegatedAction {
 
   /**
-   * Checks if this {@link ActionEntry} can be performed and if so, is continued to be called every
+   * Checks if this {@link DelegatedAction} can be performed and if so, is continued to be called every
    * tick.
    * 
    * @param performer - the {@link LivingExtension} performing the {@link Action}
@@ -72,5 +72,5 @@ public interface ActionEntry {
    * 
    * @return the {@link SoundEvent}
    */
-  SoundEvent getFinishSound();
+  Optional<SoundEvent> getFinishSound();
 }

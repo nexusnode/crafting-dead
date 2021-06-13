@@ -18,12 +18,13 @@
 
 package com.craftingdead.survival.world.action;
 
-import java.util.concurrent.ThreadLocalRandom;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.tags.ModItemTags;
+import java.util.Optional;
+import java.util.Random;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.action.ActionType;
-import com.craftingdead.core.world.action.item.BlockActionEntry;
-import com.craftingdead.core.world.action.item.EntityActionEntry;
+import com.craftingdead.core.world.action.TargetSelector;
+import com.craftingdead.core.world.action.delegated.DelegatedBlockActionType;
+import com.craftingdead.core.world.action.delegated.DelegatedEntityActionType;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.CraftingDeadSurvival;
@@ -47,10 +48,10 @@ public class SurvivalActionTypes {
       ACTION_TYPES.register("shred_clothing",
           () -> ItemActionType.builder()
               .setHeldItemPredicate(
-                  itemStack -> itemStack.getCapability(ModCapabilities.CLOTHING).isPresent())
-              .addEntry(EntityActionEntry.builder()
+                  itemStack -> itemStack.getCapability(Capabilities.CLOTHING).isPresent())
+              .addDelegatedAction(DelegatedEntityActionType.builder()
                   .setCustomAction(extension -> {
-                    ThreadLocalRandom random = ThreadLocalRandom.current();
+                    Random random = extension.getEntity().getRandom();
                     int randomRagAmount = random.nextInt(3) + 3;
 
                     for (int i = 0; i < randomRagAmount; i++) {
@@ -70,12 +71,12 @@ public class SurvivalActionTypes {
       ACTION_TYPES.register("use_splint",
           () -> ItemActionType.builder()
               .setHeldItemPredicate(itemStack -> itemStack.getItem() == SurvivalItems.SPLINT.get())
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS
                       .andThen(extension -> (extension == null
                           || !extension.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get()))
-                              ? null
-                              : extension))
+                              ? Optional.empty()
+                              : Optional.of(extension)))
                   .build())
               .build());
 
@@ -85,12 +86,12 @@ public class SurvivalActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.CLEAN_RAG.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS
                       .andThen(extension -> (extension == null
                           || !extension.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get()))
-                              ? null
-                              : extension))
+                              ? Optional.empty()
+                              : Optional.of(extension)))
                   .setReturnItem(SurvivalItems.BLOODY_RAG)
                   .build())
               .build());
@@ -101,7 +102,7 @@ public class SurvivalActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.DIRTY_RAG.get()
                       || itemStack.getItem() == SurvivalItems.BLOODY_RAG.get())
-              .addEntry(BlockActionEntry.builder()
+              .addDelegatedAction(DelegatedBlockActionType.builder()
                   .setReturnItem(SurvivalItems.CLEAN_RAG)
                   .setFinishSound(SoundEvents.BUCKET_FILL)
                   .setPredicate(
@@ -109,18 +110,16 @@ public class SurvivalActionTypes {
                   .build())
               .build());
 
-  public static final RegistryObject<ActionType> USE_SYRINGE =
-      ACTION_TYPES.register("use_syringe",
+  public static final RegistryObject<ActionType> USE_SYRINGE_ON_ZOMBIE =
+      ACTION_TYPES.register("use_syringe_on_zombie",
           () -> ItemActionType.builder()
               .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.OTHERS_ONLY
-                      .ofType(ZombieEntity.class))
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.OTHERS_ONLY.ofType(ZombieEntity.class))
                   .setCustomAction(extension -> extension.getEntity().hurt(
                       DamageSource.mobAttack(extension.getEntity()), 2.0F), 0.25F)
-                  .setCondition(() -> !ModItemTags.VIRUS_SYRINGE.getValues().isEmpty())
-                  .setReturnItem(() -> ModItemTags.VIRUS_SYRINGE.getValues().get(0))
+                  .setReturnItem(() -> SurvivalItems.RBI_SYRINGE.get())
                   .build())
               .build());
 
@@ -130,8 +129,8 @@ public class SurvivalActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.CURE_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
                   .build())
               .build());
@@ -142,8 +141,8 @@ public class SurvivalActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == SurvivalItems.RBI_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .addEffect(
                       () -> new EffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999), 1.0F)
                   .setReturnItem(ModItems.SYRINGE)

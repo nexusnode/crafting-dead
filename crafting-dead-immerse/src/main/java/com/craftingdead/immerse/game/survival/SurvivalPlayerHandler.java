@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.game.GameTypes;
@@ -45,7 +45,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private final PlayerExtension<?> player;
 
-  private final NetworkDataManager dataManager = new NetworkDataManager();
+  private final SynchedData dataManager = new SynchedData();
 
   public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
@@ -130,13 +130,13 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    NetworkDataManager
+    SynchedData
         .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+    this.dataManager.setEntryValues(SynchedData.readEntries(in));
   }
 
   @Override

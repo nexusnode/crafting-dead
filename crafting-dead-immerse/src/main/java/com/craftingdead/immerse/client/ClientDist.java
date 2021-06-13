@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
@@ -201,7 +201,7 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
     final PlayerExtension<AbstractClientPlayerEntity> viewingPlayer =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
             ? ((AbstractClientPlayerEntity) this.minecraft.getCameraEntity())
-                .getCapability(ModCapabilities.LIVING)
+                .getCapability(Capabilities.LIVING)
                 .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;

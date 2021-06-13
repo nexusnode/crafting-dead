@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.item.crafting;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -48,7 +48,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
           }
           break;
         case 4:
-          if (!inventory.getItem(i).getCapability(ModCapabilities.MAGAZINE).isPresent()) {
+          if (!inventory.getItem(i).getCapability(Capabilities.MAGAZINE).isPresent()) {
             return false;
           }
           break;
@@ -69,7 +69,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
 
     for (int i = 0; i < remainingItems.size(); ++i) {
       ItemStack item = inventory.getItem(i);
-      if (item.getCapability(ModCapabilities.MAGAZINE).isPresent()) {
+      if (item.getCapability(Capabilities.MAGAZINE).isPresent()) {
         remainingItems.set(i, item.copy());
       } else if (item.hasContainerItem()) {
         remainingItems.set(i, item.getContainerItem());
@@ -82,7 +82,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   @Override
   public ItemStack assemble(CraftingInventory inventory) {
     ItemStack result = inventory.getItem(4).copy();
-    ModCapabilities.getOrThrow(ModCapabilities.MAGAZINE, result, Magazine.class).setSize(0);
+    Capabilities.getOrThrow(Capabilities.MAGAZINE, result, Magazine.class).setSize(0);
     return result;
   }
 

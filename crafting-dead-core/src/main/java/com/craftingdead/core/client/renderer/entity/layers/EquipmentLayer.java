@@ -20,7 +20,7 @@ package com.craftingdead.core.client.renderer.entity.layers;
 
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -75,7 +75,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
-    entity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
 
       ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
 

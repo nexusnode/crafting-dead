@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.HitMessage;
 import com.craftingdead.core.network.message.play.SecondaryActionMessage;
 import com.craftingdead.core.network.message.play.SetFireModeMessage;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
-import com.craftingdead.core.network.util.NetworkDataManager;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.craftingdead.core.world.damagesource.ModDamageSource;
@@ -140,7 +140,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   private static final DataParameter<ItemStack> PAINT_STACK =
       new DataParameter<>(0x01, DataSerializers.ITEM_STACK);
 
-  private final NetworkDataManager dataManager = new NetworkDataManager();
+  private final SynchedData dataManager = new SynchedData();
 
   protected final ItemStack itemStack;
 
@@ -511,7 +511,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       if (headshot) {
         damage *= HEADSHOT_MULTIPLIER * (1.0F - hitLiving.getItemHandler()
             .getStackInSlot(InventorySlotType.HAT.getIndex())
-            .getCapability(ModCapabilities.HAT)
+            .getCapability(Capabilities.HAT)
             .map(Hat::getHeadshotReductionPercentage)
             .orElse(0.0F));
       }
@@ -748,7 +748,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    NetworkDataManager
+    SynchedData
         .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
     if (writeAll || this.attachmentsDirty) {
       out.writeVarInt(this.attachments.size());
@@ -770,7 +770,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(in));
+    this.dataManager.setEntryValues(SynchedData.readEntries(in));
 
     int size = in.readVarInt();
     if (size > -1) {

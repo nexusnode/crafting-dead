@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.action.reload;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.animation.AnimationType;
 import com.craftingdead.core.client.animation.reload.GunAnimationReload;
 import com.craftingdead.core.world.action.ActionType;
@@ -42,7 +42,7 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
       @Nullable LivingExtension<?, ?> target) {
     super(type, performer, target);
     this.gunStack = performer.getEntity().getMainHandItem();
-    this.gun = this.gunStack.getCapability(ModCapabilities.GUN)
+    this.gun = this.gunStack.getCapability(Capabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     this.oldMagazineStack = this.gun.getAmmoProvider().getMagazineStack();
   }

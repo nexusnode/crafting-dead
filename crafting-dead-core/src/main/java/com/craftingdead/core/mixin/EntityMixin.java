@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.Visibility;
 import net.minecraft.entity.Entity;
@@ -34,7 +34,7 @@ public class EntityMixin {
   @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
   private void isInvisible(CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    entity.getCapability(ModCapabilities.LIVING)
+    entity.getCapability(Capabilities.LIVING)
         .map(LivingExtension::getVisibility)
         .filter(v -> v == Visibility.INVISIBLE || v == Visibility.PARTIALLY_VISIBLE)
         .ifPresent(__ -> callbackInfo.setReturnValue(true));
@@ -44,7 +44,7 @@ public class EntityMixin {
   private void isInvisibleTo(PlayerEntity playerEntity,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    entity.getCapability(ModCapabilities.LIVING)
+    entity.getCapability(Capabilities.LIVING)
         .map(LivingExtension::getVisibility)
         .filter(Visibility.PARTIALLY_VISIBLE::equals)
         .ifPresent(__ -> callbackInfo.setReturnValue(false));

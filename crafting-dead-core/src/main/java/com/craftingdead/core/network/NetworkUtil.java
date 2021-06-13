@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.network.util;
+package com.craftingdead.core.network;
 
 import java.util.Optional;
 import net.minecraft.entity.Entity;
@@ -26,14 +26,14 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class NetworkUtil {
 
-  public static Optional<Entity> getEntity(NetworkEvent.Context ctx, int entityId) {
-    switch (ctx.getDirection().getReceptionSide()) {
+  public static Optional<Entity> getEntity(NetworkEvent.Context context, int entityId) {
+    switch (context.getDirection().getReceptionSide()) {
       case CLIENT:
-        Optional<World> world =
-            LogicalSidedProvider.CLIENTWORLD.get(ctx.getDirection().getReceptionSide());
-        return world.map(w -> w.getEntity(entityId));
+        return LogicalSidedProvider.CLIENTWORLD
+            .<Optional<World>>get(context.getDirection().getReceptionSide())
+            .map(level -> level.getEntity(entityId));
       case SERVER:
-        return Optional.ofNullable(ctx.getSender());
+        return Optional.ofNullable(context.getSender());
       default:
         return Optional.empty();
     }

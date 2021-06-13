@@ -18,8 +18,9 @@
 
 package com.craftingdead.core.world.action;
 
+import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.action.item.EntityActionEntry;
+import com.craftingdead.core.world.action.delegated.DelegatedEntityActionType;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.action.reload.MagazineReloadAction;
 import com.craftingdead.core.world.action.reload.RefillableReloadAction;
@@ -64,17 +65,17 @@ public class ActionTypes {
           () -> ItemActionType.builder()
               .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
+              .addDelegatedAction(DelegatedEntityActionType.builder()
                   .setTargetSelector((performer, target) -> {
                     if (target == null
                         || performer == target
                         || target.getEntity() instanceof SkeletonEntity) {
-                      return null;
+                      return Optional.empty();
                     }
 
                     LivingEntity targetEntity = target.getEntity();
                     if (targetEntity.getHealth() > 4) {
-                      return target;
+                      return Optional.ofNullable(target);
                     }
 
                     if (performer.getEntity() instanceof PlayerEntity) {
@@ -84,7 +85,7 @@ public class ActionTypes {
                           true);
                     }
 
-                    return null;
+                    return Optional.empty();
                   })
                   .setCustomAction(extension -> extension.getEntity().hurt(
                       DamageSource.mobAttack(extension.getEntity()), 2.0F), 1.0F)
@@ -98,8 +99,8 @@ public class ActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == ModItems.FIRST_AID_KIT.get())
               .setFreezeMovement(true)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 1), 1.0F)
                   .build())
               .build());
@@ -110,8 +111,8 @@ public class ActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == ModItems.ADRENALINE_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
                   .addEffect(
@@ -125,8 +126,8 @@ public class ActionTypes {
               .setHeldItemPredicate(
                   itemStack -> itemStack.getItem() == ModItems.BLOOD_SYRINGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
                   .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 0), 1.0F)
@@ -138,8 +139,8 @@ public class ActionTypes {
           () -> ItemActionType.builder()
               .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.BANDAGE.get())
               .setTotalDurationTicks(16)
-              .addEntry(EntityActionEntry.builder()
-                  .setTargetSelector(EntityActionEntry.TargetSelector.SELF_AND_OTHERS)
+              .addDelegatedAction(DelegatedEntityActionType.builder()
+                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 0), 1.0F)
                   .build())
               .build());

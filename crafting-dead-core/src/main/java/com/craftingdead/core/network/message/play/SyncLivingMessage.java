@@ -20,7 +20,7 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
@@ -61,7 +61,7 @@ public class SyncLivingMessage {
       if (entity == null) {
         return;
       }
-      entity.getCapability(ModCapabilities.LIVING).ifPresent(living -> living.decode(msg.data));
+      entity.getCapability(Capabilities.LIVING).ifPresent(living -> living.decode(msg.data));
     });
     return true;
   }

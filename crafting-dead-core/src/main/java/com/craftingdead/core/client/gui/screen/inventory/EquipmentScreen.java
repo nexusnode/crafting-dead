@@ -19,7 +19,7 @@
 package com.craftingdead.core.client.gui.screen.inventory;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
@@ -85,7 +85,7 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
     this.vestButton.active = this.menu
         .getItemHandler()
         .getStackInSlot(InventorySlotType.VEST.getIndex())
-        .getCapability(ModCapabilities.STORAGE)
+        .getCapability(Capabilities.STORAGE)
         .isPresent();
   }
 
@@ -107,7 +107,7 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
     this.blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
     ItemStack gunStack = this.menu.getGunStack();
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
 
       final int gunSlotX = this.leftPos + 122;
       final int gunSlotY = this.topPos + 26;

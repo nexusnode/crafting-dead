@@ -20,7 +20,7 @@ package com.craftingdead.survival;
 
 import java.util.ListIterator;
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.action.Action;
@@ -179,7 +179,9 @@ public class CraftingDeadSurvival {
         && target.getEntity() instanceof ZombieEntity) {
       event.setCanceled(true);
       event.getLiving().performAction(
-          SurvivalActionTypes.USE_SYRINGE.get().createAction(action.getPerformer(), target), true);
+          SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get().createAction(action.getPerformer(),
+              target),
+          true);
     }
   }
 
@@ -215,7 +217,7 @@ public class CraftingDeadSurvival {
   @SubscribeEvent
   public void handleRightClickItem(PlayerInteractEvent.RightClickItem event) {
     if (!event.getWorld().isClientSide()
-        && event.getItemStack().getCapability(ModCapabilities.CLOTHING).isPresent()) {
+        && event.getItemStack().getCapability(Capabilities.CLOTHING).isPresent()) {
       PlayerExtension<?> extension = PlayerExtension.getExpected(event.getPlayer());
       extension.performAction(
           SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, null), true);
@@ -224,7 +226,7 @@ public class CraftingDeadSurvival {
 
   @SubscribeEvent
   public void handleGunHitEntity(GunEvent.HitEntity event) {
-    event.getTarget().getCapability(ModCapabilities.LIVING)
+    event.getTarget().getCapability(Capabilities.LIVING)
         .resolve()
         .flatMap(living -> living.getHandler(SurvivalPlayerHandler.ID))
         .map(living -> (SurvivalPlayerHandler) living)

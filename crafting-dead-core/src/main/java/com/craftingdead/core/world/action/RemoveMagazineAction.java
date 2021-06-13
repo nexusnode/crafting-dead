@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.action;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.animation.AnimationType;
 import com.craftingdead.core.client.animation.reload.GunAnimationReload;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -40,7 +40,7 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   public RemoveMagazineAction(ActionType type, LivingExtension<?, ?> performer,
       @Nullable LivingExtension<?, ?> target) {
     super(type, performer, target);
-    this.gun = performer.getEntity().getMainHandItem().getCapability(ModCapabilities.GUN)
+    this.gun = performer.getEntity().getMainHandItem().getCapability(Capabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {

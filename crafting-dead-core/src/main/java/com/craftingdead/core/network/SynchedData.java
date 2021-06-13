@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.network.util;
+package com.craftingdead.core.network;
 
 import java.util.List;
 import java.util.Map;
@@ -38,21 +38,21 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.IDataSerializer;
 
-public class NetworkDataManager {
+public class SynchedData {
 
-  private final Map<Integer, NetworkDataManager.DataEntry<?>> entries = new Int2ObjectArrayMap<>();
+  private final Map<Integer, SynchedData.DataEntry<?>> entries = new Int2ObjectArrayMap<>();
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
   private final Runnable dirtyListener;
 
   private boolean empty = true;
   private boolean dirty;
 
-  public NetworkDataManager() {
+  public SynchedData() {
     this.dirtyListener = () -> {
     };
   }
 
-  public NetworkDataManager(Runnable dirtyListener) {
+  public SynchedData(Runnable dirtyListener) {
     this.dirtyListener = dirtyListener;
   }
 
@@ -72,7 +72,7 @@ public class NetworkDataManager {
   }
 
   private <T> void setEntry(DataParameter<T> parameter, T value) {
-    NetworkDataManager.DataEntry<T> entry = new NetworkDataManager.DataEntry<>(parameter, value);
+    SynchedData.DataEntry<T> entry = new SynchedData.DataEntry<>(parameter, value);
     this.lock.writeLock().lock();
     this.entries.put(parameter.getId(), entry);
     this.empty = false;
@@ -80,12 +80,12 @@ public class NetworkDataManager {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> NetworkDataManager.DataEntry<T> getEntry(DataParameter<T> parameter) {
+  private <T> SynchedData.DataEntry<T> getEntry(DataParameter<T> parameter) {
     this.lock.readLock().lock();
 
-    NetworkDataManager.DataEntry<T> entry;
+    SynchedData.DataEntry<T> entry;
     try {
-      entry = (NetworkDataManager.DataEntry<T>) this.entries.get(parameter.getId());
+      entry = (SynchedData.DataEntry<T>) this.entries.get(parameter.getId());
     } catch (Throwable throwable) {
       CrashReport crashReport =
           CrashReport.forThrowable(throwable, "Getting data entry");
@@ -104,7 +104,7 @@ public class NetworkDataManager {
   }
 
   public <T> void set(DataParameter<T> parameter, T value) {
-    NetworkDataManager.DataEntry<T> entry = this.getEntry(parameter);
+    SynchedData.DataEntry<T> entry = this.getEntry(parameter);
     if (ObjectUtils.notEqual(value, entry.getValue())) {
       entry.setValue(value);
       entry.setDirty(true);
@@ -113,7 +113,7 @@ public class NetworkDataManager {
   }
 
   public <T> T getUpdate(DataParameter<T> parameter, Function<T, T> updater) {
-    NetworkDataManager.DataEntry<T> entry = this.getEntry(parameter);
+    SynchedData.DataEntry<T> entry = this.getEntry(parameter);
     T newValue = updater.apply(entry.getValue());
     if (ObjectUtils.notEqual(newValue, entry.getValue())) {
       entry.setValue(newValue);
@@ -134,16 +134,16 @@ public class NetworkDataManager {
     this.dirty = true;
   }
 
-  public static void writeEntries(List<NetworkDataManager.DataEntry<?>> entries, PacketBuffer buf) {
+  public static void writeEntries(List<SynchedData.DataEntry<?>> entries, PacketBuffer buf) {
     if (entries != null) {
-      for (NetworkDataManager.DataEntry<?> entry : entries) {
+      for (SynchedData.DataEntry<?> entry : entries) {
         writeEntry(buf, entry);
       }
     }
     buf.writeByte(255);
   }
 
-  private static <T> void writeEntry(PacketBuffer out, NetworkDataManager.DataEntry<T> entry) {
+  private static <T> void writeEntry(PacketBuffer out, SynchedData.DataEntry<T> entry) {
     DataParameter<T> parameter = entry.getKey();
     int i = DataSerializers.getSerializedId(parameter.getSerializer());
     if (i < 0) {
@@ -156,11 +156,11 @@ public class NetworkDataManager {
   }
 
   @Nullable
-  public List<NetworkDataManager.DataEntry<?>> getDirty() {
-    List<NetworkDataManager.DataEntry<?>> list = null;
+  public List<SynchedData.DataEntry<?>> getDirty() {
+    List<SynchedData.DataEntry<?>> list = null;
     if (this.dirty) {
       this.lock.readLock().lock();
-      for (NetworkDataManager.DataEntry<?> enttry : this.entries.values()) {
+      for (SynchedData.DataEntry<?> enttry : this.entries.values()) {
         if (enttry.isDirty()) {
           enttry.setDirty(false);
           if (list == null) {
@@ -176,10 +176,10 @@ public class NetworkDataManager {
   }
 
   @Nullable
-  public List<NetworkDataManager.DataEntry<?>> getAll() {
-    List<NetworkDataManager.DataEntry<?>> list = null;
+  public List<SynchedData.DataEntry<?>> getAll() {
+    List<SynchedData.DataEntry<?>> list = null;
     this.lock.readLock().lock();
-    for (NetworkDataManager.DataEntry<?> entry : this.entries.values()) {
+    for (SynchedData.DataEntry<?> entry : this.entries.values()) {
       if (list == null) {
         list = Lists.newArrayList();
       }
@@ -190,8 +190,8 @@ public class NetworkDataManager {
   }
 
   @Nullable
-  public static List<NetworkDataManager.DataEntry<?>> readEntries(PacketBuffer in) {
-    List<NetworkDataManager.DataEntry<?>> entries = null;
+  public static List<SynchedData.DataEntry<?>> readEntries(PacketBuffer in) {
+    List<SynchedData.DataEntry<?>> entries = null;
 
     int id;
     while ((id = in.readUnsignedByte()) != 255) {
@@ -211,21 +211,21 @@ public class NetworkDataManager {
     return entries;
   }
 
-  private static <T> NetworkDataManager.DataEntry<T> readEntry(PacketBuffer buf,
+  private static <T> SynchedData.DataEntry<T> readEntry(PacketBuffer buf,
       int id, IDataSerializer<T> serializer) {
-    return new NetworkDataManager.DataEntry<>(serializer.createAccessor(id),
+    return new SynchedData.DataEntry<>(serializer.createAccessor(id),
         serializer.read(buf));
   }
 
-  public void setEntryValues(@Nullable List<NetworkDataManager.DataEntry<?>> entries) {
+  public void setEntryValues(@Nullable List<SynchedData.DataEntry<?>> entries) {
     if (entries == null) {
       return;
     }
 
     this.lock.writeLock().lock();
 
-    for (NetworkDataManager.DataEntry<?> entry : entries) {
-      NetworkDataManager.DataEntry<?> currentEntry = this.entries.get(entry.getKey().getId());
+    for (SynchedData.DataEntry<?> entry : entries) {
+      SynchedData.DataEntry<?> currentEntry = this.entries.get(entry.getKey().getId());
       if (currentEntry != null) {
         this.transferData(currentEntry, entry);
       }
@@ -235,8 +235,8 @@ public class NetworkDataManager {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> void transferData(NetworkDataManager.DataEntry<T> destination,
-      NetworkDataManager.DataEntry<?> source) {
+  private <T> void transferData(SynchedData.DataEntry<T> destination,
+      SynchedData.DataEntry<?> source) {
     if (!Objects.equals(source.parameter.getSerializer(), destination.parameter.getSerializer())) {
       throw new IllegalStateException(String.format(
           "Data entry mismatch for %d: old=%s(%s), new=%s(%s)",
@@ -256,7 +256,7 @@ public class NetworkDataManager {
     this.dirty = false;
     this.lock.readLock().lock();
 
-    for (NetworkDataManager.DataEntry<?> entry : this.entries.values()) {
+    for (SynchedData.DataEntry<?> entry : this.entries.values()) {
       entry.setDirty(false);
     }
 
@@ -295,8 +295,8 @@ public class NetworkDataManager {
       this.dirty = dirtyIn;
     }
 
-    public NetworkDataManager.DataEntry<T> copy() {
-      return new NetworkDataManager.DataEntry<>(this.parameter,
+    public SynchedData.DataEntry<T> copy() {
+      return new SynchedData.DataEntry<>(this.parameter,
           this.parameter.getSerializer().copy(this.value));
     }
   }

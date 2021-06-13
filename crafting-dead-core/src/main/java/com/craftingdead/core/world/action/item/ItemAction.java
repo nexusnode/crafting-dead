@@ -18,11 +18,12 @@
 
 package com.craftingdead.core.world.action.item;
 
-import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.world.action.TimedAction;
+import com.craftingdead.core.world.action.delegated.DelegatedAction;
+import com.craftingdead.core.world.action.delegated.DelegatedActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -31,9 +32,7 @@ import net.minecraft.util.Hand;
 
 public class ItemAction extends TimedAction<ItemActionType> {
 
-  protected static final Random random = new Random();
-
-  private ActionEntry selectedEntry;
+  private DelegatedAction delegatedAction;
 
   ItemAction(ItemActionType type, LivingExtension<?, ?> performer, LivingExtension<?, ?> target) {
     super(type, performer, target);
@@ -43,9 +42,10 @@ public class ItemAction extends TimedAction<ItemActionType> {
   public boolean start() {
     final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
     if (this.getType().getHeldItemPredicate().test(heldStack)) {
-      for (ActionEntry entry : this.getType().getEntries()) {
-        if (entry.canPerform(this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
-          this.selectedEntry = entry;
+      for (DelegatedActionType delegatedActionType : this.getType().getDelegatedActionTypes()) {
+        DelegatedAction action = delegatedActionType.create(this).orElse(null);
+        if (action != null) {
+          this.delegatedAction = action;
           return super.start();
         }
       }
@@ -56,9 +56,10 @@ public class ItemAction extends TimedAction<ItemActionType> {
   @Override
   protected final void finish() {
     final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
-    if (this.selectedEntry.finish(this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
-      final boolean shrinkStack = this.selectedEntry.shouldShrinkStack(this.getPerformer());
-      final ItemStack resultStack = this.selectedEntry.getReturnItem(this.getPerformer())
+    if (this.delegatedAction.finish(this.getPerformer(), this.getTarget().orElse(null),
+        heldStack)) {
+      final boolean shrinkStack = this.delegatedAction.shouldShrinkStack(this.getPerformer());
+      final ItemStack resultStack = this.delegatedAction.getReturnItem(this.getPerformer())
           .map(Item::getDefaultInstance)
           .orElse(ItemStack.EMPTY);
 
@@ -79,9 +80,8 @@ public class ItemAction extends TimedAction<ItemActionType> {
         }
       }
 
-      if (this.selectedEntry.getFinishSound() != null) {
-        this.getPerformer().getEntity().playSound(this.selectedEntry.getFinishSound(), 1.0F, 1.0F);
-      }
+      this.delegatedAction.getFinishSound().ifPresent(
+          sound -> this.getPerformer().getEntity().playSound(sound, 1.0F, 1.0F));
     }
   }
 
@@ -98,7 +98,7 @@ public class ItemAction extends TimedAction<ItemActionType> {
               || clientDist.isRightMouseDown();
     }
 
-    if (!this.selectedEntry.canPerform(
+    if (!this.delegatedAction.canPerform(
         this.getPerformer(), this.getTarget().orElse(null), heldStack) || !usingItem) {
       this.getPerformer().cancelAction(true);
     }
@@ -115,4 +115,6 @@ public class ItemAction extends TimedAction<ItemActionType> {
   protected int getTotalDurationTicks() {
     return this.getType().getTotalDurationTicks();
   }
+
+
 }

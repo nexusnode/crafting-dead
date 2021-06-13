@@ -18,7 +18,7 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
 import com.craftingdead.core.world.item.ModItems;
 import net.minecraft.entity.EntitySize;
@@ -38,7 +38,7 @@ public class GiantZombieEntity extends AdvancedZombieEntity {
   @Override
   protected ItemStack getHeldStack() {
     ItemStack gunStack = ModItems.M4A1.get().getDefaultInstance();
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> gun.setAmmoProvider(
+    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> gun.setAmmoProvider(
         new RefillableAmmoProvider(ModItems.RPK_MAGAZINE.get().getDefaultInstance(), 0, true)));
     return gunStack;
   }

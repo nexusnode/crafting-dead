@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import com.craftingdead.core.network.BufferSerializable;
-import com.craftingdead.core.network.util.NetworkDataManager;
+import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,7 +37,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 public class TeamInstance<T extends Team>
     implements INBTSerializable<CompoundNBT>, BufferSerializable {
 
-  protected final NetworkDataManager dataManager = new NetworkDataManager();
+  protected final SynchedData dataManager = new SynchedData();
 
   private final T team;
 
@@ -80,7 +80,7 @@ public class TeamInstance<T extends Team>
     this.members.remove(memberId);
   }
 
-  public NetworkDataManager getDataManager() {
+  public SynchedData getDataManager() {
     return this.dataManager;
   }
 
@@ -94,13 +94,13 @@ public class TeamInstance<T extends Team>
 
   @Override
   public void encode(PacketBuffer packetBuffer, boolean writeAll) {
-    NetworkDataManager.writeEntries(
+    SynchedData.writeEntries(
         writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), packetBuffer);
   }
 
   @Override
   public void decode(PacketBuffer packetBuffer) {
-    this.dataManager.setEntryValues(NetworkDataManager.readEntries(packetBuffer));
+    this.dataManager.setEntryValues(SynchedData.readEntries(packetBuffer));
   }
 
   @Override

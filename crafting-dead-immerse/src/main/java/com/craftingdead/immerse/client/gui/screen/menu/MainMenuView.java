@@ -37,7 +37,7 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.InventorySlotType;
 import com.craftingdead.core.world.item.HatItem;
@@ -218,7 +218,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .collect(Collectors.toList());
     Item randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
 
-    LivingExtension<?, ?> livingExtension = ModCapabilities.getOrThrow(ModCapabilities.LIVING,
+    LivingExtension<?, ?> livingExtension = Capabilities.getOrThrow(Capabilities.LIVING,
         fakePlayerEntity, LivingExtension.class);
     livingExtension.getItemHandler().insertItem(InventorySlotType.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);

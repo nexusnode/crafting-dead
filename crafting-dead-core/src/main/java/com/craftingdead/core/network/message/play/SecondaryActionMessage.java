@@ -19,8 +19,8 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -45,10 +45,10 @@ public class SecondaryActionMessage {
 
   public static boolean handle(SecondaryActionMessage message, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), message.entityId)
-        .flatMap(entity -> entity.getCapability(ModCapabilities.LIVING).resolve())
+        .flatMap(entity -> entity.getCapability(Capabilities.LIVING).resolve())
         .ifPresent(living -> {
           living.getEntity().getMainHandItem()
-              .getCapability(ModCapabilities.GUN)
+              .getCapability(Capabilities.GUN)
               .ifPresent(gun -> gun.setPerformingSecondaryAction(living, message.performing,
                   ctx.get().getDirection().getReceptionSide().isServer()));
         });

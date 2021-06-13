@@ -32,8 +32,6 @@ public class ModItemTags {
   public static final IOptionalNamedTag<Item> HATS = tag("hats");
   public static final IOptionalNamedTag<Item> MAGAZINES = tag("magazines");
 
-  public static final IOptionalNamedTag<Item> VIRUS_SYRINGE = tag("virus_syringe");
-
   private static IOptionalNamedTag<Item> tag(String name) {
     return ItemTags.createOptional(new ResourceLocation(CraftingDead.ID, name));
   }

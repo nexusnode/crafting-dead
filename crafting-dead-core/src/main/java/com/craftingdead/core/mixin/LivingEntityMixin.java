@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
 import com.craftingdead.core.world.gun.Gun;
@@ -38,7 +38,7 @@ public abstract class LivingEntityMixin {
   @Inject(at = @At("RETURN"), method = "isImmobile", cancellable = true)
   private void isImmobile(CallbackInfoReturnable<Boolean> callbackInfo) {
     final LivingEntity livingEntity = (LivingEntity) (Object) this;
-    livingEntity.getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+    livingEntity.getCapability(Capabilities.LIVING).ifPresent(living -> {
       if (!callbackInfo.getReturnValue() && living.isMovementBlocked()) {
         callbackInfo.setReturnValue(true);
       }
@@ -57,7 +57,7 @@ public abstract class LivingEntityMixin {
     LivingEntity livingEntity = (LivingEntity) (Object) this;
     for (EquipmentSlotType slotType : EquipmentSlotType.values()) {
       if (currentStack == livingEntity.getItemBySlot(slotType)) {
-        currentStack.getCapability(ModCapabilities.GUN)
+        currentStack.getCapability(Capabilities.GUN)
             .filter(Gun::requiresSync)
             .ifPresent(gun -> NetworkChannel.PLAY.getSimpleChannel().send(
                 PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),

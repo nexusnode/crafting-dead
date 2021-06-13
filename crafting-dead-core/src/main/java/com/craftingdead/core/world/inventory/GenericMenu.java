@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.item.GunItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -109,13 +109,13 @@ public class GenericMenu extends Container {
       IItemHandler itemHandler) {
     return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory,
         itemHandler, 2,
-        (slot, itemStack) -> !(itemStack.getCapability(ModCapabilities.STORAGE).isPresent()
+        (slot, itemStack) -> !(itemStack.getCapability(Capabilities.STORAGE).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 
   public static GenericMenu createVest(int windowId, PlayerInventory playerInventory) {
     return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory, 2,
-        (slot, itemStack) -> !(itemStack.getCapability(ModCapabilities.STORAGE).isPresent()
+        (slot, itemStack) -> !(itemStack.getCapability(Capabilities.STORAGE).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 }

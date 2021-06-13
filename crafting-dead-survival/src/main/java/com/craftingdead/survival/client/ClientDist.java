@@ -19,7 +19,7 @@
 package com.craftingdead.survival.client;
 
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.ClientConfig;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
@@ -119,7 +119,7 @@ public class ClientDist implements ModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     PlayerExtension<AbstractClientPlayerEntity> player =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getCameraEntity().getCapability(ModCapabilities.LIVING)
+            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING)
                 .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;

@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.item.scope.SimpleScope;
@@ -68,6 +68,6 @@ public class BinocularsItem extends Item {
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
         LazyOptional.of(() -> new SimpleScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack)),
-        () -> ModCapabilities.SCOPE);
+        () -> Capabilities.SCOPE);
   }
 }

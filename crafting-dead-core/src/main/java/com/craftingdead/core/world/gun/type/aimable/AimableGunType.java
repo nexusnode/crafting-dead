@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.gun.type.aimable;
 
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.gun.type.AbstractGunType;
 import com.google.common.collect.ImmutableSet;
@@ -44,9 +44,9 @@ public class AimableGunType extends AbstractGunType {
     return new SerializableCapabilityProvider<>(
         LazyOptional.of(() -> new AimableGun(AimableGunClient::new, itemStack, this)),
         ImmutableSet.of(
-            () -> ModCapabilities.GUN,
-            () -> ModCapabilities.COMBAT_SLOT_PROVIDER,
-            () -> ModCapabilities.SCOPE),
+            () -> Capabilities.GUN,
+            () -> Capabilities.COMBAT_SLOT_PROVIDER,
+            () -> Capabilities.SCOPE),
         CompoundNBT::new);
   }
 

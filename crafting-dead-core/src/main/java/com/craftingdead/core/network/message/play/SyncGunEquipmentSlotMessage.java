@@ -20,7 +20,7 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.Gun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.LivingEntity;
@@ -71,7 +71,7 @@ public class SyncGunEquipmentSlotMessage {
     world.map(w -> w.getEntity(message.entityId))
         .filter(e -> e instanceof LivingEntity)
         .map(e -> ((LivingEntity) e).getItemBySlot(message.slot))
-        .flatMap(itemStack -> itemStack.getCapability(ModCapabilities.GUN).resolve())
+        .flatMap(itemStack -> itemStack.getCapability(Capabilities.GUN).resolve())
         .ifPresent(gun -> gun.decode(message.data));
     return true;
   }

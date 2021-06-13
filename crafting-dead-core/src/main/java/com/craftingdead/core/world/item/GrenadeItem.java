@@ -22,7 +22,7 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
 import com.craftingdead.core.world.item.combatslot.CombatSlotType;
@@ -92,7 +92,7 @@ public class GrenadeItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(LazyOptional.of(() -> () -> CombatSlotType.GRENADE),
-        () -> ModCapabilities.COMBAT_SLOT_PROVIDER);
+        () -> Capabilities.COMBAT_SLOT_PROVIDER);
   }
 
   public static class Properties extends Item.Properties {

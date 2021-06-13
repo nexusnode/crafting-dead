@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SharedConstants;
 import net.minecraft.util.Util;
 
 public class DownloadUtil {
@@ -37,7 +38,7 @@ public class DownloadUtil {
   private static final Logger logger = LogManager.getLogger();
 
   private static final String USER_AGENT =
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+      "Minecraft Java/" + SharedConstants.getCurrentVersion().getName();
 
   public static CompletableFuture<Optional<ResourceLocation>> downloadImageAsTexture(
       String imageUrl) {

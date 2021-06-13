@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.action.Action;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -226,7 +226,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   @Nonnull
   public static <E extends LivingEntity> LivingExtension<E, ?> getExpected(E livingEntity)
       throws IllegalStateException {
-    return livingEntity.getCapability(ModCapabilities.LIVING)
+    return livingEntity.getCapability(Capabilities.LIVING)
         .<LivingExtension<E, ?>>cast()
         .orElseThrow(() -> new IllegalStateException("Missing living capability " + livingEntity));
   }

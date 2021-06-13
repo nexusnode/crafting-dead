@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item.combatslot;
 
 import java.util.Optional;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
@@ -69,7 +69,7 @@ public enum CombatSlotType implements CombatSlotProvider {
   }
 
   public static Optional<CombatSlotType> getSlotType(ItemStack itemStack) {
-    return itemStack.getCapability(ModCapabilities.COMBAT_SLOT_PROVIDER)
+    return itemStack.getCapability(Capabilities.COMBAT_SLOT_PROVIDER)
         .map(CombatSlotProvider::getSlotType);
   }
 

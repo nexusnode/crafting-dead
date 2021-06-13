@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
@@ -170,7 +170,7 @@ public class IngameGui {
 
     final AbstractClientPlayerEntity playerEntity = player.getEntity();
 
-    heldStack.getCapability(ModCapabilities.SCOPE)
+    heldStack.getCapability(Capabilities.SCOPE)
         .filter(scope -> scope.isAiming(playerEntity))
         .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
 

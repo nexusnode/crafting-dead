@@ -19,8 +19,8 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.gun.FireMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -52,9 +52,9 @@ public class SetFireModeMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getMainHandItem();
-          livingEntity.getCapability(ModCapabilities.LIVING)
+          livingEntity.getCapability(Capabilities.LIVING)
               .ifPresent(living -> heldStack
-                  .getCapability(ModCapabilities.GUN)
+                  .getCapability(Capabilities.GUN)
                   .ifPresent(gun -> gun.setFireMode(living, msg.fireMode,
                       ctx.get().getDirection().getReceptionSide().isServer())));
         });

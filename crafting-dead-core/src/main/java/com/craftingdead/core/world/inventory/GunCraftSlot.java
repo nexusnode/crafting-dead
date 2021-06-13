@@ -21,7 +21,7 @@ package com.craftingdead.core.world.inventory;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.GunItem;
@@ -48,7 +48,7 @@ public class GunCraftSlot extends Slot {
 
   @Override
   public void set(ItemStack itemStack) {
-    itemStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+    itemStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
       gun.getAttachments().forEach(
           attachment -> this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
               new ItemStack(attachment)));
@@ -63,7 +63,7 @@ public class GunCraftSlot extends Slot {
 
   @Override
   public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
-    gunStack.getCapability(ModCapabilities.GUN).ifPresent(gun -> {
+    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
       gun.setPaintStack(ItemStack.EMPTY);
       Set<Attachment> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {

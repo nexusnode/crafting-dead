@@ -20,7 +20,7 @@ package com.craftingdead.core;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
@@ -197,7 +197,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    event.getPlayer().getCapability(ModCapabilities.LIVING).<PlayerExtension<?>>cast()
+    event.getPlayer().getCapability(Capabilities.LIVING).<PlayerExtension<?>>cast()
         .filter(PlayerExtension::isCombatModeEnabled).ifPresent(living -> {
           final ItemStack itemStack = event.getItem().getItem();
           CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
@@ -229,13 +229,13 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
     if (event.getEntity()
-        .getCapability(ModCapabilities.LIVING)
+        .getCapability(Capabilities.LIVING)
         .map(living -> living.onDeath(event.getSource()))
         .orElse(false)
         || (event.getSource().getEntity() != null && event
             .getSource()
             .getEntity()
-            .getCapability(ModCapabilities.LIVING)
+            .getCapability(Capabilities.LIVING)
             .map(living -> living.onKill(event.getEntity()))
             .orElse(false))) {
       event.setCanceled(true);
@@ -245,7 +245,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDrops(LivingDropsEvent event) {
     event.getEntity()
-        .getCapability(ModCapabilities.LIVING)
+        .getCapability(Capabilities.LIVING)
         .ifPresent(
             living -> event.setCanceled(living.onDeathDrops(event.getSource(), event.getDrops())));
   }
@@ -253,7 +253,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingAttack(LivingAttackEvent event) {
     event.getEntity()
-        .getCapability(ModCapabilities.LIVING)
+        .getCapability(Capabilities.LIVING)
         .ifPresent(
             living -> event.setCanceled(living.onAttacked(event.getSource(), event.getAmount())));
   }
@@ -261,7 +261,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDamage(LivingDamageEvent event) {
     event.getEntity()
-        .getCapability(ModCapabilities.LIVING)
+        .getCapability(Capabilities.LIVING)
         .ifPresent(
             living -> event.setAmount(living.onDamaged(event.getSource(), event.getAmount())));
   }
@@ -275,7 +275,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
-    event.getEntityLiving().getCapability(ModCapabilities.LIVING).ifPresent(living -> {
+    event.getEntityLiving().getCapability(Capabilities.LIVING).ifPresent(living -> {
       living.tick();
       if (!living.getLevel().isClientSide() && living.requiresSync()) {
         PacketBuffer data = new PacketBuffer(Unpooled.buffer());
@@ -291,7 +291,7 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        event.player.getCapability(ModCapabilities.LIVING)
+        event.player.getCapability(Capabilities.LIVING)
             .filter(living -> living instanceof PlayerExtension)
             .map(living -> (PlayerExtension<?>) living)
             .ifPresent(PlayerExtension::playerTick);
@@ -308,7 +308,7 @@ public class CraftingDead {
           ? PlayerExtension.create((PlayerEntity) event.getObject())
           : LivingExtension.create((LivingEntity) event.getObject());
       event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
-          LazyOptional.of(() -> living), () -> ModCapabilities.LIVING, CompoundNBT::new));
+          LazyOptional.of(() -> living), () -> Capabilities.LIVING, CompoundNBT::new));
       living.load();
     }
   }
@@ -324,7 +324,7 @@ public class CraftingDead {
   }
 
   private static void startTracking(Entity targetEntity, ServerPlayerEntity playerEntity) {
-    targetEntity.getCapability(ModCapabilities.LIVING).ifPresent(trackedLiving -> {
+    targetEntity.getCapability(Capabilities.LIVING).ifPresent(trackedLiving -> {
       trackedLiving.onStartTracking(playerEntity);
       PacketBuffer data = new PacketBuffer(Unpooled.buffer());
       trackedLiving.encode(data, true);

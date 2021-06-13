@@ -19,8 +19,8 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.ModCapabilities;
-import com.craftingdead.core.network.util.NetworkUtil;
+import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -47,7 +47,7 @@ public class CrouchMessage {
   public static boolean handle(CrouchMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
-        .flatMap(entity -> entity.getCapability(ModCapabilities.LIVING).resolve())
+        .flatMap(entity -> entity.getCapability(Capabilities.LIVING).resolve())
         .ifPresent(living -> living.setCrouching(msg.crouching,
             ctx.get().getDirection().getReceptionSide().isServer()));
     return true;

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.ModCapabilities;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -119,7 +119,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
       for (int i = 0; i < itemHandler.getSlots(); ++i) {
         ItemStack itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
-            && !itemStack.getCapability(ModCapabilities.MAGAZINE)
+            && !itemStack.getCapability(Capabilities.MAGAZINE)
                 .map(Magazine::isEmpty)
                 .orElse(true)) {
           return Optional.of(new MagazineLocation(itemHandler, i));
