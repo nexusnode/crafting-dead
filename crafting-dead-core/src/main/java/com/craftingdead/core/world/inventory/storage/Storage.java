@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.inventory.storage;
 
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import net.minecraft.inventory.container.IContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -26,7 +26,7 @@ import net.minecraftforge.items.IItemHandler;
 
 public interface Storage extends IContainerProvider, IItemHandler, INBTSerializable<CompoundNBT> {
 
-  boolean isValidForSlot(InventorySlotType slotType);
+  boolean isValidForSlot(ModEquipmentSlotType slotType);
 
   /**
    * Whether this storage is empty or not.

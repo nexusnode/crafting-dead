@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.extension;
 
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import net.minecraft.entity.player.PlayerEntity;
 
 public interface PlayerExtension<E extends PlayerEntity>
@@ -43,5 +43,5 @@ public interface PlayerExtension<E extends PlayerEntity>
 
   void openEquipmentMenu();
 
-  void openStorage(InventorySlotType slotType);
+  void openStorage(ModEquipmentSlotType slotType);
 }

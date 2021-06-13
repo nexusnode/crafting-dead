@@ -70,7 +70,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
-public abstract class GunRenderer implements IItemRenderer {
+public abstract class GunRenderer implements CustomItemRenderer {
 
   private static final int FLASH_TEXTURE_CHANGE_TIMEOUT_MS = 250;
 

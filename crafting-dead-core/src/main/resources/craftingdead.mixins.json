@@ -12,7 +12,8 @@
     "client": [
         "ItemRendererMixin",
         "PlayerRendererMixin",
-        "PlayerInventoryMixin"
+        "PlayerInventoryMixin",
+        "GameRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1

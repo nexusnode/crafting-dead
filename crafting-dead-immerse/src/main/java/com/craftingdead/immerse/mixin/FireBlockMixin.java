@@ -35,6 +35,9 @@ import net.minecraft.world.World;
 @Mixin(FireBlock.class)
 public class FireBlockMixin {
 
+  /**
+   * Adds hook for {@link GameServer#disableBlockBurning()}.
+   */
   @Inject(method = "tryCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
   private void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age,
       Direction face, CallbackInfo callbackInfo) {
@@ -43,6 +46,9 @@ public class FireBlockMixin {
     }
   }
 
+  /**
+   * Adds hook for {@link GameServer#disableBlockBurning()}.
+   */
   @Inject(method = "canCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
   private void canCatchFire(IBlockReader world, BlockPos pos, Direction face,
       CallbackInfoReturnable<Boolean> callbackInfo) {

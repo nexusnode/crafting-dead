@@ -18,13 +18,13 @@
 
 package com.craftingdead.core.world.inventory;
 
-public enum InventorySlotType {
+public enum ModEquipmentSlotType {
 
   MELEE(0), GUN(1), HAT(2), CLOTHING(3), VEST(4);
 
   private final int index;
 
-  private InventorySlotType(int index) {
+  private ModEquipmentSlotType(int index) {
     this.index = index;
   }
 

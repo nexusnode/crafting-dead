@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
@@ -220,7 +220,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
 
     LivingExtension<?, ?> livingExtension = Capabilities.getOrThrow(Capabilities.LIVING,
         fakePlayerEntity, LivingExtension.class);
-    livingExtension.getItemHandler().insertItem(InventorySlotType.HAT.getIndex(),
+    livingExtension.getItemHandler().insertItem(ModEquipmentSlotType.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);
 
     this.addChild(new ParentView<>(new YogaLayout()

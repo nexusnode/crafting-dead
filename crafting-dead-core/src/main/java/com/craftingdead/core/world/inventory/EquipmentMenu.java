@@ -61,26 +61,26 @@ public class EquipmentMenu extends Container {
     int equipmentColumnX = 8 + (slotSize * 3);
     int equipmentColumnY = 8;
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.GUN.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.GUN.getIndex(),
         equipmentColumnX, equipmentColumnY,
         (slot, itemStack) -> itemStack.getCapability(Capabilities.GUN).isPresent()));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.MELEE.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.MELEE.getIndex(),
         equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.HAT.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.HAT.getIndex(),
         equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
 
     this.addSlot(new PredicateItemHandlerSlot(this.itemHandler,
-        InventorySlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
+        ModEquipmentSlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.getCapability(Capabilities.CLOTHING).isPresent()));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, InventorySlotType.VEST.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.VEST.getIndex(),
         equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
             .getCapability(Capabilities.STORAGE)
-            .map(storage -> storage.isValidForSlot(InventorySlotType.VEST))
+            .map(storage -> storage.isValidForSlot(ModEquipmentSlotType.VEST))
             .orElse(false)));
 
     final int gunCraftSlotGap = 3;

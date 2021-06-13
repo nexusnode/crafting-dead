@@ -32,7 +32,7 @@ import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.hat.Hat;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.ModItems;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -75,7 +75,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
   private final ItemStackHandler itemHandler =
-      new ItemStackHandler(InventorySlotType.values().length) {
+      new ItemStackHandler(ModEquipmentSlotType.values().length) {
         @Override
         public void onContentsChanged(int slot) {
           if (!LivingExtensionImpl.this.entity.getCommandSenderWorld().isClientSide()) {
@@ -296,7 +296,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   private void updateHat() {
-    ItemStack headStack = this.itemHandler.getStackInSlot(InventorySlotType.HAT.getIndex());
+    ItemStack headStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.HAT.getIndex());
     Hat hat = headStack.getCapability(Capabilities.HAT).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
@@ -308,7 +308,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   private void updateClothing() {
     ItemStack clothingStack =
-        this.itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex());
+        this.itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex());
     Clothing clothing = clothingStack.getCapability(Capabilities.CLOTHING).orElse(null);
 
     if (clothingStack != this.lastClothingStack) {

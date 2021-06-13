@@ -57,7 +57,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
@@ -307,7 +307,7 @@ public class ClientDist implements ModDist {
     ItemModelsProperties.registerGeneric(new ResourceLocation("wearing"),
         (itemStack, world, entity) -> entity.getCapability(Capabilities.LIVING)
             .filter(living -> living.getItemHandler()
-                .getStackInSlot(InventorySlotType.HAT.getIndex()) == itemStack)
+                .getStackInSlot(ModEquipmentSlotType.HAT.getIndex()) == itemStack)
             .map(__ -> 1.0F)
             .orElse(0.0F));
 
@@ -350,19 +350,19 @@ public class ClientDist implements ModDist {
     this.registerPlayerLayer(
         renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
             .withRenderer(renderer)
-            .withSlot(InventorySlotType.MELEE)
+            .withSlot(ModEquipmentSlotType.MELEE)
             .withCrouchingOrientation(true)
             .build());
     this.registerPlayerLayer(
         renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
             .withRenderer(renderer)
-            .withSlot(InventorySlotType.VEST)
+            .withSlot(ModEquipmentSlotType.VEST)
             .withCrouchingOrientation(true)
             .build());
     this.registerPlayerLayer(
         renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
             .withRenderer(renderer)
-            .withSlot(InventorySlotType.HAT)
+            .withSlot(ModEquipmentSlotType.HAT)
             .withHeadOrientation(true)
             // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
             // TODO Find a reason to not remove this line. Also, if you remove it, you will
@@ -372,7 +372,7 @@ public class ClientDist implements ModDist {
     this.registerPlayerLayer(
         renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
             .withRenderer(renderer)
-            .withSlot(InventorySlotType.GUN)
+            .withSlot(ModEquipmentSlotType.GUN)
             .withCrouchingOrientation(true)
             .build());
   }
@@ -743,7 +743,7 @@ public class ClientDist implements ModDist {
 
     ResourceLocation clothingTexture = playerEntity.getCapability(Capabilities.LIVING)
         .map(LivingExtension::getItemHandler)
-        .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
+        .map(itemHandler -> itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex()))
         .flatMap(clothingStack -> clothingStack.getCapability(Capabilities.CLOTHING).resolve())
         .map(clothing -> clothing.getTexture(playerEntity.getModelName()))
         .orElse(null);

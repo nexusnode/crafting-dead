@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.inventory.GenericMenu;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.google.common.collect.ImmutableSet;
@@ -50,7 +50,7 @@ public class StorageItem extends Item {
   public static final int MAX_ROWS_TO_SHOW = 6;
 
   public static final Supplier<Storage> VEST =
-      () -> new ItemStackHandlerStorage(2 * 9, InventorySlotType.VEST, GenericMenu::createVest);
+      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlotType.VEST, GenericMenu::createVest);
 
   private final NonNullSupplier<Storage> storageContainer;
 

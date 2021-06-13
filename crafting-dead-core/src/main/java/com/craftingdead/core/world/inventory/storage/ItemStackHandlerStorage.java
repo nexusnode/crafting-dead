@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.inventory.storage;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -28,14 +28,14 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class ItemStackHandlerStorage extends ItemStackHandler implements Storage {
 
-  private final InventorySlotType slotType;
+  private final ModEquipmentSlotType slotType;
   private final ItemHandlerMenuConstructor containerProvider;
 
   public ItemStackHandlerStorage() {
     this(1, null, (windowId, playerInventory, backpack) -> null);
   }
 
-  public ItemStackHandlerStorage(int size, InventorySlotType slotType,
+  public ItemStackHandlerStorage(int size, ModEquipmentSlotType slotType,
       ItemHandlerMenuConstructor constructor) {
     super(size);
     this.slotType = slotType;
@@ -49,7 +49,7 @@ public class ItemStackHandlerStorage extends ItemStackHandler implements Storage
   }
 
   @Override
-  public boolean isValidForSlot(InventorySlotType slotType) {
+  public boolean isValidForSlot(ModEquipmentSlotType slotType) {
     return slotType == this.slotType;
   }
 

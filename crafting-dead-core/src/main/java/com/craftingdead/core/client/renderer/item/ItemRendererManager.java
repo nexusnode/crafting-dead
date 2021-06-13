@@ -20,8 +20,8 @@ package com.craftingdead.core.client.renderer.item;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -35,7 +35,7 @@ public class ItemRendererManager {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final Map<IRegistryDelegate<Item>, IItemRenderer> itemRenderers =
+  private final Map<IRegistryDelegate<Item>, CustomItemRenderer> itemRenderers =
       new Object2ObjectOpenHashMap<>();
 
   public void gatherItemRenderers() {
@@ -50,7 +50,7 @@ public class ItemRendererManager {
 
   public void refreshCachedModels() {
     StartupMessageManager.addModMessage("Refreshing cached models");
-    this.itemRenderers.values().forEach(IItemRenderer::refreshCachedModels);
+    this.itemRenderers.values().forEach(CustomItemRenderer::refreshCachedModels);
   }
 
   public Collection<ResourceLocation> getModelDependencies() {
@@ -65,7 +65,8 @@ public class ItemRendererManager {
         .collect(Collectors.toSet());
   }
 
-  public Optional<IItemRenderer> getItemRenderer(Item item) {
-    return Optional.ofNullable(this.itemRenderers.get(item.delegate));
+  @Nullable
+  public CustomItemRenderer getItemRenderer(Item item) {
+    return this.itemRenderers.get(item.delegate);
   }
 }

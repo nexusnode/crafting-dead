@@ -32,6 +32,9 @@ import net.minecraft.client.renderer.model.ModelRenderer;
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin {
 
+  /**
+   * Renders first person arm with custom clothing.
+   */
   @Inject(at = @At("RETURN"), method = "renderHand")
   private void renderHand(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,

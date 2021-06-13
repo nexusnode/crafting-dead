@@ -33,6 +33,9 @@ import net.minecraft.client.renderer.GameRenderer;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
+  /**
+   * Renders first person items for spectating entity.
+   */
   @Inject(at = @At("RETURN"), method = "renderItemInHand")
   private void renderItemInHand(MatrixStack matrixStack, ActiveRenderInfo activeRenderInfo,
       float partialTicks, CallbackInfo callbackInfo) {

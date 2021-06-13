@@ -18,13 +18,14 @@
 
 package com.craftingdead.immerse.mixin;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.SpawnPoint;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
@@ -34,32 +35,38 @@ import net.minecraft.world.World;
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
 
+  /**
+   * Adds hook for {@link GameServer#getSpawnPoint}.
+   */
   @Inject(method = "getRespawnPosition", at = @At("HEAD"), cancellable = true)
   public void getRespawnPosition(CallbackInfoReturnable<BlockPos> callbackInfo) {
-    SpawnPoint spawnPoint = this.getSpawnPoint();
-    if (spawnPoint != null) {
-      callbackInfo.setReturnValue(spawnPoint.getBlockPos());
-    }
+    this.getSpawnPoint()
+        .map(SpawnPoint::getBlockPos)
+        .ifPresent(callbackInfo::setReturnValue);
   }
 
+  /**
+   * Adds hook for {@link GameServer#getSpawnPoint}.
+   */
   @Inject(method = "getRespawnDimension", at = @At("HEAD"), cancellable = true)
   public void getRespawnDimension(CallbackInfoReturnable<RegistryKey<World>> callbackInfo) {
-    SpawnPoint spawnPoint = this.getSpawnPoint();
-    if (spawnPoint != null) {
-      callbackInfo.setReturnValue(spawnPoint.getDimension());
-    }
+    this.getSpawnPoint()
+        .map(SpawnPoint::getDimension)
+        .ifPresent(callbackInfo::setReturnValue);
   }
 
+  /**
+   * Adds hook for {@link GameServer#getSpawnPoint}.
+   */
   @Inject(method = "isRespawnForced", at = @At("HEAD"), cancellable = true)
   public void isRespawnForced(CallbackInfoReturnable<Boolean> callbackInfo) {
-    if (this.getSpawnPoint() != null) {
+    if (this.getSpawnPoint().isPresent()) {
       callbackInfo.setReturnValue(true);
     }
   }
 
-  @Nullable
-  private SpawnPoint getSpawnPoint() {
+  private Optional<SpawnPoint> getSpawnPoint() {
     return CraftingDeadImmerse.getInstance().getLogicalServer().getGame()
-        .getSpawnPoint(PlayerExtension.getExpected((ServerPlayerEntity) (Object) this)).orElse(null);
+        .getSpawnPoint(PlayerExtension.getExpected((ServerPlayerEntity) (Object) this));
   }
 }

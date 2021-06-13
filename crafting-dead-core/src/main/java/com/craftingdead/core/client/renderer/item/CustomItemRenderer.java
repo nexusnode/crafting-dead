@@ -30,7 +30,7 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Provides custom {@link Item} rendering abilities through the use of a {@link IRendererProvider}.
  */
-public interface IItemRenderer {
+public interface CustomItemRenderer {
 
   /**
    * Checks if this renderer should handle a specific item's render type.
@@ -55,7 +55,7 @@ public interface IItemRenderer {
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay);
 
   /**
-   * Get all models this {@link IItemRenderer} depends on. This is used to resolve and stitch model
+   * Get all models this {@link CustomItemRenderer} depends on. This is used to resolve and stitch model
    * texture dependencies as well as auto baking models upon resource reload.
    * 
    * @return a {@link Collection} of model locations.
@@ -71,7 +71,7 @@ public interface IItemRenderer {
   Collection<ResourceLocation> getAdditionalModelTextures();
 
   /**
-   * Clear any cached models this {@link IItemRenderer} may of stored.
+   * Clear any cached models this {@link CustomItemRenderer} may of stored.
    */
   void refreshCachedModels();
 }

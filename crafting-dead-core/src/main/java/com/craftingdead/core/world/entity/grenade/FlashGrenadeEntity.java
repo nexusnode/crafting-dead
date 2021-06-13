@@ -26,7 +26,7 @@ import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.EntityUtil;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.hat.Hat;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
 import net.minecraft.entity.EntityType;
@@ -122,7 +122,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
 
     ItemStack hatItemStack = viewerEntity
         .getCapability(Capabilities.LIVING)
-        .map(living -> living.getItemHandler().getStackInSlot(InventorySlotType.HAT.getIndex()))
+        .map(living -> living.getItemHandler().getStackInSlot(ModEquipmentSlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 
     final boolean isImmuneToFlashes =

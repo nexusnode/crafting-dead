@@ -29,6 +29,9 @@ import net.minecraft.client.multiplayer.PlayerController;
 @Mixin(PlayerController.class)
 public class PlayerControllerMixin {
 
+  /**
+   * Renders HUD for spectating player.
+   */
   @Inject(at = @At("RETURN"), method = "canHurtPlayer", cancellable = true)
   private void canHurtPlayer(CallbackInfoReturnable<Boolean> callbackInfo) {
     callbackInfo.setReturnValue(callbackInfo.getReturnValue() ||

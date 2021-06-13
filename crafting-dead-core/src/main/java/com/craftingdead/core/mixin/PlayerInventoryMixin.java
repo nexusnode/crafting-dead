@@ -29,6 +29,9 @@ import net.minecraft.entity.player.PlayerInventory;
 @Mixin(PlayerInventory.class)
 public class PlayerInventoryMixin {
 
+  /**
+   * Scrolls over empty slots when in combat mode.
+   */
   @Inject(at = @At("HEAD"), method = "swapPaint", cancellable = true)
   private void swapPaint(double direction, CallbackInfo callbackInfo) {
     if (CraftingDead.getInstance().getClientDist().getPlayer()

@@ -31,22 +31,33 @@ import net.minecraft.entity.player.PlayerEntity;
 @Mixin(Entity.class)
 public class EntityMixin {
 
+  /**
+   * Adds hook for {@link LivingExtension#isInvisible}.
+   */
   @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
   private void isInvisible(CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    entity.getCapability(Capabilities.LIVING)
-        .map(LivingExtension::getVisibility)
-        .filter(v -> v == Visibility.INVISIBLE || v == Visibility.PARTIALLY_VISIBLE)
-        .ifPresent(__ -> callbackInfo.setReturnValue(true));
+    // It's faster not flat-mapping or filtering (we want to be fast in a render method)
+    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+      if (living.getVisibility() == Visibility.INVISIBLE
+          || living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
+        callbackInfo.setReturnValue(true);
+      }
+    });
   }
 
+  /**
+   * Adds hook for {@link LivingExtension#isInvisible}.
+   */
   @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
   private void isInvisibleTo(PlayerEntity playerEntity,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
-    entity.getCapability(Capabilities.LIVING)
-        .map(LivingExtension::getVisibility)
-        .filter(Visibility.PARTIALLY_VISIBLE::equals)
-        .ifPresent(__ -> callbackInfo.setReturnValue(false));
+    // It's faster not flat-mapping or filtering (we want to be fast in a render method)
+    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+      if (living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
+        callbackInfo.setReturnValue(false);
+      }
+    });
   }
 }

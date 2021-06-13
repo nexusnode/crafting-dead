@@ -54,7 +54,7 @@ import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.hat.Hat;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -510,7 +510,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
           || hitEntity instanceof WanderingTraderEntity) && hitPos.y >= chinHeight;
       if (headshot) {
         damage *= HEADSHOT_MULTIPLIER * (1.0F - hitLiving.getItemHandler()
-            .getStackInSlot(InventorySlotType.HAT.getIndex())
+            .getStackInSlot(ModEquipmentSlotType.HAT.getIndex())
             .getCapability(Capabilities.HAT)
             .map(Hat::getHeadshotReductionPercentage)
             .orElse(0.0F));

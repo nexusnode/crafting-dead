@@ -25,7 +25,7 @@ import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.KillFeedMessage;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
@@ -107,7 +107,7 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   }
 
   @Override
-  public void openStorage(InventorySlotType slotType) {
+  public void openStorage(ModEquipmentSlotType slotType) {
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack.getCapability(Capabilities.STORAGE)
         .ifPresent(storage -> this.getEntity().openMenu(

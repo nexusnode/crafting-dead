@@ -24,7 +24,7 @@ import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -60,7 +60,7 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
     this.vestButton =
         new SimpleButton(this.leftPos + 98, this.topPos + 61, 10, 17, ARROW, (button) -> {
           NetworkChannel.PLAY.getSimpleChannel()
-              .sendToServer(new OpenStorageMessage(InventorySlotType.VEST));
+              .sendToServer(new OpenStorageMessage(ModEquipmentSlotType.VEST));
           this.transitioning = true;
         });
     this.addButton(this.vestButton);
@@ -84,7 +84,7 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
   private void refreshButtonStatus() {
     this.vestButton.active = this.menu
         .getItemHandler()
-        .getStackInSlot(InventorySlotType.VEST.getIndex())
+        .getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
         .getCapability(Capabilities.STORAGE)
         .isPresent();
   }

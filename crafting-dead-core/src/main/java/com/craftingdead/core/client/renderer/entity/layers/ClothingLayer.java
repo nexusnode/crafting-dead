@@ -19,8 +19,9 @@
 package com.craftingdead.core.client.renderer.entity.layers;
 
 import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;
@@ -35,11 +36,18 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
 
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
-    return livingEntity.getCapability(Capabilities.LIVING)
-        .map(LivingExtension::getItemHandler)
-        .map(itemHandler -> itemHandler.getStackInSlot(InventorySlotType.CLOTHING.getIndex()))
-        .flatMap(clothingStack -> clothingStack.getCapability(Capabilities.CLOTHING).resolve())
-        .map(clothing -> clothing.getTexture(skinType))
-        .orElse(null);
+    // Resolve optionals to nullable for better performance.
+    LivingExtension<?, ?> livingExtension =
+        livingEntity.getCapability(Capabilities.LIVING).orElse(null);
+    if (livingExtension != null) {
+      Clothing clothing =
+          livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex())
+              .getCapability(Capabilities.CLOTHING)
+              .orElse(null);
+      if (clothing != null) {
+        return clothing.getTexture(skinType);
+      }
+    }
+    return null;
   }
 }

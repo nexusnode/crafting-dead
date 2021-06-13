@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -36,6 +37,9 @@ import net.minecraft.world.World;
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
 
+  /**
+   * Adds hook for {@link CustomItemRenderer}.
+   */
   @Inject(at = @At("HEAD"),
       method = "render(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V",
       cancellable = true)
@@ -48,6 +52,9 @@ public abstract class ItemRendererMixin {
     }
   }
 
+  /**
+   * Adds hook for {@link CustomItemRenderer}.
+   */
   @Inject(at = @At("HEAD"),
       method = "renderStatic(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/world/World;II)V",
       cancellable = true)
@@ -65,13 +72,14 @@ public abstract class ItemRendererMixin {
       ItemStack itemStack,
       ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    return CraftingDead.getInstance().getClientDist().getItemRendererManager()
-        .getItemRenderer(itemStack.getItem())
-        .filter(itemRenderer -> itemRenderer.handleRenderType(itemStack, transformType))
-        .map(itemRenderer -> {
-          itemRenderer.renderItem(itemStack, transformType, livingEntity, matrixStack,
-              renderTypeBuffer, packedLight, packedOverlay);
-          return true;
-        }).orElse(false);
+    CustomItemRenderer itemRenderer =
+        CraftingDead.getInstance().getClientDist().getItemRendererManager()
+            .getItemRenderer(itemStack.getItem());
+    if (itemRenderer != null && itemRenderer.handleRenderType(itemStack, transformType)) {
+      itemRenderer.renderItem(itemStack, transformType, livingEntity, matrixStack,
+          renderTypeBuffer, packedLight, packedOverlay);
+      return true;
+    }
+    return false;
   }
 }

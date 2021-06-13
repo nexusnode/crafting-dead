@@ -29,7 +29,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.gun.magazine.Magazine;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.google.common.collect.ImmutableList;
 import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
 import com.tiviacz.travelersbackpack.inventory.TravelersBackpackInventory;
@@ -97,7 +97,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
     builder.addAll(event.getItemHandlers());
 
     // Vest - first
-    living.getItemHandler().getStackInSlot(InventorySlotType.VEST.getIndex())
+    living.getItemHandler().getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
     // Backpack - second
     if (CraftingDead.getInstance().isTravelersBackpacksLoaded()

@@ -20,7 +20,7 @@ package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
-import com.craftingdead.core.world.inventory.InventorySlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombieEntity;
@@ -36,17 +36,17 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
     this.addLayer(new ClothingLayer<>(this));
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(InventorySlotType.MELEE)
+        .withSlot(ModEquipmentSlotType.MELEE)
         .withCrouchingOrientation(true)
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(InventorySlotType.VEST)
+        .withSlot(ModEquipmentSlotType.VEST)
         .withCrouchingOrientation(true)
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(InventorySlotType.HAT)
+        .withSlot(ModEquipmentSlotType.HAT)
         .withHeadOrientation(true)
         // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
         // TODO Find a reason to not remove this line. Also, if you remove it, you will
@@ -55,7 +55,7 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(InventorySlotType.GUN)
+        .withSlot(ModEquipmentSlotType.GUN)
         .withCrouchingOrientation(true)
         .build());
   }
