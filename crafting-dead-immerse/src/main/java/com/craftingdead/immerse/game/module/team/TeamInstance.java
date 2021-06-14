@@ -93,14 +93,15 @@ public class TeamInstance<T extends Team>
   }
 
   @Override
-  public void encode(PacketBuffer packetBuffer, boolean writeAll) {
-    SynchedData.writeEntries(
-        writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), packetBuffer);
+  public void encode(PacketBuffer out, boolean writeAll) {
+    SynchedData.pack(writeAll
+        ? this.dataManager.getAll()
+        : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer packetBuffer) {
-    this.dataManager.setEntryValues(SynchedData.readEntries(packetBuffer));
+  public void decode(PacketBuffer in) {
+    this.dataManager.assignValues(SynchedData.unpack(in));
   }
 
   @Override

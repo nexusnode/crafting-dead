@@ -150,14 +150,14 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
     super.encode(out, writeAll);
-    SynchedData.writeEntries(
-        writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    SynchedData.pack(
+        writeAll ? this.dataManager.getAll() : this.dataManager.packDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
     super.decode(in);
-    this.dataManager.setEntryValues(SynchedData.readEntries(in));
+    this.dataManager.assignValues(SynchedData.unpack(in));
   }
 
   @Override

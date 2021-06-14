@@ -86,20 +86,22 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public void encode(PacketBuffer packetBuffer, boolean writeAll) {
-    SynchedData.writeEntries(
-        writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), packetBuffer);
-    Set<Map.Entry<UUID, TdmPlayerData>> playerDataCollection =
-        writeAll ? this.playerData.entrySet() : this.dirtyPlayerData.entrySet();
-    packetBuffer.writeVarInt(playerDataCollection.size());
+  public void encode(PacketBuffer out, boolean writeAll) {
+    SynchedData.pack(writeAll
+        ? this.dataManager.getAll()
+        : this.dataManager.packDirty(), out);
+    Set<Map.Entry<UUID, TdmPlayerData>> playerDataCollection = writeAll
+        ? this.playerData.entrySet()
+        : this.dirtyPlayerData.entrySet();
+    out.writeVarInt(playerDataCollection.size());
     for (Map.Entry<UUID, TdmPlayerData> entry : playerDataCollection) {
-      packetBuffer.writeUUID(entry.getKey());
+      out.writeUUID(entry.getKey());
       TdmPlayerData playerData = entry.getValue();
       if (playerData == null) {
-        packetBuffer.writeBoolean(true);
+        out.writeBoolean(true);
       } else {
-        packetBuffer.writeBoolean(false);
-        playerData.encode(packetBuffer, writeAll);
+        out.writeBoolean(false);
+        playerData.encode(out, writeAll);
       }
     }
 
@@ -109,15 +111,15 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public void decode(PacketBuffer packetBuffer) {
-    this.dataManager.setEntryValues(SynchedData.readEntries(packetBuffer));
-    int playerDataSize = packetBuffer.readVarInt();
+  public void decode(PacketBuffer in) {
+    this.dataManager.assignValues(SynchedData.unpack(in));
+    int playerDataSize = in.readVarInt();
     for (int i = 0; i < playerDataSize; i++) {
-      UUID playerId = packetBuffer.readUUID();
-      if (packetBuffer.readBoolean()) {
+      UUID playerId = in.readUUID();
+      if (in.readBoolean()) {
         this.playerData.remove(playerId);
       } else {
-        this.getPlayerData(playerId).decode(packetBuffer);
+        this.getPlayerData(playerId).decode(in);
       }
     }
   }

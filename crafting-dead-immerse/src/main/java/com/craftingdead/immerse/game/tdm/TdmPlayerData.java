@@ -62,7 +62,7 @@ public class TdmPlayerData implements BufferSerializable {
   }
 
   public void incrementScore() {
-    this.dataManager.getUpdate(SCORE, score -> ++score);
+    this.dataManager.compute(SCORE, score -> ++score);
   }
 
   public int getKills() {
@@ -70,7 +70,7 @@ public class TdmPlayerData implements BufferSerializable {
   }
 
   public void incrementKills() {
-    this.dataManager.getUpdate(KILLS, kills -> ++kills);
+    this.dataManager.compute(KILLS, kills -> ++kills);
   }
 
   public int getAssists() {
@@ -78,7 +78,7 @@ public class TdmPlayerData implements BufferSerializable {
   }
 
   public void incrementAssists() {
-    this.dataManager.getUpdate(ASSISTS, assists -> ++assists);
+    this.dataManager.compute(ASSISTS, assists -> ++assists);
 
   }
 
@@ -87,18 +87,19 @@ public class TdmPlayerData implements BufferSerializable {
   }
 
   public void incrementDeaths() {
-    this.dataManager.getUpdate(DEATHS, deaths -> ++deaths);
+    this.dataManager.compute(DEATHS, deaths -> ++deaths);
   }
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    SynchedData
-        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    SynchedData.pack(writeAll
+        ? this.dataManager.getAll()
+        : this.dataManager.packDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(SynchedData.readEntries(in));
+    this.dataManager.assignValues(SynchedData.unpack(in));
   }
 
   @Override

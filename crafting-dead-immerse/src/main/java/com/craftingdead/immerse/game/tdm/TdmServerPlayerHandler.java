@@ -77,17 +77,16 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
     if (this.secondTicker++ == 20) {
       this.secondTicker = 0;
       if (this.ghost) {
-        if (this.dataManager.getUpdate(REMAINING_GHOST_TIME_SECONDS,
-            ghostTime -> --ghostTime) <= 0) {
+        if (this.dataManager.compute(REMAINING_GHOST_TIME_SECONDS, ghostTime -> --ghostTime) <= 0) {
           this.ghost = false;
           this.getPlayer().getEntity().setGameMode(GameType.ADVENTURE);
           ((TdmServer) this.game).getLogicalServer()
               .respawnPlayer((ServerPlayerEntity) this.getPlayer().getEntity(), false);
         }
       } else if (!this.getPlayer().getEntity().isSpectator()) {
-        this.dataManager.getUpdate(REMAINING_BUY_TIME_SECONDS,
+        this.dataManager.compute(REMAINING_BUY_TIME_SECONDS,
             buyTime -> buyTime > 0 ? --buyTime : buyTime);
-        this.dataManager.getUpdate(REMAINING_SPAWN_PROTECTION_SECONDS,
+        this.dataManager.compute(REMAINING_SPAWN_PROTECTION_SECONDS,
             spawnProtection -> spawnProtection > 0
                 && --spawnProtection < this.game.getSpawnProtectionDuration().getSeconds() * 0.8F
                 && this.getPlayer().isMoving() ? 0 : spawnProtection);

@@ -115,13 +115,14 @@ public class TdmPlayerHandler implements PlayerHandler {
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    SynchedData
-        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    SynchedData.pack(writeAll
+        ? this.dataManager.getAll()
+        : this.dataManager.packDirty(), out);
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(SynchedData.readEntries(in));
+    this.dataManager.assignValues(SynchedData.unpack(in));
   }
 
   @Override

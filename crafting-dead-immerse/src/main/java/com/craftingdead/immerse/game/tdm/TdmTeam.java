@@ -31,12 +31,10 @@ import net.minecraft.util.text.TextFormatting;
 
 public enum TdmTeam implements Team {
 
-  // @formatter:off
   RED("Red", TextFormatting.RED.getColor(),
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/skins/red_team.png")),
   BLUE("Blue", TextFormatting.BLUE.getColor(),
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/skins/blue_team.png"));
-  // @formatter:on
 
   private static final DataParameter<Integer> SCORE =
       new DataParameter<>(0x00, DataSerializers.INT);
@@ -52,7 +50,7 @@ public enum TdmTeam implements Team {
   }
 
   public static void incrementScore(TeamInstance<?> team) {
-    team.getDataManager().getUpdate(SCORE, score -> ++score);
+    team.getDataManager().compute(SCORE, score -> ++score);
   }
 
   public static int getScore(TeamInstance<?> teamInstance) {

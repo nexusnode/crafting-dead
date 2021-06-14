@@ -748,8 +748,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    SynchedData
-        .writeEntries(writeAll ? this.dataManager.getAll() : this.dataManager.getDirty(), out);
+    SynchedData.pack(writeAll
+        ? this.dataManager.getAll()
+        : this.dataManager.packDirty(), out);
     if (writeAll || this.attachmentsDirty) {
       out.writeVarInt(this.attachments.size());
       this.attachments.forEach(out::writeRegistryId);
@@ -770,7 +771,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   @Override
   public void decode(PacketBuffer in) {
-    this.dataManager.setEntryValues(SynchedData.readEntries(in));
+    this.dataManager.assignValues(SynchedData.unpack(in));
 
     int size = in.readVarInt();
     if (size > -1) {
