@@ -131,6 +131,11 @@ public class FakeLevel extends ClientWorld {
     return DynamicRegistries.builtin();
   }
 
+  @Override
+  public int getEntityCount() {
+    return 1;
+  }
+
   public static FakeLevel getInstance() {
     return instance == null ? instance = new FakeLevel(Minecraft.getInstance()) : instance;
   }

@@ -2,6 +2,7 @@ package com.craftingdead.core.world.gun.attachment;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
+import com.craftingdead.core.world.item.ModItems;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,6 +22,7 @@ public class Attachments {
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
+              .setItem(ModItems.RED_DOT_SIGHT)
               .build());
 
   public static final RegistryObject<Attachment> ACOG_SIGHT =
@@ -28,6 +30,7 @@ public class Attachments {
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 3.25F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
+              .setItem(ModItems.ACOG_SIGHT)
               .build());
 
   public static final RegistryObject<Attachment> LP_SCOPE =
@@ -36,6 +39,7 @@ public class Attachments {
               .addMultiplier(Attachment.MultiplierType.ZOOM, 5.0F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
+              .setItem(ModItems.LP_SCOPE)
               .build());
 
   public static final RegistryObject<Attachment> HP_SCOPE =
@@ -44,6 +48,7 @@ public class Attachments {
               .addMultiplier(Attachment.MultiplierType.ZOOM, 8.0F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
               .setScope(true)
+              .setItem(ModItems.HP_SCOPE)
               .build());
 
   public static final RegistryObject<Attachment> SUPPRESSOR =
@@ -51,6 +56,7 @@ public class Attachments {
           () -> Attachment.builder()
               .setInventorySlot(GunCraftSlotType.MUZZLE_ATTACHMENT)
               .setSoundSuppressor(true)
+              .setItem(ModItems.SUPPRESSOR)
               .build());
 
   public static final RegistryObject<Attachment> TACTICAL_GRIP =
@@ -58,6 +64,7 @@ public class Attachments {
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ACCURACY, 1.15F)
               .setInventorySlot(GunCraftSlotType.UNDERBARREL_ATTACHMENT)
+              .setItem(ModItems.TACTICAL_GRIP)
               .build());
 
   public static final RegistryObject<Attachment> BIPOD =
@@ -65,6 +72,7 @@ public class Attachments {
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ACCURACY, 1.05F)
               .setInventorySlot(GunCraftSlotType.UNDERBARREL_ATTACHMENT)
+              .setItem(ModItems.BIPOD)
               .build());
 
   public static final RegistryObject<Attachment> EOTECH_SIGHT =
@@ -72,5 +80,6 @@ public class Attachments {
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
+              .setItem(ModItems.EOTECH_SIGHT)
               .build());
 }

@@ -3,6 +3,7 @@ package com.craftingdead.core.world.gun.attachment;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import net.minecraft.item.Item;
@@ -18,7 +19,7 @@ public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemP
   private final GunCraftSlotType inventorySlot;
   private final boolean soundSuppressor;
   private final boolean scope;
-  private final Item item;
+  private final Supplier<? extends Item> item;
 
   @Nullable
   private String descriptionId;
@@ -68,7 +69,7 @@ public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemP
 
   @Override
   public Item asItem() {
-    return this.item;
+    return this.item.get();
   }
 
   public static Builder builder() {
@@ -96,7 +97,7 @@ public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemP
     private GunCraftSlotType inventorySlot;
     private boolean soundSuppressor;
     private boolean scope;
-    private Item item;
+    private Supplier<? extends Item> item;
 
     public Builder addMultiplier(MultiplierType modifierType, float multiplier) {
       this.multipliers.put(modifierType, multiplier);
@@ -118,7 +119,7 @@ public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemP
       return this;
     }
 
-    public Builder setItem(Item item) {
+    public Builder setItem(Supplier<? extends Item> item) {
       this.item = item;
       return this;
     }
