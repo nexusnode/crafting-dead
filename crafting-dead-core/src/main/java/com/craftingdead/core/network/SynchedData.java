@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -46,7 +47,7 @@ public class SynchedData {
 
   private static final Map<Class<?>, Integer> ID_POOL = Maps.newHashMap();
 
-  private final DataEntry<?>[] entries = new DataEntry<?>[255];
+  private final Map<Integer, DataEntry<?>> entries = new Int2ObjectOpenHashMap<>();
   private final Runnable dirtyListener;
   private boolean empty = true;
   private boolean dirty;
@@ -104,7 +105,7 @@ public class SynchedData {
     if (id > 254) {
       throw new IllegalArgumentException(
           "Data parameter id is too big with " + id + "! (Max is 254)");
-    } else if (this.entries[id] != null) {
+    } else if (this.entries.containsKey(id)) {
       throw new IllegalArgumentException("Duplicate id value for " + id + "!");
     } else if (DataSerializers.getSerializedId(parameter.getSerializer()) < 0) {
       throw new IllegalArgumentException(
@@ -116,7 +117,7 @@ public class SynchedData {
 
   private <T> void createEntry(DataParameter<T> parameter, T value) {
     DataEntry<T> entry = new DataEntry<>(parameter, value);
-    this.entries[parameter.getId()] = entry;
+    this.entries.put(parameter.getId(), entry);
     this.empty = false;
   }
 
@@ -124,7 +125,7 @@ public class SynchedData {
   private <T> DataEntry<T> getEntry(DataParameter<T> parameter) {
     DataEntry<T> entry;
     try {
-      entry = (DataEntry<T>) this.entries[parameter.getId()];
+      entry = (DataEntry<T>) this.entries.get(parameter.getId());
     } catch (Throwable throwable) {
       CrashReport crashReport =
           CrashReport.forThrowable(throwable, "Getting data entry");
@@ -196,7 +197,7 @@ public class SynchedData {
   public List<DataEntry<?>> packDirty() {
     List<DataEntry<?>> list = null;
     if (this.dirty) {
-      for (DataEntry<?> entry : this.entries) {
+      for (DataEntry<?> entry : this.entries.values()) {
         if (entry.isDirty()) {
           entry.setDirty(false);
           if (list == null) {
@@ -213,7 +214,7 @@ public class SynchedData {
   @Nullable
   public List<DataEntry<?>> getAll() {
     List<DataEntry<?>> list = null;
-    for (DataEntry<?> entry : this.entries) {
+    for (DataEntry<?> entry : this.entries.values()) {
       if (list == null) {
         list = new ArrayList<>();
       }
@@ -256,7 +257,7 @@ public class SynchedData {
     }
 
     for (DataEntry<?> entry : entries) {
-      DataEntry<?> currentEntry = this.entries[entry.getKey().getId()];
+      DataEntry<?> currentEntry = this.entries.get(entry.getKey().getId());
       if (currentEntry != null) {
         this.assignValue(currentEntry, entry);
       }
@@ -282,8 +283,7 @@ public class SynchedData {
 
   public void cleanDirty() {
     this.dirty = false;
-
-    for (DataEntry<?> entry : this.entries) {
+    for (DataEntry<?> entry : this.entries.values()) {
       entry.setDirty(false);
     }
   }
