@@ -19,13 +19,13 @@
 package com.craftingdead.immerse.game.tdm;
 
 import java.util.function.Consumer;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.SynchedData;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 
-public class TdmPlayerData implements BufferSerializable {
+public class TdmPlayerData implements Synched {
 
   private static final DataParameter<Integer> SCORE =
       new DataParameter<>(0x00, DataSerializers.INT);

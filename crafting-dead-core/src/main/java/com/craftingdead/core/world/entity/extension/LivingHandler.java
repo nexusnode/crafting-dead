@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -27,7 +27,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface LivingHandler extends INBTSerializable<CompoundNBT>, BufferSerializable {
+public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
 
   default void tick() {}
 

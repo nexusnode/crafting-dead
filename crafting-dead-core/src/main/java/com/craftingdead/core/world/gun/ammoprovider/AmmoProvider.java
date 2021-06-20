@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.gun.ammoprovider;
 
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.magazine.Magazine;
 import net.minecraft.item.ItemStack;
@@ -27,7 +27,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public interface AmmoProvider extends INBTSerializable<CompoundNBT>, BufferSerializable {
+public interface AmmoProvider extends INBTSerializable<CompoundNBT>, Synched {
 
   void reload(LivingExtension<?, ?> living);
 

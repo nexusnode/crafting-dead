@@ -3,7 +3,7 @@ package com.craftingdead.immerse.game;
 import java.util.Collection;
 import java.util.Map;
 import javax.annotation.Nullable;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.network.NetworkChannel;
@@ -22,21 +22,21 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
 
   protected final Map<IRegistryDelegate<ModuleType>, M> modules;
   private final Collection<Module.Tickable> tickableModules;
-  private final Map<IRegistryDelegate<ModuleType>, BufferSerializable> networkModules;
+  private final Map<IRegistryDelegate<ModuleType>, Synched> networkModules;
 
   public GameWrapper(T game) {
     this.game = game;
     ImmutableMap.Builder<IRegistryDelegate<ModuleType>, M> builder = ImmutableMap.builder();
     ImmutableList.Builder<Module.Tickable> tickableBuilder = ImmutableList.builder();
-    ImmutableMap.Builder<IRegistryDelegate<ModuleType>, BufferSerializable> networkBuilder =
+    ImmutableMap.Builder<IRegistryDelegate<ModuleType>, Synched> networkBuilder =
         ImmutableMap.builder();
     this.game.registerModules(module -> {
       builder.put(module.getType().delegate, module);
       if (module instanceof Module.Tickable) {
         tickableBuilder.add((Module.Tickable) module);
       }
-      if (module instanceof BufferSerializable) {
-        networkBuilder.put(module.getType().delegate, (BufferSerializable) module);
+      if (module instanceof Synched) {
+        networkBuilder.put(module.getType().delegate, (Synched) module);
       }
     });
     this.modules = builder.build();
@@ -81,7 +81,7 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
     this.game.encode(out, writeAll);
 
     out.writeVarInt(this.modules.size());
-    for (Map.Entry<IRegistryDelegate<ModuleType>, BufferSerializable> entry : this.networkModules
+    for (Map.Entry<IRegistryDelegate<ModuleType>, Synched> entry : this.networkModules
         .entrySet()) {
       out.writeRegistryId(entry.getKey().get());
       entry.getValue().encode(out, writeAll);
@@ -94,7 +94,7 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
     int size = in.readVarInt();
     for (int i = 0; i < size; i++) {
       ModuleType moduleType = in.readRegistryIdSafe(ModuleType.class);
-      BufferSerializable module = this.networkModules.get(moduleType.delegate);
+      Synched module = this.networkModules.get(moduleType.delegate);
       if (module == null) {
         throw new IllegalStateException(
             "Module not present with ID: " + moduleType.getRegistryName().toString());
@@ -105,6 +105,6 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
 
   protected boolean requiresSync() {
     return this.game.requiresSync()
-        || this.networkModules.values().stream().anyMatch(BufferSerializable::requiresSync);
+        || this.networkModules.values().stream().anyMatch(Synched::requiresSync);
   }
 }

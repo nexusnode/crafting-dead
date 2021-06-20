@@ -25,17 +25,13 @@ import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -43,61 +39,18 @@ import net.minecraft.network.datasync.IDataSerializer;
 
 public class SynchedData {
 
-  private static final Logger LOGGER = LogManager.getLogger();
-
-  private static final Map<Class<?>, Integer> ID_POOL = Maps.newHashMap();
-
   private final Map<Integer, DataEntry<?>> entries = new Int2ObjectOpenHashMap<>();
+  @Nullable
   private final Runnable dirtyListener;
   private boolean empty = true;
   private boolean dirty;
 
   public SynchedData() {
-    this.dirtyListener = () -> {
-    };
+    this(null);
   }
 
-  public SynchedData(Runnable dirtyListener) {
+  public SynchedData(@Nullable Runnable dirtyListener) {
     this.dirtyListener = dirtyListener;
-  }
-
-  public static <T> DataParameter<T> defineId(Class<?> clazz, IDataSerializer<T> serializer) {
-    if (LOGGER.isDebugEnabled()) {
-      try {
-        Class<?> ownerClass =
-            Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
-        if (!ownerClass.equals(clazz)) {
-          LOGGER.warn("defineId called for: {} from {}", clazz, ownerClass, new RuntimeException());
-        }
-      } catch (ClassNotFoundException classnotfoundexception) {
-      }
-    }
-
-    int id;
-    if (ID_POOL.containsKey(clazz)) {
-      id = ID_POOL.get(clazz) + 1;
-    } else {
-      int i = 0;
-      Class<?> ownerClass = clazz;
-
-      while (ownerClass != Entity.class) {
-        ownerClass = ownerClass.getSuperclass();
-        if (ID_POOL.containsKey(ownerClass)) {
-          i = ID_POOL.get(ownerClass) + 1;
-          break;
-        }
-      }
-
-      id = i;
-    }
-
-    if (id > 254) {
-      throw new IllegalArgumentException(
-          "Data value id is too big with " + id + "! (Max is " + 254 + ")");
-    } else {
-      ID_POOL.put(clazz, id);
-      return serializer.createAccessor(id);
-    }
   }
 
   public <T> void register(DataParameter<T> parameter, T value) {
@@ -166,7 +119,7 @@ public class SynchedData {
   }
 
   private void markDirty() {
-    if (!this.dirty) {
+    if (!this.dirty && this.dirtyListener != null) {
       this.dirtyListener.run();
     }
     this.dirty = true;

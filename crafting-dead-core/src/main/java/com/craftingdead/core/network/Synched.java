@@ -23,7 +23,7 @@ import net.minecraft.nbt.ByteArrayNBT;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
-public interface BufferSerializable {
+public interface Synched {
 
   void encode(PacketBuffer out, boolean writeAll);
 

@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 
-class ShopModule implements Module, BufferSerializable {
+class ShopModule implements Module, Synched {
 
   protected final Map<UUID, ShopItem> items = new HashMap<>();
   private final List<ShopCategory> categories = new ArrayList<>();

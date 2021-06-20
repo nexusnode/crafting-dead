@@ -18,11 +18,11 @@
 
 package com.craftingdead.core.world.gun.magazine;
 
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface Magazine extends INBTSerializable<CompoundNBT>, BufferSerializable {
+public interface Magazine extends INBTSerializable<CompoundNBT>, Synched {
 
   float getArmorPenetration();
 

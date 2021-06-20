@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.immerse.util.ModSoundEvents;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -35,7 +35,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class TeamInstance<T extends Team>
-    implements INBTSerializable<CompoundNBT>, BufferSerializable {
+    implements INBTSerializable<CompoundNBT>, Synched {
 
   protected final SynchedData dataManager = new SynchedData();
 

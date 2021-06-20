@@ -20,7 +20,7 @@ package com.craftingdead.core.world.gun;
 
 import java.util.Optional;
 import java.util.Set;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
@@ -34,7 +34,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 
-public interface Gun extends CombatSlotProvider, BufferSerializable {
+public interface Gun extends CombatSlotProvider, Synched {
 
   /**
    * Ticked when held by the passed in {@link LivingExtension}.

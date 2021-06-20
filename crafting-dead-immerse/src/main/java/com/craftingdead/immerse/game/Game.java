@@ -19,11 +19,11 @@
 package com.craftingdead.immerse.game;
 
 import java.util.function.Consumer;
-import com.craftingdead.core.network.BufferSerializable;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public interface Game<M extends Module> extends BufferSerializable {
+public interface Game<M extends Module> extends Synched {
 
   default void registerModules(Consumer<M> registar) {};
 
