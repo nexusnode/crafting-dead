@@ -55,10 +55,10 @@ public class PerformActionMessage {
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), this.performerEntityId).ifPresent(performerEntity -> {
       LivingExtension<?, ?> performer =
-          performerEntity.getCapability(Capabilities.LIVING).orElse(null);
+          performerEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
       LivingExtension<?, ?> target = this.targetEntityId == -1 ? null
           : performerEntity.level.getEntity(this.targetEntityId)
-              .getCapability(Capabilities.LIVING).orElse(null);
+              .getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
       final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();
       if (!isServer || this.actionType.isTriggeredByClient()) {
         performer.performAction(this.actionType.createAction(performer, target), isServer);

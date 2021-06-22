@@ -38,7 +38,7 @@ public abstract class LivingEntityMixin {
   @Inject(at = @At("RETURN"), method = "isImmobile", cancellable = true)
   private void isImmobile(CallbackInfoReturnable<Boolean> callbackInfo) {
     final LivingEntity livingEntity = (LivingEntity) (Object) this;
-    livingEntity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+    livingEntity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
       if (!callbackInfo.getReturnValue() && living.isMovementBlocked()) {
         callbackInfo.setReturnValue(true);
       }

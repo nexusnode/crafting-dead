@@ -1,3 +1,7 @@
+plugins {
+    id 'crafting-dead'
+}
+
 repositories {
 	maven {
         name 'cursemaven'
@@ -22,8 +26,6 @@ jar {
         ])
     }
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 mixin {
 	add sourceSets.main, "craftingdead.refmap.json"

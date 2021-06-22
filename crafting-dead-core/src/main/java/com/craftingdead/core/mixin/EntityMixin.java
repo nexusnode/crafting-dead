@@ -38,7 +38,7 @@ public class EntityMixin {
   private void isInvisible(CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
       if (living.getVisibility() == Visibility.INVISIBLE
           || living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
         callbackInfo.setReturnValue(true);
@@ -54,7 +54,7 @@ public class EntityMixin {
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
       if (living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
         callbackInfo.setReturnValue(false);
       }

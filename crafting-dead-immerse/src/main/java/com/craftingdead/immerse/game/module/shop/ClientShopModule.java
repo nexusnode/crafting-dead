@@ -58,7 +58,7 @@ public class ClientShopModule extends ShopModule implements Module.Tickable {
     // Consume key event
     while (this.minecraft.options.keyInventory.consumeClick()) {
       if (!this.minecraft.player.isSpectator()) {
-        PlayerExtension<?> player = PlayerExtension.getExpected(this.minecraft.player);
+        PlayerExtension<?> player = PlayerExtension.getOrThrow(this.minecraft.player);
         if (this.buyTimeSeconds > 0) {
           this.minecraft.setScreen(new ShopScreen(null, this, player));
         } else {

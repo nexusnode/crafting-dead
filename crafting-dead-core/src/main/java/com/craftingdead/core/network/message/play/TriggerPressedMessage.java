@@ -51,7 +51,7 @@ public class TriggerPressedMessage {
         .ifPresent(entity -> {
           LivingEntity livingEntity = (LivingEntity) entity;
           ItemStack heldStack = livingEntity.getMainHandItem();
-          livingEntity.getCapability(Capabilities.LIVING)
+          livingEntity.getCapability(Capabilities.LIVING_EXTENSION)
               .ifPresent(living -> heldStack
                   .getCapability(Capabilities.GUN)
                   .ifPresent(gun -> gun.setTriggerPressed(living, msg.triggerPressed,

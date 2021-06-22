@@ -218,7 +218,7 @@ public class CraftingDeadSurvival {
   public void handleRightClickItem(PlayerInteractEvent.RightClickItem event) {
     if (!event.getWorld().isClientSide()
         && event.getItemStack().getCapability(Capabilities.CLOTHING).isPresent()) {
-      PlayerExtension<?> extension = PlayerExtension.getExpected(event.getPlayer());
+      PlayerExtension<?> extension = PlayerExtension.getOrThrow(event.getPlayer());
       extension.performAction(
           SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, null), true);
     }
@@ -226,7 +226,7 @@ public class CraftingDeadSurvival {
 
   @SubscribeEvent
   public void handleGunHitEntity(GunEvent.HitEntity event) {
-    event.getTarget().getCapability(Capabilities.LIVING)
+    event.getTarget().getCapability(Capabilities.LIVING_EXTENSION)
         .resolve()
         .flatMap(living -> living.getHandler(SurvivalPlayerHandler.ID))
         .map(living -> (SurvivalPlayerHandler) living)

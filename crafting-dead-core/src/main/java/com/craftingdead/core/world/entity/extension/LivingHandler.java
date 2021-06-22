@@ -38,18 +38,18 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * @param amount - the amount of damage taken
    * @return the new damage amount
    */
-  default float onDamaged(DamageSource source, float amount) {
+  default float handleDamaged(DamageSource source, float amount) {
     return amount;
   }
 
   /**
-   * When this entity is attacked.
+   * When this entity is hurt.
    * 
    * @param source - the source of damage
    * @param amount - the amount of damage taken
    * @return if the event should be cancelled
    */
-  default boolean onAttacked(DamageSource source, float amount) {
+  default boolean handleHurt(DamageSource source, float amount) {
     return false;
   }
 
@@ -59,7 +59,7 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * @param target - the {@link Entity} killed
    * @return if the event should be cancelled
    */
-  default boolean onKill(Entity target) {
+  default boolean handleKill(Entity target) {
     return false;
   }
 
@@ -69,7 +69,7 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * @param cause - the cause of death
    * @return if the event should be cancelled
    */
-  default boolean onDeath(DamageSource cause) {
+  default boolean handleDeath(DamageSource cause) {
     return false;
   }
 
@@ -77,10 +77,10 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * When this entity's death causes dropped items to appear.
    *
    * @param cause - the DamageSource that caused the drop to occur
-   * @param drops - a collections of EntityItems that will be dropped
+   * @param loot - a collections of {@link ItemEntity}s that will be dropped
    * @return if the event should be cancelled
    */
-  default boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+  default boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot) {
     return false;
   }
 
@@ -90,7 +90,7 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * 
    * @param playerEntity - the player tracking us
    */
-  default void onStartTracking(ServerPlayerEntity playerEntity) {}
+  default void handleStartTracking(ServerPlayerEntity playerEntity) {}
 
   /**
    * Whether the {@link LivingExtension} is allowed to move or not.

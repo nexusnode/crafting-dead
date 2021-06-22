@@ -61,7 +61,7 @@ public class SyncLivingMessage {
       if (entity == null) {
         return;
       }
-      entity.getCapability(Capabilities.LIVING).ifPresent(living -> living.decode(msg.data));
+      entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> living.decode(msg.data));
     });
     return true;
   }

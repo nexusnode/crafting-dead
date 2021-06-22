@@ -247,7 +247,7 @@ public class ClientDist implements ModDist {
    * Get the {@link Minecraft} instance. If accessing {@link Minecraft} from a common class
    * (contains both client and server code) don't access fields directly from {@link Minecraft} as
    * it will cause class loading problems. To safely access {@link ClientPlayerEntity} in a
-   * multi-sided environment, use {@link #getPlayer()}.
+   * multi-sided environment, use {@link #getPlayerExtension()}.
    * 
    * @return {@link Minecraft}
    */
@@ -255,18 +255,11 @@ public class ClientDist implements ModDist {
     return this.minecraft;
   }
 
-  @SuppressWarnings("unchecked")
-  public Optional<PlayerExtension<ClientPlayerEntity>> getPlayer() {
+  public Optional<PlayerExtension<ClientPlayerEntity>> getPlayerExtension() {
     return Optional.ofNullable(this.minecraft.player)
-        .flatMap(p -> p.getCapability(Capabilities.LIVING).resolve())
-        .filter(living -> living instanceof PlayerExtension)
-        .map(living -> (PlayerExtension<ClientPlayerEntity>) living);
-  }
-
-  @SuppressWarnings("unchecked")
-  public PlayerExtension<ClientPlayerEntity> getExpectedPlayer() {
-    return Capabilities.getOrThrow(Capabilities.LIVING, this.minecraft.player,
-        PlayerExtension.class);
+        .flatMap(player -> player.getCapability(Capabilities.LIVING_EXTENSION).resolve())
+        .filter(PlayerExtension.class::isInstance)
+        .map(PlayerExtension.class::cast);
   }
 
   public boolean isRightMouseDown() {
@@ -322,7 +315,7 @@ public class ClientDist implements ModDist {
 
   private void handleClientSetup(FMLClientSetupEvent event) {
     ItemModelsProperties.registerGeneric(new ResourceLocation("wearing"),
-        (itemStack, world, entity) -> entity.getCapability(Capabilities.LIVING)
+        (itemStack, world, entity) -> entity.getCapability(Capabilities.LIVING_EXTENSION)
             .filter(living -> living.getItemHandler()
                 .getStackInSlot(ModEquipmentSlotType.HAT.getIndex()) == itemStack)
             .map(__ -> 1.0F)
@@ -331,13 +324,13 @@ public class ClientDist implements ModDist {
     StartupMessageManager.addModMessage("Registering tooltips");
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
-        (stack, world,
-            tooltipFlags) -> new TranslationTextComponent("item_lore.clothing_item.water_breathing")
+        (stack, world, tooltipFlags) -> new TranslationTextComponent(
+            "item_lore.clothing_item.water_breathing")
                 .withStyle(TextFormatting.GRAY));
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
-        (stack, world,
-            tooltipFlags) -> new TranslationTextComponent("item_lore.clothing_item.water_speed")
+        (stack, world, tooltipFlags) -> new TranslationTextComponent(
+            "item_lore.clothing_item.water_speed")
                 .withStyle(TextFormatting.GRAY));
 
     ScreenManager.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
@@ -455,7 +448,7 @@ public class ClientDist implements ModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        PlayerExtension<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+        PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
         if (player != null) {
           ItemStack heldStack = player.getEntity().getMainHandItem();
           Gun gun = heldStack.getCapability(Capabilities.GUN).orElse(null);
@@ -543,7 +536,7 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    PlayerExtension<ClientPlayerEntity> player = this.getPlayer().orElse(null);
+    PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
     if (player != null && this.minecraft.overlay == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
       ItemStack heldStack = player.getEntity().getMainHandItem();
@@ -598,7 +591,7 @@ public class ClientDist implements ModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     PlayerExtension<AbstractClientPlayerEntity> player =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING)
+            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING_EXTENSION)
                 .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;
@@ -758,7 +751,7 @@ public class ClientDist implements ModDist {
       int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
       ModelRenderer armwearRenderer) {
 
-    ResourceLocation clothingTexture = playerEntity.getCapability(Capabilities.LIVING)
+    ResourceLocation clothingTexture = playerEntity.getCapability(Capabilities.LIVING_EXTENSION)
         .map(LivingExtension::getItemHandler)
         .map(itemHandler -> itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex()))
         .flatMap(clothingStack -> clothingStack.getCapability(Capabilities.CLOTHING).resolve())

@@ -67,6 +67,6 @@ public class ServerPlayerEntityMixin {
 
   private Optional<SpawnPoint> getSpawnPoint() {
     return CraftingDeadImmerse.getInstance().getLogicalServer().getGame()
-        .getSpawnPoint(PlayerExtension.getExpected((ServerPlayerEntity) (Object) this));
+        .getSpawnPoint(PlayerExtension.getOrThrow((ServerPlayerEntity) (Object) this));
   }
 }

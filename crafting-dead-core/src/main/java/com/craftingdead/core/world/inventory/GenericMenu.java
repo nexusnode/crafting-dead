@@ -23,14 +23,12 @@ import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.item.GunItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class GenericMenu extends Container {
+public class GenericMenu extends AbstractMenu {
 
   private final int rows;
 
@@ -40,69 +38,30 @@ public class GenericMenu extends Container {
     this(menuType, windowId, playerInventory, new ItemStackHandler(9 * rows), rows, predicate);
   }
 
-  public GenericMenu(ContainerType<?> containerType, int windowId,
+  public GenericMenu(ContainerType<?> type, int id,
       PlayerInventory playerInventory, IItemHandler itemHandler, int rows,
       BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
-    super(containerType, windowId);
+    super(type, id, playerInventory, itemHandler);
     assert itemHandler.getSlots() >= rows * 9;
     this.rows = rows;
 
-    int i = (this.rows - 4) * 18;
-
-    // Container inventory
-    for (int j = 0; j < this.rows; ++j) {
-      for (int k = 0; k < 9; ++k) {
-        this
-            .addSlot(new PredicateItemHandlerSlot(itemHandler, k + j * 9, 8 + k * 18, 18 + j * 18,
-                predicate));
+    // Contents
+    for (int i = 0; i < this.rows; ++i) {
+      for (int j = 0; j < 9; ++j) {
+        this.addSlot(new PredicateItemHandlerSlot(itemHandler, j + i * 9, 8 + j * SLOT_SIZE,
+            SLOT_SIZE + i * SLOT_SIZE, predicate));
       }
     }
+  }
 
-    // Player inventory
-    for (int l = 0; l < 3; ++l) {
-      for (int j1 = 0; j1 < 9; ++j1) {
-        this.addSlot(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + i));
-      }
-    }
-
-    // Hot bar
-    for (int i1 = 0; i1 < 9; ++i1) {
-      this.addSlot(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + i));
-    }
+  @Override
+  public int getInventoryOffset() {
+    return 1 + SLOT_SIZE + (this.rows - 4) * SLOT_SIZE;
   }
 
   @Override
   public boolean stillValid(PlayerEntity playerEntity) {
     return true;
-  }
-
-  @Override
-  public ItemStack quickMoveStack(PlayerEntity playerEntity, int index) {
-    ItemStack itemstack = ItemStack.EMPTY;
-    Slot slot = this.slots.get(index);
-    if (slot != null && slot.hasItem()) {
-      ItemStack itemstack1 = slot.getItem();
-      itemstack = itemstack1.copy();
-      if (index < this.rows * 9) {
-        if (!this.moveItemStackTo(itemstack1, this.rows * 9, this.slots.size(), true)) {
-          return ItemStack.EMPTY;
-        }
-      } else if (!this.moveItemStackTo(itemstack1, 0, this.rows * 9, false)) {
-        return ItemStack.EMPTY;
-      }
-
-      if (itemstack1.isEmpty()) {
-        slot.set(ItemStack.EMPTY);
-      } else {
-        slot.setChanged();
-      }
-    }
-
-    return itemstack;
-  }
-
-  public int getRowCount() {
-    return this.rows;
   }
 
   public static GenericMenu createVest(int windowId, PlayerInventory playerInventory,

@@ -19,7 +19,7 @@ public class GameRendererMixin {
   private static void getNightVisionScale(LivingEntity livingEntity, float partialTicks,
       CallbackInfoReturnable<Float> callbackInfo) {
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    livingEntity.getCapability(Capabilities.LIVING)
+    livingEntity.getCapability(Capabilities.LIVING_EXTENSION)
         .ifPresent(l -> l.getItemHandler().getStackInSlot(ModEquipmentSlotType.HAT.getIndex())
             .getCapability(Capabilities.HAT).ifPresent(hat -> {
               if (hat.hasNightVision()) {

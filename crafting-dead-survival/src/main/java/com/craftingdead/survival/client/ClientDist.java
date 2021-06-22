@@ -119,7 +119,7 @@ public class ClientDist implements ModDist {
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     PlayerExtension<AbstractClientPlayerEntity> player =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING)
+            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING_EXTENSION)
                 .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;

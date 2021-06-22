@@ -50,7 +50,7 @@ public class RequestJoinTeamMessage implements TdmServerMessage {
   @Override
   public void handle(TdmServer gameServer, Context context) {
     ServerTeamModule<TdmTeam> teamModule = gameServer.getTeamModule();
-    teamModule.setPlayerTeam(PlayerExtension.getExpected(context.getSender()),
+    teamModule.setPlayerTeam(PlayerExtension.getOrThrow(context.getSender()),
         this.team == null ? null : teamModule.getTeamInstance(this.team));
   }
 }

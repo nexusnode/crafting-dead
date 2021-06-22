@@ -95,7 +95,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
   }
 
   @Override
-  public boolean onAttacked(DamageSource source, float amount) {
+  public boolean handleHurt(DamageSource source, float amount) {
     if (this.getRemainingSpawnProtectionSeconds() > 0 || this.isMovementBlocked()) {
       return true;
     }
@@ -111,7 +111,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
         this.lastSignificantDamage = playerEntity;
       }
 
-      if (playerEntity.getCapability(Capabilities.LIVING)
+      if (playerEntity.getCapability(Capabilities.LIVING_EXTENSION)
           .resolve()
           .flatMap(e -> e.getHandler(ID))
           .map(extension -> ((TdmPlayerHandler) extension).getTeam().orElse(null) == this.getTeam()
@@ -124,7 +124,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
   }
 
   @Override
-  public boolean onKill(Entity target) {
+  public boolean handleKill(Entity target) {
     if (target instanceof ServerPlayerEntity) {
       TdmPlayerData playerData = this.getPlayerData();
       playerData.incrementKills();
@@ -141,7 +141,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
   }
 
   @Override
-  public boolean onDeath(DamageSource cause) {
+  public boolean handleDeath(DamageSource cause) {
     if (this.getPlayer().getEntity() instanceof ServerPlayerEntity) {
       ServerPlayerEntity playerEntity = (ServerPlayerEntity) this.getPlayer().getEntity();
 

@@ -44,6 +44,12 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
     return new LivingExtensionImpl<>(entity);
   }
 
+  @Nonnull
+  @SuppressWarnings("unchecked")
+  static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E living) {
+    return Capabilities.getOrThrow(Capabilities.LIVING_EXTENSION, living, LivingExtension.class);
+  }
+
   /**
    * Load this {@link LivingExtension} - called upon capability attachment.
    */
@@ -212,23 +218,6 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    */
   default World getLevel() {
     return this.getEntity().level;
-  }
-
-  /**
-   * Get an expected {@link LivingExtension} instance.
-   * 
-   * @param <E> - the specific type of {@link LivingEntity}
-   * @param livingEntity - the {@link LivingEntity} instance
-   * @throws IllegalStateException if not present
-   * @return the {@link LivingExtension} instance
-   * @see #getOptional(LivingEntity)
-   */
-  @Nonnull
-  public static <E extends LivingEntity> LivingExtension<E, ?> getExpected(E livingEntity)
-      throws IllegalStateException {
-    return livingEntity.getCapability(Capabilities.LIVING)
-        .<LivingExtension<E, ?>>cast()
-        .orElseThrow(() -> new IllegalStateException("Missing living capability " + livingEntity));
   }
 
   /**

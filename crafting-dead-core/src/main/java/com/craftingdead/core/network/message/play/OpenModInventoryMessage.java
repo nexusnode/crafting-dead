@@ -32,7 +32,7 @@ public class OpenModInventoryMessage {
   }
 
   public static boolean handle(OpenModInventoryMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    PlayerExtension.getExpected(ctx.get().getSender()).openEquipmentMenu();
+    PlayerExtension.getOrThrow(ctx.get().getSender()).openEquipmentMenu();
     return true;
   }
 }

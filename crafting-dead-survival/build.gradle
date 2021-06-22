@@ -1,4 +1,6 @@
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+plugins {
+    id 'crafting-dead'
+}
 
 minecraft {
     runs {

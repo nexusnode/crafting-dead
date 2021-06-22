@@ -101,7 +101,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public boolean onAttacked(DamageSource source, float amount) {
+  public boolean handleHurt(DamageSource source, float amount) {
     if (source.getEntity() instanceof ZombieEntity) {
       this.infect(ZOMBIE_INFECTION_CHANCE);
     }
@@ -122,7 +122,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public float onDamaged(DamageSource source, float amount) {
+  public float handleDamaged(DamageSource source, float amount) {
     Entity immediateAttacker = source.getDirectEntity();
 
     boolean isValidSource = immediateAttacker != null || source.isExplosion();

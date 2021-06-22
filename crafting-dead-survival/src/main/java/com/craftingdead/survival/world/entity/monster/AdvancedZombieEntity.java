@@ -79,7 +79,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
       @Override
       public boolean canUse() {
         return super.canUse()
-            && AdvancedZombieEntity.this.getCapability(Capabilities.LIVING)
+            && AdvancedZombieEntity.this.getCapability(Capabilities.LIVING_EXTENSION)
                 .map(living -> AdvancedZombieEntity.this.getMainHandItem()
                     .getCapability(Capabilities.GUN)
                     .isPresent())
@@ -144,7 +144,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   protected void populateDefaultEquipmentSlots(DifficultyInstance difficulty) {
     this.entityData.set(TEXTURE_NUMBER, this.random.nextInt(23));
     this.setItemSlot(EquipmentSlotType.MAINHAND, this.getHeldStack());
-    this.getCapability(Capabilities.LIVING).ifPresent(living -> {
+    this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
       living.getItemHandler().setStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex(),
           this.getClothingStack());
       living.getItemHandler().setStackInSlot(ModEquipmentSlotType.HAT.getIndex(),
@@ -199,7 +199,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   public void tick() {
     super.tick();
     if (!this.getCommandSenderWorld().isClientSide()) {
-      this.getCapability(Capabilities.LIVING).ifPresent(
+      this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(
           living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.canContinueToUse() || (Util.getMillis()
@@ -213,7 +213,7 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   public void performRangedAttack(LivingEntity livingEntity, float distance) {
     if (!this.level.isClientSide()) {
-      this.getCapability(Capabilities.LIVING).ifPresent(
+      this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(
           living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
             this.triggerPressedStartTime = Util.getMillis();
             gun.setTriggerPressed(living, true, true);

@@ -195,7 +195,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   public void resetBuyTimes() {
     this.getMinecraftServer().getPlayerList().getPlayers()
         .stream()
-        .<PlayerExtension<?>>map(PlayerExtension::getExpected)
+        .<PlayerExtension<?>>map(PlayerExtension::getOrThrow)
         .map(player -> (TdmServerPlayerHandler) player
             .getHandlerOrThrow(TdmPlayerHandler.ID))
         .forEach(TdmServerPlayerHandler::resetBuyTime);
@@ -303,7 +303,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
     this.getMinecraftServer().setDifficulty(this.oldDifficulty, true);
 
     for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
-      ((TdmServerPlayerHandler) PlayerExtension.getExpected(playerEntity)
+      ((TdmServerPlayerHandler) PlayerExtension.getOrThrow(playerEntity)
           .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
     }
 

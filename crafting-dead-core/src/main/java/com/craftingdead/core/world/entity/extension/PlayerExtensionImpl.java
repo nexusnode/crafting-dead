@@ -102,7 +102,7 @@ class PlayerExtensionImpl<E extends PlayerEntity>
     }
     this.getEntity().openMenu(new SimpleNamedContainerProvider(
         (windowId, playerInventory, playerEntity) -> new EquipmentMenu(windowId,
-            this.getEntity().inventory),
+            this.getEntity().inventory, this.getItemHandler()),
         new TranslationTextComponent("container.equipment")));
   }
 
@@ -115,8 +115,8 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   }
 
   @Override
-  public boolean onDeath(DamageSource source) {
-    if (super.onDeath(source)) {
+  public boolean handleDeath(DamageSource source) {
+    if (super.handleDeath(source)) {
       return true;
     } else if (source instanceof KillFeedProvider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),

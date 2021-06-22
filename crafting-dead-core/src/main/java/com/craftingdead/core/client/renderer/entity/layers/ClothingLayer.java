@@ -38,7 +38,7 @@ public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
     // Resolve optionals to nullable for better performance.
     LivingExtension<?, ?> livingExtension =
-        livingEntity.getCapability(Capabilities.LIVING).orElse(null);
+        livingEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
     if (livingExtension != null) {
       Clothing clothing =
           livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex())

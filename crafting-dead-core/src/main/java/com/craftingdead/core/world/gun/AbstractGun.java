@@ -501,7 +501,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
     boolean headshot = false;
     if (hitEntity instanceof LivingEntity) {
-      LivingExtension<?, ?> hitLiving = LivingExtension.getExpected((LivingEntity) hitEntity);
+      LivingExtension<?, ?> hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
       headshot = (hitEntity instanceof PlayerEntity || hitEntity instanceof ZombieEntity
           || hitEntity instanceof SkeletonEntity || hitEntity instanceof CreeperEntity

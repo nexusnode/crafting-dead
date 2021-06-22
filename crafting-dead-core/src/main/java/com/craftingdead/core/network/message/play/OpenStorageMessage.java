@@ -41,7 +41,7 @@ public class OpenStorageMessage {
   }
 
   public static boolean handle(OpenStorageMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    PlayerExtension.getExpected(ctx.get().getSender()).openStorage(msg.slotType);
+    PlayerExtension.getOrThrow(ctx.get().getSender()).openStorage(msg.slotType);
     return true;
   }
 }

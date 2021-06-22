@@ -45,7 +45,7 @@ public class SecondaryActionMessage {
 
   public static boolean handle(SecondaryActionMessage message, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), message.entityId)
-        .flatMap(entity -> entity.getCapability(Capabilities.LIVING).resolve())
+        .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
         .ifPresent(living -> {
           living.getEntity().getMainHandItem()
               .getCapability(Capabilities.GUN)

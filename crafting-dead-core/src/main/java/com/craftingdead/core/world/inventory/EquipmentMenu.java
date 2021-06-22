@@ -31,18 +31,22 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class EquipmentMenu extends Container {
 
-  private final IItemHandler itemHandler;
+  private final IItemHandler equipment;
 
   private final CraftResultInventory outputInventory = new CraftResultInventory();
   private final Inventory craftingInventory = new Inventory(4);
 
-  public EquipmentMenu(int windowId, PlayerInventory playerInventory) {
-    super(ModMenuTypes.EQUIPMENT.get(), windowId);
-    this.itemHandler = playerInventory.player.getCapability(Capabilities.LIVING)
-        .orElseThrow(() -> new IllegalStateException("No living capability")).getItemHandler();
+  public EquipmentMenu(int id, PlayerInventory playerInventory) {
+    this(id, playerInventory, new ItemStackHandler(ModEquipmentSlotType.values().length));
+  }
+
+  public EquipmentMenu(int id, PlayerInventory playerInventory, IItemHandler equipment) {
+    super(ModMenuTypes.EQUIPMENT.get(), id);
+    this.equipment = equipment;
     this.craftingInventory.addListener(this::slotsChanged);
 
     final int slotSize = 18;
@@ -61,27 +65,29 @@ public class EquipmentMenu extends Container {
     int equipmentColumnX = 8 + (slotSize * 3);
     int equipmentColumnY = 8;
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.GUN.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.GUN.getIndex(),
         equipmentColumnX, equipmentColumnY,
         (slot, itemStack) -> itemStack.getCapability(Capabilities.GUN).isPresent()));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.MELEE.getIndex(),
-        equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
+    this.addSlot(
+        new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.MELEE.getIndex(),
+            equipmentColumnX, equipmentColumnY += slotSize,
+            (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.HAT.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.HAT.getIndex(),
         equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler,
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
         ModEquipmentSlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.getCapability(Capabilities.CLOTHING).isPresent()));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.itemHandler, ModEquipmentSlotType.VEST.getIndex(),
-        equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
-            .getCapability(Capabilities.STORAGE)
-            .map(storage -> storage.isValidForSlot(ModEquipmentSlotType.VEST))
-            .orElse(false)));
+    this.addSlot(
+        new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.VEST.getIndex(),
+            equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
+                .getCapability(Capabilities.STORAGE)
+                .map(storage -> storage.isValidForSlot(ModEquipmentSlotType.VEST))
+                .orElse(false)));
 
     final int gunCraftSlotGap = 3;
     final int gunCraftY = 8;
@@ -129,7 +135,7 @@ public class EquipmentMenu extends Container {
   }
 
   public IItemHandler getItemHandler() {
-    return this.itemHandler;
+    return this.equipment;
   }
 
   public ItemStack getGunStack() {
@@ -150,7 +156,8 @@ public class EquipmentMenu extends Container {
             }
           }
           return true;
-        }).orElse(false);
+        })
+        .orElse(false);
   }
 
   @Override

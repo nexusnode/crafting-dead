@@ -67,11 +67,11 @@ public class ActionItem extends Item {
 
   public void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
     if (this.entityActionFactory != null) {
-      performerEntity.getCapability(Capabilities.LIVING)
+      performerEntity.getCapability(Capabilities.LIVING_EXTENSION)
           .ifPresent(performer -> performer.performAction(
               this.entityActionFactory.apply(performer, targetEntity == null
                   ? null
-                  : targetEntity.getCapability(Capabilities.LIVING).orElse(null)),
+                  : targetEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null)),
               false, true));
     }
   }

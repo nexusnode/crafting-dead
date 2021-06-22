@@ -64,7 +64,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public boolean onKill(Entity target) {
+  public boolean handleKill(Entity target) {
     if (target instanceof ZombieEntity) {
       this.setZombiesKilled(this.getZombiesKilled() + 1);
     } else if (target instanceof ServerPlayerEntity) {

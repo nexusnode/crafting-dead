@@ -89,15 +89,10 @@ public class CraftingDead {
 
   public static final String ID = "craftingdead";
 
-  public static final String VERSION;
+  public static final String VERSION =
+      JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
 
   private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
-
-  static {
-    VERSION = JarVersionLookupHandler
-        .getImplementationVersion(CraftingDead.class)
-        .orElse("[version]");
-  }
 
   /**
    * Logger.
@@ -134,11 +129,11 @@ public class CraftingDead {
     ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
     ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
 
+    // Custom registries
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
 
-    // Should be registered after ITEMS registration
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
     MinecraftForge.EVENT_BUS.register(this);
@@ -197,7 +192,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    event.getPlayer().getCapability(Capabilities.LIVING).<PlayerExtension<?>>cast()
+    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION).<PlayerExtension<?>>cast()
         .filter(PlayerExtension::isCombatModeEnabled).ifPresent(living -> {
           final ItemStack itemStack = event.getItem().getItem();
           CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
@@ -229,14 +224,14 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
     if (event.getEntity()
-        .getCapability(Capabilities.LIVING)
-        .map(living -> living.onDeath(event.getSource()))
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .map(living -> living.handleDeath(event.getSource()))
         .orElse(false)
         || (event.getSource().getEntity() != null && event
             .getSource()
             .getEntity()
-            .getCapability(Capabilities.LIVING)
-            .map(living -> living.onKill(event.getEntity()))
+            .getCapability(Capabilities.LIVING_EXTENSION)
+            .map(living -> living.handleKill(event.getEntity()))
             .orElse(false))) {
       event.setCanceled(true);
     }
@@ -245,37 +240,38 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDrops(LivingDropsEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING)
+        .getCapability(Capabilities.LIVING_EXTENSION)
         .ifPresent(
-            living -> event.setCanceled(living.onDeathDrops(event.getSource(), event.getDrops())));
+            living -> event
+                .setCanceled(living.handleDeathLoot(event.getSource(), event.getDrops())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingAttack(LivingAttackEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING)
+        .getCapability(Capabilities.LIVING_EXTENSION)
         .ifPresent(
-            living -> event.setCanceled(living.onAttacked(event.getSource(), event.getAmount())));
+            living -> event.setCanceled(living.handleHurt(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDamage(LivingDamageEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING)
+        .getCapability(Capabilities.LIVING_EXTENSION)
         .ifPresent(
-            living -> event.setAmount(living.onDamaged(event.getSource(), event.getAmount())));
+            living -> event.setAmount(living.handleDamaged(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    PlayerExtension.getExpected(event.getPlayer()).copyFrom(
-        PlayerExtension.getExpected(event.getOriginal()),
+    PlayerExtension.getOrThrow(event.getPlayer()).copyFrom(
+        PlayerExtension.getOrThrow(event.getOriginal()),
         event.isWasDeath());
   }
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
-    event.getEntityLiving().getCapability(Capabilities.LIVING).ifPresent(living -> {
+    event.getEntityLiving().getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
       living.tick();
       if (!living.getLevel().isClientSide() && living.requiresSync()) {
         PacketBuffer data = new PacketBuffer(Unpooled.buffer());
@@ -291,7 +287,7 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        event.player.getCapability(Capabilities.LIVING)
+        event.player.getCapability(Capabilities.LIVING_EXTENSION)
             .filter(living -> living instanceof PlayerExtension)
             .map(living -> (PlayerExtension<?>) living)
             .ifPresent(PlayerExtension::playerTick);
@@ -308,7 +304,7 @@ public class CraftingDead {
           ? PlayerExtension.create((PlayerEntity) event.getObject())
           : LivingExtension.create((LivingEntity) event.getObject());
       event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
-          LazyOptional.of(() -> living), () -> Capabilities.LIVING, CompoundNBT::new));
+          LazyOptional.of(() -> living), () -> Capabilities.LIVING_EXTENSION, CompoundNBT::new));
       living.load();
     }
   }
@@ -324,8 +320,8 @@ public class CraftingDead {
   }
 
   private static void startTracking(Entity targetEntity, ServerPlayerEntity playerEntity) {
-    targetEntity.getCapability(Capabilities.LIVING).ifPresent(trackedLiving -> {
-      trackedLiving.onStartTracking(playerEntity);
+    targetEntity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(trackedLiving -> {
+      trackedLiving.handleStartTracking(playerEntity);
       PacketBuffer data = new PacketBuffer(Unpooled.buffer());
       trackedLiving.encode(data, true);
       NetworkChannel.PLAY.getSimpleChannel().send(

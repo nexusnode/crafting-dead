@@ -47,7 +47,7 @@ public class CrouchMessage {
   public static boolean handle(CrouchMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
-        .flatMap(entity -> entity.getCapability(Capabilities.LIVING).resolve())
+        .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
         .ifPresent(living -> living.setCrouching(msg.crouching,
             ctx.get().getDirection().getReceptionSide().isServer()));
     return true;

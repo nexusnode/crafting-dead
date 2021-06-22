@@ -121,7 +121,7 @@ public class FlashGrenadeEntity extends GrenadeEntity {
     }
 
     ItemStack hatItemStack = viewerEntity
-        .getCapability(Capabilities.LIVING)
+        .getCapability(Capabilities.LIVING_EXTENSION)
         .map(living -> living.getItemHandler().getStackInSlot(ModEquipmentSlotType.HAT.getIndex()))
         .orElse(ItemStack.EMPTY);
 

@@ -197,11 +197,11 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
     final PlayerExtension<ClientPlayerEntity> player =
-        CraftingDead.getInstance().getClientDist().getPlayer().orElse(null);
+        CraftingDead.getInstance().getClientDist().getPlayerExtension().orElse(null);
     final PlayerExtension<AbstractClientPlayerEntity> viewingPlayer =
         this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
             ? ((AbstractClientPlayerEntity) this.minecraft.getCameraEntity())
-                .getCapability(Capabilities.LIVING)
+                .getCapability(Capabilities.LIVING_EXTENSION)
                 .<PlayerExtension<AbstractClientPlayerEntity>>cast()
                 .orElse(null)
             : null;

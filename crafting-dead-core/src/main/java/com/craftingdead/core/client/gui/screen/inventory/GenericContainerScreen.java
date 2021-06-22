@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.client.gui.screen.inventory;
 
-import com.craftingdead.core.world.inventory.GenericMenu;
+import com.craftingdead.core.world.inventory.AbstractMenu;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IHasContainer;
@@ -27,19 +27,19 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class GenericContainerScreen extends ContainerScreen<GenericMenu>
-    implements IHasContainer<GenericMenu> {
+public class GenericContainerScreen extends ContainerScreen<AbstractMenu>
+    implements IHasContainer<AbstractMenu> {
 
   private static final ResourceLocation GENERIC_CONTAINER_TEXTURE =
       new ResourceLocation("textures/gui/container/generic_54.png");
 
   private static final int TITLE_TEXT_COLOUR = 0x404040;
 
-  public GenericContainerScreen(GenericMenu menu, PlayerInventory playerInventory,
+  public GenericContainerScreen(AbstractMenu menu, PlayerInventory playerInventory,
       ITextComponent title) {
     super(menu, playerInventory, title);
     this.passEvents = false;
-    this.imageHeight = 114 + this.menu.getRowCount() * 18;
+    this.imageHeight = 114 + this.menu.getContentsSize() * AbstractMenu.SLOT_SIZE;
   }
 
   @Override
@@ -57,14 +57,16 @@ public class GenericContainerScreen extends ContainerScreen<GenericMenu>
 
   @SuppressWarnings("deprecation")
   @Override
-  protected void renderBg(MatrixStack matrixStack, float partialTicks,
-      int mouseX, int mouseY) {
+  protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
     this.renderBackground(matrixStack);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     this.minecraft.getTextureManager().bind(GENERIC_CONTAINER_TEXTURE);
     int x = (this.width - this.imageWidth) / 2;
     int y = (this.height - this.imageHeight) / 2;
-    this.blit(matrixStack, x, y, 0, 0, this.imageWidth, this.menu.getRowCount() * 18 + 17);
-    this.blit(matrixStack, x, y + this.menu.getRowCount() * 18 + 17, 0, 126, this.imageWidth, 96);
+    this.blit(matrixStack, x, y, 0, 0, this.imageWidth,
+        this.menu.getContentsSize() * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE - 1);
+    this.blit(matrixStack, x,
+        y + this.menu.getContentsSize() * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE - 1, 0,
+        7 * AbstractMenu.SLOT_SIZE, this.imageWidth, 96);
   }
 }

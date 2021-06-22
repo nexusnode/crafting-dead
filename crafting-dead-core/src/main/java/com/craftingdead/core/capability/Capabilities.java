@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.capability;
 
+import javax.annotation.Nonnull;
 import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
@@ -35,7 +36,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class Capabilities {
 
   @CapabilityInject(LivingExtension.class)
-  public static final Capability<LivingExtension<?, ?>> LIVING = null;
+  public static final Capability<LivingExtension<?, ?>> LIVING_EXTENSION = null;
 
   @CapabilityInject(Storage.class)
   public static final Capability<Storage> STORAGE = null;
@@ -83,6 +84,7 @@ public class Capabilities {
     throw new UnsupportedOperationException();
   }
 
+  @Nonnull
   public static <T, R extends T> R getOrThrow(Capability<T> capability,
       ICapabilityProvider provider, Class<R> clazz) {
     return provider.getCapability(capability)

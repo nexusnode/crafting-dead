@@ -75,7 +75,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
     ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
-    entity.getCapability(Capabilities.LIVING).ifPresent(living -> {
+    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
 
       ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
 

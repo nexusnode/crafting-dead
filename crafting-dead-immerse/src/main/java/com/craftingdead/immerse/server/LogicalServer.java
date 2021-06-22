@@ -159,7 +159,7 @@ public class LogicalServer extends WorldSavedData {
     if (oldGameWrapper != null) {
       logger.info("Unloading current game");
       players.stream()
-          .map(PlayerExtension::getExpected)
+          .map(PlayerExtension::getOrThrow)
           .forEach(oldGameWrapper::removePlayer);
       oldGameWrapper.unload();
     }
@@ -183,7 +183,7 @@ public class LogicalServer extends WorldSavedData {
     }
 
     players.stream()
-        .map(PlayerExtension::getExpected)
+        .map(PlayerExtension::getOrThrow)
         .forEach(gameWrapper::addPlayer);
 
     // Respawn all players - keep data if new game uses persisted player data, otherwise discard
@@ -259,12 +259,12 @@ public class LogicalServer extends WorldSavedData {
   @SubscribeEvent
   public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
     ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getPlayer();
-    this.gameWrapper.addPlayer(PlayerExtension.getExpected(playerEntity));
+    this.gameWrapper.addPlayer(PlayerExtension.getOrThrow(playerEntity));
   }
 
   @SubscribeEvent
   public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
     this.gameWrapper
-        .removePlayer(PlayerExtension.getExpected((ServerPlayerEntity) event.getPlayer()));
+        .removePlayer(PlayerExtension.getOrThrow((ServerPlayerEntity) event.getPlayer()));
   }
 }

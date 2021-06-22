@@ -344,30 +344,30 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
 
   @Override
-  public float onDamaged(DamageSource source, float amount) {
+  public float handleDamaged(DamageSource source, float amount) {
     return this.handlers.values().stream().reduce(amount,
-        (result, extension) -> extension.onDamaged(source, result), (u, t) -> t);
+        (result, extension) -> extension.handleDamaged(source, result), (u, t) -> t);
   }
 
   @Override
-  public boolean onAttacked(DamageSource source, float amount) {
-    return this.handlers.values().stream().anyMatch(e -> e.onAttacked(source, amount));
+  public boolean handleHurt(DamageSource source, float amount) {
+    return this.handlers.values().stream().anyMatch(e -> e.handleHurt(source, amount));
   }
 
   @Override
-  public boolean onKill(Entity target) {
-    return this.handlers.values().stream().anyMatch(e -> e.onKill(target));
+  public boolean handleKill(Entity target) {
+    return this.handlers.values().stream().anyMatch(e -> e.handleKill(target));
   }
 
   @Override
-  public boolean onDeath(DamageSource cause) {
-    return this.handlers.values().stream().map(e -> e.onDeath(cause)).anyMatch(v -> v == true);
+  public boolean handleDeath(DamageSource cause) {
+    return this.handlers.values().stream().map(e -> e.handleDeath(cause)).anyMatch(v -> v == true);
   }
 
   @Override
-  public boolean onDeathDrops(DamageSource cause, Collection<ItemEntity> drops) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
     if (this.handlers.values().stream()
-        .filter(e -> e.onDeathDrops(cause, drops))
+        .filter(e -> e.handleDeathLoot(cause, drops))
         .findAny()
         .isPresent()) {
       return true;

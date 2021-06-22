@@ -44,7 +44,7 @@ public class CancelActionMessage {
   public static boolean handle(CancelActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
     NetworkUtil.getEntity(ctx.get(), msg.entityId)
         .filter(entity -> entity instanceof LivingEntity)
-        .flatMap(entity -> entity.getCapability(Capabilities.LIVING).resolve())
+        .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
         .ifPresent(
             living -> living.cancelAction(ctx.get().getDirection().getReceptionSide().isServer()));
     return true;

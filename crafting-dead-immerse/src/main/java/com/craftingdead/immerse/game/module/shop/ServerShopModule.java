@@ -69,7 +69,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
   }
 
   private void handleBuyItem(BuyItemMessage message, NetworkEvent.Context context) {
-    this.buyItem(PlayerExtension.getExpected(context.getSender()), message.getItemId());
+    this.buyItem(PlayerExtension.getOrThrow(context.getSender()), message.getItemId());
   }
 
   @Override

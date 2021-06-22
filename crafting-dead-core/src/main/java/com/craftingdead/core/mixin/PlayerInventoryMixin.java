@@ -34,7 +34,7 @@ public class PlayerInventoryMixin {
    */
   @Inject(at = @At("HEAD"), method = "swapPaint", cancellable = true)
   private void swapPaint(double direction, CallbackInfo callbackInfo) {
-    if (CraftingDead.getInstance().getClientDist().getPlayer()
+    if (CraftingDead.getInstance().getClientDist().getPlayerExtension()
         .map(PlayerExtension::isCombatModeEnabled)
         .orElse(false)) {
       callbackInfo.cancel();
