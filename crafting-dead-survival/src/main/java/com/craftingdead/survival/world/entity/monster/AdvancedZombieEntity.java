@@ -32,7 +32,6 @@ import com.craftingdead.core.world.item.ClothingItem;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
@@ -52,6 +51,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.RegistryObject;
 
@@ -187,18 +187,17 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     return this.entityData.get(TEXTURE_NUMBER);
   }
 
-  /**
-   * Method to be used as an arg for {@link EntitySpawnPlacementRegistry}.<code>register()</code>
-   */
-  public static boolean areSpawnConditionsMet(EntityType<?> entityType, IWorld world,
-      SpawnReason spawnReason, BlockPos blockPos, Random random) {
-    return true;
+  public static boolean checkAdvancedZombieSpawnRules(
+      EntityType<? extends AdvancedZombieEntity> entityType, IWorld level,
+      SpawnReason reason, BlockPos blockPos, Random random) {
+    return level.getBrightness(LightType.BLOCK, blockPos) <= 8
+        && checkAnyLightMonsterSpawnRules(entityType, level, reason, blockPos, random);
   }
 
   @Override
   public void tick() {
     super.tick();
-    if (!this.getCommandSenderWorld().isClientSide()) {
+    if (!this.level.isClientSide()) {
       this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(
           living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
             if (gun.isTriggerPressed()

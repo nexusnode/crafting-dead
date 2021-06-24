@@ -153,19 +153,23 @@ public class SurvivalEntityTypes {
     // Spawn placement rules
     EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.advancedZombie,
         EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
 
     EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.fastZombie,
         EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
 
     EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.tankZombie,
         EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
 
     EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.weakZombie,
         EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AdvancedZombieEntity::areSpawnConditionsMet);
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
   }
 
   public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
