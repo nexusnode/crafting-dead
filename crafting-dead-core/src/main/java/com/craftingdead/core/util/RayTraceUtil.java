@@ -41,25 +41,23 @@ import net.minecraftforge.common.ForgeMod;
 public class RayTraceUtil {
 
   public static List<Entity> filterEntities(Entity fromEntity, Vector3d scaledLook) {
-    return fromEntity
-        .getCommandSenderWorld()
-        .getEntities(fromEntity,
-            fromEntity.getBoundingBox().expandTowards(scaledLook).inflate(1.0D, 1.0D, 1.0D),
-            (entityTest) -> {
-              // Ignores entities that cannot be collided
-              if (entityTest.isSpectator() || !entityTest.isPickable()) {
-                return false;
-              }
-              if (entityTest instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entityTest;
+    return fromEntity.level.getEntities(fromEntity,
+        fromEntity.getBoundingBox().expandTowards(scaledLook).inflate(1.0D, 1.0D, 1.0D),
+        (entityTest) -> {
+          // Ignores entities that cannot be collided
+          if (entityTest.isSpectator() || !entityTest.isPickable()) {
+            return false;
+          }
+          if (entityTest instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity) entityTest;
 
-                // Ignores dead entities
-                if (livingEntity.isDeadOrDying()) {
-                  return false;
-                }
-              }
-              return true;
-            });
+            // Ignores dead entities
+            if (livingEntity.isDeadOrDying()) {
+              return false;
+            }
+          }
+          return true;
+        });
   }
 
   public static Optional<EntityRayTraceResult> rayTraceEntities(Entity fromEntity) {

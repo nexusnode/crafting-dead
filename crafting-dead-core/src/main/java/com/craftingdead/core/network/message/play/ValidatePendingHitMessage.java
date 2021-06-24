@@ -78,7 +78,7 @@ public class ValidatePendingHitMessage {
     ItemStack heldStack = playerEntity.getMainHandItem();
     heldStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
       for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
-        final Entity hitEntity = playerEntity.getCommandSenderWorld().getEntity(hit.getKey());
+        final Entity hitEntity = playerEntity.level.getEntity(hit.getKey());
         Optional.ofNullable(hitEntity)
             .flatMap(e -> e.getCapability(Capabilities.LIVING_EXTENSION).resolve())
             .ifPresent(hitLiving -> {

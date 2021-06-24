@@ -24,11 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -116,9 +115,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   private static final Logger logger = LogManager.getLogger();
 
-  private static final AtomicIntegerFieldUpdater<AbstractGun> triggerPressedUpdater =
-      AtomicIntegerFieldUpdater.newUpdater(AbstractGun.class, "triggerPressed");
-
   /**
    * The constant difference between server and client entity positions.
    */
@@ -128,14 +124,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   public static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
-  protected static final Random random = new Random();
-
-  private static final ExecutorService executorService = Executors.newCachedThreadPool(
-      new ThreadFactoryBuilder()
-          .setNameFormat("gun-pool-%s")
-          .setDaemon(true)
-          .setPriority(Thread.MAX_PRIORITY)
-          .build());
+  private static final ScheduledExecutorService executorService =
+      Executors.newScheduledThreadPool(3,
+          new ThreadFactoryBuilder()
+              .setNameFormat("gun-pool-%s")
+              .setDaemon(true)
+              .setPriority(Thread.MAX_PRIORITY)
+              .build());
 
   private static final DataParameter<ItemStack> PAINT_STACK =
       new DataParameter<>(0x01, DataSerializers.ITEM_STACK);
@@ -145,54 +140,46 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   protected final ItemStack itemStack;
 
   /**
-   * If the gun trigger is pressed.
+   * If the gun's trigger is pressed.
    * 
    * @see #triggerPressedUpdater
    */
-  @SuppressWarnings("unused")
-  @Deprecated
-  private volatile int triggerPressed;
   private boolean wasTriggerPressed;
 
   /**
    * The amount of ticks the trigger has been pressed for. Used to determine if a hit validation
    * packet is valid.
    */
-  private int triggerPressedTicks;
-
-  /**
-   * Time of the last shot in milliseconds.
-   */
-  protected long lastShotMs = Integer.MIN_VALUE;
+  private volatile int triggerPressedTicks;
 
   /**
    * The current {@link FireMode} being used.
    */
-  private FireMode fireMode;
+  private volatile FireMode fireMode;
 
   /**
    * The amount of shots since the last time the trigger was pressed. Used to determine if the gun
    * can continue firing using the current fire mode.
    */
-  private int shotCount;
+  private volatile int shotCount;
 
   private Set<Attachment> attachments;
   private boolean attachmentsDirty;
 
   private final Iterator<FireMode> fireModeInfiniteIterator;
 
-  private boolean performingSecondaryAction;
+  private volatile boolean performingSecondaryAction;
 
   private final Lazy<AbstractGunClient<?>> client;
 
   // Used to ensure the gun thread gets killed if we're not being ticked anymore.
   private volatile long lastTickMs;
 
-  private AmmoProvider ammoProvider;
+  private volatile AmmoProvider ammoProvider;
   private boolean ammoProviderChanged;
 
   @Nullable
-  private Future<?> gunLoopFuture;
+  private Future<?> gunFuture;
 
   @SuppressWarnings("unchecked")
   public <SELF extends AbstractGun> AbstractGun(
@@ -244,7 +231,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Override
   public void reset(LivingExtension<?, ?> living) {
     this.setTriggerPressed(living, false, false);
-    if (this.performingSecondaryAction) {
+    if (this.isPerformingSecondaryAction()) {
       this.setPerformingSecondaryAction(living, false, false);
     }
   }
@@ -252,18 +239,17 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Override
   public void setTriggerPressed(LivingExtension<?, ?> living, boolean triggerPressed,
       boolean sendUpdate) {
-    if (triggerPressed && (!this.canShoot(living)
-        || MinecraftForge.EVENT_BUS
-            .post(new GunEvent.TriggerPressed(this, this.itemStack, living)))) {
+    if (triggerPressed == this.isTriggerPressed() || (triggerPressed && (!this.canShoot(living)
+        || MinecraftForge.EVENT_BUS.post(
+            new GunEvent.TriggerPressed(this, this.itemStack, living))))) {
       return;
     }
 
-    this.setTriggerPressed(triggerPressed);
-
-    if (this.isTriggerPressed()
-        && (this.gunLoopFuture == null || this.gunLoopFuture.isDone())) {
-      this.gunLoopFuture = executorService.submit(() -> this.startGunLoop(living));
+    if (triggerPressed) {
+      this.gunFuture = executorService.scheduleAtFixedRate(() -> this.shoot(living), 0L,
+          this.getFireDelayMs(), TimeUnit.MILLISECONDS);
     } else {
+      this.stopShooting();
       // Resets the counter
       this.shotCount = 0;
     }
@@ -279,11 +265,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   @Override
   public boolean isTriggerPressed() {
-    return triggerPressedUpdater.get(this) != 0;
+    return this.gunFuture != null && !this.gunFuture.isDone();
   }
 
-  private void setTriggerPressed(boolean triggerPressed) {
-    triggerPressedUpdater.set(this, triggerPressed ? 1 : 0);
+  private void stopShooting() {
+    if (this.gunFuture != null) {
+      this.gunFuture.cancel(false);
+    }
   }
 
   @Override
@@ -319,13 +307,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     }
 
     if (!hitLiving.getEntity().isDeadOrDying()) {
-      random.setSeed(pendingHit.getRandomSeed());
+      Random random = new Random(pendingHit.getRandomSeed());
       hitSnapshot
           .rayTrace(player.getLevel(),
               playerSnapshot,
               this.getRange(),
-              this.getAccuracy(player),
-              shotCount,
+              this.getAccuracy(player, random),
+              this.shotCount,
               random)
           .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
     }
@@ -335,59 +323,49 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   protected abstract long getFireDelayMs();
 
-  private void startGunLoop(LivingExtension<?, ?> living) {
-    long time;
-    while (this.isTriggerPressed() && ((time = Util.getMillis()) - this.lastTickMs < 500L)) {
-      long timeDelta = time - this.lastShotMs;
-      if (timeDelta < this.getFireDelayMs()) {
-        try {
-          // Sleep to reduce CPU usage
-          Thread.sleep(this.getFireDelayMs() - timeDelta);
-        } catch (InterruptedException e) {
-          ;
-        }
-        continue;
-      }
+  private void shoot(LivingExtension<?, ?> living) {
+    final Random random = new Random();
 
-      if (!this.canShoot(living)) {
-        this.setTriggerPressed(false);
-        return;
-      }
-
-      LogicalSide side =
-          living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
-      ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
-
-      if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
-        if (side.isServer()) {
-          executor.execute(() -> {
-            living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
-            this.ammoProvider.reload(living);
-          });
-        }
-        this.setTriggerPressed(false);
-        return;
-      }
-
-      boolean isMaxShotsReached =
-          this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
-      if (isMaxShotsReached) {
-        this.setTriggerPressed(false);
-        return;
-      }
-
-      this.shotCount++;
-      this.lastShotMs = time;
-
-      this.processShot(living, executor);
-
-      if (side.isClient()) {
-        this.getClient().handleShoot(living);
-      }
-
-      // Allow other threads to do work (mainly the main thread as we off-load a lot of tasks to it)
-      Thread.yield();
+    if (!this.isTriggerPressed() || (Util.getMillis() - this.lastTickMs >= 500L)) {
+      this.gunFuture.cancel(false);
+      return;
     }
+
+    if (!this.canShoot(living)) {
+      this.stopShooting();
+      return;
+    }
+
+    LogicalSide side = living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+    ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
+
+    if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
+      if (side.isServer()) {
+        executor.execute(() -> {
+          living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+          this.ammoProvider.reload(living);
+        });
+      }
+      this.stopShooting();
+      return;
+    }
+
+    boolean maxShotsReached =
+        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
+    this.shotCount++;
+    if (maxShotsReached) {
+      this.stopShooting();
+      return;
+    }
+
+    executor.execute(() -> this.processShot(living, random));
+
+    if (side.isClient()) {
+      this.getClient().handleShoot(living);
+    }
+
+    // Allow other threads to do work (mainly the main thread as we off-load a lot of tasks to it)
+    Thread.yield();
   }
 
   protected boolean canShoot(LivingExtension<?, ?> living) {
@@ -397,7 +375,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   protected abstract int getRoundsPerShot();
 
-  protected void processShot(LivingExtension<?, ?> living, ThreadTaskExecutor<?> executor) {
+  protected void processShot(LivingExtension<?, ?> living, Random random) {
     Entity entity = living.getEntity();
     World level = living.getLevel();
 
@@ -407,39 +385,33 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
             && ((PlayerEntity) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.itemStack);
-      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(this.itemStack, unbreakingLevel,
-          random)) {
+      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(
+          this.itemStack, unbreakingLevel, level.getRandom())) {
         this.ammoProvider.getExpectedMagazine().decrementSize();
       }
     }
 
     // Used to avoid playing the same hit sound more than once.
-    RayTraceResult lastRayTraceResult = null;
+    boolean hitEntity = false;
+    Set<BlockState> blocksHit = new HashSet<>();
+
     for (int i = 0; i < this.getRoundsPerShot(); i++) {
       final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
-      RayTraceResult rayTraceResult =
-          CompletableFuture.supplyAsync(() -> RayTraceUtil.rayTrace(entity,
-              this.getRange(),
-              this.getAccuracy(living),
-              this.shotCount,
-              random).orElse(null), executor).join();
+      RayTraceResult rayTraceResult = RayTraceUtil
+          .rayTrace(
+              entity, this.getRange(), this.getAccuracy(living, random), this.shotCount, random)
+          .orElse(null);
 
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
             final BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) rayTraceResult;
-            final boolean playSound;
-            if (lastRayTraceResult instanceof BlockRayTraceResult) {
-              playSound =
-                  !level.getBlockState(((BlockRayTraceResult) lastRayTraceResult).getBlockPos())
-                      .equals(level.getBlockState(blockRayTraceResult.getBlockPos()));
-            } else {
-              playSound = true;
-            }
-            executor.execute(() -> this.hitBlock(living, (BlockRayTraceResult) rayTraceResult,
-                playSound && level.isClientSide()));
+            BlockState blockState = level.getBlockState(blockRayTraceResult.getBlockPos());
+            this.hitBlock(living, (BlockRayTraceResult) rayTraceResult, blockState,
+                level.isClientSide() && (i == 0 || !blocksHit.contains(blockState)));
+            blocksHit.add(blockState);
             break;
           case ENTITY:
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
@@ -460,19 +432,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
                   randomSeed);
             }
 
-            final boolean playEntityHitSound = !(lastRayTraceResult instanceof EntityRayTraceResult)
-                || !((EntityRayTraceResult) lastRayTraceResult).getEntity().getType()
-                    .getRegistryName()
-                    .equals(entityRayTraceResult.getEntity().getType().getRegistryName())
-                    && level.isClientSide();
-
-            executor.execute(() -> this.hitEntity(living, entityRayTraceResult.getEntity(),
-                entityRayTraceResult.getLocation(), playEntityHitSound));
+            this.hitEntity(living, entityRayTraceResult.getEntity(),
+                entityRayTraceResult.getLocation(), !hitEntity && level.isClientSide());
+            hitEntity = true;
             break;
           default:
             break;
         }
-        lastRayTraceResult = rayTraceResult;
       }
     }
   }
@@ -561,28 +527,27 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     }
   }
 
-  private void hitBlock(LivingExtension<?, ?> living, BlockRayTraceResult rayTrace,
-      boolean playSound) {
+  private void hitBlock(LivingExtension<?, ?> living, BlockRayTraceResult result,
+      BlockState blockState, boolean playSound) {
     final LivingEntity entity = living.getEntity();
-    BlockPos blockPos = rayTrace.getBlockPos();
-    BlockState blockState = entity.level.getBlockState(blockPos);
     Block block = blockState.getBlock();
-    World world = entity.level;
+    World level = entity.level;
+    BlockPos blockPos = result.getBlockPos();
 
     // Post gun hit block event
     GunEvent.HitBlock event =
-        new GunEvent.HitBlock(this, itemStack, block, blockPos, living, world);
+        new GunEvent.HitBlock(this, itemStack, result, blockState, living, level);
 
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
 
     // Client-side effects
-    if (world.isClientSide()) {
-      this.getClient().handleHitBlock(living, rayTrace, playSound);
+    if (level.isClientSide()) {
+      this.getClient().handleHitBlock(living, result, blockState, playSound);
     } else {
-      if (blockState.getBlock() instanceof BellBlock) {
-        ((BellBlock) blockState.getBlock()).onHit(world, blockState, rayTrace,
+      if (block instanceof BellBlock) {
+        ((BellBlock) block).onHit(level, blockState, result,
             entity instanceof PlayerEntity ? (PlayerEntity) entity : null, playSound);
       }
 
@@ -592,18 +557,18 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
         entity.level.removeBlock(blockPos, false);
       }
 
-      checkCreateExplosion(this.itemStack, entity, rayTrace.getLocation());
+      checkCreateExplosion(this.itemStack, entity, result.getLocation());
 
       if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
           this.itemStack) > 0) {
         if (CampfireBlock.canLight(blockState)) {
-          world.setBlock(blockPos,
+          level.setBlock(blockPos,
               blockState.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
         } else {
-          BlockPos faceBlockPos = blockPos.relative(rayTrace.getDirection());
-          if (AbstractFireBlock.canBePlacedAt(world, faceBlockPos, entity.getDirection())) {
-            BlockState blockstate1 = AbstractFireBlock.getState(world, faceBlockPos);
-            world.setBlock(faceBlockPos, blockstate1, 11);
+          BlockPos faceBlockPos = blockPos.relative(result.getDirection());
+          if (AbstractFireBlock.canBePlacedAt(level, faceBlockPos, entity.getDirection())) {
+            BlockState blockstate1 = AbstractFireBlock.getState(level, faceBlockPos);
+            level.setBlock(faceBlockPos, blockstate1, 11);
           }
         }
       }
@@ -666,11 +631,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Override
   public void setPerformingSecondaryAction(LivingExtension<?, ?> living,
       boolean performingAction, boolean sendUpdate) {
-    if (performingAction && living.getEntity().isSprinting()) {
+    if (performingAction == this.performingSecondaryAction
+        || (performingAction && living.getEntity().isSprinting())) {
       return;
     }
 
     this.performingSecondaryAction = performingAction;
+
     if (living.getLevel().isClientSide()) {
       this.getClient().handleToggleSecondaryAction(living);
     }
@@ -680,7 +647,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new SecondaryActionMessage(living.getEntity().getId(), this.performingSecondaryAction));
+          new SecondaryActionMessage(living.getEntity().getId(),
+              this.isPerformingSecondaryAction()));
     }
   }
 

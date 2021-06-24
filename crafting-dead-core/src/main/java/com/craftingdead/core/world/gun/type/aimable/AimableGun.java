@@ -19,6 +19,7 @@
 package com.craftingdead.core.world.gun.type.aimable;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.attachment.Attachment;
@@ -28,11 +29,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraft.util.concurrent.ThreadTaskExecutor;
 
 public class AimableGun extends TypedGun<AimableGunType> implements Scope {
 
   private boolean waitingForBoltAction;
+  private long lastShotMs;
 
   public AimableGun(Function<AimableGun, AimableGunClient> clientFactory, ItemStack itemStack,
       AimableGunType type) {
@@ -58,14 +59,13 @@ public class AimableGun extends TypedGun<AimableGunType> implements Scope {
   }
 
   @Override
-  protected void processShot(LivingExtension<?, ?> living, ThreadTaskExecutor<?> executor) {
-    super.processShot(living, executor);
-    executor.execute(() -> {
-      if (this.isPerformingSecondaryAction() && this.getType().hasBoltAction()) {
-        this.setPerformingSecondaryAction(living, false, false);
-        this.waitingForBoltAction = true;
-      }
-    });
+  protected void processShot(LivingExtension<?, ?> living, Random random) {
+    super.processShot(living, random);
+    this.lastShotMs = Util.getMillis();
+    if (this.isPerformingSecondaryAction() && this.getType().hasBoltAction()) {
+      this.setPerformingSecondaryAction(living, false, false);
+      this.waitingForBoltAction = true;
+    }
   }
 
   @Override

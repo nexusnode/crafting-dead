@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.world.gun.magazine;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import com.craftingdead.core.world.item.MagazineItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -25,24 +26,24 @@ import net.minecraft.network.PacketBuffer;
 public class MagazineImpl implements Magazine {
 
   private final MagazineItem magazineItem;
-  private int size;
+  private final AtomicInteger size;
   private boolean dirty;
 
   public MagazineImpl(MagazineItem magazineItem) {
     this.magazineItem = magazineItem;
-    this.size = magazineItem.getSize();
+    this.size = new AtomicInteger(magazineItem.getSize());
   }
 
   @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT nbt = new CompoundNBT();
-    nbt.putInt("size", this.size);
+    nbt.putInt("size", this.size.get());
     return nbt;
   }
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
-    this.size = nbt.getInt("size");
+    this.size.set(nbt.getInt("size"));
   }
 
   @Override
@@ -52,25 +53,25 @@ public class MagazineImpl implements Magazine {
 
   @Override
   public int getSize() {
-    return this.size;
+    return this.size.get();
   }
 
   @Override
   public void setSize(int size) {
     this.dirty = true;
-    this.size = size;
+    this.size.set(size);
   }
 
   @Override
   public void refill() {
     this.dirty = true;
-    this.size = this.magazineItem.getSize();
+    this.size.set(this.magazineItem.getSize());
   }
 
   @Override
   public int decrementSize() {
     this.dirty = true;
-    return --this.size;
+    return this.size.decrementAndGet();
   }
 
   @Override
@@ -85,13 +86,13 @@ public class MagazineImpl implements Magazine {
 
   @Override
   public void encode(PacketBuffer out, boolean writeAll) {
-    out.writeVarInt(this.size);
+    out.writeVarInt(this.size.get());
     this.dirty = false;
   }
 
   @Override
   public void decode(PacketBuffer in) {
-    this.size = in.readVarInt();
+    this.size.set(in.readVarInt());
   }
 
   @Override

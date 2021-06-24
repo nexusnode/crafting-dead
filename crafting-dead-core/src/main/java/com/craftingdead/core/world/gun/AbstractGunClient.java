@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.core.world.gun;
 
 import java.util.HashMap;
@@ -31,7 +49,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -208,12 +225,10 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   }
 
   public void handleHitBlock(LivingExtension<?, ?> living,
-      BlockRayTraceResult rayTrace, boolean playSound) {
+      BlockRayTraceResult result, BlockState blockState, boolean playSound) {
     Entity entity = living.getEntity();
-    Vector3d hitVec3d = rayTrace.getLocation();
-    BlockPos blockPos = rayTrace.getBlockPos();
     World level = entity.level;
-    BlockState blockState = level.getBlockState(blockPos);
+    Vector3d location = result.getLocation();
 
     if (playSound) {
       // Gets the hit sound to be played
@@ -230,14 +245,14 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
       }
 
-      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, blockPos,
+      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, result.getBlockPos(),
           hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
-      level.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), hitVec3d.x(),
-          hitVec3d.y(), hitVec3d.z(), 0.0D, 0.0D, 0.0D);
+      level.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), location.x(),
+          location.y(), location.z(), 0.0D, 0.0D, 0.0D);
     }
   }
 

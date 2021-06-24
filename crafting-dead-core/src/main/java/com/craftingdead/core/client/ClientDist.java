@@ -627,7 +627,7 @@ public class ClientDist implements ModDist {
         if (gun != null) {
           event.setCanceled(true);
           if (gun.getClient().hasCrosshair()) {
-            this.ingameGui.renderCrosshairs(gun.getAccuracy(player),
+            this.ingameGui.renderCrosshairs(gun.getAccuracy(player, player.getEntity().getRandom()),
                 event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
                 event.getWindow().getGuiScaledHeight());
           }

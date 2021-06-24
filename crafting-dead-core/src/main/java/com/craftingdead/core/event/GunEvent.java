@@ -25,10 +25,10 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.attachment.Attachment;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Cancelable;
@@ -105,29 +105,28 @@ public abstract class GunEvent extends Event {
   @Cancelable
   public static class HitBlock extends Action {
 
-    private final Block block;
-    private final BlockPos blockPos;
-    private final World world;
+    private final BlockRayTraceResult result;
+    private final BlockState blockState;
+    private final World level;
 
-    public HitBlock(Gun gun, ItemStack itemStack, Block block, BlockPos blockPos,
+    public HitBlock(Gun gun, ItemStack itemStack, BlockRayTraceResult result, BlockState blockState,
         LivingExtension<?, ?> living, World world) {
       super(gun, itemStack, living);
-
-      this.block = block;
-      this.blockPos = blockPos;
-      this.world = world;
+      this.result = result;
+      this.blockState = blockState;
+      this.level = world;
     }
 
-    public Block getBlock() {
-      return block;
+    public BlockState getBlockState() {
+      return this.blockState;
     }
 
-    public BlockPos getBlockPos() {
-      return blockPos;
+    public BlockRayTraceResult getRayTraceResult() {
+      return this.result;
     }
 
-    public World getWorld() {
-      return world;
+    public World getLevel() {
+      return this.level;
     }
   }
 
