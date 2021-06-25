@@ -16,33 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.network.play;
+package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.GameType;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class ChangeGameMessage {
+public class OpenEquipmentMenuMessage {
 
-  private final GameType gameType;
+  public void encode(PacketBuffer out) {}
 
-  public ChangeGameMessage(GameType gameType) {
-    this.gameType = gameType;
-  }
-
-  public void encode(PacketBuffer out) {
-    out.writeRegistryId(this.gameType);
-  }
-
-  public static ChangeGameMessage decode(PacketBuffer in) {
-    return new ChangeGameMessage(in.readRegistryId());
+  public static OpenEquipmentMenuMessage decode(PacketBuffer in) {
+    return new OpenEquipmentMenuMessage();
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(
-        () -> CraftingDeadImmerse.getInstance().getClientDist().loadGame(this.gameType));
+        () -> PlayerExtension.getOrThrow(ctx.get().getSender()).openEquipmentMenu());
     return true;
   }
 }

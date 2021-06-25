@@ -136,8 +136,7 @@ public abstract class GunRenderer implements CustomItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final Gun gun = itemStack.getCapability(Capabilities.GUN)
-        .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
+    final Gun gun = Capabilities.getOrThrow(Capabilities.GUN, itemStack, Gun.class);
 
     matrixStack.pushPose();
     {
@@ -170,8 +169,7 @@ public abstract class GunRenderer implements CustomItemRenderer {
     final float partialTicks =
         this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    final Gun gun = itemStack.getCapability(Capabilities.GUN)
-        .orElseThrow(() -> new IllegalArgumentException("Gun expected"));
+    final Gun gun = Capabilities.getOrThrow(Capabilities.GUN, itemStack, Gun.class);
     final GunClient gunClient = gun.getClient();
 
     final boolean scopeOverlayActive =

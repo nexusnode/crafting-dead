@@ -30,12 +30,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 
-public class AimableGun extends TypedGun<AimableGunType> implements Scope {
+public final class AimableGun extends TypedGun<AimableGunType> implements Scope {
 
   private boolean waitingForBoltAction;
-  private long lastShotMs;
 
-  public AimableGun(Function<AimableGun, AimableGunClient> clientFactory, ItemStack itemStack,
+  public static AimableGun create(Function<AimableGun, AimableGunClient> clientFactory,
+      ItemStack itemStack, AimableGunType type) {
+    AimableGun gun = new AimableGun(clientFactory, itemStack, type);
+    gun.initialize();
+    return gun;
+  }
+
+  private AimableGun(Function<AimableGun, AimableGunClient> clientFactory, ItemStack itemStack,
       AimableGunType type) {
     super(clientFactory, itemStack, type);
   }
@@ -61,7 +67,6 @@ public class AimableGun extends TypedGun<AimableGunType> implements Scope {
   @Override
   protected void processShot(LivingExtension<?, ?> living, Random random) {
     super.processShot(living, random);
-    this.lastShotMs = Util.getMillis();
     if (this.isPerformingSecondaryAction() && this.getType().hasBoltAction()) {
       this.setPerformingSecondaryAction(living, false, false);
       this.waitingForBoltAction = true;

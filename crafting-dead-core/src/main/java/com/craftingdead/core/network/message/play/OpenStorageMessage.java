@@ -32,16 +32,17 @@ public class OpenStorageMessage {
     this.slotType = slotType;
   }
 
-  public static void encode(OpenStorageMessage msg, PacketBuffer out) {
-    out.writeEnum(msg.slotType);
+  public void encode(PacketBuffer out) {
+    out.writeEnum(this.slotType);
   }
 
   public static OpenStorageMessage decode(PacketBuffer in) {
     return new OpenStorageMessage(in.readEnum(ModEquipmentSlotType.class));
   }
 
-  public static boolean handle(OpenStorageMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    PlayerExtension.getOrThrow(ctx.get().getSender()).openStorage(msg.slotType);
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(
+        () -> PlayerExtension.getOrThrow(ctx.get().getSender()).openStorage(this.slotType));
     return true;
   }
 }

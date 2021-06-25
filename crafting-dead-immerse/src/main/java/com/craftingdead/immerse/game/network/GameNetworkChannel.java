@@ -90,6 +90,7 @@ public class GameNetworkChannel {
         MSG message = gameWrapper.getGame().getType().getNetworkProtocol().decode(buf, context);
         gameWrapper.getGame().handleMessage(message, context);
       }
+      context.setPacketHandled(true);
     } catch (IOException e) {
       logger.error("Failed to process server packet for '{}'",
           gameWrapper.getGame().getType().getRegistryName().toString());

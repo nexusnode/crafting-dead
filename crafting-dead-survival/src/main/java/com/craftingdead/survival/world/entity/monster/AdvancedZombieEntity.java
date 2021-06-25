@@ -78,12 +78,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     this.rangedAttackGoal = new RangedAttackGoal(this, 1.0D, 40, 20F) {
       @Override
       public boolean canUse() {
-        return super.canUse()
-            && AdvancedZombieEntity.this.getCapability(Capabilities.LIVING_EXTENSION)
-                .map(living -> AdvancedZombieEntity.this.getMainHandItem()
-                    .getCapability(Capabilities.GUN)
-                    .isPresent())
-                .orElse(false);
+        return super.canUse() && AdvancedZombieEntity.this.getMainHandItem()
+            .getCapability(Capabilities.GUN).isPresent();
       }
     };
     this.goalSelector.addGoal(2, this.rangedAttackGoal);
@@ -198,8 +194,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   public void tick() {
     super.tick();
     if (!this.level.isClientSide()) {
-      this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(
-          living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
+      this.getCapability(Capabilities.LIVING_EXTENSION)
+          .ifPresent(living -> living.getMainHandGun().ifPresent(gun -> {
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.canContinueToUse() || (Util.getMillis()
                     - this.triggerPressedStartTime > 1000 + this.random.nextInt(2000)))) {
@@ -212,8 +208,8 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   @Override
   public void performRangedAttack(LivingEntity livingEntity, float distance) {
     if (!this.level.isClientSide()) {
-      this.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(
-          living -> this.getMainHandItem().getCapability(Capabilities.GUN).ifPresent(gun -> {
+      this.getCapability(Capabilities.LIVING_EXTENSION)
+          .ifPresent(living -> living.getMainHandGun().ifPresent(gun -> {
             this.triggerPressedStartTime = Util.getMillis();
             gun.setTriggerPressed(living, true, true);
           }));

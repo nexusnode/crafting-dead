@@ -23,6 +23,7 @@ import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -53,15 +54,17 @@ public class PerformActionMessage {
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), this.performerEntityId).ifPresent(performerEntity -> {
-      LivingExtension<?, ?> performer =
-          performerEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
+    ctx.get().enqueueWork(() -> {
+      LivingEntity performerEntity =
+          NetworkUtil.getEntityOrSender(ctx.get(), this.performerEntityId, LivingEntity.class);
+      LivingExtension<?, ?> performer = LivingExtension.getOrThrow(performerEntity);
       LivingExtension<?, ?> target = this.targetEntityId == -1 ? null
           : performerEntity.level.getEntity(this.targetEntityId)
-              .getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
-      final boolean isServer = ctx.get().getDirection().getReceptionSide().isServer();
-      if (!isServer || this.actionType.isTriggeredByClient()) {
-        performer.performAction(this.actionType.createAction(performer, target), isServer);
+              .getCapability(Capabilities.LIVING_EXTENSION)
+              .orElse(null);
+      final boolean serverSide = ctx.get().getDirection().getReceptionSide().isServer();
+      if (!serverSide || this.actionType.isTriggeredByClient()) {
+        performer.performAction(this.actionType.createAction(performer, target), serverSide);
       }
     });
     return true;

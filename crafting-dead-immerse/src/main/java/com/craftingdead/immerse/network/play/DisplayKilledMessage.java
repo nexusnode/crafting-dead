@@ -18,15 +18,13 @@
 
 package com.craftingdead.immerse.network.play;
 
-import java.util.Optional;
 import java.util.function.Supplier;
+import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.KilledMessage;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class DisplayKilledMessage {
@@ -39,23 +37,22 @@ public class DisplayKilledMessage {
     this.itemStack = itemStack;
   }
 
-  public static void encode(DisplayKilledMessage message, PacketBuffer out) {
-    out.writeVarInt(message.killerEntityId);
-    out.writeItem(message.itemStack);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.killerEntityId);
+    out.writeItem(this.itemStack);
   }
 
   public static DisplayKilledMessage decode(PacketBuffer in) {
     return new DisplayKilledMessage(in.readVarInt(), in.readItem());
   }
 
-  public static boolean handle(DisplayKilledMessage message, Supplier<NetworkEvent.Context> ctx) {
-    LogicalSidedProvider.CLIENTWORLD
-        .<Optional<World>>get(ctx.get().getDirection().getReceptionSide())
-        .map(w -> w.getEntity(message.killerEntityId))
-        .filter(e -> e instanceof AbstractClientPlayerEntity)
-        .ifPresent(e -> CraftingDeadImmerse.getInstance().getClientDist().getIngameGui()
-            .displayKilledMessage(
-                new KilledMessage((AbstractClientPlayerEntity) e, message.itemStack)));
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(
+        () -> CraftingDeadImmerse.getInstance().getClientDist().getIngameGui().displayKilledMessage(
+            new KilledMessage(
+                NetworkUtil.getEntity(ctx.get(), this.killerEntityId,
+                    AbstractClientPlayerEntity.class),
+                this.itemStack)));
     return true;
   }
 }

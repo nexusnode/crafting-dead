@@ -37,10 +37,18 @@ public class TypedGun<T extends AbstractGunType> extends AbstractGun {
 
   private final T type;
 
-  public <SELF extends TypedGun<T>> TypedGun(
+  public static <T extends AbstractGunType> TypedGun<T> create(
+      Function<TypedGun<T>, ? extends TypedGunClient<? super TypedGun<T>>> clientFactory,
+      ItemStack itemStack, T type) {
+    TypedGun<T> gun = new TypedGun<>(clientFactory, itemStack, type);
+    gun.initialize();
+    return gun;
+  }
+
+  protected <SELF extends TypedGun<T>> TypedGun(
       Function<SELF, ? extends TypedGunClient<? super SELF>> clientFactory,
       ItemStack itemStack, T type) {
-    super(clientFactory, itemStack, type.getFireModes(), type.createAmmoProvider());
+    super(clientFactory, itemStack, type.getFireModes());
     this.type = type;
   }
 

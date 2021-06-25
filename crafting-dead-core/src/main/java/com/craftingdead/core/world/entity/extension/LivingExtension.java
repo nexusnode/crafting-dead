@@ -24,11 +24,14 @@ import javax.annotation.Nonnull;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.gun.Gun;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -212,12 +215,30 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   E getEntity();
 
   /**
-   * Shorthand for {@link LivingEntity#level}
+   * Shorthand for {@link LivingEntity#level}.
    * 
    * @return the {@link World}
    */
   default World getLevel() {
     return this.getEntity().level;
+  }
+
+  /**
+   * Shorthand for {@link LivingEntity#getMainHandItem}.
+   * 
+   * @return the main hand {@link ItemStack}
+   */
+  default ItemStack getMainHandItem() {
+    return this.getEntity().getMainHandItem();
+  }
+
+  /**
+   * Helper method to retrieve a gun in the entity's main hand.
+   * 
+   * @return a {@link LazyOptional} gun.
+   */
+  default LazyOptional<Gun> getMainHandGun() {
+    return this.getMainHandItem().getCapability(Capabilities.GUN);
   }
 
   /**

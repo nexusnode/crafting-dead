@@ -179,23 +179,39 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   private boolean ammoProviderChanged;
 
   @Nullable
-  private Future<?> gunFuture;
+  private volatile Future<?> gunFuture;
+
+  protected long lastShotMs;
+
+  private boolean initialized;
 
   @SuppressWarnings("unchecked")
   public <SELF extends AbstractGun> AbstractGun(
       Function<SELF, ? extends AbstractGunClient<? super SELF>> clientFactory,
-      ItemStack itemStack, Set<FireMode> fireModes, AmmoProvider ammoProvider) {
+      ItemStack itemStack, Set<FireMode> fireModes) {
     this.itemStack = itemStack;
-
     this.fireModeInfiniteIterator = Iterables.cycle(fireModes).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.client = FMLEnvironment.dist.isClient()
         ? Lazy.concurrentOf(() -> clientFactory.apply((SELF) this))
         : Lazy.of(() -> {
-          throw new IllegalStateException("Cannot accesss gun client on dedicated server");
+          throw new IllegalStateException("Cannot access gun client on dedicated server");
         });
+  }
 
-    GunEvent.Initialize event = new GunEvent.Initialize(this, itemStack, ammoProvider);
+  /**
+   * Initialise the gun - must be called before usage. This is not done in the constructor so that
+   * the {@link GunEvent.Initialize} event is posted after the gun is constructed, preventing access
+   * to uninitialised fields.
+   */
+  protected void initialize() {
+    if (this.initialized) {
+      throw new IllegalStateException("Already initialized");
+    }
+    this.initialized = true;
+
+    GunEvent.Initialize event =
+        new GunEvent.Initialize(this, this.itemStack, this.createAmmoProvider());
     MinecraftForge.EVENT_BUS.post(event);
 
     this.setAmmoProvider(event.getAmmoProvider());
@@ -326,15 +342,20 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   private void shoot(LivingExtension<?, ?> living) {
     final Random random = new Random();
 
-    if (!this.isTriggerPressed() || (Util.getMillis() - this.lastTickMs >= 500L)) {
-      this.gunFuture.cancel(false);
-      return;
-    }
+    long time = Util.getMillis();
 
-    if (!this.canShoot(living)) {
+    if (!this.isTriggerPressed()
+        || (time - this.lastTickMs >= 500L)
+        || !this.canShoot(living)) {
       this.stopShooting();
       return;
     }
+
+    // Add 5 to account for inconsistencies in timing
+    if (time - this.lastShotMs + 5 < this.getFireDelayMs()) {
+      return;
+    }
+    this.lastShotMs = time;
 
     LogicalSide side = living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
     ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);

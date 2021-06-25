@@ -42,7 +42,7 @@ public class AimableGunType extends AbstractGunType {
   @Override
   public ICapabilityProvider createCapabilityProvider(ItemStack itemStack) {
     return new SerializableCapabilityProvider<>(
-        LazyOptional.of(() -> new AimableGun(AimableGunClient::new, itemStack, this)),
+        LazyOptional.of(() -> AimableGun.create(AimableGunClient::new, itemStack, this)),
         ImmutableSet.of(
             () -> Capabilities.GUN,
             () -> Capabilities.COMBAT_SLOT_PROVIDER,

@@ -50,39 +50,43 @@ public class KilledMessage {
     RenderUtil.fillWithShadow(matrixStack, x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
 
     matrixStack.pushPose();
-    matrixStack.translate(x + 5, y + 5, 0);
-    matrixStack.scale(1.5F, 1.5F, 1.5F);
-    fontRenderer.drawShadow(matrixStack,
-        new TranslationTextComponent("gui.killed_message.killed_by",
-            this.killerEntity.getDisplayName())
-                .withStyle(TextFormatting.DARK_RED),
-        0, 0, 0);
+    {
+      matrixStack.translate(x + 5, y + 5, 0);
+      matrixStack.scale(1.5F, 1.5F, 1.5F);
+      fontRenderer.drawShadow(matrixStack,
+          new TranslationTextComponent("gui.killed_message.killed_by",
+              this.killerEntity.getDisplayName()).withStyle(TextFormatting.DARK_RED),
+          0, 0, 0);
+    }
     matrixStack.popPose();
 
     RenderUtil.fillWithShadow(matrixStack, x, y + boxTitleHeight, boxWidth,
-        boxContentsHeight - boxTitleHeight,
-        0xDD000000);
+        boxContentsHeight - boxTitleHeight, 0xDD000000);
 
     matrixStack.pushPose();
-    matrixStack.translate(x + 5, y + 24, 0);
-    matrixStack.scale(1.5F, 1.5F, 1.5F);
-    fontRenderer.drawShadow(matrixStack,
-        new TranslationTextComponent("gui.killed_message.hp", this.killerEntity.getHealth()), 0, 0,
-        0xFFFFFFFF);
+    {
+      matrixStack.translate(x + 5, y + 24, 0);
+      matrixStack.scale(1.5F, 1.5F, 1.5F);
+      fontRenderer.drawShadow(matrixStack,
+          new TranslationTextComponent("gui.killed_message.hp", this.killerEntity.getHealth()), 0,
+          0, 0xFFFFFFFF);
+    }
     matrixStack.popPose();
 
-    RenderUtil.renderHead(this.killerEntity.getSkinTextureLocation(), matrixStack, x + 5, y + 40,
-        35, 35);
+    RenderUtil.renderHead(
+        this.killerEntity.getSkinTextureLocation(), matrixStack, x + 5, y + 40, 35, 35);
 
-    fontRenderer.drawShadow(matrixStack, this.itemStack.getDisplayName(), x + 80, y + 30,
-        0xFFFFFFFF);
+    fontRenderer.drawShadow(
+        matrixStack, this.itemStack.getDisplayName(), x + 80, y + 30, 0xFFFFFFFF);
 
     RenderSystem.pushMatrix();
-    RenderSystem.translatef(x + 110, y + 50, 0);
-    double scale = 1.2D;
-    RenderSystem.scaled(scale, scale, scale);
-    com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
-        0xFFFFFFFF, ItemCameraTransforms.TransformType.FIXED);
+    {
+      RenderSystem.translatef(x + 110, y + 50, 0);
+      double scale = 1.2D;
+      RenderSystem.scaled(scale, scale, scale);
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
+          0xFFFFFFFF, ItemCameraTransforms.TransformType.FIXED);
+    }
     RenderSystem.popMatrix();
   }
 }

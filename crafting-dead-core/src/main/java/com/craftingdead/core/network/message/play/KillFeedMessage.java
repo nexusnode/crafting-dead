@@ -50,11 +50,11 @@ public class KillFeedMessage {
     this.type = type;
   }
 
-  public static void encode(KillFeedMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.playerEntityId);
-    out.writeVarInt(msg.deadEntityId);
-    out.writeItem(msg.weaponStack);
-    out.writeEnum(msg.type);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.playerEntityId);
+    out.writeVarInt(this.deadEntityId);
+    out.writeItem(this.weaponStack);
+    out.writeEnum(this.type);
   }
 
   public static KillFeedMessage decode(PacketBuffer in) {
@@ -62,20 +62,18 @@ public class KillFeedMessage {
         in.readEnum(KillFeedEntry.Type.class));
   }
 
-  public static boolean handle(KillFeedMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    final Optional<World> world =
-        LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-    world.ifPresent(w -> {
-      ctx.get().enqueueWork(() -> {
-        Entity playerEntity = w.getEntity(msg.playerEntityId);
-        Entity deadEntity = w.getEntity(msg.deadEntityId);
-        if (playerEntity instanceof PlayerEntity && deadEntity instanceof PlayerEntity) {
-          CraftingDead.getInstance().getClientDist().getIngameGui()
-              .addKillFeedMessage(new KillFeedEntry((PlayerEntity) playerEntity,
-                  (PlayerEntity) deadEntity, msg.weaponStack, msg.type));
-        }
-      });
-    });
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> LogicalSidedProvider.CLIENTWORLD
+        .<Optional<World>>get(ctx.get().getDirection().getReceptionSide())
+        .ifPresent(level -> {
+          Entity playerEntity = level.getEntity(this.playerEntityId);
+          Entity deadEntity = level.getEntity(this.deadEntityId);
+          if (playerEntity instanceof PlayerEntity && deadEntity instanceof PlayerEntity) {
+            CraftingDead.getInstance().getClientDist().getIngameGui()
+                .addKillFeedMessage(new KillFeedEntry((PlayerEntity) playerEntity,
+                    (PlayerEntity) deadEntity, this.weaponStack, this.type));
+          }
+        }));
     return true;
   }
 }

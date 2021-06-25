@@ -34,24 +34,21 @@ public class SecondaryActionMessage {
     this.performing = performing;
   }
 
-  public static void encode(SecondaryActionMessage message, PacketBuffer out) {
-    out.writeVarInt(message.entityId);
-    out.writeBoolean(message.performing);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
+    out.writeBoolean(this.performing);
   }
 
   public static SecondaryActionMessage decode(PacketBuffer in) {
     return new SecondaryActionMessage(in.readVarInt(), in.readBoolean());
   }
 
-  public static boolean handle(SecondaryActionMessage message, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), message.entityId)
-        .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
-        .ifPresent(living -> {
-          living.getEntity().getMainHandItem()
-              .getCapability(Capabilities.GUN)
-              .ifPresent(gun -> gun.setPerformingSecondaryAction(living, message.performing,
-                  ctx.get().getDirection().getReceptionSide().isServer()));
-        });
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .ifPresent(living -> living.getMainHandGun()
+            .ifPresent(gun -> gun.setPerformingSecondaryAction(living, this.performing,
+                ctx.get().getDirection().getReceptionSide().isServer()))));
     return true;
   }
 }

@@ -22,8 +22,6 @@ import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.gun.FireMode;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -37,27 +35,21 @@ public class SetFireModeMessage {
     this.fireMode = fireMode;
   }
 
-  public static void encode(SetFireModeMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.entityId);
-    out.writeEnum(msg.fireMode);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
+    out.writeEnum(this.fireMode);
   }
 
   public static SetFireModeMessage decode(PacketBuffer in) {
     return new SetFireModeMessage(in.readVarInt(), in.readEnum(FireMode.class));
   }
 
-  public static boolean handle(SetFireModeMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), msg.entityId)
-        .filter(entity -> entity instanceof LivingEntity)
-        .ifPresent(entity -> {
-          LivingEntity livingEntity = (LivingEntity) entity;
-          ItemStack heldStack = livingEntity.getMainHandItem();
-          livingEntity.getCapability(Capabilities.LIVING_EXTENSION)
-              .ifPresent(living -> heldStack
-                  .getCapability(Capabilities.GUN)
-                  .ifPresent(gun -> gun.setFireMode(living, msg.fireMode,
-                      ctx.get().getDirection().getReceptionSide().isServer())));
-        });
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .ifPresent(extension -> extension.getMainHandGun()
+            .ifPresent(gun -> gun.setFireMode(extension, this.fireMode,
+                ctx.get().getDirection().getReceptionSide().isServer()))));
     return true;
   }
 }

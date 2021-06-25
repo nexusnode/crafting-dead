@@ -41,7 +41,7 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
   public AbstractReloadAction(ActionType type, LivingExtension<?, ?> performer,
       @Nullable LivingExtension<?, ?> target) {
     super(type, performer, target);
-    this.gunStack = performer.getEntity().getMainHandItem();
+    this.gunStack = performer.getMainHandItem();
     this.gun = this.gunStack.getCapability(Capabilities.GUN)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     this.oldMagazineStack = this.gun.getAmmoProvider().getMagazineStack();

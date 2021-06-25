@@ -67,8 +67,8 @@ public class ContainerMixin {
                 }
                 NetworkChannel.PLAY.getSimpleChannel().send(
                     PacketDistributor.PLAYER.with(() -> playerEntity),
-                    new SyncGunContainerSlotMessage(playerEntity.getId(), slot.getSlotIndex(),
-                        gun, false));
+                    new SyncGunContainerSlotMessage(
+                        playerEntity.getId(), slot.getSlotIndex(), gun, false));
                 break;
               }
             }

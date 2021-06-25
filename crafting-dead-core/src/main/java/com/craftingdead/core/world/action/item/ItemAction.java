@@ -40,7 +40,7 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
   @Override
   public boolean start() {
-    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
+    final ItemStack heldStack = this.getPerformer().getMainHandItem();
     if (this.getType().getHeldItemPredicate().test(heldStack)) {
       for (DelegatedActionType delegatedActionType : this.getType().getDelegatedActionTypes()) {
         DelegatedAction action = delegatedActionType.create(this).orElse(null);
@@ -55,9 +55,9 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
   @Override
   protected final void finish() {
-    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
-    if (this.delegatedAction.finish(this.getPerformer(), this.getTarget().orElse(null),
-        heldStack)) {
+    final ItemStack heldStack = this.getPerformer().getMainHandItem();
+    if (this.delegatedAction.finish(
+        this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
       final boolean shrinkStack = this.delegatedAction.shouldShrinkStack(this.getPerformer());
       final ItemStack resultStack = this.delegatedAction.getReturnItem(this.getPerformer())
           .map(Item::getDefaultInstance)
@@ -88,7 +88,7 @@ public class ItemAction extends TimedAction<ItemActionType> {
   @Override
   public boolean tick() {
     boolean finished = super.tick();
-    final ItemStack heldStack = this.getPerformer().getEntity().getMainHandItem();
+    final ItemStack heldStack = this.getPerformer().getMainHandItem();
 
     boolean usingItem = true;
     if (this.getPerformer().getLevel().isClientSide()) {

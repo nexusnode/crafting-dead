@@ -39,7 +39,7 @@ public class SimpleGunType extends AbstractGunType {
   @Override
   public ICapabilityProvider createCapabilityProvider(ItemStack itemStack) {
     return new SerializableCapabilityProvider<>(
-        LazyOptional.of(() -> new TypedGun<>(this.getClientFactory(), itemStack, this)),
+        LazyOptional.of(() -> TypedGun.create(this.getClientFactory(), itemStack, this)),
         ImmutableSet.of(() -> Capabilities.GUN, () -> Capabilities.COMBAT_SLOT_PROVIDER),
         CompoundNBT::new);
   }

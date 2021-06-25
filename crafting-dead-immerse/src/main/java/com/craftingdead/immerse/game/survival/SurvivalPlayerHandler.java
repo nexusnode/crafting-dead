@@ -108,6 +108,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       that.getHandler(GameTypes.SURVIVAL.getId())
           .map(extension -> (SurvivalPlayerHandler) extension)
           .ifPresent(extension -> {
+            this.setDaysSurvived(extension.getDaysSurvived());
             this.setZombiesKilled(extension.getZombiesKilled());
             this.setPlayersKilled(extension.getPlayersKilled());
           });

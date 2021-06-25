@@ -48,7 +48,7 @@ import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.core.network.NetworkChannel;
-import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
+import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.particle.ModParticleTypes;
 import com.craftingdead.core.util.MutableVector2f;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -275,11 +275,10 @@ public class ClientDist implements ModDist {
         .ifPresent(this.ingameGui::displayHitMarker);
     if (dead && ClientDist.clientConfig.killSoundEnabled.get()) {
       // Plays a sound that follows the player
-      SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS
-          .getValue(new ResourceLocation(ClientDist.clientConfig.killSound.get()));
+      SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(
+          new ResourceLocation(ClientDist.clientConfig.killSound.get()));
       if (soundEvent != null) {
-        Minecraft.getInstance().getSoundManager().play(
-            SimpleSound.forUI(soundEvent, 5.0F, 1.5F));
+        this.minecraft.getSoundManager().play(SimpleSound.forUI(soundEvent, 5.0F, 1.5F));
       }
     }
   }
@@ -450,8 +449,7 @@ public class ClientDist implements ModDist {
         this.lastTime = (float) Math.ceil(this.lastTime);
         PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
         if (player != null) {
-          ItemStack heldStack = player.getEntity().getMainHandItem();
-          Gun gun = heldStack.getCapability(Capabilities.GUN).orElse(null);
+          Gun gun = player.getMainHandGun().orElse(null);
 
           boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.overlay == null
               && (this.minecraft.screen == null);
@@ -504,7 +502,7 @@ public class ClientDist implements ModDist {
 
           // Update tutorial
           while (OPEN_EQUIPMENT_MENU.consumeClick()) {
-            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenModInventoryMessage());
+            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenEquipmentMenuMessage());
             if (this.minecraft.getTutorial().instance instanceof ModTutorialStepInstance) {
               ((ModTutorialStepInstance) this.minecraft.getTutorial().instance).openEquipmentMenu();
             }
@@ -539,8 +537,7 @@ public class ClientDist implements ModDist {
     PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
     if (player != null && this.minecraft.overlay == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
-      ItemStack heldStack = player.getEntity().getMainHandItem();
-      Gun gun = heldStack.getCapability(Capabilities.GUN).orElse(null);
+      Gun gun = player.getMainHandGun().orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
@@ -598,7 +595,7 @@ public class ClientDist implements ModDist {
     if (player == null) {
       return;
     }
-    ItemStack heldStack = player.getEntity().getMainHandItem();
+    ItemStack heldStack = player.getMainHandItem();
     Gun gun = heldStack.getCapability(Capabilities.GUN).orElse(null);
     switch (event.getType()) {
       case HEALTH:

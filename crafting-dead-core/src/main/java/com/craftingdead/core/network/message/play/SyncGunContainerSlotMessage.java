@@ -18,15 +18,13 @@
 
 package com.craftingdead.core.network.message.play;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.gun.Gun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class SyncGunContainerSlotMessage {
@@ -46,11 +44,11 @@ public class SyncGunContainerSlotMessage {
     this.data = data;
   }
 
-  public static void encode(SyncGunContainerSlotMessage message, PacketBuffer out) {
-    out.writeVarInt(message.entityId);
-    out.writeShort(message.slot);
-    out.writeVarInt(message.data.readableBytes());
-    out.writeBytes(message.data);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
+    out.writeShort(this.slot);
+    out.writeVarInt(this.data.readableBytes());
+    out.writeBytes(this.data);
   }
 
   public static SyncGunContainerSlotMessage decode(PacketBuffer in) {
@@ -62,15 +60,11 @@ public class SyncGunContainerSlotMessage {
         new PacketBuffer(Unpooled.wrappedBuffer(data)));
   }
 
-  public static boolean handle(SyncGunContainerSlotMessage message,
-      Supplier<NetworkEvent.Context> ctx) {
-    Optional<World> world =
-        LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-    world.map(w -> w.getEntity(message.entityId))
-        .filter(e -> e instanceof PlayerEntity)
-        .map(e -> ((PlayerEntity) e).inventoryMenu.getSlot(message.slot).getItem())
-        .flatMap(itemStack -> itemStack.getCapability(Capabilities.GUN).resolve())
-        .ifPresent(gun -> gun.decode(message.data));
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntity(
+        ctx.get(), this.entityId, PlayerEntity.class).inventoryMenu.getSlot(this.slot).getItem()
+            .getCapability(Capabilities.GUN)
+            .ifPresent(gun -> gun.decode(this.data)));
     return true;
   }
 }

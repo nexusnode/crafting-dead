@@ -21,8 +21,6 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -36,27 +34,21 @@ public class TriggerPressedMessage {
     this.triggerPressed = triggerPressed;
   }
 
-  public static void encode(TriggerPressedMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.entityId);
-    out.writeBoolean(msg.triggerPressed);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
+    out.writeBoolean(this.triggerPressed);
   }
 
   public static TriggerPressedMessage decode(PacketBuffer in) {
     return new TriggerPressedMessage(in.readVarInt(), in.readBoolean());
   }
 
-  public static boolean handle(TriggerPressedMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), msg.entityId)
-        .filter(entity -> entity instanceof LivingEntity)
-        .ifPresent(entity -> {
-          LivingEntity livingEntity = (LivingEntity) entity;
-          ItemStack heldStack = livingEntity.getMainHandItem();
-          livingEntity.getCapability(Capabilities.LIVING_EXTENSION)
-              .ifPresent(living -> heldStack
-                  .getCapability(Capabilities.GUN)
-                  .ifPresent(gun -> gun.setTriggerPressed(living, msg.triggerPressed,
-                      ctx.get().getDirection().getReceptionSide().isServer())));
-        });
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .ifPresent(extension -> extension.getMainHandGun()
+            .ifPresent(gun -> gun.setTriggerPressed(extension, this.triggerPressed,
+                ctx.get().getDirection().getReceptionSide().isServer()))));
     return true;
   }
 }

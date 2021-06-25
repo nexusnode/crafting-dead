@@ -40,12 +40,14 @@ public class SyncGameMessage {
     return new SyncGameMessage(in);
   }
 
-  public boolean handle(Supplier<NetworkEvent.Context> context) {
-    ClientGameWrapper gameWrapper =
-        CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
-    if (gameWrapper != null) {
-      gameWrapper.decode(this.data);
-    }
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> {
+      ClientGameWrapper gameWrapper =
+          CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
+      if (gameWrapper != null) {
+        gameWrapper.decode(this.data);
+      }
+    });
     return true;
   }
 }

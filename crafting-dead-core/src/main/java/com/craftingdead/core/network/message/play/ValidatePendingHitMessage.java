@@ -28,9 +28,7 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.PendingHit;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -42,9 +40,9 @@ public class ValidatePendingHitMessage {
     this.hits = hits;
   }
 
-  public static void encode(ValidatePendingHitMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.hits.size());
-    for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.hits.size());
+    for (Map.Entry<Integer, Collection<PendingHit>> hit : this.hits.entrySet()) {
       out.writeVarInt(hit.getKey());
       out.writeVarInt(hit.getValue().size());
       for (PendingHit value : hit.getValue()) {
@@ -72,21 +70,21 @@ public class ValidatePendingHitMessage {
     return new ValidatePendingHitMessage(hits);
   }
 
-  public static boolean handle(ValidatePendingHitMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    ServerPlayerEntity playerEntity = ctx.get().getSender();
-    PlayerExtension<ServerPlayerEntity> player = PlayerExtension.getOrThrow(playerEntity);
-    ItemStack heldStack = playerEntity.getMainHandItem();
-    heldStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
-      for (Map.Entry<Integer, Collection<PendingHit>> hit : msg.hits.entrySet()) {
-        final Entity hitEntity = playerEntity.level.getEntity(hit.getKey());
-        Optional.ofNullable(hitEntity)
-            .flatMap(e -> e.getCapability(Capabilities.LIVING_EXTENSION).resolve())
-            .ifPresent(hitLiving -> {
-              for (PendingHit value : hit.getValue()) {
-                gun.validatePendingHit(player, hitLiving, value);
-              }
-            });
-      }
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> {
+      ServerPlayerEntity player = ctx.get().getSender();
+      PlayerExtension<ServerPlayerEntity> extension = PlayerExtension.getOrThrow(player);
+      extension.getMainHandGun().ifPresent(gun -> {
+        for (Map.Entry<Integer, Collection<PendingHit>> hit : this.hits.entrySet()) {
+          Optional.ofNullable(player.level.getEntity(hit.getKey()))
+              .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
+              .ifPresent(hitLiving -> {
+                for (PendingHit value : hit.getValue()) {
+                  gun.validatePendingHit(extension, hitLiving, value);
+                }
+              });
+        }
+      });
     });
     return true;
   }

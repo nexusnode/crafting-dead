@@ -18,14 +18,11 @@
 
 package com.craftingdead.core.network.message.play;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.network.NetworkUtil;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class SyncLivingMessage {
@@ -38,10 +35,10 @@ public class SyncLivingMessage {
     this.data = data;
   }
 
-  public static void encode(SyncLivingMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.entityId);
-    out.writeVarInt(msg.data.readableBytes());
-    out.writeBytes(msg.data);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
+    out.writeVarInt(this.data.readableBytes());
+    out.writeBytes(this.data);
   }
 
   public static SyncLivingMessage decode(PacketBuffer in) {
@@ -53,16 +50,10 @@ public class SyncLivingMessage {
     return msg;
   }
 
-  public static boolean handle(SyncLivingMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      Optional<World> world =
-          LogicalSidedProvider.CLIENTWORLD.get(ctx.get().getDirection().getReceptionSide());
-      Entity entity = world.map(w -> w.getEntity(msg.entityId)).orElse(null);
-      if (entity == null) {
-        return;
-      }
-      entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> living.decode(msg.data));
-    });
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntity(ctx.get(), this.entityId)
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .ifPresent(living -> living.decode(this.data)));
     return true;
   }
 }

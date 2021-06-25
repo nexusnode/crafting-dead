@@ -23,7 +23,7 @@ import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.HitMessage;
 import com.craftingdead.core.network.message.play.KillFeedMessage;
-import com.craftingdead.core.network.message.play.OpenModInventoryMessage;
+import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.network.message.play.SecondaryActionMessage;
@@ -51,10 +51,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(OpenModInventoryMessage.class, 0x01, NetworkDirection.PLAY_TO_SERVER)
-          .encoder(OpenModInventoryMessage::encode)
-          .decoder(OpenModInventoryMessage::decode)
-          .consumer(OpenModInventoryMessage::handle)
+          .messageBuilder(OpenEquipmentMenuMessage.class, 0x01, NetworkDirection.PLAY_TO_SERVER)
+          .encoder(OpenEquipmentMenuMessage::encode)
+          .decoder(OpenEquipmentMenuMessage::decode)
+          .consumer(OpenEquipmentMenuMessage::handle)
           .add();
 
       simpleChannel

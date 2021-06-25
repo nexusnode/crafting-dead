@@ -47,10 +47,8 @@ public class HitMessage {
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-    if (ctx.get().getDirection().getReceptionSide().isClient()) {
-      ctx.get().enqueueWork(
-          () -> CraftingDead.getInstance().getClientDist().handleHit(this.hitPos, this.dead));
-    }
+    ctx.get().enqueueWork(
+        () -> CraftingDead.getInstance().getClientDist().handleHit(this.hitPos, this.dead));
     return true;
   }
 }

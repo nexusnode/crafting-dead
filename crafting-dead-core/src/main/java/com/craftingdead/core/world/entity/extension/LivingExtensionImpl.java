@@ -230,7 +230,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public void tick() {
-    ItemStack heldStack = this.entity.getMainHandItem();
+    ItemStack heldStack = this.getMainHandItem();
     if (heldStack != this.lastHeldStack) {
       this.getProgressMonitor().ifPresent(ProgressMonitor::stop);
       if (this.lastHeldStack != null) {

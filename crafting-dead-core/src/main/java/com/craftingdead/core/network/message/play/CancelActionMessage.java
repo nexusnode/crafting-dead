@@ -21,7 +21,6 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -33,20 +32,19 @@ public class CancelActionMessage {
     this.entityId = entityId;
   }
 
-  public static void encode(CancelActionMessage msg, PacketBuffer out) {
-    out.writeVarInt(msg.entityId);
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.entityId);
   }
 
   public static CancelActionMessage decode(PacketBuffer in) {
     return new CancelActionMessage(in.readVarInt());
   }
 
-  public static boolean handle(CancelActionMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    NetworkUtil.getEntity(ctx.get(), msg.entityId)
-        .filter(entity -> entity instanceof LivingEntity)
-        .flatMap(entity -> entity.getCapability(Capabilities.LIVING_EXTENSION).resolve())
-        .ifPresent(
-            living -> living.cancelAction(ctx.get().getDirection().getReceptionSide().isServer()));
+  public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
+        .getCapability(Capabilities.LIVING_EXTENSION)
+        .ifPresent(living -> living.cancelAction(
+            ctx.get().getDirection().getReceptionSide().isServer())));
     return true;
   }
 }
