@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.entity.grenade;
 
 import org.apache.commons.lang3.tuple.Triple;
-import com.craftingdead.core.world.damagesource.ModDamageSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -49,7 +48,7 @@ public class C4ExplosiveEntity extends GrenadeEntity {
 
   @Override
   public boolean hurt(DamageSource source, float amount) {
-    if (ModDamageSource.isGunDamage(source) || source.isExplosion() || source.isFire()) {
+    if (source.isExplosion() || source.isFire()) {
       // TODO Save who activated the grenade, so the true source
       // of this DamageSource could be used when the grenade explodes.
       this.setActivated(true);

@@ -69,6 +69,7 @@ fc71930174e739cf600ad3bfb226077fbc6e48e8 data/craftingdead/advancements/recipes/
 d6ef4e77f7c1f5b0e08ce4778c269390e77459fd data/craftingdead/advancements/recipes/craftingdead.medical/bandage.json
 fe2a541edf746d002416f652600d3636fc14bdc4 data/craftingdead/advancements/recipes/craftingdead.medical/first_aid_kit.json
 0f4c924d4a1f65e854eefbef4e71731b380c06fa data/craftingdead/advancements/recipes/craftingdead.medical/syringe.json
+f0cc4689cea478477015fcc507abbf9fcee792d2 data/craftingdead/advancements/recipes/misc/iron_ingot_from_magazine.json
 60c0d87dd457ce3d8246eb7e849ce359294e2e62 data/craftingdead/recipes/acog_sight.json
 af3418ec87039a6c05325771825f8b750a971964 data/craftingdead/recipes/acr.json
 05b43da24b8460c2d4f1f9e9850c00fbd33daeba data/craftingdead/recipes/ak47.json
@@ -98,6 +99,7 @@ d4c0a5b517fc3e237dac311f6422fe943d86889e data/craftingdead/recipes/g36c.json
 05a0d17be539aea62597c9cc8252b7667e0fa6f6 data/craftingdead/recipes/heavy_handle.json
 e132e9f075356ce744b01888c7ee5fa055064521 data/craftingdead/recipes/hk417.json
 730cf11054a6a804ce3a6d73a228dc03e4c2a184 data/craftingdead/recipes/hp_scope.json
+a31c3ae1c38426be0a4226a0bed03e5d31d91cd0 data/craftingdead/recipes/iron_ingot_from_magazine.json
 d9be43387850b233622dc648f5d17e43755c64ab data/craftingdead/recipes/lp_scope.json
 4ebb405afc79b8b438872462a41e05332df7e260 data/craftingdead/recipes/m107.json
 c841b04d17c3c736cdb6a5feb4ed5a7bd9cba2c0 data/craftingdead/recipes/m1911.json
@@ -146,5 +148,3 @@ c078eb6849d21a6e2ade8ce73c16a738ff2ec8f9 data/craftingdead/tags/items/hats.json
 539b1661193b0242f9275fa2156bf4ab57080d09 data/craftingdead/tags/items/magazines.json
 860c4aadd2021fa50481daebba11a73b249b5fdc data/craftingdead/tags/items/melees.json
 b1814b761dc540d346e7a2db95a258187a862e01 data/craftingdead/tags/items/syringes.json
-2b7ba439f3a7961aa7e8bb5cbab006e5c35d5b0e data/minecraft/advancements/recipes/misc/iron_ingot.json
-a31c3ae1c38426be0a4226a0bed03e5d31d91cd0 data/minecraft/recipes/iron_ingot.json

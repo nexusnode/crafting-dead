@@ -26,7 +26,6 @@ import com.craftingdead.core.world.gun.magazine.Magazine;
 import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import com.craftingdead.core.world.item.hydration.Hydration;
 import com.craftingdead.core.world.item.scope.Scope;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -63,8 +62,6 @@ public class Capabilities {
     CapabilityManager.INSTANCE.register(LivingExtension.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Storage.class, EmptyStorage.getInstance(),
-        Capabilities::unsupported);
-    CapabilityManager.INSTANCE.register(Hydration.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Clothing.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);

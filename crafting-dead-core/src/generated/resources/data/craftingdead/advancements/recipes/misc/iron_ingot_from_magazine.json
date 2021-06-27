@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "minecraft:iron_ingot"
+      "craftingdead:iron_ingot_from_magazine"
     ]
   },
   "criteria": {
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "minecraft:iron_ingot"
+        "recipe": "craftingdead:iron_ingot_from_magazine"
       }
     }
   },

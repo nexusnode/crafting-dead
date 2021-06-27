@@ -35,6 +35,7 @@ public class PredicateItemHandlerSlot extends SlotItemHandler {
 
   @Override
   public boolean mayPlace(ItemStack itemStack) {
+    System.out.println(this.getSlotIndex() + " - " + itemStack.getDisplayName().getString());
     return this.predicate.test(this, itemStack);
   }
 }

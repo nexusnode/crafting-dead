@@ -45,6 +45,8 @@ public class GenericMenu extends AbstractMenu {
     assert itemHandler.getSlots() >= rows * 9;
     this.rows = rows;
 
+    this.addPlayerInventorySlots();
+
     // Contents
     for (int i = 0; i < this.rows; ++i) {
       for (int j = 0; j < 9; ++j) {
@@ -52,6 +54,10 @@ public class GenericMenu extends AbstractMenu {
             SLOT_SIZE + i * SLOT_SIZE, predicate));
       }
     }
+  }
+
+  public int getRows() {
+    return this.rows;
   }
 
   @Override

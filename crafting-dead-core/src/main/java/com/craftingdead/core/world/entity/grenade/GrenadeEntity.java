@@ -128,7 +128,7 @@ public abstract class GrenadeEntity extends BounceableProjectileEntity {
 
   @Override
   public boolean hurt(DamageSource source, float amount) {
-    if (ModDamageSource.isGunDamage(source)) {
+    if (source.isProjectile()) {
       EntityDamageSource entitySource = (EntityDamageSource) source;
       this.setDeltaMovement(entitySource.getEntity().getLookAngle().scale(1.5D));
     }

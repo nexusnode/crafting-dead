@@ -38,21 +38,18 @@ public class ModDamageSource {
         headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source, gunStack,
         headshot ? KillFeedEntry.Type.HEADSHOT : KillFeedEntry.Type.NONE)
             .bypassArmor()
-            .setProjectile();
+            .setProjectile()
+            .setExplosion();
   }
 
   /**
    * Creates an explosion damage source without difficulty scaling.
    */
   public static DamageSource causeUnscaledExplosionDamage(@Nullable LivingEntity source) {
-    return source != null
-        ? new EntityDamageSource("explosion.player", source).setExplosion()
-        : new DamageSource("explosion").setExplosion();
-  }
-
-  public static boolean isGunDamage(DamageSource source) {
-    return source.getMsgId().equals(BULLET_HEADSHOT_DAMAGE_TYPE)
-        || source.getMsgId().equals(BULLET_BODY_DAMAGE_TYPE);
+    return (source != null
+        ? new EntityDamageSource("explosion.player", source)
+        : new DamageSource("explosion"))
+            .setExplosion();
   }
 
   /**

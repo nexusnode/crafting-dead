@@ -32,6 +32,7 @@ import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
 
 public class ModRecipeProvider extends RecipeProvider {
@@ -747,7 +748,7 @@ public class ModRecipeProvider extends RecipeProvider {
     ShapelessRecipeBuilder.shapeless(Items.IRON_INGOT, 4)
         .requires(ModItemTags.MAGAZINES)
         .unlockedBy("has_magazine", has(ModItemTags.MAGAZINES))
-        .save(consumer);
+        .save(consumer, new ResourceLocation(CraftingDead.ID, "iron_ingot_from_magazine"));
   }
 
   @Override
