@@ -51,6 +51,10 @@ public interface Game<M extends Module> extends Synched {
    */
   void tick();
 
+  default boolean disableBlockBurning() {
+    return true;
+  }
+
   /**
    * Get the {@link GameType} associated with this {@link Game} instance.
    * 

@@ -86,6 +86,11 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
+  public boolean disableBlockBurning() {
+    return true;
+  }
+
+  @Override
   public void encode(PacketBuffer out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()

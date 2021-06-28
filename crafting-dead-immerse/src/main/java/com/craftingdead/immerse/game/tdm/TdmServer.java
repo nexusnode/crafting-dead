@@ -227,11 +227,6 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public boolean disableBlockBurning() {
-    return true;
-  }
-
-  @Override
   public void tick() {
     if (this.stateMachine.getCurrentState().getState() == TdmState.IDLE
         && this.getMinecraftServer().getPlayerCount() > 0) {

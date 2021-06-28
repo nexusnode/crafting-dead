@@ -29,10 +29,6 @@ public interface GameServer extends Game<ServerModule> {
   Codec<GameServer> CODEC =
       GameType.CODEC.dispatch(GameServer::getType, GameType::getGameServerCodec);
 
-  default boolean disableBlockBurning() {
-    return false;
-  }
-
   default void addPlayer(PlayerExtension<ServerPlayerEntity> player) {}
 
   default void removePlayer(PlayerExtension<ServerPlayerEntity> player) {}

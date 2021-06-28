@@ -25,12 +25,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameServer;
 import net.minecraft.block.FireBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.LogicalSide;
 
 @Mixin(FireBlock.class)
 public class FireBlockMixin {
@@ -39,9 +41,9 @@ public class FireBlockMixin {
    * Adds hook for {@link GameServer#disableBlockBurning()}.
    */
   @Inject(method = "tryCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
-  private void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age,
+  private void tryCatchFire(World level, BlockPos pos, int chance, Random random, int age,
       Direction face, CallbackInfo callbackInfo) {
-    if (this.blockBurningDisabled()) {
+    if (this.blockBurningDisabled(level)) {
       callbackInfo.cancel();
     }
   }
@@ -50,15 +52,16 @@ public class FireBlockMixin {
    * Adds hook for {@link GameServer#disableBlockBurning()}.
    */
   @Inject(method = "canCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
-  private void canCatchFire(IBlockReader world, BlockPos pos, Direction face,
+  private void canCatchFire(IBlockReader level, BlockPos pos, Direction face,
       CallbackInfoReturnable<Boolean> callbackInfo) {
-    if (this.blockBurningDisabled()) {
+    if (this.blockBurningDisabled((World) level)) {
       callbackInfo.setReturnValue(false);
     }
   }
 
-  private boolean blockBurningDisabled() {
-    GameServer gameServer = CraftingDeadImmerse.getInstance().getLogicalServer().getGame();
-    return gameServer != null && gameServer.disableBlockBurning();
+  private boolean blockBurningDisabled(World level) {
+    Game<?> game = CraftingDeadImmerse.getInstance()
+        .getGame(level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER);
+    return game != null && game.disableBlockBurning();
   }
 }
