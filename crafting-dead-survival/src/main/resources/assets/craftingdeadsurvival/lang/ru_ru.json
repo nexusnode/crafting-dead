@@ -1,0 +1,69 @@
+{
+  "options.craftingdeadsurvival.server.broken_legs_enabled":"Перелом ног включено",
+  "options.craftingdeadsurvival.server.bleeding_enabled":"Кровотечение включено",
+  "options.craftingdeadsurvival.server.disable_zombies":"Отключить зомби",
+  "options.craftingdeadsurvival.server.infectionEnabled":"Включить заражение",
+
+  "options.craftingdeadsurvival.client.display_blood": "Отображать кровь",
+
+  "enchantment.craftingdeadsurvival.infection": "Заражение",
+
+  "block.craftingdeadsurvival.military_loot_gen": "Генератор военного награбленного",
+  "block.craftingdeadsurvival.military_loot": "Военное награбленное",
+  "block.craftingdeadsurvival.police_loot_gen": "Генератор полицейского награбленного",
+  "block.craftingdeadsurvival.police_loot": "Полицейского награбленное",
+  "block.craftingdeadsurvival.medic_loot_gen": "Генератор медицинского награбленного",
+  "block.craftingdeadsurvival.medic_loot": "Медицинское награбленное",
+  "block.craftingdeadsurvival.civilian_loot_gen": "Генератор гражданского награбленного",
+  "block.craftingdeadsurvival.civilian_loot": "Гражданского награбленное",
+  "block.craftingdeadsurvival.civilian_rare_loot_gen": "Генератор редкого гражданского награбленного",
+  "block.craftingdeadsurvival.civilian_rare_loot": "Редкое гражданское награбленное",
+
+  "effect.craftingdeadsurvival.infection":"Заражён",
+  "effect.craftingdeadsurvival.broken_leg": "Перелом ноги",
+  "effect.craftingdeadsurvival.bleeding":"Кровотечение",
+
+  "entity.craftingdeadsurvival.supply_drop": "Поставка сброса",
+  "entity.craftingdeadsurvival.pipe_grenade": "Трубковая граната",
+  "entity.craftingdeadsurvival.advanced_zombie": "Продвинутый зомби",
+  "entity.craftingdeadsurvival.fast_zombie": "Быстрый зомби",
+  "entity.craftingdeadsurvival.tank_zombie": "Зомби-танк",
+  "entity.craftingdeadsurvival.weak_zombie": "Вялый зомби",
+  "entity.craftingdeadsurvival.police_zombie": "Зомби-полицейский",
+  "entity.craftingdeadsurvival.doctor_zombie": "Зомби-доктор",
+  "entity.craftingdeadsurvival.giant_zombie": "Гигантский зомби",
+
+  "message.infected": "Ты был заражён от RBI.",
+  "message.broken_leg": "Ай, блять! Ты сломал свою ногу.",
+  "message.bleeding": "Ты истекаешь кровью!",
+
+  "death.attack.infection":"%1$s умер от RBI",
+  "death.attack.bleeding":"%1$s умер от потери крови",
+
+  "action.craftingdeadsurvival.use_clean_rag.message":"Прочищение раны",
+  "action.craftingdeadsurvival.use_splint.message":"Наложение шины",
+  "action.craftingdeadsurvival.wash_rag.message":"Промывка тряпки",
+  "action.craftingdeadsurvival.use_syringe_on_zombie.message":"Удаление заражения RBI",
+  "action.craftingdeadsurvival.use_cure_syringe.message":"Внутривенное лекарство",
+  "action.craftingdeadsurvival.use_rbi_syringe.message":"Введение инъекции RBI",
+  "action.craftingdeadsurvival.shred_clothing.message":"Рвение ткани",
+
+  "itemGroup.craftingdeadsurvival": "Crafting Dead Survival",
+
+  "item.craftingdeadsurvival.rbi_syringe": "RBI шприц",
+  "item.craftingdeadsurvival.cure_syringe": "Лекарственный RBI шприц",
+  "item.craftingdeadsurvival.splint": "Временная шина",
+  "item.craftingdeadsurvival.dirty_rag": "Грязная тряпка",
+  "item.craftingdeadsurvival.bloody_rag": "Окровавленная тряпка",
+  "item.craftingdeadsurvival.clean_rag": "Чистая тряпка",
+
+  "item.craftingdeadsurvival.pipe_grenade": "Трубковая граната",
+  "item.craftingdeadsurvival.military_drop_radio": "Радио: Гражданская поставка сброса",
+  "item.craftingdeadsurvival.medical_drop_radio": "Радио: Медицинская поставка сброса",
+  "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Яйцо продвинутого зомби",
+  "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Яйцо быстрый зомби",
+  "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Яйцо зомби-танк",
+  "item.craftingdeadsurvival.weak_zombie_spawn_egg": "Яйцо слабый зомби",
+  "item.craftingdeadsurvival.police_zombie_spawn_egg": "Яйцо зомби-полицейский",
+  "item.craftingdeadsurvival.doctor_zombie_spawn_egg": "Яйцо зомби-доктор"
+}
