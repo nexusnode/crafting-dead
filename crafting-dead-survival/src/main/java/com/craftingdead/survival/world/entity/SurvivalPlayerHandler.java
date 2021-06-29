@@ -23,7 +23,6 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -31,7 +30,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
@@ -62,7 +60,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public void playerTick() {
     if (!this.player.getLevel().isClientSide()) {
       this.updateEffects();
-      this.updateBrokenLeg();
+      // this.updateBrokenLeg();
     }
   }
 
@@ -83,23 +81,6 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     if ((invulnerable || !CraftingDeadSurvival.serverConfig.infectionEnabled.get())
         && this.player.getEntity().hasEffect(SurvivalMobEffects.INFECTION.get())) {
       this.player.getEntity().removeEffect(SurvivalMobEffects.INFECTION.get());
-    }
-  }
-
-  private void updateBrokenLeg() {
-    if (!this.player.getEntity().isCreative()
-        && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
-        && this.player.getLevel().getDifficulty() != Difficulty.PEACEFUL
-        && !this.player.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
-        && this.player.getEntity().isOnGround() && !this.player.getEntity().isInWater()
-        && ((this.player.getEntity().fallDistance > 4F && random.nextInt(3) == 0)
-            || this.player.getEntity().fallDistance > 10F)) {
-      this.player.getEntity()
-          .displayClientMessage(new TranslationTextComponent("message.broken_leg")
-              .setStyle(Style.EMPTY.applyFormats(TextFormatting.RED).withBold(true)), true);
-      this.player.getEntity()
-          .addEffect(new EffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4));
-      this.player.getEntity().addEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
     }
   }
 
@@ -126,14 +107,12 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public float handleDamaged(DamageSource source, float amount) {
-    Entity immediateAttacker = source.getDirectEntity();
-
-    boolean isValidSource = immediateAttacker != null || source.isExplosion();
     boolean invulnerable = this.player.getEntity().abilities.invulnerable
         || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
-    if (isValidSource && !invulnerable
-        && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()) {
+    if (!invulnerable
+        && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()
+        && (source.getDirectEntity() != null || source.isExplosion())) {
       float bleedChance = 0.1F * amount;
       if (random.nextFloat() < bleedChance
           && !this.player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
@@ -144,6 +123,20 @@ public class SurvivalPlayerHandler implements PlayerHandler {
             .addEffect(new EffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999));
       }
     }
+
+    if (!invulnerable
+        && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
+        && !this.player.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
+        && source == DamageSource.FALL
+        && ((amount > 0.0F && random.nextInt(3) == 0) || amount > 4.0F)) {
+      this.player.getEntity()
+          .displayClientMessage(new TranslationTextComponent("message.broken_leg")
+              .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
+      this.player.getEntity().addEffect(
+          new EffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4));
+      this.player.getEntity().addEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
+    }
+
     return amount;
   }
 
