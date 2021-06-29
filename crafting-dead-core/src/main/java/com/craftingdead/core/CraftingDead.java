@@ -264,9 +264,8 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
-    PlayerExtension.getOrThrow(event.getPlayer()).copyFrom(
-        PlayerExtension.getOrThrow(event.getOriginal()),
-        event.isWasDeath());
+    PlayerExtension.getOrThrow(event.getPlayer())
+        .copyFrom(PlayerExtension.getOrThrow(event.getOriginal()), event.isWasDeath());
   }
 
   @SubscribeEvent
@@ -307,6 +306,15 @@ public class CraftingDead {
           LazyOptional.of(() -> living), () -> Capabilities.LIVING_EXTENSION, CompoundNBT::new));
       living.load();
     }
+  }
+
+  @SubscribeEvent
+  public void handlePlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+    PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+    PlayerExtension.getOrThrow(event.getPlayer()).encode(data, true);
+    NetworkChannel.PLAY.getSimpleChannel().send(
+        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(event::getPlayer),
+        new SyncLivingMessage(event.getPlayer().getId(), data));
   }
 
   @SubscribeEvent

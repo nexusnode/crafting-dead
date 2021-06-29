@@ -52,9 +52,9 @@ public class FireBlockMixin {
    * Adds hook for {@link GameServer#disableBlockBurning()}.
    */
   @Inject(method = "canCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
-  private void canCatchFire(IBlockReader level, BlockPos pos, Direction face,
+  private void canCatchFire(IBlockReader blockGetter, BlockPos pos, Direction face,
       CallbackInfoReturnable<Boolean> callbackInfo) {
-    if (this.blockBurningDisabled((World) level)) {
+    if (blockGetter instanceof World && this.blockBurningDisabled((World) blockGetter)) {
       callbackInfo.setReturnValue(false);
     }
   }
