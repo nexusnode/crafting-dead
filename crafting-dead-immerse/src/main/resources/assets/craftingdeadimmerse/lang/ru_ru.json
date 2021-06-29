@@ -1,0 +1,71 @@
+{    
+    "commands.game.restart":"Перезагрузка игры",
+    "commands.game.reload_rotation":"Перезагрузка при смене игры",
+
+    "message.first_blood_drawn": "%s пролил первую кровь",
+    "message.joined": "%s вошёл в игру",
+    "message.left": "%s покинул игру",
+
+    "title.warm_up": "Разогрев",
+    "title.game_start": "Погнали!",
+    "title.game_over": "Игра окончена",
+
+    "message.game": "Игра",
+    "message.no_switch_team": "Ты не можешь сменить команды прямо сейчас",
+    "message.joined_team": "%s присоединился к %s",
+    "message.buy_time_expired": "Твоё время покупки истекло",
+
+    "key.switch_teams": "Switch Teams",
+
+    "gui.killed_message.killed_by": "Убит: %s",
+    "gui.killed_message.hp": "Здоровье: %s",
+
+    "gui.screen.shop.title": "Магазин",
+    "gui.screen.shop.back": "Назад '%s'",
+    "gui.screen.shop.buy_time": "Время покупки: %s",
+    "gui.screen.shop.selected": "Выбрано",
+    "gui.screen.shop.inventory":"Инвентарь",
+
+    "gui.screen.select_team.title":"Выбрать команду",
+    "gui.screen.select_team.join_red": "Присоединился к Красным",
+    "gui.screen.select_team.join_blue": "Присоединился к Синим",
+    "gui.screen.select_team.spectate": "Зритель",
+
+    "narrator.screen.start": "Начать",
+
+    "game.craftingdeadimmerse.tdm":"Командная смертельная схватка",
+
+    "gui.screen.start.message": "Нажми пробел, чтобы начать",
+
+    "menu.play_button": "Играть в игру",
+    "menu.home_button": "Домой",
+
+    "menu.home.title": "Домой",
+
+    "menu.play.title": "ИГРАТЬ",
+    "menu.play.dropdown.official": "ОФИЦИАЛЬНО",
+    "menu.play.dropdown.singleplayer": "ОДИНОЧНАЯ ИГРА",
+    "menu.play.dropdown.community": "СООБЩЕСТВО",
+    "menu.play.dropdown.custom": "СВОЁ",
+    "menu.play.tab.survival": "Выживание",
+    "menu.play.tab.tdm": "КСС",
+
+    "view.server_list.motd": "MOTD",
+    "view.server_list.map": "КАРТА",
+    "view.server_list.ping": "ПИНГ",
+    "view.server_list.players": "ИГРОКИ",
+    "view.server_list.failed_to_load": "?",
+    "view.server_list.button.play": "ИГРАТЬ",
+    "view.server_list.button.refresh": "ОБНОВИТЬ",
+    "view.server_list.button.quick_refresh": "БЫСТРОЕ ОБНОВЛЕНИЕ",
+    "view.mutable_server_list.button.add": "ДОБАВИТЬ",
+    "view.mutable_server_list.button.edit": "РЕДАКТИРОВАТЬ",
+    "view.mutable_server_list.button.remove": "УДАЛИТЬ",
+    "view.mutable_server_list.button.direct_connect": "ПРЯМОЕ ПОДКЛ.",
+
+    "view.world_list.button.play": "ИГРАТЬ",
+    "view.world_list.button.create": "СОЗДАТЬ",
+    "view.world_list.button.edit": "РЕДАКТИРОВАТЬ",
+    "view.world_list.button.delete": "УДАЛИТЬ",
+    "view.world_list.button.recreate": "ПЕРЕСОЗДАТЬ"
+}
