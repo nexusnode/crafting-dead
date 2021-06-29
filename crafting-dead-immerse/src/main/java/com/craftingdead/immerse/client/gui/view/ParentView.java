@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
+import com.craftingdead.immerse.util.ThreadSafe;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -60,8 +61,13 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     return this.layoutParent;
   }
 
+  @ThreadSafe
   @SuppressWarnings("unchecked")
   public final SELF addChild(View<?, C> view) {
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(() -> this.addChild(view)).join();
+    }
+
     if (view.parent != null) {
       return this.self();
     }
@@ -88,7 +94,11 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @param view - child to remove
    * @return ourself
    */
+  @ThreadSafe
   public final SELF removeChild(View<?, C> view) {
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(() -> this.removeChild(view)).join();
+    }
     this.assertChildPresent(view);
     this.prepareForRemoval(view);
     this.children.remove(view);
@@ -101,8 +111,12 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * 
    * @return ourself
    */
+  @ThreadSafe
   @SuppressWarnings("unchecked")
   public final SELF clearChildren() {
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(this::clearChildren).join();
+    }
     this.children.forEach(this::prepareForRemoval);
     this.children.clear();
     this.sortedChildren = new View[0];
@@ -114,8 +128,9 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * 
    * @param view - child to remove
    */
-  public final void queueChildForRemoval(View<?, C> view) {
-    this.queueChildForRemoval(view, null);
+  @ThreadSafe
+  public final SELF queueChildForRemoval(View<?, C> view) {
+    return this.queueChildForRemoval(view, null);
   }
 
   /**
@@ -126,12 +141,17 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @param view - child to remove
    * @param callback - executed upon removal
    */
-  public final void queueChildForRemoval(View<?, C> view, Runnable callback) {
+  @ThreadSafe
+  public final SELF queueChildForRemoval(View<?, C> view, Runnable callback) {
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(() -> this.queueChildForRemoval(view, callback)).join();
+    }
     this.assertChildPresent(view);
     view.queueRemoval(() -> {
       view.pendingRemoval = true;
       this.pendingRemoval.add(Pair.of(view, callback));
     });
+    return this.self();
   }
 
   /**
@@ -141,7 +161,11 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * 
    * @return ourself
    */
+  @ThreadSafe
   public final SELF queueAllForRemoval() {
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(this::queueAllForRemoval).join();
+    }
     this.children.forEach(this::queueChildForRemoval);
     return this.self();
   }
@@ -196,7 +220,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   public float computeFullHeight() {
     final float height = (float) (this.children
         .stream()
-        .mapToDouble(c -> c.getY() + c.getHeight()) // TODO + c.getBottomMargin()
+        .mapToDouble(c -> c.getY() + c.getHeight())
         .max()
         .orElse(0.0F)
         - super.getScaledContentY());
@@ -204,8 +228,14 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     return Math.max(height, 0);
   }
 
+  @ThreadSafe
   @Override
   public void layout() {
+    if (!this.minecraft.isSameThread()) {
+      this.minecraft.submit(this::layout).join();
+      return;
+    }
+
     this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
     super.layout();
