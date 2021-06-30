@@ -10,10 +10,10 @@
       "item": "minecraft:redstone_torch"
     },
     "i": {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:iron_block"
     },
     "g": {
-      "item": "minecraft:gold_ingot"
+      "item": "minecraft:diamond"
     }
   },
   "result": {

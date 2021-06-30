@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.SynchedData;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -51,7 +51,7 @@ public class TeamInstance<T extends Team>
   public void broadcastVictorySounds(SoundEvent teamVictoryCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playNotifySound(ModSoundEvents.VICTORY_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+      playerEntity.playNotifySound(ImmerseSoundEvents.VICTORY_MUSIC.get(), SoundCategory.MASTER, 0.7F,
           1.0F);
       playerEntity.playNotifySound(teamVictoryCallout, SoundCategory.MASTER, 0.7F, 1.0F);
     }, minecraftServer);
@@ -60,7 +60,7 @@ public class TeamInstance<T extends Team>
   public void broadcastDefeatSounds(SoundEvent teamDefeatCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playNotifySound(ModSoundEvents.DEFEAT_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+      playerEntity.playNotifySound(ImmerseSoundEvents.DEFEAT_MUSIC.get(), SoundCategory.MASTER, 0.7F,
           1.0F);
       playerEntity.playNotifySound(teamDefeatCallout, SoundCategory.MASTER, 0.7F, 1.0F);
     }, minecraftServer);

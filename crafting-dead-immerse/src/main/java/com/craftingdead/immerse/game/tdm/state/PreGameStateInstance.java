@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.tdm.state;
 import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.state.State;
 import com.craftingdead.immerse.util.state.TimedStateInstance;
 
@@ -48,7 +48,7 @@ public class PreGameStateInstance extends TimedStateInstance<TdmServer> {
       this.getContext().resetTeams();
       this.getContext().getLogicalServer()
           .respawnPlayers(playerEntity -> !playerEntity.isSpectator(), false);
-      GameUtil.broadcastSound(ModSoundEvents.START_MUSIC.get(),
+      GameUtil.broadcastSound(ImmerseSoundEvents.START_MUSIC.get(),
           this.getContext().getMinecraftServer());
       return true;
     }
@@ -59,7 +59,7 @@ public class PreGameStateInstance extends TimedStateInstance<TdmServer> {
     }
 
     if (this.getTimeRemainingSeconds() <= 15 && this.hasSecondPast()) {
-      GameUtil.broadcastSound(ModSoundEvents.COUNTDOWN.get(),
+      GameUtil.broadcastSound(ImmerseSoundEvents.COUNTDOWN.get(),
           this.getContext().getMinecraftServer());
     }
 

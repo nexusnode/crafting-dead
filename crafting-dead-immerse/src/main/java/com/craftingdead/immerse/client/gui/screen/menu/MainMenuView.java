@@ -58,7 +58,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.FitType;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import io.netty.util.internal.ThreadLocalRandom;
 import io.noties.tumbleweed.Timeline;
 import io.noties.tumbleweed.Tween;
@@ -153,7 +153,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setAspectRatio(1))
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"))
             .addColourHoverAnimation(new Colour(0xFF666666), 150.0F)
-            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(homeView))
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
@@ -173,7 +173,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
-            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(playView))
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslationTextComponent("menu.play_button"))));
@@ -187,7 +187,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
-            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addListener(ActionEvent.class, (c, e) -> this.getScreen().keepOpenAndSetScreen(
                 new OptionsScreen(this.getScreen(), this.minecraft.options)))
             .setFocusable(true)
@@ -203,7 +203,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addColourHoverAnimation(new Colour(0xFF181818), 150.0F)
             .addHoverAnimation(View.X_SCALE, new float[] {1.15F}, 150.0F)
             .addHoverAnimation(View.Y_SCALE, new float[] {1.15F}, 150.0F)
-            .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addListener(ActionEvent.class, (c, e) -> this.minecraft.stop())
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));

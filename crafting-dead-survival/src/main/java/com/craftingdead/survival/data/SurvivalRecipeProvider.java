@@ -77,8 +77,8 @@ public class SurvivalRecipeProvider extends RecipeProvider {
         .pattern("igi")
         .pattern("iii")
         .define('t', Items.REDSTONE_TORCH)
-        .define('i', Items.IRON_INGOT)
-        .define('g', Items.GOLD_INGOT)
+        .define('i', Items.IRON_BLOCK)
+        .define('g', Items.DIAMOND)
         .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
         .save(consumer);
     ShapedRecipeBuilder.shaped(SurvivalItems.MEDICAL_DROP_RADIO.get())
@@ -86,7 +86,7 @@ public class SurvivalRecipeProvider extends RecipeProvider {
         .pattern("ifi")
         .pattern("iii")
         .define('t', Items.REDSTONE_TORCH)
-        .define('i', Items.IRON_INGOT)
+        .define('i', Items.EMERALD)
         .define('f', ModItems.FIRST_AID_KIT.get())
         .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
         .save(consumer);

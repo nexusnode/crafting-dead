@@ -34,9 +34,8 @@ import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.DependencyLoader;
-import com.craftingdead.immerse.util.ModSoundEvents;
-import com.craftingdead.immerse.world.level.block.ModBlocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -118,17 +117,11 @@ public class CraftingDeadImmerse {
 
     modEventBus.addListener(this::handleCommonSetup);
 
-    ModBlocks.BLOCKS.register(modEventBus);
-    ModSoundEvents.SOUND_EVENTS.register(modEventBus);
+    ImmerseSoundEvents.SOUND_EVENTS.register(modEventBus);
     GameTypes.GAME_TYPES.register(modEventBus);
     ModuleTypes.MODULE_TYPES.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
-
-    // SchematicFormats.SCHEMATIC_FORMATS.makeRegistry("map_formats", RegistryBuilder::new);
-    // SchematicFormats.SCHEMATIC_FORMATS.register(modEventBus);
-    //
-    // ModDimensions.MOD_DIMENSIONS.register(modEventBus);
   }
 
   @Nullable

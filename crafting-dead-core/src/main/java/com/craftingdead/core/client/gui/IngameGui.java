@@ -510,11 +510,11 @@ public class IngameGui {
     RenderSystem.disableBlend();
 
     AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
-        String.valueOf((int) health), 31,
+        String.valueOf(Math.round(health)), 31,
         height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
     RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
     RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5,
-        (int) (65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
+        Math.round(65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
 
     if (armour > 0) {
       int armourX = healthWidth / 2 + 7;
@@ -524,12 +524,12 @@ public class IngameGui {
       RenderSystem.disableBlend();
 
       AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
-          String.valueOf((int) armour), armourX + 31,
+          String.valueOf(Math.round(armour)), armourX + 31,
           height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
       RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5, 65, 10,
           0x66000000);
       RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5,
-          (int) (65 * (armour / 20)), 10, 0xCCFFFFFF);
+          Math.round(65 * (armour / 20)), 10, 0xCCFFFFFF);
     }
   }
 

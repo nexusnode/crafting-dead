@@ -33,7 +33,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -120,8 +120,7 @@ public class ServerListView<L extends Layout>
   }
 
   protected static View<?, YogaLayout> createButton(Colour colour, Colour hoveredColour,
-      ITextComponent text,
-      Runnable actionListener) {
+      ITextComponent text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)
@@ -135,7 +134,7 @@ public class ServerListView<L extends Layout>
                     .setCentered(true))
                 .setBackgroundColour(colour)
                 .addBackgroundHoverAnimation(hoveredColour, 150F)
-                .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
                 .setFocusable(true)
                 .addListener(ActionEvent.class, (c, e) -> actionListener.run());
   }

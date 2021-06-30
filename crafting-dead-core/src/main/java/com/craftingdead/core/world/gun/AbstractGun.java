@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -161,7 +162,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
    * The amount of shots since the last time the trigger was pressed. Used to determine if the gun
    * can continue firing using the current fire mode.
    */
-  private volatile int shotCount;
+  private final AtomicInteger shotCount = new AtomicInteger();
 
   private Set<Attachment> attachments;
   private boolean attachmentsDirty;
@@ -181,7 +182,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Nullable
   private volatile Future<?> gunFuture;
 
-  protected long lastShotMs;
+  protected volatile long lastShotMs;
 
   private boolean initialized;
 
@@ -266,8 +267,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
           this.getFireDelayMs(), TimeUnit.MILLISECONDS);
     } else {
       this.stopShooting();
-      // Resets the counter
-      this.shotCount = 0;
     }
 
     if (sendUpdate) {
@@ -285,6 +284,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   private void stopShooting() {
+    this.shotCount.set(0);
     if (this.gunFuture != null) {
       this.gunFuture.cancel(false);
     }
@@ -329,7 +329,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
               playerSnapshot,
               this.getRange(),
               this.getAccuracy(player, random),
-              this.shotCount,
+              this.getShotCount(),
               random)
           .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
     }
@@ -341,7 +341,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   private void shoot(LivingExtension<?, ?> living) {
     final Random random = new Random();
-
     long time = Util.getMillis();
 
     if (!this.isTriggerPressed()
@@ -352,7 +351,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     }
 
     // Add 5 to account for inconsistencies in timing
-    if (time - this.lastShotMs + 5 < this.getFireDelayMs()) {
+    if (time - this.lastShotMs + 10 < this.getFireDelayMs()) {
       return;
     }
     this.lastShotMs = time;
@@ -371,10 +370,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       return;
     }
 
-    boolean maxShotsReached =
-        this.fireMode.getMaxShots().map(max -> this.shotCount >= max).orElse(false);
-    this.shotCount++;
-    if (maxShotsReached) {
+    int shotCount = this.shotCount.getAndIncrement();
+    int maxShots = this.fireMode.getMaxShots().orElse(Integer.MAX_VALUE);
+    if (shotCount >= maxShots) {
       this.stopShooting();
       return;
     }
@@ -385,7 +383,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       this.getClient().handleShoot(living);
     }
 
-    // Allow other threads to do work (mainly the main thread as we off-load a lot of tasks to it)
     Thread.yield();
   }
 
@@ -421,8 +418,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       random.setSeed(randomSeed);
 
       RayTraceResult rayTraceResult = RayTraceUtil
-          .rayTrace(
-              entity, this.getRange(), this.getAccuracy(living, random), this.shotCount, random)
+          .rayTrace(entity,
+              this.getRange(),
+              this.getAccuracy(living, random),
+              this.getShotCount(),
+              random)
           .orElse(null);
 
       if (rayTraceResult != null) {
@@ -674,7 +674,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   protected int getShotCount() {
-    return this.shotCount;
+    return this.shotCount.get();
   }
 
   @Override

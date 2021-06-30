@@ -37,7 +37,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.util.text.ITextComponent;
@@ -154,7 +154,7 @@ public class WorldListView<L extends Layout>
         new YogaLayoutParent()
             .setJustifyContent(Justify.CENTER)
             .setAlignItems(Align.CENTER))
-                .addActionSound(ModSoundEvents.BUTTON_CLICK.get())
+                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
                 .setBackgroundColour(colour)
                 .setFocusable(true)
                 .addBackgroundHoverAnimation(hoveredColour, 150F)

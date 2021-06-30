@@ -22,7 +22,7 @@ import com.craftingdead.immerse.game.GameUtil;
 import com.craftingdead.immerse.game.module.team.TeamInstance;
 import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
-import com.craftingdead.immerse.util.ModSoundEvents;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.state.State;
 import com.craftingdead.immerse.util.state.TimedStateInstance;
 import net.minecraft.util.text.ITextComponent;
@@ -43,7 +43,7 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
   @Override
   public boolean tick() {
     if (this.getTimeRemainingSeconds() <= 20 && this.hasSecondPast()) {
-      GameUtil.broadcastSound(ModSoundEvents.COUNTDOWN.get(),
+      GameUtil.broadcastSound(ImmerseSoundEvents.COUNTDOWN.get(),
           this.getContext().getMinecraftServer());
     }
 
@@ -75,9 +75,9 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
 
     if (winningTeam == null) {
       winnerText = TIE_GAME.copy().withStyle(TextFormatting.AQUA, TextFormatting.BOLD);
-      redTeam.broadcastVictorySounds(ModSoundEvents.RED_VICTORY.get(),
+      redTeam.broadcastVictorySounds(ImmerseSoundEvents.RED_VICTORY.get(),
           this.getContext().getMinecraftServer());
-      blueTeam.broadcastVictorySounds(ModSoundEvents.BLUE_VICTORY.get(),
+      blueTeam.broadcastVictorySounds(ImmerseSoundEvents.BLUE_VICTORY.get(),
           this.getContext().getMinecraftServer());
     } else {
       winnerText =
@@ -87,15 +87,15 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
               .append(WON);
       switch (winningTeam) {
         case RED:
-          redTeam.broadcastVictorySounds(ModSoundEvents.RED_VICTORY.get(),
+          redTeam.broadcastVictorySounds(ImmerseSoundEvents.RED_VICTORY.get(),
               this.getContext().getMinecraftServer());
-          blueTeam.broadcastDefeatSounds(ModSoundEvents.BLUE_DEFEAT.get(),
+          blueTeam.broadcastDefeatSounds(ImmerseSoundEvents.BLUE_DEFEAT.get(),
               this.getContext().getMinecraftServer());
           break;
         case BLUE:
-          blueTeam.broadcastVictorySounds(ModSoundEvents.BLUE_VICTORY.get(),
+          blueTeam.broadcastVictorySounds(ImmerseSoundEvents.BLUE_VICTORY.get(),
               this.getContext().getMinecraftServer());
-          redTeam.broadcastDefeatSounds(ModSoundEvents.RED_DEFEAT.get(),
+          redTeam.broadcastDefeatSounds(ImmerseSoundEvents.RED_DEFEAT.get(),
               this.getContext().getMinecraftServer());
           break;
         default:

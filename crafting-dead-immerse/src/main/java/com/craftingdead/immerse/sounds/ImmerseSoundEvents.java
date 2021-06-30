@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.util;
+package com.craftingdead.immerse.sounds;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.util.ResourceLocation;
@@ -25,7 +25,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ModSoundEvents {
+public class ImmerseSoundEvents {
 
   public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
       DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDeadImmerse.ID);

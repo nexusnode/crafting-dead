@@ -471,7 +471,6 @@ public class GunTypes {
       .setAccuracy(0.7F)
       .setRecoil(2.5F)
       .setRange(50.0D)
-      .addFireMode(FireMode.AUTO)
       .addFireMode(FireMode.SEMI)
       .setShootSound(ModSoundEvents.G18_SHOOT)
       .setDistantShootSound(ModSoundEvents.G18_DISTANT_SHOOT)

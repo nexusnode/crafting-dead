@@ -245,8 +245,8 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
       }
 
-      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null, result.getBlockPos(),
-          hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
+          result.getBlockPos(), hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     final int particleCount = 12;
@@ -262,8 +262,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         this.secondaryActionSoundStartTimeMs = Util.getMillis();
         living.getEntity().playSound(sound, 1.0F, 1.0F);
       } else {
-        Minecraft.getInstance().getSoundManager().stop(
-            sound.getRegistryName(), SoundCategory.PLAYERS);
+        this.minecraft.getSoundManager().stop(sound.getRegistryName(), SoundCategory.PLAYERS);
       }
     });
   }
