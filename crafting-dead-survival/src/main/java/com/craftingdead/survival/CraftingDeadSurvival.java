@@ -251,15 +251,13 @@ public class CraftingDeadSurvival {
       MobSpawnInfo.Spawners spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.advancedZombie, spawnEntry.weight * 3, 2, 8));
+            SurvivalEntityTypes.advancedZombie, 40, 2, 8));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.fastZombie, spawnEntry.weight / 2, 2, 4));
+            SurvivalEntityTypes.fastZombie, 15, 2, 4));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.tankZombie, spawnEntry.weight / 2, 2, 4));
+            SurvivalEntityTypes.tankZombie, 5, 2, 4));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.advancedZombie, spawnEntry.weight, 3, 8));
-        iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.weakZombie, spawnEntry.weight, 3, 12));
+            SurvivalEntityTypes.weakZombie, 30, 2, 12));
       }
     }
   }

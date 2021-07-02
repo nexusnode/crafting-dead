@@ -31,6 +31,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public abstract class SurvivalGame<M extends Module> implements Game<M> {
 
   @Override
+  public boolean disableBlockBurning() {
+    return true;
+  }
+
+  @Override
   public void load() {
     MinecraftForge.EVENT_BUS.register(this);
   }
