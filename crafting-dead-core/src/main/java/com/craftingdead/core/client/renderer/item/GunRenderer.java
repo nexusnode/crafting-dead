@@ -21,6 +21,7 @@ package com.craftingdead.core.client.renderer.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -485,10 +486,10 @@ public abstract class GunRenderer implements CustomItemRenderer {
     {
       matrixStack.translate(0.0D, 0.05D, 0.0D);
       IBakedModel bakedModel = this.getBakedModel(this.getGunModelLocation(),
-          gun.getPaintStack().isEmpty()
+          gun.getSkin() == null
               ? null
               : ImmutableMap.of("base", Either.left(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
-                  this.getPaintSkinLocation(gun.getPaintStack().getItem().getRegistryName())))));
+                  gun.getSkin().getTextureLocation(this.registryName)))));
       this.renderBakedModel(bakedModel, glint, colour,
           transformType, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
     }
@@ -498,18 +499,14 @@ public abstract class GunRenderer implements CustomItemRenderer {
   protected final RenderMaterial getGunMaterial(Gun gun) {
     IUnbakedModel unbakedModel =
         ModelLoader.instance().getModelOrMissing(this.getGunModelLocation());
-    ResourceLocation skin =
-        gun.getPaintStack().isEmpty() ? null : gun.getPaintStack().getItem().getRegistryName();
     if (unbakedModel instanceof BlockModel) {
-      if (skin != null) {
+      if (gun.getSkin() != null) {
         return new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
-            new ResourceLocation(skin.getNamespace(),
-                "gun/" + this.registryName.getPath() + "_" + skin.getPath()));
+            gun.getSkin().getTextureLocation(this.registryName));
       }
       return ((BlockModel) unbakedModel).getMaterial("base");
     }
-    return new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
-        MissingTextureSprite.getLocation());
+    return new RenderMaterial(PlayerContainer.BLOCK_ATLAS, MissingTextureSprite.getLocation());
   }
 
   protected final IBakedModel getBakedModel(ResourceLocation modelLocation,
@@ -638,11 +635,6 @@ public abstract class GunRenderer implements CustomItemRenderer {
     return new ResourceLocation(magazineName.getNamespace(), "magazine/" + magazineName.getPath());
   }
 
-  protected ResourceLocation getPaintSkinLocation(ResourceLocation paintName) {
-    return new ResourceLocation(paintName.getNamespace(),
-        "gun/" + this.registryName.getPath() + "_" + paintName.getPath());
-  }
-
   @Override
   public Collection<ResourceLocation> getModelDependencies() {
     final Set<ResourceLocation> dependencies = new HashSet<>();
@@ -660,12 +652,7 @@ public abstract class GunRenderer implements CustomItemRenderer {
 
   @Override
   public Collection<ResourceLocation> getAdditionalModelTextures() {
-    final Set<ResourceLocation> textures = new HashSet<>();
-    textures.addAll(this.gunType.getAcceptedPaints().stream()
-        .map(Item::getRegistryName)
-        .map(this::getPaintSkinLocation)
-        .collect(Collectors.toSet()));
-    return textures;
+    return Collections.emptySet();
   }
 
   @Override

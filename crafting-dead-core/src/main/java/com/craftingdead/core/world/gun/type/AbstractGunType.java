@@ -124,11 +124,6 @@ public abstract class AbstractGunType {
   private final Set<Supplier<? extends Attachment>> acceptedAttachments;
 
   /**
-   * A set of paints that are supported by this gun.
-   */
-  private final Set<Supplier<? extends Item>> acceptedPaints;
-
-  /**
    * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
    */
   private final Gun.SecondaryActionTrigger secondaryActionTrigger;
@@ -172,7 +167,6 @@ public abstract class AbstractGunType {
     this.acceptedMagazines = builder.acceptedMagazines;
     this.defaultMagazine = builder.defaultMagazine;
     this.acceptedAttachments = builder.acceptedAttachments;
-    this.acceptedPaints = builder.acceptedPaints;
     this.secondaryActionTrigger = builder.rightMouseActionTriggerType;
     this.triggerPredicate = builder.triggerPredicate;
     this.secondaryActionSound = builder.secondaryActionSound;
@@ -260,10 +254,6 @@ public abstract class AbstractGunType {
 
   public Set<Attachment> getAcceptedAttachments() {
     return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
-  }
-
-  public Set<Item> getAcceptedPaints() {
-    return this.acceptedPaints.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Gun.SecondaryActionTrigger getSecondaryActionTrigger() {

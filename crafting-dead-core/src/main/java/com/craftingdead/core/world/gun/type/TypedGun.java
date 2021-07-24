@@ -57,11 +57,10 @@ public class TypedGun<T extends AbstractGunType> extends AbstractGun {
   }
 
   @Override
-  public boolean isAcceptedPaintOrAttachment(ItemStack itemStack) {
+  public boolean isAcceptedAttachment(ItemStack itemStack) {
     return (itemStack.getItem() instanceof AttachmentLike
         && this.type.getAcceptedAttachments()
-            .contains(((AttachmentLike) itemStack.getItem()).asAttachment()))
-        || this.type.getAcceptedPaints().contains(itemStack.getItem());
+            .contains(((AttachmentLike) itemStack.getItem()).asAttachment()));
   }
 
   @Override

@@ -18,30 +18,37 @@
 
 package com.craftingdead.core.world.damagesource;
 
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.ITextComponent;
 
 public class KillFeedEntry {
 
-  private final LivingEntity killerEntity;
-  private final LivingEntity deadEntity;
+  private final int killerEntityId;
+  private final ITextComponent killerName;
+  private final ITextComponent deadName;
   private final ItemStack weaponStack;
   private final Type type;
 
-  public KillFeedEntry(LivingEntity killerEntity, LivingEntity deadEntity, ItemStack weaponStack,
-      Type type) {
-    this.killerEntity = killerEntity;
-    this.deadEntity = deadEntity;
+  public KillFeedEntry(int killerEntityId, ITextComponent killerName, ITextComponent deadName,
+      ItemStack weaponStack, Type type) {
+    this.killerEntityId = killerEntityId;
+    this.killerName = killerName;
+    this.deadName = deadName;
     this.weaponStack = weaponStack;
     this.type = type;
   }
 
-  public LivingEntity getKillerEntity() {
-    return this.killerEntity;
+  public int getKillerEntityId() {
+    return this.killerEntityId;
   }
 
-  public LivingEntity getDeadEntity() {
-    return this.deadEntity;
+  public ITextComponent getKillerName() {
+    return this.killerName;
+  }
+
+  public ITextComponent getDeadName() {
+    return this.deadName;
   }
 
   public ItemStack getWeaponStack() {
@@ -54,5 +61,18 @@ public class KillFeedEntry {
 
   public static enum Type {
     NONE, HEADSHOT, WALLBANG, WALLBANG_HEADSHOT;
+  }
+
+  public void encode(PacketBuffer out) {
+    out.writeVarInt(this.killerEntityId);
+    out.writeComponent(this.killerName);
+    out.writeComponent(this.deadName);
+    out.writeItem(this.weaponStack);
+    out.writeEnum(this.type);
+  }
+
+  public static KillFeedEntry decode(PacketBuffer in) {
+    return new KillFeedEntry(in.readVarInt(), in.readComponent(), in.readComponent(), in.readItem(),
+        in.readEnum(KillFeedEntry.Type.class));
   }
 }

@@ -24,6 +24,7 @@ import java.util.Set;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.AttachmentLike;
+import com.craftingdead.core.world.gun.skin.Paint;
 import com.craftingdead.core.world.item.GunItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftResultInventory;
@@ -68,12 +69,11 @@ public class GunCraftSlot extends Slot {
       Set<Attachment> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
         ItemStack itemStack = this.craftingInventory.getItem(i);
-        if (gun.isAcceptedPaintOrAttachment(itemStack)) {
-          if (itemStack.getItem() instanceof AttachmentLike) {
-            attachments.add(((AttachmentLike) itemStack.getItem()).asAttachment());
-          } else {
-            gun.setPaintStack(itemStack);
-          }
+        if (gun.isAcceptedAttachment(itemStack) && itemStack.getItem() instanceof AttachmentLike) {
+          attachments.add(((AttachmentLike) itemStack.getItem()).asAttachment());
+          this.craftingInventory.setItem(i, ItemStack.EMPTY);
+        } else if (Paint.isValid(gunStack, itemStack)) {
+          gun.setPaintStack(itemStack);
           this.craftingInventory.setItem(i, ItemStack.EMPTY);
         }
       }

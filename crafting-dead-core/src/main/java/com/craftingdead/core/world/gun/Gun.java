@@ -21,12 +21,14 @@ package com.craftingdead.core.world.gun;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.Attachment.MultiplierType;
+import com.craftingdead.core.world.gun.skin.Skin;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -140,6 +142,11 @@ public interface Gun extends CombatSlotProvider, Synched {
    */
   void setPaintStack(ItemStack paintStack);
 
+  @Nullable
+  Skin getSkin();
+
+  void setSkin(Skin skin);
+
   /**
    * Get an optional skin to be used for this gun.
    * 
@@ -157,7 +164,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * @param itemStack - the {@link ItemStack} to check
    * @return <code>true</code> if accepted, <code>false</code> otherwise
    */
-  boolean isAcceptedPaintOrAttachment(ItemStack itemStack);
+  boolean isAcceptedAttachment(ItemStack itemStack);
 
   /**
    * Get the currently selected {@link FireMode}.

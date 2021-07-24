@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.world.gun;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -53,11 +55,16 @@ import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderType;
 import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.gun.magazine.Magazine;
+import com.craftingdead.core.world.gun.skin.Paint;
+import com.craftingdead.core.world.gun.skin.Skin;
+import com.craftingdead.core.world.gun.skin.Skins;
 import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.EncoderException;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BellBlock;
 import net.minecraft.block.Block;
@@ -84,6 +91,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
@@ -185,6 +193,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   protected volatile long lastShotMs;
 
   private boolean initialized;
+
+  @Nullable
+  private Skin skin;
+  private boolean skinDirty;
 
   @SuppressWarnings("unchecked")
   public <SELF extends AbstractGun> AbstractGun(
@@ -614,6 +626,21 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Override
   public void setPaintStack(ItemStack paintStack) {
     this.dataManager.set(PAINT_STACK, paintStack);
+    this.setSkin(paintStack.getCapability(Capabilities.PAINT)
+        .map(Paint::getSkin)
+        .map(Skins.REGISTRY::get)
+        .orElse(null));
+  }
+
+  @Override
+  public Skin getSkin() {
+    return this.skin;
+  }
+
+  @Override
+  public void setSkin(Skin skin) {
+    this.skin = skin;
+    this.skinDirty = true;
   }
 
   @Override
@@ -715,6 +742,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
         .collect(ListNBT::new, ListNBT::add, List::addAll);
     nbt.put("attachments", attachmentsNbt);
     nbt.put("paintStack", this.getPaintStack().serializeNBT());
+    if (this.skin != null) {
+      nbt.put("skin", Skin.CODEC.encodeStart(NBTDynamicOps.INSTANCE, () -> this.skin)
+          .getOrThrow(false, logger::error));
+    }
     return nbt;
   }
 
@@ -733,6 +764,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
         .map(Attachments.REGISTRY.get()::getValue)
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
+    this.skin = Skin.CODEC.parse(NBTDynamicOps.INSTANCE, nbt.get("skin")).result()
+        .map(Supplier::get)
+        .orElse(null);
   }
 
   @Override
@@ -749,13 +783,31 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     this.attachmentsDirty = false;
 
     if (this.ammoProviderChanged || writeAll) {
+      this.ammoProviderChanged = false;
       out.writeBoolean(true);
       out.writeRegistryId(this.ammoProvider.getType());
     } else {
       out.writeBoolean(false);
     }
     this.ammoProvider.encode(out, this.ammoProviderChanged || writeAll);
-    this.ammoProviderChanged = false;
+
+    if (this.skinDirty || writeAll) {
+      this.skinDirty = false;
+      out.writeBoolean(true);
+      if (this.skin == null) {
+        out.writeBoolean(true);
+      } else {
+        out.writeBoolean(false);
+
+        try {
+          out.writeWithCodec(Skin.CODEC, () -> this.skin);
+        } catch (IOException e) {
+          throw new EncoderException(e);
+        }
+      }
+    } else {
+      out.writeBoolean(false);
+    }
   }
 
   @Override
@@ -774,13 +826,26 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       this.ammoProvider = in.readRegistryIdSafe(AmmoProviderType.class).create();
     }
     this.ammoProvider.decode(in);
+
+    if (in.readBoolean()) {
+      if (in.readBoolean()) {
+        this.skin = null;
+      } else {
+        try {
+          this.skin = in.readWithCodec(Skin.CODEC).get();
+        } catch (IOException e) {
+          throw new DecoderException(e);
+        }
+      }
+    }
   }
 
   @Override
   public boolean requiresSync() {
     return this.attachmentsDirty
         || this.dataManager.isDirty()
-        || this.ammoProvider.requiresSync();
+        || this.ammoProvider.requiresSync()
+        || this.skinDirty;
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
