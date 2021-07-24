@@ -22,7 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.HitMessage;
-import com.craftingdead.core.network.message.play.KillFeedMessage;
+import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
@@ -128,10 +128,10 @@ public enum NetworkChannel {
           .add();
 
       simpleChannel
-          .messageBuilder(KillFeedMessage.class, 0x0C, NetworkDirection.PLAY_TO_CLIENT)
-          .encoder(KillFeedMessage::encode)
-          .decoder(KillFeedMessage::decode)
-          .consumer(KillFeedMessage::handle)
+          .messageBuilder(AddKillFeedEntryMessage.class, 0x0C, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(AddKillFeedEntryMessage::encode)
+          .decoder(AddKillFeedEntryMessage::decode)
+          .consumer(AddKillFeedEntryMessage::handle)
           .add();
 
       simpleChannel

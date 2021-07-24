@@ -60,6 +60,7 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FragGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.world.gun.attachment.Attachments;
+import com.craftingdead.core.world.gun.skin.Skins;
 import com.craftingdead.core.world.gun.type.GunTypes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -109,115 +110,115 @@ public class ModItems {
 
   public static final RegistryObject<Item> VULCAN_PAINT =
       ITEMS.register("vulcan_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.VULCAN, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> ASMO_PAINT =
       ITEMS.register("asmo_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.ASMO, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> CANDY_APPLE_PAINT =
       ITEMS.register("candy_apple_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.CANDY_APPLE, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> CYREX_PAINT =
       ITEMS.register("cyrex_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.CYREX, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> DIAMOND_PAINT =
       ITEMS.register("diamond_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.DIAMOND, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> DRAGON_PAINT =
       ITEMS.register("dragon_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.DRAGON, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> FADE_PAINT =
       ITEMS.register("fade_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.FADE, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> FURY_PAINT =
       ITEMS.register("fury_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.FURY, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> GEM_PAINT =
       ITEMS.register("gem_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.GEM, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> INFERNO_PAINT =
       ITEMS.register("inferno_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.INFERNO, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> RUBY_PAINT =
       ITEMS.register("ruby_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.RUBY, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SCORCHED_PAINT =
       ITEMS.register("scorched_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.SCORCHED, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SLAUGHTER_PAINT =
       ITEMS.register("slaughter_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.SLAUGHTER, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> UV_PAINT =
       ITEMS.register("uv_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.UV, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HYPER_BEAST_PAINT =
       ITEMS.register("hyper_beast_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.HYPER_BEAST, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> EMPEROR_DRAGON_PAINT =
       ITEMS.register("emperor_dragon_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.EMPEROR_DRAGON, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> NUCLEAR_WINTER_PAINT =
       ITEMS.register("nuclear_winter_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.NUCLEAR_WINTER, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> MONARCH_PAINT =
       ITEMS.register("monarch_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.MONARCH, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> LOVELACE_PAINT =
       ITEMS.register("lovelace_paint",
-          () -> new Item(new Item.Properties()
+          () -> new PaintItem(Skins.LOVELACE, new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
   // ================================================================================

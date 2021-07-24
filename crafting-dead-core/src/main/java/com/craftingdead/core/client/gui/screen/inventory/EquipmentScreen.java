@@ -23,6 +23,7 @@ import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
+import com.craftingdead.core.world.gun.skin.Paint;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -114,8 +115,8 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
 
       this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
 
-      final boolean carriedItemAccepted =
-          gun.isAcceptedPaintOrAttachment(this.inventory.getCarried());
+      final boolean carriedItemAccepted = gun.isAcceptedAttachment(this.inventory.getCarried())
+          || Paint.isValid(this.menu.getGunStack(), this.inventory.getCarried());
 
       if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
           || carriedItemAccepted) {

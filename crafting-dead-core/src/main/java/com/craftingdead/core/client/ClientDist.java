@@ -57,6 +57,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.gun.skin.Skins;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
@@ -418,6 +419,9 @@ public class ClientDist implements ModDist {
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
     if (event.getMap().location().equals(PlayerContainer.BLOCK_ATLAS)) {
       this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
+      Skins.REGISTRY.stream()
+          .flatMap(skin -> skin.getAcceptedGuns().stream().map(skin::getTextureLocation))
+          .forEach(event::addSprite);
     }
   }
 

@@ -21,6 +21,7 @@ package com.craftingdead.core.world.inventory;
 import java.util.function.BiPredicate;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.gun.attachment.AttachmentLike;
+import com.craftingdead.core.world.gun.skin.Paint;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import net.minecraft.entity.player.PlayerEntity;
@@ -95,9 +96,10 @@ public class EquipmentMenu extends Container {
     this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, gunCraftY + slotSize + 3,
         this.craftingInventory));
 
-    final BiPredicate<PredicateSlot, ItemStack> attachmentAndPaintPredicate =
+    final BiPredicate<PredicateSlot, ItemStack> attachmentOrPaintPredicate =
         (slot, itemStack) -> this.getGunStack().getCapability(Capabilities.GUN)
-            .map(gun -> gun.isAcceptedPaintOrAttachment(itemStack)).orElse(false);
+            .map(gun -> gun.isAcceptedAttachment(itemStack)).orElse(false);
+
     final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
         (slot, itemStack) -> itemStack.getItem() instanceof AttachmentLike
             && ((AttachmentLike) itemStack.getItem())
@@ -106,18 +108,18 @@ public class EquipmentMenu extends Container {
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.MUZZLE_ATTACHMENT.getIndex(), 104,
         gunCraftY + slotSize + gunCraftSlotGap,
-        attachmentPredicate.and(attachmentAndPaintPredicate)));
+        attachmentPredicate.and(attachmentOrPaintPredicate)));
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125,
         gunCraftY + slotSize * 2 + gunCraftSlotGap * 2,
-        attachmentPredicate.and(attachmentAndPaintPredicate)));
+        attachmentPredicate.and(attachmentOrPaintPredicate)));
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, gunCraftY,
-        attachmentPredicate.and(attachmentAndPaintPredicate)));
+        attachmentPredicate.and(attachmentOrPaintPredicate)));
 
     this.addSlot(new PredicateSlot(this.craftingInventory,
         GunCraftSlotType.PAINT.getIndex(), 146, gunCraftY + slotSize + gunCraftSlotGap,
-        attachmentAndPaintPredicate));
+        (slot, itemStack) -> Paint.isValid(this.getGunStack(), itemStack)));
   }
 
   @Override
@@ -148,10 +150,12 @@ public class EquipmentMenu extends Container {
 
   public boolean isCraftable() {
     return this.getGunStack().getCapability(Capabilities.GUN)
-        .map(gunController -> {
+        .map(gun -> {
           for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
             ItemStack itemStack = this.craftingInventory.getItem(i);
-            if (!itemStack.isEmpty() && !gunController.isAcceptedPaintOrAttachment(itemStack)) {
+            if (!itemStack.isEmpty()
+                && !gun.isAcceptedAttachment(itemStack)
+                && !Paint.isValid(this.getGunStack(), itemStack)) {
               return false;
             }
           }

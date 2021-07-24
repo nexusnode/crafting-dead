@@ -93,7 +93,7 @@ public class IngameGui {
     this.crosshairLocation = crosshairLocation;
   }
 
-  public void addKillFeedMessage(KillFeedEntry killFeedMessage) {
+  public void addKillFeedEntry(KillFeedEntry killFeedMessage) {
     if (this.killFeedMessages.isEmpty()) {
       this.killFeedVisibleTimeMs = 0L;
     }
@@ -241,13 +241,13 @@ public class IngameGui {
   @SuppressWarnings("deprecation")
   private void renderKillFeedEntry(KillFeedEntry entry, MatrixStack matrixStack, float x, float y,
       float alpha) {
-    final String playerEntityName = entry.getKillerEntity().getDisplayName().getString();
-    final String deadEntityName = entry.getDeadEntity().getDisplayName().getString();
-    final int playerEntityNameWidth = minecraft.font.width(playerEntityName);
-    final int deadEntityNameWidth = minecraft.font.width(deadEntityName);
+    final String killerName = entry.getKillerName().getString();
+    final String deadName = entry.getDeadName().getString();
+    final int killerNameWidth = this.minecraft.font.width(killerName);
+    final int deadNameWidth = this.minecraft.font.width(deadName);
 
     int spacing = 20;
-    alpha *= this.minecraft.player == entry.getKillerEntity() ? 0.7F : 0.5F;
+    alpha *= entry.getKillerEntityId() == this.minecraft.player.getId() ? 0.7F : 0.5F;
 
     switch (entry.getType()) {
       case WALLBANG_HEADSHOT:
@@ -267,37 +267,35 @@ public class IngameGui {
 
     int colour = 0x000000 + (opacity << 24);
     RenderUtil.drawGradientRectangle(x, y,
-        x + playerEntityNameWidth + deadEntityNameWidth + spacing, y + 11, colour, colour);
+        x + killerNameWidth + deadNameWidth + spacing, y + 11, colour, colour);
 
-    this.minecraft.font.drawShadow(matrixStack,
-        entry.getKillerEntity().getDisplayName().getString(),
+    this.minecraft.font.drawShadow(matrixStack, killerName,
         x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    this.minecraft.font.drawShadow(matrixStack,
-        entry.getDeadEntity().getDisplayName().getString(),
-        x + playerEntityNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
+    this.minecraft.font.drawShadow(matrixStack, deadName,
+        x + killerNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
 
     switch (entry.getType()) {
       case HEADSHOT:
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.blit(x + playerEntityNameWidth + 17, y - 1, 12, 12);
+        RenderUtil.blit(x + killerNameWidth + 17, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG:
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.blit(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG_HEADSHOT:
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.blit(x + playerEntityNameWidth + 35, y - 1, 12, 12);
+        RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
         RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.blit(x + playerEntityNameWidth + 35 + 14, y - 1, 12, 12);
+        RenderUtil.blit(x + killerNameWidth + 35 + 14, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       default:
@@ -307,7 +305,7 @@ public class IngameGui {
     if (!entry.getWeaponStack().isEmpty()) {
       RenderSystem.pushMatrix();
       {
-        RenderSystem.translated(x + playerEntityNameWidth + 4, y - 1, 0);
+        RenderSystem.translated(x + killerNameWidth + 4, y - 1, 0);
 
         if (entry.getWeaponStack().getItem() instanceof GunItem) {
           double scale = 0.75D;

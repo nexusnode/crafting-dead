@@ -23,6 +23,7 @@ import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.magazine.Magazine;
+import com.craftingdead.core.world.gun.skin.Paint;
 import com.craftingdead.core.world.hat.Hat;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
@@ -58,6 +59,9 @@ public class Capabilities {
   @CapabilityInject(Magazine.class)
   public static final Capability<Magazine> MAGAZINE = null;
 
+  @CapabilityInject(Paint.class)
+  public static final Capability<Paint> PAINT = null;
+
   static {
     CapabilityManager.INSTANCE.register(LivingExtension.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);
@@ -74,6 +78,8 @@ public class Capabilities {
     CapabilityManager.INSTANCE.register(Magazine.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);
     CapabilityManager.INSTANCE.register(Scope.class, EmptyStorage.getInstance(),
+        Capabilities::unsupported);
+    CapabilityManager.INSTANCE.register(Paint.class, EmptyStorage.getInstance(),
         Capabilities::unsupported);
   }
 

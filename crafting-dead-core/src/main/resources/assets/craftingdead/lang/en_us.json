@@ -340,6 +340,7 @@
   "item_lore.gun_item.range": "Range: ",
   "item_lore.clothing_item.water_breathing": "Gives water breathing ability",
   "item_lore.clothing_item.water_speed": "Increases swimming speed",
+  "item_lore.paint.accepted_guns":"Use with:",
 
   "attachment_multiplier_type.damage": "Damage",
   "attachment_multiplier_type.accuracy": "Accuracy",

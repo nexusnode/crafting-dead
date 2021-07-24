@@ -22,7 +22,7 @@ import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
-import com.craftingdead.core.network.message.play.KillFeedMessage;
+import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
@@ -120,7 +120,7 @@ class PlayerExtensionImpl<E extends PlayerEntity>
       return true;
     } else if (source instanceof KillFeedProvider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new KillFeedMessage(((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
+          new AddKillFeedEntryMessage(((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
     }
     return false;
   }
