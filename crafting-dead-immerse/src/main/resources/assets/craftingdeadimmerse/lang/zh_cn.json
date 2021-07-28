@@ -7,13 +7,13 @@
     "message.left": "%s已离开游戏",
 
     "title.warm_up": "热身",
-    "title.game_start": "我们开始吧!",
+    "title.game_start": "开始!",
     "title.game_over": "游戏结束",
 
     "message.game": "游戏",
     "message.no_switch_team": "你现在不能切换队伍",
-    "message.joined_team": "%s加入%s",
-    "message.buy_time_expired": "您的购买时间已过期",
+    "message.joined_team": "%s加入了%s",
+    "message.buy_time_expired": "您的购买时间已结束",
 
     "key.switch_teams": "切换队伍",
 
