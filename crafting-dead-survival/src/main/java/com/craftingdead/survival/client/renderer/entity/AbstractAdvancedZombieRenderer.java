@@ -27,6 +27,8 @@ import com.craftingdead.survival.world.entity.monster.AdvancedZombieEntity;
 import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.TransformationMatrix;
+import net.minecraft.util.math.vector.Vector3f;
 
 public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEntity, M extends AdvancedZombieModel<T>>
     extends BipedRenderer<T, M> {
@@ -48,10 +50,8 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
         .withRenderer(this)
         .withSlot(ModEquipmentSlotType.HAT)
         .withHeadOrientation(true)
-        // Inverts X and Y rotation. This is from Mojang, based on HeadLayer.class.
-        // TODO Find a reason to not remove this line. Also, if you remove it, you will
-        // need to change the json file of every helmet since the scale affects positions.
-        .withArbitraryTransformation(matrix -> matrix.scale(-1F, -1F, 1F))
+        .withArbitraryTransformation(
+            new TransformationMatrix(null, null, new Vector3f(-1F, -1F, 1F), null))
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
