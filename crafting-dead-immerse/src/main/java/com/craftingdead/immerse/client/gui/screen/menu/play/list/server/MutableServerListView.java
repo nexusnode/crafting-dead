@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
+import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.View;
@@ -45,8 +45,8 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   protected ParentView<?, YogaLayout, YogaLayout> createTopRowControls() {
     return super.createTopRowControls()
         .configure(view -> view.getLayout().setWidth(300))
-        .addChild(createButton(new Colour(PlayView.BLUE),
-            new Colour(PlayView.BLUE_HIGHLIGHTED),
+        .addChild(createButton(new Colour(Theme.BLUE),
+            new Colour(Theme.BLUE_HIGHLIGHTED),
             new TranslationTextComponent("view.mutable_server_list.button.direct_connect"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
@@ -60,8 +60,8 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
                     }
                   }, tempServerData));
             }).configure(view -> view.getLayout().setMargin(3)))
-        .addChild(createButton(new Colour(PlayView.GREEN),
-            new Colour(PlayView.GREEN_HIGHLIGHTED),
+        .addChild(createButton(new Colour(Theme.GREEN),
+            new Colour(Theme.GREEN_HIGHLIGHTED),
             new TranslationTextComponent("view.mutable_server_list.button.add"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
@@ -79,10 +79,10 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
 
   @Override
   protected ParentView<?, YogaLayout, YogaLayout> createBottomRowControls() {
-    this.removeButton = createButton(new Colour(PlayView.RED), new Colour(PlayView.RED_HIGHLIGHTED),
+    this.removeButton = createButton(new Colour(Theme.RED), new Colour(Theme.RED_HIGHLIGHTED),
         new TranslationTextComponent("view.mutable_server_list.button.remove"),
         () -> this.getSelectedItem().ifPresent(this::removeServer))
-            .setDisabledBackgroundColour(new Colour(PlayView.RED_DISABLED), 150F)
+            .setDisabledBackgroundColour(new Colour(Theme.RED_DISABLED), 150F)
             .setEnabled(false).configure(view -> view.getLayout().setMargin(3));
     return super.createBottomRowControls()
         .configure(view -> view.getLayout().setWidth(300))

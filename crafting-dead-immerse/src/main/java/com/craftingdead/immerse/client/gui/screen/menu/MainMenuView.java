@@ -94,39 +94,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .setHeightPercent(100)
             .setPositionType(PositionType.ABSOLUTE));
 
-    ImageView<YogaLayout> backgroundComponent =
-        new ImageView<>(new YogaLayout()
-            .setPositionType(PositionType.ABSOLUTE)
-            .setHeightPercent(100)
-            .setWidthPercent(100))
-                .setImage(
-                    new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
-                .setFitType(FitType.COVER)
-                .setBilinearFiltering(true)
-                .setScale(1.25F);
-    this.addChild(backgroundComponent);
-
-    // Background animation
-    Timeline.createParallel()
-        .push(Tween.to(backgroundComponent, View.X_TRANSLATION, 20000)
-            .target(15)
-            .waypoint(5)
-            .waypoint(1)
-            .waypoint(3)
-            .path(CatmullRom.instance()))
-        .push(Tween.to(backgroundComponent, View.Y_TRANSLATION, 20000)
-            .target(-10)
-            .waypoint(5)
-            .waypoint(1)
-            .waypoint(3))
-        .push(Tween.to(backgroundComponent, View.X_SCALE, 20000)
-            .target(1.15F)
-            .waypoint(1.2F))
-        .push(Tween.to(backgroundComponent, View.Y_SCALE, 20000)
-            .target(1.15F)
-            .waypoint(1.2F))
-        .repeatYoyo(-1, 0)
-        .start(backgroundComponent.getTweenManager());
+    this.addChild(createBackgroundView());
 
     this.addChild(new FogView<>(new YogaLayout()
         .setPositionType(PositionType.ABSOLUTE)
@@ -250,5 +218,41 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
 
   public static Screen createScreen() {
     return new ViewScreen(TITLE, MainMenuView::new);
+  }
+
+  public static View<?, YogaLayout> createBackgroundView() {
+    ImageView<YogaLayout> view =
+        new ImageView<>(new YogaLayout()
+            .setPositionType(PositionType.ABSOLUTE)
+            .setHeightPercent(100)
+            .setWidthPercent(100))
+                .setImage(
+                    new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
+                .setFitType(FitType.COVER)
+                .setBilinearFiltering(true)
+                .setScale(1.25F);
+
+    Timeline.createParallel()
+        .push(Tween.to(view, View.X_TRANSLATION, 20000)
+            .target(15)
+            .waypoint(5)
+            .waypoint(1)
+            .waypoint(3)
+            .path(CatmullRom.instance()))
+        .push(Tween.to(view, View.Y_TRANSLATION, 20000)
+            .target(-10)
+            .waypoint(5)
+            .waypoint(1)
+            .waypoint(3))
+        .push(Tween.to(view, View.X_SCALE, 20000)
+            .target(1.15F)
+            .waypoint(1.2F))
+        .push(Tween.to(view, View.Y_SCALE, 20000)
+            .target(1.15F)
+            .waypoint(1.2F))
+        .repeatYoyo(-1, 0)
+        .start(view.getTweenManager());
+
+    return view;
   }
 }

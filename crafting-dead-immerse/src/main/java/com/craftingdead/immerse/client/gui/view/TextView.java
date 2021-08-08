@@ -117,7 +117,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
     {
       matrixStack.translate(this.getScaledContentX(),
           this.getScaledContentY() + (this.centered
-              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.5F
+              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2F
               : 0.0F),
           400.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);

@@ -24,7 +24,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
+import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -74,40 +74,40 @@ public class WorldListView<L extends Layout>
     this.loadWorlds();
 
     this.playButton =
-        createButton(new Colour(PlayView.GREEN), new Colour(PlayView.GREEN_HIGHLIGHTED),
+        createButton(new Colour(Theme.GREEN), new Colour(Theme.GREEN_HIGHLIGHTED),
             new TranslationTextComponent("view.world_list.button.play"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
-                .setDisabledBackgroundColour(new Colour(PlayView.GREEN_DISABLED), 150F)
+                .setDisabledBackgroundColour(new Colour(Theme.GREEN_DISABLED), 150F)
                 .configure(view -> view.getLayout().setMargin(3F))
                 .setEnabled(false);
 
     View<?, YogaLayout> createButton =
-        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
             new TranslationTextComponent("view.world_list.button.create"), () -> this.getScreen()
                 .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())))
                     .configure(view -> view.getLayout().setMargin(3F));
 
     this.editButton =
-        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
             new TranslationTextComponent("view.world_list.button.edit"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
-                .setDisabledBackgroundColour(new Colour(PlayView.BLUE_DISABLED), 150F)
+                .setDisabledBackgroundColour(new Colour(Theme.BLUE_DISABLED), 150F)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 
     this.deleteButton =
-        createButton(new Colour(PlayView.RED), new Colour(PlayView.RED_HIGHLIGHTED),
+        createButton(new Colour(Theme.RED), new Colour(Theme.RED_HIGHLIGHTED),
             new TranslationTextComponent("view.world_list.button.delete"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
-                .setDisabledBackgroundColour(new Colour(PlayView.RED_DISABLED), 150F)
+                .setDisabledBackgroundColour(new Colour(Theme.RED_DISABLED), 150F)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 
     this.recreateButton =
-        createButton(new Colour(PlayView.BLUE), new Colour(PlayView.BLUE_HIGHLIGHTED),
+        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
             new TranslationTextComponent("view.world_list.button.recreate"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
-                .setDisabledBackgroundColour(new Colour(PlayView.BLUE_DISABLED), 150F)
+                .setDisabledBackgroundColour(new Colour(Theme.BLUE_DISABLED), 150F)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 

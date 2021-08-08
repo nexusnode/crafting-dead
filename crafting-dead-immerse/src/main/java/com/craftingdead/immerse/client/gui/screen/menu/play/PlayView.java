@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
-import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NBTMutableServerList;
+import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.DropdownView;
@@ -39,16 +39,6 @@ import io.noties.tumbleweed.equations.Expo;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
-
-  public static final long RED_DISABLED = 0x3394434b;
-  public static final long RED = 0x66ff7583;
-  public static final long RED_HIGHLIGHTED = 0x66ff8c98;
-  public static final long GREEN_DISABLED = 0x3330916e;
-  public static final long GREEN = 0x6652F2B7;
-  public static final long GREEN_HIGHLIGHTED = 0x6692F0CE;
-  public static final long BLUE_DISABLED = 0x330761b0;
-  public static final long BLUE = 0x6674b9f7;
-  public static final long BLUE_HIGHLIGHTED = 0x6691cbff;
 
   private final ParentView<?, YogaLayout, YogaLayout> dropdownContent =
       new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent());

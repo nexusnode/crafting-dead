@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
-import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
+import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -68,10 +68,10 @@ public class ServerListView<L extends Layout>
     this.addChild(this.listView);
 
     this.playButton =
-        createButton(new Colour(PlayView.GREEN), new Colour(PlayView.GREEN_HIGHLIGHTED),
+        createButton(new Colour(Theme.GREEN), new Colour(Theme.GREEN_HIGHLIGHTED),
             new TranslationTextComponent("view.server_list.button.play"),
             () -> this.getSelectedItem().ifPresent(ServerItemView::connect))
-                .setDisabledBackgroundColour(new Colour(PlayView.GREEN_DISABLED), 150F)
+                .setDisabledBackgroundColour(new Colour(Theme.GREEN_DISABLED), 150F)
                 .setEnabled(false);
 
     this.controlsView = new ParentView<>(
@@ -108,13 +108,13 @@ public class ServerListView<L extends Layout>
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER))
-                .addChild(createButton(new Colour(PlayView.BLUE),
-                    new Colour(PlayView.BLUE_HIGHLIGHTED), new TranslationTextComponent(
+                .addChild(createButton(new Colour(Theme.BLUE),
+                    new Colour(Theme.BLUE_HIGHLIGHTED), new TranslationTextComponent(
                         "view.server_list.button.quick_refresh"),
                     this::quickRefresh)
                         .configure(view -> view.getLayout().setMargin(3)))
-                .addChild(createButton(new Colour(PlayView.BLUE),
-                    new Colour(PlayView.BLUE_HIGHLIGHTED), new TranslationTextComponent(
+                .addChild(createButton(new Colour(Theme.BLUE),
+                    new Colour(Theme.BLUE_HIGHLIGHTED), new TranslationTextComponent(
                         "view.server_list.button.refresh"),
                     this::refresh).configure(view -> view.getLayout().setMargin(3)));
   }

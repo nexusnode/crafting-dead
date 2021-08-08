@@ -16,20 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.gun.skin;
+package com.craftingdead.immerse.client.gui.screen;
 
-import net.minecraft.util.RegistryKey;
+public class Theme {
 
-public class SimplePaint implements Paint {
-
-  private final RegistryKey<Skin> skin;
-
-  public SimplePaint(RegistryKey<Skin> skin) {
-    this.skin = skin;
-  }
-
-  @Override
-  public RegistryKey<Skin> getSkin() {
-    return this.skin;
-  }
+  public static final long RED_DISABLED = 0x3394434b;
+  public static final long RED = 0x66ff7583;
+  public static final long RED_HIGHLIGHTED = 0x66ff8c98;
+  public static final long GREEN_DISABLED = 0x3330916e;
+  public static final long GREEN = 0x6652F2B7;
+  public static final long GREEN_HIGHLIGHTED = 0x6692F0CE;
+  public static final long BLUE_DISABLED = 0x330761b0;
+  public static final long BLUE = 0x6674b9f7;
+  public static final long BLUE_HIGHLIGHTED = 0x6691cbff;
 }

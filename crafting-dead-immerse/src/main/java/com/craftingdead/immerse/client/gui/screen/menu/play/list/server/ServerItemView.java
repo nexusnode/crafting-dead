@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Iterator;
 import org.lwjgl.glfw.GLFW;
+import com.craftingdead.immerse.client.gui.screen.ConnectView;
 import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -31,7 +32,6 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
-import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -117,9 +117,8 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   public void connect() {
     // Call this before creating a ConnectingScreen instance.
     this.getScreen().keepOpen();
-    this.minecraft.setScreen(
-        new ConnectingScreen(this.getScreen(), this.minecraft, this.serverEntry.getHostName(),
-            this.serverEntry.getPort()));
+    this.minecraft.setScreen(ConnectView.createScreen(
+        this.getScreen(), this.serverEntry.getHostName(), this.serverEntry.getPort()));
   }
 
   public ServerEntry getServerEntry() {
