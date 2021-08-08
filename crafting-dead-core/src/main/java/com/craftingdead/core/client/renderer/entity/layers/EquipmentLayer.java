@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.client.renderer.entity.layers;
 
-import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.util.RenderUtil;
@@ -35,6 +34,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.TransformationMatrix;
 
 /**
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
@@ -57,7 +57,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
   /**
    * Optional arbitrary transformation right before rendering the {@link ItemStack}.
    */
-  private final Consumer<MatrixStack> transformation;
+  private final TransformationMatrix transformation;
 
   private EquipmentLayer(Builder<T, M> builder) {
     super(builder.entityRenderer);
@@ -68,60 +68,69 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
   }
 
   @Override
-  public void render(MatrixStack matrix, IRenderTypeBuffer buffers,
-      int packedLight, LivingEntity entity, float p_225628_5_,
-      float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_,
-      float p_225628_10_) {
+  public void render(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+      int packedLight, T livingEntity, float limbSwing, float limbSwingAmount,
+      float partialTicks, float ageTicks, float headYaw, float headPitch) {
 
-    ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+    Minecraft minecraft = Minecraft.getInstance();
+    boolean invisible = livingEntity.isInvisible();
+    boolean partiallyVisible =
+        livingEntity.isInvisible() && !livingEntity.isInvisibleTo(minecraft.player);
+    if (partiallyVisible || !invisible) {
 
-    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
+      ItemRenderer itemRenderer = minecraft.getItemRenderer();
 
-      ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
+      livingEntity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
 
-      if (!itemStack.isEmpty()) {
-        IBakedModel itemModel =
-            itemRenderer.getModel(itemStack, entity.level, entity);
+        ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
 
+        if (!itemStack.isEmpty()) {
+          IBakedModel bakedModel =
+              itemRenderer.getModel(itemStack, livingEntity.level, livingEntity);
 
-        matrix.pushPose();
+          matrixStack.pushPose();
 
-        // Applies crouching rotation is needed
-        if (this.useCrouchingOrientation && entity.isCrouching()) {
-          RenderUtil.applyPlayerCrouchRotation(matrix);
-        }
-
-        // Applies the head orientation if needed
-        if (this.useHeadOrientation) {
-          // Vanilla's transformation for child entities, like baby zombies
-          if (entity.isBaby()) {
-            matrix.translate(0.0D, 0.03125D, 0.0D);
-            matrix.scale(0.7F, 0.7F, 0.7F);
-            matrix.translate(0.0D, 1.0D, 0.0D);
+          // Applies crouching rotation is needed
+          if (this.useCrouchingOrientation && livingEntity.isCrouching()) {
+            RenderUtil.applyPlayerCrouchRotation(matrixStack);
           }
 
-          this.getParentModel().getHead().translateAndRotate(matrix);
+          // Applies the head orientation if needed
+          if (this.useHeadOrientation) {
+            // Vanilla's transformation for child entities, like baby zombies
+            if (livingEntity.isBaby()) {
+              matrixStack.translate(0.0D, 0.03125D, 0.0D);
+              matrixStack.scale(0.7F, 0.7F, 0.7F);
+              matrixStack.translate(0.0D, 1.0D, 0.0D);
+            }
+
+            this.getParentModel().getHead().translateAndRotate(matrixStack);
+          }
+
+          // Applies the arbitrary transformation if needed
+          if (this.transformation != null) {
+            this.transformation.push(matrixStack);
+          }
+
+          // Renders the item. Also note the TransformType.
+          itemRenderer.render(itemStack, ItemCameraTransforms.TransformType.HEAD, false,
+              matrixStack, renderTypeBuffer, packedLight, OverlayTexture.NO_OVERLAY, bakedModel);
+
+          if (this.transformation != null) {
+            matrixStack.popPose();
+          }
+
+          matrixStack.popPose();
         }
-
-        // Applies the arbitrary transformation if needed
-        if (this.transformation != null) {
-          this.transformation.accept(matrix);
-        }
-
-        // Renders the item. Also note the TransformType.
-        itemRenderer
-            .render(itemStack, ItemCameraTransforms.TransformType.HEAD, false, matrix, buffers,
-                packedLight, OverlayTexture.NO_OVERLAY, itemModel);
-
-        matrix.popPose();
-      }
-    });
+      });
+    }
   }
 
   public static class Builder<T extends LivingEntity, M extends BipedModel<T>> {
+
     private LivingRenderer<T, M> entityRenderer;
     private ModEquipmentSlotType slot;
-    private Consumer<MatrixStack> tranformation;
+    private TransformationMatrix tranformation;
     private boolean useCrouchingOrientation;
     private boolean useHeadOrientation;
 
@@ -135,7 +144,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
       return this;
     }
 
-    public Builder<T, M> withArbitraryTransformation(Consumer<MatrixStack> transformation) {
+    public Builder<T, M> withArbitraryTransformation(TransformationMatrix transformation) {
       this.tranformation = transformation;
       return this;
     }
