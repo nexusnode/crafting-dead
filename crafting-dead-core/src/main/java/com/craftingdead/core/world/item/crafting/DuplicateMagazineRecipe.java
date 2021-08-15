@@ -42,7 +42,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
         case 2:
         case 6:
         case 8:
-          if (!Tags.Items.NUGGETS_IRON.contains(inventory.getItem(i).getItem())) {
+          if (!Tags.Items.INGOTS_IRON.contains(inventory.getItem(i).getItem())) {
             return false;
           }
           break;
