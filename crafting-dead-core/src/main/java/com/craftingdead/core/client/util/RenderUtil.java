@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
-import com.craftingdead.core.CraftingDead;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -102,9 +101,6 @@ public class RenderUtil {
           .apply(instance, TransformationMatrix::new));
 
   public static final int FULL_LIGHT = 0xF000F0;
-
-  public static final ResourceLocation ICONS =
-      new ResourceLocation(CraftingDead.ID, "textures/gui/icons.png");
 
   private static final Minecraft minecraft = Minecraft.getInstance();
 

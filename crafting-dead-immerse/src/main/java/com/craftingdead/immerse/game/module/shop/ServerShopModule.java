@@ -24,17 +24,20 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.immerse.Permissions;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
 import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.network.MessageHandlerRegistry;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 public class ServerShopModule extends ShopModule implements ServerModule, Module.Tickable {
 
@@ -100,7 +103,8 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
     if (this.secondTimer++ >= 20) {
       this.secondTimer = 0;
       for (ShopUser user : this.users.values()) {
-        if (user.buyTimeSeconds > 0) {
+        if (user.buyTimeSeconds > 0
+            && PermissionAPI.hasPermission(user.gameProfile, Permissions.GAME_OP, null)) {
           user.buyTimeSeconds--;
           user.sync();
         }
@@ -110,7 +114,8 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
 
   @Override
   public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {
-    ShopUser user = new ShopUser(player.getEntity().connection.connection);
+    ShopUser user =
+        new ShopUser(player.getEntity().getGameProfile(), player.getEntity().connection.connection);
     this.users.put(player.getEntity().getUUID(), user);
     user.sync();
   }
@@ -122,11 +127,13 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
 
   private class ShopUser {
 
+    private final GameProfile gameProfile;
     private final NetworkManager connection;
     private int buyTimeSeconds = ServerShopModule.this.defaultBuyTimeSeconds;
     private int money;
 
-    private ShopUser(NetworkManager connection) {
+    private ShopUser(GameProfile gameProfile, NetworkManager connection) {
+      this.gameProfile = gameProfile;
       this.connection = connection;
     }
 

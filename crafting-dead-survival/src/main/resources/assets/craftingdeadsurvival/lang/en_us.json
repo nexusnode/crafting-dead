@@ -2,7 +2,7 @@
   "options.craftingdeadsurvival.server.broken_legs_enabled":"Broken Legs Enabled",
   "options.craftingdeadsurvival.server.bleeding_enabled":"Bleeding Enabled",
   "options.craftingdeadsurvival.server.disable_zombies":"Disable Zombies",
-  "options.craftingdeadsurvival.server.infectionEnabled":"Infection Enabled",
+  "options.craftingdeadsurvival.server.infection_enabled":"Infection Enabled",
 
   "options.craftingdeadsurvival.client.display_blood": "Display Blood",
 

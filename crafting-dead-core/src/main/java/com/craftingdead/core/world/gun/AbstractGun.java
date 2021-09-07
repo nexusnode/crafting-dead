@@ -409,6 +409,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     Entity entity = living.getEntity();
     World level = living.getLevel();
 
+    MinecraftForge.EVENT_BUS.post(new GunEvent.Shoot(this, this.itemStack, living));
+
     // Magazine size will be synced to clients so only decrement this on the server.
     if (!level.isClientSide()
         && !(living.getEntity() instanceof PlayerEntity

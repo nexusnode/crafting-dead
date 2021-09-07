@@ -32,14 +32,17 @@ import com.craftingdead.core.world.item.ClothingItem;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -86,6 +89,24 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
     this.goalSelector.addGoal(1, new FollowAttractiveGrenadeGoal(this, 1.15F));
     this.goalSelector.addGoal(4,
         new LookAtEntityGoal<>(this, FlashGrenadeEntity.class, 20.0F, 0.35F));
+  }
+
+  @Override
+  protected void addBehaviourGoals() {
+    super.addBehaviourGoals();
+    this.targetSelector.addGoal(2,
+        new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 5, false, false,
+            targetEntity -> targetEntity.getCapability(Capabilities.LIVING_EXTENSION)
+                .resolve()
+                .flatMap(extension -> extension.getHandler(SurvivalPlayerHandler.ID))
+                .map(SurvivalPlayerHandler.class::cast)
+                .map(handler -> handler.getSoundLevel() >= targetEntity.distanceTo(this))
+                .orElse(false)) {
+          @Override
+          public double getFollowDistance() {
+            return 100.0D;
+          }
+        });
   }
 
   @Override

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -36,8 +37,7 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.ModItems;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -64,11 +64,9 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
    */
   private final E entity;
 
-  protected final Object2ObjectOpenHashMap<ResourceLocation, H> handlers =
-      new Object2ObjectOpenHashMap<>();
+  protected final Map<ResourceLocation, H> handlers = new Object2ObjectArrayMap<>();
 
-  protected final Object2ObjectOpenHashMap<ResourceLocation, H> dirtyHandlers =
-      new Object2ObjectOpenHashMap<>();
+  protected final Map<ResourceLocation, H> dirtyHandlers = new Object2ObjectArrayMap<>();
 
   private final List<Integer> dirtySlots = new IntArrayList();
 
@@ -498,7 +496,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     out.writeShort(255);
 
     // Handlers
-    ObjectSet<Map.Entry<ResourceLocation, H>> handlersToSend =
+    Set<Map.Entry<ResourceLocation, H>> handlersToSend =
         writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
     out.writeVarInt(handlersToSend.size());
     for (Map.Entry<ResourceLocation, H> entry : handlersToSend) {

@@ -102,6 +102,13 @@ public abstract class GunEvent extends Event {
     }
   }
 
+  public static class Shoot extends Action {
+
+    public Shoot(Gun gun, ItemStack itemStack, LivingExtension<?, ?> living) {
+      super(gun, itemStack, living);
+    }
+  }
+
   @Cancelable
   public static class HitBlock extends Action {
 
@@ -110,11 +117,11 @@ public abstract class GunEvent extends Event {
     private final World level;
 
     public HitBlock(Gun gun, ItemStack itemStack, BlockRayTraceResult result, BlockState blockState,
-        LivingExtension<?, ?> living, World world) {
+        LivingExtension<?, ?> living, World level) {
       super(gun, itemStack, living);
       this.result = result;
       this.blockState = blockState;
-      this.level = world;
+      this.level = level;
     }
 
     public BlockState getBlockState() {

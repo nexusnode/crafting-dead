@@ -19,11 +19,14 @@
 package com.craftingdead.immerse.command;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.Permissions;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 public class GameCommand {
 
@@ -44,7 +47,10 @@ public class GameCommand {
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
     dispatcher
         .register(Commands.literal("game")
-            .requires(context -> context.hasPermission(2))
+            .requires(context -> context.hasPermission(4)
+                || (context.getEntity() instanceof ServerPlayerEntity
+                    && PermissionAPI.hasPermission((ServerPlayerEntity) context.getEntity(),
+                        Permissions.GAME_OP)))
             .then(Commands.literal("restart").executes(GameCommand::restart))
             .then(Commands.literal("reload_rotation").executes(GameCommand::reloadRotation)));
   }

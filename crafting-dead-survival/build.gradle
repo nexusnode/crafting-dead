@@ -67,7 +67,7 @@ minecraft {
 }
 
 dependencies {
-    compileOnly project(':crafting-dead-core')
+    implementation project(':crafting-dead-core')
 }
 
 jar {

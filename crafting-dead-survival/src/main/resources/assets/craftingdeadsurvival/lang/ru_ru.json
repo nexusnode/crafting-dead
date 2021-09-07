@@ -2,7 +2,7 @@
   "options.craftingdeadsurvival.server.broken_legs_enabled":"Перелом ног включено",
   "options.craftingdeadsurvival.server.bleeding_enabled":"Кровотечение включено",
   "options.craftingdeadsurvival.server.disable_zombies":"Отключить зомби",
-  "options.craftingdeadsurvival.server.infectionEnabled":"Включить заражение",
+  "options.craftingdeadsurvival.server.infection_enabled":"Включить заражение",
 
   "options.craftingdeadsurvival.client.display_blood": "Отображать кровь",
 

@@ -45,7 +45,7 @@ public class InfectionMobEffect extends Effect {
 
   @Override
   public boolean isDurationEffectTick(int duration, int amplifier) {
-    return random.nextFloat() < 0.5F;
+    return duration % ((20 * 10) + random.nextInt(120)) == 0;
   }
 
   @Override

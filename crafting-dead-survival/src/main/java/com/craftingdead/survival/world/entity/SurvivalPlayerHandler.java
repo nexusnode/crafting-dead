@@ -48,6 +48,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private final PlayerExtension<?> player;
 
+  private int soundLevel;
+
   public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
   }
@@ -56,11 +58,21 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     return this.player;
   }
 
+  public int getSoundLevel() {
+    return this.soundLevel;
+  }
+
+  public void addSoundLevel(int soundLevel) {
+    this.soundLevel += soundLevel;
+  }
+
   @Override
   public void playerTick() {
     if (!this.player.getLevel().isClientSide()) {
       this.updateEffects();
-      // this.updateBrokenLeg();
+      if (this.player.getEntity().tickCount % 5 == 0 && this.soundLevel > 0) {
+        this.soundLevel--;
+      }
     }
   }
 

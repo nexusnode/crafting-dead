@@ -166,6 +166,7 @@ public class CraftingDeadImmerse {
   public void handleCommonSetup(FMLCommonSetupEvent event) {
     NetworkChannel.loadChannels();
     GameNetworkChannel.load();
+    Permissions.register();
   }
 
   @SubscribeEvent
