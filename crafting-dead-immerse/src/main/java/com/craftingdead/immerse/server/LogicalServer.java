@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
@@ -264,7 +265,8 @@ public class LogicalServer extends WorldSavedData {
 
   @SubscribeEvent
   public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-    this.gameWrapper
-        .removePlayer(PlayerExtension.getOrThrow((ServerPlayerEntity) event.getPlayer()));
+    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION)
+        .<PlayerExtension<ServerPlayerEntity>>cast()
+        .ifPresent(this.gameWrapper::removePlayer);
   }
 }
