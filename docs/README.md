@@ -28,6 +28,17 @@ if(foo)
   bar();
 ```
 
+* Names of fields being used as constants should be all upper-case, with underscores separating words. The following are considered to be constants:
+1. All `static final` primitive types (Remember that all interface fields are inherently static final).
+2. All `static final` object reference types that are never followed by "`.`" (dot).
+3. All `static final` arrays that are never followed by "`[`" (opening square bracket).
+
+Examples of constants:
+`MIN_VALUE, MAX_BUFFER_SIZE, OPTIONS_FILE_NAME`
+
+Examples of non-constants:
+`logger, clientConfig`
+
 # License
 Crafting Dead is licensed under GPL v3.0, see LICENSE.txt for more information. You may use Crafting Dead in modpacks, reviews or any other medium as long as you obide by the terms of the license. Commercial use of the mod must be authorised by the senior leadership team.
 
