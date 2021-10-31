@@ -826,7 +826,7 @@ public class SurvivalBlockLootTables extends BlockLootTables {
                     .setWeight(10))
                 .add(ItemLootEntry.lootTableItem(ModItems.M4A1.get())
                     .setWeight(20))
-                .add(ItemLootEntry.lootTableItem(ModItems.SCARH.get())
+                .add(ItemLootEntry.lootTableItem(ModItems.SCARL.get())
                     .setWeight(20))
                 .add(ItemLootEntry.lootTableItem(ModItems.ACR.get())
                     .setWeight(20))
