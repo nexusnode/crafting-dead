@@ -163,7 +163,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .define('e', ModItems.MEDIUM_HANDLE.get())
         .unlockedBy("has_light_gray_dye", has(Items.LIGHT_GRAY_DYE))
         .save(consumer);
-    ShapedRecipeBuilder.shaped(ModItems.SCARH.get())
+    ShapedRecipeBuilder.shaped(ModItems.SCARL.get())
         .pattern(" d ")
         .pattern("abc")
         .pattern(" e ")
@@ -507,7 +507,7 @@ public class ModRecipeProvider extends RecipeProvider {
     // Shotguns
     // ================================================================================
 
-    ShapedRecipeBuilder.shaped(ModItems.TRENCHGUN.get())
+    ShapedRecipeBuilder.shaped(ModItems.TRENCH_GUN.get())
         .pattern(" d ")
         .pattern("abc")
         .pattern(" e ")

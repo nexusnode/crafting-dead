@@ -447,10 +447,10 @@
       }
     ]
   },
-  "scarh_shoot": {
+  "scarl_shoot": {
     "sounds": [
       {
-        "name": "craftingdead:scarh_shoot",
+        "name": "craftingdead:scarl_shoot",
         "attenuation_distance": 65
       }
     ]

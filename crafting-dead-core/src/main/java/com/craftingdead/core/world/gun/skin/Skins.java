@@ -97,7 +97,7 @@ public class Skins {
   static {
     register(VULCAN, ModItems.AK47);
     register(ASMO, ModItems.AK47, ModItems.AWP, ModItems.M4A1, ModItems.P250, ModItems.P90,
-        ModItems.SCARH);
+        ModItems.SCARL);
     register(CANDY_APPLE, ModItems.AS50, ModItems.M107);
     register(CYREX, ModItems.M4A1, ModItems.M9);
     register(DIAMOND, ModItems.AS50, ModItems.DMR, ModItems.M107, ModItems.M4A1);

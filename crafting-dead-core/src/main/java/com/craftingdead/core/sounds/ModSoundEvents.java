@@ -112,7 +112,7 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> P90_SHOOT = register("p90_shoot");
   public static final RegistryObject<SoundEvent> RPK_RELOAD = register("rpk_reload");
   public static final RegistryObject<SoundEvent> RPK_SHOOT = register("rpk_shoot");
-  public static final RegistryObject<SoundEvent> SCARH_SHOOT = register("scarh_shoot");
+  public static final RegistryObject<SoundEvent> SCARL_SHOOT = register("scarl_shoot");
   public static final RegistryObject<SoundEvent> SHOTGUN_RELOAD = register("shotgun_reload");
   public static final RegistryObject<SoundEvent> SILENCED_AK47_SHOOT =
       register("silenced_ak47_shoot");

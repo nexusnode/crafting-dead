@@ -46,7 +46,7 @@ import com.craftingdead.core.client.renderer.item.MossbergRenderer;
 import com.craftingdead.core.client.renderer.item.P250Renderer;
 import com.craftingdead.core.client.renderer.item.P90Renderer;
 import com.craftingdead.core.client.renderer.item.RPKRenderer;
-import com.craftingdead.core.client.renderer.item.ScarhRenderer;
+import com.craftingdead.core.client.renderer.item.ScarlRenderer;
 import com.craftingdead.core.client.renderer.item.Sporter22Renderer;
 import com.craftingdead.core.client.renderer.item.TaserRenderer;
 import com.craftingdead.core.client.renderer.item.TrenchgunRenderer;
@@ -451,8 +451,8 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<MagazineItem> TRENCHGUN_SHELLS =
-      ITEMS.register("trenchgun_shells",
+  public static final RegistryObject<MagazineItem> TRENCH_GUN_SHELLS =
+      ITEMS.register("trench_gun_shells",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.35F)
@@ -587,10 +587,10 @@ public class ModItems {
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GunItem> SCARH = ITEMS.register("scarh",
+  public static final RegistryObject<GunItem> SCARL = ITEMS.register("scarl",
       () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.SCARH)
-          .setRendererFactory(() -> ScarhRenderer::new)
+          .setGunType(GunTypes.SCARL)
+          .setRendererFactory(() -> ScarlRenderer::new)
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
@@ -811,9 +811,9 @@ public class ModItems {
   // Shotguns
   // ================================================================================
 
-  public static final RegistryObject<GunItem> TRENCHGUN = ITEMS.register("trenchgun",
+  public static final RegistryObject<GunItem> TRENCH_GUN = ITEMS.register("trench_gun",
       () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.TRENCHGUN)
+          .setGunType(GunTypes.TRENCH_GUN)
           .setRendererFactory(() -> TrenchgunRenderer::new)
           .stacksTo(1)
           .tab(COMBAT_TAB)));

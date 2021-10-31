@@ -63,7 +63,7 @@ import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.gun.type.aimable.AimableGunType;
 import com.craftingdead.core.world.gun.type.minigun.MinigunType;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 
 public class GunTypes {
 
@@ -110,7 +110,7 @@ public class GunTypes {
       .addAcceptedPaint(ModItems.LOVELACE_PAINT)
       .build();
 
-  public static final AbstractGunType SCARH = AimableGunType.builder()
+  public static final AbstractGunType SCARL = AimableGunType.builder()
       .setFireDelayMs(110)
       .setDamage(6)
       .setReloadDurationTicks(20 * 4)
@@ -120,7 +120,7 @@ public class GunTypes {
       .addFireMode(FireMode.AUTO)
       .addFireMode(FireMode.BURST)
       .addFireMode(FireMode.SEMI)
-      .setShootSound(ModSoundEvents.SCARH_SHOOT)
+      .setShootSound(ModSoundEvents.SCARL_SHOOT)
       .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
       .setReloadSound(ModSoundEvents.M4A1_RELOAD)
       .addAnimation(AnimationType.SHOOT, RifleShootAnimation::new)
@@ -428,7 +428,7 @@ public class GunTypes {
   // ================================================================================
 
   public static final AbstractGunType TASER = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(2000)
       .setDamage(7)
       .setReloadDurationTicks(20 * 3)
@@ -443,7 +443,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType M1911 = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks(20 * 2)
@@ -464,7 +464,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType G18 = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks((int) (20 * 2.2F))
@@ -486,7 +486,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType M9 = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks((int) (20 * 1.5F))
@@ -506,7 +506,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType DESERT_EAGLE = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(8)
       .setReloadDurationTicks(20 * 2)
@@ -528,7 +528,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType P250 = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(6)
       .setReloadDurationTicks((int) (20 * 1.5F))
@@ -550,7 +550,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType MAGNUM = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(7)
       .setReloadDurationTicks(20 * 2)
@@ -567,7 +567,7 @@ public class GunTypes {
       .build();
 
   public static final AbstractGunType FN57 = AimableGunType.builder()
-      .setCombatSlotType(CombatSlotType.SECONDARY)
+      .setCombatSlot(CombatSlot.SECONDARY)
       .setFireDelayMs(160)
       .setDamage(8)
       .setReloadDurationTicks((int) (20 * 1.5F))
@@ -793,7 +793,7 @@ public class GunTypes {
   // Shotguns
   // ================================================================================
 
-  public static final AbstractGunType TRENCHGUN = AimableGunType.builder()
+  public static final AbstractGunType TRENCH_GUN = AimableGunType.builder()
       .setFireDelayMs(1200)
       .setDamage(2)
       .setRoundsPerShot(8)
@@ -803,12 +803,12 @@ public class GunTypes {
       .setRange(25.0D)
       .setBoltAction(true)
       .addFireMode(FireMode.SEMI)
-      .setShootSound(ModSoundEvents.TRENCHGUN_SHOOT)
+      .setShootSound(ModSoundEvents.TRENCH_GUN_SHOOT)
       .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
       .addAnimation(AnimationType.SHOOT, PistolShootAnimation::new)
       .addAnimation(AnimationType.RELOAD, GunAnimationReloadTrench::new)
       .addAnimation(AnimationType.INSPECT, GunAnimationInspectRifle::new)
-      .setDefaultMagazine(ModItems.TRENCHGUN_SHELLS)
+      .setDefaultMagazine(ModItems.TRENCH_GUN_SHELLS)
       .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
       .build();
 

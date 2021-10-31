@@ -38,7 +38,7 @@ public class TrenchgunRenderer extends GunRenderer {
   private final Model ironSight = new ModelScarhIS2();
 
   public TrenchgunRenderer() {
-    super(ModItems.TRENCHGUN.getId(), GunTypes.TRENCHGUN);
+    super(ModItems.TRENCH_GUN.getId(), GunTypes.TRENCH_GUN);
   }
 
   @Override
