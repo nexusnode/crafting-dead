@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
 import com.craftingdead.immerse.Permissions;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
@@ -42,7 +42,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 public class ServerShopModule extends ShopModule implements ServerModule, Module.Tickable {
 
   public static final BiConsumer<PlayerExtension<?>, ItemStack> COMBAT_PURCHASE_HANDLER =
-      (player, item) -> CombatSlotType.getSlotType(item)
+      (player, item) -> CombatSlot.getSlotType(item)
           .orElseThrow(() -> new IllegalStateException("Invalid item"))
           .addToInventory(item, player.getEntity().inventory, true);
 

@@ -27,6 +27,7 @@ import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector2f;
@@ -117,12 +118,12 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
     {
       matrixStack.translate(this.getScaledContentX(),
           this.getScaledContentY() + (this.centered
-              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2F
-              : 0.0F),
-          400.0D);
+              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D + 0.5D
+              : 0.0D),
+          51.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
       IRenderTypeBuffer.Impl renderTypeBuffer =
-          this.minecraft.renderBuffers().bufferSource();
+          IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
         IReorderingProcessor line = this.lines.get(i);
         matrixStack.pushPose();
@@ -138,6 +139,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
         }
         matrixStack.popPose();
       }
+
       renderTypeBuffer.endBatch();
     }
     matrixStack.popPose();

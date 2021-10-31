@@ -25,6 +25,7 @@ import java.util.Deque;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.util.ThreadSafe;
@@ -236,8 +237,17 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       return;
     }
 
+    // Two passes required due to cyclic relationship: content height -> full height ->
+    // children height -> content height
+
+    this.layoutParent.layout(Yoga.YGUndefined, Yoga.YGUndefined);
+    this.children.forEach(View::layout);
+
+    super.layout();
+
     this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
+
     super.layout();
   }
 

@@ -57,25 +57,19 @@ public class RenderUtil {
         shadow);
   }
 
-  public static void drawRoundedFrame(MatrixStack matrixStack, double x, double y, double x2,
-      double y2, int colour,
-      float radius) {
-    ShaderLinkHelper.glUseProgram(RoundedFrameShader.INSTANCE.getId());
+  public static void enableRoundedFrameShader(float x, float y, float x2, float y2, float radius) {
+    ShaderLinkHelper.glUseProgram(RoundedRectShader.INSTANCE.getId());
     RoundedFrameShader.INSTANCE.setRadius(radius - 1);
-    RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
-        (float) x2 - radius, (float) y2 - radius);
-    fill(matrixStack, x, y, x2, y2, colour);
-    ShaderLinkHelper.glUseProgram(0);
+    RoundedRectShader.INSTANCE.setInnerRect(x + radius, y + radius, x2 - radius, y2 - radius);
   }
 
-  public static void roundedFill(MatrixStack matrixStack, double x, double y, double x2, double y2,
-      int colour,
-      float radius) {
+  public static void enableRoundedRectShader(float x, float y, float x2, float y2, float radius) {
     ShaderLinkHelper.glUseProgram(RoundedRectShader.INSTANCE.getId());
-    RoundedRectShader.INSTANCE.setRadius(radius - 1); // we have feather radius 1px
-    RoundedRectShader.INSTANCE.setInnerRect((float) x + radius, (float) y + radius,
-        (float) x2 - radius, (float) y2 - radius);
-    fill(matrixStack, x, y, x2, y2, colour);
+    RoundedRectShader.INSTANCE.setRadius(radius - 1);
+    RoundedRectShader.INSTANCE.setInnerRect(x + radius, y + radius, x2 - radius, y2 - radius);
+  }
+
+  public static void resetShader() {
     ShaderLinkHelper.glUseProgram(0);
   }
 

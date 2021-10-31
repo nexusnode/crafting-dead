@@ -137,7 +137,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   @SubscribeEvent
   public void handleCombatPickup(CombatPickupEvent event) {
     // Only pickup combat items
-    if (event.getCombatSlotType() == null) {
+    if (event.getCombatSlot() == null) {
       event.setCanceled(true);
     }
   }

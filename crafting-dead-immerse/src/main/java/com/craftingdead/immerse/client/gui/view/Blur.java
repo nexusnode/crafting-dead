@@ -63,7 +63,7 @@ public class Blur implements AutoCloseable {
   }
 
   public void setRadius(float radius) {
-    if (radius > -1) {
+    if (radius > -1 && this.blurShader != null) {
       com.craftingdead.core.client.util.RenderUtil.updateUniform("Radius", radius, this.blurShader);
     }
   }
@@ -85,25 +85,29 @@ public class Blur implements AutoCloseable {
 
   public void render(MatrixStack matrixStack, float x, float y, float width, float height,
       float partialTicks) {
-    this.blurShader.process(partialTicks);
-    // TODO Fixes Minecraft bug when using post-processing shaders.
-    RenderSystem.enableTexture();
+    if (this.blurShader != null) {
+      this.blurShader.process(partialTicks);
+      // TODO Fixes Minecraft bug when using post-processing shaders.
+      RenderSystem.enableTexture();
 
-    this.minecraft.getMainRenderTarget().bindWrite(false);
-    Framebuffer framebuffer = this.blurShader.getTempTarget("output");
-    framebuffer.bindRead();
-    float textureWidth = (float) (framebuffer.width
-        / this.minecraft.getWindow().getGuiScale());
-    float textureHeight = (float) (framebuffer.height
-        / this.minecraft.getWindow().getGuiScale());
-    float textureX = x;
-    float textureY = (textureHeight - height) - y;
-    RenderUtil.blit(matrixStack, x, y, x + width, y + height, textureX, textureY,
-        textureX + width, textureY + height, textureWidth, textureHeight);
+      this.minecraft.getMainRenderTarget().bindWrite(false);
+      Framebuffer framebuffer = this.blurShader.getTempTarget("output");
+      framebuffer.bindRead();
+      float textureWidth = (float) (framebuffer.width
+          / this.minecraft.getWindow().getGuiScale());
+      float textureHeight = (float) (framebuffer.height
+          / this.minecraft.getWindow().getGuiScale());
+      float textureX = x;
+      float textureY = (textureHeight - height) - y;
+      RenderUtil.blit(matrixStack, x, y, x + width, y + height, textureX, textureY,
+          textureX + width, textureY + height, textureWidth, textureHeight);
+    }
   }
 
   @Override
   public void close() {
-    this.blurShader.close();
+    if (this.blurShader != null) {
+      this.blurShader.close();
+    }
   }
 }

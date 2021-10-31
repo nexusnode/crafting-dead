@@ -28,6 +28,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import com.craftingdead.core.Util;
 import com.craftingdead.core.client.animation.AnimationType;
 import com.craftingdead.core.client.animation.GunAnimation;
 import com.craftingdead.core.world.gun.FireMode;
@@ -35,7 +36,7 @@ import com.craftingdead.core.world.gun.Gun;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.gun.attachment.Attachment;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvent;
@@ -148,7 +149,7 @@ public abstract class AbstractGunType {
    */
   private final double range;
 
-  private final CombatSlotType combatSlotType;
+  private final CombatSlot combatSlot;
 
   protected AbstractGunType(Builder<?> builder) {
     this.fireDelayMs = builder.fireDelayMs;
@@ -172,7 +173,7 @@ public abstract class AbstractGunType {
     this.secondaryActionSound = builder.secondaryActionSound;
     this.secondaryActionSoundRepeatDelayMs = builder.secondaryActionSoundRepeatDelayMs;
     this.range = builder.range;
-    this.combatSlotType = builder.combatSlotType;
+    this.combatSlot = builder.combatSlot;
   }
 
   public abstract ICapabilityProvider createCapabilityProvider(ItemStack itemStack);
@@ -265,15 +266,15 @@ public abstract class AbstractGunType {
   }
 
   public Optional<SoundEvent> getSecondaryActionSound() {
-    return Optional.ofNullable(this.secondaryActionSound).map(Supplier::get);
+    return Util.optional(this.secondaryActionSound);
   }
 
   public long getSecondaryActionSoundRepeatDelayMs() {
     return this.secondaryActionSoundRepeatDelayMs;
   }
 
-  public CombatSlotType getCombatSlotType() {
-    return this.combatSlotType;
+  public CombatSlot getCombatSlot() {
+    return this.combatSlot;
   }
 
   public static class Builder<SELF extends Builder<SELF>> {
@@ -326,7 +327,7 @@ public abstract class AbstractGunType {
 
     private long secondaryActionSoundRepeatDelayMs = -1L;
 
-    private CombatSlotType combatSlotType = CombatSlotType.PRIMARY;
+    private CombatSlot combatSlot = CombatSlot.PRIMARY;
 
     public Builder(Function<SELF, AbstractGunType> factory) {
       this.factory = factory;
@@ -447,8 +448,8 @@ public abstract class AbstractGunType {
       return this.self();
     }
 
-    public SELF setCombatSlotType(CombatSlotType combatSlotType) {
-      this.combatSlotType = combatSlotType;
+    public SELF setCombatSlot(CombatSlot combatSlot) {
+      this.combatSlot = combatSlot;
       return this.self();
     }
 

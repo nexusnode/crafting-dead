@@ -33,7 +33,7 @@ public class AmmoProviderTypes {
           CraftingDead.ID);
 
   public static final Lazy<IForgeRegistry<AmmoProviderType>> REGISTRY =
-      Lazy.of(AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_types",
+      Lazy.of(AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_type",
           RegistryBuilder::new));
 
   public static final RegistryObject<AmmoProviderType> MAGAZINE =

@@ -21,5 +21,5 @@ package com.craftingdead.core.world.item.combatslot;
 @FunctionalInterface
 public interface CombatSlotProvider {
 
-  CombatSlotType getSlotType();
+  CombatSlot getCombatSlot();
 }

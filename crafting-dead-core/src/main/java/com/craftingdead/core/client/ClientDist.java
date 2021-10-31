@@ -619,7 +619,7 @@ public class ClientDist implements ModDist {
         boolean isAiming = heldStack.getCapability(Capabilities.SCOPE)
             .map(scope -> scope.isAiming(player.getEntity()))
             .orElse(false);
-        if (player.isMonitoringAction() || isAiming) {
+        if (player.hasProgressMonitor() || isAiming) {
           event.setCanceled(true);
           break;
         }

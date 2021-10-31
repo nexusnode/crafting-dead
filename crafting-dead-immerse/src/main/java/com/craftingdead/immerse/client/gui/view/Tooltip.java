@@ -41,13 +41,15 @@ public class Tooltip {
     this.text = text;
   }
 
-  public void render(FontRenderer fontRenderer, MatrixStack matrixStack, double x, double y) {
-    final double width = 10.0D + fontRenderer.width(this.text);
-    final double height = 14;
+  public void render(FontRenderer fontRenderer, MatrixStack matrixStack, float x, float y) {
+    final float width = 10.0F + fontRenderer.width(this.text);
+    final float height = 14;
 
     RenderSystem.enableBlend();
-    RenderUtil.roundedFill(matrixStack,
-        x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24), 3.0F);
+    RenderUtil.enableRoundedRectShader(x, y, x + width, y + height, 2);
+    RenderUtil.fill(matrixStack,
+        x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24));
+    RenderUtil.resetShader();
 
     final int textOpacity = Math.min((int) (this.textAlpha * 255.0F), 255);
     if (textOpacity >= 8) {

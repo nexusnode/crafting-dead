@@ -74,9 +74,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
                     .layout())))
         .addChild(officialServerListView);
 
-    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout()
-        .setFlexShrink(0)
-        .setFlexGrow(1))
+    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout())
             .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
 
     View<?, YogaLayout> customServerListView = new MutableServerListView<>(

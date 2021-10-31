@@ -57,9 +57,10 @@ public class ServerListView<L extends Layout>
 
     this.listView = new ParentView<>(
         new YogaLayout()
+            .setFlexBasis(1)
+            .setFlexGrow(1)
             .setBottomPadding(7F)
-            .setHeight(60F)
-            .setFlexGrow(1F),
+            .setHeight(60F),
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.COLUMN)
             .setAlignItems(Align.CENTER))

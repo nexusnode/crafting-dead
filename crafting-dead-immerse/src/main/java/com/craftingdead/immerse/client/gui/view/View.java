@@ -24,7 +24,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.gui.tween.ColourTweenType;
@@ -164,6 +163,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   @Nullable
   private Blur backgroundBlur;
 
+  private float cornerRadius;
+
   protected boolean pendingRemoval;
 
   private boolean hovered;
@@ -246,84 +247,131 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
       RenderSystem.enableBlend();
       float[] colour = this.modifiedBackgroundColour.getColour4f();
       colour[3] *= this.getAlpha();
-      RenderUtil.fill(matrixStack.last().pose(), this.getScaledX(), this.getScaledY(),
-          this.getZOffset(),
-          this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.getScaledHeight(), colour[0], colour[1], colour[2], colour[3]);
+
+      float x = this.getScaledX();
+      float y = this.getScaledY();
+      float x2 = this.getScaledX() + this.getScaledWidth();
+      float y2 = this.getScaledY() + this.getScaledHeight();
+
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(x, y, x2, y2, this.cornerRadius);
+      }
+
+      RenderUtil.fill(matrixStack.last().pose(), x, y,
+          this.getZOffset(), x2, y2, colour[0], colour[1], colour[2], colour[3]);
+
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.resetShader();
+      }
+
       RenderSystem.disableBlend();
     }
 
+    final float halfCornerRadius = (this.cornerRadius);
     if (this.topBorderWidth > 0F) {
-      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.topBorderWidth, this.topBorderColour.getHexColour());
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - halfCornerRadius,
+            this.getScaledY(),
+            this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+            this.getScaledY() + this.topBorderWidth,
+            this.cornerRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX() - halfCornerRadius,
+          this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+          this.getScaledY() + this.topBorderWidth,
+          this.topBorderColour.getHexColour());
     }
     if (this.rightBorderWidth > 0F) {
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(
+            this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
+            this.getScaledY() - halfCornerRadius,
+            this.getScaledX() + this.getScaledWidth(),
+            this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
+            this.cornerRadius);
+      }
       RenderUtil.fill(matrixStack,
           this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
-          this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+          this.getScaledY() - halfCornerRadius,
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
           this.rightBorderColour.getHexColour());
     }
     if (this.bottomBorderWidth > 0F) {
-      RenderUtil.fill(matrixStack, this.getScaledX(),
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - halfCornerRadius,
+            this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
+            this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+            this.getScaledY() + this.getScaledHeight(),
+            this.cornerRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX() - halfCornerRadius,
           this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
-          this.getScaledX() + this.getScaledWidth(), this.getScaledY() + this.getScaledHeight(),
+          this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+          this.getScaledY() + this.getScaledHeight(),
           this.bottomBorderColour.getHexColour());
     }
     if (this.leftBorderWidth > 0F) {
-      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
+      if (this.cornerRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX(),
+            this.getScaledY() - halfCornerRadius,
+            this.getScaledX() + this.leftBorderWidth,
+            this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
+            this.cornerRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX(),
+          this.getScaledY() - halfCornerRadius,
           this.getScaledX() + this.leftBorderWidth,
-          this.getScaledY() + this.getScaledHeight(), this.leftBorderColour.getHexColour());
+          this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
+          this.leftBorderColour.getHexColour());
     }
-
+    if (this.cornerRadius > 0.0F) {
+      RenderUtil.resetShader();
+    }
     if (this.tooltip != null && this.isHovered()) {
       this.tooltip.render(this.minecraft.font, matrixStack,
-          10.0D + this.getX() + this.getWidth(), this.getY());
+          10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
     // ---- Render Content----
 
-    final boolean scissor =
-        this.getOverflow() == Overflow.HIDDEN || this.getOverflow() == Overflow.SCROLL;
-
-    if (scissor) {
-      if (!this.minecraft.getMainRenderTarget().isStencilEnabled()) {
-        this.minecraft.getMainRenderTarget().enableStencil();
-      }
-
-      GL11.glEnable(GL11.GL_STENCIL_TEST);
-      RenderSystem.colorMask(false, false, false, false);
-      RenderSystem.stencilFunc(GL11.GL_NEVER, 1, 0xFF);
-      RenderSystem.stencilOp(GL11.GL_REPLACE, GL11.GL_KEEP, GL11.GL_KEEP); // draw 1s on test fail
-
-      RenderSystem.stencilMask(0xFF);
-      RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, false); // needs mask=0xFF
-
-      RenderUtil.fillWidthHeight(matrixStack, this.getScaledX(), this.getScaledY(),
-          this.getScaledWidth(), this.getScaledHeight(), 0);
-
-      RenderSystem.colorMask(true, true, true, true);
-      RenderSystem.stencilMask(0x00);
-
-      // draw only where stencil's value is 1
-      RenderSystem.stencilFunc(GL11.GL_EQUAL, 1, 0xFF);
+    if (this.getOverflow().shouldScissor()) {
+      final double scale = this.mainWindow.getGuiScale();
+      this.getScreen().getScissorStack().push(
+          (int) (this.getScaledX() * scale),
+          (int) (this.mainWindow.getHeight()
+              - (this.getScaledY() + this.getScaledHeight()) * scale),
+          (int) (this.getScaledWidth() * scale),
+          (int) (this.getScaledHeight() * scale));
     }
 
     this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    if (scissor) {
-      GL11.glDisable(GL11.GL_STENCIL_TEST);
+
+    if (this.getOverflow().shouldScissor()) {
+      this.getScreen().getScissorStack().pop();
     }
 
     // ---- Render Scrollbar ----
 
     if (this.isScrollbarEnabled()) {
-      RenderUtil.roundedFill(matrixStack, this.getScrollbarX(), this.getScaledY(),
-          this.getScrollbarX() + SCROLLBAR_WIDTH,
-          this.getScaledY() + this.getScaledHeight(), 0x40000000, SCROLLBAR_WIDTH / 2.0F);
-      RenderUtil.roundedFill(matrixStack, this.getScrollbarX(), this.getScrollbarY(),
-          this.getScrollbarX() + SCROLLBAR_WIDTH, this.getScrollbarY() + this.getScrollbarHeight(),
-          0x4CFFFFFF, SCROLLBAR_WIDTH / 2.0F);
+      // Background
+      float scrollbarX = this.getScrollbarX();
+      float scaledY = this.getScaledY();
+      float scrollbarX2 = scrollbarX + SCROLLBAR_WIDTH;
+      float scaledY2 = scaledY + this.getScaledHeight();
+      float radius = SCROLLBAR_WIDTH / 2.0F;
+      RenderUtil.enableRoundedRectShader(scrollbarX, scaledY, scrollbarX2, scaledY2, radius);
+      RenderUtil.fill(matrixStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
+
+      // Bar
+      float scrollbarY = this.getScrollbarY();
+      float scrollbarY2 = this.getScrollbarY() + this.getScrollbarHeight();
+      RenderUtil.enableRoundedRectShader(scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, radius);
+      RenderUtil.fill(matrixStack, scrollbarX, this.getScrollbarY(), scrollbarX2, scrollbarY2,
+          0x4CFFFFFF);
+
+      RenderUtil.resetShader();
     }
   }
 
@@ -333,15 +381,33 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    // RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
-    // this.getScaledContentWidth(), this.getScaledContentHeight(), 0x11FFF000);
+     if (this.isHovered()) {
+     RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
+     this.getScaledContentWidth(), this.getScaledContentHeight(), 0x223495eb);
+    
+     RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
+     this.getScaledContentX(),
+     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
+     RenderUtil.fill(matrixStack, this.getScaledX() + this.getScaledContentWidth(),
+     this.getScaledY(),
+     this.getScaledX() + this.getScaledWidth(),
+     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
+    
+     RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
+     this.getScaledX() + this.getScaledWidth(),
+     this.getScaledContentY(), 0x3384ab05);
+     RenderUtil.fill(matrixStack, this.getScaledX(),
+     this.getScaledY() + this.getScaledContentHeight(),
+     this.getScaledX() + this.getScaledWidth(),
+     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
+     }
   }
 
-  private final double getScrollbarX() {
+  private final float getScrollbarX() {
     return this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH;
   }
 
-  private final double getScrollbarY() {
+  private final float getScrollbarY() {
     return this.getScaledY()
         + (this.getScrollOffset(this.minecraft.getFrameTime()) / this.fullHeight)
             * this.getScaledHeight();
@@ -714,7 +780,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public final float getContentHeight() {
-    return this.getHeight() - this.layout.getBottomPadding();
+    return this.getHeight() - this.layout.getBottomPadding() - this.layout.getTopPadding();
   }
 
   public float getScaledHeight() {
@@ -875,7 +941,12 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     if (this.backgroundBlur != null) {
       this.backgroundBlur.close();
     }
-    this.backgroundBlur = new Blur(blurRadius);
+    this.backgroundBlur = this.minecraft.submit(() -> new Blur(blurRadius)).join();
+    return this.self();
+  }
+
+  public final SELF setCornerRadius(float cornerRadius) {
+    this.cornerRadius = cornerRadius;
     return this.self();
   }
 

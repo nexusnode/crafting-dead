@@ -745,7 +745,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .unlockedBy("has_medium_bolt", has(ModItems.MEDIUM_BOLT.get()))
         .save(consumer);
 
-    ShapelessRecipeBuilder.shapeless(Items.IRON_INGOT, 4)
+    ShapelessRecipeBuilder.shapeless(Items.IRON_INGOT, 8)
         .requires(ModItemTags.MAGAZINES)
         .unlockedBy("has_magazine", has(ModItemTags.MAGAZINES))
         .save(consumer, new ResourceLocation(CraftingDead.ID, "iron_ingot_from_magazine"));

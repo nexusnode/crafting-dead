@@ -18,30 +18,51 @@
 
 package com.craftingdead.core.world.item.combatslot;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import com.craftingdead.core.capability.Capabilities;
+import com.mojang.serialization.Codec;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IStringSerializable;
 
-public enum CombatSlotType implements CombatSlotProvider {
+public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
 
-  PRIMARY(true), SECONDARY(true), MELEE(false), GRENADE(false) {
+  PRIMARY("primary", true),
+  SECONDARY("secondary", true),
+  MELEE("melee", false),
+  GRENADE("grenade", false) {
     @Override
     protected int getAvailableSlot(PlayerInventory playerInventory, boolean ignoreEmpty) {
       int index = super.getAvailableSlot(playerInventory, false);
       return index == -1 ? 3 : index;
     }
   },
-  EXTRA(false);
+  EXTRA("extra", false);
 
+  public static final Codec<CombatSlot> CODEC =
+      IStringSerializable.fromEnum(CombatSlot::values, CombatSlot::byName);
+  private static final Map<String, CombatSlot> BY_NAME = Arrays.stream(values())
+      .collect(Collectors.toMap(CombatSlot::getSerializedName, Function.identity()));
+
+  private final String name;
   private final boolean dropExistingItems;
 
-  private CombatSlotType(boolean dropExistingItems) {
+  private CombatSlot(String name, boolean dropExistingItems) {
+    this.name = name;
     this.dropExistingItems = dropExistingItems;
   }
 
   @Override
-  public CombatSlotType getSlotType() {
+  public String getSerializedName() {
+    return this.name;
+  }
+
+  @Override
+  public CombatSlot getCombatSlot() {
     return this;
   }
 
@@ -68,9 +89,9 @@ public enum CombatSlotType implements CombatSlotProvider {
     return true;
   }
 
-  public static Optional<CombatSlotType> getSlotType(ItemStack itemStack) {
+  public static Optional<CombatSlot> getSlotType(ItemStack itemStack) {
     return itemStack.getCapability(Capabilities.COMBAT_SLOT_PROVIDER)
-        .map(CombatSlotProvider::getSlotType);
+        .map(CombatSlotProvider::getCombatSlot);
   }
 
   public boolean isItemValid(ItemStack itemStack) {
@@ -81,7 +102,7 @@ public enum CombatSlotType implements CombatSlotProvider {
 
   public static boolean isInventoryValid(PlayerInventory inventory) {
     for (int i = 0; i < 7; i++) {
-      if (!CombatSlotType
+      if (!CombatSlot
           .isItemValidForSlot(inventory.getItem(i), i)) {
         return false;
       }
@@ -93,7 +114,7 @@ public enum CombatSlotType implements CombatSlotProvider {
     return getSlotType(slot).isItemValid(itemStack);
   }
 
-  public static CombatSlotType getSlotType(int slot) {
+  public static CombatSlot getSlotType(int slot) {
     switch (slot) {
       case 0:
         return PRIMARY;
@@ -110,5 +131,9 @@ public enum CombatSlotType implements CombatSlotProvider {
       default:
         throw new IllegalArgumentException("Invalid slot");
     }
+  }
+
+  public static CombatSlot byName(String name) {
+    return BY_NAME.get(name);
   }
 }

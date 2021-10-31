@@ -28,7 +28,7 @@ import com.craftingdead.core.world.gun.FireMode;
 import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.gun.attachment.Attachment;
 import com.craftingdead.core.world.gun.attachment.AttachmentLike;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvent;
@@ -89,8 +89,8 @@ public class TypedGun<T extends AbstractGunType> extends AbstractGun {
   }
 
   @Override
-  public CombatSlotType getSlotType() {
-    return this.type.getCombatSlotType();
+  public CombatSlot getCombatSlot() {
+    return this.type.getCombatSlot();
   }
 
   @Override

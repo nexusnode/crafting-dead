@@ -64,7 +64,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         .add(ModItems.AS50_MAGAZINE.get())
         .add(ModItems.M1GARAND_MAGAZINE.get())
         .add(ModItems.AWP_MAGAZINE.get())
-        .add(ModItems.TRENCHGUN_SHELLS.get())
+        .add(ModItems.TRENCH_GUN_SHELLS.get())
         .add(ModItems.MOSSBERG_SHELLS.get())
         .add(ModItems.DMR_MAGAZINE.get())
         .add(ModItems.TASER_CARTRIDGE.get())

@@ -52,7 +52,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
           }
           break;
         default:
-          if (!inventory.getItem(i).isEmpty()) {
+          if (!Tags.Items.INGOTS_IRON.contains(inventory.getItem(i).getItem())) {
             return false;
           }
           break;

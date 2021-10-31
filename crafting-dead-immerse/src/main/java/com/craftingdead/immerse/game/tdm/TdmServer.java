@@ -27,7 +27,7 @@ import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.LivingHandler;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.GameUtil;
@@ -488,7 +488,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   public void handleEntityJoinWorld(EntityJoinWorldEvent event) {
     if (event.getEntity() instanceof ServerPlayerEntity) {
       ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
-      CombatSlotType.MELEE.addToInventory(ModItems.COMBAT_KNIFE.get().getDefaultInstance(),
+      CombatSlot.MELEE.addToInventory(ModItems.COMBAT_KNIFE.get().getDefaultInstance(),
           playerEntity.inventory, false);
       this.shopModule.resetBuyTime(event.getEntity().getUUID());
     }

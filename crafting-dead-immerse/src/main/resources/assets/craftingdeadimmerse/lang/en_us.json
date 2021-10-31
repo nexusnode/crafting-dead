@@ -67,5 +67,8 @@
     "view.world_list.button.create": "CREATE",
     "view.world_list.button.edit": "EDIT",
     "view.world_list.button.delete": "DELETE",
-    "view.world_list.button.recreate": "RE-CREATE"
+    "view.world_list.button.recreate": "RE-CREATE",
+
+    "view.hosting.order_now": "Order Now",
+    "view.hosting.partners": "Partners with"
 }

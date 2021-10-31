@@ -19,7 +19,7 @@
 package com.craftingdead.core.event;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
@@ -29,18 +29,18 @@ public class CombatPickupEvent extends Event {
 
   private final ItemStack itemStack;
   @Nullable
-  private final CombatSlotType combatSlotType;
+  private final CombatSlot combatSlot;
 
-  public CombatPickupEvent(ItemStack itemStack, CombatSlotType combatSlotType) {
+  public CombatPickupEvent(ItemStack itemStack, CombatSlot combatSlot) {
     this.itemStack = itemStack;
-    this.combatSlotType = combatSlotType;
+    this.combatSlot = combatSlot;
   }
 
   public ItemStack getItemStack() {
     return this.itemStack;
   }
 
-  public CombatSlotType getCombatSlotType() {
-    return this.combatSlotType;
+  public CombatSlot getCombatSlot() {
+    return this.combatSlot;
   }
 }

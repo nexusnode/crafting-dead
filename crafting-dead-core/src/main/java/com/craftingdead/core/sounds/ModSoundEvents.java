@@ -132,7 +132,7 @@ public class ModSoundEvents {
   public static final RegistryObject<SoundEvent> SPORTER22_SHOOT = register("sporter22_shoot");
   public static final RegistryObject<SoundEvent> TASER_SHOOT = register("taser_shoot");
   public static final RegistryObject<SoundEvent> TOGGLE_FIRE_MODE = register("toggle_fire_mode");
-  public static final RegistryObject<SoundEvent> TRENCHGUN_SHOOT = register("trenchgun_shoot");
+  public static final RegistryObject<SoundEvent> TRENCH_GUN_SHOOT = register("trench_gun_shoot");
   public static final RegistryObject<SoundEvent> VECTOR_DISTANT_SHOOT =
       register("vector_distant_shoot");
   public static final RegistryObject<SoundEvent> VECTOR_SHOOT = register("vector_shoot");

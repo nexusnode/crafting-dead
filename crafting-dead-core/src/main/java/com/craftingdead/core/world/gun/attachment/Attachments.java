@@ -33,7 +33,7 @@ public class Attachments {
       DeferredRegister.create(Attachment.class, CraftingDead.ID);
 
   public static final Lazy<IForgeRegistry<Attachment>> REGISTRY =
-      Lazy.of(ATTACHMENTS.makeRegistry("attachments", RegistryBuilder::new));
+      Lazy.of(ATTACHMENTS.makeRegistry("attachment", RegistryBuilder::new));
 
   public static final RegistryObject<Attachment> RED_DOT_SIGHT =
       ATTACHMENTS.register("red_dot_sight",

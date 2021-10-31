@@ -84,6 +84,8 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    */
   void registerHandler(ResourceLocation id, H handler);
 
+  Optional<Action> getAction();
+
   /**
    * Perform an unforced action.
    * 
@@ -116,15 +118,15 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * Attach a progress monitor to this {@link LivingExtension} (will show a progress bar on the
    * client).
    * 
-   * @param actionProgress - the {@link ProgressMonitor} to attach
+   * @param progressMonitor - the {@link ProgressMonitor} to attach
    */
-  void setActionProgress(ProgressMonitor actionProgress);
+  void setProgressMonitor(ProgressMonitor progressMonitor);
 
   /**
    * Get the currently attached {@link ProgressMonitor} monitor.
    * 
    * @return an {@link Optional} progress monitor
-   * @see #setActionProgress(ProgressMonitor)
+   * @see #setProgressMonitor(ProgressMonitor)
    */
   Optional<ProgressMonitor> getProgressMonitor();
 
@@ -133,7 +135,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * 
    * @return true if it is monitoring an action.
    */
-  default boolean isMonitoringAction() {
+  default boolean hasProgressMonitor() {
     return this.getProgressMonitor().isPresent();
   }
 

@@ -20,5 +20,15 @@ package com.craftingdead.immerse.client.gui.view;
 
 public enum Overflow {
 
-  VISIBLE, HIDDEN, SCROLL;
+  VISIBLE(false), HIDDEN(true), SCROLL(true);
+
+  private final boolean scissor;
+
+  private Overflow(boolean scissor) {
+    this.scissor = scissor;
+  }
+
+  public boolean shouldScissor() {
+    return this.scissor;
+  }
 }

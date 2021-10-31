@@ -38,7 +38,7 @@ public class GameTypes {
       DeferredRegister.create(GameType.class, CraftingDeadImmerse.ID);
 
   public static final Lazy<IForgeRegistry<GameType>> REGISTRY =
-      Lazy.of(GAME_TYPES.makeRegistry("game_types", RegistryBuilder::new));
+      Lazy.of(GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new));
 
   public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("survival",
       () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new,

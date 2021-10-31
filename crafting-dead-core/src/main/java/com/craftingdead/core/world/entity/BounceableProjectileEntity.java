@@ -20,13 +20,11 @@ package com.craftingdead.core.world.entity;
 
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -121,8 +119,9 @@ public abstract class BounceableProjectileEntity extends Entity
         Vector3d vec = difference.normalize().scale(0.05D);
         this.setPos(this.getX() - vec.x, this.getY() - vec.y, this.getZ() - vec.z);
 
-        Float bounceFactor = this.getBounceFactor(blockRayTraceResult);
-        if (bounceFactor != null) {
+        Optional<Float> optional = this.getBounceFactor(blockRayTraceResult);
+        if (optional.isPresent()) {
+          final float bounceFactor = optional.get();
           switch (blockRayTraceResult.getDirection()) {
             case UP:
               // If the grenade is going up too slowly, set the next bounce to zero
@@ -200,7 +199,8 @@ public abstract class BounceableProjectileEntity extends Entity
         MathHelper.cos(y * ((float) Math.PI / 180F)) * MathHelper.cos(x * ((float) Math.PI / 180F));
     this.shoot((double) f, (double) f1, (double) f2, force, p_184538_6_);
     Vector3d vec3d = entity.getDeltaMovement();
-    this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
+    this.setDeltaMovement(
+        this.getDeltaMovement().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
   }
 
   public void shoot(double x, double y, double z, float force, float p_70186_8_) {
@@ -248,16 +248,16 @@ public abstract class BounceableProjectileEntity extends Entity
   }
 
   /**
-   * @return The bounce factor or <code>null</code> if the entity should not bounce.
+   * @return the bounce factor
    */
-  public Float getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
-    return 0.375F;
+  public Optional<Float> getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
+    return Optional.of(0.375F);
   }
 
   @Override
   protected void addAdditionalSaveData(CompoundNBT compound) {
     if (this.ownerId != null) {
-      compound.put("owner", NBTUtil.createUUID(this.ownerId));
+      compound.putUUID("owner", this.ownerId);
     }
 
     compound.putBoolean("inGround", this.stoppedInGround);
@@ -267,7 +267,7 @@ public abstract class BounceableProjectileEntity extends Entity
   @Override
   protected void readAdditionalSaveData(CompoundNBT compound) {
     if (compound.contains("owner", 10)) {
-      this.ownerId = NBTUtil.loadUUID(compound.getCompound("owner"));
+      this.ownerId = compound.getUUID("owner");
     }
     this.stoppedInGround = compound.getBoolean("inGround");
     this.motionStopCount = compound.getInt("motionStopCount");
@@ -287,11 +287,9 @@ public abstract class BounceableProjectileEntity extends Entity
     this.motionStopCount = buffer.readInt();
   }
 
-  @Nullable
   public Optional<Entity> getThrower() {
-    if (this.level instanceof ServerWorld) {
-      return Optional.ofNullable(((ServerWorld) this.level).getEntity(this.ownerId));
-    }
-    return Optional.empty();
+    return this.level instanceof ServerWorld
+        ? Optional.ofNullable(((ServerWorld) this.level).getEntity(this.ownerId))
+        : Optional.empty();
   }
 }

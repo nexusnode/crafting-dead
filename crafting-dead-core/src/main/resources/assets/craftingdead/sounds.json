@@ -545,10 +545,10 @@
       "craftingdead:toggle_fire_mode"
     ]
   },
-  "trenchgun_shoot": {
+  "trench_gun_shoot": {
     "sounds": [
       {
-        "name": "craftingdead:trenchgun_shoot",
+        "name": "craftingdead:trench_gun_shoot",
         "attenuation_distance": 65
       }
     ]

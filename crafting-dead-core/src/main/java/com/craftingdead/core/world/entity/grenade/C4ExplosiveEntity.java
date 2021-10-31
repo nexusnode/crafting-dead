@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.Optional;
 import org.apache.commons.lang3.tuple.Triple;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
@@ -79,8 +80,9 @@ public class C4ExplosiveEntity extends GrenadeEntity {
   }
 
   @Override
-  public Float getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
-    return blockRayTraceResult.getDirection() == Direction.UP ? null
+  public Optional<Float> getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
+    return blockRayTraceResult.getDirection() == Direction.UP
+        ? Optional.empty()
         : super.getBounceFactor(blockRayTraceResult);
   }
 

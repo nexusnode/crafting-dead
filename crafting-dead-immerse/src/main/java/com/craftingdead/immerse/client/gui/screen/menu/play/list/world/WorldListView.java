@@ -64,7 +64,8 @@ public class WorldListView<L extends Layout>
 
     this.listView = new ParentView<>(
         new YogaLayout()
-            .setFlex(1)
+            .setFlexBasis(1)
+            .setFlexGrow(1)
             .setTopPadding(4F)
             .setBottomPadding(10F),
         new YogaLayoutParent()

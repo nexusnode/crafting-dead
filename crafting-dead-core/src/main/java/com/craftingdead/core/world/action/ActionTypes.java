@@ -46,7 +46,7 @@ public class ActionTypes {
       DeferredRegister.create(ActionType.class, CraftingDead.ID);
 
   public static final Lazy<IForgeRegistry<ActionType>> REGISTRY =
-      Lazy.of(ACTION_TYPES.makeRegistry("action_types", RegistryBuilder::new));
+      Lazy.of(ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new));
 
   public static final RegistryObject<ActionType> MAGAZINE_RELOAD =
       ACTION_TYPES.register("magazine_reload",

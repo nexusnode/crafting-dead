@@ -41,7 +41,7 @@ import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import io.netty.buffer.Unpooled;
@@ -167,13 +167,11 @@ public class CraftingDead {
     NetworkChannel.loadChannels();
     this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
     if (this.travelersBackpacksLoaded) {
-      logger.info("Adding integration for " + TRAVELERS_BACKPACK_ID);
+      logger.info("Adding integration for {}", TRAVELERS_BACKPACK_ID);
     }
-    event.enqueueWork(() -> {
-      BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
-          Ingredient.of(Items.REDSTONE),
-          new ItemStack(ModItems.ADRENALINE_SYRINGE.get()));
-    });
+    event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
+        Ingredient.of(Items.REDSTONE),
+        new ItemStack(ModItems.ADRENALINE_SYRINGE.get())));
   }
 
   private void handleGatherData(GatherDataEvent event) {
@@ -192,15 +190,16 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION).<PlayerExtension<?>>cast()
+    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION)
+        .<PlayerExtension<?>>cast()
         .filter(PlayerExtension::isCombatModeEnabled).ifPresent(living -> {
           final ItemStack itemStack = event.getItem().getItem();
-          CombatSlotType combatSlotType = CombatSlotType.getSlotType(itemStack).orElse(null);
-          CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlotType);
+          CombatSlot combatSlot = CombatSlot.getSlotType(itemStack).orElse(null);
+          CombatPickupEvent combatPickupEvent = new CombatPickupEvent(itemStack, combatSlot);
           if (MinecraftForge.EVENT_BUS.post(combatPickupEvent)) {
             event.setCanceled(true);
-          } else if (combatSlotType != null) {
-            if (combatSlotType.addToInventory(itemStack, event.getPlayer().inventory, false)) {
+          } else if (combatSlot != null) {
+            if (combatSlot.addToInventory(itemStack, event.getPlayer().inventory, false)) {
               // Allows normal processing of item pickup but prevents item being added to inventory
               // because we've already added it.
               event.setResult(Event.Result.ALLOW);
@@ -241,25 +240,24 @@ public class CraftingDead {
   public void handleLivingDrops(LivingDropsEvent event) {
     event.getEntity()
         .getCapability(Capabilities.LIVING_EXTENSION)
-        .ifPresent(
-            living -> event
-                .setCanceled(living.handleDeathLoot(event.getSource(), event.getDrops())));
+        .ifPresent(living -> event.setCanceled(
+            living.handleDeathLoot(event.getSource(), event.getDrops())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingAttack(LivingAttackEvent event) {
     event.getEntity()
         .getCapability(Capabilities.LIVING_EXTENSION)
-        .ifPresent(
-            living -> event.setCanceled(living.handleHurt(event.getSource(), event.getAmount())));
+        .ifPresent(living -> event.setCanceled(
+            living.handleHurt(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDamage(LivingDamageEvent event) {
     event.getEntity()
         .getCapability(Capabilities.LIVING_EXTENSION)
-        .ifPresent(
-            living -> event.setAmount(living.handleDamaged(event.getSource(), event.getAmount())));
+        .ifPresent(living -> event.setAmount(
+            living.handleDamaged(event.getSource(), event.getAmount())));
   }
 
   @SubscribeEvent

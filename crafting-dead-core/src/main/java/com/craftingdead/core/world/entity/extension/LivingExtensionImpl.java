@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -87,9 +88,11 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
    */
   protected ItemStack lastHeldStack = null;
 
+  @Nullable
   private Action action;
 
-  private ProgressMonitor actionProgress;
+  @Nullable
+  private ProgressMonitor progressMonitor;
 
   private boolean movementBlocked;
 
@@ -136,6 +139,11 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
+  public Optional<Action> getAction() {
+    return Optional.ofNullable(this.action);
+  }
+
+  @Override
   public boolean performAction(Action action, boolean force, boolean sendUpdate) {
     if (MinecraftForge.EVENT_BUS.post(new LivingExtensionEvent.PerformAction<>(this, action))) {
       return false;
@@ -145,12 +153,12 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         .flatMap(LivingExtension::getProgressMonitor)
         .orElse(null);
 
-    if (this.actionProgress != null || targetProgressMonitor != null) {
+    if (this.progressMonitor != null || targetProgressMonitor != null) {
       if (!force) {
         return false;
       }
-      this.actionProgress.stop();
-      if (targetProgressMonitor != this.actionProgress) {
+      this.progressMonitor.stop();
+      if (targetProgressMonitor != this.progressMonitor) {
         targetProgressMonitor.stop();
       }
     }
@@ -161,8 +169,8 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
     this.cancelAction(true);
     this.action = action;
-    this.actionProgress = action.getPerformerProgress();
-    action.getTarget().ifPresent(target -> target.setActionProgress(action.getTargetProgress()));
+    this.progressMonitor = action.getPerformerProgress();
+    action.getTarget().ifPresent(target -> target.setProgressMonitor(action.getTargetProgress()));
     if (sendUpdate) {
       PacketTarget target = this.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
@@ -194,19 +202,19 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void setActionProgress(ProgressMonitor actionProgress) {
-    this.actionProgress = actionProgress;
+  public void setProgressMonitor(ProgressMonitor actionProgress) {
+    this.progressMonitor = actionProgress;
   }
 
   @Override
   public Optional<ProgressMonitor> getProgressMonitor() {
-    return Optional.ofNullable(this.actionProgress);
+    return Optional.ofNullable(this.progressMonitor);
   }
 
   private void removeAction() {
     if (this.action != null) {
-      this.actionProgress = null;
-      this.action.getTarget().ifPresent(target -> target.setActionProgress(null));
+      this.progressMonitor = null;
+      this.action.getTarget().ifPresent(target -> target.setProgressMonitor(null));
       this.action = null;
     }
   }

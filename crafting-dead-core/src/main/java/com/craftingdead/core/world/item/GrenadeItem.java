@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
-import com.craftingdead.core.world.item.combatslot.CombatSlotType;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -91,7 +91,7 @@ public class GrenadeItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> () -> CombatSlotType.GRENADE),
+    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> () -> CombatSlot.GRENADE),
         () -> Capabilities.COMBAT_SLOT_PROVIDER);
   }
 
