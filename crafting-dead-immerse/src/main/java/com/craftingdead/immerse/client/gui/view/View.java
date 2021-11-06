@@ -18,35 +18,34 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.annotation.Nullable;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.PropertySetter;
+import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
+import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.client.gui.tween.ColourTweenType;
-import com.craftingdead.immerse.client.gui.tween.FloatArrayTweenType;
-import com.craftingdead.immerse.client.gui.tween.FloatTweenType;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
-import com.craftingdead.immerse.client.gui.view.event.EnabledChangedEvent;
 import com.craftingdead.immerse.client.gui.view.event.FocusChangedEvent;
 import com.craftingdead.immerse.client.gui.view.event.KeyEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseEnterEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
+import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.google.common.collect.Sets;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.noties.tumbleweed.Timeline;
-import io.noties.tumbleweed.Tween;
-import io.noties.tumbleweed.TweenManager;
-import io.noties.tumbleweed.TweenType;
-import io.noties.tumbleweed.equations.Sine;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -65,38 +64,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View<SELF extends View<SELF, L>, L extends Layout> extends AbstractGui
     implements IGuiEventListener, IRenderable, Comparable<View<?, ?>> {
 
-  public static final TweenType<View<?, ?>> X_SCALE =
-      new FloatTweenType<>(View::getXScale, View::setXScale);
-
-  public static final TweenType<View<?, ?>> Y_SCALE =
-      new FloatTweenType<>(View::getYScale, View::setYScale);
-
-  public static final TweenType<View<?, ?>> X_TRANSLATION =
-      new FloatTweenType<>(c -> c.xOffset, View::setXOffset);
-
-  public static final TweenType<View<?, ?>> Y_TRANSLATION =
-      new FloatTweenType<>(c -> c.yOffset, View::setYOffset);
-
-  public static final TweenType<View<?, ?>> BACKGROUND_COLOUR =
-      new ColourTweenType<>(t -> t.modifiedBackgroundColour);
-
-  public static final TweenType<View<?, ?>> BORDER_WIDTH =
-      new FloatArrayTweenType<>(4,
-          t -> new float[] {t.topBorderWidth, t.rightBorderWidth, t.bottomBorderWidth,
-              t.leftBorderWidth},
-          (t, v) -> {
-            t.topBorderWidth = v[0];
-            t.rightBorderWidth = v[1];
-            t.bottomBorderWidth = v[2];
-            t.leftBorderWidth = v[3];
-          });
-
-  public static final TweenType<View<?, ?>> ALPHA =
-      new FloatTweenType<>(c -> c.alpha, View::setAlpha);
-
-  private static final TweenType<View<?, ?>> SCROLL_OFFSET =
-      new FloatTweenType<>(c -> c.scrollOffset,
-          (View<?, ?> c, Float v) -> c.scrollOffset = v);
+  public static final boolean DEBUG = false;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -108,16 +76,15 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
-  protected final MainWindow mainWindow = this.minecraft.getWindow();
-
-  protected final ClientDist clientDist =
-      (ClientDist) CraftingDeadImmerse.getInstance().getModDist();
+  protected final MainWindow window = this.minecraft.getWindow();
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 
-  private final TweenManager tweenManager = TweenManager.create();
-
   protected final L layout;
+
+  private final Set<State> states = new HashSet<>();
+
+  private final Map<String, ValueStyleProperty<?>> valueProperties = new HashMap<>();
 
   @Nullable
   ViewScreen screen;
@@ -125,6 +92,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   @Nullable
   ParentView<?, ?, ? extends L> parent;
   int index;
+  boolean pendingRemoval;
 
   private float lastScrollOffset;
   private float scrollOffset;
@@ -132,57 +100,117 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   private float fullHeight;
 
-  private float xScale = 1.0F;
-  private float yScale = 1.0F;
+  private long lastClickTimeMs;
 
-  private float xOffset = 0.0F;
-  private float yOffset = 0.0F;
-  private float zOffset = 0.0F;
+  private final ValueStyleProperty<Float> xScale =
+      Util.make(ValueStyleProperty.create("x-scale", Float.class, 1.0F),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Float> yScale =
+      Util.make(ValueStyleProperty.create("y-scale", Float.class, 1.0F),
+          this::registerValueProperty);
+  private final CompositeStyleProperty<Float> scale =
+      CompositeStyleProperty.create("scale", this.xScale, this.yScale);
 
-  private Overflow overflow = Overflow.VISIBLE;
+  private final ValueStyleProperty<Float> xTranslation =
+      Util.make(ValueStyleProperty.create("x-translation", Float.class, 0.0F),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Float> yTranslation =
+      Util.make(ValueStyleProperty.create("y-translation", Float.class, 0.0F),
+          this::registerValueProperty);
 
-  private float alpha = 1.0F;
+  private final ValueStyleProperty<Float> alpha =
+      Util.make(ValueStyleProperty.create("alpha", Float.class, 1.0F), this::registerValueProperty);
 
-  private float topBorderWidth = 0F;
-  private Colour topBorderColour = Colour.WHITE;
-  private float rightBorderWidth = 0F;
-  private Colour rightBorderColour = Colour.WHITE;
-  private float bottomBorderWidth = 0F;
-  private Colour bottomBorderColour = Colour.WHITE;
-  private float leftBorderWidth = 0F;
-  private Colour leftBorderColour = Colour.WHITE;
+  private final ValueStyleProperty<Color> backgroundColor =
+      Util.make(ValueStyleProperty.create("background-color", Color.class, Color.INVISIBLE),
+          this::registerValueProperty);
+
+  private final ValueStyleProperty<Float> outlineWidth =
+      Util.make(ValueStyleProperty.create("outline-width", Float.class, 0.0F),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Color> outlineColor =
+      Util.make(ValueStyleProperty.create("outline-color", Color.class, Color.BLACK),
+          this::registerValueProperty);
+
+  private final ValueStyleProperty<Float> borderRadius =
+      Util.make(ValueStyleProperty.create("border-radius", Float.class, 0.0F),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Color> leftBorderColor =
+      Util.make(ValueStyleProperty.create("border-left-color", Color.class, Color.BLACK),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Color> rightBorderColor =
+      Util.make(ValueStyleProperty.create("border-right-color", Color.class, Color.BLACK),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Color> topBorderColor =
+      Util.make(ValueStyleProperty.create("border-top-color", Color.class, Color.BLACK),
+          this::registerValueProperty);
+  private final ValueStyleProperty<Color> bottomBorderColor =
+      Util.make(ValueStyleProperty.create("border-bottom-color", Color.class, Color.BLACK),
+          this::registerValueProperty);
+  private final CompositeStyleProperty<Color> borderColor =
+      CompositeStyleProperty.create("border-color", this.leftBorderColor, this.rightBorderColor,
+          this.topBorderColor, this.bottomBorderColor);
+
+  private int zIndex = 0;
 
   @Nullable
   private Tooltip tooltip;
 
   @Nullable
-  private Colour modifiedBackgroundColour;
-  @Nullable
-  private Colour backgroundColour;
-
-  @Nullable
   private Blur backgroundBlur;
 
-  private float cornerRadius;
-
-  protected boolean pendingRemoval;
-
-  private boolean hovered;
-  protected boolean focused;
-  protected boolean focusable;
+  private boolean focusable;
 
   private boolean unscaleWidth;
   private boolean unscaleHeight;
+  private boolean unscaleBorder = true;
+  private boolean unscaleOutline = true;
 
   private boolean doubleClick;
-  private long lastClickTimeMs;
-
-  private boolean enabled = true;
 
   public View(L layout) {
     this.layout = layout;
     this.layout.setMeasureFunction(this::measure);
     this.eventBus.start();
+
+    this.states.add(States.ENABLED);
+
+    this.outlineWidth
+        .registerState(1.0F, States.FOCUSED)
+        .registerState(1.0F, States.HOVERED, States.FOCUSED);
+    this.outlineColor.registerState(Color.BLUE_C, States.FOCUSED);
+  }
+
+  protected boolean hasState(State state) {
+    return this.states.contains(state);
+  }
+
+  protected boolean toggleState(State state) {
+    if (!this.addState(state)) {
+      this.removeState(state);
+      return false;
+    }
+    return true;
+  }
+
+  protected boolean addState(State state) {
+    return this.states.add(state);
+  }
+
+  protected boolean removeState(State state) {
+    return this.states.remove(state);
+  }
+
+  protected void registerValueProperty(ValueStyleProperty<?> property) {
+    this.valueProperties.put(property.getName(), property);
+  }
+
+  protected void updateProperties(boolean instant) {
+    for (Set<State> subset : Sets.powerSet(this.states)) {
+      for (ValueStyleProperty<?> property : this.valueProperties.values()) {
+        property.transition(subset, instant);
+      }
+    }
   }
 
   protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
@@ -194,12 +222,19 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.getContentHeight();
   }
 
-  protected void added() {}
+  protected void added() {
+    this.updateProperties(true);
+    this.post(new AddedEvent());
+  }
 
-  protected void removed() {}
+  protected void removed() {
+    this.post(new RemovedEvent.Post());
+  }
 
   protected void queueRemoval(Runnable remove) {
-    remove.run();
+    if (this.post(new RemovedEvent.Pre(remove)) == Event.Result.DEFAULT) {
+      remove.run();
+    }
   }
 
   protected void layout() {
@@ -232,8 +267,6 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   @SuppressWarnings("deprecation")
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    this.tweenManager.update(partialTicks * 100.0F);
-
     if (this.backgroundBlur != null) {
       RenderSystem.enableBlend();
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.getAlpha());
@@ -243,104 +276,169 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
       RenderSystem.disableBlend();
     }
 
-    if (this.modifiedBackgroundColour != null) {
+    if (this.backgroundColor.isDefined()) {
       RenderSystem.enableBlend();
-      float[] colour = this.modifiedBackgroundColour.getColour4f();
-      colour[3] *= this.getAlpha();
+      float[] color = this.backgroundColor.get().getValue();
+      color[3] *= this.getAlpha();
 
       float x = this.getScaledX();
       float y = this.getScaledY();
       float x2 = this.getScaledX() + this.getScaledWidth();
       float y2 = this.getScaledY() + this.getScaledHeight();
 
-      if (this.cornerRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(x, y, x2, y2, this.cornerRadius);
+      if (this.borderRadius.get() > 0.0F) {
+        RenderUtil.enableRoundedRectShader(x, y, x2, y2, this.borderRadius.get());
       }
 
       RenderUtil.fill(matrixStack.last().pose(), x, y,
-          this.getZOffset(), x2, y2, colour[0], colour[1], colour[2], colour[3]);
+          this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
 
-      if (this.cornerRadius > 0.0F) {
+      if (this.borderRadius.get() > 0.0F) {
         RenderUtil.resetShader();
       }
 
       RenderSystem.disableBlend();
     }
 
-    final float halfCornerRadius = (this.cornerRadius);
-    if (this.topBorderWidth > 0F) {
-      if (this.cornerRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - halfCornerRadius,
+    final float borderRadius = this.borderRadius.get();
+    final float topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
+    final float bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
+    final float leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
+    final float rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
+    if (topBorderWidth > 0F) {
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
             this.getScaledY(),
-            this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
-            this.getScaledY() + this.topBorderWidth,
-            this.cornerRadius);
+            this.getScaledX() + this.getScaledWidth() + borderRadius,
+            this.getScaledY() + topBorderWidth,
+            borderRadius);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - halfCornerRadius,
+      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
           this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
-          this.getScaledY() + this.topBorderWidth,
-          this.topBorderColour.getHexColour());
+          this.getScaledX() + this.getScaledWidth() + borderRadius,
+          this.getScaledY() + topBorderWidth,
+          this.topBorderColor.get().getHex());
     }
-    if (this.rightBorderWidth > 0F) {
-      if (this.cornerRadius > 0.0F) {
+    if (rightBorderWidth > 0F) {
+      if (borderRadius > 0.0F) {
         RenderUtil.enableRoundedRectShader(
-            this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
-            this.getScaledY() - halfCornerRadius,
+            this.getScaledX() + this.getScaledWidth() - rightBorderWidth,
+            this.getScaledY() - borderRadius,
             this.getScaledX() + this.getScaledWidth(),
-            this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
-            this.cornerRadius);
+            this.getScaledY() + this.getScaledHeight() + borderRadius,
+            borderRadius);
       }
       RenderUtil.fill(matrixStack,
-          this.getScaledX() + this.getScaledWidth() - this.rightBorderWidth,
-          this.getScaledY() - halfCornerRadius,
+          this.getScaledX() + this.getScaledWidth() - rightBorderWidth,
+          this.getScaledY() - borderRadius,
           this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
-          this.rightBorderColour.getHexColour());
+          this.getScaledY() + this.getScaledHeight() + borderRadius,
+          this.rightBorderColor.get().getHex());
     }
-    if (this.bottomBorderWidth > 0F) {
-      if (this.cornerRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - halfCornerRadius,
-            this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
-            this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+    if (bottomBorderWidth > 0F) {
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
+            this.getScaledY() + this.getScaledHeight() - bottomBorderWidth,
+            this.getScaledX() + this.getScaledWidth() + borderRadius,
             this.getScaledY() + this.getScaledHeight(),
-            this.cornerRadius);
+            borderRadius);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - halfCornerRadius,
-          this.getScaledY() + this.getScaledHeight() - this.bottomBorderWidth,
-          this.getScaledX() + this.getScaledWidth() + halfCornerRadius,
+      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+          this.getScaledY() + this.getScaledHeight() - bottomBorderWidth,
+          this.getScaledX() + this.getScaledWidth() + borderRadius,
           this.getScaledY() + this.getScaledHeight(),
-          this.bottomBorderColour.getHexColour());
+          this.bottomBorderColor.get().getHex());
     }
-    if (this.leftBorderWidth > 0F) {
-      if (this.cornerRadius > 0.0F) {
+    if (leftBorderWidth > 0F) {
+      if (borderRadius > 0.0F) {
         RenderUtil.enableRoundedRectShader(this.getScaledX(),
-            this.getScaledY() - halfCornerRadius,
-            this.getScaledX() + this.leftBorderWidth,
-            this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
-            this.cornerRadius);
+            this.getScaledY() - borderRadius,
+            this.getScaledX() + leftBorderWidth,
+            this.getScaledY() + this.getScaledHeight() + borderRadius,
+            borderRadius);
       }
       RenderUtil.fill(matrixStack, this.getScaledX(),
-          this.getScaledY() - halfCornerRadius,
-          this.getScaledX() + this.leftBorderWidth,
-          this.getScaledY() + this.getScaledHeight() + halfCornerRadius,
-          this.leftBorderColour.getHexColour());
+          this.getScaledY() - borderRadius,
+          this.getScaledX() + leftBorderWidth,
+          this.getScaledY() + this.getScaledHeight() + borderRadius,
+          this.leftBorderColor.get().getHex());
     }
-    if (this.cornerRadius > 0.0F) {
+
+
+    final float outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
+    final long outlineColor = this.outlineColor.get().getHex();
+    if (outlineWidth > 0.0F) {
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
+            this.getScaledY(),
+            this.getScaledX() + this.getScaledWidth() + borderRadius,
+            this.getScaledY() + outlineWidth,
+            borderRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+          this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth() + borderRadius,
+          this.getScaledY() + outlineWidth,
+          outlineColor);
+
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(
+            this.getScaledX() + this.getScaledWidth() - outlineWidth,
+            this.getScaledY() - borderRadius,
+            this.getScaledX() + this.getScaledWidth(),
+            this.getScaledY() + this.getScaledHeight() + borderRadius,
+            borderRadius);
+      }
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.getScaledWidth() - outlineWidth,
+          this.getScaledY() - borderRadius,
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.getScaledHeight() + borderRadius,
+          outlineColor);
+
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
+            this.getScaledY() + this.getScaledHeight() - outlineWidth,
+            this.getScaledX() + this.getScaledWidth() + borderRadius,
+            this.getScaledY() + this.getScaledHeight(),
+            borderRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+          this.getScaledY() + this.getScaledHeight() - outlineWidth,
+          this.getScaledX() + this.getScaledWidth() + borderRadius,
+          this.getScaledY() + this.getScaledHeight(),
+          outlineColor);
+
+      if (borderRadius > 0.0F) {
+        RenderUtil.enableRoundedRectShader(this.getScaledX(),
+            this.getScaledY() - borderRadius,
+            this.getScaledX() + outlineWidth,
+            this.getScaledY() + this.getScaledHeight() + borderRadius,
+            borderRadius);
+      }
+      RenderUtil.fill(matrixStack, this.getScaledX(),
+          this.getScaledY() - borderRadius,
+          this.getScaledX() + outlineWidth,
+          this.getScaledY() + this.getScaledHeight() + borderRadius,
+          outlineColor);
+    }
+
+
+    if (borderRadius > 0.0F) {
       RenderUtil.resetShader();
     }
-    if (this.tooltip != null && this.isHovered()) {
+    if (this.tooltip != null && this.hasState(States.HOVERED)) {
       this.tooltip.render(this.minecraft.font, matrixStack,
           10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
     // ---- Render Content----
 
-    if (this.getOverflow().shouldScissor()) {
-      final double scale = this.mainWindow.getGuiScale();
-      this.getScreen().getScissorStack().push(
+    if (this.layout.getOverflow().shouldScissor()) {
+      final double scale = this.window.getGuiScale();
+      ScissorStack.push(
           (int) (this.getScaledX() * scale),
-          (int) (this.mainWindow.getHeight()
+          (int) (this.window.getHeight()
               - (this.getScaledY() + this.getScaledHeight()) * scale),
           (int) (this.getScaledWidth() * scale),
           (int) (this.getScaledHeight() * scale));
@@ -348,8 +446,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
     this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-    if (this.getOverflow().shouldScissor()) {
-      this.getScreen().getScissorStack().pop();
+    if (this.layout.getOverflow().shouldScissor()) {
+      ScissorStack.pop();
     }
 
     // ---- Render Scrollbar ----
@@ -376,31 +474,78 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   protected final boolean isScrollbarEnabled() {
-    return this.getOverflow() == Overflow.SCROLL && this.fullHeight > this.getHeight();
+    return this.layout.getOverflow() == Overflow.SCROLL && this.fullHeight > this.getHeight();
   }
 
+  @SuppressWarnings("unused")
   protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-     if (this.isHovered()) {
-     RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
-     this.getScaledContentWidth(), this.getScaledContentHeight(), 0x223495eb);
-    
-     RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
-     this.getScaledContentX(),
-     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
-     RenderUtil.fill(matrixStack, this.getScaledX() + this.getScaledContentWidth(),
-     this.getScaledY(),
-     this.getScaledX() + this.getScaledWidth(),
-     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
-    
-     RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
-     this.getScaledX() + this.getScaledWidth(),
-     this.getScaledContentY(), 0x3384ab05);
-     RenderUtil.fill(matrixStack, this.getScaledX(),
-     this.getScaledY() + this.getScaledContentHeight(),
-     this.getScaledX() + this.getScaledWidth(),
-     this.getScaledY() + this.getScaledHeight(), 0x3384ab05);
-     }
+    if (DEBUG && this.hasState(States.HOVERED)) {
+      RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
+          this.getScaledContentWidth(), this.getScaledContentHeight(), 0x223495eb);
+
+      // Left border
+      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
+          this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
+          this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
+      // Left padding
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
+          this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
+          this.getScaledContentX(),
+          this.getScaledY() + this.getScaledHeight()
+              - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
+          0x3384ab05);
+
+      // Right border
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.getScaledWidth()
+              - this.unscale(this.layout.getRightBorder(), this.unscaleBorder),
+          this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
+      // Right padding
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.getScaledWidth()
+              - this.unscale(this.layout.getRightBorder(), this.unscaleBorder)
+              - this.layout.getRightPadding(),
+          this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
+          this.getScaledX() + this.getScaledWidth()
+              - this.unscale(this.layout.getRightBorder(), this.unscaleBorder),
+          this.getScaledY() + this.getScaledHeight()
+              - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
+          0x3384ab05);
+
+      // Top border
+      RenderUtil.fill(matrixStack, this.getScaledX(),
+          this.getScaledY(),
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
+          0x33e3b352);
+      // Top padding
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
+          this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
+          this.getScaledX() + this.getScaledWidth()
+              - this.unscale(this.layout.getRightBorder(), this.unscaleBorder),
+          this.getScaledContentY(), 0x3384ab05);
+
+      // Bottom border
+      RenderUtil.fill(matrixStack, this.getScaledX(),
+          this.getScaledY() + this.getScaledHeight()
+              - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
+          this.getScaledX() + this.getScaledWidth(),
+          this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
+      // Bottom padding
+      RenderUtil.fill(matrixStack,
+          this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
+          this.getScaledContentY() + this.getScaledContentHeight(),
+          this.getScaledX() + this.getScaledWidth()
+              - this.unscale(this.layout.getRightBorder(), this.unscaleBorder),
+          this.getScaledY() + this.getScaledHeight()
+              - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
+          0x3384ab05);
+    }
   }
 
   private final float getScrollbarX() {
@@ -424,11 +569,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
         this.getScaledHeight());
   }
 
-  private final void scrollTo(float y, float duration) {
-    Tween.to(this, SCROLL_OFFSET, duration)
-        .target(this.clampScrollOffset(y))
-        .ease(Sine.OUT)
-        .start(this.getTweenManager());
+  private final void scrollTo(float y, long durationMs) {
+    new Animator.Builder()
+        .addTarget(PropertySetter.getTargetTo(this, "scrollOffset",
+            new SplineInterpolator(0.25, 0.1, 0.25, 1),
+            this.clampScrollOffset(y)))
+        .setDuration(durationMs, TimeUnit.MILLISECONDS)
+        .build()
+        .start();
   }
 
   private final float clampScrollOffset(float scrollOffset) {
@@ -436,31 +584,51 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public void mouseEntered(double mouseX, double mouseY) {
-    this.hovered = true;
     if (this.tooltip != null) {
-      Timeline.createParallel(150)
-          .push(Tween.to(this.tooltip, Tooltip.ALPHA)
-              .ease(Sine.INOUT)
-              .target(1.0F))
-          .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
-              .delay(100.0F)
-              .target(1.0F))
-          .start(this.getTweenManager());
+      new Animator.Builder()
+          .addTarget(Animation.forProperty(this.tooltip.getOpacityProperty())
+              .to(255)
+              .build())
+          .setInterpolator(LinearInterpolator.getInstance())
+          .setDuration(150L, TimeUnit.MILLISECONDS)
+          .build()
+          .start();
+
+      new Animator.Builder()
+          .addTarget(Animation.forProperty(this.tooltip.getTextOpacityProperty())
+              .to(255)
+              .build())
+          .setInterpolator(LinearInterpolator.getInstance())
+          .setStartDelay(75L, TimeUnit.MILLISECONDS)
+          .setDuration(150L, TimeUnit.MILLISECONDS)
+          .build()
+          .start();
     }
+
+    this.states.add(States.HOVERED);
+    this.updateProperties(false);
 
     this.post(new MouseEnterEvent());
   }
 
   public void mouseLeft(double mouseX, double mouseY) {
-    this.hovered = false;
     if (this.tooltip != null) {
-      Timeline.createParallel(250)
-          .push(Tween.to(this.tooltip, Tooltip.ALPHA)
-              .target(0.0F))
-          .push(Tween.to(this.tooltip, Tooltip.TEXT_ALPHA)
-              .target(0.0F))
-          .start(this.getTweenManager());
+      new Animator.Builder()
+          .addTarget(Animation.forProperty(this.tooltip.getOpacityProperty())
+              .to(0)
+              .build())
+          .addTarget(Animation.forProperty(this.tooltip.getTextOpacityProperty())
+              .to(0)
+              .build())
+          .setInterpolator(LinearInterpolator.getInstance())
+          .setDuration(250L, TimeUnit.MILLISECONDS)
+          .build()
+          .start();
     }
+
+    this.states.remove(States.HOVERED);
+    this.updateProperties(false);
+
     this.post(new MouseLeaveEvent());
   }
 
@@ -471,6 +639,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    if (this.hasState(States.FOCUSED)) {
+      this.removeState(States.FOCUSED);
+      this.updateProperties(false);
+    }
+
     if (!this.isHovered()) {
       return false;
     }
@@ -501,7 +674,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     long currentTime = Util.getMillis();
     long deltaTime = currentTime - this.lastClickTimeMs;
     this.lastClickTimeMs = currentTime;
-    return this.enabled && (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
+    return this.hasState(States.ENABLED)
+        && (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
         && this.post(new ActionEvent()) == Event.Result.ALLOW;
   }
 
@@ -559,20 +733,16 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   @Override
   public boolean changeFocus(boolean forward) {
-    if (this.focusable) {
-      this.focused = !this.focused;
+    if (this.focusable && this.hasState(States.ENABLED)) {
+      boolean focused = this.toggleState(States.FOCUSED);
+      this.updateProperties(false);
       this.focusChanged();
-      return this.focused;
+      return focused;
     }
     return false;
   }
 
   protected void focusChanged() {
-    if (this.focused) {
-      this.setBorderWidth(0.7F);
-    } else {
-      this.setBorderWidth(0.0F);
-    }
     this.post(new FocusChangedEvent());
   }
 
@@ -588,18 +758,6 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
         && mouseY > this.getScaledY() && mouseY < this.getScaledY() + this.getScaledHeight();
   }
 
-  public boolean isHovered() {
-    return this.hovered;
-  }
-
-  public boolean isFocused() {
-    return this.focused;
-  }
-
-  public final TweenManager getTweenManager() {
-    return this.tweenManager;
-  }
-
   public void close() {
     if (this.backgroundBlur != null) {
       this.backgroundBlur.close();
@@ -607,68 +765,18 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     this.layout.close();
   }
 
-  public final SELF addHoverAnimation(TweenType<View<?, ?>> tweenType, float[] target,
-      float duration) {
-    float[] original = new float[tweenType.getValuesSize()];
-    tweenType.getValues(this, original);
-    return this.addHoverAnimation(tweenType, target, __ -> original, duration);
-  }
-
-  public final SELF addBackgroundHoverAnimation(Colour colour, float duration) {
-    return this.addHoverAnimation(BACKGROUND_COLOUR, colour.getColour4f(),
-        view -> view.getBackgroundColour().map(Colour::getColour4f).get(), duration);
-  }
-
-  public final SELF addHoverAnimation(TweenType<View<?, ?>> tweenType, float[] target,
-      Function<SELF, float[]> original, float duration) {
-    return this
-        .addListener(MouseEnterEvent.class, (view, event) -> {
-          if (this.enabled) {
-            Tween
-                .to(this.self(), tweenType, duration)
-                .target(target)
-                .start(this.tweenManager);
-          }
-        })
-        .addListener(MouseLeaveEvent.class, (view, event) -> {
-          if (this.enabled) {
-            Tween
-                .to(this.self(), tweenType, duration)
-                .target(original.apply(this.self()))
-                .start(this.tweenManager);
-          }
-        });
-  }
-
-  public final SELF setDisabledBackgroundColour(Colour colour, float duration) {
-    return this
-        .addListener(EnabledChangedEvent.class, (view, event) -> {
-          if (!this.enabled) {
-            if (this.parent == null) {
-              // Not added yet so just set the colour without animating.
-              this.modifiedBackgroundColour.setColour4f(colour.getColour4f());
-            } else {
-              Tween
-                  .to(this.self(), BACKGROUND_COLOUR, duration)
-                  .target(colour.getColour4f())
-                  .start(this.tweenManager);
-            }
-          } else {
-            if (this.parent == null) {
-              // Not added yet so just set the colour without animating.
-              this.modifiedBackgroundColour.setColour4f(this.backgroundColour.getColour4f());
-            } else {
-              Tween
-                  .to(this.self(), BACKGROUND_COLOUR, duration)
-                  .target(this.backgroundColour.getColour4f())
-                  .start(this.tweenManager);
-            }
-          }
-        });
+  public final SELF setDisabledBackgroundColor(Color color) {
+    this.backgroundColor.registerState(color, States.DISABLED);
+    return this.self();
   }
 
   public final SELF addActionSound(SoundEvent soundEvent) {
     return this.addListener(ActionEvent.class, (component, event) -> this.minecraft
+        .getSoundManager().play(SimpleSound.forUI(soundEvent, 1.0F)));
+  }
+
+  public final SELF addHoverSound(SoundEvent soundEvent) {
+    return this.addListener(MouseEnterEvent.class, (component, event) -> this.minecraft
         .getSoundManager().play(SimpleSound.forUI(soundEvent, 1.0F)));
   }
 
@@ -702,58 +810,58 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   public final float getScaledContentX() {
     return this.getContentX()
-        + (this.getContentWidth() - (this.getContentWidth() * this.xScale)) / 2.0F;
+        + (this.getContentWidth() - (this.getContentWidth() * this.xScale.get())) / 2.0F;
   }
 
   public float getContentX() {
     return this.getX()
-        + this.layout.getLeftPadding() * this.getXScale();
+        + this.layout.getLeftPadding() * this.getXScale()
+        + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder) * this.getXScale();
   }
 
   public final float getScaledX() {
-    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale)) / 2.0F;
+    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale.get())) / 2.0F;
   }
 
   public final float getX() {
     final float left = this.layout.getLeft();
     return left
-        + (left * this.getXScale()) - (left * this.xScale)
-        + this.xOffset
+        + (left * this.getXScale()) - (left * this.xScale.get())
+        + this.xTranslation.get()
         + (this.parent == null
             ? 0.0F
             : this.parent.getScaledContentX())
-        + (this.unscaleWidth
-            ? this.getWidth() * (float) this.mainWindow.getGuiScale() - this.getWidth()
-            : 0.0F);
+        + this.unscaleOffset(this.getWidth(), this.unscaleWidth);
   }
 
   public final float getScaledContentY() {
     return this.getContentY()
-        + (this.getContentHeight() - (this.getContentHeight() * this.yScale)) / 2.0F;
+        + (this.getContentHeight() - (this.getContentHeight() * this.yScale.get())) / 2.0F;
   }
 
   public float getContentY() {
     return this.getY()
         + this.layout.getTopPadding() * this.getYScale()
+        + this.unscale(this.layout.getTopBorder(), this.unscaleBorder) * this.getYScale()
         - (this.fullHeight > this.getHeight()
             ? this.getScrollOffset(this.minecraft.getFrameTime()) * this.getYScale()
             : 0.0F);
   }
 
   public final float getScaledY() {
-    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale)) / 2.0F;
+    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale.get())) / 2.0F;
   }
 
   public final float getY() {
     final float top = this.layout.getTop();
     return top
-        + (top * this.getYScale()) - (top * this.yScale)
-        + this.yOffset
+        + (top * this.getYScale()) - (top * this.yScale.get())
+        + this.yTranslation.get()
         + (this.parent == null
             ? 0.0F
             : this.parent.getScaledContentY())
         + (this.unscaleHeight
-            ? this.getHeight() * (float) this.mainWindow.getGuiScale() - this.getHeight()
+            ? this.getHeight() * (float) this.window.getGuiScale() - this.getHeight()
             : 0.0F);
   }
 
@@ -762,7 +870,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public float getContentWidth() {
-    return this.getWidth() - this.layout.getRightPadding()
+    return this.getWidth()
+        - this.layout.getRightPadding()
+        - this.layout.getLeftPadding()
+        - this.unscale(this.layout.getRightBorder(), this.unscaleBorder)
+        - this.unscale(this.layout.getLeftBorder(), this.unscaleBorder)
         - (this.isScrollbarEnabled() ? SCROLLBAR_WIDTH : 0.0F);
   }
 
@@ -771,8 +883,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public final float getWidth() {
-    return (float) (this.layout.getWidth()
-        / (this.unscaleWidth ? this.mainWindow.getGuiScale() : 1.0F));
+    return this.unscale(this.layout.getWidth(), this.unscaleWidth);
   }
 
   public final float getScaledContentHeight() {
@@ -780,7 +891,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public final float getContentHeight() {
-    return this.getHeight() - this.layout.getBottomPadding() - this.layout.getTopPadding();
+    return this.getHeight()
+        - this.layout.getBottomPadding()
+        - this.layout.getTopPadding()
+        - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder)
+        - this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
   }
 
   public float getScaledHeight() {
@@ -788,27 +903,24 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public final float getHeight() {
-    return (float) (this.layout.getHeight()
-        / (this.unscaleHeight ? this.mainWindow.getGuiScale() : 1.0F));
+    return this.unscale(this.layout.getHeight(), this.unscaleHeight);
   }
 
-  public final SELF setXOffset(float xOffset) {
-    this.xOffset = xOffset;
-    return this.self();
+  public final ValueStyleProperty<Float> getXTranslationProperty() {
+    return this.xTranslation;
   }
 
-  public final SELF setYOffset(float yOffset) {
-    this.yOffset = yOffset;
-    return this.self();
+  public final ValueStyleProperty<Float> getYTranslationProperty() {
+    return this.yTranslation;
   }
 
   public final float getZOffset() {
-    return this.index + this.zOffset;
+    return this.index + this.zIndex;
   }
 
-  public final SELF setZOffset(float zOffset) {
-    if (this.zOffset != zOffset) {
-      this.zOffset = zOffset;
+  public final SELF setZOffset(int zIndex) {
+    if (this.zIndex != zIndex) {
+      this.zIndex = zIndex;
       if (this.parent != null) {
         this.parent.sortChildren();
       }
@@ -817,105 +929,51 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   public final float getXScale() {
-    return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.xScale;
-  }
-
-  public final SELF setXScale(float xScale) {
-    this.xScale = xScale;
-    return this.self();
+    return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.xScale.get();
   }
 
   public final float getYScale() {
-    return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.yScale;
+    return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.yScale.get();
   }
 
-  public final SELF setYScale(float yScale) {
-    this.yScale = yScale;
-    return this.self();
+  public final ValueStyleProperty<Float> getXScaleProperty() {
+    return this.xScale;
   }
 
-  public final Overflow getOverflow() {
-    return this.overflow;
+  public final ValueStyleProperty<Float> getYScaleProperty() {
+    return this.yScale;
   }
 
-  public final SELF setOverflow(Overflow overflow) {
-    this.overflow = overflow;
-    return this.self();
+  public final CompositeStyleProperty<Float> getScaleProperty() {
+    return this.scale;
   }
 
-  public final SELF setScale(float scale) {
-    return this.setXScale(scale).setYScale(scale);
+  public final ValueStyleProperty<Color> getTopBorderColorProperty() {
+    return this.topBorderColor;
   }
 
-  public final SELF setTopBorderWidth(float width) {
-    this.topBorderWidth = width;
-    return this.self();
+  public final ValueStyleProperty<Color> getRightBorderColorProperty() {
+    return this.rightBorderColor;
   }
 
-  public final SELF setRightBorderWidth(float width) {
-    this.rightBorderWidth = width;
-    return this.self();
+  public final ValueStyleProperty<Color> getBottomBorderColorProperty() {
+    return this.bottomBorderColor;
   }
 
-  public final SELF setBotBorderWidth(float width) {
-    this.bottomBorderWidth = width;
-    return this.self();
+  public final ValueStyleProperty<Color> getLeftBorderColorProperty() {
+    return this.leftBorderColor;
   }
 
-  public final SELF setLeftBorderWidth(float width) {
-    this.leftBorderWidth = width;
-    return this.self();
+  public final CompositeStyleProperty<Color> getBorderColorProperty() {
+    return this.borderColor;
   }
 
-  public final SELF setTopBorderColour(Colour colour) {
-    this.topBorderColour = colour;
-    return this.self();
+  public final ValueStyleProperty<Float> getOutlineWidthProperty() {
+    return this.outlineWidth;
   }
 
-  public final SELF setRightBorderColour(Colour colour) {
-    this.rightBorderColour = colour;
-    return this.self();
-  }
-
-  public final SELF setBotBorderColour(Colour colour) {
-    this.bottomBorderColour = colour;
-    return this.self();
-  }
-
-  public final SELF setLeftBorderColour(Colour colour) {
-    this.leftBorderColour = colour;
-    return this.self();
-  }
-
-  public final SELF setBorderWidth(float width) {
-    this.topBorderWidth = width;
-    this.rightBorderWidth = width;
-    this.bottomBorderWidth = width;
-    this.leftBorderWidth = width;
-    return this.self();
-  }
-
-  public final SELF setBorderColour(Colour colour) {
-    this.topBorderColour = colour;
-    this.rightBorderColour = colour;
-    this.bottomBorderColour = colour;
-    this.leftBorderColour = colour;
-    return this.self();
-  }
-
-  public final boolean isEnabled() {
-    return this.enabled;
-  }
-
-  public final SELF setEnabled(boolean enabled) {
-    if (this.enabled == enabled) {
-      return this.self();
-    }
-
-    this.enabled = enabled;
-    this.post(new EnabledChangedEvent());
-
-    return this.self();
+  public final ValueStyleProperty<Color> getOutlineColorProperty() {
+    return this.outlineColor;
   }
 
   public final SELF setTooltip(@Nullable Tooltip tooltip) {
@@ -923,14 +981,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.self();
   }
 
-  public Optional<Colour> getBackgroundColour() {
-    return Optional.ofNullable(this.backgroundColour);
-  }
-
-  public final SELF setBackgroundColour(@Nullable Colour backgroundColour) {
-    this.backgroundColour = backgroundColour;
-    this.modifiedBackgroundColour = new Colour(backgroundColour);
-    return this.self();
+  public final ValueStyleProperty<Color> getBackgroundColorProperty() {
+    return this.backgroundColor;
   }
 
   public final SELF setBackgroundBlur() {
@@ -945,9 +997,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.self();
   }
 
-  public final SELF setCornerRadius(float cornerRadius) {
-    this.cornerRadius = cornerRadius;
-    return this.self();
+  public final ValueStyleProperty<Float> getBorderRadiusProperty() {
+    return this.borderRadius;
   }
 
   public final SELF setFocusable(boolean focusable) {
@@ -960,22 +1011,61 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     return this.self();
   }
 
-  public final SELF setUnscaleWidth() {
-    this.unscaleWidth = true;
+  public final SELF setUnscaleWidth(boolean unscaleWidth) {
+    this.unscaleWidth = unscaleWidth;
     return this.self();
   }
 
-  public final SELF setUnscaleHeight() {
-    this.unscaleHeight = true;
+  public final SELF setUnscaleHeight(boolean unscaleHeight) {
+    this.unscaleHeight = unscaleHeight;
     return this.self();
+  }
+
+  public final SELF setUnscaleBorder(boolean unscaleBorder) {
+    this.unscaleBorder = unscaleBorder;
+    return this.self();
+  }
+
+  public final SELF setUnscaleOutline(boolean unscaleOutline) {
+    this.unscaleOutline = unscaleOutline;
+    return this.self();
+  }
+
+  public final ValueStyleProperty<Float> getAlphaProperty() {
+    return this.alpha;
   }
 
   public final float getAlpha() {
-    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha;
+    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha.get();
   }
 
-  public final SELF setAlpha(float alpha) {
-    this.alpha = alpha;
+  public final SELF setEnabled(boolean enabled) {
+    if (enabled) {
+      this.addState(States.ENABLED);
+      this.removeState(States.DISABLED);
+    } else {
+      this.removeState(States.ENABLED);
+      this.addState(States.DISABLED);
+    }
+    this.updateProperties(!this.isAdded());
+    return this.self();
+  }
+
+  public final boolean isHovered() {
+    return this.hasState(States.HOVERED);
+  }
+
+  public final boolean isSelected() {
+    return this.hasState(States.SELECTED);
+  }
+
+  public SELF setSelected(boolean selected) {
+    if (selected) {
+      this.addState(States.SELECTED);
+    } else {
+      this.removeState(States.SELECTED);
+    }
+    this.updateProperties(!this.isAdded());
     return this.self();
   }
 
@@ -991,7 +1081,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   public final ViewScreen getScreen() {
     if (this.screen == null) {
       if (this.parent == null) {
-        throw new IllegalStateException("Root view has no screen");
+        throw new UnsupportedOperationException("Root view has no screen");
       }
       return this.parent.getScreen();
     }
@@ -1022,5 +1112,15 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   @SuppressWarnings("unchecked")
   protected final SELF self() {
     return (SELF) this;
+  }
+
+  protected final float unscaleOffset(float value, boolean condition) {
+    return condition
+        ? value * (float) this.window.getGuiScale() - value
+        : 0.0F;
+  }
+
+  protected final float unscale(float value, boolean condition) {
+    return condition ? value / (float) this.window.getGuiScale() : value;
   }
 }

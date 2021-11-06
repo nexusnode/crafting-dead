@@ -5,6 +5,10 @@ plugins {
 repositories {
     mavenCentral()
     google()
+    maven {
+        name 'IzzelAliz Maven'
+        url 'https://maven.izzel.io/releases'
+    }
 }
 
 mixin {
@@ -60,7 +64,7 @@ minecraft {
 def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
 
 dependencies {
-    shaded group: 'io.noties', name: 'tumbleweed', version: '2.1.0'
+
     implementation project(':crafting-dead-core')
     shaded (group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
@@ -70,6 +74,10 @@ dependencies {
             exclude group: 'org.lwjgl', module: 'lwjgl'
         }
     }
+    
+	implementation group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+
+    
 }
 
 jar {

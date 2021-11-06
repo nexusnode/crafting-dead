@@ -7,15 +7,15 @@ import net.minecraft.client.renderer.Rectangle2d;
 
 public class ScissorStack {
 
-  private final Deque<Rectangle2d> regionStack = new ArrayDeque<>();
+  private static final Deque<Rectangle2d> regionStack = new ArrayDeque<>();
 
-  public void push(int x, int y, int width, int height) {
-    this.push(new Rectangle2d(x, y, width, height));
+  public static void push(int x, int y, int width, int height) {
+    push(new Rectangle2d(x, y, width, height));
   }
 
-  public void push(Rectangle2d region) {
-    Rectangle2d parentRegion = this.peek();
-    this.regionStack.push(region);
+  public static void push(Rectangle2d region) {
+    Rectangle2d parentRegion = peek();
+    regionStack.push(region);
     if (parentRegion == null) {
       RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
           region.getHeight());
@@ -30,10 +30,10 @@ public class ScissorStack {
     }
   }
 
-  public void pop() {
-    if (!this.regionStack.isEmpty()) {
-      this.regionStack.pop();
-      Rectangle2d region = this.regionStack.peek();
+  public static void pop() {
+    if (!regionStack.isEmpty()) {
+      regionStack.pop();
+      Rectangle2d region = regionStack.peek();
       if (region != null) {
         RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
             region.getHeight());
@@ -43,11 +43,11 @@ public class ScissorStack {
     RenderSystem.disableScissor();
   }
 
-  public Rectangle2d peek() {
-    return this.regionStack.peek();
+  public static Rectangle2d peek() {
+    return regionStack.peek();
   }
 
-  public boolean isEmpty() {
-    return this.regionStack.isEmpty();
+  public static boolean isEmpty() {
+    return regionStack.isEmpty();
   }
 }

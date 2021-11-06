@@ -18,24 +18,19 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import com.craftingdead.immerse.client.gui.tween.FloatTweenType;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.noties.tumbleweed.TweenType;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
 
 public class Tooltip {
 
-  public static final TweenType<Tooltip> ALPHA =
-      new FloatTweenType<>(Tooltip::getAlpha, Tooltip::setAlpha);
-  public static final TweenType<Tooltip> TEXT_ALPHA =
-      new FloatTweenType<>(Tooltip::getTextAlpha, Tooltip::setTextAlpha);
-
   private final ITextComponent text;
-  private float alpha = 0;
-  private float textAlpha = 0;
+  private final ValueStyleProperty<Integer> opacityProperty =
+      ValueStyleProperty.create("alpha", Integer.class, 0);
+  private final ValueStyleProperty<Integer> textOpacityProperty =
+      ValueStyleProperty.create("text-alpha", Integer.class, 0);
 
   public Tooltip(ITextComponent text) {
     this.text = text;
@@ -48,37 +43,28 @@ public class Tooltip {
     RenderSystem.enableBlend();
     RenderUtil.enableRoundedRectShader(x, y, x + width, y + height, 2);
     RenderUtil.fill(matrixStack,
-        x, y, x + width, y + height, +((int) (this.alpha * 0.5F * 255.0F) << 24));
+        x, y, x + width, y + height, 0x111111 | (this.opacityProperty.get() << 24));
     RenderUtil.resetShader();
 
-    final int textOpacity = Math.min((int) (this.textAlpha * 255.0F), 255);
-    if (textOpacity >= 8) {
+    int shiftedOpacity = this.textOpacityProperty.get() << 24;
+    if ((shiftedOpacity & 0xFC000000) != 0) {
       matrixStack.pushPose();
       {
         matrixStack.translate(0.0D, 0.0D, 400.0D);
-        fontRenderer.drawShadow(matrixStack, this.text,
-            (float) (x + (width - fontRenderer.width(this.text)) / 2), (float) y + 4,
-            0xFFFFFF + (textOpacity << 24));
+        fontRenderer.draw(matrixStack, this.text,
+            (x + (width - fontRenderer.width(this.text)) / 2.0F), y + 3.5F,
+            0xFFFFFF | shiftedOpacity);
       }
       matrixStack.popPose();
     }
-
     RenderSystem.disableBlend();
   }
 
-  public float getAlpha() {
-    return this.alpha;
+  public ValueStyleProperty<Integer> getOpacityProperty() {
+    return this.opacityProperty;
   }
 
-  public void setAlpha(float alpha) {
-    this.alpha = alpha;
-  }
-
-  public float getTextAlpha() {
-    return this.textAlpha;
-  }
-
-  public void setTextAlpha(float textAlpha) {
-    this.textAlpha = textAlpha;
+  public ValueStyleProperty<Integer> getTextOpacityProperty() {
+    return this.textOpacityProperty;
   }
 }

@@ -18,15 +18,17 @@
 
 package com.craftingdead.immerse.client.gui.screen;
 
+import com.craftingdead.immerse.client.gui.view.Color;
+
 public class Theme {
 
-  public static final long RED_DISABLED = 0x3394434b;
-  public static final long RED = 0x66ff7583;
-  public static final long RED_HIGHLIGHTED = 0x66ff8c98;
-  public static final long GREEN_DISABLED = 0x3330916e;
-  public static final long GREEN = 0x6652F2B7;
-  public static final long GREEN_HIGHLIGHTED = 0x6692F0CE;
-  public static final long BLUE_DISABLED = 0x330761b0;
-  public static final long BLUE = 0x6674b9f7;
-  public static final long BLUE_HIGHLIGHTED = 0x6691cbff;
+  public static final Color RED_DISABLED = new Color(0x3394434b);
+  public static final Color RED = new Color(0x66ff7583);
+  public static final Color RED_HIGHLIGHTED = new Color(0x66ff8c98);
+  public static final Color GREEN_DISABLED = new Color(0x3330916e);
+  public static final Color GREEN = new Color(0x6652F2B7);
+  public static final Color GREEN_HIGHLIGHTED = new Color(0x6692F0CE);
+  public static final Color BLUE_DISABLED = new Color(0x330761b0);
+  public static final Color BLUE = new Color(0x6674b9f7);
+  public static final Color BLUE_HIGHLIGHTED = new Color(0x6691cbff);
 }

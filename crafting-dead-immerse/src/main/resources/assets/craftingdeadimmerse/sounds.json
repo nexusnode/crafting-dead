@@ -4,6 +4,36 @@
       "craftingdeadimmerse:button_click"
     ]
   },
+  "main_menu_hover": {
+    "sounds": [
+      "craftingdeadimmerse:main_menu_hover"
+    ]
+  },
+  "main_menu_press_play": {
+    "sounds": [
+      "craftingdeadimmerse:main_menu_press_play"
+    ]
+  },
+  "tab_select": {
+    "sounds": [
+      "craftingdeadimmerse:tab_select"
+    ]
+  },
+  "tab_hover": {
+    "sounds": [
+      "craftingdeadimmerse:tab_hover"
+    ]
+  },
+  "drop_down_expand": {
+    "sounds": [
+      "craftingdeadimmerse:drop_down_expand"
+    ]
+  },
+  "submenu_select": {
+    "sounds": [
+      "craftingdeadimmerse:submenu_select"
+    ]
+  },
   "countdown": {
     "sounds": [
       "craftingdeadimmerse:countdown"

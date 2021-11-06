@@ -18,13 +18,21 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.KeyFrames;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Animation;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
@@ -40,7 +48,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class ServerListView<L extends Layout>
     extends ParentView<ServerListView<L>, L, YogaLayout> {
 
-  protected final ServerProvider serverProvider;
+  protected final ServerList serverProvider;
 
   protected final ParentView<?, YogaLayout, YogaLayout> listView;
 
@@ -51,7 +59,10 @@ public class ServerListView<L extends Layout>
 
   private final View<?, YogaLayout> playButton;
 
-  public ServerListView(L layout, ServerProvider serverEntryProvider) {
+  @Nullable
+  private CompletableFuture<Collection<ServerEntry>> refreshFuture;
+
+  public ServerListView(L layout, ServerList serverEntryProvider) {
     super(layout, new YogaLayoutParent().setFlexDirection(FlexDirection.COLUMN));
     this.serverProvider = serverEntryProvider;
 
@@ -60,20 +71,20 @@ public class ServerListView<L extends Layout>
             .setFlexBasis(1)
             .setFlexGrow(1)
             .setBottomPadding(7F)
-            .setHeight(60F),
+            .setHeight(60F)
+            .setOverflow(Overflow.SCROLL),
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.COLUMN)
             .setAlignItems(Align.CENTER))
-                .setOverflow(Overflow.SCROLL)
                 .addChild(this.firstTableRow());
     this.addChild(this.listView);
 
-    this.playButton =
-        createButton(new Colour(Theme.GREEN), new Colour(Theme.GREEN_HIGHLIGHTED),
-            new TranslationTextComponent("view.server_list.button.play"),
-            () -> this.getSelectedItem().ifPresent(ServerItemView::connect))
-                .setDisabledBackgroundColour(new Colour(Theme.GREEN_DISABLED), 150F)
-                .setEnabled(false);
+    this.playButton = createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
+        new TranslationTextComponent("view.server_list.button.play"),
+        () -> this.getSelectedItem().ifPresent(ServerItemView::connect))
+            .configure(view -> view.getBackgroundColorProperty()
+                .registerState(Theme.GREEN_DISABLED, States.DISABLED))
+            .setEnabled(false);
 
     this.controlsView = new ParentView<>(
         new YogaLayout().setHeight(56),
@@ -81,7 +92,8 @@ public class ServerListView<L extends Layout>
             .setJustifyContent(Justify.CENTER)
             .setAlignItems(Align.CENTER)
             .setFlexDirection(FlexDirection.COLUMN))
-                .setBackgroundColour(new Colour(0x40121212))
+                .configure(
+                    view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x40121212)))
                 .addChild(this.createTopRowControls())
                 .addChild(this.createBottomRowControls());
 
@@ -109,18 +121,15 @@ public class ServerListView<L extends Layout>
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER))
-                .addChild(createButton(new Colour(Theme.BLUE),
-                    new Colour(Theme.BLUE_HIGHLIGHTED), new TranslationTextComponent(
-                        "view.server_list.button.quick_refresh"),
-                    this::quickRefresh)
-                        .configure(view -> view.getLayout().setMargin(3)))
-                .addChild(createButton(new Colour(Theme.BLUE),
-                    new Colour(Theme.BLUE_HIGHLIGHTED), new TranslationTextComponent(
-                        "view.server_list.button.refresh"),
+                .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+                    new TranslationTextComponent("view.server_list.button.quick_refresh"),
+                    this::quickRefresh).configure(view -> view.getLayout().setMargin(3)))
+                .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+                    new TranslationTextComponent("view.server_list.button.refresh"),
                     this::refresh).configure(view -> view.getLayout().setMargin(3)));
   }
 
-  protected static View<?, YogaLayout> createButton(Colour colour, Colour hoveredColour,
+  protected static View<?, YogaLayout> createButton(Color color, Color hoveredColor,
       ITextComponent text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
@@ -133,8 +142,10 @@ public class ServerListView<L extends Layout>
                 .addChild(new TextView<>(new YogaLayout().setHeight(8F), text)
                     .setShadow(false)
                     .setCentered(true))
-                .setBackgroundColour(colour)
-                .addBackgroundHoverAnimation(hoveredColour, 150F)
+                .configure(view -> view.getBackgroundColorProperty()
+                    .setBaseValue(color)
+                    .registerState(hoveredColor, States.HOVERED, States.ENABLED)
+                    .setTransition(Transition.linear(150L)))
                 .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
                 .setFocusable(true)
                 .addListener(ActionEvent.class, (c, e) -> actionListener.run());
@@ -154,7 +165,8 @@ public class ServerListView<L extends Layout>
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER))
-                .setBackgroundColour(new Colour(0x88121212))
+                .configure(
+                    view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x88121212)))
                 .addChild(new TextView<>(new YogaLayout().setFlex(2F).setHeight(8),
                     new TranslationTextComponent("view.server_list.motd"))
                         .setShadow(false)
@@ -178,6 +190,29 @@ public class ServerListView<L extends Layout>
   }
 
   @Override
+  protected void added() {
+    int delay = 0;
+    for (View<?, ?> view : this.listView.getChildViews()) {
+      new Animator.Builder()
+          .addTarget(Animation.forProperty(view.getXTranslationProperty())
+              .keyFrames(new KeyFrames.Builder<>(-100.0F)
+                  .addFrame(0.0F)
+                  .build())
+              .build())
+          .addTarget(Animation.forProperty(view.getAlphaProperty())
+              .keyFrames(new KeyFrames.Builder<>(0.0F)
+                  .addFrame(1.0F)
+                  .build())
+              .build())
+          .setStartDelay(delay, TimeUnit.MILLISECONDS)
+          .setDuration(200L, TimeUnit.MILLISECONDS)
+          .build()
+          .start();
+      delay += 100;
+    }
+  }
+
+  @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     boolean result = super.mouseClicked(mouseX, mouseY, button);
     this.updateSelected();
@@ -188,7 +223,7 @@ public class ServerListView<L extends Layout>
     this.selectedItem = this.listView.getChildViews().stream()
         .filter(child -> child instanceof ServerItemView)
         .map(child -> (ServerItemView) child)
-        .filter(ServerItemView::isSelected)
+        .filter(View::isSelected)
         .findAny()
         .orElse(null);
 
@@ -200,10 +235,12 @@ public class ServerListView<L extends Layout>
   }
 
   private void refresh() {
-    this.listView.clearChildren();
-    this.selectedItem = null;
-    this.updateSelected();
-    this.serverProvider.read(this::addServer);
+    if (this.refreshFuture == null || this.refreshFuture.cancel(false)) {
+      this.listView.clearChildren();
+      this.selectedItem = null;
+      this.updateSelected();
+      this.serverProvider.load().thenAccept(servers -> servers.forEach(this::addServer));
+    }
   }
 
   private void quickRefresh() {

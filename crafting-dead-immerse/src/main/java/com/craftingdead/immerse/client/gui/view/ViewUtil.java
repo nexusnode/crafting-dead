@@ -121,11 +121,12 @@ public class ViewUtil {
 
           if (text != null) {
             View<?, YogaLayout> view = new TextView<>(
-                new YogaLayout()
-                    .setWidthPercent(100.0F),
+                new YogaLayout().setWidthPercent(100.0F),
                 ForgeHooks.newChatWithLinks(text))
-                    .setShadow(shadow)
-                    .setScale(scale);
+                    .setShadow(shadow);
+
+            view.getScaleProperty().setBaseValue(scale);
+
             parentView.addChild(view);
           }
           break;

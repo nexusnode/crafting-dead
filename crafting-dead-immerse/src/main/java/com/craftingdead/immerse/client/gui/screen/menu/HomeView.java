@@ -19,7 +19,12 @@
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.io.File;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import java.util.concurrent.TimeUnit;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.KeyFrames;
+import org.jdesktop.core.animation.timing.TimingTargetAdapter;
+import com.craftingdead.immerse.client.gui.view.Animation;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.View;
@@ -28,11 +33,6 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import io.noties.tumbleweed.Timeline;
-import io.noties.tumbleweed.Tween;
-import io.noties.tumbleweed.TweenCallback;
-import io.noties.tumbleweed.equations.Expo;
-import io.noties.tumbleweed.equations.Sine;
 
 public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
 
@@ -52,38 +52,51 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
             .setWidthPercent(45.0F)
             .setHeightPercent(75.0F)
             .setPadding(10.0F)
-            .setLeftMarginPercent(10.0F),
+            .setLeftMarginPercent(10.0F)
+            .setOverflow(Overflow.SCROLL),
         new YogaLayoutParent())
-            .setBackgroundColour(new Colour(0x70777777))
+            .configure(
+                view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x70777777)))
             .setBackgroundBlur(50.0F)
-            .setOverflow(Overflow.SCROLL)
             .configure(view -> ViewUtil.addAll(view, new File("news.xml")));
     this.addChild(this.newsComponent);
   }
 
   @Override
   protected void added() {
-    this.newsComponent.setScale(0.3F);
-    Timeline.createParallel(800.0F)
-        .push(Tween.to(this.newsComponent, X_SCALE)
-            .ease(Expo.OUT)
-            .target(1.0F))
-        .push(Tween.to(this.newsComponent, Y_SCALE)
-            .ease(Expo.OUT)
-            .target(1.0F))
-        .start(this.getTweenManager());
+    new Animator.Builder()
+        .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
+            .keyFrames(new KeyFrames.Builder<>(0.3F)
+                .addFrame(1.0F)
+                .build())
+            .build())
+        .addTarget(Animation.forProperty(this.newsComponent.getYScaleProperty())
+            .keyFrames(new KeyFrames.Builder<>(0.3F)
+                .addFrame(1.0F)
+                .build())
+            .build())
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .build()
+        .start();
   }
 
   @Override
   protected void queueRemoval(Runnable remove) {
-    Timeline.createParallel(600.0F)
-        .push(Tween.to(this.newsComponent, X_SCALE)
-            .ease(Sine.OUT)
-            .target(0.1F))
-        .push(Tween.to(this.newsComponent, Y_SCALE)
-            .ease(Sine.OUT)
-            .target(0.1F))
-        .addCallback(TweenCallback.COMPLETE, (type, source) -> remove.run())
-        .start(this.getTweenManager());
+    new Animator.Builder()
+        .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
+            .to(0.3F)
+            .build())
+        .addTarget(Animation.forProperty(this.newsComponent.getYScaleProperty())
+            .to(0.3F)
+            .build())
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .addTarget(new TimingTargetAdapter() {
+          @Override
+          public void end(Animator source) {
+            remove.run();
+          }
+        })
+        .build()
+        .start();
   }
 }

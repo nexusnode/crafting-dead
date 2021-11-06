@@ -73,7 +73,7 @@ public class KilledMessage {
     }
     matrixStack.popPose();
 
-    RenderUtil.renderHead(
+    RenderUtil.blitAvatar(
         this.killerEntity.getSkinTextureLocation(), matrixStack, x + 5, y + 40, 35, 35);
 
     fontRenderer.drawShadow(

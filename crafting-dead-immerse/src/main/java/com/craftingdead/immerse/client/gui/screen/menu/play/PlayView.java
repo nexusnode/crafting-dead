@@ -19,23 +19,28 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play;
 
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.KeyFrames;
+import org.jdesktop.core.animation.timing.TimingTargetAdapter;
+import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
-import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NBTMutableServerList;
+import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
-import com.craftingdead.immerse.client.gui.view.Colour;
-import com.craftingdead.immerse.client.gui.view.DropdownView;
+import com.craftingdead.immerse.client.gui.view.Animation;
+import com.craftingdead.immerse.client.gui.view.Color;
+import com.craftingdead.immerse.client.gui.view.DropDownView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TabsView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import io.noties.tumbleweed.Tween;
-import io.noties.tumbleweed.TweenCallback;
-import io.noties.tumbleweed.equations.Expo;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
@@ -50,8 +55,8 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
         new ParentView<>(new YogaLayout(), new YogaLayoutParent());
 
     ParentView<?, YogaLayout, YogaLayout> officialServerListView =
-        new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent())
-            .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+        new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent());
+    officialServerListView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
 
     View<?, YogaLayout> survivalServerListView = new ServerListView<>(
         new YogaLayout().setTopMargin(1F),
@@ -66,25 +71,32 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
     officialView
         .addChild(new TabsView<>(new YogaLayout().setHeight(20))
             .setZOffset(5)
-            .addTab(new TabsView.Tab(new TranslationTextComponent("menu.play.tab.survival"),
+            .addTab((TabsView.Tab) new TabsView.Tab(
+                new TranslationTextComponent("menu.play.tab.survival"),
                 () -> officialServerListView.queueAllForRemoval().addChild(survivalServerListView)
-                    .layout()))
-            .addTab(new TabsView.Tab(new TranslationTextComponent("menu.play.tab.tdm"),
+                    .layout())
+                        .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
+                        .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get()))
+            .addTab((TabsView.Tab) new TabsView.Tab(
+                new TranslationTextComponent("menu.play.tab.tdm"),
                 () -> officialServerListView.queueAllForRemoval().addChild(deathmatchServerListView)
-                    .layout())))
+                    .layout())
+                        .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
+                        .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get())))
         .addChild(officialServerListView);
 
-    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout())
-            .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout());
+    singleplayerView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
 
     View<?, YogaLayout> customServerListView = new MutableServerListView<>(
         new YogaLayout(),
-        new NBTMutableServerList(
-            CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")))
-                .setBackgroundColour(new Colour(0, 0, 0, 0.25F));
+        new NbtServerList(
+            CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
+    customServerListView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
+
+    this.getBackgroundColorProperty().setBaseValue(new Color(0x50777777));
 
     this
-        .setBackgroundColour(new Colour(0x50777777))
         .setBackgroundBlur(50.0F)
         .addChild(new TextView<>(
             new YogaLayout()
@@ -94,27 +106,36 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
                 .setLeftMargin(17),
             new TranslationTextComponent("menu.play.title"))
                 .setShadow(true)
-                .setScale(1.5F))
+                .configure(view -> view.getXScaleProperty().setBaseValue(1.5F))
+                .configure(view -> view.getYScaleProperty().setBaseValue(1.5F)))
         .addChild(this.newSeparator())
-        .addChild(new DropdownView<>(new YogaLayout()
+        .addChild(new DropDownView<>(new YogaLayout()
             .setWidth(100F)
             .setHeight(21F)
             .setMargin(2)
             .setLeftMargin(10F))
+                .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
+                .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
                 .addItem(new TranslationTextComponent("menu.play.dropdown.official"),
-                    () -> this.displayContent(officialView))
+                    () -> this.dropDownSelect(officialView))
                 .addItem(new TranslationTextComponent("menu.play.dropdown.singleplayer"),
-                    () -> this.displayContent(singleplayerView))
+                    () -> this.dropDownSelect(singleplayerView))
                 .addItem(new TranslationTextComponent("menu.play.dropdown.custom"),
-                    () -> this.displayContent(customServerListView)))
+                    () -> this.dropDownSelect(customServerListView)))
         .addChild(this.newSeparator())
         .addChild(this.dropdownContent);
   }
 
+  private void dropDownSelect(View<?, YogaLayout> content) {
+    this.minecraft.getSoundManager().play(
+        SimpleSound.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
+    this.displayContent(content);
+  }
+
   private View<?, YogaLayout> newSeparator() {
     return new View<>(new YogaLayout().setHeight(1F))
-        .setUnscaleHeight()
-        .setBackgroundColour(new Colour(0X80B5B5B5));
+        .setUnscaleHeight(true)
+        .configure(view -> view.getBackgroundColorProperty().setBaseValue(new Color(0X80B5B5B5)));
   }
 
   private void displayContent(View<?, YogaLayout> content) {
@@ -126,19 +147,36 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
   @Override
   protected void added() {
-    this.setXOffset(-this.minecraft.screen.width);
-    Tween.to(this, X_TRANSLATION, 800.0F)
-        .ease(Expo.OUT)
-        .target(0.0F)
-        .start(this.getTweenManager());
+    this.minecraft.getSoundManager().play(
+        SimpleSound.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
+
+    new Animator.Builder()
+        .addTarget(Animation.forProperty(this.getXTranslationProperty())
+            .keyFrames(new KeyFrames.Builder<>(-this.getScreen().getWidth())
+                .addFrame(0.0F)
+                .build())
+            .build())
+        .setInterpolator(new SplineInterpolator(0.25, 0.1, 0.25, 1))
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .build()
+        .start();
   }
 
   @Override
   protected void queueRemoval(Runnable remove) {
-    Tween.to(this, X_TRANSLATION, 800.0F)
-        .ease(Expo.OUT)
-        .target(-this.minecraft.screen.width)
-        .addCallback(TweenCallback.COMPLETE, (type, source) -> remove.run())
-        .start(this.getTweenManager());
+    new Animator.Builder()
+        .addTarget(Animation.forProperty(this.getXTranslationProperty())
+            .to(-this.getScreen().getWidth())
+            .build())
+        .setInterpolator(new SplineInterpolator(0.25, 0.1, 0.25, 1))
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .addTarget(new TimingTargetAdapter() {
+          @Override
+          public void end(Animator source) {
+            remove.run();
+          }
+        })
+        .build()
+        .start();
   }
 }

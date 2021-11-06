@@ -21,6 +21,7 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;
+import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import net.minecraft.util.math.vector.Vector2f;
@@ -33,10 +34,51 @@ public class YogaLayout implements Layout {
   private static final MeasureMode[] measureModes =
       new MeasureMode[] {MeasureMode.UNDEFINED, MeasureMode.EXACTLY, MeasureMode.AT_MOST};
 
+  /**
+   * Maps a {@link Yoga} YGMeasureMode to a {@link MeasureMode}.
+   */
+  private static final Overflow[] overflows =
+      new Overflow[] {Overflow.VISIBLE, Overflow.HIDDEN, Overflow.SCROLL};
+
   final long node;
 
   public YogaLayout() {
     this.node = Yoga.YGNodeNew();
+  }
+
+  public final YogaLayout setOverflow(Overflow overflow) {
+    for (int i = 0; i < overflows.length; i++) {
+      if (overflow == overflows[i]) {
+        Yoga.YGNodeStyleSetOverflow(this.node, i);
+        return this;
+      }
+    }
+    throw new IllegalStateException("Unknown value: " + overflow);
+  }
+
+  public final YogaLayout setBorderWidth(float width) {
+    Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeAll, width);
+    return this;
+  }
+
+  public final YogaLayout setLeftBorderWidth(float width) {
+    Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeLeft, width);
+    return this;
+  }
+
+  public final YogaLayout setRightBorderWidth(float width) {
+    Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeRight, width);
+    return this;
+  }
+
+  public final YogaLayout setTopBorderWidth(float width) {
+    Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeTop, width);
+    return this;
+  }
+
+  public final YogaLayout setBottomBorderWidth(float width) {
+    Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeBottom, width);
+    return this;
   }
 
   public final YogaLayout setLeft(float left) {
@@ -297,6 +339,11 @@ public class YogaLayout implements Layout {
   }
 
   @Override
+  public Overflow getOverflow() {
+    return overflows[Yoga.YGNodeStyleGetOverflow(this.node)];
+  }
+
+  @Override
   public float getLeft() {
     return Yoga.YGNodeLayoutGetLeft(this.node);
   }
@@ -304,6 +351,11 @@ public class YogaLayout implements Layout {
   @Override
   public float getLeftPadding() {
     return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeLeft);
+  }
+
+  @Override
+  public float getLeftBorder() {
+    return Yoga.YGNodeLayoutGetBorder(this.node, Yoga.YGEdgeLeft);
   }
 
   @Override
@@ -317,6 +369,11 @@ public class YogaLayout implements Layout {
   }
 
   @Override
+  public float getRightBorder() {
+    return Yoga.YGNodeLayoutGetBorder(this.node, Yoga.YGEdgeRight);
+  }
+
+  @Override
   public float getTop() {
     return Yoga.YGNodeLayoutGetTop(this.node);
   }
@@ -327,6 +384,11 @@ public class YogaLayout implements Layout {
   }
 
   @Override
+  public float getTopBorder() {
+    return Yoga.YGNodeLayoutGetBorder(this.node, Yoga.YGEdgeTop);
+  }
+
+  @Override
   public float getBottom() {
     return Yoga.YGNodeLayoutGetBottom(this.node);
   }
@@ -334,6 +396,11 @@ public class YogaLayout implements Layout {
   @Override
   public float getBottomPadding() {
     return Yoga.YGNodeLayoutGetPadding(this.node, Yoga.YGEdgeBottom);
+  }
+
+  @Override
+  public float getBottomBorder() {
+    return Yoga.YGNodeLayoutGetBorder(this.node, Yoga.YGEdgeBottom);
   }
 
   @Override

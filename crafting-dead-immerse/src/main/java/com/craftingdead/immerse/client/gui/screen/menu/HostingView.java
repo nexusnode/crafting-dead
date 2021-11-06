@@ -14,12 +14,15 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -58,10 +61,9 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
   private static final Path PLANS_FILE = Paths.get("plans.json");
 
   public HostingView() {
-    super(new YogaLayout(), new YogaLayoutParent());
+    super(new YogaLayout().setOverflow(Overflow.SCROLL), new YogaLayoutParent());
 
     this.setBackgroundBlur();
-    this.setOverflow(Overflow.SCROLL);
 
     this.addChild(
         new ParentView<>(new YogaLayout()
@@ -108,14 +110,14 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                 .setFlexGrow(1)
                 .setFlexShrink(1)
                 .setTopPadding(10)
-                .setBottomPadding(10),
+                .setBottomPadding(10)
+                .setOverflow(Overflow.SCROLL),
             new YogaLayoutParent()
                 .setJustifyContent(Justify.SPACE_EVENLY)
                 .setAlignItems(Align.CENTER)
                 .setFlexDirection(FlexDirection.ROW)
-                .setFlexWrap(FlexWrap.WRAP))
-                    .setOverflow(Overflow.SCROLL)
-                    .setBackgroundColour(new Colour(0X2F2C2C2C));
+                .setFlexWrap(FlexWrap.WRAP));
+        plansView.getBackgroundColorProperty().setBaseValue(new Color(0X2F2C2C2C));
 
         for (JsonElement jsonElement : plansJson) {
           JsonObject planJson = jsonElement.getAsJsonObject();
@@ -160,9 +162,9 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
             .setTopMargin(30)
             .setTopPadding(10),
         new YogaLayoutParent().setJustifyContent(Justify.CENTER).setAlignItems(Align.CENTER))
-            .setBackgroundColour(new Colour(0x70777777))
+            .configure(v -> v.getBackgroundColorProperty().setBaseValue(new Color(0x70777777)))
             .setBackgroundBlur(50.0F)
-            .setCornerRadius(3)
+            .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
             .addChild(new ImageView<>(new YogaLayout().setPositionType(PositionType.ABSOLUTE)
                 .setBottom(150).setWidth(30).setHeight(30))
                     .setImage(image)
@@ -171,7 +173,7 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
             .addChild(new TextView<>(new YogaLayout().setMargin(2), subtitle).setCentered(true))
             .addChild(new TextView<>(new YogaLayout().setTopMargin(10).setBottomMargin(10), price)
                 .setCentered(true)
-                .setScale(1.25F))
+                .configure(v -> v.getScaleProperty().setBaseValue(1.25F)))
             .addChild(new TextView<>(
                 new YogaLayout()
                     .setWidthPercent(80)
@@ -180,18 +182,20 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                 ORDER_NOW_TEXT)
                     .setCentered(true)
                     .setShadow(false)
-                    .setBackgroundColour(new Colour(0x66EE0000))
-                    .setCornerRadius(3)
+                    .configure(v -> v.getBackgroundColorProperty()
+                        .setBaseValue(new Color(0x66EE0000))
+                        .registerState(new Color(0x88EE0000), States.HOVERED, States.ENABLED)
+                        .setTransition(Transition.linear(150L)))
+                    .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
                     .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                    .addBackgroundHoverAnimation(new Colour(0x88EE0000), 500)
                     .addListener(ActionEvent.class,
-                        (__, event) -> this.getScreen().keepOpenAndSetScreen(
+                        (__, event) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
                             new ConfirmOpenLinkScreen(
                                 result -> {
                                   if (result) {
                                     Util.getPlatform().openUri(link);
                                   }
-                                  this.minecraft.setScreen(this.getScreen());
+                                  this.minecraft.setScreen((ViewScreen) this.getScreen());
                                 }, link.toString(), true))));
 
     for (ITextComponent text : specs) {
@@ -199,8 +203,8 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
     }
 
     if (recommended) {
-      view.setBorderColour(Colour.DARK_RED);
-      view.setBorderWidth(10);
+      view.getBorderColorProperty().setBaseValue(Color.DARK_RED);
+      view.getLayout().setBorderWidth(10);
     }
 
     return view;

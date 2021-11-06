@@ -101,16 +101,14 @@ public class TabsView<L extends Layout>
 
   public static class Tab extends TextView<YogaLayout> {
 
-    public static final Colour DEFAULT_UNDERSCORE_COLOR = Colour.WHITE;
+    public static final Color DEFAULT_UNDERSCORE_COLOR = Color.WHITE;
     public static final double DEFAULT_UNDERSCORE_HEIGHT = 2.5D;
     public static final int DEFAULT_UNDERSCORE_OFFSET = 1;
     public static final boolean DEFAULT_DISABLED = false;
     public static final boolean DEFAULT_SHADOW = false;
     public static final boolean DEFAULT_CENTERED = true;
 
-    private boolean selected = false;
-
-    private Colour underscoreColor;
+    private Color underscoreColor;
     private double underscoreHeight;
     private boolean disabled;
     private float underscoreYOffset;
@@ -136,40 +134,37 @@ public class TabsView<L extends Layout>
     public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
       super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-      if (this.selected) {
+      if (this.isSelected()) {
         RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight
                 + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
-            this.underscoreColor.getHexColour());
+            this.underscoreColor.getHex());
       } else if (this.isHovered()) {
         RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5D
                 + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
-            this.underscoreColor.getHexColour());
+            this.underscoreColor.getHex());
       }
     }
 
-    public boolean isSelected() {
-      return this.selected;
-    }
-
+    @Override
     public Tab setSelected(boolean selected) {
       if (selected) {
         this.selectedListener.run();
       }
-      this.selected = selected;
+      super.setSelected(selected);
       return this;
     }
 
-    public Colour getUnderscoreColor() {
+    public Color getUnderscoreColor() {
       return this.underscoreColor;
     }
 
-    public Tab setUnderscoreColor(Colour underscoreColor) {
+    public Tab setUnderscoreColor(Color underscoreColor) {
       this.underscoreColor = underscoreColor;
       return this;
     }

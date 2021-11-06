@@ -25,11 +25,14 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
@@ -67,48 +70,50 @@ public class WorldListView<L extends Layout>
             .setFlexBasis(1)
             .setFlexGrow(1)
             .setTopPadding(4F)
-            .setBottomPadding(10F),
+            .setBottomPadding(10F)
+            .setOverflow(Overflow.SCROLL),
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.COLUMN)
-            .setAlignItems(Align.CENTER))
-                .setOverflow(Overflow.SCROLL);
+            .setAlignItems(Align.CENTER));
     this.loadWorlds();
 
     this.playButton =
-        createButton(new Colour(Theme.GREEN), new Colour(Theme.GREEN_HIGHLIGHTED),
+        createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
             new TranslationTextComponent("view.world_list.button.play"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
-                .setDisabledBackgroundColour(new Colour(Theme.GREEN_DISABLED), 150F)
+                .configure(view -> view.getBackgroundColorProperty()
+                    .registerState(Theme.GREEN_DISABLED, States.DISABLED))
                 .configure(view -> view.getLayout().setMargin(3F))
                 .setEnabled(false);
 
     View<?, YogaLayout> createButton =
-        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
-            new TranslationTextComponent("view.world_list.button.create"), () -> this.getScreen()
-                .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())))
+        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+            new TranslationTextComponent("view.world_list.button.create"),
+            () -> ((ViewScreen) this.getScreen())
+                .keepOpenAndSetScreen(CreateWorldScreen.create((ViewScreen) this.getScreen())))
                     .configure(view -> view.getLayout().setMargin(3F));
 
     this.editButton =
-        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
+        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
             new TranslationTextComponent("view.world_list.button.edit"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
-                .setDisabledBackgroundColour(new Colour(Theme.BLUE_DISABLED), 150F)
+                .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 
     this.deleteButton =
-        createButton(new Colour(Theme.RED), new Colour(Theme.RED_HIGHLIGHTED),
+        createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
             new TranslationTextComponent("view.world_list.button.delete"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
-                .setDisabledBackgroundColour(new Colour(Theme.RED_DISABLED), 150F)
+                .setDisabledBackgroundColor(Theme.RED_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 
     this.recreateButton =
-        createButton(new Colour(Theme.BLUE), new Colour(Theme.BLUE_HIGHLIGHTED),
+        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
             new TranslationTextComponent("view.world_list.button.recreate"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
-                .setDisabledBackgroundColour(new Colour(Theme.BLUE_DISABLED), 150F)
+                .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
                 .setEnabled(false);
 
@@ -119,7 +124,8 @@ public class WorldListView<L extends Layout>
                 .setJustifyContent(Justify.CENTER)
                 .setAlignItems(Align.CENTER)
                 .setFlexDirection(FlexDirection.COLUMN))
-                    .setBackgroundColour(new Colour(0x40121212))
+                    .configure(view -> view.getBackgroundColorProperty()
+                        .setBaseValue(new Color(0x40121212)))
                     .addChild(new ParentView<>(
                         new YogaLayout()
                             .setFlex(1)
@@ -145,8 +151,8 @@ public class WorldListView<L extends Layout>
 
   }
 
-  private static ParentView<?, YogaLayout, YogaLayout> createButton(Colour colour,
-      Colour hoveredColour, ITextComponent text, Runnable actionListener) {
+  private static ParentView<?, YogaLayout, YogaLayout> createButton(Color color,
+      Color hoveredColor, ITextComponent text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)
@@ -156,9 +162,11 @@ public class WorldListView<L extends Layout>
             .setJustifyContent(Justify.CENTER)
             .setAlignItems(Align.CENTER))
                 .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                .setBackgroundColour(colour)
+                .configure(view -> view.getBackgroundColorProperty()
+                    .setBaseValue(color)
+                    .registerState(hoveredColor, States.HOVERED, States.ENABLED)
+                    .setTransition(Transition.linear(150L)))
                 .setFocusable(true)
-                .addBackgroundHoverAnimation(hoveredColour, 150F)
                 .addListener(ActionEvent.class, (c, e) -> actionListener.run())
                 .addChild(new TextView<>(new YogaLayout().setTopMargin(1F), text)
                     .setShadow(false)

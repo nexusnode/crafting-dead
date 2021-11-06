@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
 import com.craftingdead.immerse.game.Game;
@@ -36,6 +37,7 @@ import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.DependencyLoader;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -53,6 +55,7 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.rocketpowered.connector.client.gui.OverlayManager;
 
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {

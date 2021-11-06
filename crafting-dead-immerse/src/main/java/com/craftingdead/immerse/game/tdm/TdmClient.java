@@ -210,7 +210,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
-          RenderUtil.renderHead(playerInfo.getSkinLocation(), matrixStack,
+          RenderUtil.blitAvatar(playerInfo.getSkinLocation(), matrixStack,
               x, y, headWidth, headHeight);
         }
 
@@ -243,7 +243,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
-          RenderUtil.renderHead(playerInfo.getSkinLocation(), matrixStack,
+          RenderUtil.blitAvatar(playerInfo.getSkinLocation(), matrixStack,
               x, y, headWidth, headHeight);
         }
 

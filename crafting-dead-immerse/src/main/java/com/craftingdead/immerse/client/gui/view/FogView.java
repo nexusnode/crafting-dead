@@ -54,6 +54,7 @@ public class FogView<L extends Layout> extends View<FogView<L>, L> {
     if (pct == 1.0F) {
       fogStartTime = Util.getMillis();
     }
+    
 
     matrixStack.pushPose();
     {

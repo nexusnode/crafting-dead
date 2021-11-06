@@ -18,9 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-public interface MutableServerProvider extends ServerProvider {
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
-  void write(ServerEntry serverEntry);
+public interface ServerList {
 
-  void delete(ServerEntry serverEntry);
+  CompletableFuture<Stream<ServerEntry>> load();
 }

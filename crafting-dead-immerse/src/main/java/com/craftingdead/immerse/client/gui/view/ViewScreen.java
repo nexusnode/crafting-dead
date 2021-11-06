@@ -36,8 +36,6 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
   private boolean keepOpen;
 
-  private final ScissorStack viewStack;
-
   public ViewScreen(ITextComponent title,
       Function<ViewScreen, View<?, ViewScreen>> viewFactory) {
     super(title);
@@ -46,11 +44,6 @@ public final class ViewScreen extends Screen implements EmptyLayout {
     this.height = this.minecraft.getWindow().getGuiScaledHeight();
     this.view = viewFactory.apply(this);
     this.view.screen = this;
-    this.viewStack = new ScissorStack();
-  }
-
-  public ScissorStack getScissorStack() {
-    return this.viewStack;
   }
 
   public void keepOpenAndSetScreen(Screen screen) {
@@ -104,7 +97,7 @@ public final class ViewScreen extends Screen implements EmptyLayout {
         keepLastHovered = true;
       }
 
-      if (!hovered.isHovered()) {
+      if (!hovered.hasState(States.HOVERED)) {
         hovered.mouseEntered(mouseX, mouseY);
       }
     }

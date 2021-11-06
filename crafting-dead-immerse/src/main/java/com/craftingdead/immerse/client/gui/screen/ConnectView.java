@@ -26,10 +26,12 @@ import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
@@ -91,7 +93,9 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
                 .setAlignItems(Align.CENTER)
                 .setJustifyContent(Justify.CENTER))
                     .setBackgroundBlur(50.0F)
-                    .setBackgroundColour(new Colour(0x40111111))
+                    .configure(
+                        view -> view.getBackgroundColorProperty()
+                            .setBaseValue(new Color(0x40111111)))
                     .addChild(
                         this.statusView =
                             new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15),
@@ -106,11 +110,13 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
                             new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50),
                             DialogTexts.GUI_CANCEL)
                                 .setCentered(true)
-                                .setBackgroundColour(
-                                    new Colour(TextFormatting.RED.getColor() + (100 << 24)))
-                                .addBackgroundHoverAnimation(
-                                    new Colour(TextFormatting.DARK_RED.getColor() + (100 << 24)),
-                                    150.0F)
+                                .configure(view -> view.getBackgroundColorProperty()
+                                    .setBaseValue(
+                                        new Color(TextFormatting.RED.getColor() + (100 << 24)))
+                                    .registerState(
+                                        new Color(TextFormatting.DARK_RED.getColor() + (100 << 24)),
+                                        States.HOVERED, States.ENABLED)
+                                    .setTransition(Transition.linear(150L)))
                                 .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
                                 .addListener(ActionEvent.class, (c, e) -> {
                                   this.aborted = true;

@@ -21,10 +21,12 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 import java.util.Iterator;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.screen.ConnectView;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -46,8 +48,6 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   private final TextView<YogaLayout> pingComponent;
   private final TextView<YogaLayout> playersAmountComponent;
 
-  private boolean selected = false;
-
   private long lastAnimationUpdateMs;
 
   ServerItemView(ServerEntry serverEntry) {
@@ -65,11 +65,18 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
             .setAlignItems(Align.CENTER));
     this.serverEntry = serverEntry;
 
+    this.getOutlineWidthProperty()
+        .registerState(1.0F, States.SELECTED)
+        .registerState(1.0F, States.HOVERED);
+    this.getOutlineColorProperty()
+        .registerState(Color.WHITE, States.SELECTED)
+        .registerState(Color.GRAY, States.HOVERED);
+
     this.motdComponent = new TextView<>(new YogaLayout()
+        .setOverflow(Overflow.HIDDEN)
         .setFlex(2)
         .setWidthPercent(100)
         .setHeight(8), "...")
-            .setOverflow(Overflow.HIDDEN)
             .setShadow(false)
             .setCentered(true);
 
@@ -86,16 +93,17 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
             .setShadow(false)
             .setCentered(true);
 
+    this.getBackgroundColorProperty().setBaseValue(new Color(0X882C2C2C));
+
     this
-        .setBackgroundColour(new Colour(0X882C2C2C))
         .setFocusable(true)
         .setDoubleClick(true)
         .addListener(ActionEvent.class, (c, e) -> this.connect())
         .addChild(this.motdComponent)
-        .addChild(new TextView<>(new YogaLayout().setFlex(1).setHeight(8),
+        .addChild(new TextView<>(
+            new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8),
             new StringTextComponent(this.serverEntry.getMap().orElse("-"))
                 .withStyle(TextFormatting.GRAY))
-                    .setOverflow(Overflow.HIDDEN)
                     .setShadow(false)
                     .setCentered(true))
         .addChild(this.pingComponent)
@@ -116,9 +124,10 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
 
   public void connect() {
     // Call this before creating a ConnectingScreen instance.
-    this.getScreen().keepOpen();
+    ((ViewScreen) this.getScreen()).keepOpen();
     this.minecraft.setScreen(ConnectView.createScreen(
-        this.getScreen(), this.serverEntry.getHostName(), this.serverEntry.getPort()));
+        ((ViewScreen) this.getScreen()), this.serverEntry.getHostName(),
+        this.serverEntry.getPort()));
   }
 
   public ServerEntry getServerEntry() {
@@ -159,59 +168,18 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.focused) {
-      this.selected = !this.selected;
-      this.updateBorder();
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.hasState(States.FOCUSED)) {
+      this.toggleState(States.SELECTED);
+      this.updateProperties(false);
       return true;
     }
     return super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
-  protected void focusChanged() {
-    this.updateBorder();
-  }
-
-  @Override
-  public void mouseEntered(double mouseX, double mouseY) {
-    super.mouseEntered(mouseX, mouseY);
-    this.updateBorder();
-  }
-
-  @Override
-  public void mouseLeft(double mouseX, double mouseY) {
-    super.mouseLeft(mouseX, mouseY);
-    this.updateBorder();
-  }
-
-  private void updateBorder() {
-    if (this.selected) {
-      this.setBorderWidth(1.0F);
-      this.setBorderColour(Colour.WHITE);
-    } else if (this.isHovered() || this.isFocused()) {
-      this.setBorderWidth(0.7F);
-      this.setBorderColour(Colour.GRAY);
-    } else {
-      this.setBorderWidth(0F);
-    }
-  }
-
-  public boolean isSelected() {
-    return this.selected;
-  }
-
-  @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     boolean consume = super.mouseClicked(mouseX, mouseY, button);
-
-    if (this.isHovered()) {
-      this.selected = true;
-      this.updateBorder();
-    } else {
-      this.selected = false;
-      this.updateBorder();
-    }
-
+    this.setSelected(this.isHovered());
     return consume;
   }
 }

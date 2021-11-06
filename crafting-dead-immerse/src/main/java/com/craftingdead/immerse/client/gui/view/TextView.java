@@ -114,6 +114,11 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+    int opacity = MathHelper.ceil(this.getAlpha() * 255.0F) << 24;
+    if ((opacity & 0xFC000000) == 0) {
+      return;
+    }
+
     matrixStack.pushPose();
     {
       matrixStack.translate(this.getScaledContentX(),
@@ -133,7 +138,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
           this.font.drawInBatch(line, x, 0.0F,
-              0xFFFFFF + ((int) (this.getAlpha() * 255.0F) << 24),
+              0xFFFFFF | opacity,
               this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
               RenderUtil.FULL_LIGHT);
         }

@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.util.ThreadSafe;
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.INestedGuiEventHandler;
@@ -38,6 +38,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     extends View<SELF, L> implements INestedGuiEventHandler {
 
   private final List<View<?, C>> children = new ArrayList<>();
+  // Bottom to top order
   @SuppressWarnings("unchecked")
   private View<?, C>[] sortedChildren = new View[0];
 
@@ -148,9 +149,20 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       return this.minecraft.submit(() -> this.queueChildForRemoval(view, callback)).join();
     }
     this.assertChildPresent(view);
-    view.queueRemoval(() -> {
-      view.pendingRemoval = true;
-      this.pendingRemoval.add(Pair.of(view, callback));
+    view.queueRemoval(new Runnable() {
+
+      private boolean removed;
+
+      @Override
+      public void run() {
+        if (!this.removed) {
+          this.removed = true;
+          view.pendingRemoval = true;
+          ParentView.this.pendingRemoval.add(Pair.of(view, callback));
+        } else {
+          throw new UnsupportedOperationException("Cannot call remove twice.");
+        }
+      }
     });
     return this.self();
   }
@@ -214,6 +226,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       this.pendingRemoval.clear();
 
       this.indexAndSortChildren();
+      this.layout();
     }
   }
 
@@ -259,7 +272,8 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   }
 
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     for (View<?, ?> view : this.sortedChildren) {
       if (!view.pendingRemoval) {
@@ -281,7 +295,18 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
   @Override
   public List<? extends IGuiEventListener> children() {
-    return Lists.reverse(Arrays.asList(this.sortedChildren));
+    return Arrays.asList(this.sortedChildren);
+  }
+
+  @Override
+  public Optional<IGuiEventListener> getChildAt(double mouseX, double mouseY) {
+    for (int i = this.sortedChildren.length; i-- > 0;) {
+      IGuiEventListener eventListener = this.sortedChildren[i];
+      if (eventListener.isMouseOver(mouseX, mouseY)) {
+        return Optional.of(eventListener);
+      }
+    }
+    return Optional.empty();
   }
 
   @Override
@@ -292,8 +317,8 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    for (IGuiEventListener eventListener : this.children()) {
-      if (eventListener.isMouseOver(mouseX, mouseY)) {
+    for (int i = this.sortedChildren.length; i-- > 0;) {
+      if (this.sortedChildren[i].isMouseOver(mouseX, mouseY)) {
         return true;
       }
     }

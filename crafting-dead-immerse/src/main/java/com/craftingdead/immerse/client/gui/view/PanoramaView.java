@@ -47,7 +47,7 @@ public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    this.panorama.render(partialTicks, 1.0F);
+    this.panorama.render(partialTicks, this.getAlpha());
     RenderUtil.bind(PANORAMA_OVERLAY_TEXTURES);
     RenderSystem.enableBlend();
     RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
@@ -55,5 +55,6 @@ public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
     RenderUtil.blit(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
         this.getScaledContentWidth(), this.getScaledContentHeight());
     RenderSystem.disableBlend();
+
   }
 }

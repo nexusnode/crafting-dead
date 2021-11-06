@@ -31,11 +31,12 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.view.Colour;
+import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
@@ -82,8 +83,6 @@ class WorldItemView
   private final WorldSummary worldSummary;
   private final WorldListView<?> parentWorldList;
 
-  private boolean selected = false;
-
   WorldItemView(WorldSummary worldSummary, WorldListView<?> parentWorldList) {
     super(
         new YogaLayout()
@@ -111,8 +110,18 @@ class WorldItemView
       worldIcon = UNKOWN_SERVER_ICON;
     }
 
+    this.getOutlineWidthProperty()
+        .registerState(1.0F, States.SELECTED)
+        .registerState(1.0F, States.HOVERED)
+        .registerState(1.0F, States.FOCUSED);
+    this.getOutlineColorProperty()
+        .registerState(Color.WHITE, States.SELECTED)
+        .registerState(Color.GRAY, States.HOVERED)
+        .registerState(Color.GRAY, States.FOCUSED);
+
+    this.getBackgroundColorProperty().setBaseValue(new Color(0X882C2C2C));
+
     this
-        .setBackgroundColour(new Colour(0X882C2C2C))
         .setFocusable(true)
         .setDoubleClick(true)
         .addListener(ActionEvent.class, (c, e) -> this.joinWorld())
@@ -165,59 +174,18 @@ class WorldItemView
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.focused) {
-      this.selected = !this.selected;
-      this.updateBorder();
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.hasState(States.FOCUSED)) {
+      this.toggleState(States.SELECTED);
+      this.updateProperties(false);
       return true;
     }
     return super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
-  public void mouseEntered(double mouseX, double mouseY) {
-    super.mouseEntered(mouseX, mouseY);
-    this.updateBorder();
-  }
-
-  @Override
-  public void mouseLeft(double mouseX, double mouseY) {
-    super.mouseLeft(mouseX, mouseY);
-    this.updateBorder();
-  }
-
-  private void updateBorder() {
-    if (this.selected) {
-      this.setBorderWidth(1.0F);
-      this.setBorderColour(Colour.WHITE);
-    } else if (this.isHovered() || this.isFocused()) {
-      this.setBorderWidth(0.7F);
-      this.setBorderColour(Colour.GRAY);
-    } else {
-      this.setBorderWidth(0F);
-    }
-  }
-
-  public void removeSelect() {
-    this.selected = false;
-    this.updateBorder();
-  }
-
-  public boolean isSelected() {
-    return this.selected;
-  }
-
-  @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     boolean consume = super.mouseClicked(mouseX, mouseY, button);
-
-    if (this.isHovered()) {
-      this.selected = true;
-      this.updateBorder();
-    } else {
-      this.selected = false;
-      this.updateBorder();
-    }
-
+    this.setSelected(this.isHovered());
     return consume;
   }
 
@@ -225,53 +193,57 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
   public void joinWorld() {
-    if (!this.worldSummary.isLocked()) {
-      if (this.worldSummary.shouldBackup()) {
-        ITextComponent backupQuestion = new TranslationTextComponent("selectWorld.backupQuestion");
-        ITextComponent backupWarning = new TranslationTextComponent("selectWorld.backupWarning",
-            this.worldSummary.getWorldVersionName(), SharedConstants.getCurrentVersion().getName());
-        this.getScreen().keepOpenAndSetScreen(
-            new ConfirmBackupScreen(this.getScreen(), (backup, eraseCache) -> {
-              if (backup) {
-                String levelName = this.worldSummary.getLevelName();
-                try (SaveFormat.LevelSave levelSave =
-                    this.minecraft.getLevelSource().createAccess(levelName)) {
-                  EditWorldScreen.makeBackupAndShowToast(levelSave);
-                } catch (IOException ioexception) {
-                  SystemToast.onWorldAccessFailure(this.minecraft, levelName);
-                  logger.error("Failed to backup level {}", levelName, ioexception);
-                }
-              }
-
-              this.loadWorld();
-              this.getScreen().removed();
-            }, backupQuestion, backupWarning, false));
-      } else if (this.worldSummary.askToOpenWorld()) {
-        this.getScreen().keepOpenAndSetScreen(new ConfirmScreen((confirm) -> {
-          if (confirm) {
-            try {
-              this.loadWorld();
-              this.getScreen().removed();
-            } catch (Exception exception) {
-              logger.error("Failure to open 'future world'", (Throwable) exception);
-              this.minecraft.setScreen(new AlertScreen(() -> {
-                this.minecraft.setScreen(this.minecraft.screen);
-              }, new TranslationTextComponent("selectWorld.futureworld.error.title"),
-                  new TranslationTextComponent("selectWorld.futureworld.error.text")));
-            }
-          } else {
-            this.minecraft.setScreen(this.getScreen());
-          }
-
-        }, new TranslationTextComponent("selectWorld.versionQuestion"),
-            new TranslationTextComponent("selectWorld.versionWarning",
-                this.worldSummary.getWorldVersionName(),
-                new TranslationTextComponent("selectWorld.versionJoinButton"),
-                DialogTexts.GUI_CANCEL)));
-      } else {
-        this.loadWorld();
-      }
+    if (this.worldSummary.isLocked()) {
+      return;
     }
+
+    ViewScreen screen = (ViewScreen) this.getScreen();
+    if (this.worldSummary.shouldBackup()) {
+      ITextComponent backupQuestion = new TranslationTextComponent("selectWorld.backupQuestion");
+      ITextComponent backupWarning = new TranslationTextComponent("selectWorld.backupWarning",
+          this.worldSummary.getWorldVersionName(), SharedConstants.getCurrentVersion().getName());
+      screen.keepOpenAndSetScreen(
+          new ConfirmBackupScreen(screen, (backup, eraseCache) -> {
+            if (backup) {
+              String levelName = this.worldSummary.getLevelName();
+              try (SaveFormat.LevelSave levelSave =
+                  this.minecraft.getLevelSource().createAccess(levelName)) {
+                EditWorldScreen.makeBackupAndShowToast(levelSave);
+              } catch (IOException ioexception) {
+                SystemToast.onWorldAccessFailure(this.minecraft, levelName);
+                logger.error("Failed to backup level {}", levelName, ioexception);
+              }
+            }
+
+            this.loadWorld();
+            screen.removed();
+          }, backupQuestion, backupWarning, false));
+    } else if (this.worldSummary.askToOpenWorld()) {
+      screen.keepOpenAndSetScreen(new ConfirmScreen((confirm) -> {
+        if (confirm) {
+          try {
+            this.loadWorld();
+            screen.removed();
+          } catch (Exception exception) {
+            logger.error("Failure to open 'future world'", (Throwable) exception);
+            this.minecraft.setScreen(new AlertScreen(() -> {
+              this.minecraft.setScreen(this.minecraft.screen);
+            }, new TranslationTextComponent("selectWorld.futureworld.error.title"),
+                new TranslationTextComponent("selectWorld.futureworld.error.text")));
+          }
+        } else {
+          this.minecraft.setScreen(screen);
+        }
+
+      }, new TranslationTextComponent("selectWorld.versionQuestion"),
+          new TranslationTextComponent("selectWorld.versionWarning",
+              this.worldSummary.getWorldVersionName(),
+              new TranslationTextComponent("selectWorld.versionJoinButton"),
+              DialogTexts.GUI_CANCEL)));
+    } else {
+      this.loadWorld();
+    }
+
   }
 
   private void loadWorld() {
@@ -289,7 +261,7 @@ class WorldItemView
     String fileName = this.worldSummary.getLevelName();
     try {
       SaveFormat.LevelSave levelSave = this.minecraft.getLevelSource().createAccess(fileName);
-      ViewScreen screen = this.getScreen();
+      ViewScreen screen = (ViewScreen) this.getScreen();
       screen.keepOpenAndSetScreen(new EditWorldScreen(confirm -> {
         try {
           levelSave.close();
@@ -312,7 +284,7 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
   public void deleteWorld() {
-    ViewScreen screen = this.getScreen();
+    ViewScreen screen = (ViewScreen) this.getScreen();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
         this.minecraft.setScreen(new WorkingScreen());
@@ -338,7 +310,8 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
   public void recreateWorld() {
-    this.getScreen().keepOpen();
+    ViewScreen screen = (ViewScreen) this.getScreen();
+    screen.keepOpen();
 
     this.minecraft.forceSetScreen(
         new DirtMessageScreen(new TranslationTextComponent("selectWorld.data_read")));
@@ -359,19 +332,19 @@ class WorldItemView
               this.minecraft);
       if (worldGenSettings.isOldCustomizedWorld()) {
         this.minecraft.setScreen(new ConfirmScreen(confirm -> this.minecraft.setScreen(confirm
-            ? new CreateWorldScreen(this.getScreen(), levelSettings,
+            ? new CreateWorldScreen(screen, levelSettings,
                 worldGenSettings, path, dataPackCodec, dynamicRegistries)
-            : this.getScreen()),
+            : screen),
             new TranslationTextComponent("selectWorld.recreate.customized.title"),
             new TranslationTextComponent("selectWorld.recreate.customized.text"),
             DialogTexts.GUI_PROCEED, DialogTexts.GUI_CANCEL));
       } else {
-        this.minecraft.setScreen(new CreateWorldScreen(this.getScreen(), levelSettings,
+        this.minecraft.setScreen(new CreateWorldScreen(screen, levelSettings,
             worldGenSettings, path, dataPackCodec, dynamicRegistries));
       }
     } catch (Exception e) {
       logger.error("Unable to recreate world", e);
-      this.minecraft.setScreen(new AlertScreen(() -> this.minecraft.setScreen(this.getScreen()),
+      this.minecraft.setScreen(new AlertScreen(() -> this.minecraft.setScreen(screen),
           new TranslationTextComponent("selectWorld.recreate.error.title"),
           new TranslationTextComponent("selectWorld.recreate.error.text")));
     }

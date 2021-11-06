@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Colour;
 import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
@@ -37,7 +37,7 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
 
   private View<?, YogaLayout> removeButton;
 
-  public MutableServerListView(L layout, MutableServerProvider serverProvider) {
+  public MutableServerListView(L layout, MutableServerList serverProvider) {
     super(layout, serverProvider);
   }
 
@@ -45,27 +45,22 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   protected ParentView<?, YogaLayout, YogaLayout> createTopRowControls() {
     return super.createTopRowControls()
         .configure(view -> view.getLayout().setWidth(300))
-        .addChild(createButton(new Colour(Theme.BLUE),
-            new Colour(Theme.BLUE_HIGHLIGHTED),
+        .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
             new TranslationTextComponent("view.mutable_server_list.button.direct_connect"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              this.getScreen()
-                  .keepOpenAndSetScreen(new ServerListScreen(this.getScreen(), connect -> {
-                    if (connect) {
-                      this.minecraft.setScreen(new ConnectingScreen(this.getScreen(),
-                          this.minecraft, tempServerData));
-                    } else {
-                      this.minecraft.setScreen(this.getScreen());
-                    }
-                  }, tempServerData));
+              ViewScreen screen = ((ViewScreen) this.getScreen());
+              screen.keepOpenAndSetScreen(new ServerListScreen(screen,
+                  connect -> this.minecraft.setScreen(connect
+                      ? new ConnectingScreen(screen, this.minecraft, tempServerData)
+                      : screen),
+                  tempServerData));
             }).configure(view -> view.getLayout().setMargin(3)))
-        .addChild(createButton(new Colour(Theme.GREEN),
-            new Colour(Theme.GREEN_HIGHLIGHTED),
+        .addChild(createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
             new TranslationTextComponent("view.mutable_server_list.button.add"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = this.getScreen();
+              ViewScreen screen = ((ViewScreen) this.getScreen());
               screen.keepOpenAndSetScreen(new AddServerScreen(screen,
                   success -> {
                     if (success) {
@@ -79,11 +74,13 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
 
   @Override
   protected ParentView<?, YogaLayout, YogaLayout> createBottomRowControls() {
-    this.removeButton = createButton(new Colour(Theme.RED), new Colour(Theme.RED_HIGHLIGHTED),
+    this.removeButton = createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
         new TranslationTextComponent("view.mutable_server_list.button.remove"),
         () -> this.getSelectedItem().ifPresent(this::removeServer))
-            .setDisabledBackgroundColour(new Colour(Theme.RED_DISABLED), 150F)
-            .setEnabled(false).configure(view -> view.getLayout().setMargin(3));
+            .configure(view -> view.getBackgroundColorProperty()
+                .registerState(Theme.RED_DISABLED, States.DISABLED))
+            .setEnabled(false)
+            .configure(view -> view.getLayout().setMargin(3));
     return super.createBottomRowControls()
         .configure(view -> view.getLayout().setWidth(300))
         .addChild(this.removeButton);
@@ -98,12 +95,22 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   private void addServer(String host) {
     ServerAddress address = ServerAddress.parseString(host);
     ServerEntry entry = new ServerEntry(null, address.getHost(), address.getPort());
-    ((MutableServerProvider) this.serverProvider).write(entry);
     this.addServer(entry);
+    this.saveServerList();
   }
 
   private void removeServer(ServerItemView serverItem) {
-    ((MutableServerProvider) this.serverProvider).delete(serverItem.getServerEntry());
-    this.listView.queueChildForRemoval(serverItem, this::updateSelected);
+    this.listView.queueChildForRemoval(serverItem, () -> {
+      this.updateSelected();
+      this.saveServerList();
+    });
+  }
+
+  private void saveServerList() {
+    ((MutableServerList) this.serverProvider)
+        .save(this.listView.getChildViews().stream()
+            .filter(ServerItemView.class::isInstance)
+            .map(ServerItemView.class::cast)
+            .map(ServerItemView::getServerEntry));
   }
 }

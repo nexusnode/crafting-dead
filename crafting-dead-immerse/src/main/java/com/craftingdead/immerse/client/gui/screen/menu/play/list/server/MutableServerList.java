@@ -18,9 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
-public interface ServerProvider {
+public interface MutableServerList extends ServerList {
 
-  void read(Consumer<ServerEntry> entryConsumer);
+  CompletableFuture<Void> save(Stream<ServerEntry> servers);
 }

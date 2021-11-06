@@ -44,6 +44,11 @@ public class YogaLayoutParent implements LayoutParent<YogaLayout> {
     return this;
   }
 
+  public final YogaLayoutParent setAlignContent(Align align) {
+    Yoga.YGNodeStyleSetAlignContent(this.node, align.getYogaType());
+    return this;
+  }
+
   public final YogaLayoutParent setJustifyContent(Justify justify) {
     Yoga.YGNodeStyleSetJustifyContent(this.node, justify.getYogaType());
     return this;

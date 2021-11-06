@@ -18,7 +18,14 @@
 
 package com.craftingdead.immerse.client.gui.view.layout;
 
+import com.craftingdead.immerse.client.gui.view.Overflow;
+
 public interface EmptyLayout extends Layout {
+
+  @Override
+  default Overflow getOverflow() {
+    return Overflow.VISIBLE;
+  }
 
   @Override
   default float getLeft() {
@@ -27,6 +34,11 @@ public interface EmptyLayout extends Layout {
 
   @Override
   default float getLeftPadding() {
+    return 0;
+  }
+
+  @Override
+  default float getLeftBorder() {
     return 0;
   }
 
@@ -41,6 +53,11 @@ public interface EmptyLayout extends Layout {
   }
 
   @Override
+  default float getRightBorder() {
+    return 0;
+  }
+
+  @Override
   default float getTop() {
     return 0;
   }
@@ -51,12 +68,22 @@ public interface EmptyLayout extends Layout {
   }
 
   @Override
+  default float getTopBorder() {
+    return 0;
+  }
+
+  @Override
   default float getBottom() {
     return 0;
   }
 
   @Override
   default float getBottomPadding() {
+    return 0;
+  }
+
+  @Override
+  default float getBottomBorder() {
     return 0;
   }
 

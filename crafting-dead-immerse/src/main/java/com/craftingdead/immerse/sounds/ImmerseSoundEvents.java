@@ -31,6 +31,13 @@ public class ImmerseSoundEvents {
       DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDeadImmerse.ID);
 
   public static final RegistryObject<SoundEvent> BUTTON_CLICK = register("button_click");
+  public static final RegistryObject<SoundEvent> MAIN_MENU_HOVER = register("main_menu_hover");
+  public static final RegistryObject<SoundEvent> MAIN_MENU_PRESS_PLAY =
+      register("main_menu_press_play");
+  public static final RegistryObject<SoundEvent> TAB_SELECT = register("tab_select");
+  public static final RegistryObject<SoundEvent> TAB_HOVER = register("tab_hover");
+  public static final RegistryObject<SoundEvent> DROP_DOWN_EXPAND = register("drop_down_expand");
+  public static final RegistryObject<SoundEvent> SUBMENU_SELECT = register("submenu_select");
 
   public static final RegistryObject<SoundEvent> COUNTDOWN = register("countdown");
   public static final RegistryObject<SoundEvent> VICTORY_MUSIC = register("victory_music");

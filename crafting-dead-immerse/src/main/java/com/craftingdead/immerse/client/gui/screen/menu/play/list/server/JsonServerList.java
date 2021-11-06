@@ -25,18 +25,14 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.function.Consumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+import com.google.common.collect.Streams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-public class JsonServerList implements ServerProvider {
-
-  private static final Logger logger = LogManager.getLogger();
-
+public class JsonServerList implements ServerList {
 
   private static final Gson gson = new Gson();
 
@@ -47,14 +43,16 @@ public class JsonServerList implements ServerProvider {
   }
 
   @Override
-  public void read(Consumer<ServerEntry> entryConsumer) {
+  public CompletableFuture<Stream<ServerEntry>> load() {
+    CompletableFuture<Stream<ServerEntry>> future = new CompletableFuture<>();
+
     AsynchronousFileChannel fileChannel;
     try {
       fileChannel = AsynchronousFileChannel.open(
           this.serverListFile, StandardOpenOption.READ);
     } catch (IOException e) {
-      logger.warn("Failed to read server list file", e);
-      return;
+      future.completeExceptionally(e);
+      return future;
     }
 
     ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -67,19 +65,18 @@ public class JsonServerList implements ServerProvider {
         byte[] bytes = new byte[buffer.limit()];
         buffer.get(bytes);
         String jsonString = new String(bytes, StandardCharsets.UTF_8).trim();
-        JsonArray serverListJson =
-            gson.fromJson(jsonString, JsonArray.class);
-        for (JsonElement jsonElement : serverListJson) {
-          JsonObject serverJson = jsonElement.getAsJsonObject();
-          entryConsumer.accept(new ServerEntry(serverJson.get("map").getAsString(),
-              serverJson.get("hostName").getAsString(), serverJson.get("port").getAsInt()));
-        }
+        future.complete(Streams.stream(gson.fromJson(jsonString, JsonArray.class))
+            .map(JsonElement::getAsJsonObject)
+            .map(json -> new ServerEntry(json.get("map").getAsString(),
+                json.get("hostName").getAsString(), json.get("port").getAsInt())));
       }
 
       @Override
       public void failed(Throwable exc, Void attachment) {
-        logger.warn("Failed to read server list file", exc);
+        future.completeExceptionally(exc);
       }
     });
+
+    return future;
   }
 }

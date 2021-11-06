@@ -152,6 +152,29 @@ public class RenderUtil {
     WorldVertexBufferUploader.end(builder);
   }
 
+  public static void blitAvatar(
+      ResourceLocation skin, MatrixStack matrixStack, float x, float y, float width, float height) {
+    bind(skin);
+    spriteBlit(matrixStack, x, y, width, height, 8.0F, 8.0F, 8, 8, 64, 64);
+  }
+
+  public static void spriteBlit(MatrixStack matrixStack, float x, float y,
+      float width, float height, float spriteX, float spriteY, float spriteWidth,
+      float spriteHeight, float textureWidth, float textureHeight) {
+    spriteBlit(matrixStack, x, y, x + width, y + height, 0, spriteWidth, spriteHeight, spriteX,
+        spriteY, textureWidth, textureHeight);
+  }
+
+  public static void spriteBlit(MatrixStack matrixStack, float x, float y, float x2,
+      float y2, float z, float spriteWidth, float spriteHeight,
+      float spriteX, float spriteY, float textureWidth, float textureHeight) {
+    blit(matrixStack.last().pose(), x, y, x2, y2,
+        spriteX / textureWidth,
+        (spriteY + spriteHeight) / textureHeight,
+        (spriteX + spriteWidth) / textureWidth,
+        spriteY / textureHeight);
+  }
+
   public static void bind(ResourceLocation resourceLocation) {
     minecraft.getTextureManager().bind(resourceLocation);
   }
@@ -164,6 +187,14 @@ public class RenderUtil {
     int[] rgba = new int[4];
     for (int i = 0; i < 4; i++) {
       rgba[i] = MathHelper.ceil(MathHelper.lerp(pct, colour1[i], colour2[i]));
+    }
+    return rgba;
+  }
+
+  public static float[] lerp(float[] colour1, float[] colour2, float pct) {
+    float[] rgba = new float[4];
+    for (int i = 0; i < 4; i++) {
+      rgba[i] = MathHelper.lerp(pct, colour1[i], colour2[i]);
     }
     return rgba;
   }
@@ -191,12 +222,6 @@ public class RenderUtil {
     return ((long) (colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16)
         | ((colour4i[1] & 0xFF) << 8)
         | ((colour4i[2] & 0xFF) << 0);
-  }
-
-  public static void renderHead(ResourceLocation skin, MatrixStack matrixStack, int x, int y,
-      int width, int height) {
-    bind(skin);
-    AbstractGui.blit(matrixStack, x, y, width, height, 8.0F, 8.0F, 8, 8, 64, 64);
   }
 
   public static void renderPlayerListRow(MatrixStack matrixStack, int x, int y, int width,

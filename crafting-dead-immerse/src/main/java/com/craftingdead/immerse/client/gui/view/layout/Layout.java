@@ -18,25 +18,36 @@
 
 package com.craftingdead.immerse.client.gui.view.layout;
 
+import com.craftingdead.immerse.client.gui.view.Overflow;
 import net.minecraft.util.math.vector.Vector2f;
 
 public interface Layout {
+
+  Overflow getOverflow();
 
   float getLeft();
 
   float getLeftPadding();
 
+  float getLeftBorder();
+
   float getRight();
 
   float getRightPadding();
+
+  float getRightBorder();
 
   float getTop();
 
   float getTopPadding();
 
+  float getTopBorder();
+
   float getBottom();
 
   float getBottomPadding();
+
+  float getBottomBorder();
 
   float getWidth();
 

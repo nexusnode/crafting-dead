@@ -24,6 +24,8 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.sources.ManualTimingSource;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.Capabilities;
@@ -73,6 +75,8 @@ import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 
 public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
+  private static final ManualTimingSource TIMING_SOURCE = new ManualTimingSource();
+
   public static final KeyBinding SWITCH_TEAMS =
       new KeyBinding("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
           InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_M), "key.categories.gameplay");
@@ -81,6 +85,10 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
 
   private static final Logger logger = LogManager.getLogger();
+
+  static {
+    Animator.setDefaultTimingSource(TIMING_SOURCE);
+  }
 
   private final Minecraft minecraft;
 
@@ -266,6 +274,17 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
             }
           }
         }
+        break;
+      default:
+        break;
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRenderTick(TickEvent.RenderTickEvent event) {
+    switch (event.phase) {
+      case END:
+        TIMING_SOURCE.tick();
         break;
       default:
         break;

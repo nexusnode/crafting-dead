@@ -7,7 +7,9 @@
         "MinecraftMixin",
         "GameRendererMixin",
         "FirstPersonRendererAccessor",
-        "PlayerControllerMixin"
+        "PlayerControllerMixin",
+        "KeyboardListenerMixin",
+        "MouseHelperMixin"
     ],
     "mixins": [
         "PlayerDataMixin",
