@@ -1,10 +1,10 @@
 {    
     "commands.game.restart":"重启游戏中",
-    "commands.game.reload_rotation":"重新加载",
+    "commands.game.reload_rotation":"重载游戏中",
 
-    "message.first_blood_drawn": "%s抽取了第一滴血",
-    "message.joined": "%s已加入游戏",
-    "message.left": "%s已离开游戏",
+    "message.first_blood_drawn": "%s 抽取了第一滴血",
+    "message.joined": "%s 已加入游戏",
+    "message.left": "%s 已离开游戏",
 
     "title.warm_up": "热身",
     "title.game_start": "开始!",
@@ -17,7 +17,7 @@
 
     "key.switch_teams": "切换队伍",
 
-    "gui.killed_message.killed_by": "被%s杀死",
+    "gui.killed_message.killed_by": "被 %s 杀死",
     "gui.killed_message.hp": "生命值: %s",
 
     "gui.screen.shop.title": "商店",
@@ -67,5 +67,8 @@
     "menu.play.world_list.button.create": "创建",
     "menu.play.world_list.button.edit": "编辑",
     "menu.play.world_list.button.delete": "删除",
-    "menu.play.world_list.button.recreate": "重新创建"
+    "menu.play.world_list.button.recreate": "重新创建",
+    
+    "view.hosting.order_now": "现在下单",
+    "view.hosting.partners": "和伙伴一起"
 }
