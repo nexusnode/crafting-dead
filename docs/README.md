@@ -40,7 +40,7 @@ Examples of non-constants:
 `logger, clientConfig`
 
 # License
-Crafting Dead is licensed under GPL v3.0, see LICENSE.txt for more information. You may use Crafting Dead in modpacks, reviews or any other medium as long as you obide by the terms of the license. Commercial use of the mod must be authorised by NEXUSNODE Directors (Brad Hunter).
+Crafting Dead is licensed under LICENSE.txt for more information. You may use Crafting Dead in modpacks, reviews or any other medium as long as you obide by the terms of the license. Commercial use of the mod must be authorised by NEXUSNODE Directors (Brad Hunter).
 
 Commercial use is any reproduction or purpose that is marketed, promoted, or sold and incorporates a financial transaction. You can use Crafting Dead for personal use, To host a server for friends for example, But not to use the mod or mod pack in any way that gives you a financial advantage, neither can you use or modify the code and re-sell it which will allow others to gain a financial advantage. Any use of the Crafting Dead mod other than within the official Crafting Dead Mod pack is for personal use, none of our work or assets can be used in any way that will allow the person commercial advantage or monetary compensation.
 
