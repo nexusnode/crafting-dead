@@ -26,22 +26,41 @@ public class ServerConfig {
   public final ForgeConfigSpec.BooleanValue bleedingEnabled;
   public final ForgeConfigSpec.BooleanValue disableZombies;
   public final ForgeConfigSpec.BooleanValue infectionEnabled;
+  public final ForgeConfigSpec.IntValue militaryLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue medicalLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue civilianLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue rareCivilianLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue policeLootRefreshDelayTicks;
 
   public ServerConfig(ForgeConfigSpec.Builder builder) {
-    builder.push("server");
-    {
-      this.brokenLegsEnabled = builder
-          .translation("options.craftingdeadsurvival.server.broken_legs_enabled")
-          .define("brokenLegsEnabled", true);
-      this.bleedingEnabled = builder
-          .translation("options.craftingdeadsurvival.server.bleeding_enabled")
-          .define("bleedingEnabled", true);
-      this.disableZombies = builder
-          .translation("options.craftingdeadsurvival.server.disable_zombies")
-          .define("disableZombies", false);
-      this.infectionEnabled = builder
-          .translation("options.craftingdeadsurvival.server.infection_enabled")
-          .define("infectionEnabled", true);
-    }
+
+    this.brokenLegsEnabled = builder
+        .translation("options.craftingdeadsurvival.server.broken_legs_enabled")
+        .define("brokenLegsEnabled", true);
+    this.bleedingEnabled = builder
+        .translation("options.craftingdeadsurvival.server.bleeding_enabled")
+        .define("bleedingEnabled", true);
+    this.disableZombies = builder
+        .translation("options.craftingdeadsurvival.server.disable_zombies")
+        .define("disableZombies", false);
+    this.infectionEnabled = builder
+        .translation("options.craftingdeadsurvival.server.infection_enabled")
+        .define("infectionEnabled", true);
+
+    this.militaryLootRefreshDelayTicks = builder
+        .translation("options.craftingdeadsurvival.server.military_loot_refresh_delay_ticks")
+        .defineInRange("militaryLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+    this.medicalLootRefreshDelayTicks = builder
+        .translation("options.craftingdeadsurvival.server.medical_loot_refresh_delay_ticks")
+        .defineInRange("medicalLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+    this.civilianLootRefreshDelayTicks = builder
+        .translation("options.craftingdeadsurvival.server.civilian_loot_refresh_delay_ticks")
+        .defineInRange("civilianLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+    this.rareCivilianLootRefreshDelayTicks = builder
+        .translation("options.craftingdeadsurvival.server.rare_civilian_loot_refresh_delay_ticks")
+        .defineInRange("rareCivilianLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+    this.policeLootRefreshDelayTicks = builder
+        .translation("options.craftingdeadsurvival.server.police_loot_refresh_delay_ticks")
+        .defineInRange("policeLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
   }
 }

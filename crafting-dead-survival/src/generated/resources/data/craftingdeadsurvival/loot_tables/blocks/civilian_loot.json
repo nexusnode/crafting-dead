@@ -287,7 +287,7 @@
         {
           "type": "minecraft:item",
           "weight": 30,
-          "name": "craftingdead:trenchgun_shells"
+          "name": "craftingdead:trench_gun_shells"
         },
         {
           "type": "minecraft:item",
@@ -357,7 +357,7 @@
         {
           "type": "minecraft:item",
           "weight": 15,
-          "name": "craftingdead:trenchgun"
+          "name": "craftingdead:trench_gun"
         },
         {
           "type": "minecraft:item",

@@ -3,6 +3,11 @@
   "options.craftingdeadsurvival.server.bleeding_enabled":"Bleeding Enabled",
   "options.craftingdeadsurvival.server.disable_zombies":"Disable Zombies",
   "options.craftingdeadsurvival.server.infection_enabled":"Infection Enabled",
+  "options.craftingdeadsurvival.server.military_loot_refresh_delay_ticks":"Military Loot Refresh Delay (Ticks)",
+  "options.craftingdeadsurvival.server.medical_loot_refresh_delay_ticks":"Medical Loot Refresh Delay (Ticks)",
+  "options.craftingdeadsurvival.server.civilian_loot_refresh_delay_ticks":"Civilian Loot Refresh Delay (Ticks)",
+  "options.craftingdeadsurvival.server.rare_civilian_loot_refresh_delay_ticks":"Rare Civilian Loot Refresh Delay (Ticks)",
+  "options.craftingdeadsurvival.server.police_loot_refresh_delay_ticks":"Police Loot Refresh Delay (Ticks)",
 
   "options.craftingdeadsurvival.client.display_blood": "Display Blood",
 

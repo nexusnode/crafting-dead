@@ -85,19 +85,19 @@ public class ClientDist implements ModDist {
         CylinderGrenadeRenderer::new);
     RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.advancedZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.fastZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.FAST_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.tankZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.TANK_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.weakZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.WEAK_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.policeZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.POLICE_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.doctorZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.DOCTOR_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.giantZombie,
+    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.GIANT_ZOMBIE.get(),
         GiantZombieRenderer::new);
   }
 

@@ -31,7 +31,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
-import net.minecraft.item.SpawnEggItem;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -48,7 +48,7 @@ public class SurvivalItems {
       return new ItemStack(RBI_SYRINGE::get);
     }
   };
-  
+
   // ================================================================================
   // Loot
   // ================================================================================
@@ -61,7 +61,7 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> MEDIC_LOOT_ITEM =
       ITEMS.register("medic_loot",
-          () -> new BlockItem(SurvivalBlocks.MEDIC_LOOT.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.MEDICAL_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
@@ -73,7 +73,7 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_ITEM =
       ITEMS.register("civilian_rare_loot",
-          () -> new BlockItem(SurvivalBlocks.CIVILIAN_RARE_LOOT.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.RARE_CIVILIAN_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
@@ -85,27 +85,28 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> MILITARY_LOOT_GEN_ITEM =
       ITEMS.register("military_loot_gen",
-          () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT_GEN.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> MEDIC_LOOT_GEN_ITEM =
       ITEMS.register("medic_loot_gen",
-          () -> new BlockItem(SurvivalBlocks.MEDIC_LOOT_GEN.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.MEDICAL_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_LOOT_GEN_ITEM =
       ITEMS.register("civilian_loot_gen",
-          () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT_GEN.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_GEN_ITEM =
       ITEMS.register("civilian_rare_loot_gen",
-          () -> new BlockItem(SurvivalBlocks.CIVILIAN_RARE_LOOT_GEN.get(), new Item.Properties()
-              .tab(TAB)));
+          () -> new BlockItem(SurvivalBlocks.RARE_CIVILIAN_LOOT_GENERATOR.get(),
+              new Item.Properties()
+                  .tab(TAB)));
 
   public static final RegistryObject<Item> POLICE_LOOT_GEN_ITEM =
       ITEMS.register("police_loot_gen",
-          () -> new BlockItem(SurvivalBlocks.POLICE_LOOT_GEN.get(), new Item.Properties()
+          () -> new BlockItem(SurvivalBlocks.POLICE_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   // ================================================================================
@@ -177,31 +178,31 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> ADVANCED_ZOMBIE_SPAWN_EGG =
       ITEMS.register("advanced_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.advancedZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.ADVANCED_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> FAST_ZOMBIE_SPAWN_EGG =
       ITEMS.register("fast_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.fastZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.FAST_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> TANK_ZOMBIE_SPAWN_EGG =
       ITEMS.register("tank_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.tankZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.TANK_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> WEAK_ZOMBIE_SPAWN_EGG =
       ITEMS.register("weak_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.weakZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.WEAK_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> POLICE_ZOMBIE_SPAWN_EGG =
       ITEMS.register("police_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.policeZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.POLICE_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> DOCTOR_ZOMBIE_SPAWN_EGG =
       ITEMS.register("doctor_zombie_spawn_egg",
-          () -> new SpawnEggItem(SurvivalEntityTypes.doctorZombie, 0x000000, 0xFFFFFF,
+          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.DOCTOR_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 }

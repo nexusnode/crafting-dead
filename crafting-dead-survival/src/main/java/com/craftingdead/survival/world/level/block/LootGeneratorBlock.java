@@ -19,6 +19,7 @@
 package com.craftingdead.survival.world.level.block;
 
 import java.util.Random;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -26,25 +27,29 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 public class LootGeneratorBlock extends AirBlock {
 
   private final Supplier<Block> lootBlock;
-  private final Supplier<IParticleData> particleOptions;
+  private final Supplier<? extends IParticleData> particleOptions;
+  private final IntSupplier refreshDelayTicks;
 
   public LootGeneratorBlock(Properties properties, Supplier<Block> lootBlock,
-      Supplier<IParticleData> particleOptions) {
+      Supplier<? extends IParticleData> particleOptions, IntSupplier refreshDelayTicks) {
     super(properties);
     this.lootBlock = lootBlock;
     this.particleOptions = particleOptions;
+    this.refreshDelayTicks = refreshDelayTicks;
   }
 
   @Override
@@ -69,8 +74,18 @@ public class LootGeneratorBlock extends AirBlock {
 
   @SuppressWarnings("deprecation")
   @Override
-  public void randomTick(BlockState blockState, ServerWorld level, BlockPos pos, Random random) {
-    super.randomTick(blockState, level, pos, random);
+  public BlockState updateShape(BlockState blockState, Direction direction,
+      BlockState neighborState, IWorld level, BlockPos pos, BlockPos neighborPos) {
+    level.getBlockTicks().scheduleTick(pos, this, 0);
+    return super.updateShape(blockState, direction, neighborState, level, pos, neighborPos);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void tick(BlockState blockState, ServerWorld level, BlockPos pos, Random random) {
+    super.tick(blockState, level, pos, random);
+
+    level.getBlockTicks().scheduleTick(pos, this, this.refreshDelayTicks.getAsInt());
 
     BlockState lootBlockState = this.lootBlock.get().defaultBlockState();
 

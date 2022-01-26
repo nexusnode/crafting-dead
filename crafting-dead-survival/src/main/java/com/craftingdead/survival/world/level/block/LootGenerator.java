@@ -44,13 +44,13 @@ public class LootGenerator extends Block {
         worldIn.setBlockAndUpdate(pos, SurvivalBlocks.MILITARY_LOOT.get().defaultBlockState());
         break;
       case "medic":
-        worldIn.setBlockAndUpdate(pos, SurvivalBlocks.MEDIC_LOOT.get().defaultBlockState());
+        worldIn.setBlockAndUpdate(pos, SurvivalBlocks.MEDICAL_LOOT.get().defaultBlockState());
         break;
       case "civilian":
         worldIn.setBlockAndUpdate(pos, SurvivalBlocks.CIVILIAN_LOOT.get().defaultBlockState());
         break;
       case "civilian_rare":
-        worldIn.setBlockAndUpdate(pos, SurvivalBlocks.CIVILIAN_RARE_LOOT.get().defaultBlockState());
+        worldIn.setBlockAndUpdate(pos, SurvivalBlocks.RARE_CIVILIAN_LOOT.get().defaultBlockState());
         break;
       case "police":
         worldIn.setBlockAndUpdate(pos, SurvivalBlocks.POLICE_LOOT.get().defaultBlockState());

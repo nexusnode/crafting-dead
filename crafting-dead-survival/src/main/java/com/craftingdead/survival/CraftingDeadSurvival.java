@@ -53,6 +53,7 @@ import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.item.Item;
@@ -61,6 +62,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -114,9 +116,6 @@ public class CraftingDeadSurvival {
 
     MinecraftForge.EVENT_BUS.register(this);
 
-    SurvivalEntityTypes.initialize();
-    modEventBus.addGenericListener(EntityType.class, SurvivalEntityTypes::registerAll);
-
     SurvivalEnchantments.ENCHANTMENTS.register(modEventBus);
     SurvivalActionTypes.ACTION_TYPES.register(modEventBus);
     SurvivalItems.ITEMS.register(modEventBus);
@@ -142,17 +141,47 @@ public class CraftingDeadSurvival {
     BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
         Ingredient.of(Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE),
         new ItemStack(SurvivalItems.CURE_SYRINGE.get()));
+
+    registerEntitySpawnPlacements();
+  }
+
+  private static void registerEntitySpawnPlacements() {
+    EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
+
+    EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.FAST_ZOMBIE.get(),
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
+
+    EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.TANK_ZOMBIE.get(),
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
+
+    EntitySpawnPlacementRegistry.register(SurvivalEntityTypes.WEAK_ZOMBIE.get(),
+        EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+        AdvancedZombieEntity::checkAdvancedZombieSpawnRules);
   }
 
   private void handleEntityAttributeCreation(EntityAttributeCreationEvent event) {
-    event.put(SurvivalEntityTypes.advancedZombie,
-        AdvancedZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.doctorZombie, DoctorZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.fastZombie, FastZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.giantZombie, GiantZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.policeZombie, PoliceZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.tankZombie, TankZombieEntity.registerAttributes().build());
-    event.put(SurvivalEntityTypes.weakZombie, WeakZombieEntity.registerAttributes().build());
+    event.put(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
+        AdvancedZombieEntity.createAttributes().build());
+    event.put(SurvivalEntityTypes.DOCTOR_ZOMBIE.get(),
+        DoctorZombieEntity.createAttributes().build());
+    event.put(SurvivalEntityTypes.FAST_ZOMBIE.get(),
+        FastZombieEntity.createAttributes().build());
+    event.put(SurvivalEntityTypes.GIANT_ZOMBIE.get(),
+        GiantZombieEntity.registerAttributes().build());
+    event.put(SurvivalEntityTypes.POLICE_ZOMBIE.get(),
+        PoliceZombieEntity.createAttributes().build());
+    event.put(SurvivalEntityTypes.TANK_ZOMBIE.get(),
+        TankZombieEntity.registerAttributes().build());
+    event.put(SurvivalEntityTypes.WEAK_ZOMBIE.get(),
+        WeakZombieEntity.registerAttributes().build());
   }
 
   private void handleGatherData(GatherDataEvent event) {
@@ -251,13 +280,13 @@ public class CraftingDeadSurvival {
       MobSpawnInfo.Spawners spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.advancedZombie, 40, 2, 8));
+            SurvivalEntityTypes.ADVANCED_ZOMBIE.get(), 40, 2, 8));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.fastZombie, 15, 2, 4));
+            SurvivalEntityTypes.FAST_ZOMBIE.get(), 15, 2, 4));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.tankZombie, 5, 2, 4));
+            SurvivalEntityTypes.TANK_ZOMBIE.get(), 5, 2, 4));
         iterator.add(new MobSpawnInfo.Spawners(
-            SurvivalEntityTypes.weakZombie, 30, 2, 12));
+            SurvivalEntityTypes.WEAK_ZOMBIE.get(), 30, 2, 12));
       }
     }
   }

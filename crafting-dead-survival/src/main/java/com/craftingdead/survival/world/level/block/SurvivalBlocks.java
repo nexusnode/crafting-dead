@@ -18,6 +18,7 @@
 
 package com.craftingdead.survival.world.level.block;
 
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.particles.SurvivalParticleTypes;
@@ -40,7 +41,7 @@ public class SurvivalBlocks {
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
-  public static final RegistryObject<Block> MEDIC_LOOT =
+  public static final RegistryObject<Block> MEDICAL_LOOT =
       BLOCKS.register("medic_loot",
           () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
@@ -52,7 +53,7 @@ public class SurvivalBlocks {
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
-  public static final RegistryObject<Block> CIVILIAN_RARE_LOOT =
+  public static final RegistryObject<Block> RARE_CIVILIAN_LOOT =
       BLOCKS.register("civilian_rare_loot",
           () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
@@ -64,35 +65,40 @@ public class SurvivalBlocks {
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
-  public static final RegistryObject<Block> MILITARY_LOOT_GEN =
+  public static final RegistryObject<Block> MILITARY_LOOT_GENERATOR =
       BLOCKS.register("military_loot_gen",
-          () -> lootGenerator(MILITARY_LOOT, SurvivalParticleTypes.MILITARY_LOOT_GEN::get));
+          () -> lootGenerator(MILITARY_LOOT, SurvivalParticleTypes.MILITARY_LOOT_GEN,
+              CraftingDeadSurvival.serverConfig.militaryLootRefreshDelayTicks::get));
 
-  public static final RegistryObject<Block> MEDIC_LOOT_GEN =
+  public static final RegistryObject<Block> MEDICAL_LOOT_GENERATOR =
       BLOCKS.register("medic_loot_gen",
-          () -> lootGenerator(MEDIC_LOOT, SurvivalParticleTypes.MEDIC_LOOT_GEN::get));
+          () -> lootGenerator(MEDICAL_LOOT, SurvivalParticleTypes.MEDIC_LOOT_GEN,
+              CraftingDeadSurvival.serverConfig.medicalLootRefreshDelayTicks::get));
 
-  public static final RegistryObject<Block> CIVILIAN_LOOT_GEN =
+  public static final RegistryObject<Block> CIVILIAN_LOOT_GENERATOR =
       BLOCKS.register("civilian_loot_gen",
-          () -> lootGenerator(CIVILIAN_LOOT, SurvivalParticleTypes.CIVILIAN_LOOT_GEN::get));
+          () -> lootGenerator(CIVILIAN_LOOT, SurvivalParticleTypes.CIVILIAN_LOOT_GEN,
+              CraftingDeadSurvival.serverConfig.civilianLootRefreshDelayTicks::get));
 
-  public static final RegistryObject<Block> CIVILIAN_RARE_LOOT_GEN =
+  public static final RegistryObject<Block> RARE_CIVILIAN_LOOT_GENERATOR =
       BLOCKS.register("civilian_rare_loot_gen",
-          () -> lootGenerator(CIVILIAN_RARE_LOOT,
-              SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN::get));
+          () -> lootGenerator(RARE_CIVILIAN_LOOT,
+              SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN,
+              CraftingDeadSurvival.serverConfig.rareCivilianLootRefreshDelayTicks::get));
 
-  public static final RegistryObject<Block> POLICE_LOOT_GEN =
+  public static final RegistryObject<Block> POLICE_LOOT_GENERATOR =
       BLOCKS.register("police_loot_gen",
-          () -> lootGenerator(POLICE_LOOT, SurvivalParticleTypes.POLICE_LOOT_GEN::get));
+          () -> lootGenerator(POLICE_LOOT, SurvivalParticleTypes.POLICE_LOOT_GEN,
+              CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks::get));
 
   private static LootGeneratorBlock lootGenerator(Supplier<Block> lootBlock,
-      Supplier<IParticleData> particleOptions) {
+      Supplier<? extends IParticleData> particleOptions, IntSupplier refreshDelayTicks) {
     return new LootGeneratorBlock(
         AbstractBlock.Properties.of(Material.STRUCTURAL_AIR)
             .strength(5.0F, 5.0F)
             .randomTicks()
             .noOcclusion()
             .noCollission(),
-        lootBlock, particleOptions);
+        lootBlock, particleOptions, refreshDelayTicks);
   }
 }

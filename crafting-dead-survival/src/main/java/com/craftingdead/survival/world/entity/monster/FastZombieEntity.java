@@ -21,6 +21,7 @@ package com.craftingdead.survival.world.entity.monster;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.world.World;
 
 public class FastZombieEntity extends AdvancedZombieEntity {
@@ -29,11 +30,12 @@ public class FastZombieEntity extends AdvancedZombieEntity {
     super(type, world);
   }
 
-  public static AttributeModifierMap.MutableAttribute registerAttributes() {
-    return AdvancedZombieEntity.registerAttributes()
+  public static AttributeModifierMap.MutableAttribute createAttributes() {
+    return ZombieEntity.createAttributes()
         .add(Attributes.MAX_HEALTH, 10.0D)
-        .add(Attributes.ATTACK_DAMAGE, 4.0D)
+        .add(Attributes.ATTACK_DAMAGE, 1.0D)
         .add(Attributes.FOLLOW_RANGE, 30.0D)
-        .add(Attributes.MOVEMENT_SPEED, 0.4D);
+        .add(Attributes.MOVEMENT_SPEED, 0.4D)
+        .add(Attributes.ATTACK_KNOCKBACK, 1.5D);
   }
 }

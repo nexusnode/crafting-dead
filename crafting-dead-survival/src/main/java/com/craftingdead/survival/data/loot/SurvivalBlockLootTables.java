@@ -35,11 +35,11 @@ public class SurvivalBlockLootTables extends BlockLootTables {
 
   @Override
   protected void addTables() {
-    this.dropSelf(SurvivalBlocks.CIVILIAN_LOOT_GEN.get());
-    this.dropSelf(SurvivalBlocks.CIVILIAN_RARE_LOOT_GEN.get());
-    this.dropSelf(SurvivalBlocks.MEDIC_LOOT_GEN.get());
-    this.dropSelf(SurvivalBlocks.MILITARY_LOOT_GEN.get());
-    this.dropSelf(SurvivalBlocks.POLICE_LOOT_GEN.get());
+    this.dropSelf(SurvivalBlocks.CIVILIAN_LOOT_GENERATOR.get());
+    this.dropSelf(SurvivalBlocks.RARE_CIVILIAN_LOOT_GENERATOR.get());
+    this.dropSelf(SurvivalBlocks.MEDICAL_LOOT_GENERATOR.get());
+    this.dropSelf(SurvivalBlocks.MILITARY_LOOT_GENERATOR.get());
+    this.dropSelf(SurvivalBlocks.POLICE_LOOT_GENERATOR.get());
 
     this.add(SurvivalBlocks.CIVILIAN_LOOT.get(),
         LootTable.lootTable()
@@ -265,7 +265,7 @@ public class SurvivalBlockLootTables extends BlockLootTables {
                 .add(ItemLootEntry.lootTableItem(Items.BAKED_POTATO)
                     .setWeight(20))));
 
-    this.add(SurvivalBlocks.CIVILIAN_RARE_LOOT.get(),
+    this.add(SurvivalBlocks.RARE_CIVILIAN_LOOT.get(),
         LootTable.lootTable()
             .withPool(LootPool.lootPool()
                 .setRolls(ConstantRange.exactly(1))
@@ -574,7 +574,7 @@ public class SurvivalBlockLootTables extends BlockLootTables {
                 .add(ItemLootEntry.lootTableItem(Items.BAKED_POTATO)
                     .setWeight(20))));
 
-    this.add(SurvivalBlocks.MEDIC_LOOT.get(),
+    this.add(SurvivalBlocks.MEDICAL_LOOT.get(),
         LootTable.lootTable()
             .withPool(LootPool.lootPool()
                 .setRolls(ConstantRange.exactly(1))

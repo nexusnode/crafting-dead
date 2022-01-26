@@ -21,6 +21,7 @@ package com.craftingdead.survival.world.entity.monster;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.craftingdead.core.capability.Capabilities;
@@ -37,8 +38,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -59,6 +61,18 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.RegistryObject;
 
 public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackMob {
+
+  private static final UUID DAMAGE_MODIFIER_BABY_UUID =
+      UUID.fromString("53405062-b8d8-461c-a542-26b0be8ed481");
+  private static final AttributeModifier DAMAGE_MODIFIER_BABY =
+      new AttributeModifier(DAMAGE_MODIFIER_BABY_UUID, "Baby damage reduction", -1.5D,
+          AttributeModifier.Operation.MULTIPLY_BASE);
+
+  private static final UUID HEALTH_MODIFIER_BABY_UUID =
+      UUID.fromString("69d754ea-1ae3-4684-bb69-51a29de92b9a");
+  private static final AttributeModifier HEALTH_MODIFIER_BABY =
+      new AttributeModifier(HEALTH_MODIFIER_BABY_UUID, "Baby health reduction", -1.5D,
+          AttributeModifier.Operation.MULTIPLY_BASE);
 
   private static final float MELEE_CHANCE = 0.15F;
   private static final float CLOTHING_CHANCE = 0.25F;
@@ -110,14 +124,22 @@ public class AdvancedZombieEntity extends ZombieEntity implements IRangedAttackM
   }
 
   @Override
-  public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
-    return true;
+  public void setBaby(boolean baby) {
+    super.setBaby(baby);
+    if (this.level != null && !this.level.isClientSide) {
+      ModifiableAttributeInstance damageAttribute = this.getAttribute(Attributes.ATTACK_DAMAGE);
+      damageAttribute.removeModifier(DAMAGE_MODIFIER_BABY);
+      damageAttribute.removeModifier(HEALTH_MODIFIER_BABY);
+      if (baby) {
+        damageAttribute.addTransientModifier(DAMAGE_MODIFIER_BABY);
+        damageAttribute.addTransientModifier(HEALTH_MODIFIER_BABY);
+      }
+    }
   }
 
-  public static AttributeModifierMap.MutableAttribute registerAttributes() {
-    return ZombieEntity.createAttributes()
-        .add(Attributes.MAX_HEALTH, 20.0D)
-        .add(Attributes.ATTACK_DAMAGE, 6.0D);
+  @Override
+  public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+    return true;
   }
 
   @Override

@@ -54,7 +54,7 @@ public class GiantZombieEntity extends AdvancedZombieEntity {
   }
 
   public static AttributeModifierMap.MutableAttribute registerAttributes() {
-    return AdvancedZombieEntity.registerAttributes()
+    return AdvancedZombieEntity.createAttributes()
         .add(Attributes.MAX_HEALTH, 100.0D)
         .add(Attributes.ATTACK_DAMAGE, 50.0D)
         .add(Attributes.MOVEMENT_SPEED, 0.5D);
