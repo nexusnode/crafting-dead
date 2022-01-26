@@ -2,16 +2,16 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "craftingdead:trenchgun"
+      "craftingdead:scarl"
     ]
   },
   "criteria": {
-    "has_oak_planks": {
+    "has_orange_dye": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:oak_planks"
+            "item": "minecraft:orange_dye"
           }
         ]
       }
@@ -19,13 +19,13 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "craftingdead:trenchgun"
+        "recipe": "craftingdead:scarl"
       }
     }
   },
   "requirements": [
     [
-      "has_oak_planks",
+      "has_orange_dye",
       "has_the_recipe"
     ]
   ]
