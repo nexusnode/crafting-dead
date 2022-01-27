@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.renderer.item.ItemRendererTypes;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -36,14 +37,14 @@ import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.gun.ammoprovider.AmmoProviderTypes;
-import com.craftingdead.core.world.gun.attachment.Attachments;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
+import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.entity.Entity;
@@ -133,6 +134,7 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
+    ItemRendererTypes.ITEM_RENDERER_TYPES.register(modEventBus);
 
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 

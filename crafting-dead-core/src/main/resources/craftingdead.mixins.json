@@ -13,7 +13,8 @@
         "ItemRendererMixin",
         "PlayerRendererMixin",
         "PlayerInventoryMixin",
-        "GameRendererMixin"
+        "GameRendererMixin",
+        "ModelBakeryMixin"
     ],
     "injectors": {
         "defaultRequire": 1

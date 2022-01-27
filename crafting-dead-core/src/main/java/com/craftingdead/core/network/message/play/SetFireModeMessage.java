@@ -21,7 +21,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import com.craftingdead.core.world.gun.FireMode;
+import com.craftingdead.core.world.item.gun.FireMode;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 

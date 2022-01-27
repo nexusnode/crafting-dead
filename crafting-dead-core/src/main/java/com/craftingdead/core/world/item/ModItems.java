@@ -19,49 +19,29 @@
 package com.craftingdead.core.world.item;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.renderer.item.ACRRenderer;
-import com.craftingdead.core.client.renderer.item.AK47Renderer;
-import com.craftingdead.core.client.renderer.item.AS50Renderer;
-import com.craftingdead.core.client.renderer.item.AWPRenderer;
-import com.craftingdead.core.client.renderer.item.DMRRenderer;
-import com.craftingdead.core.client.renderer.item.DesertEagleRenderer;
-import com.craftingdead.core.client.renderer.item.FN57Renderer;
-import com.craftingdead.core.client.renderer.item.FNFALRenderer;
-import com.craftingdead.core.client.renderer.item.G18Renderer;
-import com.craftingdead.core.client.renderer.item.G36CRenderer;
-import com.craftingdead.core.client.renderer.item.HK417Renderer;
-import com.craftingdead.core.client.renderer.item.M107Renderer;
-import com.craftingdead.core.client.renderer.item.M1911Renderer;
-import com.craftingdead.core.client.renderer.item.M1GarandRenderer;
-import com.craftingdead.core.client.renderer.item.M240BRenderer;
-import com.craftingdead.core.client.renderer.item.M4A1Renderer;
-import com.craftingdead.core.client.renderer.item.M9Renderer;
-import com.craftingdead.core.client.renderer.item.MAC10Renderer;
-import com.craftingdead.core.client.renderer.item.MK48ModRenderer;
-import com.craftingdead.core.client.renderer.item.MP5A5Renderer;
-import com.craftingdead.core.client.renderer.item.MPT55Renderer;
-import com.craftingdead.core.client.renderer.item.MagnumRenderer;
-import com.craftingdead.core.client.renderer.item.MinigunRenderer;
-import com.craftingdead.core.client.renderer.item.MossbergRenderer;
-import com.craftingdead.core.client.renderer.item.P250Renderer;
-import com.craftingdead.core.client.renderer.item.P90Renderer;
-import com.craftingdead.core.client.renderer.item.RPKRenderer;
-import com.craftingdead.core.client.renderer.item.ScarlRenderer;
-import com.craftingdead.core.client.renderer.item.Sporter22Renderer;
-import com.craftingdead.core.client.renderer.item.TaserRenderer;
-import com.craftingdead.core.client.renderer.item.TrenchgunRenderer;
-import com.craftingdead.core.client.renderer.item.VectorRenderer;
+import com.craftingdead.core.client.animation.gun.InspectAnimation;
+import com.craftingdead.core.client.animation.gun.PistolShootAnimation;
+import com.craftingdead.core.client.animation.gun.ReloadAnimation;
+import com.craftingdead.core.client.animation.gun.RifleShootAnimation;
+import com.craftingdead.core.client.animation.gun.SubmachineShootAnimation;
+import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.ActionTypes;
-import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.grenade.C4ExplosiveEntity;
 import com.craftingdead.core.world.entity.grenade.DecoyGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FragGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
-import com.craftingdead.core.world.gun.attachment.Attachments;
-import com.craftingdead.core.world.gun.skin.Skins;
-import com.craftingdead.core.world.gun.type.GunTypes;
+import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.gun.FireMode;
+import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunAnimationEvent;
+import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.gun.aimable.AimableGunItem;
+import com.craftingdead.core.world.item.gun.attachment.Attachments;
+import com.craftingdead.core.world.item.gun.minigun.MinigunItem;
+import com.craftingdead.core.world.item.gun.skin.Skins;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.AxeItem;
@@ -230,7 +210,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(85)
               .setArmorPenetration(0.4F)
-              .setCustomTexture(true)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -239,7 +218,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.4F)
-              .setCustomTexture(true)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -248,7 +226,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
-              .setCustomTexture(true)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -257,7 +234,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.4F)
-              .setCustomTexture(true)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -496,7 +472,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(100)
               .setArmorPenetration(0.5F)
-              .setCustomTexture(true)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -580,250 +555,795 @@ public class ModItems {
   // Assault Rifles
   // ================================================================================
 
-  public static final RegistryObject<GunItem> M4A1 = ITEMS.register("m4a1",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M4A1)
-          .setRendererFactory(() -> M4A1Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M4A1 =
+      ITEMS.register("m4a1",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(100)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.9F)
+              .setRecoil(3.5F)
+              .setRange(160.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.BURST)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M4A1_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M4A1_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> SCARL = ITEMS.register("scarl",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.SCARL)
-          .setRendererFactory(() -> ScarlRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> SCARL =
+      ITEMS.register("scarl",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(110)
+              .setDamage(6)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.87F)
+              .setRecoil(4.25F)
+              .setRange(300.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.BURST)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.SCARL_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> AK47 = ITEMS.register("ak47",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.AK47)
-          .setRendererFactory(() -> AK47Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> AK47 =
+      ITEMS.register("ak47",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(100)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.83F)
+              .setRecoil(4.5F)
+              .setRange(125.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.AK47_SHOOT)
+              .setDistantShootSound(ModSoundEvents.AK47_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_AK47_SHOOT)
+              .setReloadSound(ModSoundEvents.AK47_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AK47_30_ROUND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> FNFAL = ITEMS.register("fnfal",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.FNFAL)
-          .setRendererFactory(() -> FNFALRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> FNFAL =
+      ITEMS.register("fnfal",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(80)
+              .setDamage(9)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.80F)
+              .setRecoil(4.0F)
+              .setRange(100.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.FNFAL_SHOOT)
+              .setDistantShootSound(ModSoundEvents.FNFAL_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.FNFAL_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> ACR = ITEMS.register("acr",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.ACR)
-          .setRendererFactory(() -> ACRRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> ACR =
+      ITEMS.register("acr",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(92)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.8F)
+              .setRecoil(3.25F)
+              .setRange(150.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.ACR_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.ACR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> HK417 = ITEMS.register("hk417",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.HK417)
-          .setRendererFactory(() -> HK417Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> HK417 =
+      ITEMS.register("hk417",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(100)
+              .setDamage(8)
+              .setReloadDurationTicks((int) (20 * 2.1F))
+              .setAccuracy(0.85F)
+              .setRecoil(3.5F)
+              .setRange(130.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.HK417_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.HK417_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> MPT55 = ITEMS.register("mpt55",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MPT55)
-          .setRendererFactory(() -> MPT55Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MPT55 =
+      ITEMS.register("mpt55",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(70)
+              .setDamage(6)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.8F)
+              .setRecoil(2.0F)
+              .setRange(180.0D)
+              .addFireMode(FireMode.BURST)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.MPT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MPT55_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> M1GARAND = ITEMS.register("m1garand",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M1GARAND)
-          .setRendererFactory(() -> M1GarandRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M1GARAND =
+      ITEMS.register("m1garand",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(170)
+              .setDamage(10)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.92F)
+              .setRecoil(7.0F)
+              .setRange(200.0D)
+              .setCrosshair(false)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M1GARAND_SHOOT)
+              .setReloadSound(ModSoundEvents.AS50_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M1GARAND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
-  public static final RegistryObject<GunItem> SPORTER22 = ITEMS.register("sporter22",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.SPORTER22)
-          .setRendererFactory(() -> Sporter22Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> SPORTER22 =
+      ITEMS.register("sporter22",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(200)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.7F)
+              .setRecoil(2.5F)
+              .setCrosshair(false)
+              .setRange(60.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.SPORTER22_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
+              .setReloadSound(ModSoundEvents.M107_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.SPORTER22_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> G36C = ITEMS.register("g36c",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.G36C)
-          .setRendererFactory(() -> G36CRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
-
+  public static final RegistryObject<GunItem> G36C =
+      ITEMS.register("g36c",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(92)
+              .setDamage(8)
+              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setAccuracy(0.91F)
+              .setRecoil(2.0F)
+              .setRange(80.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.G36C_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.G36C_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   // ================================================================================
   // Machine Guns
   // ================================================================================
 
-  public static final RegistryObject<GunItem> M240B = ITEMS.register("m240b",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M240B)
-          .setRendererFactory(() -> M240BRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M240B =
+      ITEMS.register("m240b",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(85)
+              .setDamage(8)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.79F)
+              .setRecoil(6.0F)
+              .setRange(260.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.M240B_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M240B_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
+              .setReloadSound(ModSoundEvents.M240B_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M240B_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> RPK = ITEMS.register("rpk",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.RPK)
-          .setRendererFactory(() -> RPKRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> RPK =
+      ITEMS.register("rpk",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(92)
+              .setDamage(6)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.9F)
+              .setRecoil(4.5F)
+              .setRange(150.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.RPK_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
+              .setReloadSound(ModSoundEvents.RPK_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.RPK_MAGAZINE)
+              .addAcceptedMagazine(ModItems.RPK_DRUM_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .build());
 
-  public static final RegistryObject<GunItem> MINIGUN = ITEMS.register("minigun",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MINIGUN)
-          .setRendererFactory(() -> MinigunRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MINIGUN =
+      ITEMS.register("minigun",
+          () -> MinigunItem.builder()
+              .setFireDelayMs(75)
+              .setDamage(4)
+              .setReloadDurationTicks(20 * 5)
+              .setAccuracy(0.6F)
+              .setRecoil(2.5F)
+              .setRange(350.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.MINIGUN_SHOOT)
+              .setReloadSound(ModSoundEvents.M240B_RELOAD)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MINIGUN_MAGAZINE)
+              .setRightMouseActionTriggerType(Gun.SecondaryActionTrigger.HOLD)
+              .setTriggerPredicate(Gun::isPerformingSecondaryAction)
+              .setSecondaryActionSound(ModSoundEvents.MINIGUN_BARREL)
+              .setSecondaryActionSoundRepeatDelayMs(177L)
+              .build());
 
-  public static final RegistryObject<GunItem> MK48MOD = ITEMS.register("mk48mod",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MK48MOD)
-          .setRendererFactory(() -> MK48ModRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MK48MOD =
+      ITEMS.register("mk48mod",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(92)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 4)
+              .setAccuracy(0.79F)
+              .setRecoil(5.0F)
+              .setRange(260.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.MK48MOD_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_MK48MOD_SHOOT)
+              .setReloadSound(ModSoundEvents.M240B_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MK48MOD_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   // ================================================================================
   // Pistols
   // ================================================================================
 
-  public static final RegistryObject<GunItem> TASER = ITEMS.register("taser",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.TASER)
-          .setRendererFactory(() -> TaserRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> TASER =
+      ITEMS.register("taser",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(2000)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.9F)
+              .setRecoil(1.5F)
+              .setRange(7.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.TASER_SHOOT)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .setDefaultMagazine(ModItems.TASER_CARTRIDGE)
+              .build());
 
-  public static final RegistryObject<GunItem> M1911 = ITEMS.register("m1911",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M1911)
-          .setRendererFactory(() -> M1911Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M1911 =
+      ITEMS.register("m1911",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.8F)
+              .setRecoil(2.0F)
+              .setRange(50.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M1911_SHOOT)
+              .setDistantShootSound(ModSoundEvents.M1911_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M1911_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M1911_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> G18 = ITEMS.register("g18",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.G18)
-          .setRendererFactory(() -> G18Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> G18 =
+      ITEMS.register("g18",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setAccuracy(0.7F)
+              .setRecoil(2.5F)
+              .setRange(50.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.G18_SHOOT)
+              .setDistantShootSound(ModSoundEvents.G18_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
+              .setReloadSound(ModSoundEvents.M1911_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.G18_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> M9 = ITEMS.register("m9",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M9)
-          .setRendererFactory(() -> M9Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M9 =
+      ITEMS.register("m9",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.7F)
+              .setRecoil(2.0F)
+              .setRange(50.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M9_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
+              .setReloadSound(ModSoundEvents.M9_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M9_MAGAZINE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> DESERT_EAGLE = ITEMS.register("desert_eagle",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.DESERT_EAGLE)
-          .setRendererFactory(() -> DesertEagleRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> DESERT_EAGLE =
+      ITEMS.register("desert_eagle",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(8)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.9F)
+              .setRecoil(8.0F)
+              .setRange(80.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
+              .setDistantShootSound(ModSoundEvents.DESERT_EAGLE_DISTANT_SHOOT)
+              .setReloadSound(ModSoundEvents.M9_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.DESERT_EAGLE_MAGAZINE)
+              .build());
 
-  public static final RegistryObject<GunItem> P250 = ITEMS.register("p250",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.P250)
-          .setRendererFactory(() -> P250Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> P250 =
+      ITEMS.register("p250",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(6)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.7F)
+              .setRecoil(3.5F)
+              .setRange(60.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.P250_SHOOT)
+              .setDistantShootSound(ModSoundEvents.P250_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
+              .setReloadSound(ModSoundEvents.M9_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.P250_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> MAGNUM = ITEMS.register("magnum",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MAGNUM)
-          .setRendererFactory(() -> MagnumRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MAGNUM =
+      ITEMS.register("magnum",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(7)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.8F)
+              .setRecoil(8.0F)
+              .setRange(80.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
+              .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MAGNUM_MAGAZINE)
+              .build());
 
-  public static final RegistryObject<GunItem> FN57 = ITEMS.register("fn57",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.FN57)
-          .setRendererFactory(() -> FN57Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> FN57 =
+      ITEMS.register("fn57",
+          () -> AimableGunItem.builder()
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .setFireDelayMs(160)
+              .setDamage(8)
+              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setAccuracy(0.8F)
+              .setRecoil(3.5F)
+              .setRange(50.0D)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.FN57_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.FN57_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.FN57_MAGAZINE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Submachine Guns
   // ================================================================================
 
-  public static final RegistryObject<GunItem> MAC10 = ITEMS.register("mac10",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MAC10)
-          .setRendererFactory(() -> MAC10Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MAC10 =
+      ITEMS.register("mac10",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(80)
+              .setDamage(6)
+              .setReloadDurationTicks((int) (20 * 1.8F))
+              .setAccuracy(0.7F)
+              .setRecoil(3.0F)
+              .setRange(70.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.MAC10_SHOOT)
+              .setDistantShootSound(ModSoundEvents.MAC10_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MAC10_MAGAZINE)
+              .addAcceptedMagazine(ModItems.MAC10_EXTENDED_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> P90 = ITEMS.register("p90",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.P90)
-          .setRendererFactory(() -> P90Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> P90 =
+      ITEMS.register("p90",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(80)
+              .setDamage(5)
+              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setAccuracy(0.75F)
+              .setRecoil(2.0F)
+              .setRange(100.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.P90_SHOOT)
+              .setDistantShootSound(ModSoundEvents.P90_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_P90_SHOOT)
+              .setReloadSound(ModSoundEvents.P90_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.P90_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> VECTOR = ITEMS.register("vector",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.VECTOR)
-          .setRendererFactory(() -> VectorRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> VECTOR =
+      ITEMS.register("vector",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(90)
+              .setDamage(5)
+              .setReloadDurationTicks((int) (20 * 1.9F))
+              .setAccuracy(0.7F)
+              .setRecoil(2.5F)
+              .setRange(80.0D)
+              .addFireMode(FireMode.AUTO)
+              .setShootSound(ModSoundEvents.VECTOR_SHOOT)
+              .setDistantShootSound(ModSoundEvents.VECTOR_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.VECTOR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> MP5A5 = ITEMS.register("mp5a5",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MP5A5)
-          .setRendererFactory(() -> MP5A5Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MP5A5 =
+      ITEMS.register("mp5a5",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(85)
+              .setDamage(7)
+              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setAccuracy(0.7F)
+              .setRecoil(4.5F)
+              .setRange(100.0D)
+              .addFireMode(FireMode.AUTO)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.MP5A5_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_MP5A5_SHOOT)
+              .setReloadSound(ModSoundEvents.MP5A5_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MP5A5_21_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.MP5A5_35_ROUND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Sniper Rifles
   // ================================================================================
 
-  public static final RegistryObject<GunItem> M107 = ITEMS.register("m107",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.M107)
-          .setRendererFactory(() -> M107Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> M107 =
+      ITEMS.register("m107",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(750)
+              .setDamage(20)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.9F)
+              .setRecoil(12.0F)
+              .setRange(400.0D)
+              .setCrosshair(false)
+              .setBoltAction(true)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.M107_SHOOT)
+              .setReloadSound(ModSoundEvents.M107_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M107_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
-  public static final RegistryObject<GunItem> AS50 = ITEMS.register("as50",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.AS50)
-          .setRendererFactory(() -> AS50Renderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> AS50 =
+      ITEMS.register("as50",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(170)
+              .setDamage(14)
+              .setReloadDurationTicks((int) (20 * 3.5F))
+              .setAccuracy(0.9F)
+              .setRecoil(8.5F)
+              .setRange(400.0D)
+              .setCrosshair(false)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.AS50_SHOOT)
+              .setReloadSound(ModSoundEvents.AS50_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AS50_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
-  public static final RegistryObject<GunItem> AWP = ITEMS.register("awp",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.AWP)
-          .setRendererFactory(() -> AWPRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> AWP =
+      ITEMS.register("awp",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(1200)
+              .setDamage(20)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.97F)
+              .setRecoil(9.0F)
+              .setRange(400.0D)
+              .setCrosshair(false)
+              .setBoltAction(true)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.AWP_SHOOT)
+              .setDistantShootSound(ModSoundEvents.AWP_DISTANT_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
+              .setReloadSound(ModSoundEvents.AWP_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AWP_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
-  public static final RegistryObject<GunItem> DMR = ITEMS.register("dmr",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.DMR)
-          .setRendererFactory(() -> DMRRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> DMR =
+      ITEMS.register("dmr",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(170)
+              .setDamage(15)
+              .setReloadDurationTicks(20 * 2)
+              .setAccuracy(0.9F)
+              .setRecoil(7.0F)
+              .setRange(300.0D)
+              .setCrosshair(false)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.DMR_SHOOT)
+              .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
+              .setReloadSound(ModSoundEvents.DMR_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.DMR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Shotguns
   // ================================================================================
 
-  public static final RegistryObject<GunItem> TRENCH_GUN = ITEMS.register("trench_gun",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.TRENCH_GUN)
-          .setRendererFactory(() -> TrenchgunRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> TRENCH_GUN =
+      ITEMS.register("trench_gun",
+          () -> AimableGunItem.builder()
+              .setFireDelayMs(1200)
+              .setDamage(2)
+              .setRoundsPerShot(8)
+              .setReloadDurationTicks(20 * 1)
+              .setAccuracy(0.7F)
+              .setRecoil(9.0F)
+              .setRange(25.0D)
+              .setBoltAction(true)
+              .addFireMode(FireMode.SEMI)
+              .setShootSound(ModSoundEvents.TRENCH_GUN_SHOOT)
+              .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.TRENCH_GUN_SHELLS)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .build());
 
-  public static final RegistryObject<GunItem> MOSSBERG = ITEMS.register("mossberg",
-      () -> new GunItem((GunItem.Properties) new GunItem.Properties()
-          .setGunType(GunTypes.MOSSBERG)
-          .setRendererFactory(() -> MossbergRenderer::new)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GunItem> MOSSBERG =
+      ITEMS.register("mossberg",
+          () -> AimableGunItem.builder()
+              .setRoundsPerShot(8)
+              .setFireDelayMs(1200)
+              .setDamage(3)
+              .setReloadDurationTicks(20 * 3)
+              .setAccuracy(0.7F)
+              .setRecoil(9.0F)
+              .setRange(20.0D)
+              .addFireMode(FireMode.SEMI)
+              .setBoltAction(true)
+              .setShootSound(ModSoundEvents.MOSSBERG_SHOOT)
+              .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MOSSBERG_SHELLS)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .build());
 
   // ================================================================================
   // Grenades

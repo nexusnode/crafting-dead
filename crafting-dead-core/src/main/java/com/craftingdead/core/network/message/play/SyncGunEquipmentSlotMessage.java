@@ -21,7 +21,7 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.item.gun.Gun;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;

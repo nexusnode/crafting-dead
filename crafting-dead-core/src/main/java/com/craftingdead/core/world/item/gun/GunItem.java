@@ -1,0 +1,600 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.craftingdead.core.world.item.gun;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import com.craftingdead.core.Util;
+import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.attachment.Attachment;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShootableItem;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+@RegisterGunColour
+public abstract class GunItem extends ShootableItem {
+
+  /**
+   * Time between shots in milliseconds.
+   */
+  private final int fireDelayMs;
+
+  /**
+   * Damage inflicted by a single shot from this gun.
+   */
+  private final int damage;
+
+  /**
+   * The duration of time this gun takes to reload in ticks.
+   */
+  private final int reloadDurationTicks;
+
+  /**
+   * Accuracy as percentage.
+   */
+  private final float accuracyPct;
+
+  /**
+   * Recoil.
+   */
+  private final float recoil;
+
+  /**
+   * Amount of rounds to be fired in a single shot. e.g. for shotguns
+   */
+  private final int roundsPerShot;
+
+  /**
+   * Whether the crosshair should be rendered or not while holding this item.
+   */
+  private final boolean crosshair;
+
+  /**
+   * {@link FireMode}s the gun can cycle through.
+   */
+  private final Set<FireMode> fireModes;
+
+  /**
+   * Sound to play for each shot of the gun.
+   */
+  private final Supplier<SoundEvent> shootSound;
+
+  /**
+   * Sound to play for each shot of the gun when far away.
+   */
+  private final Supplier<SoundEvent> distantShootSound;
+
+  /**
+   * A 'silenced' version of the shoot sound.
+   */
+  private final Supplier<SoundEvent> silencedShootSound;
+
+  /**
+   * Sound to play whilst the gun is being reloaded.
+   */
+  private final Supplier<SoundEvent> reloadSound;
+
+  private final Map<GunAnimationEvent, Function<GunItem, Animation>> animations;
+
+  /**
+   * A set of magazines that are supported by this gun.
+   */
+  private final Set<Supplier<? extends Item>> acceptedMagazines;
+
+  /**
+   * The default magazine that is supplied with this gun when crafted.
+   */
+  private final Supplier<? extends Item> defaultMagazine;
+
+  /**
+   * A set of attachments that are supported by this gun.
+   */
+  private final Set<Supplier<? extends Attachment>> acceptedAttachments;
+
+  /**
+   * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
+   */
+  private final Gun.SecondaryActionTrigger secondaryActionTrigger;
+
+  /**
+   * A {@link Predicate} used to determine if the gun can shoot or not.
+   */
+  private final Predicate<Gun> triggerPredicate;
+
+  /**
+   * Sound to be played when performing the right mouse action.
+   */
+  private final Supplier<SoundEvent> secondaryActionSound;
+
+  /**
+   * A delay in milliseconds between repeating the secondary action sound.
+   */
+  private final long secondaryActionSoundRepeatDelayMs;
+
+  /**
+   * Range in blocks.
+   */
+  private final double range;
+
+  private final CombatSlot combatSlot;
+
+  protected GunItem(Builder<?> builder) {
+    super(builder.properties);
+    this.fireDelayMs = builder.fireDelayMs;
+    this.damage = builder.damage;
+    this.reloadDurationTicks = builder.reloadDurationTicks;
+    this.accuracyPct = builder.accuracy;
+    this.recoil = builder.recoil;
+    this.roundsPerShot = builder.roundsPerShot;
+    this.crosshair = builder.crosshair;
+    this.fireModes = builder.fireModes;
+    this.shootSound = builder.shootSound;
+    this.distantShootSound = builder.distantShootSound;
+    this.silencedShootSound = builder.silencedShootSound;
+    this.reloadSound = builder.reloadSound;
+    this.animations = builder.animations;
+    this.acceptedMagazines = builder.acceptedMagazines;
+    this.defaultMagazine = builder.defaultMagazine;
+    this.acceptedAttachments = builder.acceptedAttachments;
+    this.secondaryActionTrigger = builder.rightMouseActionTriggerType;
+    this.triggerPredicate = builder.triggerPredicate;
+    this.secondaryActionSound = builder.secondaryActionSound;
+    this.secondaryActionSoundRepeatDelayMs = builder.secondaryActionSoundRepeatDelayMs;
+    this.range = builder.range;
+    this.combatSlot = builder.combatSlot;
+  }
+
+  public int getFireDelayMs() {
+    return this.fireDelayMs;
+  }
+
+  public int getFireRateRPM() {
+    return 60000 / this.getFireDelayMs();
+  }
+
+  public float getDamage() {
+    return this.damage;
+  }
+
+  public int getReloadDurationTicks() {
+    return this.reloadDurationTicks;
+  }
+
+  public float getAccuracyPct() {
+    return this.accuracyPct;
+  }
+
+  public float getRecoil() {
+    return this.recoil;
+  }
+
+  public double getRange() {
+    return this.range;
+  }
+
+  public int getRoundsPerShot() {
+    return this.roundsPerShot;
+  }
+
+  public boolean hasCrosshair() {
+    return this.crosshair;
+  }
+
+  public Set<FireMode> getFireModes() {
+    return this.fireModes;
+  }
+
+  public SoundEvent getShootSound() {
+    return this.shootSound.get();
+  }
+
+  public Optional<SoundEvent> getDistantShootSound() {
+    return Optional.ofNullable(this.distantShootSound).map(Supplier::get);
+  }
+
+  public Optional<SoundEvent> getSilencedShootSound() {
+    return Optional.ofNullable(this.silencedShootSound).map(Supplier::get);
+  }
+
+  public Optional<SoundEvent> getReloadSound() {
+    return Optional.ofNullable(this.reloadSound).map(Supplier::get);
+  }
+
+  public Map<GunAnimationEvent, Function<GunItem, Animation>> getAnimations() {
+    return this.animations;
+  }
+
+  public AmmoProvider createAmmoProvider() {
+    AmmoProvider ammoProvider =
+        new MagazineAmmoProvider(this.getDefaultMagazine().getDefaultInstance());
+    ammoProvider.getExpectedMagazine().setSize(0);
+    return ammoProvider;
+  }
+
+  public Set<Item> getAcceptedMagazines() {
+    return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Item getDefaultMagazine() {
+    return this.defaultMagazine.get();
+  }
+
+  public Set<Attachment> getAcceptedAttachments() {
+    return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Gun.SecondaryActionTrigger getSecondaryActionTrigger() {
+    return this.secondaryActionTrigger;
+  }
+
+  public Predicate<Gun> getTriggerPredicate() {
+    return this.triggerPredicate;
+  }
+
+  public Optional<SoundEvent> getSecondaryActionSound() {
+    return Util.optional(this.secondaryActionSound);
+  }
+
+  public long getSecondaryActionSoundRepeatDelayMs() {
+    return this.secondaryActionSoundRepeatDelayMs;
+  }
+
+  public CombatSlot getCombatSlot() {
+    return this.combatSlot;
+  }
+
+  @Override
+  public Predicate<ItemStack> getAllSupportedProjectiles() {
+    return itemStack -> this.getAcceptedMagazines()
+        .stream()
+        .anyMatch(itemStack.getItem()::equals);
+  }
+
+  @Override
+  public abstract ICapabilityProvider initCapabilities(ItemStack itemStack,
+      @Nullable CompoundNBT nbt);
+
+  @Override
+  public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+    return true;
+  }
+
+  @Override
+  public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack,
+      boolean slotChanged) {
+    return oldStack.getItem() != newStack.getItem();
+  }
+
+  @Override
+  public void appendHoverText(ItemStack itemStack, World world,
+      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+    super.appendHoverText(itemStack, world, lines, tooltipFlag);
+
+    itemStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
+      ITextComponent ammoCount =
+          new StringTextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
+              .map(Magazine::getSize)
+              .orElse(0))).withStyle(TextFormatting.RED);
+      ITextComponent damageText =
+          new StringTextComponent(String.valueOf(this.getDamage()))
+              .withStyle(TextFormatting.RED);
+      ITextComponent headshotDamageText = new StringTextComponent(
+          String.valueOf((int) (this.getDamage() * AbstractGun.HEADSHOT_MULTIPLIER)))
+              .withStyle(TextFormatting.RED);
+      ITextComponent accuracyText =
+          new StringTextComponent((int) (this.getAccuracyPct() * 100D) + "%")
+              .withStyle(TextFormatting.RED);
+      ITextComponent rpmText =
+          new StringTextComponent(String.valueOf(this.getFireRateRPM()))
+              .withStyle(TextFormatting.RED);
+      ITextComponent rangeText =
+          new StringTextComponent(this.getRange() + " blocks")
+              .withStyle(TextFormatting.RED);
+
+      lines.add(new TranslationTextComponent("item_lore.gun_item.ammo_amount")
+          .withStyle(TextFormatting.GRAY)
+          .append(ammoCount));
+      lines.add(new TranslationTextComponent("item_lore.gun_item.damage")
+          .withStyle(TextFormatting.GRAY)
+          .append(damageText));
+      lines.add(new TranslationTextComponent("item_lore.gun_item.headshot_damage")
+          .withStyle(TextFormatting.GRAY)
+          .append(headshotDamageText));
+
+      if (this.getRoundsPerShot() > 1) {
+        ITextComponent pelletsText =
+            new StringTextComponent(String.valueOf(this.getRoundsPerShot()))
+                .withStyle(TextFormatting.RED);
+
+        lines.add(new TranslationTextComponent("item_lore.gun_item.pellets_shot")
+            .withStyle(TextFormatting.GRAY)
+            .append(pelletsText));
+      }
+
+      for (Attachment attachment : gun.getAttachments()) {
+        ITextComponent attachmentName = attachment.getDescription()
+            .plainCopy()
+            .withStyle(TextFormatting.RED);
+        lines.add(new TranslationTextComponent("item_lore.gun_item.attachment")
+            .withStyle(TextFormatting.GRAY)
+            .append(attachmentName));
+      }
+
+      lines.add(new TranslationTextComponent("item_lore.gun_item.rpm")
+          .withStyle(TextFormatting.GRAY)
+          .append(rpmText));
+      lines.add(new TranslationTextComponent("item_lore.gun_item.accuracy")
+          .withStyle(TextFormatting.GRAY)
+          .append(accuracyText));
+      lines.add(new TranslationTextComponent("item_lore.gun_item.range")
+          .withStyle(TextFormatting.GRAY)
+          .append(rangeText));
+    });
+  }
+
+  @Override
+  public boolean isEnchantable(ItemStack stack) {
+    return true;
+  }
+
+  @Override
+  public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+    return enchantment == Enchantments.FLAMING_ARROWS
+        || enchantment == Enchantments.POWER_ARROWS
+        || enchantment == Enchantments.UNBREAKING
+        || super.canApplyAtEnchantingTable(stack, enchantment);
+  }
+
+  @Override
+  public int getEnchantmentValue() {
+    return 1;
+  }
+
+  @Override
+  public int getDefaultProjectileRange() {
+    return 0;
+  }
+
+  public static class Builder<SELF extends Builder<SELF>> {
+
+    private final Function<SELF, GunItem> factory;
+
+    private final Properties properties = new Properties().stacksTo(1).tab(ModItems.COMBAT_TAB);
+
+    private int fireDelayMs;
+
+    private int damage;
+
+    private int reloadDurationTicks;
+
+    private int roundsPerShot = 1;
+
+    private float accuracy;
+
+    private float recoil;
+
+    private double range;
+
+    private boolean crosshair = true;
+
+    private final Set<FireMode> fireModes = EnumSet.noneOf(FireMode.class);
+
+    private Supplier<SoundEvent> shootSound;
+
+    private Supplier<SoundEvent> distantShootSound = () -> null;
+
+    private Supplier<SoundEvent> silencedShootSound = () -> null;
+
+    private Supplier<SoundEvent> reloadSound = () -> null;
+
+    private final Map<GunAnimationEvent, Function<GunItem, Animation>> animations =
+        new EnumMap<>(GunAnimationEvent.class);
+
+    private final Set<Supplier<? extends Item>> acceptedMagazines = new HashSet<>();
+
+    private Supplier<? extends Item> defaultMagazine;
+
+    private final Set<Supplier<? extends Attachment>> acceptedAttachments = new HashSet<>();
+
+    private Gun.SecondaryActionTrigger rightMouseActionTriggerType =
+        Gun.SecondaryActionTrigger.TOGGLE;
+
+    private Predicate<Gun> triggerPredicate = gun -> true;
+
+    private Supplier<SoundEvent> secondaryActionSound = () -> null;
+
+    private long secondaryActionSoundRepeatDelayMs = -1L;
+
+    private CombatSlot combatSlot = CombatSlot.PRIMARY;
+
+    public Builder(Function<SELF, GunItem> factory) {
+      this.factory = factory;
+    }
+
+    public SELF properties(Consumer<Properties> consumer) {
+      consumer.accept(this.properties);
+      return this.self();
+    }
+
+    public SELF setFireDelayMs(int fireDelayMs) {
+      this.fireDelayMs = fireDelayMs;
+      return this.self();
+    }
+
+    public SELF setDamage(int damage) {
+      this.damage = damage;
+      return this.self();
+    }
+
+    public SELF setReloadDurationTicks(int reloadDurationTicks) {
+      this.reloadDurationTicks = reloadDurationTicks;
+      return this.self();
+    }
+
+    public SELF setRoundsPerShot(int roundsPerShot) {
+      this.roundsPerShot = roundsPerShot;
+      return this.self();
+    }
+
+    public SELF setCrosshair(boolean crosshair) {
+      this.crosshair = crosshair;
+      return this.self();
+    }
+
+    public SELF setAccuracy(float accuracy) {
+      this.accuracy = accuracy;
+      return this.self();
+    }
+
+    public SELF setRecoil(float recoil) {
+      this.recoil = recoil;
+      return this.self();
+    }
+
+    public SELF setRange(double range) {
+      this.range = range;
+      return this.self();
+    }
+
+    public SELF addFireMode(FireMode fireMode) {
+      this.fireModes.add(fireMode);
+      return this.self();
+    }
+
+    public SELF setShootSound(Supplier<SoundEvent> shootSound) {
+      this.shootSound = shootSound;
+      return this.self();
+    }
+
+    public SELF setDistantShootSound(Supplier<SoundEvent> distantShootSound) {
+      this.distantShootSound = distantShootSound;
+      return this.self();
+    }
+
+    public SELF setSilencedShootSound(Supplier<SoundEvent> silencedShootSound) {
+      this.silencedShootSound = silencedShootSound;
+      return this.self();
+    }
+
+    public SELF setReloadSound(Supplier<SoundEvent> reloadSound) {
+      this.reloadSound = reloadSound;
+      return this.self();
+    }
+
+    public SELF putAnimation(GunAnimationEvent event, Supplier<Animation> animation) {
+      return this.putAnimation(event, __ -> animation.get());
+    }
+
+    public SELF putReloadAnimation(IntFunction<Animation> animation) {
+      return this.putAnimation(GunAnimationEvent.RELOAD,
+          gunType -> animation.apply(gunType.reloadDurationTicks));
+    }
+
+    public SELF putAnimation(GunAnimationEvent event,
+        Function<GunItem, Animation> animation) {
+      this.animations.put(event, animation);
+      return this.self();
+    }
+
+    public SELF addAcceptedMagazine(Supplier<? extends Item> acceptedMagazine) {
+      this.acceptedMagazines.add(acceptedMagazine);
+      return this.self();
+    }
+
+    public SELF setDefaultMagazine(Supplier<? extends Item> defaultMagazine) {
+      if (this.defaultMagazine != null) {
+        throw new IllegalArgumentException("Default magazine already set");
+      }
+      this.defaultMagazine = defaultMagazine;
+      return this.addAcceptedMagazine(defaultMagazine);
+    }
+
+    public SELF addAcceptedAttachment(Supplier<? extends Attachment> acceptedAttachment) {
+      this.acceptedAttachments.add(acceptedAttachment);
+      return this.self();
+    }
+
+    public SELF setRightMouseActionTriggerType(
+        Gun.SecondaryActionTrigger rightMouseActionTriggerType) {
+      this.rightMouseActionTriggerType = rightMouseActionTriggerType;
+      return this.self();
+    }
+
+    public SELF setTriggerPredicate(Predicate<Gun> triggerPredicate) {
+      this.triggerPredicate = triggerPredicate;
+      return this.self();
+    }
+
+    public SELF setSecondaryActionSound(Supplier<SoundEvent> secondaryActionSound) {
+      this.secondaryActionSound = secondaryActionSound;
+      return this.self();
+    }
+
+    public SELF setSecondaryActionSoundRepeatDelayMs(
+        long secondaryActionSoundRepeatDelayMs) {
+      this.secondaryActionSoundRepeatDelayMs = secondaryActionSoundRepeatDelayMs;
+      return this.self();
+    }
+
+    public SELF setCombatSlot(CombatSlot combatSlot) {
+      this.combatSlot = combatSlot;
+      return this.self();
+    }
+
+    public GunItem build() {
+      return this.factory.apply(this.self());
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final SELF self() {
+      return (SELF) this;
+    }
+  }
+}

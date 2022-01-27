@@ -21,8 +21,8 @@ package com.craftingdead.core.world.action.reload;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.RefillableAmmoProvider;
 
 public class RefillableReloadAction extends AbstractReloadAction {
 

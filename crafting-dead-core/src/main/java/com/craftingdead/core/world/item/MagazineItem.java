@@ -22,8 +22,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.craftingdead.core.world.gun.magazine.Magazine;
-import com.craftingdead.core.world.gun.magazine.MagazineImpl;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import com.craftingdead.core.world.item.gun.magazine.MagazineImpl;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,13 +43,11 @@ public class MagazineItem extends Item {
 
   private final float armorPenetration;
   private final int size;
-  private final boolean customTexture;
 
   public MagazineItem(Properties properties) {
     super(properties);
     this.size = properties.size;
     this.armorPenetration = properties.armorPenetration;
-    this.customTexture = properties.customTexture;
   }
 
   public float getArmorPenetration() {
@@ -58,10 +56,6 @@ public class MagazineItem extends Item {
 
   public int getSize() {
     return this.size;
-  }
-
-  public boolean hasCustomTexture() {
-    return this.customTexture;
   }
 
   @Override
@@ -155,7 +149,6 @@ public class MagazineItem extends Item {
 
     private float armorPenetration;
     private int size;
-    private boolean customTexture;
 
     public Properties setArmorPenetration(float armorPenetration) {
       this.armorPenetration = armorPenetration;
@@ -164,11 +157,6 @@ public class MagazineItem extends Item {
 
     public Properties setSize(int size) {
       this.size = size;
-      return this;
-    }
-
-    public Properties setCustomTexture(boolean customTexture) {
-      this.customTexture = customTexture;
       return this;
     }
   }

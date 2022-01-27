@@ -19,18 +19,25 @@
 package com.craftingdead.core.client.renderer.item;
 
 import java.util.Collection;
+import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 /**
- * Provides custom {@link Item} rendering abilities through the use of a {@link IRendererProvider}.
+ * Provides custom {@link Item} rendering abilities.
  */
 public interface CustomItemRenderer {
+
+  Codec<? extends CustomItemRenderer> CODEC =
+      ItemRendererType.CODEC.dispatch(CustomItemRenderer::getType, ItemRendererType::getCodec);
 
   /**
    * Checks if this renderer should handle a specific item's render type.
@@ -39,7 +46,7 @@ public interface CustomItemRenderer {
    * @param transformType - the perspective
    * @return true if this renderer should handle the given render type, otherwise false
    */
-  boolean handleRenderType(ItemStack itemStack, ItemCameraTransforms.TransformType transformType);
+  boolean handlePerspective(ItemStack itemStack, ItemCameraTransforms.TransformType transformType);
 
   /**
    * Called to do the actual rendering.
@@ -48,19 +55,19 @@ public interface CustomItemRenderer {
    * @param itemStack - {@link ItemStack} being rendered
    */
   void renderItem(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
-      LivingEntity livingEntity, MatrixStack matrixStack,
+      @Nullable LivingEntity livingEntity, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay);
 
-  void renderGeneric(ItemStack itemStack, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay);
+  void rotateCamera(ItemStack itemStack, LivingEntity livingEntity, float partialTicks,
+      Vector3f rotations);
 
   /**
-   * Get all models this {@link CustomItemRenderer} depends on. This is used to resolve and stitch model
-   * texture dependencies as well as auto baking models upon resource reload.
+   * Get all models this {@link CustomItemRenderer} depends on. This is used to resolve and stitch
+   * model texture dependencies as well as auto baking models upon resource reload.
    * 
    * @return a {@link Collection} of model locations.
    */
-  Collection<ResourceLocation> getModelDependencies();
+  Collection<ResourceLocation> getModelDependencies(Item item);
 
   /**
    * Get any additional textures that need to be stitched to the block texture atlas. Use this if
@@ -68,10 +75,12 @@ public interface CustomItemRenderer {
    * 
    * @return a {@link Collection} of texture locations.
    */
-  Collection<ResourceLocation> getAdditionalModelTextures();
+  Collection<RenderMaterial> getMaterials();
 
   /**
    * Clear any cached models this {@link CustomItemRenderer} may of stored.
    */
   void refreshCachedModels();
+
+  ItemRendererType getType();
 }

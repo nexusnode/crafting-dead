@@ -1,6 +1,19 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/awp_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+	"credit": "Made with Blockbench",
+	"texture_size": [128, 128],
+	"elements": [
+		{
+			"from": [6.5, 1.5, 9.5],
+			"to": [8.5, 5.5, 14.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 3, 12]},
+			"faces": {
+				"north": {"uv": [4.875, 7, 5.125, 7.5], "texture": "#gun"},
+				"east": {"uv": [4.25, 7, 4.875, 7.5], "texture": "#gun"},
+				"south": {"uv": [5.75, 7, 6, 7.5], "texture": "#gun"},
+				"west": {"uv": [5.125, 7, 5.75, 7.5], "texture": "#gun"},
+				"up": {"uv": [5.125, 7, 4.875, 6.375], "texture": "#gun"},
+				"down": {"uv": [5.375, 6.375, 5.125, 7], "texture": "#gun"}
+			}
+		}
+	]
 }

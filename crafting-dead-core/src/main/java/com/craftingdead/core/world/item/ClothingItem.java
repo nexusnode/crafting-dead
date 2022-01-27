@@ -23,7 +23,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.world.clothing.DefaultClothing;
+import com.craftingdead.core.world.item.clothing.DefaultClothing;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.util.ITooltipFlag;

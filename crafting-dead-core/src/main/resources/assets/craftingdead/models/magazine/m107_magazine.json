@@ -1,6 +1,17 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/m107_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+    "elements": [
+        {
+			"from": [7.25, 0, 11.25],
+			"to": [9.75, 4, 16.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, -1, 8]},
+			"faces": {
+				"north": {"uv": [5.125, 7.625, 5.375, 8.125], "texture": "#gun"},
+				"east": {"uv": [4.5, 7.625, 5.125, 8.125], "texture": "#gun"},
+				"south": {"uv": [6, 7.625, 6.25, 8.125], "texture": "#gun"},
+				"west": {"uv": [5.375, 7.625, 6, 8.125], "texture": "#gun"},
+				"up": {"uv": [5.375, 7.625, 5.125, 7], "texture": "#gun"},
+				"down": {"uv": [5.625, 7, 5.375, 7.625], "texture": "#gun"}
+			}
+		}
+    ]
 }

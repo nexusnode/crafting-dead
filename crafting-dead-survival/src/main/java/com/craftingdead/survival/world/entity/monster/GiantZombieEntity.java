@@ -19,8 +19,8 @@
 package com.craftingdead.survival.world.entity.monster;
 
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.gun.ammoprovider.RefillableAmmoProvider;
 import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.gun.ammoprovider.RefillableAmmoProvider;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Pose;

@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item.crafting;
 
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.gun.magazine.Magazine;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;

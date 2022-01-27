@@ -20,7 +20,7 @@ package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.GunItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;

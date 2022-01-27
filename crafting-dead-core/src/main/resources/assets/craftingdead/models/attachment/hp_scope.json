@@ -1,9 +1,103 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/attachment/hp_scope.obj",
-	"flip-v": true,
-	"ambientToFullbright": false,
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
 	"textures": {
-		"base": "craftingdead:attachment/hp_scope"
-	}
+		"texture": "craftingdead:attachment/hp_scope",
+		"particle": "#texture"
+	},
+	"elements": [
+		{
+			"from": [6.5, 1.5, -0.5],
+			"to": [9.5, 4.5, 6.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [1.75, 1.75, 2.5, 2.5], "texture": "#texture"},
+				"east": {"uv": [0, 1.75, 1.75, 2.5], "texture": "#texture"},
+				"south": {"uv": [4.25, 1.75, 5, 2.5], "texture": "#texture"},
+				"west": {"uv": [2.5, 1.75, 4.25, 2.5], "texture": "#texture"},
+				"up": {"uv": [2.5, 1.75, 1.75, 0], "texture": "#texture"},
+				"down": {"uv": [3.25, 0, 2.5, 1.75], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [6.75, 0, 6],
+			"to": [9.25, 1, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [1.5, 4, 2, 4.25], "texture": "#texture"},
+				"east": {"uv": [0, 4, 1.5, 4.25], "texture": "#texture"},
+				"south": {"uv": [3.5, 4, 4, 4.25], "texture": "#texture"},
+				"west": {"uv": [2, 4, 3.5, 4.25], "texture": "#texture"},
+				"up": {"uv": [2, 4, 1.5, 2.5], "texture": "#texture"},
+				"down": {"uv": [2.5, 2.5, 2, 4], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [7.5, 1, 8],
+			"to": [8.5, 2, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [0.5, 4.75, 0.75, 5], "texture": "#texture"},
+				"east": {"uv": [0, 4.75, 0.5, 5], "texture": "#texture"},
+				"south": {"uv": [1.25, 4.75, 1.5, 5], "texture": "#texture"},
+				"west": {"uv": [0.75, 4.75, 1.25, 5], "texture": "#texture"},
+				"up": {"uv": [0.75, 4.75, 0.5, 4.25], "texture": "#texture"},
+				"down": {"uv": [1, 4.25, 0.75, 4.75], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [7, 2, 6],
+			"to": [9, 4, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [6.5, 1.5, 7, 2], "texture": "#texture"},
+				"east": {"uv": [5, 1.5, 6.5, 2], "texture": "#texture"},
+				"south": {"uv": [8.5, 1.5, 9, 2], "texture": "#texture"},
+				"west": {"uv": [7, 1.5, 8.5, 2], "texture": "#texture"},
+				"up": {"uv": [7, 1.5, 6.5, 0], "texture": "#texture"},
+				"down": {"uv": [7.5, 0, 7, 1.5], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [7.5, 4, 8.5],
+			"to": [8.5, 5, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [1.75, 4.5, 2, 4.75], "texture": "#texture"},
+				"east": {"uv": [1.5, 4.5, 1.75, 4.75], "texture": "#texture"},
+				"south": {"uv": [2.25, 4.5, 2.5, 4.75], "texture": "#texture"},
+				"west": {"uv": [2, 4.5, 2.25, 4.75], "texture": "#texture"},
+				"up": {"uv": [2, 4.5, 1.75, 4.25], "texture": "#texture"},
+				"down": {"uv": [2.25, 4.25, 2, 4.5], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [6.5, 1.5, 12],
+			"to": [9.5, 4.5, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 2.58333, 8.83333]},
+			"faces": {
+				"north": {"uv": [5, 3.5, 5.75, 4.25], "texture": "#texture"},
+				"east": {"uv": [4, 3.5, 5, 4.25], "texture": "#texture"},
+				"south": {"uv": [6.75, 3.5, 7.5, 4.25], "texture": "#texture"},
+				"west": {"uv": [5.75, 3.5, 6.75, 4.25], "texture": "#texture"},
+				"up": {"uv": [5.75, 3.5, 5, 2.5], "texture": "#texture"},
+				"down": {"uv": [6.5, 2.5, 5.75, 3.5], "texture": "#texture"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [
+				{
+					"name": "HP Scope",
+					"origin": [8, 8, 8],
+					"color": 0,
+					"children": [0, 1, 2, 3, 4, 5]
+				}
+			]
+		}
+	]
 }

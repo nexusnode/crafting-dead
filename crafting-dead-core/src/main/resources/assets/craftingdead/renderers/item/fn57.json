@@ -1,0 +1,80 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/fn57",
+    "muzzle_flash_transform": {
+        "translation": [
+            2,
+            0,
+            -20
+        ],
+        "scale": [
+            0.75,
+            0.75,
+            0.75
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9,
+            6,
+            2.75
+        ],
+        "rotation": [
+            -1.5,
+            0,
+            0
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -3,
+                    2,
+                    -1
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    0,
+                    2,
+                    2
+                ],
+                "rotation": [
+                    0,
+                    10,
+                    0
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -14,
+                    8,
+                    10
+                ],
+                "rotation": [
+                    0,
+                    10,
+                    0
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    -14,
+                    6.75,
+                    13
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            }
+        }
+    },
+    "iron_sights": {
+        "craftingdead:attachment/fn57_iron_sight": {}
+    }
+}

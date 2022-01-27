@@ -1,0 +1,77 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/scarl",
+    "muzzle_flash_transform": {
+        "translation": [
+            3,
+            0,
+            -40
+        ],
+        "scale": [
+            1.2,
+            1.2,
+            1.2
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9.5,
+            -0.25,
+            -3.25
+        ],
+        "rotation": [
+            -3.5,
+            0,
+            0
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -2.2,
+                    0,
+                    -2
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    2,
+                    -7,
+                    -11
+                ],
+                "rotation": [
+                    0,
+                    12,
+                    0
+                ],
+                "scale": [
+                    1.75,
+                    1.75,
+                    1.75
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    }
+}

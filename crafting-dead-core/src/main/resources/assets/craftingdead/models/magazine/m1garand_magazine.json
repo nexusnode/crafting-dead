@@ -1,6 +1,17 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/m1garand_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+    "elements": [
+        {
+			"from": [7.5, 8.4, 7],
+			"to": [9.5, 11.4, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 11, 9]},
+			"faces": {
+				"north": {"uv": [14, 15.25, 14.5, 16], "texture": "#gun"},
+				"east": {"uv": [13, 15.25, 14, 16], "texture": "#gun"},
+				"south": {"uv": [15.5, 15.25, 16, 16], "texture": "#gun"},
+				"west": {"uv": [14.5, 15.25, 15.5, 16], "texture": "#gun"},
+				"up": {"uv": [14.5, 15.25, 14, 14.25], "texture": "#gun"},
+				"down": {"uv": [15, 14.25, 14.5, 15.25], "texture": "#gun"}
+			}
+		}
+    ]
 }

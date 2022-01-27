@@ -19,12 +19,12 @@
 package com.craftingdead.core.world.action;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.client.animation.AnimationType;
-import com.craftingdead.core.client.animation.reload.GunAnimationReload;
+import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunAnimationEvent;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
@@ -35,6 +35,9 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   private final ItemStack oldMagazineStack;
 
   private final MagazineAmmoProvider ammoProvider;
+
+  @Nullable
+  private Animation animation;
 
   public RemoveMagazineAction(ActionType type, LivingExtension<?, ?> performer,
       @Nullable LivingExtension<?, ?> target) {
@@ -61,14 +64,8 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
         this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
       }
       if (this.getPerformer().getLevel().isClientSide()) {
-        this.gun.getClient().getAnimation(AnimationType.RELOAD)
-            .filter(animation -> animation instanceof GunAnimationReload)
-            .map(animation -> (GunAnimationReload) animation)
-            .ifPresent(animation -> {
-              animation.setEjectingClip(true);
-              this.gun.getClient().getAnimationController().addAnimation(animation,
-                  () -> this.ammoProvider.setMagazineStack(ItemStack.EMPTY));
-            });
+        this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
+        this.gun.getClient().getAnimationController().addAnimation(this.animation);
       }
       return true;
     }
@@ -87,8 +84,8 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   @Override
   public void cancel() {
     super.cancel();
-    if (this.getPerformer().getLevel().isClientSide()) {
-      this.gun.getClient().getAnimationController().removeCurrentAnimation();
+    if (this.animation != null) {
+      this.animation.remove();
     }
     // Call this on both sides as we change the client side stack for the remove animation.
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);

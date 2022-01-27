@@ -22,7 +22,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.world.hat.DefaultHat;
+import com.craftingdead.core.world.item.hat.DefaultHat;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

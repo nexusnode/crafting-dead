@@ -21,6 +21,7 @@ package com.craftingdead.core.client.renderer;
 import java.util.Random;
 import com.craftingdead.core.util.MutableVector2f;
 import net.minecraft.client.util.NativeUtil;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 
@@ -28,26 +29,16 @@ public class CameraManager {
 
   private static final Random random = new Random();
 
-  private static final float LOOK_ROTATION_DECELERATION_PER_SECOND = 100.0F;
-  private static final float JOLT_DECELERATION_PER_TICK = 1.0F;
-
-  private FloatSmoother lookPitchSmoother = new FloatSmoother(0.5F);
-  private FloatSmoother lookYawSmoother = new FloatSmoother(0.5F);
+  private FloatSmoother lookPitchSmoother = new FloatSmoother(1.0F);
+  private FloatSmoother lookYawSmoother = new FloatSmoother(1.0F);
 
   private float lastLookTime = Float.MIN_VALUE;
 
-  private FloatSmoother joltPitchSmoother = new FloatSmoother(1.1F);
-
-  private float joltPitch;
-  private float lastJoltPitch;
-
-  private FloatSmoother joltRollSmoother = new FloatSmoother(0.75F);
-
-  private float joltRoll;
-  private float lastJoltRoll;
+  private float largeAmpSlowFade;
+  private float smallAmpQuickFade;
 
   public void randomRecoil(float pitchOffset, boolean modifyLookPosition) {
-    this.joltCamera(pitchOffset, pitchOffset * (random.nextBoolean() ? 1.0F : -1.0F) * 0.5F,
+    this.joltCamera(pitchOffset, pitchOffset * (random.nextBoolean() ? 1.0F : -1.0F) / 2.0F,
         modifyLookPosition);
   }
 
@@ -57,40 +48,37 @@ public class CameraManager {
       this.lookYawSmoother.add(yawOffset);
     }
 
-    this.joltPitchSmoother.add(-pitchOffset * 0.175F);
-    this.joltRollSmoother.add(yawOffset * 0.75F);
+    this.largeAmpSlowFade += pitchOffset;
+    this.smallAmpQuickFade += pitchOffset / 2.0F;
   }
 
   public void tick() {
-    this.lastJoltPitch = this.joltPitch;
-    this.joltPitch = this.joltPitchSmoother.getAndDecelerate(JOLT_DECELERATION_PER_TICK);
+    if (this.largeAmpSlowFade > 0) {
+      this.largeAmpSlowFade *= 0.7F;
+    }
 
-    this.lastJoltRoll = this.joltRoll;
-    this.joltRoll = this.joltRollSmoother.getAndDecelerate(0.5F);
+    if (this.smallAmpQuickFade > 0) {
+      this.smallAmpQuickFade *= 0.25;
+    }
   }
 
   public void getLookRotationDelta(MutableVector2f result) {
     float currentTime = (float) NativeUtil.getTime();
-    float timeDelta = Math.min(currentTime - this.lastLookTime, 0.1F);
-    this.lastLookTime = currentTime;
-    final float deceleration = timeDelta * LOOK_ROTATION_DECELERATION_PER_SECOND;
-    result.set(this.lookPitchSmoother.getAndDecelerate(deceleration),
-        this.lookYawSmoother.getAndDecelerate(deceleration));
+    float timeDelta = currentTime - this.lastLookTime;
+    result.set(this.lookPitchSmoother.getAndDecelerate(timeDelta* 2.0F),
+        this.lookYawSmoother.getAndDecelerate(timeDelta * 2.0F));
   }
 
   public void getCameraRotations(float partialTicks, Vector3f result) {
-    result.set(this.lerpPitch(partialTicks), 0.0F, this.lerpRoll(partialTicks));
+    final float time = (float) Util.getMillis() / 20.0F;
+    float bounce = MathHelper.sin(time * 0.35F);
+    float roll = bounce / 2.0F * this.largeAmpSlowFade;
+    result.set(-this.smallAmpQuickFade, 0, roll);
   }
 
   public float getFov(float partialTicks) {
-    return -this.lerpPitch(partialTicks) * 0.025F;
-  }
-
-  private float lerpPitch(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastJoltPitch, this.joltPitch);
-  }
-
-  private float lerpRoll(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastJoltRoll, this.joltRoll);
+    final float time = (float) Util.getMillis() / 20.0F;
+    float bounce = MathHelper.sin(time * 0.5F);
+    return bounce / 125.0F * -this.largeAmpSlowFade;
   }
 }

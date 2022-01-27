@@ -1,6 +1,30 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/ak47_30_round_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+	"elements": [
+		{
+			"from": [7.5, 4.5, 5.5],
+			"to": [9.5, 7.5, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 4.47783, 7.09777]},
+			"faces": {
+				"north": {"uv": [10.5, 8, 11, 8.75], "texture": "#gun"},
+				"east": {"uv": [9.5, 8, 10.5, 8.75], "texture": "#gun"},
+				"south": {"uv": [12, 8, 12.5, 8.75], "texture": "#gun"},
+				"west": {"uv": [11, 8, 12, 8.75], "texture": "#gun"},
+				"up": {"uv": [11, 8, 10.5, 7], "texture": "#gun"},
+				"down": {"uv": [11.5, 7, 11, 8], "texture": "#gun"}
+			}
+		},
+		{
+			"from": [7.5, 0.41761, 5.30866],
+			"to": [9.5, 5.41761, 9.30866],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8.5, 4.47783, 7.09777]},
+			"faces": {
+				"north": {"uv": [13.5, 8, 14, 9.25], "texture": "#gun"},
+				"east": {"uv": [12.5, 8, 13.5, 9.25], "texture": "#gun"},
+				"south": {"uv": [15, 8, 15.5, 9.25], "texture": "#gun"},
+				"west": {"uv": [14, 8, 15, 9.25], "texture": "#gun"},
+				"up": {"uv": [14, 8, 13.5, 7], "texture": "#gun"},
+				"down": {"uv": [14.5, 7, 14, 8], "texture": "#gun"}
+			}
+		}
+	]
 }

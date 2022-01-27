@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.gun.PendingHit;
+import com.craftingdead.core.world.item.gun.PendingHit;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.player.ServerPlayerEntity;

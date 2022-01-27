@@ -19,13 +19,15 @@
 package com.craftingdead.core.world.item;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.world.gun.skin.SimplePaint;
-import com.craftingdead.core.world.gun.skin.Skin;
-import com.craftingdead.core.world.gun.skin.Skins;
+import com.craftingdead.core.world.item.gun.skin.SimplePaint;
+import com.craftingdead.core.world.item.gun.skin.Skin;
+import com.craftingdead.core.world.item.gun.skin.Skins;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -40,17 +42,29 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class PaintItem extends Item {
 
+  private final boolean multipaint;
   private final RegistryKey<Skin> skin;
+
+  public PaintItem(Properties properties) {
+    super(properties);
+    this.multipaint = true;
+    this.skin = null;
+  }
 
   public PaintItem(RegistryKey<Skin> skin, Properties properties) {
     super(properties);
+    this.multipaint = false;
     this.skin = skin;
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
     return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> new SimplePaint(this.skin)), () -> Capabilities.PAINT);
+        LazyOptional.of(() -> new SimplePaint(this.multipaint
+            ? DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]
+                .getColorValue()
+            : null, this.skin)),
+        () -> Capabilities.PAINT);
   }
 
   @Override

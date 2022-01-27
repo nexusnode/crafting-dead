@@ -40,7 +40,7 @@ import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
-import com.craftingdead.core.client.renderer.item.GunRenderer;
+import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
@@ -56,13 +56,14 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.gun.Gun;
-import com.craftingdead.core.world.gun.skin.Skins;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
-import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.gun.skin.Paint;
+import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.RegisterGunColour;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -112,13 +113,11 @@ import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -163,7 +162,7 @@ public class ClientDist implements ModDist {
   private static final ResourceLocation ADRENALINE_SHADER =
       new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
 
-  private static final Vector3f CAMERA_ROTATIONS = new Vector3f();
+  private static final Vector3f MUTABLE_CAMERA_ROTATIONS = new Vector3f();
   private static final MutableVector2f FOV = new MutableVector2f();
 
   private static final int DOUBLE_CLICK_DURATION = 500;
@@ -195,9 +194,12 @@ public class ClientDist implements ModDist {
   private boolean wasSneaking;
   private long lastSneakPressTime;
 
+  private float lastPitch;
+  private float lastYaw;
+  private float lastRoll;
+
   public ClientDist() {
     final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modBus.addListener(this::handleModelRegistry);
     modBus.addListener(this::handleModelBake);
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleParticleFactoryRegisterEvent);
@@ -211,14 +213,17 @@ public class ClientDist implements ModDist {
 
     this.minecraft = Minecraft.getInstance();
     this.crosshairManager = new CrosshairManager();
+    this.itemRendererManager = new ItemRendererManager();
+
     // Minecraft is null on date gen launch
     if (this.minecraft != null) {
-      ((IReloadableResourceManager) this.minecraft.getResourceManager())
-          .registerReloadListener(this.crosshairManager);
+      IReloadableResourceManager resourceManager =
+          (IReloadableResourceManager) this.minecraft.getResourceManager();
+      resourceManager.registerReloadListener(this.crosshairManager);
     }
+
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
-    this.itemRendererManager = new ItemRendererManager();
     this.cameraManager = new CameraManager();
   }
 
@@ -301,13 +306,6 @@ public class ClientDist implements ModDist {
     if (event.getConfig().getSpec() == clientConfigSpec) {
       this.ingameGui.setCrosshairLocation(new ResourceLocation(clientConfig.crosshair.get()));
     }
-  }
-
-  private void handleModelRegistry(ModelRegistryEvent event) {
-    StartupMessageManager.addModMessage("Gathering item renderers");
-    this.itemRendererManager.gatherItemRenderers();
-    StartupMessageManager.addModMessage("Registering special models");
-    this.itemRendererManager.getModelDependencies().forEach(ModelLoader::addSpecialModel);
   }
 
   private void handleModelBake(ModelBakeEvent event) {
@@ -409,15 +407,19 @@ public class ClientDist implements ModDist {
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
-    IItemColor gunColour = (itemStack, tintIndex) -> GunRenderer.getColour(itemStack);
+    IItemColor gunColour =
+        (itemStack, tintIndex) -> itemStack.getCapability(Capabilities.GUN).resolve()
+            .flatMap(gun -> gun.getPaintStack().getCapability(Capabilities.PAINT).resolve())
+            .flatMap(Paint::getColor)
+            .orElse(0xFFFFFFFF);
     ForgeRegistries.ITEMS.getValues().stream()
         .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColour.class))
         .forEach(item -> event.getItemColors().register(gunColour, item));
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
+    this.itemRendererManager.getTextures(event.getMap().location()).forEach(event::addSprite);
     if (event.getMap().location().equals(PlayerContainer.BLOCK_ATLAS)) {
-      this.itemRendererManager.getTexturesToStitch().forEach(event::addSprite);
       Skins.REGISTRY.stream()
           .flatMap(skin -> skin.getAcceptedGuns().stream().map(skin::getTextureLocation))
           .forEach(event::addSprite);
@@ -640,14 +642,39 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    this.cameraManager.getCameraRotations((float) event.getRenderPartialTicks(), CAMERA_ROTATIONS);
-    event.setPitch(event.getPitch() + CAMERA_ROTATIONS.x());
-    event.setYaw(event.getYaw() + CAMERA_ROTATIONS.y());
-    event.setRoll(event.getRoll() + CAMERA_ROTATIONS.z());
+    this.cameraManager.getCameraRotations((float) event.getRenderPartialTicks(),
+        MUTABLE_CAMERA_ROTATIONS);
+    if (this.minecraft.cameraEntity instanceof LivingEntity) {
+      LivingEntity livingEntity = (LivingEntity) this.minecraft.cameraEntity;
+      ItemStack itemStack = livingEntity.getMainHandItem();
+      CustomItemRenderer itemRenderer =
+          this.itemRendererManager.getItemRenderer(itemStack.getItem());
+      if (itemRenderer != null) {
+        itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getRenderPartialTicks(),
+            MUTABLE_CAMERA_ROTATIONS);
+      }
+    }
+
+    this.lastPitch = MathHelper.lerp(0.1F, this.lastPitch, MUTABLE_CAMERA_ROTATIONS.x());
+    this.lastYaw = MathHelper.lerp(0.1F, this.lastYaw, MUTABLE_CAMERA_ROTATIONS.y());
+    this.lastRoll = MathHelper.lerp(0.1F, this.lastRoll, MUTABLE_CAMERA_ROTATIONS.z());
+    MUTABLE_CAMERA_ROTATIONS.set(0.0F, 0.0F, 0.0F);
+    event.setPitch(event.getPitch() + this.lastPitch);
+    event.setYaw(event.getYaw() + this.lastYaw);
+    event.setRoll(event.getRoll() + this.lastRoll);
   }
 
   @SubscribeEvent
   public void handeFOVUpdate(FOVUpdateEvent event) {
+    if (this.minecraft.getCameraEntity() instanceof LivingEntity) {
+      LivingEntity livingEntity = (LivingEntity) this.minecraft.getCameraEntity();
+      ItemStack heldStack = livingEntity.getMainHandItem();
+      float newFov = heldStack.getCapability(Capabilities.SCOPE)
+          .filter(scope -> scope.isAiming(livingEntity))
+          .map(scope -> 1.0F / scope.getZoomMultiplier(livingEntity))
+          .orElse(0.0F);
+      event.setNewfov(event.getFov() - newFov);
+    }
     event.setNewfov(event.getNewfov()
         + this.cameraManager.getFov(Minecraft.getInstance().getFrameTime()));
   }
@@ -664,8 +691,8 @@ public class ClientDist implements ModDist {
       this.lastFov = this.fov;
       this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
 
-      event.setFOV(event.getFOV()
-          * MathHelper.lerp(this.minecraft.getFrameTime(), this.lastFov, this.fov));
+      // event.setFOV(event.getFOV()
+      // * MathHelper.lerp(this.minecraft.getFrameTime(), this.lastFov, this.fov));
     }
   }
 

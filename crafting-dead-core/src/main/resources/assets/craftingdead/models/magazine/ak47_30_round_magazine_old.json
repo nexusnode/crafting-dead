@@ -1,0 +1,17 @@
+{
+    "elements": [
+        {
+            "from": [7.5, 0, 6],
+            "to": [9.5, 7, 10],
+            "rotation": {"angle": 0, "axis": "y", "origin": [8, 4, 8]},
+            "faces": {
+                "north": {"uv": [10.5, 8, 11, 9.75], "texture": "#gun"},
+                "east": {"uv": [9.5, 8, 10.5, 9.75], "texture": "#gun"},
+                "south": {"uv": [12, 8, 12.5, 9.75], "texture": "#gun"},
+                "west": {"uv": [11, 8, 12, 9.75], "texture": "#gun"},
+                "up": {"uv": [11, 8, 10.5, 7], "texture": "#gun"},
+                "down": {"uv": [11.5, 7, 11, 8], "texture": "#gun"}
+            }
+        }
+    ]
+}

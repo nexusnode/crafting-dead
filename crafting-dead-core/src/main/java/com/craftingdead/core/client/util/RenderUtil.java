@@ -90,7 +90,17 @@ public class RenderUtil {
   public static final Codec<TransformationMatrix> TRANSFORMATION_MATRIX_CODEC =
       RecordCodecBuilder.create(instance -> instance
           .group(
-              VECTOR_3F_CODEC.optionalFieldOf("translation", new Vector3f())
+              VECTOR_3F_CODEC
+                  .optionalFieldOf("translation", new Vector3f())
+                  .xmap(vec -> {
+                    Vector3f scaledVec = vec.copy();
+                    scaledVec.mul(1.0F / 16.0F);
+                    return scaledVec;
+                  }, scaledVec -> {
+                    Vector3f vec = scaledVec.copy();
+                    vec.mul(16.0F);
+                    return vec;
+                  })
                   .forGetter(TransformationMatrix::getTranslation),
               QUATERNION_CODEC.optionalFieldOf("rotation", Quaternion.ONE.copy())
                   .forGetter(TransformationMatrix::getLeftRotation),
@@ -526,29 +536,5 @@ public class RenderUtil {
       vertexBuilder.addVertexData(matrixStackEntry, bakedQuad, r, g, b, a, packedLight,
           packedOverlay);
     }
-  }
-
-  /**
-   * @see <a href="https://easings.net/#easeInOutSine">https://easings.net/#easeInOutSine</a>
-   */
-  public static float easeInOutSine(float value) {
-    return -(MathHelper.cos((float) Math.PI * value) - 1) / 2;
-  }
-
-  public static float easeIn(float value, float damperPct) {
-    return 1.0F - MathHelper.cos((float) ((value * Math.PI) / (2.0F * damperPct)));
-  }
-
-  public static float easeOut(float value, float damperPct) {
-    return MathHelper.sin((float) ((value * Math.PI) / (2.0F * damperPct)));
-  }
-
-  public static float easeOutElastic(float x) {
-    float c4 = (float) ((2.0F * Math.PI) / 3.0F);
-    return x == 0
-        ? 0
-        : x == 1
-            ? 1
-            : (float) Math.pow(2.0F, -10.0F * x) * MathHelper.sin((x * 10 - 0.75F) * c4) + 1;
   }
 }

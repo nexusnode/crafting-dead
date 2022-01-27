@@ -1,9 +1,0 @@
-{
-	"loader": "forge:obj",
-	"model": "craftingdead:models/attachment/acog_sight.obj",
-	"flip-v": true,
-	"ambientToFullbright": false,
-	"textures": {
-		"base": "craftingdead:attachment/acog_sight"
-	}
-}

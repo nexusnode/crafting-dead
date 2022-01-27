@@ -20,10 +20,10 @@ package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.gun.attachment.AttachmentLike;
-import com.craftingdead.core.world.gun.skin.Paint;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
+import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
+import com.craftingdead.core.world.item.gun.skin.Paint;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftResultInventory;

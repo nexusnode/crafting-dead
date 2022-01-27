@@ -1,0 +1,72 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/m107",
+    "muzzle_flash_transform": {
+        "translation": [
+            1.6,
+            -1,
+            -52
+        ],
+        "scale": [
+            1.75,
+            1.75,
+            1.75
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9.5,
+            4,
+            -5
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -2,
+                    -8,
+                    -9
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    -7.5
+                ],
+                "scale": [
+                    1.75,
+                    1.75,
+                    1.75
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -3,
+                    1,
+                    2
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    }
+}

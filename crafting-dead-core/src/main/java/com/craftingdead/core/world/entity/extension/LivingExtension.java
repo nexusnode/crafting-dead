@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.action.Action;
-import com.craftingdead.core.world.gun.Gun;
+import com.craftingdead.core.world.item.gun.Gun;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

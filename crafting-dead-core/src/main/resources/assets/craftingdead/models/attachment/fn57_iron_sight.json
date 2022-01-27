@@ -1,0 +1,28 @@
+{
+    "elements": [
+        {
+			"from": [7.5, 10, 1.5],
+			"to": [8.5, 11, 1.5],
+			"faces": {
+				"north": {"uv": [0, 1.5, 0.5, 2], "texture": "#gun"},
+				"east": {"uv": [0, 1.5, 0, 2], "texture": "#gun"},
+				"south": {"uv": [0.5, 1.5, 1, 2], "texture": "#gun"},
+				"west": {"uv": [0.5, 1.5, 0.5, 2], "texture": "#gun"},
+				"up": {"uv": [0.5, 1.5, 0, 1.5], "texture": "#gun"},
+				"down": {"uv": [1, 1.5, 0.5, 1.5], "texture": "#gun"}
+			}
+		},
+		{
+			"from": [7, 10, 12.5],
+			"to": [9, 11, 12.5],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 0.5], "texture": "#gun"},
+				"east": {"uv": [0, 0, 0, 0.5], "texture": "#gun"},
+				"south": {"uv": [1, 0, 2, 0.5], "texture": "#gun"},
+				"west": {"uv": [1, 0, 1, 0.5], "texture": "#gun"},
+				"up": {"uv": [1, 0, 0, 0], "texture": "#gun"},
+				"down": {"uv": [2, 0, 1, 0], "texture": "#gun"}
+			}
+		}
+    ]
+}

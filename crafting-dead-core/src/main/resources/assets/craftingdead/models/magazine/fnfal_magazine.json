@@ -1,6 +1,17 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/fnfal_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+    "elements": [
+        {
+			"from": [7.25, 1, 6.25],
+			"to": [9.75, 6, 11.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 2]},
+			"faces": {
+				"north": {"uv": [2.375, 6.375, 2.625, 7], "texture": "#gun"},
+				"east": {"uv": [1.75, 6.375, 2.375, 7], "texture": "#gun"},
+				"south": {"uv": [3.25, 6.375, 3.5, 7], "texture": "#gun"},
+				"west": {"uv": [2.625, 6.375, 3.25, 7], "texture": "#gun"},
+				"up": {"uv": [2.625, 6.375, 2.375, 5.75], "texture": "#gun"},
+				"down": {"uv": [2.875, 5.75, 2.625, 6.375], "texture": "#gun"}
+			}
+		}
+    ]
 }

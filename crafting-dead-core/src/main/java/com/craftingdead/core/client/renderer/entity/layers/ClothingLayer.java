@@ -19,9 +19,9 @@
 package com.craftingdead.core.client.renderer.entity.layers;
 
 import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.world.clothing.Clothing;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.item.clothing.Clothing;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;

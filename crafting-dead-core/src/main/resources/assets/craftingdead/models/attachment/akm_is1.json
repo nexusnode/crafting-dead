@@ -1,9 +1,0 @@
-{
-	"loader": "forge:obj",
-	"model": "craftingdead:models/attachment/akm_is1.obj",
-	"flip-v": true,
-	"ambientToFullbright": false,
-	"textures": {
-		"base": "craftingdead:attachment/akm_is1"
-	}
-}

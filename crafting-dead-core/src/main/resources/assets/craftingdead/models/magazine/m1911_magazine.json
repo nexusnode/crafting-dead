@@ -1,6 +1,17 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/m1911_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+    "elements": [
+        {
+			"from": [8.5, 1, 9],
+			"to": [9.5, 6, 11],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 4, 8]},
+			"faces": {
+				"north": {"uv": [2.5, 6.75, 2.75, 8], "texture": "#gun"},
+				"east": {"uv": [2, 6.75, 2.5, 8], "texture": "#gun"},
+				"south": {"uv": [3.25, 6.75, 3.5, 8], "texture": "#gun"},
+				"west": {"uv": [2.75, 6.75, 3.25, 8], "texture": "#gun"},
+				"up": {"uv": [2.75, 6.75, 2.5, 6.25], "texture": "#gun"},
+				"down": {"uv": [3, 6.25, 2.75, 6.75], "texture": "#gun"}
+			}
+		}
+    ]
 }

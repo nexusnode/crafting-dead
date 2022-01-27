@@ -1,6 +1,17 @@
 {
-	"loader": "forge:obj",
-	"model": "craftingdead:models/magazine/g18_magazine.obj",
-	"flip-v": true,
-	"ambientToFullbright": false
+    "elements": [
+        {
+			"from": [7.5, 0.24895, 9.25157],
+			"to": [8.5, 5.24895, 11.25157],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 6.74895, 10.50157]},
+			"faces": {
+				"north": {"uv": [3, 6.5, 3.25, 7.75], "texture": "#gun"},
+				"east": {"uv": [2.5, 6.5, 3, 7.75], "texture": "#gun"},
+				"south": {"uv": [3.75, 6.5, 4, 7.75], "texture": "#gun"},
+				"west": {"uv": [3.25, 6.5, 3.75, 7.75], "texture": "#gun"},
+				"up": {"uv": [3.25, 6.5, 3, 6], "texture": "#gun"},
+				"down": {"uv": [3.5, 6, 3.25, 6.5], "texture": "#gun"}
+			}
+		}
+    ]
 }

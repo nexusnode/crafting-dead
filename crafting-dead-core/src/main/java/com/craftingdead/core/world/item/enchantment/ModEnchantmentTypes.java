@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.item.enchantment;
 
-import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.GunItem;
 import net.minecraft.enchantment.EnchantmentType;
 
 public class ModEnchantmentTypes {

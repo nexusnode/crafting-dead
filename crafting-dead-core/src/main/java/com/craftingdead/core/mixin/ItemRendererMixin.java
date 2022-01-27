@@ -46,8 +46,8 @@ public abstract class ItemRendererMixin {
   private void render(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
       boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
       int packedLight, int packedOverlay, IBakedModel bakedModel, CallbackInfo callbackInfo) {
-    if (this.renderItem(null, itemStack, transformType, leftHanded,
-        matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
+    if (CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
+        transformType, null, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
       callbackInfo.cancel();
     }
   }
@@ -62,24 +62,9 @@ public abstract class ItemRendererMixin {
       ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
       IRenderTypeBuffer renderTypeBuffer, @Nullable World world, int packedLight, int packedOverlay,
       CallbackInfo callbackInfo) {
-    if (this.renderItem(livingEntity, itemStack, transformType, leftHanded,
-        matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
+    if (CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
+        transformType, livingEntity, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
       callbackInfo.cancel();
     }
-  }
-
-  private boolean renderItem(@Nullable LivingEntity livingEntity,
-      ItemStack itemStack,
-      ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    CustomItemRenderer itemRenderer =
-        CraftingDead.getInstance().getClientDist().getItemRendererManager()
-            .getItemRenderer(itemStack.getItem());
-    if (itemRenderer != null && itemRenderer.handleRenderType(itemStack, transformType)) {
-      itemRenderer.renderItem(itemStack, transformType, livingEntity, matrixStack,
-          renderTypeBuffer, packedLight, packedOverlay);
-      return true;
-    }
-    return false;
   }
 }

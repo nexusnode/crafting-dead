@@ -23,8 +23,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
-import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.gun.GunItem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particles.ParticleTypes;
@@ -89,12 +89,12 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   }
 
   public boolean canShoot() {
-    final long fireDelayMs = this.gunItem.getGunType().getFireDelayMs();
+    final long fireDelayMs = this.gunItem.getFireDelayMs();
     return (Util.getMillis() - this.lastShotMs) >= fireDelayMs;
   }
 
   public void playFakeShoot() {
-    this.playSound(this.gunItem.getGunType().getShootSound(), 1.5F, 1F);
+    this.playSound(this.gunItem.getShootSound(), 1.5F, 1F);
     this.lastShotMs = Util.getMillis();
   }
 
