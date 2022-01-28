@@ -17,21 +17,18 @@
  */
 
 /**
- * Crafting Dead
- * Copyright (C) 2020  Nexus Node
+ * Crafting Dead Copyright (C) 2020 Nexus Node
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package com.craftingdead.immerse.client.gui.screen.menu;
 
@@ -61,6 +58,7 @@ import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
@@ -76,15 +74,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayout> {
+public class MainMenuView extends ParentView<MainMenuView, Layout, YogaLayout> {
 
   private static final Component TITLE = new TranslatableComponent("menu.home.title");
 
   private final ParentView<?, YogaLayout, YogaLayout> contentContainer =
       new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
-  public MainMenuView(ViewScreen screen) {
-    super(screen,
+  public MainMenuView(Layout layout) {
+    super(layout,
         new YogaLayoutParent().setFlexDirection(FlexDirection.ROW_REVERSE));
 
     var homeView = new HomeView()
@@ -94,11 +92,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .setHeightPercent(100)
             .setPositionType(PositionType.ABSOLUTE));
 
-    var playView = new PlayView()
-        .configure(view -> view.getLayout()
-            .setWidthPercent(100)
-            .setHeightPercent(100)
-            .setPositionType(PositionType.ABSOLUTE));
+    var playView = new PlayView();
 
     this.addChild(createBackgroundView());
 
@@ -124,7 +118,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"))
             .configure(view -> view.getColorProperty()
                 .setTransition(Transition.linear(150L))
-                .registerState(new Color(0xFF666666), States.HOVERED))
+                .defineState(new Color(0xFF666666), States.HOVERED))
             .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(homeView))
@@ -147,10 +141,10 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .configure(view -> {
               view.getColorProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(new Color(0xFF181818), States.HOVERED);
+                  .defineState(new Color(0xFF181818), States.HOVERED);
               view.getScaleProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(1.15F, States.HOVERED);
+                  .defineState(1.15F, States.HOVERED);
             })
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(playView))
@@ -166,17 +160,17 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .configure(view -> {
               view.getColorProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(new Color(0xFF181818), States.HOVERED);
+                  .defineState(new Color(0xFF181818), States.HOVERED);
 
               view.getScaleProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(1.15F, States.HOVERED);
+                  .defineState(1.15F, States.HOVERED);
             })
             .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class,
-                (c, e) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
-                    new OptionsScreen((ViewScreen) this.getScreen(), this.minecraft.options)))
+                (c, e) -> this.getScreen().keepOpenAndSetScreen(
+                    new OptionsScreen(this.getScreen(), this.minecraft.options)))
             .setFocusable(true)
             .setTooltip(new Tooltip(new TranslatableComponent("menu.options"))));
 
@@ -190,10 +184,10 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .configure(view -> {
               view.getColorProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(new Color(0xFF181818), States.HOVERED);
+                  .defineState(new Color(0xFF181818), States.HOVERED);
               view.getScaleProperty()
                   .setTransition(Transition.linear(150L))
-                  .registerState(1.15F, States.HOVERED);
+                  .defineState(1.15F, States.HOVERED);
             })
             .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())

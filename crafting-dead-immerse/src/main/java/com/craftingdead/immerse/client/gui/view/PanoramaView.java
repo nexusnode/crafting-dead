@@ -30,10 +30,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
 
-  private static final ResourceLocation PANORAMA_OVERLAY_TEXTURES =
-      new ResourceLocation("textures/gui/title/background/panorama_overlay.png");
-
-  private final PanoramaRenderer panorama;
+  private final RenderSkybox panorama;
 
   private final ResourceLocation panoramaTexture;
 
@@ -48,13 +45,5 @@ public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
   public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     this.panorama.render(partialTicks, this.getAlpha());
-    RenderSystem.setShaderTexture(0, PANORAMA_OVERLAY_TEXTURES);
-    RenderSystem.enableBlend();
-    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
-        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-    RenderUtil.blit(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
-        this.getScaledContentWidth(), this.getScaledContentHeight());
-    RenderSystem.disableBlend();
-
   }
 }

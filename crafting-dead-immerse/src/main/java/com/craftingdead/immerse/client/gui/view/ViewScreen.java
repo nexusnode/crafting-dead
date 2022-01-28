@@ -21,29 +21,40 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import com.craftingdead.immerse.client.gui.view.layout.EmptyLayout;
+import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public final class ViewScreen extends Screen implements EmptyLayout {
+public final class ViewScreen extends Screen {
 
-  private final View<?, ?> view;
+  private final ParentView<?, Layout, ?> root;
 
   private View<?, ?> lastHovered;
 
   private boolean keepOpen;
 
-  public ViewScreen(Component title,
-      Function<ViewScreen, View<?, ViewScreen>> viewFactory) {
+  public ViewScreen(Component title, Function<Layout, ParentView<?, Layout, ?>> rootFactory) {
     super(title);
     this.minecraft = Minecraft.getInstance();
     this.width = this.minecraft.getWindow().getGuiScaledWidth();
     this.height = this.minecraft.getWindow().getGuiScaledHeight();
-    this.view = viewFactory.apply(this);
-    this.view.screen = this;
+    this.root = rootFactory.apply(new Layout() {
+
+      @Override
+      public float getWidth() {
+        return ViewScreen.this.width;
+      }
+
+      @Override
+      public float getHeight() {
+        return ViewScreen.this.height;
+      }
+    });
+    this.root.screen = this;
+    this.root.added();
   }
 
   public void keepOpenAndSetScreen(Screen screen) {
@@ -57,29 +68,32 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
   @Override
   public void init() {
-    this.view.layout();
+    this.root.layout();
     // Reset mouse pos
     double scaledMouseX =
         this.minecraft.mouseHandler.xpos() / this.minecraft.getWindow().getGuiScale();
     double scaledMouseY =
         this.minecraft.mouseHandler.ypos() / this.minecraft.getWindow().getGuiScale();
     this.mouseMoved(scaledMouseX, scaledMouseY);
+    this.root.setVisible(true);
+
   }
 
   @Override
   public void removed() {
+    this.root.setVisible(false);
     if (this.keepOpen) {
       this.keepOpen = false;
       return;
     }
-    this.view.close();
+    this.root.close();
   }
 
   private void updateHovered(double mouseX, double mouseY) {
     // Update hovered views
 
     boolean keepLastHovered = false;
-    View<?, ?> hovered = this.view.isMouseOver(mouseX, mouseY) ? this.view : null;
+    View<?, ?> hovered = this.root.isMouseOver(mouseX, mouseY) ? this.root : null;
     while (hovered instanceof ParentView) {
       View<?, ?> nextHovered = ((ParentView<?, ?, ?>) hovered)
           .getChildAt(mouseX, mouseY)
@@ -97,7 +111,7 @@ public final class ViewScreen extends Screen implements EmptyLayout {
         keepLastHovered = true;
       }
 
-      if (!hovered.hasState(States.HOVERED)) {
+      if (!hovered.isHovered()) {
         hovered.mouseEntered(mouseX, mouseY);
       }
     }
@@ -116,40 +130,29 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    this.view.mouseMoved(mouseX, mouseY);
+    this.root.mouseMoved(mouseX, mouseY);
     this.updateHovered(mouseX, mouseY);
   }
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    boolean result = this.view.mouseScrolled(mouseX, mouseY, scrollDelta);
-
+    boolean result = this.root.mouseScrolled(mouseX, mouseY, scrollDelta);
     this.updateHovered(mouseX, mouseY);
     return result;
   }
 
   @Override
   public void tick() {
-    this.view.tick();
+    this.root.tick();
   }
 
   @Override
-  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    this.view.render(matrixStack, mouseX, mouseY, partialTicks);
+  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    this.root.render(poseStack, mouseX, mouseY, partialTicks);
   }
 
   @Override
   public List<? extends GuiEventListener> children() {
-    return Collections.singletonList(this.view);
-  }
-
-  @Override
-  public float getWidth() {
-    return this.width;
-  }
-
-  @Override
-  public float getHeight() {
-    return this.height;
+    return List.of(this.root);
   }
 }

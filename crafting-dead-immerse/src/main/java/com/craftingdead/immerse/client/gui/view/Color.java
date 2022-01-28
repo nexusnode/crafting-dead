@@ -25,13 +25,12 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 
 public class Color {
 
-
   static {
     KnownEvaluators.getInstance().register(new Evaluator<Color>() {
 
       @Override
       public Color evaluate(Color v0, Color v1, double fraction) {
-        return new Color(RenderUtil.lerp(v0.getValue(), v1.getValue(), (float) fraction));
+        return new Color(RenderUtil.lerp(v0.getValue4f(), v1.getValue4f(), (float) fraction));
       }
 
       @Override
@@ -66,42 +65,63 @@ public class Color {
       new Color[] {BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY,
           DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE};
 
-  private final float[] value;
-  private final long hex;
+  private final float[] value4f;
+  private final int[] value4i;
+  private final int valueHex;
 
-  public Color(long hex) {
-    this(RenderUtil.getColour4f(RenderUtil.getColour4i(hex)));
+  public Color(int valueHex) {
+    this.value4i = RenderUtil.getColour4i(valueHex);
+    this.value4f = RenderUtil.getColour4f(this.value4i);
+    this.valueHex = valueHex;
   }
 
   public Color(int red, int green, int blue) {
-    this(red / 255.0F, green / 255.0F, blue / 255.0F);
+    this(red, green, blue, 255);
+  }
+
+  public Color(int red, int green, int blue, int alpha) {
+    this(new int[] {red, green, blue, alpha});
+  }
+
+  public Color(int[] value4i) {
+    this.value4i = value4i;
+    this.value4f = RenderUtil.getColour4f(this.value4i);
+    this.valueHex = RenderUtil.getColour(this.value4i);
   }
 
   public Color(float red, float green, float blue) {
     this(red, green, blue, 1.0F);
   }
 
-  public Color(int red, int green, int blue, int alpha) {
-    this(red / 255.0F, green / 255.0F, blue / 255.0F, alpha / 255.0F);
-  }
-
   public Color(float red, float green, float blue, float alpha) {
     this(new float[] {red, green, blue, alpha});
   }
 
-  public Color(float[] value) {
-    this.value = value;
-    this.hex = RenderUtil.getColour(RenderUtil.getColour4i(value));
+  public Color(float[] value4f) {
+    this.value4f = value4f;
+    this.value4i = RenderUtil.getColour4i(value4f);
+    this.valueHex = RenderUtil.getColour(this.value4i);
   }
 
-  public long getHex() {
-    return this.hex;
-  }
-
-  public float[] getValue() {
+  public float[] getValue4f() {
     float[] result = new float[4];
-    System.arraycopy(this.value, 0, result, 0, 4);
+    System.arraycopy(this.value4f, 0, result, 0, 4);
     return result;
+  }
+
+  public int[] getValue4i() {
+    int[] result = new int[4];
+    System.arraycopy(this.value4i, 0, result, 0, 4);
+    return result;
+  }
+
+  public int getHex() {
+    return this.valueHex;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Color && ((Color) obj).valueHex == this.valueHex;
   }
 
   @Nullable

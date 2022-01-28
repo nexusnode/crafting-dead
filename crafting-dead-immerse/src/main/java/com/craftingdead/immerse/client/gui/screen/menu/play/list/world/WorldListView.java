@@ -21,19 +21,19 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.world;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.KeyFrames;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.States;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -78,44 +78,44 @@ public class WorldListView<L extends Layout>
     this.loadWorlds();
 
     this.playButton =
-        createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
+        Theme.createGreenButton(
             new TranslatableComponent("view.world_list.button.play"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
-                .configure(view -> view.getBackgroundColorProperty()
-                    .registerState(Theme.GREEN_DISABLED, States.DISABLED))
-                .configure(view -> view.getLayout().setMargin(3F))
-                .setEnabled(false);
+            .configure(view -> view.getBackgroundColorProperty()
+                .defineState(Theme.GREEN_DISABLED, States.DISABLED))
+            .configure(view -> view.getLayout().setMargin(3F))
+            .setEnabled(false);
 
     View<?, YogaLayout> createButton =
-        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+        Theme.createBlueButton(
             new TranslatableComponent("view.world_list.button.create"),
-            () -> ((ViewScreen) this.getScreen())
-                .keepOpenAndSetScreen(CreateWorldScreen.create((ViewScreen) this.getScreen())))
-                    .configure(view -> view.getLayout().setMargin(3F));
+            () -> this.getScreen()
+                .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())))
+            .configure(view -> view.getLayout().setMargin(3F));
 
     this.editButton =
-        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+        Theme.createBlueButton(
             new TranslatableComponent("view.world_list.button.edit"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
-                .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
-                .configure(view -> view.getLayout().setMargin(3))
-                .setEnabled(false);
+            .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
+            .configure(view -> view.getLayout().setMargin(3))
+            .setEnabled(false);
 
     this.deleteButton =
-        createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
+        Theme.createRedButton(
             new TranslatableComponent("view.world_list.button.delete"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
-                .setDisabledBackgroundColor(Theme.RED_DISABLED)
-                .configure(view -> view.getLayout().setMargin(3))
-                .setEnabled(false);
+            .setDisabledBackgroundColor(Theme.RED_DISABLED)
+            .configure(view -> view.getLayout().setMargin(3))
+            .setEnabled(false);
 
     this.recreateButton =
-        createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+        Theme.createBlueButton(
             new TranslatableComponent("view.world_list.button.recreate"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
-                .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
-                .configure(view -> view.getLayout().setMargin(3))
-                .setEnabled(false);
+            .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
+            .configure(view -> view.getLayout().setMargin(3))
+            .setEnabled(false);
 
     ParentView<?, YogaLayout, YogaLayout> controlsContainer =
         new ParentView<>(
@@ -151,26 +151,22 @@ public class WorldListView<L extends Layout>
 
   }
 
-  private static ParentView<?, YogaLayout, YogaLayout> createButton(Color color,
-      Color hoveredColor, Component text, Runnable actionListener) {
-    return new ParentView<>(
-        new YogaLayout()
-            .setWidth(30F)
-            .setHeight(20F)
-            .setFlex(1F),
-        new YogaLayoutParent()
-            .setJustifyContent(Justify.CENTER)
-            .setAlignItems(Align.CENTER))
-                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                .configure(view -> view.getBackgroundColorProperty()
-                    .setBaseValue(color)
-                    .registerState(hoveredColor, States.HOVERED, States.ENABLED)
-                    .setTransition(Transition.linear(150L)))
-                .setFocusable(true)
-                .addListener(ActionEvent.class, (c, e) -> actionListener.run())
-                .addChild(new TextView<>(new YogaLayout().setTopMargin(1F), text)
-                    .setShadow(false)
-                    .setCentered(true));
+  @Override
+  protected void added() {
+    int delay = 0;
+    for (View<?, ?> view : this.listView.getChildViews()) {
+      new Animator.Builder()
+          .addTarget(Animation.forProperty(view.getAlphaProperty())
+              .keyFrames(new KeyFrames.Builder<>(0.0F)
+                  .addFrame(1.0F)
+                  .build())
+              .build())
+          .setStartDelay(delay, TimeUnit.MILLISECONDS)
+          .setDuration(250L, TimeUnit.MILLISECONDS)
+          .build()
+          .start();
+      delay += 150;
+    }
   }
 
   @Override

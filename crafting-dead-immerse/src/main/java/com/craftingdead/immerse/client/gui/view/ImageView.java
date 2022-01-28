@@ -39,27 +39,30 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
   private boolean depthTest = false;
   private boolean bilinearFiltering = false;
 
-  private final ValueStyleProperty<Color> colour =
-      Util.make(ValueStyleProperty.create("colour", Color.class, Color.WHITE),
+  private final ValueStyleProperty<Color> color =
+      Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
           this::registerValueProperty);
 
   private Vec2 fittedImageSize;
 
   public ImageView(L layout) {
     super(layout);
+    this.layout.setMeasureFunction(this::measure);
   }
 
   public ValueStyleProperty<Color> getColorProperty() {
-    return this.colour;
+    return this.color;
   }
 
   public final ImageView<L> setImage(ResourceLocation image) {
     this.image = image;
+    this.layout.markDirty();
     return this;
   }
 
   public final ImageView<L> setFitType(FitType fitType) {
     this.fitType = fitType;
+    this.layout.markDirty();
     return this;
   }
 
@@ -98,9 +101,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     this.fittedImageSize = this.getFittedImageSize().orElse(null);
   }
 
-  @Override
-  public Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-      float height) {
+  private Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
         .orElse(new Vec2(width, height));
@@ -114,7 +115,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     if (this.depthTest) {
       RenderSystem.enableDepthTest();
     }
-    final var colour = this.colour.get().getValue();
+    final var colour = this.color.get().getValue4f();
     RenderSystem.setShaderColor(colour[0], colour[1], colour[2], colour[3]);
     if (this.image != null) {
       if (this.bilinearFiltering) {

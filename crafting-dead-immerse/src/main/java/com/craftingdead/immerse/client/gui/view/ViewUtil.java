@@ -98,7 +98,8 @@ public class ViewUtil {
       Node node = nodes.item(i);
       switch (node.getNodeName()) {
         case "text":
-          String text = node.getTextContent();
+          final String text = node.getTextContent();
+
           boolean shadow = true;
           float scale = 1.0F;
           Node scaleNode = node.getAttributes().getNamedItem("scale");
@@ -120,14 +121,18 @@ public class ViewUtil {
           }
 
           if (text != null) {
-            View<?, YogaLayout> view = new TextView<>(
-                new YogaLayout().setWidthPercent(100.0F),
-                ForgeHooks.newChatWithLinks(text))
-                    .setShadow(shadow);
+            final boolean finalShadow = shadow;
+            final float finalScale = scale;
+            parentView.minecraft.executeBlocking(() -> {
+              View<?, YogaLayout> view = new TextView<>(
+                  new YogaLayout().setWidthPercent(100.0F))
+                      .setText(ForgeHooks.newChatWithLinks(text))
+                      .setShadow(finalShadow);
 
-            view.getScaleProperty().setBaseValue(scale);
+              view.getScaleProperty().setBaseValue(finalScale);
 
-            parentView.addChild(view);
+              parentView.addChild(view);
+            });
           }
           break;
         case "image":

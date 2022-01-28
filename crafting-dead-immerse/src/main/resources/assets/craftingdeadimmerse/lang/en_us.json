@@ -70,5 +70,10 @@
     "view.world_list.button.recreate": "RE-CREATE",
 
     "view.hosting.order_now": "Order Now",
-    "view.hosting.partners": "Partners with"
+    "view.hosting.partners": "Partners with",
+
+    "view.guild.manage_members": "Manage Members",
+    "view.guild.invites": "Invites",
+    "view.guild.send_invite": "Send Invite",
+    "view.guild.your_guild": "Your Guild"
 }

@@ -46,50 +46,51 @@ import net.minecraft.network.chat.TranslatableComponent;
 public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
   private final ParentView<?, YogaLayout, YogaLayout> dropdownContent =
-      new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent());
+      new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
   public PlayView() {
-    super(new YogaLayout(), new YogaLayoutParent());
+    super(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
     ParentView<?, YogaLayout, YogaLayout> officialView =
-        new ParentView<>(new YogaLayout(), new YogaLayoutParent());
+        new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
     ParentView<?, YogaLayout, YogaLayout> officialServerListView =
-        new ParentView<>(new YogaLayout().setFlexShrink(1), new YogaLayoutParent());
-    officialServerListView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
+        new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
     View<?, YogaLayout> survivalServerListView = new ServerListView<>(
-        new YogaLayout().setTopMargin(1F),
+        new YogaLayout().setFlex(1).setTopMargin(1F),
         new JsonServerList(
             Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
 
     View<?, YogaLayout> deathmatchServerListView = new ServerListView<>(
-        new YogaLayout().setTopMargin(1F),
+        new YogaLayout().setFlex(1).setTopMargin(1F),
         new JsonServerList(
             Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
 
     officialView
         .addChild(new TabsView<>(new YogaLayout().setHeight(20))
             .setZOffset(5)
-            .addTab((TabsView.Tab) new TabsView.Tab(
-                new TranslatableComponent("menu.play.tab.survival"),
-                () -> officialServerListView.queueAllForRemoval().addChild(survivalServerListView)
+            .addTab((TabsView.TabView) new TabsView.TabView()
+                .setSelectedListener(() -> officialServerListView.queueAllForRemoval()
+                    .addChild(survivalServerListView)
                     .layout())
-                        .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
-                        .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get()))
-            .addTab((TabsView.Tab) new TabsView.Tab(
-                new TranslatableComponent("menu.play.tab.tdm"),
-                () -> officialServerListView.queueAllForRemoval().addChild(deathmatchServerListView)
+                .setText(new TranslatableComponent("menu.play.tab.survival"))
+                .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
+                .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get()))
+            .addTab((TabsView.TabView) new TabsView.TabView()
+                .setSelectedListener(() -> officialServerListView.queueAllForRemoval()
+                    .addChild(deathmatchServerListView)
                     .layout())
-                        .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
-                        .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get())))
+                .setText(new TranslatableComponent("menu.play.tab.tdm"))
+                .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
+                .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get())))
         .addChild(officialServerListView);
 
-    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout());
+    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout().setFlex(1));
     singleplayerView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
 
     View<?, YogaLayout> customServerListView = new MutableServerListView<>(
-        new YogaLayout(),
+        new YogaLayout().setFlex(1),
         new NbtServerList(
             CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
     customServerListView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
@@ -103,11 +104,11 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
                 .setWidth(25)
                 .setHeight(30)
                 .setTopPadding(12)
-                .setLeftMargin(17),
-            new TranslatableComponent("menu.play.title"))
-                .setShadow(true)
-                .configure(view -> view.getXScaleProperty().setBaseValue(1.5F))
-                .configure(view -> view.getYScaleProperty().setBaseValue(1.5F)))
+                .setLeftMargin(17))
+                    .setShadow(true)
+                    .setText(new TranslatableComponent("menu.play.title"))
+                    .configure(view -> view.getXScaleProperty().setBaseValue(1.5F))
+                    .configure(view -> view.getYScaleProperty().setBaseValue(1.5F)))
         .addChild(this.newSeparator())
         .addChild(new DropDownView<>(new YogaLayout()
             .setWidth(100F)
@@ -152,11 +153,11 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.getXTranslationProperty())
-            .keyFrames(new KeyFrames.Builder<>(-this.getScreen().getWidth())
+            .keyFrames(new KeyFrames.Builder<>((float) -this.window.getWidth())
                 .addFrame(0.0F)
                 .build())
             .build())
-        .setInterpolator(new SplineInterpolator(0.25, 0.1, 0.25, 1))
+        .setInterpolator(new SplineInterpolator(0.1F, 1.0F, 0.1F, 1.0F))
         .setDuration(250L, TimeUnit.MILLISECONDS)
         .build()
         .start();
@@ -166,9 +167,9 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
   protected void queueRemoval(Runnable remove) {
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.getXTranslationProperty())
-            .to(-this.getScreen().getWidth())
+            .to((float) -this.window.getWidth())
             .build())
-        .setInterpolator(new SplineInterpolator(0.25, 0.1, 0.25, 1))
+
         .setDuration(250L, TimeUnit.MILLISECONDS)
         .addTarget(new TimingTargetAdapter() {
           @Override

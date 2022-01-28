@@ -306,7 +306,7 @@ public class ClientDist implements ModDist {
   @SubscribeEvent
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
-      case END:
+      case START:
         TIMING_SOURCE.tick();
         break;
       default:

@@ -34,6 +34,7 @@ import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
@@ -62,7 +63,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
 
-public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout> {
+public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
 
   private static final Logger logger = LogManager.getLogger();
   private static final ExecutorService executorService = Executors.newSingleThreadExecutor(
@@ -80,7 +81,7 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
   private final TextView<YogaLayout> statusView;
   private final TextView<YogaLayout> animationView;
 
-  public ConnectView(ViewScreen layout, Screen lastScreen, ServerAddress address) {
+  public ConnectView(Layout layout, Screen lastScreen, ServerAddress address) {
     super(layout,
         new YogaLayoutParent().setAlignItems(Align.CENTER).setJustifyContent(Justify.CENTER));
     this.lastScreen = lastScreen;
@@ -107,8 +108,9 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
                                     .setCentered(true))
                     .addChild(
                         this.animationView =
-                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15),
-                                this.nextAnimation()).setCentered(true))
+                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
+                                .setText(this.nextAnimation())
+                                .setCentered(true))
                     .addChild(
                         new TextView<>(
                             new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50),
@@ -117,7 +119,7 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
                                 .configure(view -> view.getBackgroundColorProperty()
                                     .setBaseValue(
                                         new Color(ChatFormatting.RED.getColor() + (100 << 24)))
-                                    .registerState(
+                                    .defineState(
                                         new Color(ChatFormatting.DARK_RED.getColor() + (100 << 24)),
                                         States.HOVERED, States.ENABLED)
                                     .setTransition(Transition.linear(150L)))
@@ -162,7 +164,7 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
         ConnectView.this.connection.setListener(
             new ClientHandshakePacketListenerImpl(ConnectView.this.connection,
                 ConnectView.this.minecraft, ConnectView.this.lastScreen,
-                ConnectView.this.statusView::setText));
+                text -> this.minecraft.execute(() -> ConnectView.this.statusView.setText(text))));
         ConnectView.this.connection
             .send(new ClientIntentionPacket(inetAddress.getHostName(), inetAddress.getPort(),
                 ConnectionProtocol.LOGIN));

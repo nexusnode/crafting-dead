@@ -18,8 +18,11 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +34,7 @@ import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL20;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
@@ -41,22 +45,25 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
+import com.craftingdead.immerse.client.shader.ShaderPrograms;
 import com.craftingdead.immerse.client.util.RenderUtil;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.IRenderable;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -65,7 +72,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiComponent
     implements GuiEventListener, Widget, Comparable<View<?, ?>> {
 
-  public static final boolean DEBUG = false;
+  public static final boolean DEBUG = true;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -91,9 +98,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   ViewScreen screen;
 
   @Nullable
-  ParentView<?, ?, ? extends L> parent;
+  ParentView<?, ?, L> parent;
   int index;
   boolean pendingRemoval;
+  protected boolean visible;
 
   private float lastScrollOffset;
   private float scrollOffset;
@@ -171,15 +179,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   public View(L layout) {
     this.layout = layout;
-    this.layout.setMeasureFunction(this::measure);
     this.eventBus.start();
 
     this.states.add(States.ENABLED);
 
     this.outlineWidth
-        .registerState(1.0F, States.FOCUSED)
-        .registerState(1.0F, States.HOVERED, States.FOCUSED);
-    this.outlineColor.registerState(Color.BLUE_C, States.FOCUSED);
+        .defineState(1.0F, States.FOCUSED)
+        .defineState(1.0F, States.HOVERED, States.FOCUSED);
+    this.outlineColor.defineState(Color.BLUE_C, States.FOCUSED);
   }
 
   protected boolean hasState(State state) {
@@ -207,16 +214,15 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   protected void updateProperties(boolean instant) {
-    for (Set<State> subset : Sets.powerSet(this.states)) {
-      for (ValueStyleProperty<?> property : this.valueProperties.values()) {
-        property.transition(subset, instant);
+    List<Set<State>> powerSet = new ArrayList<>(Sets.powerSet(this.states));
+    Collections.reverse(powerSet);
+    for (ValueStyleProperty<?> property : this.valueProperties.values()) {
+      for (Set<State> subset : powerSet) {
+        if (property.transition(subset, instant)) {
+          break;
+        }
       }
     }
-  }
-
-  protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
-      float height) {
-    return new Vec2(width, height);
   }
 
   protected float computeFullHeight() {
@@ -241,7 +247,6 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   protected void layout() {
     this.fullHeight = this.computeFullHeight();
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
-    this.layout.layout();
   }
 
   public void tick() {
@@ -255,7 +260,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     this.scrollOffset += this.scrollVelocity;
 
     if (this.scrollOffset < 0.0F
-        || this.scrollOffset > this.fullHeight - this.getHeight()) {
+        || this.scrollOffset > this.fullHeight - this.getContentHeight()) {
       this.scrollVelocity = 0.0F;
     }
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
@@ -266,185 +271,176 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   @Override
-  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-    if (this.backgroundBlur != null) {
-      RenderSystem.enableBlend();
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
-      this.backgroundBlur.render(poseStack, this.getScaledX(), this.getScaledY(),
-          this.getScaledWidth(), this.getScaledHeight(), partialTicks);
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.disableBlend();
-    }
-
-    if (this.backgroundColor.isDefined()) {
-      RenderSystem.enableBlend();
-      float[] color = this.backgroundColor.get().getValue();
-      color[3] *= this.getAlpha();
-
-      float x = this.getScaledX();
-      float y = this.getScaledY();
-      float x2 = this.getScaledX() + this.getScaledWidth();
-      float y2 = this.getScaledY() + this.getScaledHeight();
-
-      if (this.borderRadius.get() > 0.0F) {
-        RenderUtil.enableRoundedRectShader(x, y, x2, y2, this.borderRadius.get());
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-
-      RenderUtil.fill(poseStack.last().pose(), x, y,
-          this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
-
-      RenderSystem.disableBlend();
-    }
-
-    final float borderRadius = this.borderRadius.get();
+  public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     final float topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
     final float bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
     final float leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
     final float rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
-    if (topBorderWidth > 0F) {
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
-            this.getScaledY(),
-            this.getScaledX() + this.getScaledWidth() + borderRadius,
-            this.getScaledY() + topBorderWidth,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
-          this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth() + borderRadius,
-          this.getScaledY() + topBorderWidth,
-          this.topBorderColor.get().getHex());
-    }
-    if (rightBorderWidth > 0F) {
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(
-            this.getScaledX() + this.getScaledWidth() - rightBorderWidth,
-            this.getScaledY() - borderRadius,
-            this.getScaledX() + this.getScaledWidth(),
-            this.getScaledY() + this.getScaledHeight() + borderRadius,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack,
-          this.getScaledX() + this.getScaledWidth() - rightBorderWidth,
-          this.getScaledY() - borderRadius,
-          this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.getScaledHeight() + borderRadius,
-          this.rightBorderColor.get().getHex());
-    }
-    if (bottomBorderWidth > 0F) {
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
-            this.getScaledY() + this.getScaledHeight() - bottomBorderWidth,
-            this.getScaledX() + this.getScaledWidth() + borderRadius,
-            this.getScaledY() + this.getScaledHeight(),
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
-          this.getScaledY() + this.getScaledHeight() - bottomBorderWidth,
-          this.getScaledX() + this.getScaledWidth() + borderRadius,
-          this.getScaledY() + this.getScaledHeight(),
-          this.bottomBorderColor.get().getHex());
-    }
-    if (leftBorderWidth > 0F) {
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX(),
-            this.getScaledY() - borderRadius,
-            this.getScaledX() + leftBorderWidth,
-            this.getScaledY() + this.getScaledHeight() + borderRadius,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack, this.getScaledX(),
-          this.getScaledY() - borderRadius,
-          this.getScaledX() + leftBorderWidth,
-          this.getScaledY() + this.getScaledHeight() + borderRadius,
-          this.leftBorderColor.get().getHex());
-    }
-
+    final float borderRadius = this.unscale(this.borderRadius.get(), this.unscaleBorder);
 
     final float outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
-    final long outlineColor = this.outlineColor.get().getHex();
-    if (outlineWidth > 0.0F) {
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
-            this.getScaledY(),
-            this.getScaledX() + this.getScaledWidth() + borderRadius,
-            this.getScaledY() + outlineWidth,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
-          this.getScaledY(),
-          this.getScaledX() + this.getScaledWidth() + borderRadius,
-          this.getScaledY() + outlineWidth,
-          outlineColor);
+    final float[] outlineColor = this.outlineColor.get().getValue4f();
 
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(
-            this.getScaledX() + this.getScaledWidth() - outlineWidth,
-            this.getScaledY() - borderRadius,
-            this.getScaledX() + this.getScaledWidth(),
-            this.getScaledY() + this.getScaledHeight() + borderRadius,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack,
-          this.getScaledX() + this.getScaledWidth() - outlineWidth,
-          this.getScaledY() - borderRadius,
-          this.getScaledX() + this.getScaledWidth(),
-          this.getScaledY() + this.getScaledHeight() + borderRadius,
-          outlineColor);
 
-      if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX() - borderRadius,
-            this.getScaledY() + this.getScaledHeight() - outlineWidth,
-            this.getScaledX() + this.getScaledWidth() + borderRadius,
-            this.getScaledY() + this.getScaledHeight(),
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      }
-      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
-          this.getScaledY() + this.getScaledHeight() - outlineWidth,
-          this.getScaledX() + this.getScaledWidth() + borderRadius,
-          this.getScaledY() + this.getScaledHeight(),
-          outlineColor);
 
+    if (this.backgroundBlur != null) {
+      this.backgroundBlur.renderToTempTarget(partialTicks);
       if (borderRadius > 0.0F) {
-        RenderUtil.enableRoundedRectShader(this.getScaledX(),
-            this.getScaledY() - borderRadius,
-            this.getScaledX() + outlineWidth,
-            this.getScaledY() + this.getScaledHeight() + borderRadius,
-            borderRadius);
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        ShaderPrograms.ROUNDED_TEX.use();
+        GL20.glUniform4f(0, borderRadius, borderRadius, borderRadius, borderRadius);
+        GL20.glUniform2f(1, this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
+        GL20.glUniform2f(2, this.getScaledWidth() + (outlineWidth * 2.0F),
+            this.getScaledHeight() + (outlineWidth * 2.0F));
       }
-      RenderUtil.fill(poseStack, this.getScaledX(),
-          this.getScaledY() - borderRadius,
-          this.getScaledX() + outlineWidth,
-          this.getScaledY() + this.getScaledHeight() + borderRadius,
-          outlineColor);
+      RenderSystem.enableBlend();
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
+      this.backgroundBlur.render(matrixStack, this.getScaledX() - outlineWidth,
+          this.getScaledY() - outlineWidth,
+          this.getScaledWidth() + (outlineWidth * 2.0F),
+          this.getScaledHeight() + (outlineWidth * 2.0F));
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.disableBlend();
+      if (borderRadius > 0.0F) {
+        RenderUtil.resetShader();
+      }
     }
 
-    if (this.tooltip != null && this.hasState(States.HOVERED)) {
-      this.tooltip.render(this.minecraft.font, poseStack,
+    ShaderPrograms.ROUNDED_RECT.use();
+    GL20.glUniform4f(0, borderRadius, borderRadius, borderRadius, borderRadius);
+    GL20.glUniform2f(1, this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
+    GL20.glUniform2f(2, this.getScaledWidth() + (outlineWidth * 2.0F),
+        this.getScaledHeight() + (outlineWidth * 2.0F));
+    GL20.glUniform1f(3, outlineWidth);
+    GL20.glUniform4fv(4, outlineColor);
+
+    if (this.backgroundColor.isDefined()) {
+      float[] color = this.backgroundColor.get().getValue4f();
+      color[3] *= this.getAlpha();
+      float x = this.getScaledX() - outlineWidth;
+      float y = this.getScaledY() - outlineWidth;
+      float x2 = this.getScaledX() + this.getScaledWidth() + outlineWidth;
+      float y2 = this.getScaledY() + this.getScaledHeight() + outlineWidth;
+      RenderUtil.fill(matrixStack.last().pose(), x, y,
+          this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
+    }
+
+    RenderSystem.disableTexture();
+    RenderSystem.enableBlend();
+    RenderSystem.defaultBlendFunc();
+
+    if (leftBorderWidth > 0F) {
+      float x2 = this.getScaledX() + leftBorderWidth;
+      float x = this.getScaledX();
+      float y2 = this.getScaledY() + this.getScaledHeight();
+
+      float[] color = this.leftBorderColor.get().getValue4f();
+
+      Tessellator tessellator = Tessellator.getInstance();
+      BufferBuilder builder = tessellator.getBuilder();
+      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.vertex(x, y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, y2 - bottomBorderWidth, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, this.getScaledY() + topBorderWidth, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x, this.getScaledY(), this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      tessellator.end();
+    }
+    if (rightBorderWidth > 0F) {
+      float x2 = this.getScaledX() + this.getScaledWidth();
+      float x = x2 - rightBorderWidth;
+      float y2 = this.getScaledY() + this.getScaledHeight();
+
+      float[] color = this.rightBorderColor.get().getValue4f();
+
+      Tessellator tessellator = Tessellator.getInstance();
+      BufferBuilder builder = tessellator.getBuilder();
+      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.vertex(x, y2 - bottomBorderWidth, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, this.getScaledY(), this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x, this.getScaledY() + topBorderWidth, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      tessellator.end();
+    }
+
+    if (topBorderWidth > 0F) {
+      float x2 = this.getScaledX() + this.getScaledWidth();
+      float y2 = this.getScaledY() + topBorderWidth;
+
+      float[] color = this.topBorderColor.get().getValue4f();
+
+      Tessellator tessellator = Tessellator.getInstance();
+      BufferBuilder builder = tessellator.getBuilder();
+      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.vertex(this.getScaledX() + leftBorderWidth, y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2 - rightBorderWidth, y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, this.getScaledY(), this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(this.getScaledX(), this.getScaledY(), this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      tessellator.end();
+    }
+    if (bottomBorderWidth > 0F) {
+      float x2 = this.getScaledX() + this.getScaledWidth();
+      float y2 = this.getScaledY() + this.getScaledHeight();
+      float y = y2 - bottomBorderWidth;
+
+      float[] color = this.bottomBorderColor.get().getValue4f();
+
+      Tessellator tessellator = Tessellator.getInstance();
+      BufferBuilder builder = tessellator.getBuilder();
+      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.vertex(this.getScaledX(), y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2, y2, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(x2 - rightBorderWidth, y, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      builder.vertex(this.getScaledX() + leftBorderWidth, y, this.getZOffset())
+          .color(color[0], color[1], color[2], color[3])
+          .endVertex();
+      tessellator.end();
+    }
+
+
+    RenderSystem.enableTexture();
+    RenderSystem.disableBlend();
+
+    RenderUtil.resetShader();
+
+
+    if (this.tooltip != null && this.isHovered()) {
+      this.tooltip.render(this.minecraft.font, matrixStack,
           10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
     // ---- Render Content----
 
-    if (this.layout.getOverflow().shouldScissor()) {
+    final boolean scissor = this.layout.getOverflow().shouldScissor();
+    if (scissor) {
       final double scale = this.window.getGuiScale();
       ScissorStack.push(
           (int) (this.getScaledX() * scale),
@@ -456,43 +452,55 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
     this.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
-    if (this.layout.getOverflow().shouldScissor()) {
+    if (scissor) {
       ScissorStack.pop();
     }
 
     // ---- Render Scrollbar ----
 
     if (this.isScrollbarEnabled()) {
-      // Background
       float scrollbarX = this.getScrollbarX();
       float scaledY = this.getScaledY();
-      float scrollbarX2 = scrollbarX + SCROLLBAR_WIDTH;
+
+      float scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
+      float scrollbarRadius = scrollbarWidth / 2.0F;
+
+      float scrollbarX2 = scrollbarX + scrollbarWidth;
       float scaledY2 = scaledY + this.getScaledHeight();
-      float radius = SCROLLBAR_WIDTH / 2.0F;
-      RenderUtil.enableRoundedRectShader(scrollbarX, scaledY, scrollbarX2, scaledY2, radius);
-      RenderUtil.fill(poseStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
+
+      ShaderPrograms.ROUNDED_RECT.use();
+      GL20.glUniform4f(0, scrollbarRadius, scrollbarRadius, scrollbarRadius, scrollbarRadius);
+      GL20.glUniform1f(3, 0.0F); // No outline
+
+      // Background
+      GL20.glUniform2f(1, scrollbarX, scaledY);
+      GL20.glUniform2f(2, scrollbarWidth, this.getScaledHeight());
+      RenderUtil.fill(matrixStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
 
       // Bar
       float scrollbarY = this.getScrollbarY();
-      float scrollbarY2 = this.getScrollbarY() + this.getScrollbarHeight();
-      RenderUtil.enableRoundedRectShader(scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, radius);
-      RenderUtil.fill(poseStack, scrollbarX, this.getScrollbarY(), scrollbarX2, scrollbarY2,
-          0x4CFFFFFF);
+      float scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+      GL20.glUniform2f(1, scrollbarX, scrollbarY);
+      GL20.glUniform2f(2, scrollbarWidth, this.getScrollbarHeight());
+      RenderUtil.fill(matrixStack, scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, 0x4CFFFFFF);
+
+      RenderUtil.resetShader();
     }
   }
 
   protected final boolean isScrollbarEnabled() {
-    return this.layout.getOverflow() == Overflow.SCROLL && this.fullHeight > this.getHeight();
+    return this.layout.getOverflow() == Overflow.SCROLL
+        && this.fullHeight > this.getContentHeight();
   }
 
   @SuppressWarnings("unused")
   protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    if (DEBUG && this.hasState(States.HOVERED)) {
-      RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
+
+    if (DEBUG && this.isHovered()) {
       RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
-          this.getScaledContentWidth(), this.getScaledContentHeight(), 0x223495eb);
+          this.getScaledContentWidth(), this.getScaledContentHeight(), 0x333495eb);
 
       // Left border
       RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
@@ -559,7 +567,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   private final float getScrollbarX() {
-    return this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH;
+    return this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH * this.getXScale();
   }
 
   private final float getScrollbarY() {
@@ -572,10 +580,22 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     return Mth.lerp(partialTicks, this.lastScrollOffset, this.scrollOffset);
   }
 
+  // Visible for property getter in scrollTo animation.
+  @VisibleForTesting
+  public final float getScrollOffset() {
+    return this.scrollOffset;
+  }
+
+  // Visible for property setter in scrollTo animation.
+  @VisibleForTesting
+  public final void setScrollOffset(float scrollOffset) {
+    this.scrollOffset = scrollOffset;
+  }
+
   private final float getScrollbarHeight() {
     return Mth.clamp(
         this.getScaledHeight() * (this.getContentHeight() / this.fullHeight),
-        10.0F,
+        10.0F * this.getYScale(),
         this.getScaledHeight());
   }
 
@@ -649,13 +669,22 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (this.hasState(States.FOCUSED)) {
-      this.removeState(States.FOCUSED);
-      this.updateProperties(false);
+    if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
+        GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
+      return true;
     }
 
     if (!this.isHovered()) {
+      if (this.isFocused()) {
+        this.removeState(States.FOCUSED);
+        this.updateProperties(false);
+      }
       return false;
+    }
+
+    if (!this.isFocused() && this.focusable && this.hasState(States.ENABLED)) {
+      this.addState(States.FOCUSED);
+      this.updateProperties(false);
     }
 
     // Clicked on scrollbar region
@@ -676,11 +705,6 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
       return true;
     }
 
-    if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
-        GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
-      return true;
-    }
-
     long currentTime = Util.getMillis();
     long deltaTime = currentTime - this.lastClickTimeMs;
     this.lastClickTimeMs = currentTime;
@@ -698,7 +722,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    if (mouseY >= this.getScaledY() && mouseY <= this.getScaledY() + this.getScaledHeight()) {
+    if (this.isScrollbarEnabled() &&
+        mouseY >= this.getScaledY() && mouseY <= this.getScaledY() + this.getScaledHeight()) {
       this.scrollOffset = this.clampScrollOffset(this.scrollOffset
           + ((float) deltaY) * this.fullHeight / this.getScaledHeight());
       return true;
@@ -776,7 +801,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   public final SELF setDisabledBackgroundColor(Color color) {
-    this.backgroundColor.registerState(color, States.DISABLED);
+    this.backgroundColor.defineState(color, States.DISABLED);
     return this.self();
   }
 
@@ -820,7 +845,13 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   public final float getScaledContentX() {
     return this.getContentX()
-        + (this.getContentWidth() - (this.getContentWidth() * this.xScale.get())) / 2.0F;
+        + (this.getContentWidth() - (this.getContentWidth() * this.xScale.get())) / 2.0F
+        + (this.layout.getLeftPadding() - (this.layout.getLeftPadding() * this.xScale.get())) / 2.0F
+        + (this.layout.getRightPadding() - (this.layout.getRightPadding() * this.xScale.get()))
+            / 2.0F
+        + (this.isScrollbarEnabled()
+            ? (SCROLLBAR_WIDTH - (SCROLLBAR_WIDTH * this.xScale.get())) / 2.0F
+            : 0.0F);
   }
 
   public float getContentX() {
@@ -846,14 +877,17 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   public final float getScaledContentY() {
     return this.getContentY()
-        + (this.getContentHeight() - (this.getContentHeight() * this.yScale.get())) / 2.0F;
+        + (this.getContentHeight() - (this.getContentHeight() * this.yScale.get())) / 2.0F
+        + (this.layout.getTopPadding() - (this.layout.getTopPadding() * this.yScale.get())) / 2.0F
+        + (this.layout.getBottomPadding() - (this.layout.getBottomPadding() * this.yScale.get()))
+            / 2.0F;
   }
 
   public float getContentY() {
     return this.getY()
         + this.layout.getTopPadding() * this.getYScale()
         + this.unscale(this.layout.getTopBorder(), this.unscaleBorder) * this.getYScale()
-        - (this.fullHeight > this.getHeight()
+        - (this.isScrollbarEnabled()
             ? this.getScrollOffset(this.minecraft.getFrameTime()) * this.getYScale()
             : 0.0F);
   }
@@ -881,11 +915,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   public float getContentWidth() {
     return this.getWidth()
+        - (this.isScrollbarEnabled() ? SCROLLBAR_WIDTH : 0.0F)
         - this.layout.getRightPadding()
         - this.layout.getLeftPadding()
         - this.unscale(this.layout.getRightBorder(), this.unscaleBorder)
-        - this.unscale(this.layout.getLeftBorder(), this.unscaleBorder)
-        - (this.isScrollbarEnabled() ? SCROLLBAR_WIDTH : 0.0F);
+        - this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
   }
 
   public final float getScaledWidth() {
@@ -1056,13 +1090,20 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     } else {
       this.removeState(States.ENABLED);
       this.addState(States.DISABLED);
+      if (this.hasState(States.FOCUSED)) {
+        this.removeState(States.FOCUSED);
+      }
     }
-    this.updateProperties(!this.isAdded());
+    this.updateProperties(!this.visible);
     return this.self();
   }
 
   public final boolean isHovered() {
     return this.hasState(States.HOVERED);
+  }
+
+  public final boolean isFocused() {
+    return this.hasState(States.FOCUSED);
   }
 
   public final boolean isSelected() {
@@ -1075,7 +1116,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     } else {
       this.removeState(States.SELECTED);
     }
-    this.updateProperties(!this.isAdded());
+    this.updateProperties(!this.visible);
     return this.self();
   }
 
@@ -1098,12 +1139,17 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     return this.screen;
   }
 
-  public final ParentView<?, ?, ? extends L> getParent() {
+  public final ParentView<?, ?, L> getParent() {
     return this.parent;
   }
 
   public final boolean isAdded() {
     return this.parent != null || this.screen != null;
+  }
+
+  protected SELF setVisible(boolean visible) {
+    this.visible = visible;
+    return this.self();
   }
 
   @Override

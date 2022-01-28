@@ -6,8 +6,10 @@ repositories {
     mavenCentral()
     google()
     maven {
-        name 'IzzelAliz Maven'
-        url 'https://maven.izzel.io/releases'
+   	    url 'https://packages.jetbrains.team/maven/p/skija/maven'   	
+    }
+    flatDir {
+        dir 'libs'
     }
 }
 
@@ -85,8 +87,9 @@ dependencies {
             exclude group: 'org.lwjgl', module: 'lwjgl'
         }
     }
-    
+
 	library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+	library fg.deobf('blank:rocket-connector:1.16.5-0.0.1')
 }
 
 jar {
