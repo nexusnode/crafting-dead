@@ -18,7 +18,6 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;

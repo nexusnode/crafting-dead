@@ -1,11 +1,11 @@
 #version 430 compatibility
 
 
-layout(location = 0) uniform vec4 u_Radius;
-layout(location = 1) uniform vec2 u_Position;
-layout(location = 2) uniform vec2 u_Size;
-layout(location = 3) uniform float u_OutlineWidth;
-layout(location = 4) uniform vec4 u_OutlineColor;
+uniform vec4 u_Radius;
+uniform vec2 u_Position;
+uniform vec2 u_Size;
+uniform float u_OutlineWidth;
+uniform vec4 u_OutlineColor;
 
 in vec4 f_VertexColor;
 in vec2 f_VertexPosition;

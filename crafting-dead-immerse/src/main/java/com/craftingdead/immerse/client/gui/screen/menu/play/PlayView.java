@@ -51,18 +51,18 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
   public PlayView() {
     super(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
-    ParentView<?, YogaLayout, YogaLayout> officialView =
+    var officialView =
         new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
-    ParentView<?, YogaLayout, YogaLayout> officialServerListView =
+    var officialServerListView =
         new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
 
-    View<?, YogaLayout> survivalServerListView = new ServerListView<>(
+    var survivalServerListView = new ServerListView<>(
         new YogaLayout().setFlex(1).setTopMargin(1F),
         new JsonServerList(
             Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
 
-    View<?, YogaLayout> deathmatchServerListView = new ServerListView<>(
+    var deathmatchServerListView = new ServerListView<>(
         new YogaLayout().setFlex(1).setTopMargin(1F),
         new JsonServerList(
             Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
@@ -86,10 +86,10 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
                 .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get())))
         .addChild(officialServerListView);
 
-    View<?, YogaLayout> singleplayerView = new WorldListView<>(new YogaLayout().setFlex(1));
+    var singleplayerView = new WorldListView<>(new YogaLayout().setFlex(1));
     singleplayerView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
 
-    View<?, YogaLayout> customServerListView = new MutableServerListView<>(
+    var customServerListView = new MutableServerListView<>(
         new YogaLayout().setFlex(1),
         new NbtServerList(
             CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));

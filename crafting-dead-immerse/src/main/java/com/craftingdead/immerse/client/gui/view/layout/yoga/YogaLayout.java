@@ -25,7 +25,6 @@ import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
-import net.minecraft.world.phys.Vec2;
 
 public class YogaLayout implements Layout {
 
@@ -518,7 +517,8 @@ public class YogaLayout implements Layout {
     this.measureFunctionPresent = measureFunction != null;
     Yoga.YGNodeSetMeasureFunc(this.node,
         measureFunction == null ? null : (node, width, widthMode, height, heightMode) -> {
-          var size = measureFunction.measure(measureModes[widthMode], width, measureModes[heightMode], height);
+          var size = measureFunction.measure(measureModes[widthMode], width,
+              measureModes[heightMode], height);
           return YGMeasureFunc.toLong(YGSize.create()
               .width(size.x)
               .height(size.y));

@@ -8,23 +8,24 @@ import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.Style;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.SharedConstants;
+import net.minecraft.Util;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
 
-  private final FontRenderer font;
+  private final Font font;
 
   private String value = "";
   private int maxLength = 32;
@@ -46,8 +47,8 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   private String suggestion;
   private Consumer<String> responder;
   private Predicate<String> filter = Objects::nonNull;
-  private BiFunction<String, Integer, IReorderingProcessor> formatter =
-      (p_195610_0_, p_195610_1_) -> IReorderingProcessor.forward(p_195610_0_, Style.EMPTY);
+  private BiFunction<String, Integer, FormattedCharSequence> formatter =
+      (value, p_195610_1_) -> FormattedCharSequence.forward(value, Style.EMPTY);
 
   public TextFieldView(L layout) {
     super(layout);
@@ -61,7 +62,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   }
 
   public TextFieldView<L> setFormatter(
-      BiFunction<String, Integer, IReorderingProcessor> formatter) {
+      BiFunction<String, Integer, FormattedCharSequence> formatter) {
     this.formatter = formatter;
     return this;
   }
@@ -225,7 +226,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   }
 
   public void setCursorIndex(int cursorIndex) {
-    this.cursorIndex = MathHelper.clamp(cursorIndex, 0, this.value.length());
+    this.cursorIndex = Mth.clamp(cursorIndex, 0, this.value.length());
   }
 
   public void moveCursorToStart() {
@@ -338,9 +339,9 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     super.mouseClicked(mouseX, mouseY, button);
 
     if (this.isFocused() && this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-      int i = MathHelper.ceil(mouseX) - MathHelper.ceil(this.getScaledContentX());
+      int i = Mth.ceil(mouseX) - Mth.ceil(this.getScaledContentX());
       String s = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
-          MathHelper.floor(this.getScaledContentWidth()));
+          Mth.floor(this.getScaledContentWidth()));
       this.moveCursorTo(this.font.plainSubstrByWidth(s, i).length() + this.displayIndex);
       return true;
     }
@@ -349,36 +350,34 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   }
 
   @Override
-  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
+  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     int textColor =
         this.editable ? this.textColor.get().getHex() : this.textColorUneditable.get().getHex();
     int cursorIndex = this.cursorIndex - this.displayIndex;
     int highlightMaxIndex = this.highlightIndex - this.displayIndex;
-    String text =
-        this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
-            MathHelper.floor(this.getScaledContentX()));
-    boolean cursorVisisble = cursorIndex >= 0 && cursorIndex <= text.length();
-    boolean cursorBlink = this.isFocused() && this.frame / 6 % 2 == 0 && cursorVisisble;
-    float x = this.getScaledContentX() + 2;
-    float y = this.getScaledContentY()
+    var text = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
+        Mth.floor(this.getScaledContentX()));
+    var cursorVisisble = cursorIndex >= 0 && cursorIndex <= text.length();
+    var cursorBlink = this.isFocused() && this.frame / 6 % 2 == 0 && cursorVisisble;
+    var x = this.getScaledContentX() + 2;
+    var y = this.getScaledContentY()
         + this.getScaledContentHeight() / 2.0F
         - this.font.lineHeight / 2.0F;
-    float remainingX = x;
+    var remainingX = x;
     if (highlightMaxIndex > text.length()) {
       highlightMaxIndex = text.length();
     }
 
     if (!text.isEmpty()) {
       String highlightedText = cursorVisisble ? text.substring(0, cursorIndex) : text;
-      remainingX = this.font.drawShadow(matrixStack,
+      remainingX = this.font.drawShadow(poseStack,
           this.formatter.apply(highlightedText, this.displayIndex), x,
           y, textColor);
     }
 
-    boolean pipeCursor =
+    var pipeCursor =
         this.cursorIndex < this.value.length() || this.value.length() >= this.getMaxLength();
-    float highlightX = remainingX;
+    var highlightX = remainingX;
     if (!cursorVisisble) {
       highlightX = cursorIndex > 0 ? x + this.getScaledContentWidth() : x;
     } else if (pipeCursor) {
@@ -387,20 +386,20 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     }
 
     if (!text.isEmpty() && cursorVisisble && cursorIndex < text.length()) {
-      this.font.drawShadow(matrixStack,
+      this.font.drawShadow(poseStack,
           this.formatter.apply(text.substring(cursorIndex), this.cursorIndex), remainingX, y,
           textColor);
     }
 
     if (!pipeCursor && this.suggestion != null) {
-      this.font.drawShadow(matrixStack, this.suggestion, highlightX - 1.0F, y, 0xFF808080);
+      this.font.drawShadow(poseStack, this.suggestion, highlightX - 1.0F, y, 0xFF808080);
     }
 
     if (cursorBlink) {
       if (pipeCursor) {
-        RenderUtil.fill(matrixStack, highlightX, y - 1, highlightX + 1, y + 1 + 9, 0xFFD0D0D0);
+        RenderUtil.fill(poseStack, highlightX, y - 1, highlightX + 1, y + 1 + 9, 0xFFD0D0D0);
       } else {
-        this.font.drawShadow(matrixStack, "_", (float) highlightX, (float) y, textColor);
+        this.font.drawShadow(poseStack, "_", (float) highlightX, (float) y, textColor);
       }
     }
 
@@ -410,7 +409,6 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void renderHighlight(float x, float y, float x2, float y2) {
     if (x < x2) {
       float i = x;
@@ -433,18 +431,20 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
       x = maxX;
     }
 
-    Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder bufferbuilder = tessellator.getBuilder();
-    RenderSystem.color4f(0.0F, 0.0F, 255.0F, 255.0F);
+    final var tessellator = Tesselator.getInstance();
+    final var builder = tessellator.getBuilder();
+    RenderSystem.setShader(GameRenderer::getPositionShader);
+    RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
     RenderSystem.disableTexture();
     RenderSystem.enableColorLogicOp();
     RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-    bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-    bufferbuilder.vertex(x, y2, 0.0D).endVertex();
-    bufferbuilder.vertex(x2, y2, 0.0D).endVertex();
-    bufferbuilder.vertex(x2, y, 0.0D).endVertex();
-    bufferbuilder.vertex(x, y, 0.0D).endVertex();
+    builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+    builder.vertex(x, y2, 0.0D).endVertex();
+    builder.vertex(x2, y2, 0.0D).endVertex();
+    builder.vertex(x2, y, 0.0D).endVertex();
+    builder.vertex(x, y, 0.0D).endVertex();
     tessellator.end();
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.disableColorLogicOp();
     RenderSystem.enableTexture();
   }
@@ -497,13 +497,13 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
 
   public void setHighlightIndex(int highlightIndex) {
     int length = this.value.length();
-    this.highlightIndex = MathHelper.clamp(highlightIndex, 0, length);
+    this.highlightIndex = Mth.clamp(highlightIndex, 0, length);
     if (this.font != null) {
       if (this.displayIndex > length) {
         this.displayIndex = length;
       }
 
-      int width = MathHelper.floor(this.getScaledContentWidth());
+      int width = Mth.floor(this.getScaledContentWidth());
       String s = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex), width);
       int k = s.length() + this.displayIndex;
       if (this.highlightIndex == this.displayIndex) {
@@ -516,7 +516,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
         this.displayIndex -= this.displayIndex - this.highlightIndex;
       }
 
-      this.displayIndex = MathHelper.clamp(this.displayIndex, 0, length);
+      this.displayIndex = Mth.clamp(this.displayIndex, 0, length);
     }
   }
 

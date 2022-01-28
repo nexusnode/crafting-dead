@@ -96,7 +96,7 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     return this.overrideValue != null ? this.overrideValue : this.value;
   }
 
-  public boolean transition(Set<State> states, boolean instant) {
+  public boolean transition(Set<State> states, boolean animate) {
     T newValue = this.stateValues.get(states);
     if (newValue == null) {
       return false;
@@ -107,10 +107,10 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     }
 
     if (!Objects.equals(newValue, this.value)) {
-      if (instant) {
-        this.set(newValue);
-      } else {
+      if (animate) {
         this.transitionStopListener = this.transition.transition(this, newValue);
+      } else {
+        this.set(newValue);
       }
     }
 

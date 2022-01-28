@@ -101,37 +101,34 @@ public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
                     .configure(
                         view -> view.getBackgroundColorProperty()
                             .setBaseValue(new Color(0x40111111)))
-                    .addChild(
-                        this.statusView =
-                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15),
-                                new TranslatableComponent("connect.connecting"))
-                                    .setCentered(true))
-                    .addChild(
-                        this.animationView =
-                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
-                                .setText(this.nextAnimation())
-                                .setCentered(true))
-                    .addChild(
-                        new TextView<>(
-                            new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50),
-                            CommonComponents.GUI_CANCEL)
-                                .setCentered(true)
-                                .configure(view -> view.getBackgroundColorProperty()
-                                    .setBaseValue(
-                                        new Color(ChatFormatting.RED.getColor() + (100 << 24)))
-                                    .defineState(
-                                        new Color(ChatFormatting.DARK_RED.getColor() + (100 << 24)),
-                                        States.HOVERED, States.ENABLED)
-                                    .setTransition(Transition.linear(150L)))
-                                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                                .addListener(ActionEvent.class, (c, e) -> {
-                                  this.aborted = true;
-                                  if (this.connection != null) {
-                                    this.connection.disconnect(
-                                        new TranslatableComponent("connect.aborted"));
-                                  }
-                                  this.minecraft.setScreen(this.lastScreen);
-                                })));
+                    .addChild(this.statusView =
+                        new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
+                            .setText(new TranslatableComponent("connect.connecting"))
+                            .setCentered(true))
+                    .addChild(this.animationView =
+                        new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
+                            .setText(this.nextAnimation())
+                            .setCentered(true))
+                    .addChild(new TextView<>(
+                        new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50))
+                            .setText(CommonComponents.GUI_CANCEL)
+                            .setCentered(true)
+                            .configure(view -> view.getBackgroundColorProperty()
+                                .setBaseValue(
+                                    new Color(ChatFormatting.RED.getColor() + (100 << 24)))
+                                .defineState(
+                                    new Color(ChatFormatting.DARK_RED.getColor() + (100 << 24)),
+                                    States.HOVERED, States.ENABLED)
+                                .setTransition(Transition.linear(150L)))
+                            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
+                            .addListener(ActionEvent.class, (c, e) -> {
+                              this.aborted = true;
+                              if (this.connection != null) {
+                                this.connection.disconnect(
+                                    new TranslatableComponent("connect.aborted"));
+                              }
+                              this.minecraft.setScreen(this.lastScreen);
+                            })));
 
     this.minecraft.clearLevel();
     this.connect(address);

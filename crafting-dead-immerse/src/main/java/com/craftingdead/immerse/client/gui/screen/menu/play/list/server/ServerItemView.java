@@ -107,7 +107,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
         .addChild(new TextView<>(
             new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8))
                 .setText(new TextComponent(this.serverEntry.getMap().orElse("-"))
-                    .withStyle(TextFormatting.GRAY))
+                    .withStyle(ChatFormatting.GRAY))
                 .setShadow(false)
                 .setCentered(true))
         .addChild(this.pingComponent)
@@ -129,7 +129,8 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   public void connect() {
     // Call this before creating a ConnectingScreen instance.
     this.getScreen().keepOpen();
-    this.minecraft.setScreen(ConnectView.createScreen(this.getScreen()), this.serverEntry.toServerAddress());
+    this.minecraft.setScreen(
+        ConnectView.createScreen(this.getScreen(), this.serverEntry.toServerAddress()));
   }
 
   public ServerEntry getServerEntry() {
@@ -172,7 +173,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
     if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
       this.toggleState(States.SELECTED);
-      this.updateProperties(false);
+      this.updateProperties(true);
       return true;
     }
     return super.keyPressed(keyCode, scanCode, modifiers);

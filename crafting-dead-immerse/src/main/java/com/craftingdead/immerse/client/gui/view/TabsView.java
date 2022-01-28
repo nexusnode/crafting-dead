@@ -31,8 +31,6 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 public class TabsView<L extends Layout>
     extends ParentView<TabsView<L>, L, YogaLayout> {

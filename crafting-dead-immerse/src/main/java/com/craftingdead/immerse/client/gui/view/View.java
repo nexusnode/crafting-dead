@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +33,7 @@ import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL20;
+import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
@@ -45,25 +44,24 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.shader.ShaderPrograms;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -72,7 +70,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiComponent
     implements GuiEventListener, Widget, Comparable<View<?, ?>> {
 
-  public static final boolean DEBUG = true;
+  public static final boolean DEBUG = false;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -213,12 +211,12 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     this.valueProperties.put(property.getName(), property);
   }
 
-  protected void updateProperties(boolean instant) {
-    List<Set<State>> powerSet = new ArrayList<>(Sets.powerSet(this.states));
+  protected void updateProperties(boolean animate) {
+    var powerSet = new ArrayList<>(Sets.powerSet(this.states));
     Collections.reverse(powerSet);
-    for (ValueStyleProperty<?> property : this.valueProperties.values()) {
-      for (Set<State> subset : powerSet) {
-        if (property.transition(subset, instant)) {
+    for (var property : this.valueProperties.values()) {
+      for (var subset : powerSet) {
+        if (property.transition(subset, animate)) {
           break;
         }
       }
@@ -230,7 +228,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   protected void added() {
-    this.updateProperties(true);
+    this.updateProperties(false);
     this.post(new AddedEvent());
   }
 
@@ -272,46 +270,49 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   @Override
   public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-    final float topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
-    final float bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
-    final float leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
-    final float rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
-    final float borderRadius = this.unscale(this.borderRadius.get(), this.unscaleBorder);
+    final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
+    final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
+    final var leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
+    final var rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
+    final var borderRadius = this.unscale(this.borderRadius.get(), this.unscaleBorder);
 
-    final float outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
-    final float[] outlineColor = this.outlineColor.get().getValue4f();
-
-
+    final var outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
+    final var outlineColor = this.outlineColor.get().getValue4f();
 
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.renderToTempTarget(partialTicks);
+      this.backgroundBlur.process(partialTicks);
       if (borderRadius > 0.0F) {
-        ShaderPrograms.ROUNDED_TEX.use();
-        GL20.glUniform4f(0, borderRadius, borderRadius, borderRadius, borderRadius);
-        GL20.glUniform2f(1, this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
-        GL20.glUniform2f(2, this.getScaledWidth() + (outlineWidth * 2.0F),
+        final var shader = ClientDist.getRoundedTexShader();
+        RenderSystem.setShader(shader::instance);
+        shader.radius().set(borderRadius, borderRadius, borderRadius, borderRadius);
+        shader.position().set(this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
+        shader.size().set(this.getScaledWidth() + (outlineWidth * 2.0F),
             this.getScaledHeight() + (outlineWidth * 2.0F));
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
       }
       RenderSystem.enableBlend();
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
-      this.backgroundBlur.render(matrixStack, this.getScaledX() - outlineWidth,
+      this.backgroundBlur.render(poseStack, this.getScaledX() - outlineWidth,
           this.getScaledY() - outlineWidth,
           this.getScaledWidth() + (outlineWidth * 2.0F),
           this.getScaledHeight() + (outlineWidth * 2.0F));
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       RenderSystem.disableBlend();
-      if (borderRadius > 0.0F) {
-        RenderUtil.resetShader();
-      }
     }
 
-    ShaderPrograms.ROUNDED_RECT.use();
-    GL20.glUniform4f(0, borderRadius, borderRadius, borderRadius, borderRadius);
-    GL20.glUniform2f(1, this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
-    GL20.glUniform2f(2, this.getScaledWidth() + (outlineWidth * 2.0F),
-        this.getScaledHeight() + (outlineWidth * 2.0F));
-    GL20.glUniform1f(3, outlineWidth);
-    GL20.glUniform4fv(4, outlineColor);
+    final var roundedRectShader = ClientDist.getRoundedRectShader();
+    RenderSystem.setShader(roundedRectShader::instance);
+
+    roundedRectShader.radius()
+        .set(borderRadius, borderRadius, borderRadius, borderRadius);
+    roundedRectShader.position()
+        .set(this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
+    roundedRectShader.size()
+        .set(this.getScaledWidth() + (outlineWidth * 2.0F),
+            this.getScaledHeight() + (outlineWidth * 2.0F));
+    roundedRectShader.outlineWidth().set(outlineWidth);
+    roundedRectShader.outlineColor().set(outlineColor);
 
     if (this.backgroundColor.isDefined()) {
       float[] color = this.backgroundColor.get().getValue4f();
@@ -320,13 +321,16 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
       float y = this.getScaledY() - outlineWidth;
       float x2 = this.getScaledX() + this.getScaledWidth() + outlineWidth;
       float y2 = this.getScaledY() + this.getScaledHeight() + outlineWidth;
-      RenderUtil.fill(matrixStack.last().pose(), x, y,
+      RenderUtil.fill(poseStack.last().pose(), x, y,
           this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
     }
 
     RenderSystem.disableTexture();
     RenderSystem.enableBlend();
     RenderSystem.defaultBlendFunc();
+
+    final var tessellator = Tesselator.getInstance();
+    final var builder = tessellator.getBuilder();
 
     if (leftBorderWidth > 0F) {
       float x2 = this.getScaledX() + leftBorderWidth;
@@ -335,9 +339,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
       float[] color = this.leftBorderColor.get().getValue4f();
 
-      Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder builder = tessellator.getBuilder();
-      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
       builder.vertex(x, y2, this.getZOffset())
           .color(color[0], color[1], color[2], color[3])
           .endVertex();
@@ -359,9 +361,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
       float[] color = this.rightBorderColor.get().getValue4f();
 
-      Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder builder = tessellator.getBuilder();
-      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
       builder.vertex(x, y2 - bottomBorderWidth, this.getZOffset())
           .color(color[0], color[1], color[2], color[3])
           .endVertex();
@@ -383,9 +383,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
       float[] color = this.topBorderColor.get().getValue4f();
 
-      Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder builder = tessellator.getBuilder();
-      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
       builder.vertex(this.getScaledX() + leftBorderWidth, y2, this.getZOffset())
           .color(color[0], color[1], color[2], color[3])
           .endVertex();
@@ -407,9 +405,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
       float[] color = this.bottomBorderColor.get().getValue4f();
 
-      Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder builder = tessellator.getBuilder();
-      builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
       builder.vertex(this.getScaledX(), y2, this.getZOffset())
           .color(color[0], color[1], color[2], color[3])
           .endVertex();
@@ -429,11 +425,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
 
-    RenderUtil.resetShader();
-
-
     if (this.tooltip != null && this.isHovered()) {
-      this.tooltip.render(this.minecraft.font, matrixStack,
+      this.tooltip.render(this.minecraft.font, poseStack,
           10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
@@ -459,32 +452,32 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     // ---- Render Scrollbar ----
 
     if (this.isScrollbarEnabled()) {
-      float scrollbarX = this.getScrollbarX();
-      float scaledY = this.getScaledY();
+      final var scrollbarX = this.getScrollbarX();
+      final var scaledY = this.getScaledY();
 
-      float scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
-      float scrollbarRadius = scrollbarWidth / 2.0F;
+      final var scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
+      final var scrollbarRadius = scrollbarWidth / 2.0F;
 
-      float scrollbarX2 = scrollbarX + scrollbarWidth;
-      float scaledY2 = scaledY + this.getScaledHeight();
+      final var scrollbarX2 = scrollbarX + scrollbarWidth;
+      final var scaledY2 = scaledY + this.getScaledHeight();
 
-      ShaderPrograms.ROUNDED_RECT.use();
-      GL20.glUniform4f(0, scrollbarRadius, scrollbarRadius, scrollbarRadius, scrollbarRadius);
-      GL20.glUniform1f(3, 0.0F); // No outline
+      RenderSystem.setShader(roundedRectShader::instance);
+
+      roundedRectShader.radius().set(scrollbarRadius, scrollbarRadius, scrollbarRadius,
+          scrollbarRadius);
+      roundedRectShader.outlineWidth().set(0.0F);
 
       // Background
-      GL20.glUniform2f(1, scrollbarX, scaledY);
-      GL20.glUniform2f(2, scrollbarWidth, this.getScaledHeight());
-      RenderUtil.fill(matrixStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
+      roundedRectShader.position().set(scrollbarX, scaledY);
+      roundedRectShader.size().set(scrollbarWidth, this.getScaledHeight());
+      RenderUtil.fill(poseStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
 
       // Bar
-      float scrollbarY = this.getScrollbarY();
-      float scrollbarY2 = scrollbarY + this.getScrollbarHeight();
-      GL20.glUniform2f(1, scrollbarX, scrollbarY);
-      GL20.glUniform2f(2, scrollbarWidth, this.getScrollbarHeight());
-      RenderUtil.fill(matrixStack, scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, 0x4CFFFFFF);
-
-      RenderUtil.resetShader();
+      final var scrollbarY = this.getScrollbarY();
+      final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+      roundedRectShader.position().set(scrollbarX, scrollbarY);
+      roundedRectShader.size().set(scrollbarWidth, this.getScrollbarHeight());
+      RenderUtil.fill(poseStack, scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, 0x4CFFFFFF);
     }
   }
 
@@ -494,20 +487,20 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   @SuppressWarnings("unused")
-  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
+  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY,
       float partialTicks) {
 
 
     if (DEBUG && this.isHovered()) {
-      RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
+      RenderUtil.fillWidthHeight(poseStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledContentWidth(), this.getScaledContentHeight(), 0x333495eb);
 
       // Left border
-      RenderUtil.fill(matrixStack, this.getScaledX(), this.getScaledY(),
+      RenderUtil.fill(poseStack, this.getScaledX(), this.getScaledY(),
           this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
           this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
       // Left padding
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
           this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
           this.getScaledContentX(),
@@ -516,14 +509,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
           0x3384ab05);
 
       // Right border
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.getScaledWidth()
               - this.unscale(this.layout.getRightBorder(), this.unscaleBorder),
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
       // Right padding
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.getScaledWidth()
               - this.unscale(this.layout.getRightBorder(), this.unscaleBorder)
               - this.layout.getRightPadding(),
@@ -535,13 +528,13 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
           0x3384ab05);
 
       // Top border
-      RenderUtil.fill(matrixStack, this.getScaledX(),
+      RenderUtil.fill(poseStack, this.getScaledX(),
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
           0x33e3b352);
       // Top padding
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
           this.getScaledY() + this.unscale(this.layout.getTopBorder(), this.unscaleBorder),
           this.getScaledX() + this.getScaledWidth()
@@ -549,13 +542,13 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
           this.getScaledContentY(), 0x3384ab05);
 
       // Bottom border
-      RenderUtil.fill(matrixStack, this.getScaledX(),
+      RenderUtil.fill(poseStack, this.getScaledX(),
           this.getScaledY() + this.getScaledHeight()
               - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
           this.getScaledX() + this.getScaledWidth(),
           this.getScaledY() + this.getScaledHeight(), 0x33e3b352);
       // Bottom padding
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder),
           this.getScaledContentY() + this.getScaledContentHeight(),
           this.getScaledX() + this.getScaledWidth()
@@ -636,7 +629,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     }
 
     this.states.add(States.HOVERED);
-    this.updateProperties(false);
+    this.updateProperties(true);
 
     this.post(new MouseEnterEvent());
   }
@@ -657,7 +650,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     }
 
     this.states.remove(States.HOVERED);
-    this.updateProperties(false);
+    this.updateProperties(true);
 
     this.post(new MouseLeaveEvent());
   }
@@ -677,14 +670,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     if (!this.isHovered()) {
       if (this.isFocused()) {
         this.removeState(States.FOCUSED);
-        this.updateProperties(false);
+        this.updateProperties(true);
       }
       return false;
     }
 
     if (!this.isFocused() && this.focusable && this.hasState(States.ENABLED)) {
       this.addState(States.FOCUSED);
-      this.updateProperties(false);
+      this.updateProperties(true);
     }
 
     // Clicked on scrollbar region
@@ -769,8 +762,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   @Override
   public boolean changeFocus(boolean forward) {
     if (this.focusable && this.hasState(States.ENABLED)) {
-      boolean focused = this.toggleState(States.FOCUSED);
-      this.updateProperties(false);
+      var focused = this.toggleState(States.FOCUSED);
+      this.updateProperties(true);
       this.focusChanged();
       return focused;
     }
@@ -817,7 +810,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   public final <T extends Event> SELF addListener(Class<T> eventType,
       BiConsumer<SELF, T> consumer) {
-    return this.addListener(eventType, consumer, true);
+    return this.addListener(eventType, consumer, false);
   }
 
   public final <T extends Event> SELF addListener(Class<T> eventType,
@@ -1094,7 +1087,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
         this.removeState(States.FOCUSED);
       }
     }
-    this.updateProperties(!this.visible);
+    this.updateProperties(this.visible);
     return this.self();
   }
 
@@ -1116,7 +1109,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     } else {
       this.removeState(States.SELECTED);
     }
-    this.updateProperties(!this.visible);
+    this.updateProperties(this.visible);
     return this.self();
   }
 

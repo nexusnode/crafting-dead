@@ -40,11 +40,9 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
 
 public class WorldListView<L extends Layout>
@@ -86,7 +84,7 @@ public class WorldListView<L extends Layout>
             .configure(view -> view.getLayout().setMargin(3F))
             .setEnabled(false);
 
-    View<?, YogaLayout> createButton =
+    var createButton =
         Theme.createBlueButton(
             new TranslatableComponent("view.world_list.button.create"),
             () -> this.getScreen()
@@ -117,34 +115,33 @@ public class WorldListView<L extends Layout>
             .configure(view -> view.getLayout().setMargin(3))
             .setEnabled(false);
 
-    ParentView<?, YogaLayout, YogaLayout> controlsContainer =
-        new ParentView<>(
-            new YogaLayout().setHeight(56),
-            new YogaLayoutParent()
-                .setJustifyContent(Justify.CENTER)
-                .setAlignItems(Align.CENTER)
-                .setFlexDirection(FlexDirection.COLUMN))
-                    .configure(view -> view.getBackgroundColorProperty()
-                        .setBaseValue(new Color(0x40121212)))
-                    .addChild(new ParentView<>(
-                        new YogaLayout()
-                            .setFlex(1)
-                            .setWidth(220F),
-                        new YogaLayoutParent()
-                            .setFlexDirection(FlexDirection.ROW)
-                            .setAlignItems(Align.CENTER))
-                                .addChild(this.playButton)
-                                .addChild(createButton))
-                    .addChild(new ParentView<>(
-                        new YogaLayout()
-                            .setFlex(1)
-                            .setWidth(220F),
-                        new YogaLayoutParent()
-                            .setFlexDirection(FlexDirection.ROW)
-                            .setAlignItems(Align.CENTER))
-                                .addChild(this.deleteButton)
-                                .addChild(this.editButton)
-                                .addChild(this.recreateButton));
+    var controlsContainer = new ParentView<>(
+        new YogaLayout().setHeight(56),
+        new YogaLayoutParent()
+            .setJustifyContent(Justify.CENTER)
+            .setAlignItems(Align.CENTER)
+            .setFlexDirection(FlexDirection.COLUMN))
+                .configure(view -> view.getBackgroundColorProperty()
+                    .setBaseValue(new Color(0x40121212)))
+                .addChild(new ParentView<>(
+                    new YogaLayout()
+                        .setFlex(1)
+                        .setWidth(220F),
+                    new YogaLayoutParent()
+                        .setFlexDirection(FlexDirection.ROW)
+                        .setAlignItems(Align.CENTER))
+                            .addChild(this.playButton)
+                            .addChild(createButton))
+                .addChild(new ParentView<>(
+                    new YogaLayout()
+                        .setFlex(1)
+                        .setWidth(220F),
+                    new YogaLayoutParent()
+                        .setFlexDirection(FlexDirection.ROW)
+                        .setAlignItems(Align.CENTER))
+                            .addChild(this.deleteButton)
+                            .addChild(this.editButton)
+                            .addChild(this.recreateButton));
 
     this.addChild(this.listView);
     this.addChild(controlsContainer);

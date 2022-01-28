@@ -19,36 +19,35 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.LanguageMap;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.Util;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 
 public class TextView<L extends Layout> extends View<TextView<L>, L> {
 
-  private static final ITextComponent ELLIPSIS = new StringTextComponent("...");
+  private static final Component ELLIPSIS = new TextComponent("...");
 
   private final ValueStyleProperty<Color> colorProperty =
       Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
           this::registerValueProperty);
 
   private Component text = TextComponent.EMPTY;
-  private FontRenderer font;
+  private Font font;
   private boolean shadow;
   private boolean centered;
   private boolean wrap = true;
@@ -97,10 +96,10 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   public TextView<L> setText(@Nullable String text) {
-    return this.setText(ITextComponent.nullToEmpty(text));
+    return this.setText(Component.nullToEmpty(text));
   }
 
-  public TextView<L> setText(ITextComponent text) {
+  public TextView<L> setText(Component text) {
     this.text = text;
     if (this.isAdded()) {
       this.layout.markDirty();
@@ -132,20 +131,20 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   private void generateLines(float width) {
-    int ceilWidth = MathHelper.floor(width);
+    int ceilWidth = Mth.floor(width);
     if (this.wrap) {
       this.lines = this.font.split(this.text, ceilWidth);
     } else {
       int textWidth = this.font.width(this.text);
-      ITextProperties finalText;
+      FormattedText finalText;
       if (textWidth > ceilWidth) {
         int ellipsisWidth = this.font.width(ELLIPSIS);
-        finalText = ITextProperties.composite(
+        finalText = FormattedText.composite(
             this.font.substrByWidth(this.text, ceilWidth - ellipsisWidth), ELLIPSIS);
       } else {
         finalText = this.font.substrByWidth(this.text, ceilWidth);
       }
-      this.lines = List.of(LanguageMap.getInstance().getVisualOrder(finalText));
+      this.lines = List.of(ClientLanguage.getInstance().getVisualOrder(finalText));
     }
   }
 
@@ -163,12 +162,12 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   @Override
-  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
     final var color4i = this.colorProperty.get().getValue4i();
 
-    final int opacity = MathHelper.ceil(this.getAlpha() * color4i[3]) << 24;
+    final int opacity = Mth.ceil(this.getAlpha() * color4i[3]) << 24;
     if ((opacity & 0xFC000000) == 0) {
       return;
     }
@@ -179,46 +178,43 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
         | ((color4i[2] & 0xFF) << 0);
 
 
-    matrixStack.pushPose();
+    poseStack.pushPose();
     {
-      matrixStack.translate(this.getScaledContentX(),
+      poseStack.translate(this.getScaledContentX(),
           this.getScaledContentY() + (this.centered
               ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D + 0.5D
               : 0.0D),
           51.0D);
-      matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
-      MultiBufferSource.BufferSource renderTypeBuffer =
-          MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+      poseStack.scale(this.getXScale(), this.getYScale(), 1.0F);
+      var bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
-        FormattedCharSequence line = this.lines.get(i);
-        matrixStack.pushPose();
+        var line = this.lines.get(i);
+        poseStack.pushPose();
         {
-          matrixStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
+          poseStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
           float x = this.centered
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
-          this.font.drawInBatch(line, x, 0.0F,
-              color,
-              this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
-              com.craftingdead.core.client.util.RenderUtil.FULL_LIGHT);
+          this.font.drawInBatch(line, x, 0.0F, color, this.shadow, poseStack.last().pose(),
+              bufferSource, false, 0, com.craftingdead.core.client.util.RenderUtil.FULL_LIGHT);
         }
-        matrixStack.popPose();
+        poseStack.popPose();
       }
 
-      renderTypeBuffer.endBatch();
+      bufferSource.endBatch();
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
   public Optional<Style> componentStyleAtWidth(double mouseX, double mouseY) {
-    int offsetMouseX = Mth.floor((mouseX - this.getContentX()) / this.getXScale());
-    int offsetMouseY = Mth.floor((mouseY - this.getContentY()) / this.getYScale());
-    final int lines = this.lines.size();
+    final var offsetMouseX = Mth.floor((mouseX - this.getContentX()) / this.getXScale());
+    final var offsetMouseY = Mth.floor((mouseY - this.getContentY()) / this.getYScale());
+    final var lines = this.lines.size();
     if (offsetMouseX >= 0 && offsetMouseY >= 0 && offsetMouseX <= this.getContentWidth()
         && offsetMouseY < (this.font.lineHeight * lines + lines)) {
       int maxLines = offsetMouseY / this.font.lineHeight;
       if (maxLines >= 0 && maxLines < this.lines.size()) {
-        FormattedCharSequence line = this.lines.get(maxLines);
+        var line = this.lines.get(maxLines);
         return Optional.ofNullable(
             this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
       }

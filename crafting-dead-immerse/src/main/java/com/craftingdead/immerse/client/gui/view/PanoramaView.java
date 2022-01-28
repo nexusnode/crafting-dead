@@ -20,17 +20,14 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Objects;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.CubeMap;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
 
-  private final RenderSkybox panorama;
+  private final PanoramaRenderer panorama;
 
   private final ResourceLocation panoramaTexture;
 

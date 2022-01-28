@@ -30,7 +30,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public class Theme {
 
@@ -47,21 +47,21 @@ public class Theme {
   public static final Color ONLINE = new Color(0xFF90ba3c);
   public static final Color OFFLINE = Color.GRAY;
 
-  public static View<?, YogaLayout> createRedButton(ITextComponent text, Runnable actionListener) {
+  public static View<?, YogaLayout> createRedButton(Component text, Runnable actionListener) {
     return createButton(RED, RED_HIGHLIGHTED, text, actionListener);
   }
 
-  public static View<?, YogaLayout> createGreenButton(ITextComponent text,
+  public static View<?, YogaLayout> createGreenButton(Component text,
       Runnable actionListener) {
     return createButton(GREEN, GREEN_HIGHLIGHTED, text, actionListener);
   }
 
-  public static View<?, YogaLayout> createBlueButton(ITextComponent text, Runnable actionListener) {
+  public static View<?, YogaLayout> createBlueButton(Component text, Runnable actionListener) {
     return createButton(BLUE, BLUE_HIGHLIGHTED, text, actionListener);
   }
 
   public static View<?, YogaLayout> createButton(Color color, Color hoveredColor,
-      ITextComponent text, Runnable actionListener) {
+      Component text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)

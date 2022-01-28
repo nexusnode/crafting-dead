@@ -3,15 +3,15 @@
 in vec3 Position;
 in vec4 Color;
 
-layout(location = 0) uniform mat4 ModelViewMat;
-layout(location = 1) uniform mat4 ProjMat;
+uniform mat4 ModelViewMat;
+uniform mat4 ProjMat;
 
-out vec4 vertexColor;
-out vec2 f_Position;
+out vec4 f_VertexColor;
+out vec2 f_VertexPosition;
 
 void main() {
-    f_Position = Position.xy;
+    f_VertexPosition = Position.xy;
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
-    vertexColor = Color;
+    f_VertexColor = Color;
 }

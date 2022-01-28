@@ -55,14 +55,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.minecraft.client.gui.screens.ConfirmLinkScreen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout> {
 
@@ -89,10 +88,10 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
             .setBottomMargin(10),
             new YogaLayoutParent().setAlignItems(Align.CENTER))
                 .addChild(
-                    new TextView<>(new YogaLayout(),
-                        new TranslatableComponent("view.hosting.partners")
+                    new TextView<>(new YogaLayout())
+                        .setText(new TranslatableComponent("view.hosting.partners")
                             .withStyle(ChatFormatting.ITALIC))
-                                .setCentered(true))
+                        .setCentered(true))
                 .addChild(new ImageView<>(new YogaLayout()
                     .setWidth(200))
                         .setFitType(FitType.CONTAIN)
@@ -110,19 +109,19 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
       return;
     }
 
-    ByteBuffer buffer = ByteBuffer.allocate(1048576);
+    var buffer = ByteBuffer.allocate(1048576);
 
     fileChannel.read(buffer, 0, null, new CompletionHandler<Integer, Void>() {
 
       @Override
       public void completed(Integer result, Void attachment) {
         buffer.flip();
-        byte[] bytes = new byte[buffer.limit()];
+        var bytes = new byte[buffer.limit()];
         buffer.get(bytes);
-        String jsonString = new String(bytes, StandardCharsets.UTF_8).trim();
-        JsonArray plansJson = gson.fromJson(jsonString, JsonArray.class);
+        var jsonString = new String(bytes, StandardCharsets.UTF_8).trim();
+        var plansJson = gson.fromJson(jsonString, JsonArray.class);
 
-        ParentView<?, YogaLayout, YogaLayout> plansView = new ParentView<>(
+        var plansView = new ParentView<>(
             new YogaLayout()
                 .setFlexGrow(1)
                 .setFlexShrink(1)
@@ -136,9 +135,9 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                 .setFlexWrap(FlexWrap.WRAP));
         plansView.getBackgroundColorProperty().setBaseValue(new Color(0X2F2C2C2C));
 
-        for (JsonElement jsonElement : plansJson) {
-          JsonObject planJson = jsonElement.getAsJsonObject();
-          JsonElement recommendedJson = planJson.get("recommended");
+        for (var jsonElement : plansJson) {
+          var planJson = jsonElement.getAsJsonObject();
+          var recommendedJson = planJson.get("recommended");
           plansView.addChild(
               HostingView.this.createPlan(recommendedJson != null && recommendedJson.getAsBoolean(),
                   gson.fromJson(planJson.get("image"), ResourceLocation.class),
@@ -172,7 +171,7 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
       Component price,
       URI link, Collection<Component> specs) {
 
-    ParentView<?, YogaLayout, YogaLayout> planView = new ParentView<>(
+    var view = new ParentView<>(
         new YogaLayout()
             .setWidth(100)
             .setHeight(165)
@@ -198,40 +197,41 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                 .setBottomMargin(10))
                     .setText(price)
                     .setCentered(true)
-                    .configure(view -> view.getScaleProperty().setBaseValue(1.25F)))
+                    .configure(v -> v.getScaleProperty().setBaseValue(1.25F)))
             .addChild(new TextView<>(
                 new YogaLayout()
                     .setWidthPercent(80)
                     .setHeight(20)
                     .setBottomMargin(10))
-                    .setText(ORDER_NOW_TEXT)
-                    .setCentered(true)
-                    .setShadow(false)
-                    .configure(v -> v.getBackgroundColorProperty()
-                        .setBaseValue(new Color(0x66EE0000))
-                        .defineState(new Color(0x88EE0000), States.HOVERED, States.ENABLED)
-                        .setTransition(Transition.linear(150L)))
-                    .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
-                    .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                    .addListener(ActionEvent.class,
-                        (__, event) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
-                            new ConfirmLinkScreen(
-                                result -> {
-                                  if (result) {
-                                    Util.getPlatform().openUri(link);
-                                  }
-                                  this.minecraft.setScreen((ViewScreen) this.getScreen());
-                                }, link.toString(), true))));
+                        .setText(ORDER_NOW_TEXT)
+                        .setCentered(true)
+                        .setShadow(false)
+                        .configure(v -> v.getBackgroundColorProperty()
+                            .setBaseValue(new Color(0x66EE0000))
+                            .defineState(new Color(0x88EE0000), States.HOVERED, States.ENABLED)
+                            .setTransition(Transition.linear(150L)))
+                        .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
+                        .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
+                        .addListener(ActionEvent.class,
+                            (__, event) -> this.getScreen().keepOpenAndSetScreen(
+                                new ConfirmLinkScreen(
+                                    result -> {
+                                      if (result) {
+                                        Util.getPlatform().openUri(link);
+                                      }
+                                      this.minecraft.setScreen(this.getScreen());
+                                    }, link.toString(), true))));
 
-    for (Component text : specs) {
-      view.addChild(new TextView<>(new YogaLayout().setMargin(2)).setText(text).setCentered(true));
+    for (var text : specs) {
+      view.addChild(
+          new TextView<>(new YogaLayout().setMargin(2)).setText(text).setCentered(true));
     }
 
     if (recommended) {
-      planView.getBorderColorProperty().setBaseValue(Color.DARK_RED);
-      planView.getLayout().setBorderWidth(10);
+      view.getBorderColorProperty().setBaseValue(Color.DARK_RED);
+      view.getLayout().setBorderWidth(10);
     }
 
-    return planView;
+    return view;
   }
 }

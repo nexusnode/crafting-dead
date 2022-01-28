@@ -18,7 +18,6 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -38,8 +37,6 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
 public class ServerListView<L extends Layout>
@@ -57,12 +54,11 @@ public class ServerListView<L extends Layout>
   private final View<?, YogaLayout> playButton;
 
   @Nullable
-  private CompletableFuture<Collection<ServerEntry>> refreshFuture;
+  private CompletableFuture<Void> refreshFuture;
 
   public ServerListView(L layout, ServerList serverEntryProvider) {
     super(layout, new YogaLayoutParent().setFlexDirection(FlexDirection.COLUMN));
     this.serverProvider = serverEntryProvider;
-
 
     this.listView = new ParentView<>(
         new YogaLayout()
@@ -127,7 +123,7 @@ public class ServerListView<L extends Layout>
   @Override
   protected void added() {
     int delay = 0;
-    for (View<?, ?> view : this.listView.getChildViews()) {
+    for (var view : this.listView.getChildViews()) {
       new Animator.Builder()
           .addTarget(Animation.forProperty(view.getXTranslationProperty())
               .keyFrames(new KeyFrames.Builder<>(-100.0F)
@@ -149,7 +145,7 @@ public class ServerListView<L extends Layout>
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+    var result = super.mouseClicked(mouseX, mouseY, button);
     this.updateSelected();
     return result;
   }
@@ -170,19 +166,19 @@ public class ServerListView<L extends Layout>
   }
 
   private void refresh() {
-    if (this.refreshFuture == null || this.refreshFuture.cancel(false)) {
+    if (this.refreshFuture == null || this.refreshFuture.isDone()) {
       this.listView.clearChildren();
       this.selectedItem = null;
       this.updateSelected();
-      this.serverProvider.load()
+      this.refreshFuture = this.serverProvider.load()
           .thenAcceptAsync(servers -> servers.forEach(this::addServer), this.minecraft);
     }
   }
 
   private void quickRefresh() {
-    for (View<?, ?> child : this.listView.getChildViews()) {
-      if (child instanceof ServerItemView) {
-        ((ServerItemView) child).ping();
+    for (var child : this.listView.getChildViews()) {
+      if (child instanceof ServerItemView serverItem) {
+        serverItem.ping();
       }
     }
   }

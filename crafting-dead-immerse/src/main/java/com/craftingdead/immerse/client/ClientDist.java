@@ -37,6 +37,9 @@ import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
+import com.craftingdead.immerse.client.shader.RectShader;
+import com.craftingdead.immerse.client.shader.RoundedRectShader;
+import com.craftingdead.immerse.client.shader.RoundedTexShader;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
@@ -99,8 +102,12 @@ public class ClientDist implements ModDist {
 
   private final IngameGui ingameGui;
 
-  private ShaderInstance roundedFrameShader;
-  private ShaderInstance roundedRectShader;
+  @Nullable
+  private static RectShader rectShader;
+  @Nullable
+  private static RoundedRectShader roundedRectShader;
+  @Nullable
+  private static RoundedTexShader roundedTexShader;
 
   public ClientDist() {
     final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -144,12 +151,19 @@ public class ClientDist implements ModDist {
     }
   }
 
-  public ShaderInstance getRoundedFrameShader() {
-    return this.roundedFrameShader;
+  @Nullable
+  public static RectShader getRectShader() {
+    return rectShader;
   }
 
-  public ShaderInstance getRoundedRectShader() {
-    return this.roundedRectShader;
+  @Nullable
+  public static RoundedRectShader getRoundedRectShader() {
+    return roundedRectShader;
+  }
+
+  @Nullable
+  public static RoundedTexShader getRoundedTexShader() {
+    return roundedTexShader;
   }
 
   @Override
@@ -196,11 +210,17 @@ public class ClientDist implements ModDist {
   private void handleRegisterShaders(RegisterShadersEvent event) {
     try {
       event.registerShader(new ShaderInstance(event.getResourceManager(),
-          new ResourceLocation(CraftingDeadImmerse.ID, "rounded_frame"),
-          DefaultVertexFormat.POSITION_COLOR), (shader) -> this.roundedFrameShader = shader);
+          new ResourceLocation(CraftingDeadImmerse.ID, "rect"),
+          DefaultVertexFormat.POSITION_COLOR),
+          shader -> rectShader = new RectShader(shader));
       event.registerShader(new ShaderInstance(event.getResourceManager(),
           new ResourceLocation(CraftingDeadImmerse.ID, "rounded_rect"),
-          DefaultVertexFormat.POSITION_COLOR), (shader) -> this.roundedRectShader = shader);
+          DefaultVertexFormat.POSITION_COLOR),
+          shader -> roundedRectShader = new RoundedRectShader(shader));
+      event.registerShader(new ShaderInstance(event.getResourceManager(),
+          new ResourceLocation(CraftingDeadImmerse.ID, "rounded_tex"),
+          DefaultVertexFormat.POSITION_COLOR_TEX),
+          shader -> roundedTexShader = new RoundedTexShader(shader));
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

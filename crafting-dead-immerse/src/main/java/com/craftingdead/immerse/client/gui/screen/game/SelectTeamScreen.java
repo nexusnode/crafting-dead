@@ -23,8 +23,10 @@ import com.craftingdead.immerse.client.gui.view.Blur;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
 import com.craftingdead.immerse.game.tdm.message.RequestJoinTeamMessage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -83,7 +85,8 @@ public class SelectTeamScreen extends Screen {
   @Override
   public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
-    this.blur.renderToTempTarget(partialTicks);
+    this.blur.process(partialTicks);
+    RenderSystem.setShader(GameRenderer::getPositionTexShader);
     this.blur.render(matrixStack, 0, 0, this.width, this.height);
 
     super.render(matrixStack, mouseX, mouseY, partialTicks);

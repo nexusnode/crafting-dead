@@ -46,11 +46,11 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
     return super.createTopRowControls()
         .configure(view -> view.getLayout().setWidth(300))
         .addChild(Theme.createBlueButton(
-            new TranslationTextComponent("view.mutable_server_list.button.direct_connect"), () -> {
+            new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
               ViewScreen screen = this.getScreen();
-              screen.keepOpenAndSetScreen(new ServerListScreen(screen,
+              screen.keepOpenAndSetScreen(new DirectJoinServerScreen(screen,
                   connect -> {
                     if (connect) {
                       ConnectScreen.startConnecting(screen, this.minecraft,
@@ -62,11 +62,11 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
                   tempServerData));
             }).configure(view -> view.getLayout().setMargin(3)))
         .addChild(Theme.createGreenButton(
-            new TranslationTextComponent("view.mutable_server_list.button.add"), () -> {
+            new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
               ViewScreen screen = this.getScreen();
-              screen.keepOpenAndSetScreen(new AddServerScreen(screen,
+              screen.keepOpenAndSetScreen(new EditServerScreen(screen,
                   success -> {
                     if (success) {
                       this.addServer(tempServerData.ip);

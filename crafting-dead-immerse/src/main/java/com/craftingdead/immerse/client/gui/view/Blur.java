@@ -82,7 +82,7 @@ public class Blur implements AutoCloseable {
     }
   }
 
-  public void renderToTempTarget(float partialTicks) {
+  public void process(float partialTicks) {
     if (this.blurShader != null) {
       this.blurShader.process(partialTicks);
       // TODO Fixes Minecraft bug when using post-processing shaders.
@@ -91,7 +91,7 @@ public class Blur implements AutoCloseable {
     }
   }
 
-  public void render(MatrixStack matrixStack, float x, float y, float width, float height) {
+  public void render(PoseStack poseStack, float x, float y, float width, float height) {
     if (this.blurShader != null) {
       var renderTarget = this.blurShader.getTempTarget("output");
       RenderSystem.setShaderTexture(0, renderTarget.getColorTextureId());
@@ -101,7 +101,7 @@ public class Blur implements AutoCloseable {
           / this.minecraft.getWindow().getGuiScale());
       float textureX = x;
       float textureY = (textureHeight - height) - y;
-      RenderUtil.blit(matrixStack, x, y, x + width, y + height, textureX, textureY,
+      RenderUtil.blit(poseStack, x, y, x + width, y + height, textureX, textureY,
           textureX + width, textureY + height, textureWidth, textureHeight);
     }
   }

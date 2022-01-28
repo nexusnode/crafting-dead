@@ -7,6 +7,7 @@
     "vertex": "craftingdeadimmerse:rect",
     "fragment": "craftingdeadimmerse:rounded_rect",
     "attributes": [
+        "Position",
         "Color"
     ],
     "samplers": [
@@ -14,7 +15,10 @@
     "uniforms": [
         { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
         { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
-        { "name": "u_Radius", "type": "float", "count": 1, "values": [ 1.0 ] },
-        { "name": "u_InnerRect", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] }
+        { "name": "u_Radius", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+        { "name": "u_Position", "type": "float", "count": 2, "values": [ 1.0] },
+        { "name": "u_Size", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+        { "name": "u_OutlineWidth", "type": "float", "count": 1, "values": [ 1.0 ] },
+        { "name": "u_OutlineColor", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] }
     ]
 }

@@ -143,11 +143,11 @@ class WorldItemView
                         .setShadow(false))
                     .addChild(new TextView<>(new YogaLayout().setTopMargin(2F))
                         .setText(new TextComponent(info)
-                            .withStyle(TextFormatting.GRAY))
+                            .withStyle(ChatFormatting.GRAY))
                         .setShadow(false))
                     .addChild(new TextView<>(new YogaLayout())
                         .setText(new TextComponent(description)
-                            .withStyle(TextFormatting.GRAY))
+                            .withStyle(ChatFormatting.GRAY))
                         .setShadow(false)));
   }
 
@@ -177,7 +177,7 @@ class WorldItemView
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
     if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
       this.toggleState(States.SELECTED);
-      this.updateProperties(false);
+      this.updateProperties(true);
       return true;
     }
     return super.keyPressed(keyCode, scanCode, modifiers);

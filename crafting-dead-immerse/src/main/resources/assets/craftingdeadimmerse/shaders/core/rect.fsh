@@ -2,12 +2,13 @@
 
 precision highp float;
 
-layout(location = 0) uniform vec2 u_Position;
-layout(location = 1) uniform vec2 u_Size;
-layout(location = 2) uniform float u_OutlineWidth;
-layout(location = 3) uniform vec4 u_OutlineColor;
+uniform vec2 u_Position;
+uniform vec2 u_Size;
+uniform float u_OutlineWidth;
+uniform vec4 u_OutlineColor;
 
 in vec2 f_VertexPosition;
+in vec4 f_VertexColor;
 
 out vec4 fragColor;
 
@@ -19,6 +20,6 @@ void main() {
         || dist.y > halfSize.y - u_OutlineWidth) {
         fragColor = u_OutlineColor;
     } else {
-        fragColor = gl_Color;
+        fragColor = f_VertexColor;
     }
 }
