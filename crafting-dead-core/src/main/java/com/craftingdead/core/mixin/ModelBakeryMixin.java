@@ -8,22 +8,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
 
   @Shadow
   @Final
-  private IResourceManager resourceManager;
+  private ResourceManager resourceManager;
 
   @Inject(method = "processLoading", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-      target = "Lnet/minecraft/client/renderer/model/ModelBakery;loadTopLevel(Lnet/minecraft/client/renderer/model/ModelResourceLocation;)V",
+      target = "Lnet/minecraft/client/resources/model/ModelBakery;loadTopLevel(Lnet/minecraft/client/resources/model/ModelResourceLocation;)V",
       ordinal = 0))
-  public void prepare(IProfiler profiler, int mipLevel, CallbackInfo callbackInfo) {
+  public void prepare(ProfilerFiller profiler, int mipLevel, CallbackInfo callbackInfo) {
     CraftingDead.getInstance().getClientDist().getItemRendererManager()
         .gatherItemRenderers(this.resourceManager, profiler)
         .forEach(this::invokeAddModelToCache);

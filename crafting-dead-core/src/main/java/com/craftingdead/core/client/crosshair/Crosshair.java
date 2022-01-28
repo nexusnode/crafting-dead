@@ -20,7 +20,7 @@ package com.craftingdead.core.client.crosshair;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class Crosshair {
 

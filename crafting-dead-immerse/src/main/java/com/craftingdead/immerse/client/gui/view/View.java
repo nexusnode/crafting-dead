@@ -44,25 +44,26 @@ import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MainWindow;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
-public class View<SELF extends View<SELF, L>, L extends Layout> extends AbstractGui
-    implements IGuiEventListener, IRenderable, Comparable<View<?, ?>> {
+public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiComponent
+    implements GuiEventListener, Widget, Comparable<View<?, ?>> {
 
   public static final boolean DEBUG = false;
 
@@ -76,7 +77,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   protected final Minecraft minecraft = Minecraft.getInstance();
 
-  protected final MainWindow window = this.minecraft.getWindow();
+  protected final Window window = this.minecraft.getWindow();
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 
@@ -213,9 +214,9 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     }
   }
 
-  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
-    return new Vector2f(width, height);
+    return new Vec2(width, height);
   }
 
   protected float computeFullHeight() {
@@ -264,15 +265,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     if (this.backgroundBlur != null) {
       RenderSystem.enableBlend();
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.getAlpha());
-      this.backgroundBlur.render(matrixStack, this.getScaledX(), this.getScaledY(),
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
+      this.backgroundBlur.render(poseStack, this.getScaledX(), this.getScaledY(),
           this.getScaledWidth(), this.getScaledHeight(), partialTicks);
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       RenderSystem.disableBlend();
     }
 
@@ -288,14 +288,12 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
       if (this.borderRadius.get() > 0.0F) {
         RenderUtil.enableRoundedRectShader(x, y, x2, y2, this.borderRadius.get());
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
 
-      RenderUtil.fill(matrixStack.last().pose(), x, y,
+      RenderUtil.fill(poseStack.last().pose(), x, y,
           this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
-
-      if (this.borderRadius.get() > 0.0F) {
-        RenderUtil.resetShader();
-      }
 
       RenderSystem.disableBlend();
     }
@@ -312,8 +310,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth() + borderRadius,
             this.getScaledY() + topBorderWidth,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth() + borderRadius,
           this.getScaledY() + topBorderWidth,
@@ -327,8 +327,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + borderRadius,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.getScaledWidth() - rightBorderWidth,
           this.getScaledY() - borderRadius,
           this.getScaledX() + this.getScaledWidth(),
@@ -342,8 +344,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth() + borderRadius,
             this.getScaledY() + this.getScaledHeight(),
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
           this.getScaledY() + this.getScaledHeight() - bottomBorderWidth,
           this.getScaledX() + this.getScaledWidth() + borderRadius,
           this.getScaledY() + this.getScaledHeight(),
@@ -356,8 +360,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + leftBorderWidth,
             this.getScaledY() + this.getScaledHeight() + borderRadius,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX(),
+      RenderUtil.fill(poseStack, this.getScaledX(),
           this.getScaledY() - borderRadius,
           this.getScaledX() + leftBorderWidth,
           this.getScaledY() + this.getScaledHeight() + borderRadius,
@@ -374,8 +380,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth() + borderRadius,
             this.getScaledY() + outlineWidth,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
           this.getScaledY(),
           this.getScaledX() + this.getScaledWidth() + borderRadius,
           this.getScaledY() + outlineWidth,
@@ -388,8 +396,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + borderRadius,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack,
+      RenderUtil.fill(poseStack,
           this.getScaledX() + this.getScaledWidth() - outlineWidth,
           this.getScaledY() - borderRadius,
           this.getScaledX() + this.getScaledWidth(),
@@ -402,8 +412,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + this.getScaledWidth() + borderRadius,
             this.getScaledY() + this.getScaledHeight(),
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX() - borderRadius,
+      RenderUtil.fill(poseStack, this.getScaledX() - borderRadius,
           this.getScaledY() + this.getScaledHeight() - outlineWidth,
           this.getScaledX() + this.getScaledWidth() + borderRadius,
           this.getScaledY() + this.getScaledHeight(),
@@ -415,20 +427,18 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
             this.getScaledX() + outlineWidth,
             this.getScaledY() + this.getScaledHeight() + borderRadius,
             borderRadius);
+      } else {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
       }
-      RenderUtil.fill(matrixStack, this.getScaledX(),
+      RenderUtil.fill(poseStack, this.getScaledX(),
           this.getScaledY() - borderRadius,
           this.getScaledX() + outlineWidth,
           this.getScaledY() + this.getScaledHeight() + borderRadius,
           outlineColor);
     }
 
-
-    if (borderRadius > 0.0F) {
-      RenderUtil.resetShader();
-    }
     if (this.tooltip != null && this.hasState(States.HOVERED)) {
-      this.tooltip.render(this.minecraft.font, matrixStack,
+      this.tooltip.render(this.minecraft.font, poseStack,
           10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
@@ -444,7 +454,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
           (int) (this.getScaledHeight() * scale));
     }
 
-    this.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+    this.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
     if (this.layout.getOverflow().shouldScissor()) {
       ScissorStack.pop();
@@ -460,16 +470,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
       float scaledY2 = scaledY + this.getScaledHeight();
       float radius = SCROLLBAR_WIDTH / 2.0F;
       RenderUtil.enableRoundedRectShader(scrollbarX, scaledY, scrollbarX2, scaledY2, radius);
-      RenderUtil.fill(matrixStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
+      RenderUtil.fill(poseStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
 
       // Bar
       float scrollbarY = this.getScrollbarY();
       float scrollbarY2 = this.getScrollbarY() + this.getScrollbarHeight();
       RenderUtil.enableRoundedRectShader(scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, radius);
-      RenderUtil.fill(matrixStack, scrollbarX, this.getScrollbarY(), scrollbarX2, scrollbarY2,
+      RenderUtil.fill(poseStack, scrollbarX, this.getScrollbarY(), scrollbarX2, scrollbarY2,
           0x4CFFFFFF);
-
-      RenderUtil.resetShader();
     }
   }
 
@@ -478,9 +486,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   @SuppressWarnings("unused")
-  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
+  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
     if (DEBUG && this.hasState(States.HOVERED)) {
+      RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
       RenderUtil.fillWidthHeight(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledContentWidth(), this.getScaledContentHeight(), 0x223495eb);
 
@@ -559,11 +569,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   private final float getScrollOffset(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastScrollOffset, this.scrollOffset);
+    return Mth.lerp(partialTicks, this.lastScrollOffset, this.scrollOffset);
   }
 
   private final float getScrollbarHeight() {
-    return MathHelper.clamp(
+    return Mth.clamp(
         this.getScaledHeight() * (this.getContentHeight() / this.fullHeight),
         10.0F,
         this.getScaledHeight());
@@ -580,7 +590,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
   }
 
   private final float clampScrollOffset(float scrollOffset) {
-    return MathHelper.clamp(scrollOffset, 0.0F, this.fullHeight - this.getContentHeight());
+    return Mth.clamp(scrollOffset, 0.0F, this.fullHeight - this.getContentHeight());
   }
 
   public void mouseEntered(double mouseX, double mouseY) {
@@ -772,12 +782,12 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends Abstract
 
   public final SELF addActionSound(SoundEvent soundEvent) {
     return this.addListener(ActionEvent.class, (component, event) -> this.minecraft
-        .getSoundManager().play(SimpleSound.forUI(soundEvent, 1.0F)));
+        .getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 1.0F)));
   }
 
   public final SELF addHoverSound(SoundEvent soundEvent) {
     return this.addListener(MouseEnterEvent.class, (component, event) -> this.minecraft
-        .getSoundManager().play(SimpleSound.forUI(soundEvent, 1.0F)));
+        .getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 1.0F)));
   }
 
   public final <T extends Event> SELF addListener(Class<T> eventType,

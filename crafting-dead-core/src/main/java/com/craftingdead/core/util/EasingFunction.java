@@ -1,18 +1,19 @@
 package com.craftingdead.core.util;
 
-import java.util.function.UnaryOperator;
-import net.minecraft.util.math.MathHelper;
+import java.util.Objects;
+import it.unimi.dsi.fastutil.floats.FloatUnaryOperator;
+import net.minecraft.util.Mth;
 
-public enum EasingFunction implements UnaryOperator<Float> {
+public enum EasingFunction implements FloatUnaryOperator {
 
-  SINE_IN_OUT(t -> -(MathHelper.cos((float) Math.PI * t) - 1.0F) / 2.0F),
-  SINE_IN(t -> 1.0F - MathHelper.cos((float) ((t * Math.PI) / (2.0F)))),
-  SINE_OUT(t -> MathHelper.sin((float) ((t * Math.PI) / (2.0F)))),
+  SINE_IN_OUT(t -> -(Mth.cos((float) Math.PI * t) - 1.0F) / 2.0F),
+  SINE_IN(t -> 1.0F - Mth.cos((float) ((t * Math.PI) / (2.0F)))),
+  SINE_OUT(t -> Mth.sin((float) ((t * Math.PI) / (2.0F)))),
   ELASTIC_OUT(t -> {
     float c4 = (float) ((2.0F * Math.PI) / 3.0F);
     return t == 0.0F ? 0.0F
         : t == 1.0F ? 1.0F
-            : (float) Math.pow(2.0F, -10.0F * t) * MathHelper.sin((t * 10 - 0.75F) * c4) + 1.0F;
+            : (float) Math.pow(2.0F, -10.0F * t) * Mth.sin((t * 10 - 0.75F) * c4) + 1.0F;
   }),
   EXPO_OUT(t -> (t == 1.0F) ? 1.0F : -(float) Math.pow(2.0F, -10.0F * t) + 1.0F),
   BOUNCE_OUT(t -> {
@@ -33,14 +34,19 @@ public enum EasingFunction implements UnaryOperator<Float> {
       ? (1.0F - BOUNCE_OUT.apply(1.0F - 2.0F * t)) / 2.0F
       : (1.0F + BOUNCE_OUT.apply(2.0F * t - 1.0F)) / 2.0F);
 
-  private final UnaryOperator<Float> function;
+  private final FloatUnaryOperator function;
 
-  private EasingFunction(UnaryOperator<Float> function) {
+  private EasingFunction(FloatUnaryOperator function) {
     this.function = function;
   }
 
   @Override
-  public Float apply(Float t) {
+  public float apply(float t) {
     return this.function.apply(t);
+  }
+
+  public FloatUnaryOperator andThen(FloatUnaryOperator after) {
+    Objects.requireNonNull(after);
+    return (float t) -> after.apply(this.apply(t));
   }
 }

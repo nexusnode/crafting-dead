@@ -25,10 +25,10 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.scope.Scope;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
 
 public final class AimableGun extends TypedGun<AimableGunItem> implements Scope {
 
@@ -74,7 +74,7 @@ public final class AimableGun extends TypedGun<AimableGunItem> implements Scope 
   }
 
   @Override
-  public boolean isAiming(Entity entity) {
+  public boolean isScoping(Entity entity) {
     return this.isPerformingSecondaryAction();
   }
 

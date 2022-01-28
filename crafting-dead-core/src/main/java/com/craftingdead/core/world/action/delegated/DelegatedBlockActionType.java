@@ -21,7 +21,7 @@ package com.craftingdead.core.world.action.delegated;
 import java.util.Optional;
 import java.util.function.Predicate;
 import com.craftingdead.core.world.action.Action;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class DelegatedBlockActionType extends AbstractDelegatedActionType {
 

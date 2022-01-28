@@ -23,76 +23,76 @@ import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.item.ModItems;
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.SimpleRegistry;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.RegistryObject;
 
 public class Skins {
 
-  public static final RegistryKey<Registry<Skin>> SKINS = createRegistryKey("skins");
+  public static final ResourceKey<Registry<Skin>> SKINS = createRegistryKey("skins");
 
-  public static final MutableRegistry<Skin> REGISTRY =
-      new SimpleRegistry<>(SKINS, Lifecycle.stable());
+  public static final WritableRegistry<Skin> REGISTRY =
+      new MappedRegistry<>(SKINS, Lifecycle.stable());
 
-  public static final RegistryKey<Skin> VULCAN =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "vulcan"));
+  public static final ResourceKey<Skin> VULCAN =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "vulcan"));
 
-  public static final RegistryKey<Skin> ASMO =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "asmo"));
+  public static final ResourceKey<Skin> ASMO =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "asmo"));
 
-  public static final RegistryKey<Skin> CANDY_APPLE =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "candy_apple"));
+  public static final ResourceKey<Skin> CANDY_APPLE =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "candy_apple"));
 
-  public static final RegistryKey<Skin> CYREX =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "cyrex"));
+  public static final ResourceKey<Skin> CYREX =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "cyrex"));
 
-  public static final RegistryKey<Skin> DIAMOND =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "diamond"));
+  public static final ResourceKey<Skin> DIAMOND =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "diamond"));
 
-  public static final RegistryKey<Skin> DRAGON =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "dragon"));
+  public static final ResourceKey<Skin> DRAGON =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "dragon"));
 
-  public static final RegistryKey<Skin> FADE =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "fade"));
+  public static final ResourceKey<Skin> FADE =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "fade"));
 
-  public static final RegistryKey<Skin> FURY =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "fury"));
+  public static final ResourceKey<Skin> FURY =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "fury"));
 
-  public static final RegistryKey<Skin> GEM =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "gem"));
+  public static final ResourceKey<Skin> GEM =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "gem"));
 
-  public static final RegistryKey<Skin> INFERNO =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "inferno"));
+  public static final ResourceKey<Skin> INFERNO =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "inferno"));
 
-  public static final RegistryKey<Skin> RUBY =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "ruby"));
+  public static final ResourceKey<Skin> RUBY =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "ruby"));
 
-  public static final RegistryKey<Skin> SCORCHED =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "scorched"));
+  public static final ResourceKey<Skin> SCORCHED =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "scorched"));
 
-  public static final RegistryKey<Skin> SLAUGHTER =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "slaughter"));
+  public static final ResourceKey<Skin> SLAUGHTER =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "slaughter"));
 
-  public static final RegistryKey<Skin> UV =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "uv"));
+  public static final ResourceKey<Skin> UV =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "uv"));
 
-  public static final RegistryKey<Skin> HYPER_BEAST =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "hyper_beast"));
+  public static final ResourceKey<Skin> HYPER_BEAST =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "hyper_beast"));
 
-  public static final RegistryKey<Skin> EMPEROR_DRAGON =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "emperor_dragon"));
+  public static final ResourceKey<Skin> EMPEROR_DRAGON =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "emperor_dragon"));
 
-  public static final RegistryKey<Skin> NUCLEAR_WINTER =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "nuclear_winter"));
+  public static final ResourceKey<Skin> NUCLEAR_WINTER =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "nuclear_winter"));
 
-  public static final RegistryKey<Skin> MONARCH =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "monarch"));
+  public static final ResourceKey<Skin> MONARCH =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "monarch"));
 
-  public static final RegistryKey<Skin> LOVELACE =
-      RegistryKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "lovelace"));
+  public static final ResourceKey<Skin> LOVELACE =
+      ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "lovelace"));
 
   static {
     register(VULCAN, ModItems.AK47);
@@ -113,16 +113,15 @@ public class Skins {
     register(HYPER_BEAST, ModItems.M4A1);
     register(EMPEROR_DRAGON, ModItems.M4A1);
     register(NUCLEAR_WINTER, ModItems.DESERT_EAGLE);
-    register(HYPER_BEAST, ModItems.M4A1);
     register(MONARCH, ModItems.AWP);
     register(LOVELACE, ModItems.DESERT_EAGLE, ModItems.M4A1);
   }
 
-  private static <T> RegistryKey<Registry<T>> createRegistryKey(String name) {
-    return RegistryKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, name));
+  private static <T> ResourceKey<Registry<T>> createRegistryKey(String name) {
+    return ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, name));
   }
 
-  private static void register(RegistryKey<Skin> location, RegistryObject<?>... guns) {
+  private static void register(ResourceKey<Skin> location, RegistryObject<?>... guns) {
     REGISTRY.register(location, new Skin(location.location(),
         Arrays.stream(guns)
             .map(RegistryObject::getId)

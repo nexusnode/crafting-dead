@@ -20,20 +20,20 @@ package com.craftingdead.immerse.game.module.team;
 
 import java.util.Optional;
 import com.craftingdead.core.network.SynchedData;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
 
 public interface Team {
 
   void registerDataParameters(SynchedData dataManager);
 
-  void save(TeamInstance<?> teamInstance, CompoundNBT nbt);
+  void save(TeamInstance<?> teamInstance, CompoundTag nbt);
 
-  void load(TeamInstance<?> teamInstance, CompoundNBT nbt);
+  void load(TeamInstance<?> teamInstance, CompoundTag nbt);
 
   int getColour();
 
@@ -42,13 +42,13 @@ public interface Team {
   }
 
   default Style getColourStyle() {
-    return Style.EMPTY.withColor(Color.fromRgb(this.getColour()));
+    return Style.EMPTY.withColor(TextColor.fromRgb(this.getColour()));
   }
 
   String getName();
 
-  default ITextComponent getDisplayName() {
-    return new StringTextComponent(this.getName())
-        .withStyle(Style.EMPTY.withColor(Color.fromRgb(this.getColour())));
+  default Component getDisplayName() {
+    return new TextComponent(this.getName())
+        .withStyle(Style.EMPTY.withColor(TextColor.fromRgb(this.getColour())));
   }
 }

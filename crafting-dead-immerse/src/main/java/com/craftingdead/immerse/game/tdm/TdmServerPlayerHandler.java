@@ -18,36 +18,36 @@
 
 package com.craftingdead.immerse.game.tdm;
 
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.GameType;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
+import net.minecraftforge.network.PacketDistributor;
 
-public class TdmServerPlayerHandler extends TdmPlayerHandler {
+public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
 
   private static final float ASSIST_DAMAGE_PCT = 0.4F;
 
   private int secondTicker;
 
-  private PlayerEntity lastSignificantDamage;
+  private Player lastSignificantDamage;
 
   private boolean wasGhost;
 
   private boolean ghost;
-  private ServerPlayerEntity pendingSpectate;
+  private ServerPlayer pendingSpectate;
 
   private TdmServer game;
 
   private boolean valid = true;
 
-  public TdmServerPlayerHandler(TdmServer game, PlayerExtension<?> player) {
+  public TdmServerPlayerHandler(TdmServer game, PlayerExtension<ServerPlayer> player) {
     super(game, player, (int) game.getBuyDuration().getSeconds(),
         (int) game.getSpawnProtectionDuration().getSeconds(),
         (int) game.getGhostDuration().getSeconds());
@@ -69,7 +69,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
 
     if (this.ghost && this.pendingSpectate != null) {
       if (this.pendingSpectate.isAlive() && !this.pendingSpectate.isSpectator()) {
-        ((ServerPlayerEntity) this.getPlayer().getEntity()).setCamera(this.pendingSpectate);
+        ((ServerPlayer) this.getPlayer().getEntity()).setCamera(this.pendingSpectate);
       }
       this.pendingSpectate = null;
     }
@@ -81,7 +81,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
           this.ghost = false;
           this.getPlayer().getEntity().setGameMode(GameType.ADVENTURE);
           ((TdmServer) this.game).getLogicalServer()
-              .respawnPlayer((ServerPlayerEntity) this.getPlayer().getEntity(), false);
+              .respawnPlayer((ServerPlayer) this.getPlayer().getEntity(), false);
         }
       } else if (!this.getPlayer().getEntity().isSpectator()) {
         this.dataManager.compute(REMAINING_BUY_TIME_SECONDS,
@@ -100,8 +100,8 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
       return true;
     }
 
-    if (source.getEntity() instanceof PlayerEntity) {
-      PlayerEntity playerEntity = (PlayerEntity) source.getEntity();
+    if (source.getEntity() instanceof Player) {
+      Player playerEntity = (Player) source.getEntity();
 
       if (playerEntity.getMainHandItem().isEmpty()) {
         return true;
@@ -111,10 +111,11 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
         this.lastSignificantDamage = playerEntity;
       }
 
-      if (playerEntity.getCapability(Capabilities.LIVING_EXTENSION)
+      if (playerEntity.getCapability(LivingExtension.CAPABILITY)
           .resolve()
           .flatMap(e -> e.getHandler(ID))
-          .map(extension -> ((TdmPlayerHandler) extension).getTeam().orElse(null) == this.getTeam()
+          .map(extension -> ((TdmPlayerHandler<?>) extension).getTeam().orElse(null) == this
+              .getTeam()
               .orElse(null))
           .orElse(false)) {
         return true;
@@ -125,7 +126,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
 
   @Override
   public boolean handleKill(Entity target) {
-    if (target instanceof ServerPlayerEntity) {
+    if (target instanceof ServerPlayer) {
       TdmPlayerData playerData = this.getPlayerData();
       playerData.incrementKills();
       playerData.incrementScore();
@@ -133,7 +134,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
           .ifPresent(TdmTeam::incrementScore);
 
       NetworkChannel.PLAY.getSimpleChannel().send(
-          PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) target),
+          PacketDistributor.PLAYER.with(() -> (ServerPlayer) target),
           new DisplayKilledMessage(this.getPlayer().getEntity().getId(),
               this.getPlayer().getEntity().getMainHandItem()));
     }
@@ -142,8 +143,8 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    if (this.getPlayer().getEntity() instanceof ServerPlayerEntity) {
-      ServerPlayerEntity playerEntity = (ServerPlayerEntity) this.getPlayer().getEntity();
+    if (this.getPlayer().getEntity() instanceof ServerPlayer) {
+      ServerPlayer playerEntity = (ServerPlayer) this.getPlayer().getEntity();
 
       this.getPlayerData().incrementDeaths();
 
@@ -158,8 +159,8 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler {
           playerEntity.getY(),
           playerEntity.getZ(), 0.0D, 0.0D, 0.0D);
       playerEntity.setGameMode(GameType.SPECTATOR);
-      if (cause.getEntity() instanceof ServerPlayerEntity) {
-        this.pendingSpectate = (ServerPlayerEntity) cause.getEntity();
+      if (cause.getEntity() instanceof ServerPlayer) {
+        this.pendingSpectate = (ServerPlayer) cause.getEntity();
       }
     }
     return false;

@@ -18,10 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.screen.game.shop;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 public interface InfoPanel {
 
-  void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
+  void renderInfo(int x, int y, PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks);
 }

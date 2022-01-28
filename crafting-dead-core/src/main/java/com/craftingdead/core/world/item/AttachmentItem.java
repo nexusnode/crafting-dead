@@ -23,14 +23,14 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 public class AttachmentItem extends Item implements AttachmentLike {
 
@@ -47,16 +47,16 @@ public class AttachmentItem extends Item implements AttachmentLike {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack stack, Level world,
+      List<Component> lines, TooltipFlag tooltipFlag) {
     super.appendHoverText(stack, world, lines, tooltipFlag);
 
     for (Entry<Attachment.MultiplierType, Float> entry : this.asAttachment()
         .getMultipliers().entrySet()) {
-      lines.add(new TranslationTextComponent(entry.getKey().getTranslationKey())
-          .withStyle(TextFormatting.GRAY)
-          .append(new StringTextComponent(" " + entry.getValue() + "x")
-              .withStyle(TextFormatting.RED)));
+      lines.add(new TranslatableComponent(entry.getKey().getTranslationKey())
+          .withStyle(ChatFormatting.GRAY)
+          .append(new TextComponent(" " + entry.getValue() + "x")
+              .withStyle(ChatFormatting.RED)));
     }
   }
 

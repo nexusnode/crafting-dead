@@ -18,22 +18,22 @@
 
 package com.craftingdead.core.world.item.crafting;
 
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class UpgradeMagazineRecipe extends SpecialRecipe {
+public class UpgradeMagazineRecipe extends CustomRecipe {
 
   private static final int MIDDLE_SLOT_INDEX = 4;
 
@@ -47,7 +47,7 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public boolean matches(CraftingInventory inventory, World world) {
+  public boolean matches(CraftingContainer inventory, Level world) {
     for (int i = 0; i < inventory.getContainerSize(); ++i) {
       switch (i) {
         case MIDDLE_SLOT_INDEX: // Middle slot
@@ -66,12 +66,12 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public ItemStack assemble(CraftingInventory inventory) {
-    Magazine magazine = Capabilities.getOrThrow(
-        Capabilities.MAGAZINE, inventory.getItem(MIDDLE_SLOT_INDEX), Magazine.class);
+  public ItemStack assemble(CraftingContainer inventory) {
+    Magazine magazine = CapabilityUtil.getOrThrow(
+        Magazine.CAPABILITY, inventory.getItem(MIDDLE_SLOT_INDEX), Magazine.class);
 
-    Capabilities.getOrThrow(
-        Capabilities.MAGAZINE, this.nextTier, Magazine.class).setSize(magazine.getSize());
+    CapabilityUtil.getOrThrow(
+        Magazine.CAPABILITY, this.nextTier, Magazine.class).setSize(magazine.getSize());
 
     return this.nextTier;
   }
@@ -82,26 +82,26 @@ public class UpgradeMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return ModRecipeSerializers.UPGRADE_MAGAZINE.get();
   }
 
-  public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>
-      implements IRecipeSerializer<UpgradeMagazineRecipe> {
+  public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
+      implements RecipeSerializer<UpgradeMagazineRecipe> {
 
     @Override
     public UpgradeMagazineRecipe fromJson(ResourceLocation id, JsonObject json) {
       return new UpgradeMagazineRecipe(id, Ingredient.fromJson(json.get("magazine")),
-          ShapedRecipe.itemFromJson(json.getAsJsonObject("nextTier")));
+          new ItemStack(ShapedRecipe.itemFromJson(json.getAsJsonObject("nextTier"))));
     }
 
     @Override
-    public UpgradeMagazineRecipe fromNetwork(ResourceLocation id, PacketBuffer buf) {
+    public UpgradeMagazineRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
       return new UpgradeMagazineRecipe(id, Ingredient.fromNetwork(buf), buf.readItem());
     }
 
     @Override
-    public void toNetwork(PacketBuffer buf, UpgradeMagazineRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buf, UpgradeMagazineRecipe recipe) {
       recipe.magazine.toNetwork(buf);
       buf.writeItem(recipe.nextTier);
     }

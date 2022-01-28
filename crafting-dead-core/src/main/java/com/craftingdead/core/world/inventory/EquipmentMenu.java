@@ -19,33 +19,35 @@
 package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
+import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class EquipmentMenu extends Container {
+public class EquipmentMenu extends AbstractContainerMenu {
 
   private final IItemHandler equipment;
 
-  private final CraftResultInventory outputInventory = new CraftResultInventory();
-  private final Inventory craftingInventory = new Inventory(4);
+  private final ResultContainer outputInventory = new ResultContainer();
+  private final SimpleContainer craftingInventory = new SimpleContainer(4);
 
-  public EquipmentMenu(int id, PlayerInventory playerInventory) {
+  public EquipmentMenu(int id, Inventory playerInventory) {
     this(id, playerInventory, new ItemStackHandler(ModEquipmentSlotType.values().length));
   }
 
-  public EquipmentMenu(int id, PlayerInventory playerInventory, IItemHandler equipment) {
+  public EquipmentMenu(int id, Inventory playerInventory, IItemHandler equipment) {
     super(ModMenuTypes.EQUIPMENT.get(), id);
     this.equipment = equipment;
     this.craftingInventory.addListener(this::slotsChanged);
@@ -68,7 +70,7 @@ public class EquipmentMenu extends Container {
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.GUN.getIndex(),
         equipmentColumnX, equipmentColumnY,
-        (slot, itemStack) -> itemStack.getCapability(Capabilities.GUN).isPresent()));
+        (slot, itemStack) -> itemStack.getCapability(Gun.CAPABILITY).isPresent()));
 
     this.addSlot(
         new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.MELEE.getIndex(),
@@ -81,12 +83,12 @@ public class EquipmentMenu extends Container {
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
         ModEquipmentSlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.getCapability(Capabilities.CLOTHING).isPresent()));
+        (slot, itemStack) -> itemStack.getCapability(Clothing.CAPABILITY).isPresent()));
 
     this.addSlot(
         new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.VEST.getIndex(),
             equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
-                .getCapability(Capabilities.STORAGE)
+                .getCapability(Storage.CAPABILITY)
                 .map(storage -> storage.isValidForSlot(ModEquipmentSlotType.VEST))
                 .orElse(false)));
 
@@ -97,7 +99,7 @@ public class EquipmentMenu extends Container {
         this.craftingInventory));
 
     final BiPredicate<PredicateSlot, ItemStack> attachmentOrPaintPredicate =
-        (slot, itemStack) -> this.getGunStack().getCapability(Capabilities.GUN)
+        (slot, itemStack) -> this.getGunStack().getCapability(Gun.CAPABILITY)
             .map(gun -> gun.isAcceptedAttachment(itemStack)).orElse(false);
 
     final BiPredicate<PredicateSlot, ItemStack> attachmentPredicate =
@@ -123,16 +125,16 @@ public class EquipmentMenu extends Container {
   }
 
   @Override
-  public boolean stillValid(PlayerEntity playerEntity) {
+  public boolean stillValid(Player playerEntity) {
     return true;
   }
 
   @Override
-  public void removed(PlayerEntity playerEntity) {
+  public void removed(Player playerEntity) {
     super.removed(playerEntity);
     if (!playerEntity.level.isClientSide()) {
-      this.clearContainer(playerEntity, playerEntity.level, this.craftingInventory);
-      this.clearContainer(playerEntity, playerEntity.level, this.outputInventory);
+      this.clearContainer(playerEntity, this.craftingInventory);
+      this.clearContainer(playerEntity, this.outputInventory);
     }
   }
 
@@ -149,7 +151,7 @@ public class EquipmentMenu extends Container {
   }
 
   public boolean isCraftable() {
-    return this.getGunStack().getCapability(Capabilities.GUN)
+    return this.getGunStack().getCapability(Gun.CAPABILITY)
         .map(gun -> {
           for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
             ItemStack itemStack = this.craftingInventory.getItem(i);
@@ -165,7 +167,7 @@ public class EquipmentMenu extends Container {
   }
 
   @Override
-  public ItemStack quickMoveStack(PlayerEntity playerEntity, int clickedIndex) {
+  public ItemStack quickMoveStack(Player playerEntity, int clickedIndex) {
     Slot clickedSlot = this.slots.get(clickedIndex);
     if (clickedSlot != null && clickedSlot.hasItem()) {
       // Shift-clicking gun crafting slots is currently unavailable due to

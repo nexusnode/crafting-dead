@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.survival;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.module.ServerModule;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public class SurvivalServer extends SurvivalGame<ServerModule> implements GameServer {
 
@@ -41,8 +41,8 @@ public class SurvivalServer extends SurvivalGame<ServerModule> implements GameSe
   }
 
   @Override
-  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {}
+  public void addPlayer(PlayerExtension<ServerPlayer> player) {}
 
   @Override
-  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {}
+  public void removePlayer(PlayerExtension<ServerPlayer> player) {}
 }

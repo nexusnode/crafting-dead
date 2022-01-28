@@ -23,7 +23,7 @@ import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.module.Module;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

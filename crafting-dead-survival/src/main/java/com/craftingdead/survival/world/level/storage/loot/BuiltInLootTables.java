@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import com.craftingdead.survival.CraftingDeadSurvival;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class BuiltInLootTables {
 

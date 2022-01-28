@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.module.shop.message;
 
 import java.util.UUID;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class BuyItemMessage {
 
@@ -33,11 +33,11 @@ public class BuyItemMessage {
     return this.itemId;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeUUID(this.itemId);
   }
 
-  public static BuyItemMessage decode(PacketBuffer in) {
+  public static BuyItemMessage decode(FriendlyByteBuf in) {
     return new BuyItemMessage(in.readUUID());
   }
 }

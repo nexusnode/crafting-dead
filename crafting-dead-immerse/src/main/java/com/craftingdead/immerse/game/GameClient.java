@@ -20,8 +20,8 @@ package com.craftingdead.immerse.game;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.Module;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.player.AbstractClientPlayer;
 
 public interface GameClient extends Game<Module> {
 
@@ -44,8 +44,8 @@ public interface GameClient extends Game<Module> {
    * @param partialTicks - partialTicks
    * @return <code>true</code> to remove the vanilla overlay, <code>false</code> otherwise
    */
-  default boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks) {
+  default boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
+      PoseStack matrixStack, int width, int height, float partialTicks) {
     return false;
   }
 
@@ -59,8 +59,8 @@ public interface GameClient extends Game<Module> {
    * @param partialTicks - partialTicks
    * @return <code>true</code> to remove the vanilla player list, <code>false</code> otherwise
    */
-  default boolean renderPlayerList(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks) {
+  default boolean renderPlayerList(PlayerExtension<? extends AbstractClientPlayer> player,
+      PoseStack matrixStack, int width, int height, float partialTicks) {
     return false;
   }
 }

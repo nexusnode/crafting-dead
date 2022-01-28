@@ -22,35 +22,34 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.Permissions;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class GameCommand {
 
-  private static int restart(CommandContext<CommandSource> context) {
+  private static int restart(CommandContext<CommandSourceStack> context) {
     context.getSource().sendSuccess(
-        new TranslationTextComponent("commands.game.restart"), true);
+        new TranslatableComponent("commands.game.restart"), true);
     CraftingDeadImmerse.getInstance().getLogicalServer().restartGame();
     return 0;
   }
 
-  private static int reloadRotation(CommandContext<CommandSource> context) {
+  private static int reloadRotation(CommandContext<CommandSourceStack> context) {
     context.getSource().sendSuccess(
-        new TranslationTextComponent("commands.game.reload_rotation"), true);
+        new TranslatableComponent("commands.game.reload_rotation"), true);
     CraftingDeadImmerse.getInstance().getLogicalServer().reloadGameRotation();
     return 0;
   }
 
-  public static void register(CommandDispatcher<CommandSource> dispatcher) {
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
     dispatcher
         .register(Commands.literal("game")
             .requires(context -> context.hasPermission(4)
-                || (context.getEntity() instanceof ServerPlayerEntity
-                    && PermissionAPI.hasPermission((ServerPlayerEntity) context.getEntity(),
-                        Permissions.GAME_OP)))
+                || (context.getEntity()instanceof ServerPlayer player
+                    && PermissionAPI.getPermission(player, Permissions.GAME_OP)))
             .then(Commands.literal("restart").executes(GameCommand::restart))
             .then(Commands.literal("reload_rotation").executes(GameCommand::reloadRotation)));
   }

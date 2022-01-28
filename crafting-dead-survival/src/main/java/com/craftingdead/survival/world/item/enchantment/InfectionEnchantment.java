@@ -19,12 +19,12 @@
 package com.craftingdead.survival.world.item.enchantment;
 
 import com.craftingdead.core.world.item.enchantment.ModEnchantmentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 public class InfectionEnchantment extends Enchantment {
 
-  protected InfectionEnchantment(Rarity rarity, EquipmentSlotType... slotType) {
+  protected InfectionEnchantment(Rarity rarity, EquipmentSlot... slotType) {
     super(rarity, ModEnchantmentTypes.GUN, slotType);
   }
 }

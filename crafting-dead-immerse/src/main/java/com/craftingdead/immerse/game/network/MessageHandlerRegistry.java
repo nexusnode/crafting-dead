@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game.network;
 
 import java.util.Map;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class MessageHandlerRegistry<T> {
 
@@ -32,7 +32,7 @@ public class MessageHandlerRegistry<T> {
 
   public <MSG> void handle(T parent, MSG message, NetworkEvent.Context context) {
     @SuppressWarnings("unchecked")
-    MessageHandler<T, MSG> handler = (MessageHandler<T, MSG>) this.handlers.get(message.getClass());
+    var handler = (MessageHandler<T, MSG>) this.handlers.get(message.getClass());
     if (handler == null) {
       throw new IllegalArgumentException(
           "No handler for message type: " + message.getClass().getName());

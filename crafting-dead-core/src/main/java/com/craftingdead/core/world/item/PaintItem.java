@@ -19,23 +19,23 @@
 package com.craftingdead.core.world.item;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.world.item.gun.skin.SimplePaint;
+import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
 import com.craftingdead.core.world.item.gun.skin.Skins;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -43,7 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class PaintItem extends Item {
 
   private final boolean multipaint;
-  private final RegistryKey<Skin> skin;
+  private final ResourceKey<Skin> skin;
 
   public PaintItem(Properties properties) {
     super(properties);
@@ -51,31 +51,32 @@ public class PaintItem extends Item {
     this.skin = null;
   }
 
-  public PaintItem(RegistryKey<Skin> skin, Properties properties) {
+  public PaintItem(ResourceKey<Skin> skin, Properties properties) {
     super(properties);
     this.multipaint = false;
     this.skin = skin;
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
     return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> new SimplePaint(this.multipaint
-            ? DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]
-                .getColorValue()
-            : null, this.skin)),
-        () -> Capabilities.PAINT);
+        LazyOptional.of(() -> Paint.of(this.skin, this.multipaint
+            ? OptionalInt.of(
+                DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]
+                    .getTextColor())
+            : OptionalInt.empty())),
+        () -> Paint.CAPABILITY);
   }
 
   @Override
-  public void appendHoverText(ItemStack itemStack, @Nullable World level,
-      List<ITextComponent> lines, ITooltipFlag flag) {
-    lines.add(new TranslationTextComponent("item_lore.paint.accepted_guns")
-        .withStyle(TextFormatting.GRAY));
+  public void appendHoverText(ItemStack itemStack, @Nullable Level level,
+      List<Component> lines, TooltipFlag flag) {
+    lines.add(new TranslatableComponent("item_lore.paint.accepted_guns")
+        .withStyle(ChatFormatting.GRAY));
     Skins.REGISTRY.get(this.skin).getAcceptedGuns().stream()
         .map(ForgeRegistries.ITEMS::getValue)
         .map(Item::getDescription)
-        .map(text -> text.copy().withStyle(TextFormatting.RED))
+        .map(text -> text.copy().withStyle(ChatFormatting.RED))
         .forEach(lines::add);
   }
 }

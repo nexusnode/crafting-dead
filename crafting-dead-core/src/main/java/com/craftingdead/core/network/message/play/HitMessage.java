@@ -20,29 +20,29 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkEvent;
 
 public class HitMessage {
 
-  private final Vector3d hitPos;
+  private final Vec3 hitPos;
   private final boolean dead;
 
-  public HitMessage(Vector3d hitPos, boolean dead) {
+  public HitMessage(Vec3 hitPos, boolean dead) {
     this.hitPos = hitPos;
     this.dead = dead;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeDouble(this.hitPos.x());
     out.writeDouble(this.hitPos.y());
     out.writeDouble(this.hitPos.z());
     out.writeBoolean(this.dead);
   }
 
-  public static HitMessage decode(PacketBuffer in) {
-    return new HitMessage(new Vector3d(in.readDouble(), in.readDouble(), in.readDouble()),
+  public static HitMessage decode(FriendlyByteBuf in) {
+    return new HitMessage(new Vec3(in.readDouble(), in.readDouble(), in.readDouble()),
         in.readBoolean());
   }
 

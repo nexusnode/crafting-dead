@@ -25,10 +25,10 @@ import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.action.delegated.DelegatedAction;
 import com.craftingdead.core.world.action.delegated.DelegatedActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
 
 public class ItemAction extends TimedAction<ItemActionType> {
 
@@ -64,8 +64,8 @@ public class ItemAction extends TimedAction<ItemActionType> {
           .orElse(ItemStack.EMPTY);
 
       @Nullable
-      final PlayerEntity playerEntity = this.getPerformer().getEntity() instanceof PlayerEntity
-          ? (PlayerEntity) this.getPerformer().getEntity()
+      final Player playerEntity = this.getPerformer().getEntity() instanceof Player
+          ? (Player) this.getPerformer().getEntity()
           : null;
       if (shrinkStack && !(playerEntity != null && playerEntity.isCreative())) {
         heldStack.shrink(1);
@@ -73,9 +73,9 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
       if (!resultStack.isEmpty()) {
         if (heldStack.isEmpty()) {
-          this.getPerformer().getEntity().setItemInHand(Hand.MAIN_HAND, resultStack);
+          this.getPerformer().getEntity().setItemInHand(InteractionHand.MAIN_HAND, resultStack);
         } else if (playerEntity != null
-            && playerEntity.inventory.add(resultStack)) {
+            && playerEntity.getInventory().add(resultStack)) {
           this.getPerformer().getEntity().spawnAtLocation(resultStack);
         }
       }

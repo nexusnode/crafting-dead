@@ -24,9 +24,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.phys.EntityHitResult;
 
 public final class DelegatedEntityAction
     extends AbstractDelegatedAction<DelegatedEntityActionType> {
@@ -46,11 +46,11 @@ public final class DelegatedEntityAction
     }
 
     if (!performer.getLevel().isClientSide()) {
-      Optional<EntityRayTraceResult> entityRayTraceResult =
+      Optional<EntityHitResult> entityRayTraceResult =
           RayTraceUtil.rayTraceEntities(performer.getEntity());
       if (this.selectedTarget != performer
           && this.selectedTarget.getEntity() != entityRayTraceResult
-              .map(EntityRayTraceResult::getEntity)
+              .map(EntityHitResult::getEntity)
               .orElse(null)) {
         return false;
       }
@@ -68,16 +68,16 @@ public final class DelegatedEntityAction
 
     this.selectedTarget.getEntity().curePotionEffects(heldStack);
 
-    for (Pair<Supplier<EffectInstance>, Float> pair : this.type.getEffects()) {
+    for (Pair<Supplier<MobEffectInstance>, Float> pair : this.type.getEffects()) {
       if (pair.getLeft() != null
           && performer.getEntity().getRandom().nextFloat() < pair.getRight()) {
-        EffectInstance effectInstance = pair.getLeft().get();
+        MobEffectInstance effectInstance = pair.getLeft().get();
         if (effectInstance.getEffect().isInstantenous()) {
           effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
               this.selectedTarget.getEntity(),
               this.selectedTarget.getEntity(), effectInstance.getAmplifier(), 1.0D);
         } else {
-          this.selectedTarget.getEntity().addEffect(new EffectInstance(effectInstance));
+          this.selectedTarget.getEntity().addEffect(new MobEffectInstance(effectInstance));
         }
       }
     }

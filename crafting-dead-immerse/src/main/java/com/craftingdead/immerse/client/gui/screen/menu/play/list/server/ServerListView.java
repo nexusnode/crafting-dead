@@ -42,8 +42,8 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ServerListView<L extends Layout>
     extends ParentView<ServerListView<L>, L, YogaLayout> {
@@ -80,7 +80,7 @@ public class ServerListView<L extends Layout>
     this.addChild(this.listView);
 
     this.playButton = createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
-        new TranslationTextComponent("view.server_list.button.play"),
+        new TranslatableComponent("view.server_list.button.play"),
         () -> this.getSelectedItem().ifPresent(ServerItemView::connect))
             .configure(view -> view.getBackgroundColorProperty()
                 .registerState(Theme.GREEN_DISABLED, States.DISABLED))
@@ -122,15 +122,15 @@ public class ServerListView<L extends Layout>
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER))
                 .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-                    new TranslationTextComponent("view.server_list.button.quick_refresh"),
+                    new TranslatableComponent("view.server_list.button.quick_refresh"),
                     this::quickRefresh).configure(view -> view.getLayout().setMargin(3)))
                 .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-                    new TranslationTextComponent("view.server_list.button.refresh"),
+                    new TranslatableComponent("view.server_list.button.refresh"),
                     this::refresh).configure(view -> view.getLayout().setMargin(3)));
   }
 
   protected static View<?, YogaLayout> createButton(Color color, Color hoveredColor,
-      ITextComponent text, Runnable actionListener) {
+      Component text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)
@@ -168,23 +168,23 @@ public class ServerListView<L extends Layout>
                 .configure(
                     view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x88121212)))
                 .addChild(new TextView<>(new YogaLayout().setFlex(2F).setHeight(8),
-                    new TranslationTextComponent("view.server_list.motd"))
+                    new TranslatableComponent("view.server_list.motd"))
                         .setShadow(false)
                         .setCentered(true))
                 .addChild(new TextView<>(new YogaLayout().setFlex(1).setHeight(8),
-                    new TranslationTextComponent("view.server_list.map"))
+                    new TranslatableComponent("view.server_list.map"))
                         .setShadow(false)
                         .setCentered(true))
                 .addChild(new TextView<>(
                     new YogaLayout().setWidth(60F).setHeight(8).setLeftMargin(10F),
-                    new TranslationTextComponent("view.server_list.ping"))
+                    new TranslatableComponent("view.server_list.ping"))
                         .setShadow(false)
                         .setCentered(true))
                 .addChild(new TextView<>(new YogaLayout()
                     .setWidth(60F)
                     .setHeight(8)
                     .setLeftMargin(10F),
-                    new TranslationTextComponent("view.server_list.players"))
+                    new TranslatableComponent("view.server_list.players"))
                         .setShadow(false)
                         .setCentered(true));
   }

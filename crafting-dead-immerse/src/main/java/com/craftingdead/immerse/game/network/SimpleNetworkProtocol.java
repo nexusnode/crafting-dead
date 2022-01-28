@@ -25,8 +25,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SimpleNetworkProtocol implements NetworkProtocol {
 
@@ -39,7 +39,7 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> void encode(PacketBuffer buf, T payload) throws IOException {
+  public <T> void encode(FriendlyByteBuf buf, T payload) throws IOException {
     Codec<T> entry = (Codec<T>) this.codecTypes.get(payload.getClass());
     if (entry == null) {
       throw new IOException("Unknown payload type " + payload.getClass().getName());
@@ -49,7 +49,7 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
   }
 
   @Override
-  public <T> T decode(PacketBuffer buf, NetworkEvent.Context ctx) throws IOException {
+  public <T> T decode(FriendlyByteBuf buf, NetworkEvent.Context ctx) throws IOException {
     byte index = buf.readByte();
     @SuppressWarnings("unchecked")
     Codec<T> entry = (Codec<T>) this.codecIndicies.get(index);
@@ -63,11 +63,11 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
   private static class Codec<T> {
 
     private final byte index;
-    private final BiConsumer<T, PacketBuffer> encoder;
-    private final Function<PacketBuffer, T> decoder;
+    private final BiConsumer<T, FriendlyByteBuf> encoder;
+    private final Function<FriendlyByteBuf, T> decoder;
 
-    private Codec(byte index, BiConsumer<T, PacketBuffer> encoder,
-        Function<PacketBuffer, T> decoder) {
+    private Codec(byte index, BiConsumer<T, FriendlyByteBuf> encoder,
+        Function<FriendlyByteBuf, T> decoder) {
       this.index = index;
       this.encoder = encoder;
       this.decoder = decoder;
@@ -78,8 +78,8 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
 
     private final byte index;
     private final Class<T> type;
-    private BiConsumer<T, PacketBuffer> encoder;
-    private Function<PacketBuffer, T> decoder;
+    private BiConsumer<T, FriendlyByteBuf> encoder;
+    private Function<FriendlyByteBuf, T> decoder;
 
     private CodecBuilder(int index, Class<T> type) {
       if (index >= 256) {
@@ -94,7 +94,7 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
       });
     }
 
-    public CodecBuilder<T> encoder(BiConsumer<T, PacketBuffer> encoder) {
+    public CodecBuilder<T> encoder(BiConsumer<T, FriendlyByteBuf> encoder) {
       this.encoder = encoder;
       return this;
     }
@@ -103,7 +103,7 @@ public class SimpleNetworkProtocol implements NetworkProtocol {
       return this.decoder(in -> value.get());
     }
 
-    public CodecBuilder<T> decoder(Function<PacketBuffer, T> decoder) {
+    public CodecBuilder<T> decoder(Function<FriendlyByteBuf, T> decoder) {
       this.decoder = decoder;
       return this;
     }

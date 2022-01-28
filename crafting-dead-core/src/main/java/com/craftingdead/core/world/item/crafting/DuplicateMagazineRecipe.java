@@ -18,24 +18,24 @@
 
 package com.craftingdead.core.world.item.crafting;
 
-import com.craftingdead.core.capability.Capabilities;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
-public class DuplicateMagazineRecipe extends SpecialRecipe {
+public class DuplicateMagazineRecipe extends CustomRecipe {
 
   public DuplicateMagazineRecipe(ResourceLocation id) {
     super(id);
   }
 
   @Override
-  public boolean matches(CraftingInventory inventory, World world) {
+  public boolean matches(CraftingContainer inventory, Level world) {
     for (int i = 0; i < inventory.getContainerSize(); i++) {
       switch (i) {
         case 0:
@@ -47,7 +47,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
           }
           break;
         case 4:
-          if (!inventory.getItem(i).getCapability(Capabilities.MAGAZINE).isPresent()) {
+          if (!inventory.getItem(i).getCapability(Magazine.CAPABILITY).isPresent()) {
             return false;
           }
           break;
@@ -62,13 +62,13 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public NonNullList<ItemStack> getRemainingItems(CraftingInventory inventory) {
+  public NonNullList<ItemStack> getRemainingItems(CraftingContainer inventory) {
     NonNullList<ItemStack> remainingItems =
         NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
 
     for (int i = 0; i < remainingItems.size(); ++i) {
       ItemStack item = inventory.getItem(i);
-      if (item.getCapability(Capabilities.MAGAZINE).isPresent()) {
+      if (item.getCapability(Magazine.CAPABILITY).isPresent()) {
         remainingItems.set(i, item.copy());
       } else if (item.hasContainerItem()) {
         remainingItems.set(i, item.getContainerItem());
@@ -79,10 +79,10 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public ItemStack assemble(CraftingInventory inventory) {
+  public ItemStack assemble(CraftingContainer inventory) {
     ItemStack result = inventory.getItem(4).copy();
     // Sometimes this isn't present for some reason...
-    result.getCapability(Capabilities.MAGAZINE).ifPresent(magazine -> magazine.setSize(0));
+    result.getCapability(Magazine.CAPABILITY).ifPresent(magazine -> magazine.setSize(0));
     return result;
   }
 
@@ -92,7 +92,7 @@ public class DuplicateMagazineRecipe extends SpecialRecipe {
   }
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return ModRecipeSerializers.DUPLICATE_MAGAZINE.get();
   }
 }

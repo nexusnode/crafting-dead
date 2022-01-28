@@ -20,14 +20,14 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class OpenEquipmentMenuMessage {
 
-  public void encode(PacketBuffer out) {}
+  public void encode(FriendlyByteBuf out) {}
 
-  public static OpenEquipmentMenuMessage decode(PacketBuffer in) {
+  public static OpenEquipmentMenuMessage decode(FriendlyByteBuf in) {
     return new OpenEquipmentMenuMessage();
   }
 

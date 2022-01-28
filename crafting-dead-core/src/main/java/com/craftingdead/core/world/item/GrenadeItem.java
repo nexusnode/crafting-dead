@@ -22,31 +22,31 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
-import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
+import com.craftingdead.core.world.entity.grenade.Grenade;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class GrenadeItem extends Item {
 
-  private final BiFunction<LivingEntity, World, GrenadeEntity> grenadeEntitySupplier;
+  private final BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
   private final float throwSpeed;
 
   public GrenadeItem(Properties properties) {
@@ -56,52 +56,52 @@ public class GrenadeItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable World world,
-      List<ITextComponent> texts, ITooltipFlag tooltipFlag) {
-    texts.add(new TranslationTextComponent("item_lore.grenade").withStyle(TextFormatting.GRAY));
+  public void appendHoverText(ItemStack stack, @Nullable Level world,
+      List<Component> texts, TooltipFlag tooltipFlag) {
+    texts.add(new TranslatableComponent("item_lore.grenade").withStyle(ChatFormatting.GRAY));
   }
 
   @Override
-  public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn,
-      Hand handIn) {
-    ItemStack itemStack = playerIn.getItemInHand(handIn);
-    worldIn.playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
-        SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F,
-        0.4F / (random.nextFloat() * 0.4F + 0.8F));
-    if (!worldIn.isClientSide) {
-      GrenadeEntity grenadeEntity = this.grenadeEntitySupplier.apply(playerIn, worldIn);
+  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    var itemStack = player.getItemInHand(hand);
+    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+        SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F,
+        0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+    if (!level.isClientSide) {
+      Grenade grenadeEntity = this.grenadeEntitySupplier.apply(player, level);
 
-      float force = playerIn.isShiftKeyDown() ? 0.4F : this.throwSpeed;
-      grenadeEntity.teleportTo(playerIn.getX(),
-          playerIn.getY() + playerIn.getEyeHeight(),
-          playerIn.getZ());
-      grenadeEntity.shootFromEntity(playerIn, playerIn.xRot, playerIn.yRot, 0,
+      float force = player.isShiftKeyDown() ? 0.4F : this.throwSpeed;
+      grenadeEntity.teleportTo(player.getX(),
+          player.getY() + player.getEyeHeight(),
+          player.getZ());
+      grenadeEntity.shootFromEntity(player, player.getXRot(), player.getYRot(), 0,
           force, 1.0F);
-      worldIn.addFreshEntity(grenadeEntity);
+      level.addFreshEntity(grenadeEntity);
     }
 
-    playerIn.awardStat(Stats.ITEM_USED.get(this));
-    if (!playerIn.abilities.instabuild) {
+    player.awardStat(Stats.ITEM_USED.get(this));
+    if (!player.getAbilities().instabuild) {
       itemStack.shrink(1);
     }
 
-    return ActionResult.success(itemStack);
+    return InteractionResultHolder.success(itemStack);
   }
 
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> () -> CombatSlot.GRENADE),
-        () -> Capabilities.COMBAT_SLOT_PROVIDER);
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
+    return new SimpleCapabilityProvider<>(
+        LazyOptional.of(() -> () -> CombatSlot.GRENADE),
+        () -> CombatSlotProvider.CAPABILITY);
   }
 
   public static class Properties extends Item.Properties {
 
-    private BiFunction<LivingEntity, World, GrenadeEntity> grenadeEntitySupplier;
+    private BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
     private float throwSpeed = 1.45F;
 
     public Properties setGrenadeEntitySupplier(
-        BiFunction<LivingEntity, World, GrenadeEntity> grenadeEntitySupplier) {
+        BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier) {
       this.grenadeEntitySupplier = grenadeEntitySupplier;
       return this;
     }

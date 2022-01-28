@@ -33,7 +33,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.Util;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.RegisterGunColour;
@@ -42,24 +41,24 @@ import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ShootableItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 @RegisterGunColour
-public abstract class GunItem extends ShootableItem {
+public abstract class GunItem extends ProjectileWeaponItem {
 
   /**
    * Time between shots in milliseconds.
@@ -299,7 +298,7 @@ public abstract class GunItem extends ShootableItem {
 
   @Override
   public abstract ICapabilityProvider initCapabilities(ItemStack itemStack,
-      @Nullable CompoundNBT nbt);
+      @Nullable CompoundTag nbt);
 
   @Override
   public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
@@ -313,68 +312,68 @@ public abstract class GunItem extends ShootableItem {
   }
 
   @Override
-  public void appendHoverText(ItemStack itemStack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack itemStack, Level world,
+      List<Component> lines, TooltipFlag tooltipFlag) {
     super.appendHoverText(itemStack, world, lines, tooltipFlag);
 
-    itemStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
-      ITextComponent ammoCount =
-          new StringTextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
+    itemStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
+      Component ammoCount =
+          new TextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
               .map(Magazine::getSize)
-              .orElse(0))).withStyle(TextFormatting.RED);
-      ITextComponent damageText =
-          new StringTextComponent(String.valueOf(this.getDamage()))
-              .withStyle(TextFormatting.RED);
-      ITextComponent headshotDamageText = new StringTextComponent(
+              .orElse(0))).withStyle(ChatFormatting.RED);
+      Component damageText =
+          new TextComponent(String.valueOf(this.getDamage()))
+              .withStyle(ChatFormatting.RED);
+      Component headshotDamageText = new TextComponent(
           String.valueOf((int) (this.getDamage() * AbstractGun.HEADSHOT_MULTIPLIER)))
-              .withStyle(TextFormatting.RED);
-      ITextComponent accuracyText =
-          new StringTextComponent((int) (this.getAccuracyPct() * 100D) + "%")
-              .withStyle(TextFormatting.RED);
-      ITextComponent rpmText =
-          new StringTextComponent(String.valueOf(this.getFireRateRPM()))
-              .withStyle(TextFormatting.RED);
-      ITextComponent rangeText =
-          new StringTextComponent(this.getRange() + " blocks")
-              .withStyle(TextFormatting.RED);
+              .withStyle(ChatFormatting.RED);
+      Component accuracyText =
+          new TextComponent((int) (this.getAccuracyPct() * 100D) + "%")
+              .withStyle(ChatFormatting.RED);
+      Component rpmText =
+          new TextComponent(String.valueOf(this.getFireRateRPM()))
+              .withStyle(ChatFormatting.RED);
+      Component rangeText =
+          new TextComponent(this.getRange() + " blocks")
+              .withStyle(ChatFormatting.RED);
 
-      lines.add(new TranslationTextComponent("item_lore.gun_item.ammo_amount")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.ammo_amount")
+          .withStyle(ChatFormatting.GRAY)
           .append(ammoCount));
-      lines.add(new TranslationTextComponent("item_lore.gun_item.damage")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.damage")
+          .withStyle(ChatFormatting.GRAY)
           .append(damageText));
-      lines.add(new TranslationTextComponent("item_lore.gun_item.headshot_damage")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.headshot_damage")
+          .withStyle(ChatFormatting.GRAY)
           .append(headshotDamageText));
 
       if (this.getRoundsPerShot() > 1) {
-        ITextComponent pelletsText =
-            new StringTextComponent(String.valueOf(this.getRoundsPerShot()))
-                .withStyle(TextFormatting.RED);
+        Component pelletsText =
+            new TextComponent(String.valueOf(this.getRoundsPerShot()))
+                .withStyle(ChatFormatting.RED);
 
-        lines.add(new TranslationTextComponent("item_lore.gun_item.pellets_shot")
-            .withStyle(TextFormatting.GRAY)
+        lines.add(new TranslatableComponent("item_lore.gun_item.pellets_shot")
+            .withStyle(ChatFormatting.GRAY)
             .append(pelletsText));
       }
 
       for (Attachment attachment : gun.getAttachments()) {
-        ITextComponent attachmentName = attachment.getDescription()
+        Component attachmentName = attachment.getDescription()
             .plainCopy()
-            .withStyle(TextFormatting.RED);
-        lines.add(new TranslationTextComponent("item_lore.gun_item.attachment")
-            .withStyle(TextFormatting.GRAY)
+            .withStyle(ChatFormatting.RED);
+        lines.add(new TranslatableComponent("item_lore.gun_item.attachment")
+            .withStyle(ChatFormatting.GRAY)
             .append(attachmentName));
       }
 
-      lines.add(new TranslationTextComponent("item_lore.gun_item.rpm")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.rpm")
+          .withStyle(ChatFormatting.GRAY)
           .append(rpmText));
-      lines.add(new TranslationTextComponent("item_lore.gun_item.accuracy")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.accuracy")
+          .withStyle(ChatFormatting.GRAY)
           .append(accuracyText));
-      lines.add(new TranslationTextComponent("item_lore.gun_item.range")
-          .withStyle(TextFormatting.GRAY)
+      lines.add(new TranslatableComponent("item_lore.gun_item.range")
+          .withStyle(ChatFormatting.GRAY)
           .append(rangeText));
     });
   }

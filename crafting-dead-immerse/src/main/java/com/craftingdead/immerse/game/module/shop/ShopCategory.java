@@ -19,25 +19,25 @@
 package com.craftingdead.immerse.game.module.shop;
 
 import java.util.List;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public class ShopCategory {
 
-  private final ITextComponent displayName;
-  private final ITextComponent info;
+  private final Component displayName;
+  private final Component info;
   private final List<ShopItem> items;
 
-  public ShopCategory(ITextComponent displayName, ITextComponent info, List<ShopItem> items) {
+  public ShopCategory(Component displayName, Component info, List<ShopItem> items) {
     this.displayName = displayName;
     this.info = info;
     this.items = items;
   }
 
-  public ITextComponent getDisplayName() {
+  public Component getDisplayName() {
     return this.displayName;
   }
 
-  public ITextComponent getInfo() {
+  public Component getInfo() {
     return this.info;
   }
 

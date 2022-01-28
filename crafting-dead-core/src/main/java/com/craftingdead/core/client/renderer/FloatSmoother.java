@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.client.renderer;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class FloatSmoother {
 
@@ -49,7 +49,7 @@ public class FloatSmoother {
 
   public float getAndDecelerate(float deceleration) {
     float deltaAmount = this.targetValue - this.remainingValue;
-    float lerpAmount = MathHelper.lerp(this.acceleration, this.lastAmount, deltaAmount);
+    float lerpAmount = Mth.lerp(this.acceleration, this.lastAmount, deltaAmount);
     float signum = Math.signum(deltaAmount);
     if (signum * deltaAmount > signum * this.lastAmount) {
       deltaAmount = lerpAmount;

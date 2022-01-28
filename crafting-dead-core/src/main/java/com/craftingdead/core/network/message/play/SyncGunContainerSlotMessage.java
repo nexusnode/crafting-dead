@@ -19,51 +19,50 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.item.gun.Gun;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SyncGunContainerSlotMessage {
 
   private final int entityId;
   private final int slot;
-  private final PacketBuffer data;
+  private final FriendlyByteBuf data;
 
   public SyncGunContainerSlotMessage(int entityId, int slot, Gun gun, boolean writeAll) {
-    this(entityId, slot, new PacketBuffer(Unpooled.buffer()));
+    this(entityId, slot, new FriendlyByteBuf(Unpooled.buffer()));
     gun.encode(this.data, writeAll);
   }
 
-  public SyncGunContainerSlotMessage(int entityId, int slot, PacketBuffer data) {
+  public SyncGunContainerSlotMessage(int entityId, int slot, FriendlyByteBuf data) {
     this.entityId = entityId;
     this.slot = slot;
     this.data = data;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
     out.writeShort(this.slot);
     out.writeVarInt(this.data.readableBytes());
     out.writeBytes(this.data);
   }
 
-  public static SyncGunContainerSlotMessage decode(PacketBuffer in) {
+  public static SyncGunContainerSlotMessage decode(FriendlyByteBuf in) {
     int entityId = in.readVarInt();
     int slot = in.readShort();
     byte[] data = new byte[in.readVarInt()];
     in.readBytes(data);
     return new SyncGunContainerSlotMessage(entityId, slot,
-        new PacketBuffer(Unpooled.wrappedBuffer(data)));
+        new FriendlyByteBuf(Unpooled.wrappedBuffer(data)));
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntity(
-        ctx.get(), this.entityId, PlayerEntity.class).inventoryMenu.getSlot(this.slot).getItem()
-            .getCapability(Capabilities.GUN)
+        ctx.get(), this.entityId, Player.class).inventoryMenu.getSlot(this.slot).getItem()
+            .getCapability(Gun.CAPABILITY)
             .ifPresent(gun -> gun.decode(this.data)));
     return true;
   }

@@ -23,8 +23,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 
 @FunctionalInterface
 public interface TargetSelector {

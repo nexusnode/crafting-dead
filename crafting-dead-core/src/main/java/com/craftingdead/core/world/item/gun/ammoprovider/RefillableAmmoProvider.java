@@ -21,10 +21,10 @@ package com.craftingdead.core.world.item.gun.ammoprovider;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
 
 public class RefillableAmmoProvider implements AmmoProvider {
 
@@ -97,8 +97,8 @@ public class RefillableAmmoProvider implements AmmoProvider {
   public void unload(LivingExtension<?, ?> living) {}
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.put("magazineStack", this.magazineStack.serializeNBT());
     nbt.putInt("reserveSize", this.reserveSize);
     nbt.putBoolean("infiniteAmmo", this.infiniteAmmo);
@@ -106,8 +106,8 @@ public class RefillableAmmoProvider implements AmmoProvider {
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    if (nbt.contains("magazineStack", Constants.NBT.TAG_COMPOUND)) {
+  public void deserializeNBT(CompoundTag nbt) {
+    if (nbt.contains("magazineStack", Tag.TAG_COMPOUND)) {
       this.magazineStack = ItemStack.of(nbt.getCompound("magazineStack"));
     }
     this.reserveSize = nbt.getInt("reserveSize");
@@ -115,7 +115,7 @@ public class RefillableAmmoProvider implements AmmoProvider {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     if (writeAll) {
       out.writeBoolean(true);
       out.writeItem(this.magazineStack);
@@ -130,7 +130,7 @@ public class RefillableAmmoProvider implements AmmoProvider {
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     if (in.readBoolean()) {
       this.magazineStack = in.readItem();
       this.infiniteAmmo = in.readBoolean();

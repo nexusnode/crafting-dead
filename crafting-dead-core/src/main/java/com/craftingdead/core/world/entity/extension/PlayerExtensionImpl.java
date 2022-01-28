@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.world.entity.extension;
 
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
@@ -26,27 +25,28 @@ import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
+import com.craftingdead.core.world.inventory.storage.Storage;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
-class PlayerExtensionImpl<E extends PlayerEntity>
+class PlayerExtensionImpl<E extends Player>
     extends LivingExtensionImpl<E, PlayerHandler> implements PlayerExtension<E> {
 
   private final SynchedData dataManager = new SynchedData();
 
-  private static final DataParameter<Boolean> COMBAT_MODE_ENABLED =
-      new DataParameter<>(0x02, DataSerializers.BOOLEAN);
+  private static final EntityDataAccessor<Boolean> COMBAT_MODE_ENABLED =
+      new EntityDataAccessor<>(0x02, EntityDataSerializers.BOOLEAN);
 
   private boolean cachedCombatModeEnabled;
 
@@ -100,18 +100,18 @@ class PlayerExtensionImpl<E extends PlayerEntity>
     if (MinecraftForge.EVENT_BUS.post(new OpenEquipmentMenuEvent(this))) {
       return;
     }
-    this.getEntity().openMenu(new SimpleNamedContainerProvider(
+    this.getEntity().openMenu(new SimpleMenuProvider(
         (windowId, playerInventory, playerEntity) -> new EquipmentMenu(windowId,
-            this.getEntity().inventory, this.getItemHandler()),
-        new TranslationTextComponent("container.equipment")));
+            this.getEntity().getInventory(), this.getItemHandler()),
+        new TranslatableComponent("container.equipment")));
   }
 
   @Override
   public void openStorage(ModEquipmentSlotType slotType) {
     ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
-    storageStack.getCapability(Capabilities.STORAGE)
+    storageStack.getCapability(Storage.CAPABILITY)
         .ifPresent(storage -> this.getEntity().openMenu(
-            new SimpleNamedContainerProvider(storage, storageStack.getHoverName())));
+            new SimpleMenuProvider(storage, storageStack.getHoverName())));
   }
 
   @Override
@@ -120,7 +120,8 @@ class PlayerExtensionImpl<E extends PlayerEntity>
       return true;
     } else if (source instanceof KillFeedProvider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new AddKillFeedEntryMessage(((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
+          new AddKillFeedEntryMessage(
+              ((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
     }
     return false;
   }
@@ -148,14 +149,14 @@ class PlayerExtensionImpl<E extends PlayerEntity>
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     super.encode(out, writeAll);
     SynchedData.pack(
         writeAll ? this.dataManager.getAll() : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     super.decode(in);
     this.dataManager.assignValues(SynchedData.unpack(in));
   }

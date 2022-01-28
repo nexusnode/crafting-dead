@@ -24,24 +24,21 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameWrapper;
-import com.craftingdead.immerse.game.ServerGameWrapper;
-import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ModuleType;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.event.EventNetworkChannel;
+import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.event.EventNetworkChannel;
 
 public class GameNetworkChannel {
 
@@ -67,27 +64,25 @@ public class GameNetworkChannel {
   }
 
   private static void handleClientPayload(NetworkEvent.ClientCustomPayloadEvent event) {
-    ServerGameWrapper gameWrapper =
-        CraftingDeadImmerse.getInstance().getLogicalServer().getGameWrapper();
+    var gameWrapper = CraftingDeadImmerse.getInstance().getLogicalServer().getGameWrapper();
     processInboundPayload(gameWrapper, event.getPayload(), event.getSource().get());
   }
 
   private static void handleServerPayload(NetworkEvent.ServerCustomPayloadEvent event) {
-    ClientGameWrapper gameWrapper =
-        CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
+    var gameWrapper = CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
     processInboundPayload(gameWrapper, event.getPayload(), event.getSource().get());
   }
 
-  private static <MSG> void processInboundPayload(GameWrapper<?, ?> gameWrapper, PacketBuffer buf,
-      NetworkEvent.Context context) {
+  private static <MSG> void processInboundPayload(GameWrapper<?, ?> gameWrapper,
+      FriendlyByteBuf buf, NetworkEvent.Context context) {
     try {
       if (buf.readBoolean()) {
-        ModuleType moduleType = buf.readRegistryIdSafe(ModuleType.class);
-        Module module = gameWrapper.getModule(moduleType);
-        MSG message = moduleType.getNetworkProtocol().decode(buf, context);
+        var moduleType = buf.readRegistryIdSafe(ModuleType.class);
+        var module = gameWrapper.getModule(moduleType);
+        var message = moduleType.getNetworkProtocol().decode(buf, context);
         module.handleMessage(message, context);
       } else {
-        MSG message = gameWrapper.getGame().getType().getNetworkProtocol().decode(buf, context);
+        var message = gameWrapper.getGame().getType().getNetworkProtocol().decode(buf, context);
         gameWrapper.getGame().handleMessage(message, context);
       }
       context.setPacketHandled(true);
@@ -103,7 +98,7 @@ public class GameNetworkChannel {
   }
 
   public static <MSG> void sendTo(@Nullable ModuleType moduleType, MSG message,
-      NetworkManager manager, NetworkDirection direction) {
+      Connection manager, NetworkDirection direction) {
     manager.send(toVanillaPacket(moduleType, message, direction));
   }
 
@@ -112,11 +107,11 @@ public class GameNetworkChannel {
     target.send(toVanillaPacket(moduleType, message, target.getDirection()));
   }
 
-  public static <MSG> IPacket<?> toVanillaPacket(@Nullable ModuleType moduleType, MSG message,
+  public static <MSG> Packet<?> toVanillaPacket(@Nullable ModuleType moduleType, MSG message,
       NetworkDirection direction) {
     Game<?> game = CraftingDeadImmerse.getInstance().getGame(direction.getOriginationSide());
     try {
-      PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
+      FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
       if (moduleType == null) {
         buf.writeBoolean(false);
         game.getType().getNetworkProtocol().encode(buf, message);

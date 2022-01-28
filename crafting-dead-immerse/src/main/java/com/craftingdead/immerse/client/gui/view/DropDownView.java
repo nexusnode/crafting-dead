@@ -23,29 +23,28 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.INestedGuiEventHandler;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 
 public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
-    implements INestedGuiEventHandler {
+    implements ContainerEventHandler {
 
   public static final int DEFAULT_HEIGHT = 14;
   public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0x444444;
@@ -53,10 +52,10 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR = 0x333333;
 
   public static final int DEFAULT_Z_LEVEL = 5;
-  public static final double DEFAULT_ARROW_WIDTH = 12D;
-  public static final double DEFAULT_ARROW_HEIGHT = 5D;
-  public static final double DEFAULT_ARROW_LINE_WIDTH = 1.6D;
-  public static final double DEFAULT_X_ARROW_OFFSET = 0.18D;
+  public static final float DEFAULT_ARROW_WIDTH = 12.0F;
+  public static final float DEFAULT_ARROW_HEIGHT = 5.0F;
+  public static final float DEFAULT_ARROW_LINE_WIDTH = 1.6F;
+  public static final float DEFAULT_X_ARROW_OFFSET = 0.18F;
 
   private final List<Item> items = new ArrayList<>();
 
@@ -68,15 +67,15 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   private int selectedItemIndex = -1;
   private boolean init = false;
 
-  private double arrowWidth;
-  private double arrowHeight;
-  private double arrowLineWidth;
-  private double arrowLineWidthX;
-  private double arrowLineWidthY;
-  private double xArrowOffset;
+  private float arrowWidth;
+  private float arrowHeight;
+  private float arrowLineWidth;
+  private float arrowLineWidthX;
+  private float arrowLineWidthY;
+  private float xArrowOffset;
 
   @Nullable
-  private IGuiEventListener focusedListener;
+  private GuiEventListener focusedListener;
   private boolean dragging;
 
   private long fadeStartTimeMs;
@@ -87,7 +86,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   private SoundEvent itemHoverSound;
 
   @Nullable
-  private IGuiEventListener lastHoveredListener;
+  private GuiEventListener lastHoveredListener;
 
   public DropDownView(L layout) {
     super(layout);
@@ -102,33 +101,33 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     this.xArrowOffset = DEFAULT_X_ARROW_OFFSET;
   }
 
-  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
-    return new Vector2f(width, DEFAULT_HEIGHT);
+    return new Vec2(width, DEFAULT_HEIGHT);
   }
 
-  public DropDownView<L> setArrowWidth(double arrowWidth) {
+  public DropDownView<L> setArrowWidth(float arrowWidth) {
     this.arrowWidth = arrowWidth;
     this.calculateArrowLineWidthProjections();
     return this;
   }
 
-  public DropDownView<L> setArrowHeight(double arrowHeight) {
+  public DropDownView<L> setArrowHeight(float arrowHeight) {
     this.arrowHeight = arrowHeight;
     this.calculateArrowLineWidthProjections();
     return this;
   }
 
-  public DropDownView<L> setArrowLineWidth(double arrowLineWidth) {
+  public DropDownView<L> setArrowLineWidth(float arrowLineWidth) {
     this.arrowLineWidth = arrowLineWidth;
     this.calculateArrowLineWidthProjections();
     return this;
   }
 
   /**
-   * @param xArrowOffset RTL offset from 0.0D to 1.0D (something like percent margin right)
+   * @param xArrowOffset RTL offset from 0.0F to 1.0F (something like percent margin right)
    */
-  public DropDownView<L> setXArrowOffset(double xArrowOffset) {
+  public DropDownView<L> setXArrowOffset(float xArrowOffset) {
     this.xArrowOffset = xArrowOffset;
     return this;
   }
@@ -148,7 +147,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     return this;
   }
 
-  public DropDownView<L> addItem(ITextComponent text, Runnable actionListener) {
+  public DropDownView<L> addItem(Component text, Runnable actionListener) {
     this.items.add(new Item(this.items.size(), text, actionListener));
     return this;
   }
@@ -175,11 +174,11 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     super.mouseMoved(mouseX, mouseY);
-    IGuiEventListener hoveredListener = this.getChildAt(mouseX, mouseY).orElse(null);
+    GuiEventListener hoveredListener = this.getChildAt(mouseX, mouseY).orElse(null);
     if (hoveredListener instanceof DropDownView.Item
         && hoveredListener != this.lastHoveredListener
         && this.itemHoverSound != null) {
-      this.minecraft.getSoundManager().play(SimpleSound.forUI(this.itemHoverSound, 1.0F));
+      this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(this.itemHoverSound, 1.0F));
     }
     this.lastHoveredListener = hoveredListener;
   }
@@ -192,7 +191,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
 
     if (this.expanded || this.isMouseOver(mouseX, mouseY)) {
       if (this.expanded) {
-        INestedGuiEventHandler.super.mouseClicked(mouseX, mouseY, button);
+        ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button);
       }
       this.toggleExpanded();
       return true;
@@ -221,7 +220,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   @Override
   public boolean changeFocus(boolean forward) {
     if (this.expanded) {
-      if (!INestedGuiEventHandler.super.changeFocus(forward)) {
+      if (!ContainerEventHandler.super.changeFocus(forward)) {
         this.toggleExpanded();
       }
     } else {
@@ -232,12 +231,12 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return INestedGuiEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
+    return ContainerEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
         || super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
-  public List<? extends IGuiEventListener> children() {
+  public List<? extends GuiEventListener> children() {
     return Collections.unmodifiableList(this.items);
   }
 
@@ -245,7 +244,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     this.fadeStartTimeMs = Util.getMillis();
     this.expanded = !this.expanded;
     if (this.expandSound != null) {
-      this.minecraft.getSoundManager().play(SimpleSound.forUI(this.expandSound, 1.0F));
+      this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(this.expandSound, 1.0F));
     }
   }
 
@@ -261,17 +260,17 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   }
 
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
-    this.items.get(this.selectedItemIndex).render(matrixStack, Type.SELECTED, 255 << 24);
-    this.renderArrow();
+    this.items.get(this.selectedItemIndex).render(poseStack, Type.SELECTED, 255 << 24);
+    this.renderArrow(poseStack);
 
-    float alpha = MathHelper.clamp((Util.getMillis() - this.fadeStartTimeMs) / 100.0F, 0.0F, 1.0F);
+    float alpha = Mth.clamp((Util.getMillis() - this.fadeStartTimeMs) / 100.0F, 0.0F, 1.0F);
     if (!this.expanded) {
       alpha = 1.0F - alpha;
     }
-    int opacity = MathHelper.ceil(alpha * 255.0F) << 24;
+    int opacity = Mth.ceil(alpha * 255.0F) << 24;
     if ((opacity & 0xFC000000) != 0) {
       for (Item item : this.items) {
         Type type;
@@ -285,85 +284,88 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
           type = Type.NONE;
         }
 
-        item.render(matrixStack, type, opacity);
+        item.render(poseStack, type, opacity);
       }
     }
   }
 
-  @SuppressWarnings("deprecation")
-  private void renderArrow() {
+  private void renderArrow(PoseStack poseStack) {
     // TODO make it smoother around the edges?
-    RenderSystem.pushMatrix();
+    poseStack.pushPose();
     {
-      double xOffset =
+      var xOffset =
           this.getScaledContentX() + this.getScaledContentWidth() * (1 - this.xArrowOffset);
-      double yOffset =
+      var yOffset =
           (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2d);
-      RenderSystem.translated(xOffset, yOffset, 0);
-      Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder builder = tessellator.getBuilder();
-      builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-      builder.vertex(0, 0, 0.0D).endVertex();
-      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
-      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D)
+      poseStack.translate(xOffset, yOffset, 0);
+      RenderSystem.setShader(GameRenderer::getPositionShader);
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+      final var matrix = poseStack.last().pose();
+      final var tessellator = Tesselator.getInstance();
+      final var builder = tessellator.getBuilder();
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+      builder.vertex(matrix, 0.0F, 0.0F, 0.0F).endVertex();
+      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight, 0.0F).endVertex();
+      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight - this.arrowLineWidthY, 0.0F)
           .endVertex();
-      builder.vertex(this.arrowLineWidthX, 0, 0.0D).endVertex();
+      builder.vertex(matrix, this.arrowLineWidthX, 0.0F, 0.0F).endVertex();
       tessellator.end();
-      builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-      builder.vertex(this.arrowWidth - this.arrowLineWidthX, 0, 0.0D).endVertex();
-      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight - this.arrowLineWidthY, 0.0D)
+      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+      builder.vertex(matrix, this.arrowWidth - this.arrowLineWidthX, 0.0F, 0.0F).endVertex();
+      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight - this.arrowLineWidthY, 0.0F)
           .endVertex();
-      builder.vertex(this.arrowWidth / 2.0D, this.arrowHeight, 0.0D).endVertex();
-      builder.vertex(this.arrowWidth, 0, 0.0D).endVertex();
+      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight, 0.0F).endVertex();
+      builder.vertex(matrix, this.arrowWidth, 0.0F, 0.0F).endVertex();
       tessellator.end();
     }
-    RenderSystem.popMatrix();
+    poseStack.popPose();
   }
 
   private void calculateArrowLineWidthProjections() {
-    double arrowLinePitchRad =
-        Math.toRadians(90) - Math.atan(this.arrowWidth / 2D / this.arrowHeight);
-    this.arrowLineWidthX = this.arrowLineWidth / Math.sin(arrowLinePitchRad);
+    var arrowLinePitchRad =
+        Math.toRadians(90) - Math.atan(this.arrowWidth / 2.0F / this.arrowHeight);
+    this.arrowLineWidthX = this.arrowLineWidth / (float) Math.sin(arrowLinePitchRad);
     this.arrowLineWidthY =
-        arrowHeight - Math.tan(arrowLinePitchRad) * (this.arrowWidth / 2D - this.arrowLineWidthX);
+        this.arrowHeight
+            - (float) Math.tan(arrowLinePitchRad) * (this.arrowWidth / 2.0F - this.arrowLineWidthX);
   }
 
   private enum Type {
     HIGHLIGHTED, SELECTED, DISABLED, HOVERED, NONE;
   }
 
-  public class Item implements IGuiEventListener {
+  public class Item implements GuiEventListener {
 
     private final int index;
-    private final ITextComponent text;
+    private final Component text;
     private final Runnable actionListener;
 
     private boolean disabled = false;
 
-    public Item(int index, ITextComponent text, Runnable actionListener) {
+    public Item(int index, Component text, Runnable actionListener) {
       this.index = index;
       this.text = text;
       this.actionListener = actionListener;
     }
 
-    private void render(MatrixStack matrixStack, Type type, int opacity) {
+    private void render(PoseStack poseStack, Type type, int opacity) {
       float y = this.getY();
 
       int backgroundColour = DropDownView.this.itemBackgroundColour;
-      int textColour = TextFormatting.GRAY.getColor();
+      int textColour = ChatFormatting.GRAY.getColor();
 
       switch (type) {
         case SELECTED:
           y = DropDownView.this.getScaledContentY();
           backgroundColour ^= 0x000000;
           backgroundColour += 128 << 24;
-          textColour = TextFormatting.WHITE.getColor();
+          textColour = ChatFormatting.WHITE.getColor();
           break;
         case HIGHLIGHTED:
           backgroundColour = DropDownView.this.selectedItemBackgroundColour;
           break;
         case DISABLED:
-          textColour = TextFormatting.DARK_GRAY.getColor();
+          textColour = ChatFormatting.DARK_GRAY.getColor();
           break;
         case HOVERED:
           backgroundColour = DropDownView.this.hoveredItemBackgroundColour;
@@ -372,27 +374,28 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
           break;
       }
 
-      this.render(matrixStack, DropDownView.this.getScaledContentX(), y,
+      this.render(poseStack, DropDownView.this.getScaledContentX(), y,
           DropDownView.this.getScaledContentWidth(), DropDownView.this.getItemHeight(),
           backgroundColour | opacity, textColour | opacity);
     }
 
-    private void render(MatrixStack matrixStack, float x, float y, float width, float height,
+    private void render(PoseStack poseStack, float x, float y, float width, float height,
         int backgroundColour, int textColour) {
-      RenderUtil.fillWidthHeight(matrixStack, x, y, width, height, backgroundColour);
+      RenderSystem.setShader(GameRenderer::getPositionColorShader);
+      RenderUtil.fillWidthHeight(poseStack, x, y, width, height, backgroundColour);
 
-      FontRenderer font = DropDownView.this.minecraft.font;
+      var font = DropDownView.this.minecraft.font;
 
-      matrixStack.pushPose();
+      poseStack.pushPose();
       {
-        matrixStack.translate(0.0D, 0.0D, 400.0D);
+        poseStack.translate(0.0D, 0.0D, 400.0D);
         float textY = y + (height - DropDownView.this.minecraft.font.lineHeight) / 2 + 1;
-        for (IReorderingProcessor line : font.split(this.text, (int) width)) {
-          font.draw(matrixStack, line, x + 3, textY, textColour);
+        for (FormattedCharSequence line : font.split(this.text, (int) width)) {
+          font.draw(poseStack, line, x + 3, textY, textColour);
           textY += DropDownView.this.minecraft.font.lineHeight;
         }
       }
-      matrixStack.popPose();
+      poseStack.popPose();
     }
 
     private void click() {
@@ -455,12 +458,12 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
 
   @Nullable
   @Override
-  public IGuiEventListener getFocused() {
+  public GuiEventListener getFocused() {
     return this.focusedListener;
   }
 
   @Override
-  public void setFocused(@Nullable IGuiEventListener focusedListener) {
+  public void setFocused(@Nullable GuiEventListener focusedListener) {
     this.focusedListener = focusedListener;
   }
 }

@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.module.shop.message;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class SyncUserMessage {
 
@@ -38,12 +38,12 @@ public class SyncUserMessage {
     return this.money;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.buyTimeSeconds);
     out.writeVarInt(this.money);
   }
 
-  public static SyncUserMessage decode(PacketBuffer in) {
+  public static SyncUserMessage decode(FriendlyByteBuf in) {
     return new SyncUserMessage(in.readVarInt(), in.readVarInt());
   }
 }

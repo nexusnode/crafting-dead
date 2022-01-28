@@ -26,11 +26,11 @@ import com.craftingdead.core.client.animation.gun.RifleShootAnimation;
 import com.craftingdead.core.client.animation.gun.SubmachineShootAnimation;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.ActionTypes;
-import com.craftingdead.core.world.entity.grenade.C4ExplosiveEntity;
+import com.craftingdead.core.world.entity.grenade.C4Explosive;
 import com.craftingdead.core.world.entity.grenade.DecoyGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.entity.grenade.FragGrenadeEntity;
+import com.craftingdead.core.world.entity.grenade.FragGrenade;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
@@ -42,25 +42,25 @@ import com.craftingdead.core.world.item.gun.aimable.AimableGunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.minigun.MinigunItem;
 import com.craftingdead.core.world.item.gun.skin.Skins;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ShovelItem;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModItems {
 
   public static final DeferredRegister<Item> ITEMS =
       DeferredRegister.create(ForgeRegistries.ITEMS, CraftingDead.ID);
 
-  public static final ItemGroup COSMETICS_TAB = new ItemGroup("craftingdead.cosmetics") {
+  public static final CreativeModeTab COSMETICS_TAB = new CreativeModeTab("craftingdead.cosmetics") {
 
     @Override
     public ItemStack makeIcon() {
@@ -68,7 +68,7 @@ public class ModItems {
     }
   };
 
-  public static final ItemGroup COMBAT_TAB = new ItemGroup("craftingdead.combat") {
+  public static final CreativeModeTab COMBAT_TAB = new CreativeModeTab("craftingdead.combat") {
 
     @Override
     public ItemStack makeIcon() {
@@ -76,7 +76,7 @@ public class ModItems {
     }
   };
 
-  public static final ItemGroup MEDICAL_TAB = new ItemGroup("craftingdead.medical") {
+  public static final CreativeModeTab MEDICAL_TAB = new CreativeModeTab("craftingdead.medical") {
 
     @Override
     public ItemStack makeIcon() {
@@ -1375,13 +1375,13 @@ public class ModItems {
 
   public static final RegistryObject<GrenadeItem> FRAG_GRENADE = ITEMS.register("frag_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(FragGrenadeEntity::new)
+          .setGrenadeEntitySupplier(FragGrenade::new)
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> C4 = ITEMS.register("c4_explosive",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(C4ExplosiveEntity::new)
+          .setGrenadeEntitySupplier(C4Explosive::new)
           .setThrowSpeed(0.75F)
           .stacksTo(1)
           .tab(COMBAT_TAB)));
@@ -1421,7 +1421,7 @@ public class ModItems {
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> FIRE_AXE = ITEMS.register("fire_axe",
-      () -> new AxeItem(ItemTier.IRON, 14, -2.4F, new Item.Properties()
+      () -> new AxeItem(Tiers.IRON, 14, -2.4F, new Item.Properties()
           .durability(100)
           .tab((COMBAT_TAB))));
 
@@ -1446,7 +1446,7 @@ public class ModItems {
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SLEDGEHAMMER = ITEMS.register("sledgehammer",
-      () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F,
+      () -> new PickaxeItem(Tiers.IRON, 10, -2.4F,
           new Item.Properties()
               .durability(110)
               .tab(COMBAT_TAB)));
@@ -1457,12 +1457,12 @@ public class ModItems {
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SHOVEL = ITEMS.register("shovel",
-      () -> new ShovelItem(ItemTier.IRON, 8, -2.4F, new Item.Properties()
+      () -> new ShovelItem(Tiers.IRON, 8, -2.4F, new Item.Properties()
           .durability(70)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HATCHET = ITEMS.register("hatchet",
-      () -> new AxeItem(ItemTier.IRON, 16, -2.4F, new Item.Properties()
+      () -> new AxeItem(Tiers.IRON, 16, -2.4F, new Item.Properties()
           .durability(40)
           .tab(COMBAT_TAB)));
 
@@ -1487,7 +1487,7 @@ public class ModItems {
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> PICKAXE = ITEMS.register("pickaxe",
-      () -> new PickaxeItem(ItemTier.IRON, 10, -2.4F, new Item.Properties()
+      () -> new PickaxeItem(Tiers.IRON, 10, -2.4F, new Item.Properties()
           .durability(210)
           .tab(COMBAT_TAB)));
 

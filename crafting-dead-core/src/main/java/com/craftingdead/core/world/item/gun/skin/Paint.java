@@ -18,24 +18,53 @@
 
 package com.craftingdead.core.world.item.gun.skin;
 
-import java.util.Optional;
-import com.craftingdead.core.capability.Capabilities;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import java.util.OptionalInt;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 
 public interface Paint {
 
-  Optional<Integer> getColor();
+  Capability<Paint> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
-  RegistryKey<Skin> getSkin();
+  ResourceKey<Skin> getSkin();
+
+  default OptionalInt getColor() {
+    return OptionalInt.empty();
+  }
+
+  static Paint of(ResourceKey<Skin> skin) {
+    return () -> skin;
+  }
+
+  static Paint of(ResourceKey<Skin> skin, int color) {
+    return of(skin, OptionalInt.of(color));
+  }
+
+  static Paint of(ResourceKey<Skin> skin, OptionalInt color) {
+    return new Paint() {
+
+      @Override
+      public OptionalInt getColor() {
+        return color;
+      }
+
+      @Override
+      public ResourceKey<Skin> getSkin() {
+        return skin;
+      }
+    };
+  }
 
   static boolean isValid(ItemStack gunStack, ItemStack itemStack) {
     return isValid(gunStack.getItem().getRegistryName(), itemStack);
   }
 
   static boolean isValid(ResourceLocation gunName, ItemStack itemStack) {
-    return itemStack.getCapability(Capabilities.PAINT)
+    return itemStack.getCapability(Paint.CAPABILITY)
         .map(Paint::getSkin)
         .map(Skins.REGISTRY::get)
         .filter(skin -> skin.getAcceptedGuns().contains(gunName))

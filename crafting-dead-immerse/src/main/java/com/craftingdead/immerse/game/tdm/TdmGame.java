@@ -37,23 +37,23 @@ import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.team.TeamModule;
 import com.craftingdead.immerse.game.tdm.state.TdmState;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.item.Item;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public abstract class TdmGame<M extends Module> implements Game<M> {
 
-  private static final DataParameter<Boolean> MOVEMENT_BLOCKED =
-      new DataParameter<>(0x00, DataSerializers.BOOLEAN);
-  private static final DataParameter<Integer> TIMER_VALUE_SECONDS =
-      new DataParameter<>(0x01, DataSerializers.INT);
-  private static final DataParameter<Integer> GAME_STATE_ORDINAL =
-      new DataParameter<>(0x02, DataSerializers.INT);
-  private static final DataParameter<String> DISPLAY_NAME =
-      new DataParameter<>(0x03, DataSerializers.STRING);
+  private static final EntityDataAccessor<Boolean> MOVEMENT_BLOCKED =
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.BOOLEAN);
+  private static final EntityDataAccessor<Integer> TIMER_VALUE_SECONDS =
+      new EntityDataAccessor<>(0x01, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> GAME_STATE_ORDINAL =
+      new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<String> DISPLAY_NAME =
+      new EntityDataAccessor<>(0x03, EntityDataSerializers.STRING);
 
   private final SynchedData dataManager = new SynchedData();
 
@@ -91,7 +91,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
@@ -116,7 +116,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
     int playerDataSize = in.readVarInt();
     for (int i = 0; i < playerDataSize; i++) {

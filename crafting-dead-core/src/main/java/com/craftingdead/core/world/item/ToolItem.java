@@ -18,17 +18,17 @@
 
 package com.craftingdead.core.world.item;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 public class ToolItem extends Item {
 
@@ -37,8 +37,8 @@ public class ToolItem extends Item {
   }
 
   @Override
-  public boolean canAttackBlock(BlockState blockState, World world,
-      BlockPos blockPos, PlayerEntity playerEntity) {
+  public boolean canAttackBlock(BlockState blockState, Level world,
+      BlockPos blockPos, Player playerEntity) {
     return !playerEntity.isCreative();
   }
 
@@ -48,8 +48,10 @@ public class ToolItem extends Item {
       return 15.0F;
     } else {
       Material material = blockState.getMaterial();
-      return material != Material.PLANT && material != Material.REPLACEABLE_PLANT
-          && material != Material.CORAL && !blockState.is(BlockTags.LEAVES)
+      return material != Material.PLANT
+          && material != Material.REPLACEABLE_PLANT
+          && material != Material.WATER_PLANT
+          && !blockState.is(BlockTags.LEAVES)
           && material != Material.VEGETABLE ? 1.0F : 1.5F;
     }
   }
@@ -58,16 +60,16 @@ public class ToolItem extends Item {
   public boolean hurtEnemy(ItemStack itemStack, LivingEntity targetEntity,
       LivingEntity attackerEntity) {
     itemStack.hurtAndBreak(1, attackerEntity,
-        (entity) -> entity.broadcastBreakEvent(EquipmentSlotType.MAINHAND));
+        (entity) -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
     return true;
   }
 
   @Override
-  public boolean mineBlock(ItemStack stack, World worldIn, BlockState state, BlockPos pos,
+  public boolean mineBlock(ItemStack stack, Level worldIn, BlockState state, BlockPos pos,
       LivingEntity entityLiving) {
     if (state.getDestroySpeed(worldIn, pos) != 0.0F) {
       stack.hurtAndBreak(2, entityLiving,
-          (entity) -> entity.broadcastBreakEvent(EquipmentSlotType.MAINHAND));
+          (entity) -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
     }
     return true;
   }

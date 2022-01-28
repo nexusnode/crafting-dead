@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.server.LogicalServer;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ServerGameWrapper extends GameWrapper<GameServer, ServerModule> {
 
@@ -41,7 +41,7 @@ public class ServerGameWrapper extends GameWrapper<GameServer, ServerModule> {
     }
   }
 
-  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void addPlayer(PlayerExtension<ServerPlayer> player) {
     for (ServerModule module : this.modules.values()) {
       module.addPlayer(player);
     }
@@ -49,7 +49,7 @@ public class ServerGameWrapper extends GameWrapper<GameServer, ServerModule> {
     player.getEntity().connection.send(this.buildSyncPacket(true));
   }
 
-  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void removePlayer(PlayerExtension<ServerPlayer> player) {
     this.getGame().removePlayer(player);
     for (ServerModule module : this.modules.values()) {
       module.removePlayer(player);

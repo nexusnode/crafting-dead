@@ -19,49 +19,48 @@
 package com.craftingdead.immerse.game;
 
 import org.apache.commons.lang3.StringUtils;
-import net.minecraft.network.play.server.STitlePacket;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 
 public class GameUtil {
 
   private static final String SQUARE_UTF_8 = "\u2588";
-  private static final ITextComponent CHAT_SEPERATOR =
-      new StringTextComponent(StringUtils.repeat(SQUARE_UTF_8, 30));
-  public static final ITextComponent NEW_LINE = new StringTextComponent("\n\n");
+  private static final Component CHAT_SEPERATOR =
+      new TextComponent(StringUtils.repeat(SQUARE_UTF_8, 30));
+  public static final Component NEW_LINE = new TextComponent("\n\n");
 
-  public static ITextComponent formatMessage(ITextComponent message) {
-    return new TranslationTextComponent("message.game")
-        .withStyle(TextFormatting.AQUA)
-        .append(new StringTextComponent(" >>> ")
+  public static Component formatMessage(Component message) {
+    return new TranslatableComponent("message.game")
+        .withStyle(ChatFormatting.AQUA)
+        .append(new TextComponent(" >>> ")
             .withStyle(style -> style
                 .withBold(true)
-                .withColor(Color.fromRgb(0xFFFFFF))))
-        .append(message.copy().withStyle(TextFormatting.GRAY));
+                .withColor(TextColor.fromRgb(0xFFFFFF))))
+        .append(message.copy().withStyle(ChatFormatting.GRAY));
   }
 
-  public static void sendGameMessageToAll(ITextComponent message, MinecraftServer minecraftServer) {
+  public static void sendGameMessageToAll(Component message, MinecraftServer minecraftServer) {
     minecraftServer.getPlayerList().broadcastMessage(formatMessage(message), ChatType.SYSTEM,
         Util.NIL_UUID);
   }
 
-  public static void sendAnnouncement(ITextComponent message, MinecraftServer minecraftServer) {
-    minecraftServer.getPlayerList()
-        .broadcastAll(new STitlePacket(STitlePacket.Type.TITLE, message));
+  public static void sendAnnouncement(Component message, MinecraftServer minecraftServer) {
+    minecraftServer.getPlayerList().broadcastAll(new ClientboundSetTitleTextPacket(message));
   }
 
-  public static void sendChatAnnouncement(ITextComponent title, ITextComponent body,
+  public static void sendChatAnnouncement(Component title, Component body,
       MinecraftServer minecraftServer) {
-    final ITextComponent announcement = CHAT_SEPERATOR.copy()
+    final Component announcement = CHAT_SEPERATOR.copy()
         .append(NEW_LINE)
         .append(title.copy().withStyle(Style.EMPTY.withBold(true)))
         .append(NEW_LINE)
@@ -80,6 +79,6 @@ public class GameUtil {
       float volume, float pitch) {
     minecraftServer.getPlayerList().getPlayers()
         .forEach(playerEntity -> playerEntity.playNotifySound(soundEvent,
-            SoundCategory.MASTER, volume, pitch));
+            SoundSource.MASTER, volume, pitch));
   }
 }

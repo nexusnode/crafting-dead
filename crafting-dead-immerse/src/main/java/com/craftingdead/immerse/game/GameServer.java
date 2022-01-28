@@ -22,16 +22,16 @@ import java.util.Optional;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.mojang.serialization.Codec;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public interface GameServer extends Game<ServerModule> {
 
   Codec<GameServer> CODEC =
       GameType.CODEC.dispatch(GameServer::getType, GameType::getGameServerCodec);
 
-  default void addPlayer(PlayerExtension<ServerPlayerEntity> player) {}
+  default void addPlayer(PlayerExtension<ServerPlayer> player) {}
 
-  default void removePlayer(PlayerExtension<ServerPlayerEntity> player) {}
+  default void removePlayer(PlayerExtension<ServerPlayer> player) {}
 
   /**
    * Determine if the game has finished.
@@ -57,7 +57,7 @@ public interface GameServer extends Game<ServerModule> {
    * @return an optional spawn point. If no spawn point is returned, the player's default spawn
    *         point will be used.
    */
-  default Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayerEntity> player) {
+  default Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
     return Optional.empty();
   }
 

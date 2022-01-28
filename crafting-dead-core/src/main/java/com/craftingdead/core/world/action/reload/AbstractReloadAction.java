@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.action.reload;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TimedAction;
@@ -27,8 +26,8 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class AbstractReloadAction extends TimedAction<ActionType> {
 
@@ -45,7 +44,7 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
       @Nullable LivingExtension<?, ?> target) {
     super(type, performer, target);
     this.gunStack = performer.getMainHandItem();
-    this.gun = this.gunStack.getCapability(Capabilities.GUN)
+    this.gun = this.gunStack.getCapability(Gun.CAPABILITY)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     this.oldMagazineStack = this.gun.getAmmoProvider().getMagazineStack();
   }
@@ -67,7 +66,7 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
 
     this.gun.getReloadSound()
         .ifPresent(sound -> this.getPerformer().getLevel().playSound(null,
-            this.getPerformer().getEntity(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F));
+            this.getPerformer().getEntity(), sound, SoundSource.PLAYERS, 1.0F, 1.0F));
 
     if (this.getPerformer().getLevel().isClientSide()) {
       this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
@@ -105,7 +104,7 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound
         Minecraft.getInstance().getSoundManager()
-            .stop(this.gun.getReloadSound().get().getRegistryName(), SoundCategory.PLAYERS);
+            .stop(this.gun.getReloadSound().get().getRegistryName(), SoundSource.PLAYERS);
       }
       if (this.animation != null) {
         this.animation.remove();

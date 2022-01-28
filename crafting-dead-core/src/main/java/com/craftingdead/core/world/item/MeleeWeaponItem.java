@@ -19,19 +19,19 @@
 package com.craftingdead.core.world.item;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -57,14 +57,15 @@ public class MeleeWeaponItem extends ToolItem {
 
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
-      EquipmentSlotType equipmentSlot, ItemStack itemStack) {
-    return equipmentSlot == EquipmentSlotType.MAINHAND ? this.attributeModifiers
+      EquipmentSlot equipmentSlot, ItemStack itemStack) {
+    return equipmentSlot == EquipmentSlot.MAINHAND ? this.attributeModifiers
         : super.getAttributeModifiers(equipmentSlot, itemStack);
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> CombatSlot.MELEE),
-        () -> Capabilities.COMBAT_SLOT_PROVIDER);
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
+    return new SimpleCapabilityProvider<>(
+        LazyOptional.of(() -> CombatSlot.MELEE),
+        () -> CombatSlotProvider.CAPABILITY);
   }
 }

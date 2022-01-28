@@ -20,9 +20,9 @@ package com.craftingdead.core.world.action.delegated;
 
 import java.util.Optional;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.sounds.SoundEvent;
 
 public abstract class AbstractDelegatedAction<T extends AbstractDelegatedActionType>
     implements DelegatedAction {
@@ -35,14 +35,14 @@ public abstract class AbstractDelegatedAction<T extends AbstractDelegatedActionT
 
   @Override
   public boolean shouldShrinkStack(LivingExtension<?, ?> performer) {
-    return (!this.type.isShrinkStackInCreative() && performer.getEntity() instanceof PlayerEntity
-        && ((PlayerEntity) performer.getEntity()).isCreative()) ? false : this.type.isShrinkStack();
+    return (!this.type.isShrinkStackInCreative() && performer.getEntity() instanceof Player
+        && ((Player) performer.getEntity()).isCreative()) ? false : this.type.isShrinkStack();
   }
 
   @Override
   public Optional<Item> getReturnItem(LivingExtension<?, ?> performer) {
-    return (!this.type.isReturnItemInCreative() && performer.getEntity() instanceof PlayerEntity
-        && ((PlayerEntity) performer.getEntity()).isCreative())
+    return (!this.type.isReturnItemInCreative() && performer.getEntity() instanceof Player
+        && ((Player) performer.getEntity()).isCreative())
             ? Optional.empty()
             : this.type.getReturnItem();
   }

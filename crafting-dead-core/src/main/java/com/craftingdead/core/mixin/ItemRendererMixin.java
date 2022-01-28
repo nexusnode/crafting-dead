@@ -25,14 +25,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -41,11 +41,11 @@ public abstract class ItemRendererMixin {
    * Adds hook for {@link CustomItemRenderer}.
    */
   @Inject(at = @At("HEAD"),
-      method = "render(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V",
+      method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/block/model/ItemTransforms$TransformType;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V",
       cancellable = true)
-  private void render(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
-      boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
-      int packedLight, int packedOverlay, IBakedModel bakedModel, CallbackInfo callbackInfo) {
+  private void render(ItemStack itemStack, ItemTransforms.TransformType transformType,
+      boolean leftHanded, PoseStack matrixStack, MultiBufferSource renderTypeBuffer,
+      int packedLight, int packedOverlay, BakedModel bakedModel, CallbackInfo callbackInfo) {
     if (CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
         transformType, null, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
       callbackInfo.cancel();
@@ -56,11 +56,11 @@ public abstract class ItemRendererMixin {
    * Adds hook for {@link CustomItemRenderer}.
    */
   @Inject(at = @At("HEAD"),
-      method = "renderStatic(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/world/World;II)V",
+      method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/block/model/ItemTransforms$TransformType;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
       cancellable = true)
   private void renderStatic(@Nullable LivingEntity livingEntity, ItemStack itemStack,
-      ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, @Nullable World world, int packedLight, int packedOverlay,
+      ItemTransforms.TransformType transformType, boolean leftHanded, PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer, @Nullable Level world, int packedLight, int packedOverlay, int value,
       CallbackInfo callbackInfo) {
     if (CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
         transformType, livingEntity, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {

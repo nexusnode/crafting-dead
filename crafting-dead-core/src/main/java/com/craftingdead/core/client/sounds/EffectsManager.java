@@ -23,9 +23,9 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
-import net.minecraft.client.audio.ChannelManager;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.SoundEngine;
+import net.minecraft.client.sounds.ChannelAccess;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundEngine;
 
 public class EffectsManager {
 
@@ -70,13 +70,13 @@ public class EffectsManager {
   }
 
   public void setDirectHighpassForAll() {
-    for (ChannelManager.Entry entry : this.soundEngine.instanceToChannel.values()) {
+    for (ChannelAccess.ChannelHandle entry : this.soundEngine.instanceToChannel.values()) {
       entry.execute(source -> this.setDirectHighpass(source.source));
     }
   }
 
-  public void setDirectHighpass(ISound sound) {
-    ChannelManager.Entry entry = this.soundEngine.instanceToChannel.get(sound);
+  public void setDirectHighpass(SoundInstance sound) {
+    ChannelAccess.ChannelHandle entry = this.soundEngine.instanceToChannel.get(sound);
     if (entry != null) {
       entry.execute(source -> this.setDirectHighpass(source.source));
     }
@@ -87,7 +87,7 @@ public class EffectsManager {
   }
 
   public void removeFilterForAll() {
-    for (ChannelManager.Entry entry : this.soundEngine.instanceToChannel.values()) {
+    for (ChannelAccess.ChannelHandle entry : this.soundEngine.instanceToChannel.values()) {
       entry.execute(source -> this.removeFilter(source.source));
     }
   }

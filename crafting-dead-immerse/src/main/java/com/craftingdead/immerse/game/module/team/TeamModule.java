@@ -27,7 +27,7 @@ import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class TeamModule<T extends Enum<T> & Team> implements Module, Synched {
 
@@ -70,7 +70,7 @@ public class TeamModule<T extends Enum<T> & Team> implements Module, Synched {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     for (Map.Entry<T, TeamInstance<T>> entry : this.teams.entrySet()) {
       if (entry.getValue().requiresSync()) {
         out.writeVarInt(entry.getKey().ordinal());
@@ -111,7 +111,7 @@ public class TeamModule<T extends Enum<T> & Team> implements Module, Synched {
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     int i;
     while ((i = in.readVarInt()) != -1) {
       T team = this.teamType.getEnumConstants()[i];

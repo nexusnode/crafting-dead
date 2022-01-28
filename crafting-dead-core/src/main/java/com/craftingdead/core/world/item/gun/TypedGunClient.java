@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item.gun;
 
 import java.util.Optional;
 import com.craftingdead.core.client.animation.Animation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
 
 public class TypedGunClient<T extends TypedGun<?>> extends AbstractGunClient<T> {
 

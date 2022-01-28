@@ -19,11 +19,11 @@
 package com.craftingdead.survival.world.item.enchantment;
 
 import com.craftingdead.survival.CraftingDeadSurvival;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalEnchantments {
 
@@ -32,5 +32,5 @@ public class SurvivalEnchantments {
 
   public static final RegistryObject<InfectionEnchantment> INFECTION =
       ENCHANTMENTS.register("infection",
-          () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlotType.MAINHAND));
+          () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlot.MAINHAND));
 }

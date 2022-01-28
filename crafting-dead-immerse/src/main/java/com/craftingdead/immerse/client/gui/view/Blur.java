@@ -24,12 +24,11 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.client.shader.ShaderGroup;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.PostChain;
+import net.minecraft.resources.ResourceLocation;
 
 public class Blur implements AutoCloseable {
 
@@ -40,7 +39,7 @@ public class Blur implements AutoCloseable {
 
   private final Minecraft minecraft = Minecraft.getInstance();
 
-  private ShaderGroup blurShader;
+  private PostChain blurShader;
 
   private float lastFramebufferWidth;
   private float lastFramebufferHeight;
@@ -51,7 +50,7 @@ public class Blur implements AutoCloseable {
 
   public Blur(float radius) {
     try {
-      this.blurShader = new ShaderGroup(this.minecraft.getTextureManager(),
+      this.blurShader = new PostChain(this.minecraft.getTextureManager(),
           this.minecraft.getResourceManager(), this.minecraft.getMainRenderTarget(), BLUR_SHADER);
       this.setRadius(radius);
       this.blurShader.resize(this.minecraft.getWindow().getWidth(),
@@ -83,7 +82,7 @@ public class Blur implements AutoCloseable {
     }
   }
 
-  public void render(MatrixStack matrixStack, float x, float y, float width, float height,
+  public void render(PoseStack matrixStack, float x, float y, float width, float height,
       float partialTicks) {
     if (this.blurShader != null) {
       this.blurShader.process(partialTicks);
@@ -91,11 +90,11 @@ public class Blur implements AutoCloseable {
       RenderSystem.enableTexture();
 
       this.minecraft.getMainRenderTarget().bindWrite(false);
-      Framebuffer framebuffer = this.blurShader.getTempTarget("output");
-      framebuffer.bindRead();
-      float textureWidth = (float) (framebuffer.width
+      var renderTarget = this.blurShader.getTempTarget("output");
+      RenderSystem.setShaderTexture(0, renderTarget.getColorTextureId());
+      float textureWidth = (float) (renderTarget.width
           / this.minecraft.getWindow().getGuiScale());
-      float textureHeight = (float) (framebuffer.height
+      float textureHeight = (float) (renderTarget.height
           / this.minecraft.getWindow().getGuiScale());
       float textureX = x;
       float textureY = (textureHeight - height) - y;

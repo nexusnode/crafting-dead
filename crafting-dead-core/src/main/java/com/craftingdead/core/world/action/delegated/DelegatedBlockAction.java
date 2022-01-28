@@ -20,12 +20,12 @@ package com.craftingdead.core.world.action.delegated;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
 
 public final class DelegatedBlockAction extends AbstractDelegatedAction<DelegatedBlockActionType> {
@@ -40,12 +40,12 @@ public final class DelegatedBlockAction extends AbstractDelegatedAction<Delegate
   @Override
   public boolean canPerform(LivingExtension<?, ?> performer, @Nullable LivingExtension<?, ?> target,
       ItemStack heldStack) {
-    ModifiableAttributeInstance reachDistanceAttribute =
+    AttributeInstance reachDistanceAttribute =
         performer.getEntity().getAttribute(ForgeMod.REACH_DISTANCE.get());
-    RayTraceResult result = performer.getEntity().pick(
+    HitResult result = performer.getEntity().pick(
         reachDistanceAttribute == null ? 4.0D : reachDistanceAttribute.getValue(), 1.0F, true);
-    if (result instanceof BlockRayTraceResult) {
-      BlockPos blockPos = ((BlockRayTraceResult) result).getBlockPos();
+    if (result instanceof BlockHitResult) {
+      BlockPos blockPos = ((BlockHitResult) result).getBlockPos();
       BlockState blockState = performer.getLevel().getBlockState(blockPos);
       if (this.blockPosTarget == null || this.blockStateTarget == null) {
         this.blockPosTarget = blockPos;

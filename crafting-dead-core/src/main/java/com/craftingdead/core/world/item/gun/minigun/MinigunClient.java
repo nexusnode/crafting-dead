@@ -21,7 +21,7 @@ package com.craftingdead.core.world.item.gun.minigun;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class MinigunClient extends TypedGunClient<TypedGun<?>> {
 
@@ -45,6 +45,6 @@ public class MinigunClient extends TypedGunClient<TypedGun<?>> {
   }
 
   public float getBarrelRotation(float partialTicks) {
-    return MathHelper.lerp(partialTicks, this.lastBarrelRotation, this.barrelRotation);
+    return Mth.lerp(partialTicks, this.lastBarrelRotation, this.barrelRotation);
   }
 }

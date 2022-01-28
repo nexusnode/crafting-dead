@@ -23,20 +23,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import com.craftingdead.core.capability.Capabilities;
 import com.mojang.serialization.Codec;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
+public enum CombatSlot implements CombatSlotProvider, StringRepresentable {
 
   PRIMARY("primary", true),
   SECONDARY("secondary", true),
   MELEE("melee", false),
   GRENADE("grenade", false) {
     @Override
-    protected int getAvailableSlot(PlayerInventory playerInventory, boolean ignoreEmpty) {
+    protected int getAvailableSlot(Inventory playerInventory, boolean ignoreEmpty) {
       int index = super.getAvailableSlot(playerInventory, false);
       return index == -1 ? 3 : index;
     }
@@ -44,7 +43,7 @@ public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
   EXTRA("extra", false);
 
   public static final Codec<CombatSlot> CODEC =
-      IStringSerializable.fromEnum(CombatSlot::values, CombatSlot::byName);
+      StringRepresentable.fromEnum(CombatSlot::values, CombatSlot::byName);
   private static final Map<String, CombatSlot> BY_NAME = Arrays.stream(values())
       .collect(Collectors.toMap(CombatSlot::getSerializedName, Function.identity()));
 
@@ -66,7 +65,7 @@ public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
     return this;
   }
 
-  protected int getAvailableSlot(PlayerInventory playerInventory, boolean ignoreEmpty) {
+  protected int getAvailableSlot(Inventory playerInventory, boolean ignoreEmpty) {
     for (int i = 0; i < 6; i++) {
       if ((ignoreEmpty || playerInventory.getItem(i).isEmpty()) && getSlotType(i) == this) {
         return i;
@@ -75,7 +74,7 @@ public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
     return -1;
   }
 
-  public boolean addToInventory(ItemStack itemStack, PlayerInventory playerInventory,
+  public boolean addToInventory(ItemStack itemStack, Inventory playerInventory,
       boolean ignoreEmpty) {
     int index = this.getAvailableSlot(playerInventory, ignoreEmpty);
     if (index == -1) {
@@ -90,8 +89,7 @@ public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
   }
 
   public static Optional<CombatSlot> getSlotType(ItemStack itemStack) {
-    return itemStack.getCapability(Capabilities.COMBAT_SLOT_PROVIDER)
-        .map(CombatSlotProvider::getCombatSlot);
+    return itemStack.getCapability(CAPABILITY).map(CombatSlotProvider::getCombatSlot);
   }
 
   public boolean isItemValid(ItemStack itemStack) {
@@ -100,7 +98,7 @@ public enum CombatSlot implements CombatSlotProvider, IStringSerializable {
         .orElse(false);
   }
 
-  public static boolean isInventoryValid(PlayerInventory inventory) {
+  public static boolean isInventoryValid(Inventory inventory) {
     for (int i = 0; i < 7; i++) {
       if (!CombatSlot
           .isItemValidForSlot(inventory.getItem(i), i)) {

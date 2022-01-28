@@ -19,24 +19,24 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
 
 public class Tooltip {
 
-  private final ITextComponent text;
+  private final Component text;
   private final ValueStyleProperty<Integer> opacityProperty =
       ValueStyleProperty.create("alpha", Integer.class, 0);
   private final ValueStyleProperty<Integer> textOpacityProperty =
       ValueStyleProperty.create("text-alpha", Integer.class, 0);
 
-  public Tooltip(ITextComponent text) {
+  public Tooltip(Component text) {
     this.text = text;
   }
 
-  public void render(FontRenderer fontRenderer, MatrixStack matrixStack, float x, float y) {
+  public void render(Font fontRenderer, PoseStack matrixStack, float x, float y) {
     final float width = 10.0F + fontRenderer.width(this.text);
     final float height = 14;
 
@@ -44,7 +44,6 @@ public class Tooltip {
     RenderUtil.enableRoundedRectShader(x, y, x + width, y + height, 2);
     RenderUtil.fill(matrixStack,
         x, y, x + width, y + height, 0x111111 | (this.opacityProperty.get() << 24));
-    RenderUtil.resetShader();
 
     int shiftedOpacity = this.textOpacityProperty.get() << 24;
     if ((shiftedOpacity & 0xFC000000) != 0) {

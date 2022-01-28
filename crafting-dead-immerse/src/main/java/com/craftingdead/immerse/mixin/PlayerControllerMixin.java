@@ -23,10 +23,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
-import net.minecraft.client.multiplayer.PlayerController;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 
-@Mixin(PlayerController.class)
+@Mixin(MultiPlayerGameMode.class)
 public class PlayerControllerMixin {
 
   /**
@@ -35,6 +35,6 @@ public class PlayerControllerMixin {
   @Inject(at = @At("RETURN"), method = "canHurtPlayer", cancellable = true)
   private void canHurtPlayer(CallbackInfoReturnable<Boolean> callbackInfo) {
     callbackInfo.setReturnValue(callbackInfo.getReturnValue() ||
-        Minecraft.getInstance().getCameraEntity() instanceof RemoteClientPlayerEntity);
+        Minecraft.getInstance().getCameraEntity() instanceof RemotePlayer);
   }
 }

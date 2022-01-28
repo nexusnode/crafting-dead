@@ -23,25 +23,25 @@ import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
-import com.craftingdead.survival.world.entity.grenade.PipeGrenadeEntity;
+import com.craftingdead.survival.world.entity.grenade.PipeGrenade;
 import com.craftingdead.survival.world.level.block.SurvivalBlocks;
 import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalItems {
 
   public static final DeferredRegister<Item> ITEMS =
       DeferredRegister.create(ForgeRegistries.ITEMS, CraftingDeadSurvival.ID);
 
-  public static final ItemGroup TAB = new ItemGroup(CraftingDeadSurvival.ID) {
+  public static final CreativeModeTab TAB = new CreativeModeTab(CraftingDeadSurvival.ID) {
 
     @Override
     public ItemStack makeIcon() {
@@ -135,7 +135,7 @@ public class SurvivalItems {
 
   public static final RegistryObject<GrenadeItem> PIPE_GRENADE = ITEMS.register("pipe_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(PipeGrenadeEntity::new)
+          .setGrenadeEntitySupplier(PipeGrenade::new)
           .stacksTo(3)
           .tab(TAB)));
 

@@ -29,9 +29,9 @@ import com.craftingdead.immerse.network.play.SyncGameMessage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.IRegistryDelegate;
 
 public class GameWrapper<T extends Game<M>, M extends Module> {
@@ -88,14 +88,14 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
     this.game.tick();
   }
 
-  public IPacket<?> buildSyncPacket(boolean writeAll) {
-    PacketBuffer packetBuffer = new PacketBuffer(Unpooled.buffer());
+  public Packet<?> buildSyncPacket(boolean writeAll) {
+    FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
     this.encode(packetBuffer, writeAll);
     return NetworkChannel.PLAY.getSimpleChannel()
         .toVanillaPacket(new SyncGameMessage(packetBuffer), NetworkDirection.PLAY_TO_CLIENT);
   }
 
-  private void encode(PacketBuffer out, boolean writeAll) {
+  private void encode(FriendlyByteBuf out, boolean writeAll) {
     this.game.encode(out, writeAll);
 
     out.writeVarInt(this.modules.size());
@@ -106,7 +106,7 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
     }
   }
 
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.game.decode(in);
 
     int size = in.readVarInt();

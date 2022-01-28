@@ -21,14 +21,14 @@ package com.craftingdead.core.capability;
 import java.util.Set;
 import java.util.function.Supplier;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullFunction;
 
-public class SerializableCapabilityProvider<C extends INBTSerializable<S>, S extends INBT>
+public class SerializableCapabilityProvider<C extends INBTSerializable<S>, S extends Tag>
     extends SimpleCapabilityProvider<C> implements INBTSerializable<S> {
 
   private final Supplier<S> emptyNbt;

@@ -20,8 +20,8 @@ package com.craftingdead.core.world.item.gun.magazine;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import com.craftingdead.core.world.item.MagazineItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class MagazineImpl implements Magazine {
 
@@ -35,14 +35,14 @@ public class MagazineImpl implements Magazine {
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.putInt("size", this.size.get());
     return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
+  public void deserializeNBT(CompoundTag nbt) {
     this.size.set(nbt.getInt("size"));
   }
 
@@ -80,13 +80,13 @@ public class MagazineImpl implements Magazine {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     out.writeVarInt(this.size.get());
     this.dirty = false;
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.size.set(in.readVarInt());
   }
 

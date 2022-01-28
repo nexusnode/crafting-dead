@@ -20,16 +20,20 @@ package com.craftingdead.core.client;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.ModDist;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.EquipmentScreen;
 import com.craftingdead.core.client.gui.screen.inventory.GenericContainerScreen;
+import com.craftingdead.core.client.model.C4ExplosiveModel;
+import com.craftingdead.core.client.model.CylinderGrenadeModel;
+import com.craftingdead.core.client.model.FragGrenadeModel;
+import com.craftingdead.core.client.model.SlimGrenadeModel;
+import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
 import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
@@ -41,6 +45,7 @@ import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
 import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
+import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
@@ -60,94 +65,95 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
+import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skins;
-import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.craftingdead.core.world.item.scope.Scope;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.HumanoidModel.ArmPose;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.BipedModel.ArmPose;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.shader.ShaderGroup;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.TransformationMatrix;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.FOVUpdateEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.FOVModifierEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.StartupMessageManager;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements ModDist {
 
-  public static final KeyBinding RELOAD =
-      new KeyBinding("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
-  public static final KeyBinding REMOVE_MAGAZINE =
-      new KeyBinding("key.remove_magazine", GLFW.GLFW_KEY_J, "key.categories.gameplay");
-  public static final KeyBinding TOGGLE_FIRE_MODE =
-      new KeyBinding("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
-  public static final KeyBinding OPEN_EQUIPMENT_MENU =
-      new KeyBinding("key.equipment_menu", GLFW.GLFW_KEY_Z, "key.categories.inventory");
-  public static final KeyBinding TOGGLE_COMBAT_MODE =
-      new KeyBinding("key.toggle_combat_mode", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
-          InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_C), "key.categories.inventory");
+  public static final KeyMapping RELOAD =
+      new KeyMapping("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
+  public static final KeyMapping REMOVE_MAGAZINE =
+      new KeyMapping("key.remove_magazine", GLFW.GLFW_KEY_J, "key.categories.gameplay");
+  public static final KeyMapping TOGGLE_FIRE_MODE =
+      new KeyMapping("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
+  public static final KeyMapping OPEN_EQUIPMENT_MENU =
+      new KeyMapping("key.equipment_menu", GLFW.GLFW_KEY_Z, "key.categories.inventory");
+  public static final KeyMapping TOGGLE_COMBAT_MODE =
+      new KeyMapping("key.toggle_combat_mode", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
+          InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_C), "key.categories.inventory");
 
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;
@@ -187,10 +193,6 @@ public class ClientDist implements ModDist {
 
   private boolean wasAdrenalineActive;
 
-  private float lastFov;
-
-  private float fov;
-
   private boolean wasSneaking;
   private long lastSneakPressTime;
 
@@ -199,14 +201,17 @@ public class ClientDist implements ModDist {
   private float lastRoll;
 
   public ClientDist() {
-    final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modBus.addListener(this::handleModelBake);
+    final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleParticleFactoryRegisterEvent);
     modBus.addListener(this::handleItemColor);
     modBus.addListener(this::handleTextureStitch);
     modBus.addListener(this::handleSoundLoad);
     modBus.addListener(this::handleConfigReloading);
+    modBus.addListener(this::handleEntityRenderers);
+    modBus.addListener(this::handleEntityRenderersAddLayers);
+    modBus.addListener(this::handleEntityRenderersLayerDefinitions);
+    modBus.addListener(this::handleRegisterClientReloadListeners);
 
     MinecraftForge.EVENT_BUS.register(this);
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
@@ -214,13 +219,6 @@ public class ClientDist implements ModDist {
     this.minecraft = Minecraft.getInstance();
     this.crosshairManager = new CrosshairManager();
     this.itemRendererManager = new ItemRendererManager();
-
-    // Minecraft is null on date gen launch
-    if (this.minecraft != null) {
-      IReloadableResourceManager resourceManager =
-          (IReloadableResourceManager) this.minecraft.getResourceManager();
-      resourceManager.registerReloadListener(this.crosshairManager);
-    }
 
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
@@ -262,9 +260,9 @@ public class ClientDist implements ModDist {
     return this.minecraft;
   }
 
-  public Optional<PlayerExtension<ClientPlayerEntity>> getPlayerExtension() {
+  public Optional<PlayerExtension<LocalPlayer>> getPlayerExtension() {
     return Optional.ofNullable(this.minecraft.player)
-        .flatMap(player -> player.getCapability(Capabilities.LIVING_EXTENSION).resolve())
+        .flatMap(player -> player.getCapability(LivingExtension.CAPABILITY).resolve())
         .filter(PlayerExtension.class::isInstance)
         .map(PlayerExtension.class::cast);
   }
@@ -277,7 +275,7 @@ public class ClientDist implements ModDist {
     return entity == this.minecraft.player;
   }
 
-  public void handleHit(Vector3d hitPos, boolean dead) {
+  public void handleHit(Vec3 hitPos, boolean dead) {
     clientConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
         .ifPresent(this.ingameGui::displayHitMarker);
     if (dead && ClientDist.clientConfig.killSoundEnabled.get()) {
@@ -285,36 +283,46 @@ public class ClientDist implements ModDist {
       SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(
           new ResourceLocation(ClientDist.clientConfig.killSound.get()));
       if (soundEvent != null) {
-        this.minecraft.getSoundManager().play(SimpleSound.forUI(soundEvent, 5.0F, 1.5F));
+        this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 5.0F, 1.5F));
       }
     }
+  }
+
+  @Nullable
+  public PlayerExtension<AbstractClientPlayer> getCameraPlayer() {
+    return this.minecraft.getCameraEntity() instanceof AbstractClientPlayer
+        ? this.minecraft.getCameraEntity().getCapability(LivingExtension.CAPABILITY)
+            .<PlayerExtension<AbstractClientPlayer>>cast()
+            .orElse(null)
+        : null;
   }
 
   // ================================================================================
   // Mod Events
   // ================================================================================
 
+  private void handleRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+    event.registerReloadListener(this.crosshairManager);
+    event.registerReloadListener(this.itemRendererManager);
+  }
+
   /**
    * This has to be handled on the mod bus and forge bus.
    */
   @SubscribeEvent
   public void handleSoundLoad(SoundLoadEvent event) {
-    this.effectsManager = new EffectsManager(event.getManager());
+    this.effectsManager = new EffectsManager(event.getEngine());
   }
 
-  private void handleConfigReloading(ModConfig.Reloading event) {
+  private void handleConfigReloading(ModConfigEvent.Reloading event) {
     if (event.getConfig().getSpec() == clientConfigSpec) {
       this.ingameGui.setCrosshairLocation(new ResourceLocation(clientConfig.crosshair.get()));
     }
   }
 
-  private void handleModelBake(ModelBakeEvent event) {
-    this.itemRendererManager.refreshCachedModels();
-  }
-
   private void handleClientSetup(FMLClientSetupEvent event) {
-    ItemModelsProperties.registerGeneric(new ResourceLocation("wearing"),
-        (itemStack, world, entity) -> entity.getCapability(Capabilities.LIVING_EXTENSION)
+    ItemProperties.registerGeneric(new ResourceLocation("wearing"),
+        (itemStack, level, entity, value) -> entity.getCapability(LivingExtension.CAPABILITY)
             .filter(living -> living.getItemHandler()
                 .getStackInSlot(ModEquipmentSlotType.HAT.getIndex()) == itemStack)
             .map(__ -> 1.0F)
@@ -323,94 +331,102 @@ public class ClientDist implements ModDist {
     StartupMessageManager.addModMessage("Registering tooltips");
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
-        (stack, world, tooltipFlags) -> new TranslationTextComponent(
+        (stack, level, tooltipFlags) -> new TranslatableComponent(
             "item_lore.clothing_item.water_breathing")
-                .withStyle(TextFormatting.GRAY));
+                .withStyle(ChatFormatting.GRAY));
 
     ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
-        (stack, world, tooltipFlags) -> new TranslationTextComponent(
+        (stack, level, tooltipFlags) -> new TranslatableComponent(
             "item_lore.clothing_item.water_speed")
-                .withStyle(TextFormatting.GRAY));
+                .withStyle(ChatFormatting.GRAY));
 
-    ScreenManager.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
-    ScreenManager.register(ModMenuTypes.VEST.get(), GenericContainerScreen::new);
+    MenuScreens.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
+    MenuScreens.register(ModMenuTypes.VEST.get(), GenericContainerScreen::new);
 
     ClientRegistry.registerKeyBinding(TOGGLE_FIRE_MODE);
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_EQUIPMENT_MENU);
     ClientRegistry.registerKeyBinding(TOGGLE_COMBAT_MODE);
-
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.C4_EXPLOSIVE.get(),
-        C4ExplosiveRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FIRE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FRAG_GRENADE.get(),
-        FragGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.DECOY_GRENADE.get(),
-        SlimGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.SMOKE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FLASH_GRENADE.get(),
-        SlimGrenadeRenderer::new);
-
-    this.registerPlayerLayer(ParachuteLayer::new);
-    this.registerPlayerLayer(ClothingLayer::new);
-    this.registerPlayerLayer(
-        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-            .withRenderer(renderer)
-            .withSlot(ModEquipmentSlotType.MELEE)
-            .withCrouchingOrientation(true)
-            .build());
-    this.registerPlayerLayer(
-        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-            .withRenderer(renderer)
-            .withSlot(ModEquipmentSlotType.VEST)
-            .withCrouchingOrientation(true)
-            .build());
-    this.registerPlayerLayer(
-        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-            .withRenderer(renderer)
-            .withSlot(ModEquipmentSlotType.HAT)
-            .withHeadOrientation(true)
-            .withArbitraryTransformation(
-                new TransformationMatrix(null, null, new Vector3f(-1F, -1F, 1F), null))
-            .build());
-    this.registerPlayerLayer(
-        renderer -> new EquipmentLayer.Builder<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>()
-            .withRenderer(renderer)
-            .withSlot(ModEquipmentSlotType.GUN)
-            .withCrouchingOrientation(true)
-            .build());
   }
 
-  /**
-   * Registers a layer into {@link PlayerRenderer}. Can be used normally during
-   * {@link FMLClientSetupEvent}.
-   *
-   * @param function - {@link Function} with a {@link PlayerRenderer} as input and a
-   *        {@link LayerRenderer} as output.
-   */
-  public void registerPlayerLayer(
-      Function<PlayerRenderer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> function) {
-    // A little dirty way, blame Mojang
-    this.minecraft.getEntityRenderDispatcher().getSkinMap().forEach((skin, renderer) -> {
-      renderer.addLayer(function.apply(renderer));
-    });
+  private void handleEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    event.registerEntityRenderer(ModEntityTypes.C4_EXPLOSIVE.get(),
+        C4ExplosiveRenderer::new);
+    event.registerEntityRenderer(ModEntityTypes.FIRE_GRENADE.get(),
+        CylinderGrenadeRenderer::new);
+    event.registerEntityRenderer(ModEntityTypes.FRAG_GRENADE.get(),
+        FragGrenadeRenderer::new);
+    event.registerEntityRenderer(ModEntityTypes.DECOY_GRENADE.get(),
+        SlimGrenadeRenderer::new);
+    event.registerEntityRenderer(ModEntityTypes.SMOKE_GRENADE.get(),
+        CylinderGrenadeRenderer::new);
+    event.registerEntityRenderer(ModEntityTypes.FLASH_GRENADE.get(),
+        SlimGrenadeRenderer::new);
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {
+    for (var skin : event.getSkins()) {
+      var renderer = event.getSkin(skin);
+      renderer.addLayer(new ParachuteLayer(renderer, event.getEntityModels()));
+      renderer.addLayer(new ClothingLayer(renderer));
+      renderer.addLayer(new EquipmentLayer.Builder()
+          .withRenderer(renderer)
+          .withSlot(ModEquipmentSlotType.MELEE)
+          .withCrouchingOrientation(true)
+          .build());
+      renderer.addLayer(new EquipmentLayer.Builder()
+          .withRenderer(renderer)
+          .withSlot(ModEquipmentSlotType.VEST)
+          .withCrouchingOrientation(true)
+          .build());
+      renderer.addLayer(new EquipmentLayer.Builder()
+          .withRenderer(renderer)
+          .withSlot(ModEquipmentSlotType.HAT)
+          .withHeadOrientation(true)
+          .withArbitraryTransformation(
+              new Transformation(null, null, new Vector3f(-1F, -1F, 1F), null))
+          .build());
+      renderer.addLayer(new EquipmentLayer.Builder()
+          .withRenderer(renderer)
+          .withSlot(ModEquipmentSlotType.GUN)
+          .withCrouchingOrientation(true)
+          .build());
+    }
+  }
+
+  private void handleEntityRenderersLayerDefinitions(
+      EntityRenderersEvent.RegisterLayerDefinitions event) {
+    event.registerLayerDefinition(ModModelLayers.MUZZLE_FLASH,
+        GunRenderer::createMuzzleFlashBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.PARACHUTE,
+        ParachuteLayer::createParachuteBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.C4_EXPLOSIVE,
+        C4ExplosiveModel::createBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.CYLINDER_GRENADE,
+        CylinderGrenadeModel::createBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.FRAG_GRENADE,
+        FragGrenadeModel::createBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.SLIM_GRENADE,
+        SlimGrenadeModel::createBodyLayer);
   }
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    ParticleManager particleEngine = this.minecraft.particleEngine;
+    ParticleEngine particleEngine = this.minecraft.particleEngine;
     particleEngine.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
     particleEngine.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
-    IItemColor gunColour =
-        (itemStack, tintIndex) -> itemStack.getCapability(Capabilities.GUN).resolve()
-            .flatMap(gun -> gun.getPaintStack().getCapability(Capabilities.PAINT).resolve())
-            .flatMap(Paint::getColor)
+    ItemColor gunColour =
+        (itemStack, tintIndex) -> itemStack.getCapability(Gun.CAPABILITY)
+            .resolve()
+            .flatMap(gun -> gun.getPaintStack().getCapability(Paint.CAPABILITY).resolve())
+            .stream()
+            .flatMapToInt(paint -> paint.getColor().stream())
+            .findAny()
             .orElse(0xFFFFFFFF);
     ForgeRegistries.ITEMS.getValues().stream()
         .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColour.class))
@@ -418,8 +434,8 @@ public class ClientDist implements ModDist {
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
-    this.itemRendererManager.getTextures(event.getMap().location()).forEach(event::addSprite);
-    if (event.getMap().location().equals(PlayerContainer.BLOCK_ATLAS)) {
+    this.itemRendererManager.getTextures(event.getAtlas().location()).forEach(event::addSprite);
+    if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
       Skins.REGISTRY.stream()
           .flatMap(skin -> skin.getAcceptedGuns().stream().map(skin::getTextureLocation))
           .forEach(event::addSprite);
@@ -438,8 +454,8 @@ public class ClientDist implements ModDist {
 
     // Applies the arbitrary tooltip
     for (TooltipFunction function : functions) {
-      World world = event.getEntity() != null ? event.getEntity().level : null;
-      ITextComponent tooltip =
+      Level world = event.getEntity() != null ? event.getEntity().level : null;
+      Component tooltip =
           function.createTooltip(event.getItemStack(), world, event.getFlags());
       if (tooltip != null) {
         event.getToolTip().add(lineIndex++, tooltip);
@@ -452,11 +468,11 @@ public class ClientDist implements ModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
+        PlayerExtension<LocalPlayer> player = this.getPlayerExtension().orElse(null);
         if (player != null) {
           Gun gun = player.getMainHandGun().orElse(null);
 
-          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.overlay == null
+          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           this.cameraManager.tick();
@@ -539,8 +555,8 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    PlayerExtension<ClientPlayerEntity> player = this.getPlayerExtension().orElse(null);
-    if (player != null && this.minecraft.overlay == null
+    PlayerExtension<LocalPlayer> player = this.getPlayerExtension().orElse(null);
+    if (player != null && this.minecraft.getOverlay() == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
       Gun gun = player.getMainHandGun().orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
@@ -570,12 +586,12 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleRenderLiving(RenderLivingEvent.Pre<?, BipedModel<?>> event) {
+  public void handleRenderLiving(RenderLivingEvent.Pre<?, HumanoidModel<?>> event) {
     ItemStack heldStack = event.getEntity().getMainHandItem();
     // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
-    if (event.getRenderer().getModel() instanceof BipedModel
+    if (event.getRenderer().getModel() instanceof HumanoidModel
         && heldStack.getItem() instanceof GunItem) {
-      BipedModel<?> model = event.getRenderer().getModel();
+      HumanoidModel<?> model = event.getRenderer().getModel();
       switch (event.getEntity().getMainArm()) {
         case LEFT:
           model.leftArmPose = ArmPose.BOW_AND_ARROW;
@@ -590,50 +606,56 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    PlayerExtension<AbstractClientPlayerEntity> player =
-        this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING_EXTENSION)
-                .<PlayerExtension<AbstractClientPlayerEntity>>cast()
-                .orElse(null)
-            : null;
+  public void handleRenderGameOverlayPreLayer(RenderGameOverlayEvent.PreLayer event) {
+    var player = this.getCameraPlayer();
     if (player == null) {
       return;
     }
-    ItemStack heldStack = player.getMainHandItem();
-    Gun gun = heldStack.getCapability(Capabilities.GUN).orElse(null);
+
+    final var overlay = event.getOverlay();
+    if (overlay == ForgeIngameGui.PLAYER_HEALTH_ELEMENT
+        || overlay == ForgeIngameGui.HOTBAR_ELEMENT
+        || overlay == ForgeIngameGui.EXPERIENCE_BAR_ELEMENT
+        || overlay == ForgeIngameGui.MOUNT_HEALTH_ELEMENT
+        || overlay == ForgeIngameGui.FOOD_LEVEL_ELEMENT
+        || overlay == ForgeIngameGui.AIR_LEVEL_ELEMENT
+        || overlay == ForgeIngameGui.ARMOR_LEVEL_ELEMENT) {
+      event.setCanceled(player.isCombatModeEnabled());
+    } else if (overlay == ForgeIngameGui.CROSSHAIR_ELEMENT) {
+      var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
+          .map(scope -> scope.isScoping(player.getEntity()))
+          .orElse(false);
+      if (player.hasProgressMonitor() || aiming) {
+        event.setCanceled(true);
+        return;
+      }
+
+      player.getMainHandItem().getCapability(Gun.CAPABILITY).ifPresent(gun -> {
+        event.setCanceled(true);
+        if (gun.getClient().hasCrosshair()) {
+          this.ingameGui.renderCrosshairs(event.getMatrixStack(),
+              gun.getAccuracy(player, player.getEntity().getRandom()),
+              event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
+              event.getWindow().getGuiScaledHeight());
+        }
+      });
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
+    var player = this.getCameraPlayer();
+    if (player == null) {
+      return;
+    }
+
+    var heldStack = player.getMainHandItem();
+    var gun = heldStack.getCapability(Gun.CAPABILITY).orElse(null);
     switch (event.getType()) {
-      case HEALTH:
-      case HOTBAR:
-      case EXPERIENCE:
-      case HEALTHMOUNT:
-      case FOOD:
-      case AIR:
-      case ARMOR:
-        event.setCanceled(player.isCombatModeEnabled());
-        break;
       case ALL:
         this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
             event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
             event.getPartialTicks());
-        break;
-      case CROSSHAIRS:
-        boolean isAiming = heldStack.getCapability(Capabilities.SCOPE)
-            .map(scope -> scope.isAiming(player.getEntity()))
-            .orElse(false);
-        if (player.hasProgressMonitor() || isAiming) {
-          event.setCanceled(true);
-          break;
-        }
-
-        if (gun != null) {
-          event.setCanceled(true);
-          if (gun.getClient().hasCrosshair()) {
-            this.ingameGui.renderCrosshairs(gun.getAccuracy(player, player.getEntity().getRandom()),
-                event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
-                event.getWindow().getGuiScaledHeight());
-          }
-        }
         break;
       default:
         break;
@@ -642,7 +664,7 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
-    this.cameraManager.getCameraRotations((float) event.getRenderPartialTicks(),
+    this.cameraManager.getCameraRotations((float) event.getPartialTicks(),
         MUTABLE_CAMERA_ROTATIONS);
     if (this.minecraft.cameraEntity instanceof LivingEntity) {
       LivingEntity livingEntity = (LivingEntity) this.minecraft.cameraEntity;
@@ -650,14 +672,14 @@ public class ClientDist implements ModDist {
       CustomItemRenderer itemRenderer =
           this.itemRendererManager.getItemRenderer(itemStack.getItem());
       if (itemRenderer != null) {
-        itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getRenderPartialTicks(),
+        itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getPartialTicks(),
             MUTABLE_CAMERA_ROTATIONS);
       }
     }
 
-    this.lastPitch = MathHelper.lerp(0.1F, this.lastPitch, MUTABLE_CAMERA_ROTATIONS.x());
-    this.lastYaw = MathHelper.lerp(0.1F, this.lastYaw, MUTABLE_CAMERA_ROTATIONS.y());
-    this.lastRoll = MathHelper.lerp(0.1F, this.lastRoll, MUTABLE_CAMERA_ROTATIONS.z());
+    this.lastPitch = Mth.lerp(0.1F, this.lastPitch, MUTABLE_CAMERA_ROTATIONS.x());
+    this.lastYaw = Mth.lerp(0.1F, this.lastYaw, MUTABLE_CAMERA_ROTATIONS.y());
+    this.lastRoll = Mth.lerp(0.1F, this.lastRoll, MUTABLE_CAMERA_ROTATIONS.z());
     MUTABLE_CAMERA_ROTATIONS.set(0.0F, 0.0F, 0.0F);
     event.setPitch(event.getPitch() + this.lastPitch);
     event.setYaw(event.getYaw() + this.lastYaw);
@@ -665,35 +687,15 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handeFOVUpdate(FOVUpdateEvent event) {
-    if (this.minecraft.getCameraEntity() instanceof LivingEntity) {
-      LivingEntity livingEntity = (LivingEntity) this.minecraft.getCameraEntity();
-      ItemStack heldStack = livingEntity.getMainHandItem();
-      float newFov = heldStack.getCapability(Capabilities.SCOPE)
-          .filter(scope -> scope.isAiming(livingEntity))
-          .map(scope -> 1.0F / scope.getZoomMultiplier(livingEntity))
-          .orElse(0.0F);
-      event.setNewfov(event.getFov() - newFov);
+  public void handeFOVModifier(FOVModifierEvent event) {
+    if (this.minecraft.getCameraEntity()instanceof LivingEntity livingEntity) {
+      final var scope = livingEntity.getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
+      if (scope != null && scope.isScoping(livingEntity)) {
+        event.setNewfov(1.0F / scope.getZoomMultiplier(livingEntity));
+      }
     }
-    event.setNewfov(event.getNewfov()
-        + this.cameraManager.getFov(Minecraft.getInstance().getFrameTime()));
-  }
-
-  @SubscribeEvent
-  public void handeFOVUpdate(EntityViewRenderEvent.FOVModifier event) {
-    if (this.minecraft.getCameraEntity() instanceof LivingEntity) {
-      LivingEntity livingEntity = (LivingEntity) this.minecraft.getCameraEntity();
-      ItemStack heldStack = livingEntity.getMainHandItem();
-      float newFov = heldStack.getCapability(Capabilities.SCOPE)
-          .filter(scope -> scope.isAiming(livingEntity))
-          .map(scope -> 1 / scope.getZoomMultiplier(livingEntity)).orElse(1.0F);
-
-      this.lastFov = this.fov;
-      this.fov = MathHelper.lerp(0.25F, this.fov, newFov);
-
-      // event.setFOV(event.getFOV()
-      // * MathHelper.lerp(this.minecraft.getFrameTime(), this.lastFov, this.fov));
-    }
+    event.setNewfov(
+        event.getNewfov() + this.cameraManager.getFov(Minecraft.getInstance().getFrameTime()));
   }
 
   @SubscribeEvent
@@ -725,7 +727,7 @@ public class ClientDist implements ModDist {
       if (this.adrenalineShaderStartTime == 0L) {
         this.adrenalineShaderStartTime = currentTime;
       }
-      float progress = MathHelper.clamp(
+      float progress = Mth.clamp(
           ((currentTime - this.adrenalineShaderStartTime) - partialTicks) / 5000.0F, 0.0F, 1.0F);
       if (!shaderLoaded) {
         if (gameRenderer.currentEffect() != null) {
@@ -733,7 +735,7 @@ public class ClientDist implements ModDist {
         }
         gameRenderer.loadEffect(ADRENALINE_SHADER);
       }
-      ShaderGroup shaderGroup = gameRenderer.currentEffect();
+      PostChain shaderGroup = gameRenderer.currentEffect();
       RenderUtil.updateUniform("Saturation", progress * 0.25F, shaderGroup);
     } else if (shaderLoaded) {
       this.adrenalineShaderStartTime = 0L;
@@ -742,10 +744,11 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleGuiOpen(GuiOpenEvent event) {
-    // Prevents current GUI being closed before new one opens.
-    if (this.minecraft.screen instanceof EquipmentScreen && event.getGui() == null
-        && ((EquipmentScreen) this.minecraft.screen).isTransitioning()) {
+  public void handleScreenOpen(ScreenOpenEvent event) {
+    // Prevents current screen being closed before new one opens.
+    if (this.minecraft.screen instanceof EquipmentScreen screen
+        && event.getScreen() == null
+        && screen.isTransitioning()) {
       event.setCanceled(true);
     }
   }
@@ -760,8 +763,8 @@ public class ClientDist implements ModDist {
     int duration = flashGrenadeEntity.calculateDuration(this.minecraft.player,
         RenderUtil.isInsideFrustum(flashGrenadeEntity, false));
     if (duration > 0) {
-      EffectInstance flashEffect =
-          new EffectInstance(ModMobEffects.FLASH_BLINDNESS.get(), duration);
+      MobEffectInstance flashEffect =
+          new MobEffectInstance(ModMobEffects.FLASH_BLINDNESS.get(), duration);
       ModMobEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);
     }
   }
@@ -773,15 +776,15 @@ public class ClientDist implements ModDist {
   /**
    * @see com.craftingdead.core.mixin.PlayerRendererMixin
    */
-  public static void renderArmWithClothing(PlayerRenderer renderer, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
-      int packedLight, AbstractClientPlayerEntity playerEntity, ModelRenderer armRenderer,
-      ModelRenderer armwearRenderer) {
+  public static void renderArmWithClothing(PlayerRenderer renderer, PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
+      int packedLight, AbstractClientPlayer playerEntity, ModelPart armRenderer,
+      ModelPart armwearRenderer) {
 
-    ResourceLocation clothingTexture = playerEntity.getCapability(Capabilities.LIVING_EXTENSION)
+    var clothingTexture = playerEntity.getCapability(LivingExtension.CAPABILITY)
         .map(LivingExtension::getItemHandler)
         .map(itemHandler -> itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex()))
-        .flatMap(clothingStack -> clothingStack.getCapability(Capabilities.CLOTHING).resolve())
+        .flatMap(clothingStack -> clothingStack.getCapability(Clothing.CAPABILITY).resolve())
         .map(clothing -> clothing.getTexture(playerEntity.getModelName()))
         .orElse(null);
 
@@ -790,7 +793,7 @@ public class ClientDist implements ModDist {
     clothingTexture = event.getClothingTexture();
 
     if (clothingTexture != null) {
-      PlayerModel<AbstractClientPlayerEntity> playerModel = renderer.getModel();
+      PlayerModel<AbstractClientPlayer> playerModel = renderer.getModel();
       playerModel.attackTime = 0.0F;
       playerModel.crouching = false;
       playerModel.swimAmount = 0.0F;

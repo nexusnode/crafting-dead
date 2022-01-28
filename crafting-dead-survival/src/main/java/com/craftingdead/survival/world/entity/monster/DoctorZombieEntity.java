@@ -21,26 +21,26 @@ package com.craftingdead.survival.world.entity.monster;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.entity.ai.goal.ActionItemGoal;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.LookAtWithoutMovingGoal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.goal.InteractGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-public class DoctorZombieEntity extends AdvancedZombieEntity {
+public class DoctorZombieEntity extends AdvancedZombie {
 
   private static final int COOLDOWN_TICKS = 20 * 20;
 
   private int ticks;
 
-  public DoctorZombieEntity(EntityType<? extends AdvancedZombieEntity> type, World world) {
+  public DoctorZombieEntity(EntityType<? extends AdvancedZombie> type, Level world) {
     super(type, world);
   }
 
   @Override
   protected void registerGoals() {
     super.registerGoals();
-    this.goalSelector.addGoal(1, new LookAtWithoutMovingGoal(this, PlayerEntity.class, 8.0F, 1.0F));
+    this.goalSelector.addGoal(1, new InteractGoal(this, Player.class, 8.0F, 1.0F));
     this.goalSelector.addGoal(1,
         new ActionItemGoal(this, () -> this.ticks == 0, () -> this.ticks = COOLDOWN_TICKS));
   }

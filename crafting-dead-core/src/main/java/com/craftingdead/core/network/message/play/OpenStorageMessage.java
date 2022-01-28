@@ -21,8 +21,8 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class OpenStorageMessage {
 
@@ -32,11 +32,11 @@ public class OpenStorageMessage {
     this.slotType = slotType;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeEnum(this.slotType);
   }
 
-  public static OpenStorageMessage decode(PacketBuffer in) {
+  public static OpenStorageMessage decode(FriendlyByteBuf in) {
     return new OpenStorageMessage(in.readEnum(ModEquipmentSlotType.class));
   }
 

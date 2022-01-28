@@ -21,19 +21,19 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.Objects;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.RenderSkybox;
-import net.minecraft.client.renderer.RenderSkyboxCube;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.PanoramaRenderer;
+import net.minecraft.client.renderer.CubeMap;
+import net.minecraft.resources.ResourceLocation;
 
 public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
 
   private static final ResourceLocation PANORAMA_OVERLAY_TEXTURES =
       new ResourceLocation("textures/gui/title/background/panorama_overlay.png");
 
-  private final RenderSkybox panorama;
+  private final PanoramaRenderer panorama;
 
   private final ResourceLocation panoramaTexture;
 
@@ -41,14 +41,14 @@ public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
     super(layout);
     Objects.requireNonNull(panoramaTexture, "Panorama texture cannot be null");
     this.panoramaTexture = panoramaTexture;
-    this.panorama = new RenderSkybox(new RenderSkyboxCube(this.panoramaTexture));
+    this.panorama = new PanoramaRenderer(new CubeMap(this.panoramaTexture));
   }
 
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     this.panorama.render(partialTicks, this.getAlpha());
-    RenderUtil.bind(PANORAMA_OVERLAY_TEXTURES);
+    RenderSystem.setShaderTexture(0, PANORAMA_OVERLAY_TEXTURES);
     RenderSystem.enableBlend();
     RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);

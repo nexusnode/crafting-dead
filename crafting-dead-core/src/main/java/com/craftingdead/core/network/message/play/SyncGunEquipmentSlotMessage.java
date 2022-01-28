@@ -19,53 +19,52 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.item.gun.Gun;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SyncGunEquipmentSlotMessage {
 
   private final int entityId;
-  private final EquipmentSlotType slot;
-  private final PacketBuffer data;
+  private final EquipmentSlot slot;
+  private final FriendlyByteBuf data;
 
-  public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlotType slot, Gun gun,
+  public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlot slot, Gun gun,
       boolean writeAll) {
-    this(entityId, slot, new PacketBuffer(Unpooled.buffer()));
+    this(entityId, slot, new FriendlyByteBuf(Unpooled.buffer()));
     gun.encode(this.data, writeAll);
   }
 
-  public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlotType slot, PacketBuffer data) {
+  public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlot slot, FriendlyByteBuf data) {
     this.entityId = entityId;
     this.slot = slot;
     this.data = data;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
     out.writeEnum(this.slot);
     out.writeVarInt(this.data.readableBytes());
     out.writeBytes(this.data);
   }
 
-  public static SyncGunEquipmentSlotMessage decode(PacketBuffer in) {
+  public static SyncGunEquipmentSlotMessage decode(FriendlyByteBuf in) {
     int entityId = in.readVarInt();
-    EquipmentSlotType slot = in.readEnum(EquipmentSlotType.class);
+    EquipmentSlot slot = in.readEnum(EquipmentSlot.class);
     byte[] data = new byte[in.readVarInt()];
     in.readBytes(data);
     return new SyncGunEquipmentSlotMessage(entityId, slot,
-        new PacketBuffer(Unpooled.wrappedBuffer(data)));
+        new FriendlyByteBuf(Unpooled.wrappedBuffer(data)));
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntity(ctx.get(), this.entityId, LivingEntity.class)
         .getItemBySlot(this.slot)
-        .getCapability(Capabilities.GUN)
+        .getCapability(Gun.CAPABILITY)
         .ifPresent(gun -> gun.decode(this.data)));
     return true;
   }

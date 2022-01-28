@@ -20,11 +20,16 @@ package com.craftingdead.core.world.item.clothing;
 
 import java.util.UUID;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraft.resources.ResourceLocation;
 
 public interface Clothing {
+
+  Capability<Clothing> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   UUID MODIFIER_ID = UUID.fromString("c14e5f26-bbe9-11eb-8529-0242ac130003");
 

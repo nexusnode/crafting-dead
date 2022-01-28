@@ -22,10 +22,10 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.module.shop.ShopNetworkProtocol;
 import com.craftingdead.immerse.game.network.NetworkProtocol;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModuleTypes {
 

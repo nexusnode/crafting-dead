@@ -18,111 +18,68 @@
 
 package com.craftingdead.core.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import com.craftingdead.core.world.entity.grenade.Grenade;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
 
-public class SlimGrenadeModel extends Model {
+public class SlimGrenadeModel<T extends Grenade> extends HierarchicalModel<T> {
 
-  private final ModelRenderer shape1;
-  private final ModelRenderer shape2;
-  private final ModelRenderer shape3;
-  private final ModelRenderer shape5;
-  private final ModelRenderer shape4;
-  private final ModelRenderer shape6;
-  private final ModelRenderer shape7;
-  private final ModelRenderer shape8;
-  private final ModelRenderer shape9;
+  private final ModelPart root;
 
-  public SlimGrenadeModel() {
-    super(RenderType::entityCutoutNoCull);
-    this.texWidth = 64;
-    this.texHeight = 32;
+  public SlimGrenadeModel(ModelPart root) {
+    this.root = root;
+  }
 
-    this.shape1 = new ModelRenderer(this, 17, 16);
-    this.shape1.addBox(0F, 0F, 0F, 3, 6, 3);
-    this.shape1.setPos(0F, 0F, 0F);
-    this.shape1.setTexSize(64, 32);
-    this.shape1.mirror = true;
-    this.setRotation(shape1, 0F, 0F, 0F);
-    this.shape2 = new ModelRenderer(this, 17, 26);
-    this.shape2.addBox(0F, 0F, 0F, 4, 2, 4);
-    this.shape2.setPos(-0.5F, 6F, -0.5F);
-    this.shape2.setTexSize(64, 32);
-    this.shape2.mirror = true;
-    this.setRotation(shape2, 0F, 0F, 0F);
-    this.shape3 = new ModelRenderer(this, 17, 9);
-    this.shape3.addBox(0F, 0F, 0F, 4, 2, 4);
-    this.shape3.setPos(-0.5F, -2F, -0.5F);
-    this.shape3.setTexSize(64, 32);
-    this.shape3.mirror = true;
-    this.setRotation(shape3, 0F, 0F, 0F);
-    this.shape5 = new ModelRenderer(this, 17, 3);
-    this.shape5.addBox(0F, 0F, 0F, 2, 3, 2);
-    this.shape5.setPos(0.5F, -5F, 0.5F);
-    this.shape5.setTexSize(64, 32);
-    this.shape5.mirror = true;
-    this.setRotation(shape5, 0F, 0F, 0F);
-    this.shape4 = new ModelRenderer(this, 26, 4);
-    this.shape4.addBox(0F, 0F, 0F, 1, 2, 2);
-    this.shape4.setPos(2.5F, -5F, 0.5F);
-    this.shape4.setTexSize(64, 32);
-    this.shape4.mirror = true;
-    this.setRotation(shape4, 0F, 0F, 0F);
-    this.shape6 = new ModelRenderer(this, 36, 9);
-    this.shape6.addBox(0F, 0F, 0F, 4, 1, 2);
-    this.shape6.setPos(3.5F, -5F, 0.5F);
-    this.shape6.setTexSize(64, 32);
-    this.shape6.mirror = true;
-    this.setRotation(shape6, 0F, 0F, 1.064651F);
-    this.shape7 = new ModelRenderer(this, 36, 13);
-    this.shape7.addBox(0F, 0F, 0F, 1, 5, 2);
-    this.shape7.setPos(4.45F, -1.5F, 0.5F);
-    this.shape7.setTexSize(64, 32);
-    this.shape7.mirror = true;
-    this.setRotation(shape7, 0F, 0F, 0F);
-    this.shape8 = new ModelRenderer(this, 36, 21);
-    this.shape8.addBox(0F, 0F, 0F, 1, 1, 2);
-    this.shape8.setPos(4F, 2.5F, 0.5F);
-    this.shape8.setTexSize(64, 32);
-    this.shape8.mirror = true;
-    this.setRotation(shape8, 0F, 0F, 0F);
-    this.shape9 = new ModelRenderer(this, 10, 3);
-    this.shape9.addBox(0F, 0F, 0F, 3, 3, 0);
-    this.shape9.setPos(0F, -5F, 0.5F);
-    this.shape9.setTexSize(64, 32);
-    this.shape9.mirror = true;
-    this.setRotation(shape9, -0.3839724F, 0F, 0F);
+  public static LayerDefinition createBodyLayer() {
+    var mesh = new MeshDefinition();
+    var root = mesh.getRoot();
+
+    var anchor = root.addOrReplaceChild("anchor", CubeListBuilder.create(),
+        PartPose.offset(0.0F, -2.0F, 0.0F));
+
+    anchor.addOrReplaceChild("body", CubeListBuilder.create().texOffs(12, 0)
+        .addBox(-1.5F, -2.0F, -1.5F, 3.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
+        .texOffs(8, 5).addBox(-0.5F, -4.0F, -1.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+        .texOffs(0, 0).addBox(-1.5F, 3.5F, -1.5F, 3.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
+        .texOffs(0, 5).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F))
+        .texOffs(8, 11).addBox(-0.5F, 0.25F, -0.5F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)),
+        PartPose.offset(0.0F, -1.5F, 0.0F));
+
+    var trigger = anchor.addOrReplaceChild("trigger",
+        CubeListBuilder.create().texOffs(0, 11)
+            .addBox(-0.5F, 1.2768F, 0.12F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+            .texOffs(4, 16).addBox(-0.5F, -0.571F, -0.6454F, 1.0F, 1.0F, 1.0F,
+                new CubeDeformation(0.0F)),
+        PartPose.offset(0.0F, -4.929F, 1.6454F));
+
+    trigger.addOrReplaceChild("cube_r1",
+        CubeListBuilder.create().texOffs(0, 16).addBox(-0.5F, -0.0652F, -0.3186F, 1.0F, 2.0F, 1.0F,
+            new CubeDeformation(0.0F)),
+        PartPose.offsetAndRotation(0.0F, -0.25F, -0.25F, 0.3927F, 0.0F, 0.0F));
+
+    var lock = anchor
+        .addOrReplaceChild("lock", CubeListBuilder.create(),
+            PartPose.offset(1.1768F, -4.3232F, 0.0F));
+
+    lock.addOrReplaceChild("cube_r2",
+        CubeListBuilder.create().texOffs(4, 11).addBox(0.0F, 0.0607F, -1.0F, 0.0F, 2.0F, 2.0F,
+            new CubeDeformation(0.0F)),
+        PartPose.offsetAndRotation(-0.75F, -0.75F, 0.0F, 0.0F, 0.0F, -0.7854F));
+
+    return LayerDefinition.create(mesh, 32, 32);
   }
 
   @Override
-  public void renderToBuffer(MatrixStack matrix, IVertexBuilder vertexBuilder, int packedLight,
-      int packedOverlay, float red, float green, float blue, float alpha) {
-    this.shape1.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape2.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape3.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape5.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape4.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape6.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape7.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape8.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-    this.shape9.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
-  }
+  public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+      float netHeadYaw, float headPitch) {}
 
-  private void setRotation(ModelRenderer model, float x, float y, float z) {
-    model.xRot = x;
-    model.yRot = y;
-    model.zRot = z;
+  @Override
+  public ModelPart root() {
+    return this.root;
   }
 }

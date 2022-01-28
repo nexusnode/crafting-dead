@@ -25,16 +25,16 @@ import com.craftingdead.immerse.game.tdm.TdmTeam;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.state.State;
 import com.craftingdead.immerse.util.state.TimedStateInstance;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class GameStateInstance extends TimedStateInstance<TdmServer> {
 
-  private static final ITextComponent TIE_GAME = new StringTextComponent("Tie Game!");
-  private static final ITextComponent SPACE = new StringTextComponent(" ");
-  private static final ITextComponent WON = new StringTextComponent("Won!");
-  private static final ITextComponent DEATHMATCH = new StringTextComponent("Deathmatch");
+  private static final Component TIE_GAME = new TextComponent("Tie Game!");
+  private static final Component SPACE = new TextComponent(" ");
+  private static final Component WON = new TextComponent("Won!");
+  private static final Component DEATHMATCH = new TextComponent("Deathmatch");
 
   public GameStateInstance(State<?> state, TdmServer context) {
     super(state, context, context.getGameDuration());
@@ -71,10 +71,10 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
 
     this.getContext().setMovementBlocked(true);
 
-    ITextComponent winnerText;
+    Component winnerText;
 
     if (winningTeam == null) {
-      winnerText = TIE_GAME.copy().withStyle(TextFormatting.AQUA, TextFormatting.BOLD);
+      winnerText = TIE_GAME.copy().withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);
       redTeam.broadcastVictorySounds(ImmerseSoundEvents.RED_VICTORY.get(),
           this.getContext().getMinecraftServer());
       blueTeam.broadcastVictorySounds(ImmerseSoundEvents.BLUE_VICTORY.get(),
@@ -82,7 +82,7 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
     } else {
       winnerText =
           winningTeam.getDisplayName().copy()
-              .withStyle(TextFormatting.BOLD)
+              .withStyle(ChatFormatting.BOLD)
               .append(SPACE)
               .append(WON);
       switch (winningTeam) {
@@ -107,9 +107,9 @@ public class GameStateInstance extends TimedStateInstance<TdmServer> {
         TdmTeam.getScore(blueTeam));
   }
 
-  private void sendWinAnnoucement(ITextComponent winnerText, int redScore, int blueScore) {
-    ITextComponent scores = new StringTextComponent("Red: " + redScore + "    Blue: " + blueScore)
-        .withStyle(TextFormatting.RESET, TextFormatting.ITALIC);
+  private void sendWinAnnoucement(Component winnerText, int redScore, int blueScore) {
+    Component scores = new TextComponent("Red: " + redScore + "    Blue: " + blueScore)
+        .withStyle(ChatFormatting.RESET, ChatFormatting.ITALIC);
     GameUtil.sendChatAnnouncement(DEATHMATCH,
         winnerText
             .copy()

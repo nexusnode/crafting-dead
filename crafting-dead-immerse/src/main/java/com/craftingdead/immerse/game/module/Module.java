@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.module;
 
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public interface Module {
 

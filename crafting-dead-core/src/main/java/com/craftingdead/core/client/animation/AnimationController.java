@@ -1,12 +1,11 @@
 package com.craftingdead.core.client.animation;
 
 import java.util.ArrayDeque;
-import java.util.Iterator;
 import java.util.Queue;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 
 public class AnimationController {
 
@@ -17,9 +16,9 @@ public class AnimationController {
   }
 
   public void tick() {
-    Iterator<Animation> iterator = this.animations.iterator();
+    var iterator = this.animations.iterator();
     while (iterator.hasNext()) {
-      Animation animation = iterator.next();
+      var animation = iterator.next();
       animation.tick();
       if (!animation.isAlive()) {
         iterator.remove();
@@ -27,16 +26,17 @@ public class AnimationController {
     }
   }
 
-  public void apply(float partialTicks, MatrixStack poseStack) {
-    for (Animation animation : this.animations) {
+  public void apply(float partialTicks, PoseStack poseStack) {
+    for (var animation : this.animations) {
       if (animation.isAlive()) {
         animation.apply(partialTicks, poseStack);
       }
     }
   }
 
-  public void applyHand(Hand hand, HandSide handSide, float partialTicks, MatrixStack poseStack) {
-    for (Animation animation : this.animations) {
+  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks,
+      PoseStack poseStack) {
+    for (var animation : this.animations) {
       if (animation.isAlive()) {
         animation.applyHand(hand, handSide, partialTicks, poseStack);
       }
@@ -44,7 +44,7 @@ public class AnimationController {
   }
 
   public void applyCamera(float partialTicks, Vector3f rotations) {
-    for (Animation animation : this.animations) {
+    for (var animation : this.animations) {
       if (animation.isAlive()) {
         animation.applyCamera(partialTicks, rotations);
       }

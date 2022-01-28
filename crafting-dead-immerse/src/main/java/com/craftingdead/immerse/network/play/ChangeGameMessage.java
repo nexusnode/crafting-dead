@@ -21,8 +21,8 @@ package com.craftingdead.immerse.network.play;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class ChangeGameMessage {
 
@@ -32,11 +32,11 @@ public class ChangeGameMessage {
     this.gameType = gameType;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeRegistryId(this.gameType);
   }
 
-  public static ChangeGameMessage decode(PacketBuffer in) {
+  public static ChangeGameMessage decode(FriendlyByteBuf in) {
     return new ChangeGameMessage(in.readRegistryId());
   }
 

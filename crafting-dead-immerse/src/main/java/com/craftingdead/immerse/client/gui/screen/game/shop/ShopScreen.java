@@ -21,7 +21,7 @@ package com.craftingdead.immerse.client.gui.screen.game.shop;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.craftingdead.immerse.game.module.shop.ShopCategory;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ShopScreen extends AbstractShopScreen {
 

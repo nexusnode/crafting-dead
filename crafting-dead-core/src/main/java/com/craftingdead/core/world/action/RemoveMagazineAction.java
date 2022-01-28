@@ -25,8 +25,8 @@ import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class RemoveMagazineAction extends TimedAction<ActionType> {
 
@@ -97,8 +97,8 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
       // This will be synced to the client by the gun.
       this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
       if (!this.oldMagazineStack.isEmpty()
-          && this.getPerformer().getEntity() instanceof PlayerEntity) {
-        ((PlayerEntity) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
+          && this.getPerformer().getEntity() instanceof Player) {
+        ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
       }
     }
   }

@@ -19,10 +19,10 @@
 package com.craftingdead.core.world.item.enchantment;
 
 import com.craftingdead.core.world.item.gun.GunItem;
-import net.minecraft.enchantment.EnchantmentType;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
 public class ModEnchantmentTypes {
 
-  public static final EnchantmentType GUN =
-      EnchantmentType.create("gun", item -> item instanceof GunItem);
+  public static final EnchantmentCategory GUN =
+      EnchantmentCategory.create("gun", item -> item instanceof GunItem);
 }

@@ -24,14 +24,14 @@ import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.ICriterionInstance;
-import net.minecraft.advancements.IRequirementsStrategy;
-import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class UpgradeMagazineRecipeBuilder {
@@ -50,7 +50,7 @@ public class UpgradeMagazineRecipeBuilder {
     return new UpgradeMagazineRecipeBuilder(magazine, nextTier);
   }
 
-  public UpgradeMagazineRecipeBuilder unlockedBy(String id, ICriterionInstance criterion) {
+  public UpgradeMagazineRecipeBuilder unlockedBy(String id, CriterionTriggerInstance criterion) {
     this.advancement.addCriterion(id, criterion);
     return this;
   }
@@ -60,11 +60,11 @@ public class UpgradeMagazineRecipeBuilder {
     return this;
   }
 
-  public void save(Consumer<IFinishedRecipe> consumer) {
+  public void save(Consumer<FinishedRecipe> consumer) {
     this.save(consumer, ForgeRegistries.ITEMS.getKey(this.nextTier));
   }
 
-  public void save(Consumer<IFinishedRecipe> consumer, String id) {
+  public void save(Consumer<FinishedRecipe> consumer, String id) {
     ResourceLocation resourcelocation = ForgeRegistries.ITEMS.getKey(this.nextTier);
     if ((new ResourceLocation(id)).equals(resourcelocation)) {
       throw new IllegalStateException(
@@ -74,12 +74,12 @@ public class UpgradeMagazineRecipeBuilder {
     }
   }
 
-  public void save(Consumer<IFinishedRecipe> consumer, ResourceLocation id) {
+  public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
     this.ensureValid(id);
     this.advancement.parent(new ResourceLocation("recipes/root"))
         .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
         .rewards(AdvancementRewards.Builder.recipe(id))
-        .requirements(IRequirementsStrategy.OR);
+        .requirements(RequirementsStrategy.OR);
     consumer.accept(new UpgradeMagazineRecipeBuilder.Result(id, this.nextTier,
         this.group == null ? "" : this.group, this.magazine, this.advancement,
         new ResourceLocation(id.getNamespace(), "recipes/"
@@ -92,7 +92,7 @@ public class UpgradeMagazineRecipeBuilder {
     }
   }
 
-  public static class Result implements IFinishedRecipe {
+  public static class Result implements FinishedRecipe {
 
     private final ResourceLocation id;
     private final Item nextTier;
@@ -127,7 +127,7 @@ public class UpgradeMagazineRecipeBuilder {
     }
 
     @Override
-    public IRecipeSerializer<?> getType() {
+    public RecipeSerializer<?> getType() {
       return ModRecipeSerializers.UPGRADE_MAGAZINE.get();
     }
 

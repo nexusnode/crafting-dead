@@ -25,12 +25,12 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -112,12 +112,12 @@ public abstract class GunEvent extends Event {
   @Cancelable
   public static class HitBlock extends Action {
 
-    private final BlockRayTraceResult result;
+    private final BlockHitResult result;
     private final BlockState blockState;
-    private final World level;
+    private final Level level;
 
-    public HitBlock(Gun gun, ItemStack itemStack, BlockRayTraceResult result, BlockState blockState,
-        LivingExtension<?, ?> living, World level) {
+    public HitBlock(Gun gun, ItemStack itemStack, BlockHitResult result, BlockState blockState,
+        LivingExtension<?, ?> living, Level level) {
       super(gun, itemStack, living);
       this.result = result;
       this.blockState = blockState;
@@ -128,11 +128,11 @@ public abstract class GunEvent extends Event {
       return this.blockState;
     }
 
-    public BlockRayTraceResult getRayTraceResult() {
+    public BlockHitResult getRayTraceResult() {
       return this.result;
     }
 
-    public World getLevel() {
+    public Level getLevel() {
       return this.level;
     }
   }
@@ -141,7 +141,7 @@ public abstract class GunEvent extends Event {
   public static class HitEntity extends Action {
 
     private final Entity target;
-    private final Vector3d hitPos;
+    private final Vec3 hitPos;
     private float damage;
     private boolean headshot;
 
@@ -151,7 +151,7 @@ public abstract class GunEvent extends Event {
         LivingExtension<?, ?> living,
         Entity target,
         float damage,
-        Vector3d hitPos,
+        Vec3 hitPos,
         boolean headshot) {
       super(gun, itemStack, living);
 
@@ -165,7 +165,7 @@ public abstract class GunEvent extends Event {
       return target;
     }
 
-    public Vector3d getHitPos() {
+    public Vec3 getHitPos() {
       return hitPos;
     }
 

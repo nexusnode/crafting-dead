@@ -27,10 +27,10 @@ import com.craftingdead.immerse.game.tdm.TdmNetworkProtocol;
 import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.mojang.serialization.Codec;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class GameTypes {
 

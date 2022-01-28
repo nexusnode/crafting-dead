@@ -3,18 +3,18 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.Rect2i;
 
 public class ScissorStack {
 
-  private static final Deque<Rectangle2d> regionStack = new ArrayDeque<>();
+  private static final Deque<Rect2i> regionStack = new ArrayDeque<>();
 
   public static void push(int x, int y, int width, int height) {
-    push(new Rectangle2d(x, y, width, height));
+    push(new Rect2i(x, y, width, height));
   }
 
-  public static void push(Rectangle2d region) {
-    Rectangle2d parentRegion = peek();
+  public static void push(Rect2i region) {
+    Rect2i parentRegion = peek();
     regionStack.push(region);
     if (parentRegion == null) {
       RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
@@ -33,7 +33,7 @@ public class ScissorStack {
   public static void pop() {
     if (!regionStack.isEmpty()) {
       regionStack.pop();
-      Rectangle2d region = regionStack.peek();
+      Rect2i region = regionStack.peek();
       if (region != null) {
         RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
             region.getHeight());
@@ -43,7 +43,7 @@ public class ScissorStack {
     RenderSystem.disableScissor();
   }
 
-  public static Rectangle2d peek() {
+  public static Rect2i peek() {
     return regionStack.peek();
   }
 

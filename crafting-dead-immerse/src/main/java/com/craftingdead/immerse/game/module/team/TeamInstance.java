@@ -26,16 +26,16 @@ import java.util.function.Consumer;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class TeamInstance<T extends Team>
-    implements INBTSerializable<CompoundNBT>, Synched {
+    implements INBTSerializable<CompoundTag>, Synched {
 
   protected final SynchedData dataManager = new SynchedData();
 
@@ -51,22 +51,22 @@ public class TeamInstance<T extends Team>
   public void broadcastVictorySounds(SoundEvent teamVictoryCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playNotifySound(ImmerseSoundEvents.VICTORY_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+      playerEntity.playNotifySound(ImmerseSoundEvents.VICTORY_MUSIC.get(), SoundSource.MASTER, 0.7F,
           1.0F);
-      playerEntity.playNotifySound(teamVictoryCallout, SoundCategory.MASTER, 0.7F, 1.0F);
+      playerEntity.playNotifySound(teamVictoryCallout, SoundSource.MASTER, 0.7F, 1.0F);
     }, minecraftServer);
   }
 
   public void broadcastDefeatSounds(SoundEvent teamDefeatCallout,
       MinecraftServer minecraftServer) {
     this.forEach(playerEntity -> {
-      playerEntity.playNotifySound(ImmerseSoundEvents.DEFEAT_MUSIC.get(), SoundCategory.MASTER, 0.7F,
+      playerEntity.playNotifySound(ImmerseSoundEvents.DEFEAT_MUSIC.get(), SoundSource.MASTER, 0.7F,
           1.0F);
-      playerEntity.playNotifySound(teamDefeatCallout, SoundCategory.MASTER, 0.7F, 1.0F);
+      playerEntity.playNotifySound(teamDefeatCallout, SoundSource.MASTER, 0.7F, 1.0F);
     }, minecraftServer);
   }
 
-  public void forEach(Consumer<ServerPlayerEntity> action, MinecraftServer minecraftServer) {
+  public void forEach(Consumer<ServerPlayer> action, MinecraftServer minecraftServer) {
     for (UUID memberId : this.members) {
       action.accept(minecraftServer.getPlayerList().getPlayer(memberId));
     }
@@ -93,14 +93,14 @@ public class TeamInstance<T extends Team>
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
   }
 
@@ -110,14 +110,14 @@ public class TeamInstance<T extends Team>
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     this.team.save(this, nbt);
     return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
+  public void deserializeNBT(CompoundTag nbt) {
     this.team.load(this, nbt);
   }
 }

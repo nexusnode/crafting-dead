@@ -19,8 +19,6 @@
 package com.craftingdead.core.client.renderer.item;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,8 +30,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.client.renderer.item.model.MuzzleFlashModel;
+import com.craftingdead.core.capability.CapabilityUtil;
+import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -42,92 +40,49 @@ import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.scope.Scope;
-import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockModel;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.TransformationMatrix;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.SimpleModelTransform;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.model.ForgeModelBakery;
+import net.minecraftforge.client.model.SimpleModelState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.model.TransformationHelper;
 
 public class GunRenderer implements CustomItemRenderer {
 
-  private static final TransformationMatrix DEFAULT_SPRINTING_TRANSFORM =
-      new TransformationMatrix(
-          new Vector3f(-0.3F, 0.0F, 0.15F),
-          new Quaternion(-20, 40, 0, true),
-          new Vector3f(1.0F, 1.0F, 1.0F),
-          null);
-
-  public static final Codec<GunRenderer> CODEC = RecordCodecBuilder.create(instance -> instance
-      .group(
-          ResourceLocation.CODEC
-              .fieldOf("model")
-              .forGetter(t -> t.modelLocation),
-          RenderUtil.TRANSFORMATION_MATRIX_CODEC
-              .fieldOf("muzzle_flash_transform")
-              .forGetter(t -> t.muzzleFlashTransform),
-          RenderUtil.TRANSFORMATION_MATRIX_CODEC
-              .optionalFieldOf("aiming_transform", TransformationMatrix.identity())
-              .forGetter(t -> t.aimingTransform),
-          RenderUtil.TRANSFORMATION_MATRIX_CODEC
-              .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
-              .forGetter(t -> t.sprintingTransform),
-          Codec.unboundedMap(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
-              .optionalFieldOf("attachement_transforms", Collections.emptyMap())
-              .forGetter(t -> t.attachementTransforms),
-          Codec.unboundedMap(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
-              .optionalFieldOf("magazine_transforms", Collections.emptyMap())
-              .forGetter(t -> t.magazineTransforms),
-          Codec
-              .unboundedMap(HandTransform.CODEC,
-                  Codec.mapPair(
-                      RenderUtil.TRANSFORMATION_MATRIX_CODEC.optionalFieldOf("right_hand",
-                          TransformationMatrix.identity()),
-                      RenderUtil.TRANSFORMATION_MATRIX_CODEC.optionalFieldOf("left_hand",
-                          TransformationMatrix.identity()))
-                      .codec())
-              .optionalFieldOf("hand_transforms", Collections.emptyMap())
-              .forGetter(t -> t.handTransforms),
-          Codec.compoundList(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
-              .optionalFieldOf("iron_sights", Collections.emptyList())
-              .forGetter(t -> t.ironSights))
-      .apply(instance, GunRenderer::new));
-
-  private static final Pair<TransformationMatrix, TransformationMatrix> IDENTITY_HAND_TRANSFORMS =
-      Pair.of(TransformationMatrix.identity(), TransformationMatrix.identity());
+  private static final Pair<Transformation, Transformation> IDENTITY_HAND_TRANSFORMS =
+      Pair.of(Transformation.identity(), Transformation.identity());
 
   private static final String GUN_TEXTURE_REFERENCE = "gun";
 
@@ -137,29 +92,17 @@ public class GunRenderer implements CustomItemRenderer {
 
   private static final int AIMING_TRANSITION_MS = 200;
 
-  private static final Model muzzleFlashModel = new MuzzleFlashModel();
-
   private static final Random random = new Random();
 
   private final Minecraft minecraft = Minecraft.getInstance();
 
-  private final Map<Integer, IBakedModel> cachedModels = new Int2ObjectOpenHashMap<>();
+  private final Map<Integer, BakedModel> cachedModels = new Int2ObjectOpenHashMap<>();
 
-  private final ResourceLocation modelLocation;
+  private final GunItem item;
 
-  private final TransformationMatrix muzzleFlashTransform;
+  private final GunRendererProperties properties;
 
-  private final TransformationMatrix aimingTransform;
-
-  private final TransformationMatrix sprintingTransform;
-
-  private final Map<ResourceLocation, TransformationMatrix> attachementTransforms;
-
-  private final Map<ResourceLocation, TransformationMatrix> magazineTransforms;
-
-  private final Map<HandTransform, Pair<TransformationMatrix, TransformationMatrix>> handTransforms;
-
-  private final List<Pair<ResourceLocation, TransformationMatrix>> ironSights;
+  private ModelPart muzzleFlashModel;
 
   private long lastFlashTime = 0;
 
@@ -169,34 +112,21 @@ public class GunRenderer implements CustomItemRenderer {
   private long aimingStartTimeMs;
   private boolean wasAiming;
 
-  public GunRenderer(ResourceLocation model,
-      TransformationMatrix muzzleFlashTransform,
-      TransformationMatrix aimingTransform,
-      TransformationMatrix sprintingTransform,
-      Map<ResourceLocation, TransformationMatrix> attachementTransforms,
-      Map<ResourceLocation, TransformationMatrix> magazineTransforms,
-      Map<HandTransform, Pair<TransformationMatrix, TransformationMatrix>> handTransforms,
-      List<Pair<ResourceLocation, TransformationMatrix>> ironSights) {
-    this.modelLocation = model;
-    this.muzzleFlashTransform = muzzleFlashTransform;
-    this.aimingTransform = aimingTransform;
-    this.sprintingTransform = sprintingTransform;
-    this.attachementTransforms = attachementTransforms;
-    this.magazineTransforms = magazineTransforms;
-    this.handTransforms = handTransforms;
-    this.ironSights = ironSights;
+  public GunRenderer(GunItem item, GunRendererProperties properties) {
+    this.item = item;
+    this.properties = properties;
   }
 
   @Override
   public void rotateCamera(ItemStack itemStack, LivingEntity livingEntity, float partialTicks,
       Vector3f rotations) {
-    Gun gun = Capabilities.getOrThrow(Capabilities.GUN, itemStack, Gun.class);
+    var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
     gun.getClient().getAnimationController().applyCamera(partialTicks, rotations);
   }
 
   @Override
   public boolean handlePerspective(ItemStack item,
-      ItemCameraTransforms.TransformType transformType) {
+      ItemTransforms.TransformType transformType) {
     switch (transformType) {
       case THIRD_PERSON_LEFT_HAND:
       case THIRD_PERSON_RIGHT_HAND:
@@ -213,30 +143,30 @@ public class GunRenderer implements CustomItemRenderer {
   @Override
   public void renderItem(
       ItemStack itemStack,
-      ItemCameraTransforms.TransformType transformType,
+      ItemTransforms.TransformType transformType,
       LivingEntity entity,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
 
-    Scope scope = itemStack.getCapability(Capabilities.SCOPE).orElse(null);
-    boolean aiming = scope != null && scope.isAiming(entity);
+    var scope = itemStack.getCapability(Scope.CAPABILITY).orElse(null);
+    var aiming = scope != null && scope.isScoping(entity);
     if (aiming && scope.getOverlayTexture(entity).isPresent()) {
       return;
     }
 
-    float partialTicks = this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
+    var partialTicks = this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
-    Gun gun = Capabilities.getOrThrow(Capabilities.GUN, itemStack, Gun.class);
+    var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
 
     matrixStack.pushPose();
     {
       switch (transformType) {
         case FIRST_PERSON_LEFT_HAND:
         case FIRST_PERSON_RIGHT_HAND:
-          if (entity instanceof AbstractClientPlayerEntity) {
-            AbstractClientPlayerEntity playerEntity = (AbstractClientPlayerEntity) entity;
+          if (entity instanceof AbstractClientPlayer) {
+            AbstractClientPlayer playerEntity = (AbstractClientPlayer) entity;
             this.renderFirstPerson(playerEntity, itemStack, gun, aiming, transformType,
                 partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
           }
@@ -264,35 +194,34 @@ public class GunRenderer implements CustomItemRenderer {
   }
 
   private void renderFirstPersonHands(
-      AbstractClientPlayerEntity playerEntity,
+      AbstractClientPlayer playerEntity,
       ItemStack itemStack,
       Gun gun,
       float aimingPct,
       float partialTicks,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight) {
 
-    final PlayerRenderer playerRenderer =
+    final var playerRenderer =
         (PlayerRenderer) this.minecraft.getEntityRenderDispatcher().getRenderer(playerEntity);
 
-    HandSide handSide = playerEntity.getMainArm();
+    var handSide = playerEntity.getMainArm();
 
-    Pair<TransformationMatrix, TransformationMatrix> heldTransforms =
-        this.handTransforms.getOrDefault(
-            handSide == HandSide.RIGHT
-                ? HandTransform.HELD_RIGHT_HANDED
-                : HandTransform.HELD_LEFT_HANDED,
-            IDENTITY_HAND_TRANSFORMS);
+    var heldTransforms = this.properties.handTransforms().getOrDefault(
+        handSide == HumanoidArm.RIGHT
+            ? GunRendererProperties.HandTransform.HELD_RIGHT_HANDED
+            : GunRendererProperties.HandTransform.HELD_LEFT_HANDED,
+        IDENTITY_HAND_TRANSFORMS);
 
-    TransformationMatrix rightHandTransforms;
-    TransformationMatrix leftHandTransforms;
+    Transformation rightHandTransforms;
+    Transformation leftHandTransforms;
     if (aimingPct > 0) {
-      Pair<TransformationMatrix, TransformationMatrix> aimingTransforms =
-          this.handTransforms.getOrDefault(
-              handSide == HandSide.RIGHT
-                  ? HandTransform.AIMING_RIGHT_HANDED
-                  : HandTransform.AIMING_LEFT_HANDED,
+      Pair<Transformation, Transformation> aimingTransforms =
+          this.properties.handTransforms().getOrDefault(
+              handSide == HumanoidArm.RIGHT
+                  ? GunRendererProperties.HandTransform.AIMING_RIGHT_HANDED
+                  : GunRendererProperties.HandTransform.AIMING_LEFT_HANDED,
               IDENTITY_HAND_TRANSFORMS);
       rightHandTransforms = TransformationHelper.slerp(heldTransforms.getFirst(),
           aimingTransforms.getFirst(), aimingPct);
@@ -307,8 +236,10 @@ public class GunRenderer implements CustomItemRenderer {
     matrixStack.pushPose();
     {
       gun.getClient().getAnimationController().applyHand(
-          playerEntity.getMainArm() == HandSide.RIGHT ? Hand.MAIN_HAND : Hand.OFF_HAND,
-          HandSide.RIGHT,
+          playerEntity.getMainArm() == HumanoidArm.RIGHT
+              ? InteractionHand.MAIN_HAND
+              : InteractionHand.OFF_HAND,
+          HumanoidArm.RIGHT,
           partialTicks, matrixStack);
       matrixStack.translate(0.75F, -0.75F, -0.6F);
 
@@ -330,8 +261,9 @@ public class GunRenderer implements CustomItemRenderer {
     matrixStack.pushPose();
     {
       gun.getClient().getAnimationController().applyHand(
-          playerEntity.getMainArm() == HandSide.LEFT ? Hand.MAIN_HAND : Hand.OFF_HAND,
-          HandSide.LEFT,
+          playerEntity.getMainArm() == HumanoidArm.LEFT ? InteractionHand.MAIN_HAND
+              : InteractionHand.OFF_HAND,
+          HumanoidArm.LEFT,
           partialTicks, matrixStack);
 
       matrixStack.translate(0.75F, -0.75F, -0.75F);
@@ -351,12 +283,12 @@ public class GunRenderer implements CustomItemRenderer {
     matrixStack.popPose();
   }
 
-  private void renderFlash(Gun gun, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+  private void renderFlash(Gun gun, PoseStack matrixStack, MultiBufferSource bufferSource,
       int packedOverlay) {
     matrixStack.pushPose();
     {
-      long currentTime = Util.getMillis();
-      long deltaTime = currentTime - this.lastFlashTime;
+      var currentTime = Util.getMillis();
+      var deltaTime = currentTime - this.lastFlashTime;
 
       int texture;
       if (deltaTime > FLASH_TEXTURE_CHANGE_TIMEOUT_MS) {
@@ -366,43 +298,50 @@ public class GunRenderer implements CustomItemRenderer {
 
       // Every n milliseconds, change the muzzle flash texture
       texture = (int) ((deltaTime / 100) + 1);
-      float scale = (random.nextInt(8) + 3) / 10.0F;
+      var randomScale = (random.nextInt(8) + 3) / 10.0F;
 
-      float x = this.muzzleFlashTransform.getTranslation().x();
-      float y = this.muzzleFlashTransform.getTranslation().y();
-      float z = this.muzzleFlashTransform.getTranslation().z();
+      var transform = this.properties.muzzleFlashTransform();
+
+      var scale = transform.getScale();
+      matrixStack.scale(
+          scale.x() + randomScale,
+          scale.y() + randomScale,
+          scale.z() + randomScale);
+
+      var x = transform.getTranslation().x();
+      var y = transform.getTranslation().y();
+      var z = transform.getTranslation().z();
       if (gun.getAttachments().contains(Attachments.SUPPRESSOR.get())) {
         z -= 0.4;
       }
 
-      matrixStack.scale(this.muzzleFlashTransform.getScale().x() + scale,
-          this.muzzleFlashTransform.getScale().y() + scale,
-          this.muzzleFlashTransform.getScale().z() + scale);
+      matrixStack.translate(
+          x - randomScale * x / 2,
+          y - randomScale * y / 2,
+          z - randomScale * z / 2);
 
-      matrixStack.translate(x - scale * x / 2, y - scale * y / 2, z - scale * z / 2);
-
-      IVertexBuilder flashVertexBuilder = renderTypeBuffer
-          .getBuffer(muzzleFlashModel.renderType(new ResourceLocation(CraftingDead.ID,
-              "textures/flash/flash" + texture + ".png")));
-      muzzleFlashModel.renderToBuffer(matrixStack, flashVertexBuilder, RenderUtil.FULL_LIGHT,
-          packedOverlay, 1.0F, 1.0F, 1.0F, scale + 0.5F);
+      var flashBuffer = bufferSource.getBuffer(RenderType.beaconBeam(
+          new ResourceLocation(CraftingDead.ID, "textures/flash/flash" + texture + ".png"),
+          true));
+      this.muzzleFlashModel.render(matrixStack, flashBuffer, RenderUtil.FULL_LIGHT,
+          packedOverlay, 1.0F, 1.0F, 1.0F, randomScale + 0.5F);
     }
     matrixStack.popPose();
   }
 
   private void renderFirstPerson(
-      AbstractClientPlayerEntity playerEntity,
+      AbstractClientPlayer playerEntity,
       ItemStack itemStack,
       Gun gun,
       boolean aiming,
-      ItemCameraTransforms.TransformType transformType,
+      ItemTransforms.TransformType transformType,
       float partialTicks,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      PoseStack poseStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
 
-    final boolean flash = gun.getClient().isFlashing();
+    final var flash = gun.getClient().isFlashing();
     if (flash) {
       packedLight = RenderUtil.FULL_LIGHT;
     }
@@ -414,7 +353,7 @@ public class GunRenderer implements CustomItemRenderer {
       this.wasSprinting = playerEntity.isSprinting();
     }
 
-    float sprintingPct = MathHelper.clamp(
+    var sprintingPct = Mth.clamp(
         (float) (Util.getMillis() - this.sprintStartTimeMs) / SPRINT_TRANSITION_MS,
         0.0F, 1.0F);
     if (!playerEntity.isSprinting()) {
@@ -428,7 +367,7 @@ public class GunRenderer implements CustomItemRenderer {
       this.wasAiming = aiming;
     }
 
-    float aimingPct = MathHelper.clamp(
+    var aimingPct = Mth.clamp(
         (float) (Util.getMillis() - this.aimingStartTimeMs) / AIMING_TRANSITION_MS,
         0.0F, 1.0F);
     if (!aiming) {
@@ -441,62 +380,62 @@ public class GunRenderer implements CustomItemRenderer {
 
     if (sprintingPct > 0) {
       TransformationHelper
-          .slerp(TransformationMatrix.identity(), this.sprintingTransform, sprintingPct)
-          .push(matrixStack);
+          .slerp(Transformation.identity(), this.properties.sprintingTransform(), sprintingPct)
+          .push(poseStack);
     } else {
-      matrixStack.pushPose();
+      poseStack.pushPose();
     }
     {
       if (!aiming && flash) {
-        this.renderFlash(gun, matrixStack, renderTypeBuffer, packedOverlay);
+        this.renderFlash(gun, poseStack, renderTypeBuffer, packedOverlay);
       }
 
       this.renderFirstPersonHands(playerEntity, itemStack, gun, aimingPct, partialTicks,
-          matrixStack, renderTypeBuffer, packedLight);
+          poseStack, renderTypeBuffer, packedLight);
 
-      gun.getClient().getAnimationController().apply(partialTicks, matrixStack);
+      gun.getClient().getAnimationController().apply(partialTicks, poseStack);
 
       this.renderGunWithAttachements(itemStack.hasFoil(), gun, aimingPct, transformType,
-          partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+          partialTicks, poseStack, renderTypeBuffer, packedLight, packedOverlay);
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
   private void renderGunWithAttachements(
       boolean foil,
       Gun gun,
       float aimingPct,
-      ItemCameraTransforms.TransformType transformType,
+      ItemTransforms.TransformType transformType,
       float partialTicks,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
 
-    ResourceLocation skinTextureLocation = gun.getSkin() == null
+    var skinTextureLocation = gun.getSkin() == null
         ? null
         : gun.getSkin().getTextureLocation(gun.getItemStack().getItem().getRegistryName());
 
-    final int color = gun.getPaintStack().getCapability(Capabilities.PAINT)
+    final var color = gun.getPaintStack().getCapability(Paint.CAPABILITY)
         .resolve()
-        .flatMap(Paint::getColor)
+        .map(paint -> paint.getColor().orElse(0xFFFFFFFF))
         .orElse(0xFFFFFFFF);
 
-    Map<String, Either<RenderMaterial, String>> textures = null;
+    Map<String, Either<Material, String>> textures = null;
     if (skinTextureLocation != null) {
-      textures = ImmutableMap.of(GUN_TEXTURE_REFERENCE,
-          Either.left(new RenderMaterial(PlayerContainer.BLOCK_ATLAS, skinTextureLocation)));
+      textures = Map.of(GUN_TEXTURE_REFERENCE,
+          Either.left(new Material(InventoryMenu.BLOCK_ATLAS, skinTextureLocation)));
     }
-    IBakedModel bakedModel = this.getBakedModel(this.modelLocation, textures);
+    var bakedModel = this.getBakedModel(this.properties.modelLocation(), textures);
 
-    MatrixStack tempStack = new MatrixStack();
-    bakedModel = bakedModel.handlePerspective(transformType, tempStack);
-    TransformationMatrix normalTransform = new TransformationMatrix(tempStack.last().pose());
+    var tempPoseStack = new PoseStack();
+    bakedModel = bakedModel.handlePerspective(transformType, tempPoseStack);
+    var normalTransform = new Transformation(tempPoseStack.last().pose());
 
-    TransformationMatrix perspectiveTransform;
+    Transformation perspectiveTransform;
     if (aimingPct > 0) {
       perspectiveTransform =
-          TransformationHelper.slerp(normalTransform, this.aimingTransform, aimingPct);
+          TransformationHelper.slerp(normalTransform, this.properties.aimingTransform(), aimingPct);
     } else {
       perspectiveTransform = normalTransform;
     }
@@ -519,40 +458,39 @@ public class GunRenderer implements CustomItemRenderer {
     matrixStack.popPose();
   }
 
-  protected final void renderBakedModel(IBakedModel bakedModel, boolean foil, int colour,
-      ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    matrixStack.pushPose();
+  protected final void renderBakedModel(BakedModel bakedModel, boolean foil, int colour,
+      ItemTransforms.TransformType transformType, PoseStack poseStack,
+      MultiBufferSource renderTypeBuffer, int packedLight, int packedOverlay) {
+    poseStack.pushPose();
     {
-      matrixStack.translate(-0.5D, -0.5D, -0.5D);
-      IVertexBuilder vertexBuilder = ItemRenderer.getFoilBuffer(renderTypeBuffer,
-          Atlases.translucentCullBlockSheet(), true, foil);
-      List<BakedQuad> bakedQuads = bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE);
-      MatrixStack.Entry matrixStackEntry = matrixStack.last();
-      for (BakedQuad bakedQuad : bakedQuads) {
-        float red = (colour >> 16 & 255) / 255.0F;
-        float green = (colour >> 8 & 255) / 255.0F;
-        float blue = (colour & 255) / 255.0F;
-        vertexBuilder.addVertexData(matrixStackEntry, bakedQuad, red, green, blue, packedLight,
+      poseStack.translate(-0.5D, -0.5D, -0.5D);
+      VertexConsumer vertexBuilder = ItemRenderer.getFoilBuffer(renderTypeBuffer,
+          Sheets.translucentCullBlockSheet(), true, foil);
+      var bakedQuads = bakedModel.getQuads(null, null, random, EmptyModelData.INSTANCE);
+      var pose = poseStack.last();
+      for (var bakedQuad : bakedQuads) {
+        var red = (colour >> 16 & 255) / 255.0F;
+        var green = (colour >> 8 & 255) / 255.0F;
+        var blue = (colour & 255) / 255.0F;
+        vertexBuilder.putBulkData(pose, bakedQuad, red, green, blue, packedLight,
             packedOverlay, true);
       }
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
-  private IBakedModel getBakedModel(ResourceLocation modelLocation,
-      @Nullable Map<String, Either<RenderMaterial, String>> textures) {
+  private BakedModel getBakedModel(ResourceLocation modelLocation,
+      @Nullable Map<String, Either<Material, String>> textures) {
     return this.cachedModels.computeIfAbsent(
         modelLocation.hashCode() + (textures == null ? 0 : textures.hashCode()), key -> {
           if (textures != null) {
-            IUnbakedModel model = ModelLoader.instance().getModelOrMissing(modelLocation);
-            if (model instanceof BlockModel) {
-              BlockModel blockModel = (BlockModel) model;
-              BlockModel overriddenModel = new BlockModel(null, new ArrayList<>(), textures, false,
-                  null, ItemCameraTransforms.NO_TRANSFORMS, new ArrayList<>());
+            var model = ForgeModelBakery.instance().getModelOrMissing(modelLocation);
+            if (model instanceof BlockModel blockModel) {
+              BlockModel overriddenModel = new BlockModel(null, List.of(), textures, false,
+                  null, ItemTransforms.NO_TRANSFORMS, List.of());
               overriddenModel.parent = blockModel;
-              return overriddenModel.bake(ModelLoader.instance(), overriddenModel,
-                  ModelLoader.defaultTextureGetter(), SimpleModelTransform.IDENTITY, modelLocation,
+              return overriddenModel.bake(ForgeModelBakery.instance(), overriddenModel,
+                  ForgeModelBakery.defaultTextureGetter(), SimpleModelState.IDENTITY, modelLocation,
                   false);
             }
           }
@@ -565,21 +503,21 @@ public class GunRenderer implements CustomItemRenderer {
       @Nullable ResourceLocation skinTextureLocation,
       int colour,
       boolean foil,
-      ItemCameraTransforms.TransformType transformType,
+      ItemTransforms.TransformType transformType,
       float partialTicks,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
 
     if (gun.hasIronSight()) {
-      for (Pair<ResourceLocation, TransformationMatrix> ironSight : this.ironSights) {
+      for (var ironSight : this.properties.ironSights()) {
         ironSight.getSecond().push(matrixStack);
         {
-          IBakedModel bakedModel = this.getBakedModel(ironSight.getFirst(),
-              ImmutableMap.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
+          var bakedModel = this.getBakedModel(ironSight.getFirst(),
+              Map.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
                   ? this.getGunRenderMaterial()
-                  : new RenderMaterial(PlayerContainer.BLOCK_ATLAS, skinTextureLocation))));
+                  : new Material(InventoryMenu.BLOCK_ATLAS, skinTextureLocation))));
           this.renderBakedModel(bakedModel, foil, colour, transformType, matrixStack,
               renderTypeBuffer, packedLight, packedOverlay);
         }
@@ -587,13 +525,12 @@ public class GunRenderer implements CustomItemRenderer {
       }
     }
 
-    for (Attachment attachment : gun.getAttachments()) {
-      TransformationMatrix transform =
-          this.attachementTransforms.getOrDefault(attachment.getRegistryName(),
-              TransformationMatrix.identity());
+    for (var attachment : gun.getAttachments()) {
+      var transform = this.properties.attachementTransforms()
+          .getOrDefault(attachment.getRegistryName(), Transformation.identity());
       transform.push(matrixStack);
       {
-        IBakedModel bakedModel =
+        var bakedModel =
             this.getBakedModel(getAttachmentModelLocation(attachment.getRegistryName()), null);
         this.renderBakedModel(bakedModel, foil, colour, transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
@@ -607,25 +544,24 @@ public class GunRenderer implements CustomItemRenderer {
       @Nullable ResourceLocation skinTextureLocation,
       int colour,
       boolean foil,
-      ItemCameraTransforms.TransformType transformType,
-      MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer,
+      ItemTransforms.TransformType transformType,
+      PoseStack matrixStack,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
 
-    ItemStack magazineStack = gun.getAmmoProvider().getMagazineStack();
+    var magazineStack = gun.getAmmoProvider().getMagazineStack();
     if (!magazineStack.isEmpty()) {
-      TransformationMatrix transform = this.magazineTransforms
-          .getOrDefault(magazineStack.getItem().getRegistryName(), TransformationMatrix.identity());
+      var transform = this.properties.magazineTransforms()
+          .getOrDefault(magazineStack.getItem().getRegistryName(), Transformation.identity());
       transform.push(matrixStack);
       {
-        ResourceLocation modelLocation =
-            getMagazineModelLocation(magazineStack.getItem().getRegistryName());
+        var modelLocation = getMagazineModelLocation(magazineStack.getItem().getRegistryName());
 
-        IBakedModel magazineBakedModel = this.getBakedModel(modelLocation,
-            ImmutableMap.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
+        var magazineBakedModel = this.getBakedModel(modelLocation,
+            Map.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
                 ? this.getGunRenderMaterial()
-                : new RenderMaterial(PlayerContainer.BLOCK_ATLAS, skinTextureLocation))));
+                : new Material(InventoryMenu.BLOCK_ATLAS, skinTextureLocation))));
 
         this.renderBakedModel(magazineBakedModel, foil, colour, transformType, matrixStack,
             renderTypeBuffer, packedLight, packedOverlay);
@@ -634,44 +570,45 @@ public class GunRenderer implements CustomItemRenderer {
     }
   }
 
-  private RenderMaterial getGunRenderMaterial() {
-    IUnbakedModel unbakedModel = ModelLoader.instance().getModelOrMissing(this.modelLocation);
-    return unbakedModel instanceof BlockModel
-        ? ((BlockModel) unbakedModel).getMaterial(GUN_TEXTURE_REFERENCE)
-        : new RenderMaterial(PlayerContainer.BLOCK_ATLAS, MissingTextureSprite.getLocation());
+  private Material getGunRenderMaterial() {
+    var unbakedModel =
+        ForgeModelBakery.instance().getModelOrMissing(this.properties.modelLocation());
+    return unbakedModel instanceof BlockModel model
+        ? model.getMaterial(GUN_TEXTURE_REFERENCE)
+        : new Material(InventoryMenu.BLOCK_ATLAS, MissingTextureAtlasSprite.getLocation());
   }
 
   @Override
-  public Collection<ResourceLocation> getModelDependencies(Item item) {
-    final GunItem gun = (GunItem) item;
+  public Collection<ResourceLocation> getModelDependencies() {
     final Set<ResourceLocation> dependencies = new HashSet<>();
-    dependencies.addAll(this.ironSights.stream()
+    dependencies.addAll(this.properties.ironSights().stream()
         .map(Pair::getFirst)
         .collect(Collectors.toSet()));
-    dependencies.addAll(gun.getAcceptedAttachments().stream()
+    dependencies.addAll(this.item.getAcceptedAttachments().stream()
         .map(Attachment::getRegistryName)
         .map(GunRenderer::getAttachmentModelLocation)
         .collect(Collectors.toSet()));
-    dependencies.addAll(gun.getAcceptedMagazines().stream()
+    dependencies.addAll(this.item.getAcceptedMagazines().stream()
         .map(Item::getRegistryName)
         .map(GunRenderer::getMagazineModelLocation)
         .collect(Collectors.toSet()));
-    dependencies.add(this.modelLocation);
+    dependencies.add(this.properties.modelLocation());
     return dependencies;
   }
 
   @Override
-  public Collection<RenderMaterial> getMaterials() {
+  public Collection<Material> getMaterials() {
     return Collections.emptySet();
   }
 
   @Override
-  public void refreshCachedModels() {
+  public void refreshCachedModels(Function<ModelLayerLocation, ModelPart> modelBaker) {
     this.cachedModels.clear();
+    this.muzzleFlashModel = modelBaker.apply(ModModelLayers.MUZZLE_FLASH);
   }
 
   @Override
-  public ItemRendererType getType() {
+  public ItemRendererType<?, ?> getType() {
     return ItemRendererTypes.GUN.get();
   }
 
@@ -684,31 +621,30 @@ public class GunRenderer implements CustomItemRenderer {
     return new ResourceLocation(magazineName.getNamespace(), "magazine/" + magazineName.getPath());
   }
 
-  private enum HandTransform implements IStringSerializable {
-
-    HELD_RIGHT_HANDED("held_right_handed"),
-    HELD_LEFT_HANDED("held_left_handed"),
-    AIMING_RIGHT_HANDED("aiming_right_handed"),
-    AIMING_LEFT_HANDED("aiming_left_handed");
-
-    public static final Codec<HandTransform> CODEC =
-        IStringSerializable.fromEnum(HandTransform::values, HandTransform::byName);
-    private static final Map<String, HandTransform> BY_NAME = Arrays.stream(values())
-        .collect(Collectors.toMap(HandTransform::getSerializedName, Function.identity()));
-
-    private final String name;
-
-    private HandTransform(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public String getSerializedName() {
-      return this.name;
-    }
-
-    public static HandTransform byName(String name) {
-      return BY_NAME.get(name);
-    }
+  public static LayerDefinition createMuzzleFlashBodyLayer() {
+    var mesh = new MeshDefinition();
+    var root = mesh.getRoot();
+    root.addOrReplaceChild("box0",
+        CubeListBuilder.create()
+            .mirror()
+            .texOffs(1, 1)
+            .addBox(0F, 0F, 0F, 8, 8, 0)
+            .mirror(false),
+        PartPose.offset(-4F, -4F, 0F));
+    root.addOrReplaceChild("box1",
+        CubeListBuilder.create()
+            .mirror()
+            .texOffs(9, 1)
+            .addBox(-4F, 0F, 0F, 8, 0, 15)
+            .mirror(false),
+        PartPose.offsetAndRotation(0F, 0F, -15F, 0F, 0F, -0.7853982F));
+    root.addOrReplaceChild("box2",
+        CubeListBuilder.create()
+            .mirror()
+            .texOffs(1, 17)
+            .addBox(-4F, 0F, 0F, 8, 0, 15)
+            .mirror(false),
+        PartPose.offsetAndRotation(0F, 0F, -15F, 0F, 0F, -2.373648F));
+    return LayerDefinition.create(mesh, 64, 64);
   }
 }

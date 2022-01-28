@@ -28,8 +28,8 @@ import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.network.MessageHandlerRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class ClientShopModule extends ShopModule implements Module.Tickable {
 
@@ -81,7 +81,7 @@ public class ClientShopModule extends ShopModule implements Module.Tickable {
           this.minecraft.setScreen(new ShopScreen(null, this, player));
         } else {
           this.minecraft.gui.getChat().addMessage(GameUtil.formatMessage(
-              new TranslationTextComponent("message.buy_time_expired")));
+              new TranslatableComponent("message.buy_time_expired")));
         }
       }
     }

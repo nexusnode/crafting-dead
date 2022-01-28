@@ -22,8 +22,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import net.minecraft.item.Item;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.sounds.SoundEvent;
 
 public abstract class AbstractDelegatedActionType implements DelegatedActionType {
 

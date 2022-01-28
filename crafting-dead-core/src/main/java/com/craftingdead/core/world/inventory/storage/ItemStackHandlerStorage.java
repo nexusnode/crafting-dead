@@ -20,9 +20,9 @@ package com.craftingdead.core.world.inventory.storage;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -43,8 +43,8 @@ public class ItemStackHandlerStorage extends ItemStackHandler implements Storage
   }
 
   @Override
-  public Container createMenu(int windowId, PlayerInventory playerInventory,
-      PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory,
+      Player playerEntity) {
     return this.containerProvider.createMenu(windowId, playerInventory, this);
   }
 
@@ -57,6 +57,6 @@ public class ItemStackHandlerStorage extends ItemStackHandler implements Storage
   public interface ItemHandlerMenuConstructor {
 
     @Nullable
-    Container createMenu(int windowId, PlayerInventory playerInventory, IItemHandler itemHandler);
+    AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, IItemHandler itemHandler);
   }
 }

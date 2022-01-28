@@ -23,18 +23,19 @@ import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
-import com.craftingdead.survival.world.entity.monster.AdvancedZombieEntity;
-import net.minecraft.client.renderer.entity.BipedRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.TransformationMatrix;
-import net.minecraft.util.math.vector.Vector3f;
+import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
+import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.resources.ResourceLocation;
 
-public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEntity, M extends AdvancedZombieModel<T>>
-    extends BipedRenderer<T, M> {
+public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombie, M extends AdvancedZombieModel<T>>
+    extends HumanoidMobRenderer<T, M> {
 
-  public AbstractAdvancedZombieRenderer(EntityRendererManager renderManager, M model, float scale) {
-    super(renderManager, model, scale);
+  public AbstractAdvancedZombieRenderer(EntityRendererProvider.Context context, M model,
+      float scale) {
+    super(context, model, scale);
     this.addLayer(new ClothingLayer<>(this));
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
@@ -51,7 +52,7 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
         .withSlot(ModEquipmentSlotType.HAT)
         .withHeadOrientation(true)
         .withArbitraryTransformation(
-            new TransformationMatrix(null, null, new Vector3f(-1F, -1F, 1F), null))
+            new Transformation(null, null, new Vector3f(-1F, -1F, 1F), null))
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
@@ -61,10 +62,8 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombieEnt
   }
 
   @Override
-  public ResourceLocation getTextureLocation(AdvancedZombieEntity entity) {
-    ResourceLocation texture =
-        new ResourceLocation(CraftingDeadSurvival.ID, "textures/entity/zombie/zombie"
-            + ((AdvancedZombieEntity) entity).getTextureNumber() + ".png");
-    return texture;
+  public ResourceLocation getTextureLocation(AdvancedZombie entity) {
+    return new ResourceLocation(CraftingDeadSurvival.ID, "textures/entity/zombie/zombie"
+        + entity.getTextureNumber() + ".png");
   }
 }

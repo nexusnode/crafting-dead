@@ -24,27 +24,27 @@ import java.util.Optional;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
 
 public class TextView<L extends Layout> extends View<TextView<L>, L> {
 
-  private ITextComponent text;
-  private FontRenderer font;
+  private Component text;
+  private Font font;
   private boolean shadow;
   private boolean centered;
 
-  private List<IReorderingProcessor> lines = new ArrayList<>();
+  private List<FormattedCharSequence> lines = new ArrayList<>();
 
-  public TextView(L layout, ITextComponent text) {
+  public TextView(L layout, Component text) {
     super(layout);
     this.text = text;
     this.font = super.minecraft.font;
@@ -53,10 +53,10 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   public TextView(L layout, String text) {
-    this(layout, new StringTextComponent(text));
+    this(layout, new TextComponent(text));
   }
 
-  public TextView<L> setFontRenderer(FontRenderer fontRenderer) {
+  public TextView<L> setFontRenderer(Font fontRenderer) {
     this.font = fontRenderer;
     return this;
   }
@@ -71,7 +71,7 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
     return this;
   }
 
-  public TextView<L> setText(ITextComponent text) {
+  public TextView<L> setText(Component text) {
     this.text = text;
     this.generateLines(this.getContentWidth());
     return this;
@@ -84,18 +84,18 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   @Override
-  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     if (widthMode == MeasureMode.UNDEFINED) {
       width = this.font.width(this.text.getString());
     }
 
     this.generateLines(width);
-    return new Vector2f(width, this.lines.size() * this.font.lineHeight);
+    return new Vec2(width, this.lines.size() * this.font.lineHeight);
   }
 
   private void generateLines(float width) {
-    this.lines = this.font.split(this.text, MathHelper.ceil(width));
+    this.lines = this.font.split(this.text, Mth.ceil(width));
   }
 
   @Override
@@ -112,9 +112,9 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    int opacity = MathHelper.ceil(this.getAlpha() * 255.0F) << 24;
+    int opacity = Mth.ceil(this.getAlpha() * 255.0F) << 24;
     if ((opacity & 0xFC000000) == 0) {
       return;
     }
@@ -127,10 +127,10 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
               : 0.0D),
           51.0D);
       matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
-      IRenderTypeBuffer.Impl renderTypeBuffer =
-          IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
+      MultiBufferSource.BufferSource renderTypeBuffer =
+          MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
-        IReorderingProcessor line = this.lines.get(i);
+        FormattedCharSequence line = this.lines.get(i);
         matrixStack.pushPose();
         {
           matrixStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
@@ -151,14 +151,14 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   public Optional<Style> componentStyleAtWidth(double mouseX, double mouseY) {
-    int offsetMouseX = MathHelper.floor((mouseX - this.getContentX()) / this.getXScale());
-    int offsetMouseY = MathHelper.floor((mouseY - this.getContentY()) / this.getYScale());
+    int offsetMouseX = Mth.floor((mouseX - this.getContentX()) / this.getXScale());
+    int offsetMouseY = Mth.floor((mouseY - this.getContentY()) / this.getYScale());
     final int lines = this.lines.size();
     if (offsetMouseX >= 0 && offsetMouseY >= 0 && offsetMouseX <= this.getContentWidth()
         && offsetMouseY < (this.font.lineHeight * lines + lines)) {
       int maxLines = offsetMouseY / this.font.lineHeight;
       if (maxLines >= 0 && maxLines < this.lines.size()) {
-        IReorderingProcessor line = this.lines.get(maxLines);
+        FormattedCharSequence line = this.lines.get(maxLines);
         return Optional.ofNullable(
             this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
       }

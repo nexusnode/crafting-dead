@@ -19,40 +19,40 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SyncLivingMessage {
 
   private final int entityId;
-  private final PacketBuffer data;
+  private final FriendlyByteBuf data;
 
-  public SyncLivingMessage(int entityId, PacketBuffer data) {
+  public SyncLivingMessage(int entityId, FriendlyByteBuf data) {
     this.entityId = entityId;
     this.data = data;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
     out.writeVarInt(this.data.readableBytes());
     out.writeBytes(this.data);
   }
 
-  public static SyncLivingMessage decode(PacketBuffer in) {
+  public static SyncLivingMessage decode(FriendlyByteBuf in) {
     int entityId = in.readVarInt();
     byte[] data = new byte[in.readVarInt()];
     in.readBytes(data);
     SyncLivingMessage msg = new SyncLivingMessage(entityId,
-        new PacketBuffer(Unpooled.wrappedBuffer(data)));
+        new FriendlyByteBuf(Unpooled.wrappedBuffer(data)));
     return msg;
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntity(ctx.get(), this.entityId)
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> living.decode(this.data)));
     return true;
   }

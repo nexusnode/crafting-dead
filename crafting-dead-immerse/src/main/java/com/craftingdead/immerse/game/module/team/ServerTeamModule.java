@@ -22,7 +22,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.ServerModule;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ServerTeamModule<T extends Enum<T> & Team> extends TeamModule<T>
     implements ServerModule {
@@ -34,7 +34,7 @@ public class ServerTeamModule<T extends Enum<T> & Team> extends TeamModule<T>
     this.teamHandler = teamHandler;
   }
 
-  public void setPlayerTeam(PlayerExtension<ServerPlayerEntity> player,
+  public void setPlayerTeam(PlayerExtension<ServerPlayer> player,
       @Nullable TeamInstance<T> teamInstance) {
     UUID playerId = player.getEntity().getUUID();
     TeamInstance<T> oldTeamInstance =
@@ -59,11 +59,11 @@ public class ServerTeamModule<T extends Enum<T> & Team> extends TeamModule<T>
 
   public interface TeamHandler<T extends Team> {
 
-    boolean canChangeTeam(PlayerExtension<ServerPlayerEntity> player,
+    boolean canChangeTeam(PlayerExtension<ServerPlayer> player,
         @Nullable TeamInstance<T> oldTeam,
         @Nullable TeamInstance<T> newTeam);
 
-    void teamChanged(PlayerExtension<ServerPlayerEntity> player,
+    void teamChanged(PlayerExtension<ServerPlayer> player,
         @Nullable TeamInstance<T> oldTeam,
         @Nullable TeamInstance<T> newTeam);
   }

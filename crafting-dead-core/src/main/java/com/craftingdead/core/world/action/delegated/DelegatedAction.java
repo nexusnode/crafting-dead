@@ -22,9 +22,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundEvent;
 
 public interface DelegatedAction {
 

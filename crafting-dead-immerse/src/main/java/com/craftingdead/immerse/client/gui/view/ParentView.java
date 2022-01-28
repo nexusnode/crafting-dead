@@ -30,12 +30,12 @@ import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.util.ThreadSafe;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.INestedGuiEventHandler;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
 
 public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C extends Layout>
-    extends View<SELF, L> implements INestedGuiEventHandler {
+    extends View<SELF, L> implements ContainerEventHandler {
 
   private final List<View<?, C>> children = new ArrayList<>();
   // Bottom to top order
@@ -47,7 +47,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   private final LayoutParent<C> layoutParent;
 
   @Nullable
-  private IGuiEventListener focusedListener;
+  private GuiEventListener focusedListener;
   private boolean dragging;
 
   public ParentView(L layout, LayoutParent<C> layoutParent) {
@@ -272,7 +272,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   }
 
   @Override
-  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
+  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     for (View<?, ?> view : this.sortedChildren) {
@@ -294,14 +294,14 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   }
 
   @Override
-  public List<? extends IGuiEventListener> children() {
+  public List<? extends GuiEventListener> children() {
     return Arrays.asList(this.sortedChildren);
   }
 
   @Override
-  public Optional<IGuiEventListener> getChildAt(double mouseX, double mouseY) {
+  public Optional<GuiEventListener> getChildAt(double mouseX, double mouseY) {
     for (int i = this.sortedChildren.length; i-- > 0;) {
-      IGuiEventListener eventListener = this.sortedChildren[i];
+      GuiEventListener eventListener = this.sortedChildren[i];
       if (eventListener.isMouseOver(mouseX, mouseY)) {
         return Optional.of(eventListener);
       }
@@ -327,38 +327,38 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return INestedGuiEventHandler.super.mouseClicked(mouseX, mouseY, button)
+    return ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button)
         || super.mouseClicked(mouseX, mouseY, button);
   }
 
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    return INestedGuiEventHandler.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+    return ContainerEventHandler.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
         || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
   }
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    return INestedGuiEventHandler.super.mouseScrolled(mouseX, mouseY, scrollDelta)
+    return ContainerEventHandler.super.mouseScrolled(mouseX, mouseY, scrollDelta)
         || super.mouseScrolled(mouseX, mouseY, scrollDelta);
   }
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return INestedGuiEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
+    return ContainerEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
         || super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return INestedGuiEventHandler.super.keyReleased(keyCode, scanCode, modifiers)
+    return ContainerEventHandler.super.keyReleased(keyCode, scanCode, modifiers)
         || super.keyReleased(keyCode, scanCode, modifiers);
   }
 
   @Override
   public boolean charTyped(char codePoint, int modifiers) {
-    return INestedGuiEventHandler.super.charTyped(codePoint, modifiers)
+    return ContainerEventHandler.super.charTyped(codePoint, modifiers)
         || super.charTyped(codePoint, modifiers);
   }
 
@@ -374,17 +374,17 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
   @Nullable
   @Override
-  public IGuiEventListener getFocused() {
+  public GuiEventListener getFocused() {
     return this.focusedListener;
   }
 
   @Override
   public boolean changeFocus(boolean focus) {
-    return super.changeFocus(focus) || INestedGuiEventHandler.super.changeFocus(focus);
+    return super.changeFocus(focus) || ContainerEventHandler.super.changeFocus(focus);
   }
 
   @Override
-  public void setFocused(@Nullable IGuiEventListener focusedListener) {
+  public void setFocused(@Nullable GuiEventListener focusedListener) {
     this.focusedListener = focusedListener;
   }
 

@@ -22,10 +22,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.item.hat.Hat;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
@@ -37,9 +38,9 @@ public class GameRendererMixin {
   private static void getNightVisionScale(LivingEntity livingEntity, float partialTicks,
       CallbackInfoReturnable<Float> callbackInfo) {
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    livingEntity.getCapability(Capabilities.LIVING_EXTENSION)
+    livingEntity.getCapability(LivingExtension.CAPABILITY)
         .ifPresent(l -> l.getItemHandler().getStackInSlot(ModEquipmentSlotType.HAT.getIndex())
-            .getCapability(Capabilities.HAT).ifPresent(hat -> {
+            .getCapability(Hat.CAPABILITY).ifPresent(hat -> {
               if (hat.hasNightVision()) {
                 callbackInfo.setReturnValue(1.0F);
               }

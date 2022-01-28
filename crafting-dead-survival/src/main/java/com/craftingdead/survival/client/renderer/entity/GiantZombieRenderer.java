@@ -19,26 +19,29 @@
 package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
-import com.craftingdead.survival.world.entity.monster.GiantZombieEntity;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.craftingdead.survival.world.entity.monster.GiantZombie;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 public class GiantZombieRenderer extends
-    AbstractAdvancedZombieRenderer<GiantZombieEntity, AdvancedZombieModel<GiantZombieEntity>> {
+    AbstractAdvancedZombieRenderer<GiantZombie, AdvancedZombieModel<GiantZombie>> {
 
   private final float scale;
 
-  public GiantZombieRenderer(EntityRendererManager renderManager) {
-    this(renderManager, 6.0F);
+  public GiantZombieRenderer(EntityRendererProvider.Context context) {
+    this(context, 6.0F);
   }
 
-  public GiantZombieRenderer(EntityRendererManager renderManager, float scale) {
-    super(renderManager, new AdvancedZombieModel<>(0.0F, false), 0.5F * scale);
+  public GiantZombieRenderer(EntityRendererProvider.Context context, float scale) {
+    super(context, new AdvancedZombieModel<>(
+        context.bakeLayer(ModelLayers.ZOMBIE),
+        context.bakeLayer(ModelLayers.PLAYER)), 0.5F * scale);
     this.scale = scale;
   }
 
   @Override
-  protected void scale(GiantZombieEntity entity, MatrixStack matrixStack, float partialTicks) {
-    matrixStack.scale(this.scale, this.scale, this.scale);
+  protected void scale(GiantZombie entity, PoseStack poseStack, float partialTicks) {
+    poseStack.scale(this.scale, this.scale, this.scale);
   }
 }

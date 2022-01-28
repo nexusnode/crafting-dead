@@ -22,8 +22,8 @@ import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.network.NetworkChannel;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SetupGameMessage extends LoginIndexedMessage {
 
@@ -33,11 +33,11 @@ public class SetupGameMessage extends LoginIndexedMessage {
     this.gameType = gameType;
   }
 
-  public static void encode(SetupGameMessage msg, PacketBuffer out) {
+  public static void encode(SetupGameMessage msg, FriendlyByteBuf out) {
     out.writeRegistryId(msg.gameType);
   }
 
-  public static SetupGameMessage decode(PacketBuffer in) {
+  public static SetupGameMessage decode(FriendlyByteBuf in) {
     return new SetupGameMessage(in.readRegistryId());
   }
 

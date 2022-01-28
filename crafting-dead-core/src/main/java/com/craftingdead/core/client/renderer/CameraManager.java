@@ -20,10 +20,10 @@ package com.craftingdead.core.client.renderer;
 
 import java.util.Random;
 import com.craftingdead.core.util.MutableVector2f;
-import net.minecraft.client.util.NativeUtil;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.Blaze3D;
+import net.minecraft.Util;
+import net.minecraft.util.Mth;
+import com.mojang.math.Vector3f;
 
 public class CameraManager {
 
@@ -63,7 +63,7 @@ public class CameraManager {
   }
 
   public void getLookRotationDelta(MutableVector2f result) {
-    float currentTime = (float) NativeUtil.getTime();
+    float currentTime = (float) Blaze3D.getTime();
     float timeDelta = currentTime - this.lastLookTime;
     result.set(this.lookPitchSmoother.getAndDecelerate(timeDelta* 2.0F),
         this.lookYawSmoother.getAndDecelerate(timeDelta * 2.0F));
@@ -71,14 +71,14 @@ public class CameraManager {
 
   public void getCameraRotations(float partialTicks, Vector3f result) {
     final float time = (float) Util.getMillis() / 20.0F;
-    float bounce = MathHelper.sin(time * 0.35F);
+    float bounce = Mth.sin(time * 0.35F);
     float roll = bounce / 2.0F * this.largeAmpSlowFade;
     result.set(-this.smallAmpQuickFade, 0, roll);
   }
 
   public float getFov(float partialTicks) {
     final float time = (float) Util.getMillis() / 20.0F;
-    float bounce = MathHelper.sin(time * 0.5F);
+    float bounce = Mth.sin(time * 0.5F);
     return bounce / 125.0F * -this.largeAmpSlowFade;
   }
 }

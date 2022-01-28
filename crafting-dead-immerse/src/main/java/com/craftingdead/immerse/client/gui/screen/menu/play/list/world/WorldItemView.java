@@ -43,33 +43,32 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.google.common.hash.Hashing;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.ChatFormatting;
+import net.minecraft.SharedConstants;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.screen.AlertScreen;
-import net.minecraft.client.gui.screen.ConfirmBackupScreen;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.CreateWorldScreen;
-import net.minecraft.client.gui.screen.DirtMessageScreen;
-import net.minecraft.client.gui.screen.EditWorldScreen;
-import net.minecraft.client.gui.screen.WorkingScreen;
-import net.minecraft.client.gui.screen.WorldSelectionList;
-import net.minecraft.client.gui.toasts.SystemToast;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.screens.AlertScreen;
+import net.minecraft.client.gui.screens.BackupConfirmScreen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
+import net.minecraft.client.gui.screens.ProgressScreen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.util.Util;
-import net.minecraft.util.datafix.codec.DatapackCodec;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
-import net.minecraft.world.storage.FolderName;
-import net.minecraft.world.storage.SaveFormat;
-import net.minecraft.world.storage.WorldSummary;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.DataPackConfig;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelSummary;
 
 class WorldItemView
     extends ParentView<WorldItemView, YogaLayout, YogaLayout> {
@@ -80,10 +79,10 @@ class WorldItemView
   private static final ResourceLocation UNKOWN_SERVER_ICON =
       new ResourceLocation("textures/misc/unknown_server.png");
 
-  private final WorldSummary worldSummary;
+  private final LevelSummary worldSummary;
   private final WorldListView<?> parentWorldList;
 
-  WorldItemView(WorldSummary worldSummary, WorldListView<?> parentWorldList) {
+  WorldItemView(LevelSummary worldSummary, WorldListView<?> parentWorldList) {
     super(
         new YogaLayout()
             .setHeight(46F)
@@ -99,6 +98,7 @@ class WorldItemView
         new Date(worldSummary.getLastPlayed())) + ")";
     String description = worldSummary.getInfo().getString();
     String levelId = worldSummary.getLevelId();
+    @SuppressWarnings("deprecation")
     ResourceLocation dynamicWorldIcon =
         new ResourceLocation("worlds/" + Util.sanitizeName(levelId,
             ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(levelId)
@@ -138,20 +138,20 @@ class WorldItemView
                 .setFlexDirection(FlexDirection.COLUMN)
                 .setJustifyContent(Justify.CENTER))
                     .addChild(new TextView<>(new YogaLayout(),
-                        new StringTextComponent(displayName))
+                        new TextComponent(displayName))
                             .setShadow(false))
                     .addChild(new TextView<>(new YogaLayout().setTopMargin(2F),
-                        new StringTextComponent(info)
-                            .withStyle(TextFormatting.GRAY))
+                        new TextComponent(info)
+                            .withStyle(ChatFormatting.GRAY))
                                 .setShadow(false))
                     .addChild(new TextView<>(new YogaLayout(),
-                        new StringTextComponent(description)
-                            .withStyle(TextFormatting.GRAY))
+                        new TextComponent(description)
+                            .withStyle(ChatFormatting.GRAY))
                                 .setShadow(false)));
   }
 
   @Nullable
-  private DynamicTexture loadIconTexture(WorldSummary worldSummary,
+  private DynamicTexture loadIconTexture(LevelSummary worldSummary,
       ResourceLocation textureLocation) {
     File iconFile = worldSummary.getIcon();
     if (iconFile.isFile()) {
@@ -193,21 +193,29 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
   public void joinWorld() {
-    if (this.worldSummary.isLocked()) {
+    if (this.worldSummary.isDisabled()) {
       return;
     }
 
-    ViewScreen screen = (ViewScreen) this.getScreen();
-    if (this.worldSummary.shouldBackup()) {
-      ITextComponent backupQuestion = new TranslationTextComponent("selectWorld.backupQuestion");
-      ITextComponent backupWarning = new TranslationTextComponent("selectWorld.backupWarning",
-          this.worldSummary.getWorldVersionName(), SharedConstants.getCurrentVersion().getName());
+    var screen = (ViewScreen) this.getScreen();
+    var backupStatus = this.worldSummary.backupStatus();
+    if (backupStatus.shouldBackup()) {
+      var backupQuestionKey = "selectWorld.backupQuestion." + backupStatus.getTranslationKey();
+      var backupWarningKey = "selectWorld.backupWarning." + backupStatus.getTranslationKey();
+      var backupQuestion = new TranslatableComponent(backupQuestionKey);
+      if (backupStatus.isSevere()) {
+        backupQuestion.withStyle(ChatFormatting.BOLD, ChatFormatting.RED);
+      }
+
+      var backupWarning =
+          new TranslatableComponent(backupWarningKey, this.worldSummary.getWorldVersionName(),
+              SharedConstants.getCurrentVersion().getName());
+
       screen.keepOpenAndSetScreen(
-          new ConfirmBackupScreen(screen, (backup, eraseCache) -> {
+          new BackupConfirmScreen(screen, (backup, eraseCache) -> {
             if (backup) {
-              String levelName = this.worldSummary.getLevelName();
-              try (SaveFormat.LevelSave levelSave =
-                  this.minecraft.getLevelSource().createAccess(levelName)) {
+              var levelName = this.worldSummary.getLevelName();
+              try (var levelSave = this.minecraft.getLevelSource().createAccess(levelName)) {
                 EditWorldScreen.makeBackupAndShowToast(levelSave);
               } catch (IOException ioexception) {
                 SystemToast.onWorldAccessFailure(this.minecraft, levelName);
@@ -228,18 +236,18 @@ class WorldItemView
             logger.error("Failure to open 'future world'", (Throwable) exception);
             this.minecraft.setScreen(new AlertScreen(() -> {
               this.minecraft.setScreen(this.minecraft.screen);
-            }, new TranslationTextComponent("selectWorld.futureworld.error.title"),
-                new TranslationTextComponent("selectWorld.futureworld.error.text")));
+            }, new TranslatableComponent("selectWorld.futureworld.error.title"),
+                new TranslatableComponent("selectWorld.futureworld.error.text")));
           }
         } else {
           this.minecraft.setScreen(screen);
         }
 
-      }, new TranslationTextComponent("selectWorld.versionQuestion"),
-          new TranslationTextComponent("selectWorld.versionWarning",
+      }, new TranslatableComponent("selectWorld.versionQuestion"),
+          new TranslatableComponent("selectWorld.versionWarning",
               this.worldSummary.getWorldVersionName(),
-              new TranslationTextComponent("selectWorld.versionJoinButton"),
-              DialogTexts.GUI_CANCEL)));
+              new TranslatableComponent("selectWorld.versionJoinButton"),
+              CommonComponents.GUI_CANCEL)));
     } else {
       this.loadWorld();
     }
@@ -249,7 +257,7 @@ class WorldItemView
   private void loadWorld() {
     if (this.minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
       this.minecraft.forceSetScreen(
-          new DirtMessageScreen(new TranslationTextComponent("selectWorld.data_read")));
+          new GenericDirtMessageScreen(new TranslatableComponent("selectWorld.data_read")));
       this.minecraft.loadLevel(this.worldSummary.getLevelId());
     }
   }
@@ -260,7 +268,8 @@ class WorldItemView
   public void editWorld() {
     String fileName = this.worldSummary.getLevelName();
     try {
-      SaveFormat.LevelSave levelSave = this.minecraft.getLevelSource().createAccess(fileName);
+      LevelStorageSource.LevelStorageAccess levelSave =
+          this.minecraft.getLevelSource().createAccess(fileName);
       ViewScreen screen = (ViewScreen) this.getScreen();
       screen.keepOpenAndSetScreen(new EditWorldScreen(confirm -> {
         try {
@@ -287,10 +296,10 @@ class WorldItemView
     ViewScreen screen = (ViewScreen) this.getScreen();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
-        this.minecraft.setScreen(new WorkingScreen());
-        SaveFormat levelSource = this.minecraft.getLevelSource();
+        this.minecraft.setScreen(new ProgressScreen(true));
+        LevelStorageSource levelSource = this.minecraft.getLevelSource();
         String s = this.worldSummary.getLevelName();
-        try (SaveFormat.LevelSave levelSave = levelSource.createAccess(s)) {
+        try (var levelSave = levelSource.createAccess(s)) {
           levelSave.deleteLevel();
         } catch (IOException ioexception) {
           SystemToast.onWorldDeleteFailure(this.minecraft, s);
@@ -299,11 +308,11 @@ class WorldItemView
         this.parentWorldList.reloadWorlds();
       }
       this.minecraft.setScreen(screen);
-    }, new TranslationTextComponent("selectWorld.deleteQuestion"),
-        new TranslationTextComponent("selectWorld.deleteWarning",
+    }, new TranslatableComponent("selectWorld.deleteQuestion"),
+        new TranslatableComponent("selectWorld.deleteWarning",
             this.worldSummary.getLevelName()),
-        new TranslationTextComponent("selectWorld.deleteButton"),
-        DialogTexts.GUI_CANCEL));
+        new TranslatableComponent("selectWorld.deleteButton"),
+        CommonComponents.GUI_CANCEL));
   }
 
   /**
@@ -314,30 +323,30 @@ class WorldItemView
     screen.keepOpen();
 
     this.minecraft.forceSetScreen(
-        new DirtMessageScreen(new TranslationTextComponent("selectWorld.data_read")));
-    DynamicRegistries.Impl dynamicRegistries = DynamicRegistries.builtin();
+        new GenericDirtMessageScreen(new TranslatableComponent("selectWorld.data_read")));
+    RegistryAccess.RegistryHolder dynamicRegistries = RegistryAccess.builtin();
 
     try (
-        SaveFormat.LevelSave levelSave =
+        LevelStorageSource.LevelStorageAccess levelSave =
             this.minecraft.getLevelSource().createAccess(this.worldSummary.getLevelName());
-        Minecraft.PackManager serverStem = this.minecraft.makeServerStem(dynamicRegistries,
+        Minecraft.ServerStem serverStem = this.minecraft.makeServerStem(dynamicRegistries,
             Minecraft::loadDataPacks, Minecraft::loadWorldData, false, levelSave);) {
-      WorldSettings levelSettings = serverStem.worldData().getLevelSettings();
-      DatapackCodec dataPackCodec = levelSettings.getDataPackConfig();
-      DimensionGeneratorSettings worldGenSettings = serverStem
+      LevelSettings levelSettings = serverStem.worldData().getLevelSettings();
+      DataPackConfig dataPackCodec = levelSettings.getDataPackConfig();
+      WorldGenSettings worldGenSettings = serverStem
           .worldData().worldGenSettings();
       Path path =
           CreateWorldScreen.createTempDataPackDirFromExistingWorld(
-              levelSave.getLevelPath(FolderName.DATAPACK_DIR),
+              levelSave.getLevelPath(LevelResource.DATAPACK_DIR),
               this.minecraft);
       if (worldGenSettings.isOldCustomizedWorld()) {
         this.minecraft.setScreen(new ConfirmScreen(confirm -> this.minecraft.setScreen(confirm
             ? new CreateWorldScreen(screen, levelSettings,
                 worldGenSettings, path, dataPackCodec, dynamicRegistries)
             : screen),
-            new TranslationTextComponent("selectWorld.recreate.customized.title"),
-            new TranslationTextComponent("selectWorld.recreate.customized.text"),
-            DialogTexts.GUI_PROCEED, DialogTexts.GUI_CANCEL));
+            new TranslatableComponent("selectWorld.recreate.customized.title"),
+            new TranslatableComponent("selectWorld.recreate.customized.text"),
+            CommonComponents.GUI_PROCEED, CommonComponents.GUI_CANCEL));
       } else {
         this.minecraft.setScreen(new CreateWorldScreen(screen, levelSettings,
             worldGenSettings, path, dataPackCodec, dynamicRegistries));
@@ -345,8 +354,8 @@ class WorldItemView
     } catch (Exception e) {
       logger.error("Unable to recreate world", e);
       this.minecraft.setScreen(new AlertScreen(() -> this.minecraft.setScreen(screen),
-          new TranslationTextComponent("selectWorld.recreate.error.title"),
-          new TranslationTextComponent("selectWorld.recreate.error.text")));
+          new TranslatableComponent("selectWorld.recreate.error.title"),
+          new TranslatableComponent("selectWorld.recreate.error.text")));
     }
   }
 }

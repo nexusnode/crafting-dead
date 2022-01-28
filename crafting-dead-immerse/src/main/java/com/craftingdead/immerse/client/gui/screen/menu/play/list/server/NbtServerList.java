@@ -24,11 +24,11 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Util;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
 
 public class NbtServerList implements MutableServerList {
 
@@ -41,9 +41,9 @@ public class NbtServerList implements MutableServerList {
   @Override
   public CompletableFuture<Stream<ServerEntry>> load() {
     return this.read()
-        .thenApply(tag -> tag.getList("servers", Constants.NBT.TAG_COMPOUND).stream()
-            .filter(CompoundNBT.class::isInstance)
-            .map(CompoundNBT.class::cast)
+        .thenApply(tag -> tag.getList("servers", Tag.TAG_COMPOUND).stream()
+            .filter(CompoundTag.class::isInstance)
+            .map(CompoundTag.class::cast)
             .map(serverTag -> new ServerEntry(
                 serverTag.contains("map") ? serverTag.getString("map") : null,
                 serverTag.getString("host"), serverTag.getInt("port"))));
@@ -51,25 +51,25 @@ public class NbtServerList implements MutableServerList {
 
   @Override
   public CompletableFuture<Void> save(Stream<ServerEntry> servers) {
-    CompoundNBT tag = new CompoundNBT();
+    CompoundTag tag = new CompoundTag();
     tag.put("servers", servers
         .map(server -> {
-          CompoundNBT serverTag = new CompoundNBT();
+          CompoundTag serverTag = new CompoundTag();
           server.getMap().ifPresent(map -> serverTag.putString("map", map));
           serverTag.putString("host", server.getHostName());
           serverTag.putInt("port", server.getPort());
           return serverTag;
         })
-        .collect(Collectors.toCollection(ListNBT::new)));
+        .collect(Collectors.toCollection(ListTag::new)));
     return this.save(tag);
   }
 
-  private CompletableFuture<CompoundNBT> read() {
-    CompletableFuture<CompoundNBT> future = new CompletableFuture<>();
+  private CompletableFuture<CompoundTag> read() {
+    CompletableFuture<CompoundTag> future = new CompletableFuture<>();
     Util.backgroundExecutor().execute(() -> {
       try {
-        CompoundNBT tag = CompressedStreamTools.read(this.serverListFile.toFile());
-        future.complete(tag == null ? new CompoundNBT() : tag);
+        CompoundTag tag = NbtIo.read(this.serverListFile.toFile());
+        future.complete(tag == null ? new CompoundTag() : tag);
       } catch (IOException e) {
         future.completeExceptionally(e);
       }
@@ -77,13 +77,13 @@ public class NbtServerList implements MutableServerList {
     return future;
   }
 
-  private CompletableFuture<Void> save(CompoundNBT tag) {
+  private CompletableFuture<Void> save(CompoundTag tag) {
     CompletableFuture<Void> future = new CompletableFuture<>();
     Util.backgroundExecutor().execute(() -> {
       try {
         File tempFile =
             File.createTempFile("servers", ".dat", this.serverListFile.getParent().toFile());
-        CompressedStreamTools.write(tag, tempFile);
+        NbtIo.write(tag, tempFile);
         File oldFile = new File(this.serverListFile.getParent().toString(), "servers.dat_old");
         Util.safeReplaceFile(this.serverListFile.toFile(), tempFile, oldFile);
         future.complete(null);

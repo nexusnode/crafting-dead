@@ -18,8 +18,14 @@
 
 package com.craftingdead.core.world.item.combatslot;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+
 @FunctionalInterface
 public interface CombatSlotProvider {
+  
+  Capability<CombatSlotProvider> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   CombatSlot getCombatSlot();
 }

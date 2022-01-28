@@ -34,9 +34,9 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> {
 
@@ -102,8 +102,8 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
         .addChild(this.motdComponent)
         .addChild(new TextView<>(
             new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8),
-            new StringTextComponent(this.serverEntry.getMap().orElse("-"))
-                .withStyle(TextFormatting.GRAY))
+            new TextComponent(this.serverEntry.getMap().orElse("-"))
+                .withStyle(ChatFormatting.GRAY))
                     .setShadow(false)
                     .setCentered(true))
         .addChild(this.pingComponent)
@@ -118,7 +118,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
     long currentTime = Util.getMillis();
     if (this.lastAnimationUpdateMs != -1L && currentTime - this.lastAnimationUpdateMs >= 100L) {
       this.lastAnimationUpdateMs = currentTime;
-      this.motdComponent.setText(new StringTextComponent(this.animation.next()));
+      this.motdComponent.setText(new TextComponent(this.animation.next()));
     }
   }
 
@@ -126,8 +126,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
     // Call this before creating a ConnectingScreen instance.
     ((ViewScreen) this.getScreen()).keepOpen();
     this.minecraft.setScreen(ConnectView.createScreen(
-        ((ViewScreen) this.getScreen()), this.serverEntry.getHostName(),
-        this.serverEntry.getPort()));
+        ((ViewScreen) this.getScreen()), this.serverEntry.toServerAddress()));
   }
 
   public ServerEntry getServerEntry() {
@@ -135,12 +134,12 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   }
 
   public void ping() {
-    this.motdComponent.setText(new StringTextComponent("..."));
-    this.pingComponent.setText(new StringTextComponent("..."));
-    this.playersAmountComponent.setText(new StringTextComponent("..."));
+    this.motdComponent.setText(new TextComponent("..."));
+    this.pingComponent.setText(new TextComponent("..."));
+    this.playersAmountComponent.setText(new TextComponent("..."));
     this.lastAnimationUpdateMs = 0;
 
-    ServerPinger.INSTANCE.ping(this.serverEntry.getHostName(), this.serverEntry.getPort(),
+    ServerPinger.INSTANCE.ping(this.serverEntry.toServerAddress(),
         (pingData) -> this.minecraft.execute(() -> this.updateServerInfo(pingData)));
   }
 
@@ -150,17 +149,17 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
       long ping = pingData.getPing();
       String pingText = ping + "ms";
       if (ping < 200) {
-        pingText = TextFormatting.GREEN + pingText;
+        pingText = ChatFormatting.GREEN + pingText;
       } else if (ping < 400) {
-        pingText = TextFormatting.YELLOW + pingText;
+        pingText = ChatFormatting.YELLOW + pingText;
       } else if (ping < 1200) {
-        pingText = TextFormatting.RED + pingText;
+        pingText = ChatFormatting.RED + pingText;
       } else {
-        pingText = TextFormatting.DARK_RED + pingText;
+        pingText = ChatFormatting.DARK_RED + pingText;
       }
-      this.pingComponent.setText(new StringTextComponent(pingText));
+      this.pingComponent.setText(new TextComponent(pingText));
     } else {
-      this.pingComponent.setText(new StringTextComponent("?"));
+      this.pingComponent.setText(new TextComponent("?"));
     }
     this.playersAmountComponent.setText(pingData.getPlayersAmount());
     this.lastAnimationUpdateMs = -1L;

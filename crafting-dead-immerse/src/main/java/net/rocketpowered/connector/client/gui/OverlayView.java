@@ -8,15 +8,12 @@ import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.google.common.collect.Maps;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class OverlayView extends ParentView<OverlayView, OverlayManager, YogaLayout> {
 
@@ -34,24 +31,24 @@ public class OverlayView extends ParentView<OverlayView, OverlayManager, YogaLay
   }
 
   @Override
-  protected void renderContent(MatrixStack matrixStack, int mouseX, int mouseY,
+  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
-    int opacity = MathHelper.ceil(this.getAlpha() * 255.0F) << 24;
+    int opacity = Mth.ceil(this.getAlpha() * 255.0F) << 24;
     if ((opacity & 0xFC000000) != 0) {
 
       fill(matrixStack, 0, 0,
           (int) this.getScaledContentWidth(),
           (int) this.getScaledContentHeight(),
-          0x505050 | (MathHelper.ceil(this.getAlpha() * 96.0F) << 24));
+          0x505050 | (Mth.ceil(this.getAlpha() * 96.0F) << 24));
 
       this.fillGradient(matrixStack, 0, 0,
           (int) this.getScaledContentWidth(),
           (int) this.getScaledContentHeight(), 0,
           0x101010 | opacity);
 
-      RenderUtil.bind(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/rocket.png"));
+      RenderSystem.setShaderTexture(0, new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/rocket.png"));
 
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.getAlpha());
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
       RenderSystem.enableBlend();
 
       matrixStack.pushPose();
@@ -73,7 +70,7 @@ public class OverlayView extends ParentView<OverlayView, OverlayManager, YogaLay
       RenderSystem.disableBlend();
 
 
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
       this.minecraft.font.drawShadow(matrixStack, this.minecraft.getUser().getName(),
           this.getScaledContentWidth() / 2 + 20, this.getScaledContentHeight() - 48,

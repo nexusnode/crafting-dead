@@ -38,7 +38,7 @@ import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
 import com.google.common.base.Strings;
 import com.mojang.datafixers.util.Either;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraftforge.common.ForgeHooks;
 
 public class ViewUtil {

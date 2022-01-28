@@ -21,24 +21,24 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.clothing.DefaultClothing;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -54,30 +54,30 @@ public class ClothingItem extends Item {
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
     return new SimpleCapabilityProvider<>(
         LazyOptional.of(() -> new DefaultClothing(
             this.attributeModifiers,
             this.fireImmunity,
             new ResourceLocation(this.getRegistryName().getNamespace(), "textures/clothing/"
                 + this.getRegistryName().getPath() + "_" + "default" + ".png"))),
-        () -> Capabilities.CLOTHING);
+        () -> Clothing.CAPABILITY);
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, World world, List<ITextComponent> lines,
-      ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack stack, Level world, List<Component> lines,
+      TooltipFlag tooltipFlag) {
     super.appendHoverText(stack, world, lines, tooltipFlag);
 
     if (this.fireImmunity) {
-      lines.add(new TranslationTextComponent("item_lore.clothing.immune_to_fire")
-          .withStyle(TextFormatting.GRAY));
+      lines.add(new TranslatableComponent("item_lore.clothing.immune_to_fire")
+          .withStyle(ChatFormatting.GRAY));
     }
 
     if (!this.attributeModifiers.isEmpty()) {
-      lines.add(StringTextComponent.EMPTY);
+      lines.add(TextComponent.EMPTY);
       lines.add(
-          new TranslationTextComponent("item.modifiers.clothing").withStyle(TextFormatting.GRAY));
+          new TranslatableComponent("item.modifiers.clothing").withStyle(ChatFormatting.GRAY));
 
       for (Entry<Attribute, AttributeModifier> entry : this.attributeModifiers.entries()) {
         AttributeModifier modifier = entry.getValue();
@@ -97,25 +97,25 @@ public class ClothingItem extends Item {
 
         if (modifier.getId() == Item.BASE_ATTACK_DAMAGE_UUID
             || modifier.getId() == Item.BASE_ATTACK_SPEED_UUID) {
-          lines.add((new StringTextComponent(" "))
-              .append(new TranslationTextComponent(
+          lines.add((new TextComponent(" "))
+              .append(new TranslatableComponent(
                   "attribute.modifier.equals." + modifier.getOperation().toValue(),
                   ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(multipliedAmount),
-                  new TranslationTextComponent(entry.getKey().getDescriptionId())))
-              .withStyle(TextFormatting.DARK_GREEN));
+                  new TranslatableComponent(entry.getKey().getDescriptionId())))
+              .withStyle(ChatFormatting.DARK_GREEN));
         } else if (amount > 0.0D) {
-          lines.add((new TranslationTextComponent(
+          lines.add((new TranslatableComponent(
               "attribute.modifier.plus." + modifier.getOperation().toValue(),
               ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(multipliedAmount),
-              new TranslationTextComponent(entry.getKey().getDescriptionId())))
-                  .withStyle(TextFormatting.BLUE));
+              new TranslatableComponent(entry.getKey().getDescriptionId())))
+                  .withStyle(ChatFormatting.BLUE));
         } else if (amount < 0.0D) {
           multipliedAmount = multipliedAmount * -1.0D;
-          lines.add((new TranslationTextComponent(
+          lines.add((new TranslatableComponent(
               "attribute.modifier.take." + modifier.getOperation().toValue(),
               ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(multipliedAmount),
-              new TranslationTextComponent(entry.getKey().getDescriptionId())))
-                  .withStyle(TextFormatting.RED));
+              new TranslatableComponent(entry.getKey().getDescriptionId())))
+                  .withStyle(ChatFormatting.RED));
         }
       }
     }

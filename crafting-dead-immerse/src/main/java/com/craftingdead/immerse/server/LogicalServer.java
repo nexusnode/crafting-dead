@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
@@ -40,20 +40,20 @@ import com.craftingdead.immerse.network.play.ChangeGameMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTDynamicOps;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.FolderName;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.network.NetworkDirection;
 
-public class LogicalServer extends WorldSavedData {
+public class LogicalServer extends SavedData {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -61,7 +61,7 @@ public class LogicalServer extends WorldSavedData {
 
   private final MinecraftServer minecraftServer;
 
-  private static final FolderName GAME_FOLDER_NAME = new FolderName("games");
+  private static final LevelResource GAME_FOLDER_NAME = new LevelResource("games");
 
   private final Path gamePath;
 
@@ -69,7 +69,6 @@ public class LogicalServer extends WorldSavedData {
   private String currentGameName;
 
   public LogicalServer(MinecraftServer minecraftServer) {
-    super(CraftingDeadImmerse.ID);
     this.minecraftServer = minecraftServer;
     this.gamePath = minecraftServer.getWorldPath(GAME_FOLDER_NAME);
   }
@@ -94,8 +93,8 @@ public class LogicalServer extends WorldSavedData {
   public void startLoading() {}
 
   public void finishLoading() {
-    this.minecraftServer.getLevel(World.OVERWORLD).getDataStorage()
-        .computeIfAbsent(() -> this, CraftingDeadImmerse.ID);
+    this.minecraftServer.getLevel(Level.OVERWORLD).getDataStorage()
+        .computeIfAbsent(this::load, () -> this, CraftingDeadImmerse.ID);
 
     // If there was no saved game in the world, load a new game
     if (this.gameWrapper == null) {
@@ -154,7 +153,7 @@ public class LogicalServer extends WorldSavedData {
   }
 
   private void loadGame(ServerGameWrapper gameWrapper) {
-    List<ServerPlayerEntity> players = this.minecraftServer.getPlayerList().getPlayers();
+    List<ServerPlayer> players = this.minecraftServer.getPlayerList().getPlayers();
 
     ServerGameWrapper oldGameWrapper = this.gameWrapper;
     if (oldGameWrapper != null) {
@@ -172,7 +171,7 @@ public class LogicalServer extends WorldSavedData {
     gameWrapper.load();
 
     logger.info("Loading players");
-    for (ServerPlayerEntity playerEntity : players) {
+    for (ServerPlayer playerEntity : players) {
       playerEntity.connection.send(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
           new ChangeGameMessage(gameWrapper.getGame().getType()),
           NetworkDirection.PLAY_TO_CLIENT));
@@ -205,38 +204,38 @@ public class LogicalServer extends WorldSavedData {
     this.respawnPlayers(player -> true, keepData);
   }
 
-  public void respawnPlayers(Predicate<ServerPlayerEntity> predicate, boolean keepData) {
-    List<ServerPlayerEntity> players =
+  public void respawnPlayers(Predicate<ServerPlayer> predicate, boolean keepData) {
+    List<ServerPlayer> players =
         new ArrayList<>(this.minecraftServer.getPlayerList().getPlayers());
-    for (ServerPlayerEntity playerEntity : players) {
+    for (ServerPlayer playerEntity : players) {
       if (predicate.test(playerEntity)) {
         this.respawnPlayer(playerEntity, keepData);
       }
     }
   }
 
-  public void respawnPlayer(ServerPlayerEntity playerEntity, boolean keepData) {
+  public void respawnPlayer(ServerPlayer playerEntity, boolean keepData) {
     playerEntity.connection.player =
         this.minecraftServer.getPlayerList().respawn(playerEntity, keepData);
   }
 
-  @Override
-  public void load(CompoundNBT nbt) {
-    CompoundNBT gameNbt = nbt.getCompound("game");
-    if (!gameNbt.isEmpty()) {
-      GameServer gameServer = GameServer.CODEC.parse(NBTDynamicOps.INSTANCE, gameNbt)
-          .getOrThrow(false, logger::error);
+  public LogicalServer load(CompoundTag tag) {
+    var gameTag = tag.getCompound("game");
+    if (!gameTag.isEmpty()) {
+      var gameServer =
+          GameServer.CODEC.parse(NbtOps.INSTANCE, gameTag).getOrThrow(false, logger::error);
       this.loadGame(new ServerGameWrapper(gameServer, this));
     }
+    return this;
   }
 
   @Override
-  public CompoundNBT save(CompoundNBT nbt) {
+  public CompoundTag save(CompoundTag tag) {
     if (this.getGame().save()) {
-      nbt.put("game", GameServer.CODEC.encodeStart(NBTDynamicOps.INSTANCE, this.getGame())
+      tag.put("game", GameServer.CODEC.encodeStart(NbtOps.INSTANCE, this.getGame())
           .getOrThrow(false, logger::error));
     }
-    return nbt;
+    return tag;
   }
 
   // ================================================================================
@@ -259,14 +258,14 @@ public class LogicalServer extends WorldSavedData {
 
   @SubscribeEvent
   public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-    ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getPlayer();
+    ServerPlayer playerEntity = (ServerPlayer) event.getPlayer();
     this.gameWrapper.addPlayer(PlayerExtension.getOrThrow(playerEntity));
   }
 
   @SubscribeEvent
   public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION)
-        .<PlayerExtension<ServerPlayerEntity>>cast()
+    event.getPlayer().getCapability(LivingExtension.CAPABILITY)
+        .<PlayerExtension<ServerPlayer>>cast()
         .ifPresent(this.gameWrapper::removePlayer);
   }
 }

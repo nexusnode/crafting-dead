@@ -25,37 +25,38 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.core.world.entity.extension.Visibility;
 import com.craftingdead.immerse.game.GameTypes;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 
-public class TdmPlayerHandler implements PlayerHandler {
+public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
 
   public static final ResourceLocation ID = GameTypes.TEAM_DEATHMATCH.getId();
 
-  protected static final DataParameter<Integer> REMAINING_BUY_TIME_SECONDS =
-      new DataParameter<>(0x00, DataSerializers.INT);
+  protected static final EntityDataAccessor<Integer> REMAINING_BUY_TIME_SECONDS =
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
 
-  protected static final DataParameter<Integer> REMAINING_SPAWN_PROTECTION_SECONDS =
-      new DataParameter<>(0x02, DataSerializers.INT);
+  protected static final EntityDataAccessor<Integer> REMAINING_SPAWN_PROTECTION_SECONDS =
+      new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
 
-  protected static final DataParameter<Integer> REMAINING_GHOST_TIME_SECONDS =
-      new DataParameter<>(0x03, DataSerializers.INT);
+  protected static final EntityDataAccessor<Integer> REMAINING_GHOST_TIME_SECONDS =
+      new EntityDataAccessor<>(0x03, EntityDataSerializers.INT);
 
-  private final PlayerExtension<?> player;
+  private final PlayerExtension<P> player;
 
   protected final SynchedData dataManager = new SynchedData();
 
   private final TdmGame<?> game;
 
-  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<?> player) {
+  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<P> player) {
     this(game, player, 0, 0, 0);
   }
 
-  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<?> player, int buyTimeSeconds,
+  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<P> player, int buyTimeSeconds,
       int spawnProtectionSeconds, int ghostTimeSeconds) {
     this.game = game;
     this.player = player;
@@ -64,7 +65,7 @@ public class TdmPlayerHandler implements PlayerHandler {
     this.dataManager.register(REMAINING_GHOST_TIME_SECONDS, ghostTimeSeconds);
   }
 
-  public PlayerExtension<?> getPlayer() {
+  public PlayerExtension<P> getPlayer() {
     return this.player;
   }
 
@@ -114,14 +115,14 @@ public class TdmPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
   }
 

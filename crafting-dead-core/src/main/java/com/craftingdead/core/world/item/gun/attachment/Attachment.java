@@ -24,14 +24,14 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemProvider {
+public class Attachment extends ForgeRegistryEntry<Attachment> implements ItemLike {
 
   private final Map<MultiplierType, Float> multipliers;
   private final GunCraftSlotType inventorySlot;
@@ -81,8 +81,8 @@ public class Attachment extends ForgeRegistryEntry<Attachment> implements IItemP
     return this.getOrCreateDescriptionId();
   }
 
-  public ITextComponent getDescription() {
-    return new TranslationTextComponent(this.getDescriptionId());
+  public Component getDescription() {
+    return new TranslatableComponent(this.getDescriptionId());
   }
 
   @Override

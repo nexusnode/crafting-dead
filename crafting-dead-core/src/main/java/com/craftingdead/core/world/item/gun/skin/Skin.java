@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.RegistryKeyCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.RegistryFileCodec;
 
 public class Skin {
 
@@ -40,7 +40,7 @@ public class Skin {
           .apply(instance, Skin::new));
 
   public static final Codec<Supplier<Skin>> CODEC =
-      RegistryKeyCodec.create(Skins.SKINS, DIRECT_CODEC);
+      RegistryFileCodec.create(Skins.SKINS, DIRECT_CODEC);
 
   private final ResourceLocation name;
   private final List<ResourceLocation> acceptedGuns;

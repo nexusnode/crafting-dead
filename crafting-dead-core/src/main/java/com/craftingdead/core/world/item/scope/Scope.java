@@ -19,12 +19,17 @@
 package com.craftingdead.core.world.item.scope;
 
 import java.util.Optional;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 
 public interface Scope {
 
-  boolean isAiming(Entity entity);
+  Capability<Scope> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+
+  boolean isScoping(Entity entity);
 
   float getZoomMultiplier(Entity entity);
 
@@ -33,4 +38,8 @@ public interface Scope {
   int getOverlayTextureWidth();
 
   int getOverlayTextureHeight();
+
+  default boolean shouldReduceMouseSensitivity(Entity entity) {
+    return this.getZoomMultiplier(entity) >= 5.0F;
+  }
 }

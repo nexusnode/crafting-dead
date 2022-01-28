@@ -23,14 +23,14 @@ import java.util.function.Consumer;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
-import net.minecraft.loot.BinomialRange;
-import net.minecraft.loot.ConstantRange;
-import net.minecraft.loot.ItemLootEntry;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.TagLootEntry;
-import net.minecraft.loot.functions.SetCount;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.TagEntry;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.BinomialDistributionGenerator;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 public class SupplyDropLootTables
     implements Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {
@@ -39,122 +39,178 @@ public class SupplyDropLootTables
   public void accept(BiConsumer<ResourceLocation, LootTable.Builder> t) {
     t.accept(BuiltInLootTables.MEDICAL_SUPPLY_DROP, new LootTable.Builder()
         .withPool(LootPool.lootPool()
-            .setRolls(ConstantRange.exactly(10))
-            .add(ItemLootEntry.lootTableItem(ModItems.BANDAGE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.FIRST_AID_KIT.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(6, 0.12F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.ADRENALINE_SYRINGE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(TagLootEntry.expandTag(ModItemTags.SYRINGES)
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.ARMY_MEDIC_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M9_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M1911_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.G18_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.SMOKE_GRENADE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.ADRENALINE_SYRINGE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M1911.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.G18.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M9.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.AK47_30_ROUND_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.45F))))));
+            .setRolls(ConstantValue.exactly(10))
+            .add(LootItem.lootTableItem(ModItems.BANDAGE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.FIRST_AID_KIT.get())
+                .apply(SetItemCountFunction
+                    .setCount(BinomialDistributionGenerator.binomial(6, 0.12F))))
+            .add(LootItem.lootTableItem(ModItems.ADRENALINE_SYRINGE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.5F))))
+            .add(TagEntry.expandTag(ModItemTags.SYRINGES)
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.ARMY_MEDIC_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M9_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M1911_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.G18_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.SMOKE_GRENADE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.ADRENALINE_SYRINGE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M1911.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.G18.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.M9.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.AK47_30_ROUND_MAGAZINE.get())
+                .apply(SetItemCountFunction
+                    .setCount(BinomialDistributionGenerator.binomial(2, 0.45F))))));
 
     t.accept(BuiltInLootTables.MILITARY_SUPPLY_DROP, new LootTable.Builder()
         .withPool(LootPool.lootPool()
-            .setRolls(ConstantRange.exactly(10))
-            .add(ItemLootEntry.lootTableItem(ModItems.BANDAGE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.BOLT_CUTTERS.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.7F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.C4.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(6, 0.2F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.REMOTE_DETONATOR.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.9F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.STANAG_30_ROUND_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M107_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(6, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M9_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.G18_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M240B_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.RPK_DRUM_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MINIGUN_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.6F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MPT55_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.FRAG_GRENADE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.FIRE_GRENADE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.FLASH_GRENADE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.ACOG_SIGHT.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.SUPPRESSOR.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.HP_SCOPE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.2F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.ARMY_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.TAC_GHILLIE_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(4, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.SPACE_SUIT_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.2F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.JUGGERNAUT_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.8F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.COMBAT_BDU_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.8F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.CLONE_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.6F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.CONTRACTOR_CLOTHING.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.AK47.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.45F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M4A1.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M107.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.2F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M1911.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(6, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.G18.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M9.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.P250.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(5, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.AS50.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.7F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.M240B.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.9F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MINIGUN.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.2F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MP5A5.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(3, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MPT55.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.3F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.FURY_PAINT.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.5F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.SCORCHED_PAINT.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.INFERNO_PAINT.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.4F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.AK47_30_ROUND_MAGAZINE.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(2, 0.45F))))
-            .add(ItemLootEntry.lootTableItem(ModItems.MOSSBERG.get())
-                .apply(SetCount.setCount(BinomialRange.binomial(1, 0.45F))))));
+            .setRolls(ConstantValue.exactly(10))
+            .add(LootItem.lootTableItem(ModItems.BANDAGE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.BOLT_CUTTERS.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.7F))))
+            .add(LootItem.lootTableItem(ModItems.C4.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(6, 0.2F))))
+            .add(LootItem.lootTableItem(ModItems.REMOTE_DETONATOR.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(1, 0.9F))))
+            .add(LootItem.lootTableItem(ModItems.STANAG_30_ROUND_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M107_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(6, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.M9_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.G18_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M240B_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.RPK_DRUM_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.MINIGUN_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.6F))))
+            .add(LootItem.lootTableItem(ModItems.MPT55_MAGAZINE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.FRAG_GRENADE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.FIRE_GRENADE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.FLASH_GRENADE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.ACOG_SIGHT.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.SUPPRESSOR.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.HP_SCOPE.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.2F))))
+            .add(LootItem.lootTableItem(ModItems.ARMY_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.TAC_GHILLIE_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(4, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.SPACE_SUIT_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.2F))))
+            .add(LootItem.lootTableItem(ModItems.JUGGERNAUT_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.8F))))
+            .add(LootItem.lootTableItem(ModItems.COMBAT_BDU_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.8F))))
+            .add(LootItem.lootTableItem(ModItems.CLONE_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(1, 0.6F))))
+            .add(LootItem.lootTableItem(ModItems.CONTRACTOR_CLOTHING.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.AK47.get())
+                .apply(SetItemCountFunction
+                    .setCount(BinomialDistributionGenerator.binomial(3, 0.45F))))
+            .add(LootItem.lootTableItem(ModItems.M4A1.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.M107.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.2F))))
+            .add(LootItem.lootTableItem(ModItems.M1911.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(6, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.G18.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.M9.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.P250.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(5, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.AS50.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(1, 0.7F))))
+            .add(LootItem.lootTableItem(ModItems.M240B.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(1, 0.9F))))
+            .add(LootItem.lootTableItem(ModItems.MINIGUN.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(1, 0.2F))))
+            .add(LootItem.lootTableItem(ModItems.MP5A5.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(3, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.MPT55.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.3F))))
+            .add(LootItem.lootTableItem(ModItems.FURY_PAINT.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.5F))))
+            .add(LootItem.lootTableItem(ModItems.SCORCHED_PAINT.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.INFERNO_PAINT.get())
+                .apply(
+                    SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.4F))))
+            .add(LootItem.lootTableItem(ModItems.AK47_30_ROUND_MAGAZINE.get())
+                .apply(SetItemCountFunction
+                    .setCount(BinomialDistributionGenerator.binomial(2, 0.45F))))
+            .add(LootItem.lootTableItem(ModItems.MOSSBERG.get())
+                .apply(SetItemCountFunction
+                    .setCount(BinomialDistributionGenerator.binomial(1, 0.45F))))));
   }
 }

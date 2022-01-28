@@ -18,40 +18,43 @@
 
 package com.craftingdead.core.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import com.craftingdead.core.world.entity.grenade.C4Explosive;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
 
-public class C4ExplosiveModel extends Model {
+public class C4ExplosiveModel extends HierarchicalModel<C4Explosive> {
 
-  private final ModelRenderer shape1;
+  private final ModelPart root;
 
-  public C4ExplosiveModel() {
-    super(RenderType::entityCutoutNoCull);
-    this.texWidth = 64;
-    this.texHeight = 32;
+  public C4ExplosiveModel(ModelPart root) {
+    this.root = root;
+  }
 
-    this.shape1 = new ModelRenderer(this, 0, 0);
-    this.shape1.addBox(0F, 0F, 0F, 10, 4, 10);
-    this.shape1.setPos(-5F, 0F, -5F);
-    this.shape1.setTexSize(64, 32);
-    this.shape1.mirror = true;
-    this.setRotation(this.shape1, 0F, 0F, 0F);
+  public static LayerDefinition createBodyLayer() {
+    var mesh = new MeshDefinition();
+    mesh.getRoot()
+        .addOrReplaceChild("anchor",
+            CubeListBuilder.create()
+                .texOffs(0, 0)
+                .addBox(-2.0F, -1.0F, -3.3333F, 4.0F, 2.0F, 6.0F)
+                .texOffs(18, 8)
+                .addBox(2.0F, -0.5F, -0.3333F, 1.0F, 1.0F, 2.0F)
+                .texOffs(0, 8)
+                .addBox(-2.5F, 0.0F, 1.1667F, 6.0F, 0.0F, 3.0F),
+            PartPose.offset(0.0F, 0.5F, 0.3333F));
+    return LayerDefinition.create(mesh, 32, 32);
   }
 
   @Override
-  public void renderToBuffer(MatrixStack matrix, IVertexBuilder vertexBuilder, int packedLight,
-      int packedOverlay, float red, float green, float blue, float alpha) {
-    this.shape1.render(matrix, vertexBuilder, packedLight, packedOverlay, red, green,
-        blue, alpha);
+  public ModelPart root() {
+    return this.root;
   }
 
-  private void setRotation(ModelRenderer model, float x, float y, float z) {
-    model.xRot = x;
-    model.yRot = y;
-    model.zRot = z;
-  }
+  @Override
+  public void setupAnim(C4Explosive entity, float limbSwing, float limbSwingAmount,
+      float ageInTicks, float netHeadYaw, float headPitch) {}
 }
-

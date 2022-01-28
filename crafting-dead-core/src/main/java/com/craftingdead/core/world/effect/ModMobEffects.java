@@ -19,28 +19,28 @@
 package com.craftingdead.core.world.effect;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModMobEffects {
 
-  public static final DeferredRegister<Effect> MOB_EFFECTS =
-      DeferredRegister.create(ForgeRegistries.POTIONS, CraftingDead.ID);
+  public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+      DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CraftingDead.ID);
 
-  public static final RegistryObject<Effect> SCUBA =
+  public static final RegistryObject<MobEffect> SCUBA =
       MOB_EFFECTS.register("scuba", ScubaMobEffect::new);
 
-  public static final RegistryObject<Effect> FLASH_BLINDNESS =
+  public static final RegistryObject<MobEffect> FLASH_BLINDNESS =
       MOB_EFFECTS.register("flash_blindness", FlashBlindnessMobEffect::new);
 
-  public static final RegistryObject<Effect> ADRENALINE =
+  public static final RegistryObject<MobEffect> ADRENALINE =
       MOB_EFFECTS.register("adrenaline", AdrenalineMobEffect::new);
 
-  public static final RegistryObject<Effect> PARACHUTE =
+  public static final RegistryObject<MobEffect> PARACHUTE =
       MOB_EFFECTS.register("parachute", ParachuteMobEffect::new);
 
   /**
@@ -49,8 +49,8 @@ public class ModMobEffects {
    *
    * @return <code>true</code> if the effect was applied. <code>false</code> otherwise.
    */
-  public static boolean applyOrOverrideIfLonger(LivingEntity target, EffectInstance effect) {
-    EffectInstance currentEffect = target.getEffect(effect.getEffect());
+  public static boolean applyOrOverrideIfLonger(LivingEntity target, MobEffectInstance effect) {
+    MobEffectInstance currentEffect = target.getEffect(effect.getEffect());
     if (currentEffect == null || currentEffect.getDuration() < effect.getDuration()) {
       target.removeEffect(effect.getEffect());
       return target.addEffect(effect);

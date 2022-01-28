@@ -18,19 +18,19 @@
 
 package com.craftingdead.core.world.damagesource;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 
 public class KillFeedEntry {
 
   private final int killerEntityId;
-  private final ITextComponent killerName;
-  private final ITextComponent deadName;
+  private final Component killerName;
+  private final Component deadName;
   private final ItemStack weaponStack;
   private final Type type;
 
-  public KillFeedEntry(int killerEntityId, ITextComponent killerName, ITextComponent deadName,
+  public KillFeedEntry(int killerEntityId, Component killerName, Component deadName,
       ItemStack weaponStack, Type type) {
     this.killerEntityId = killerEntityId;
     this.killerName = killerName;
@@ -43,11 +43,11 @@ public class KillFeedEntry {
     return this.killerEntityId;
   }
 
-  public ITextComponent getKillerName() {
+  public Component getKillerName() {
     return this.killerName;
   }
 
-  public ITextComponent getDeadName() {
+  public Component getDeadName() {
     return this.deadName;
   }
 
@@ -63,7 +63,7 @@ public class KillFeedEntry {
     NONE, HEADSHOT, WALLBANG, WALLBANG_HEADSHOT;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.killerEntityId);
     out.writeComponent(this.killerName);
     out.writeComponent(this.deadName);
@@ -71,7 +71,7 @@ public class KillFeedEntry {
     out.writeEnum(this.type);
   }
 
-  public static KillFeedEntry decode(PacketBuffer in) {
+  public static KillFeedEntry decode(FriendlyByteBuf in) {
     return new KillFeedEntry(in.readVarInt(), in.readComponent(), in.readComponent(), in.readItem(),
         in.readEnum(KillFeedEntry.Type.class));
   }

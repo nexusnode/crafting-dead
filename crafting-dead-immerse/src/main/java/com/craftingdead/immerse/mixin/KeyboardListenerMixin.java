@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.KeyboardListener;
+import net.minecraft.client.KeyboardHandler;
 import net.rocketpowered.connector.client.gui.OverlayManager;
 
-@Mixin(KeyboardListener.class)
+@Mixin(KeyboardHandler.class)
 public class KeyboardListenerMixin {
 
   @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)

@@ -20,7 +20,6 @@ package com.craftingdead.core;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.renderer.item.ItemRendererTypes;
@@ -38,28 +37,37 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
+import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ModItems;
+import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import com.craftingdead.core.world.item.gun.skin.Paint;
+import com.craftingdead.core.world.item.hat.Hat;
+import com.craftingdead.core.world.item.scope.Scope;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -74,16 +82,14 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -92,8 +98,6 @@ public class CraftingDead {
 
   public static final String VERSION =
       JarVersionLookupHandler.getImplementationVersion(CraftingDead.class).orElse("[version]");
-
-  private static final String TRAVELERS_BACKPACK_ID = "travelersbackpack";
 
   /**
    * Logger.
@@ -110,16 +114,15 @@ public class CraftingDead {
    */
   private final ModDist modDist;
 
-  private boolean travelersBackpacksLoaded;
-
   public CraftingDead() {
     instance = this;
 
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
-    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
     modEventBus.addListener(this::handleGatherData);
+    modEventBus.addListener(this::handleRegisterCapabilities);
 
     ModEntityTypes.ENTITY_TYPES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
@@ -146,14 +149,10 @@ public class CraftingDead {
   }
 
   public ClientDist getClientDist() {
-    if (this.modDist instanceof ClientDist) {
-      return (ClientDist) this.modDist;
+    if (this.modDist instanceof ClientDist clientDist) {
+      return clientDist;
     }
     throw new IllegalStateException("Accessing client dist on wrong side");
-  }
-
-  public boolean isTravelersBackpacksLoaded() {
-    return this.travelersBackpacksLoaded;
   }
 
   public static CraftingDead getInstance() {
@@ -167,10 +166,6 @@ public class CraftingDead {
   private void handleCommonSetup(FMLCommonSetupEvent event) {
     logger.info("Starting Crafting Dead, version {}", VERSION);
     NetworkChannel.loadChannels();
-    this.travelersBackpacksLoaded = ModList.get().isLoaded(TRAVELERS_BACKPACK_ID);
-    if (this.travelersBackpacksLoaded) {
-      logger.info("Adding integration for {}", TRAVELERS_BACKPACK_ID);
-    }
     event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
         Ingredient.of(Items.REDSTONE),
         new ItemStack(ModItems.ADRENALINE_SYRINGE.get())));
@@ -186,13 +181,25 @@ public class CraftingDead {
     }
   }
 
+  private void handleRegisterCapabilities(RegisterCapabilitiesEvent event) {
+    event.register(LivingExtension.class);
+    event.register(Storage.class);
+    event.register(Clothing.class);
+    event.register(Hat.class);
+    event.register(CombatSlotProvider.class);
+    event.register(Gun.class);
+    event.register(Magazine.class);
+    event.register(Scope.class);
+    event.register(Paint.class);
+  }
+
   // ================================================================================
   // Common Forge Events
   // ================================================================================
 
   @SubscribeEvent
   public void handleEntityItemPickup(EntityItemPickupEvent event) {
-    event.getPlayer().getCapability(Capabilities.LIVING_EXTENSION)
+    event.getPlayer().getCapability(LivingExtension.CAPABILITY)
         .<PlayerExtension<?>>cast()
         .filter(PlayerExtension::isCombatModeEnabled).ifPresent(living -> {
           final ItemStack itemStack = event.getItem().getItem();
@@ -201,7 +208,7 @@ public class CraftingDead {
           if (MinecraftForge.EVENT_BUS.post(combatPickupEvent)) {
             event.setCanceled(true);
           } else if (combatSlot != null) {
-            if (combatSlot.addToInventory(itemStack, event.getPlayer().inventory, false)) {
+            if (combatSlot.addToInventory(itemStack, event.getPlayer().getInventory(), false)) {
               // Allows normal processing of item pickup but prevents item being added to inventory
               // because we've already added it.
               event.setResult(Event.Result.ALLOW);
@@ -214,8 +221,8 @@ public class CraftingDead {
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
-    if (event.getTarget() != null && event.getEntityLiving() instanceof MobEntity) {
-      MobEntity mobEntity = (MobEntity) event.getEntityLiving();
+    if (event.getTarget() != null && event.getEntityLiving() instanceof Mob) {
+      Mob mobEntity = (Mob) event.getEntityLiving();
       if (mobEntity.hasEffect(ModMobEffects.FLASH_BLINDNESS.get())) {
         mobEntity.setTarget(null);
       }
@@ -225,13 +232,13 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDeath(LivingDeathEvent event) {
     if (event.getEntity()
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .map(living -> living.handleDeath(event.getSource()))
         .orElse(false)
         || (event.getSource().getEntity() != null && event
             .getSource()
             .getEntity()
-            .getCapability(Capabilities.LIVING_EXTENSION)
+            .getCapability(LivingExtension.CAPABILITY)
             .map(living -> living.handleKill(event.getEntity()))
             .orElse(false))) {
       event.setCanceled(true);
@@ -241,7 +248,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDrops(LivingDropsEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> event.setCanceled(
             living.handleDeathLoot(event.getSource(), event.getDrops())));
   }
@@ -249,7 +256,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingAttack(LivingAttackEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> event.setCanceled(
             living.handleHurt(event.getSource(), event.getAmount())));
   }
@@ -257,7 +264,7 @@ public class CraftingDead {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleLivingDamage(LivingDamageEvent event) {
     event.getEntity()
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> event.setAmount(
             living.handleDamaged(event.getSource(), event.getAmount())));
   }
@@ -270,10 +277,10 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handleLivingUpdate(LivingUpdateEvent event) {
-    event.getEntityLiving().getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
+    event.getEntityLiving().getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
       living.tick();
       if (!living.getLevel().isClientSide() && living.requiresSync()) {
-        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+        FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
         living.encode(data, false);
         NetworkChannel.PLAY.getSimpleChannel().send(
             PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
@@ -286,7 +293,7 @@ public class CraftingDead {
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
     switch (event.phase) {
       case END:
-        event.player.getCapability(Capabilities.LIVING_EXTENSION)
+        event.player.getCapability(LivingExtension.CAPABILITY)
             .filter(living -> living instanceof PlayerExtension)
             .map(living -> (PlayerExtension<?>) living)
             .ifPresent(PlayerExtension::playerTick);
@@ -299,18 +306,18 @@ public class CraftingDead {
   @SubscribeEvent
   public void handleAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof LivingEntity) {
-      LivingExtension<?, ?> living = event.getObject() instanceof PlayerEntity
-          ? PlayerExtension.create((PlayerEntity) event.getObject())
+      LivingExtension<?, ?> living = event.getObject() instanceof Player
+          ? PlayerExtension.create((Player) event.getObject())
           : LivingExtension.create((LivingEntity) event.getObject());
       event.addCapability(LivingExtension.CAPABILITY_KEY, new SerializableCapabilityProvider<>(
-          LazyOptional.of(() -> living), () -> Capabilities.LIVING_EXTENSION, CompoundNBT::new));
+          LazyOptional.of(() -> living), () -> LivingExtension.CAPABILITY, CompoundTag::new));
       living.load();
     }
   }
 
   @SubscribeEvent
   public void handlePlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-    PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+    FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
     PlayerExtension.getOrThrow(event.getPlayer()).encode(data, true);
     NetworkChannel.PLAY.getSimpleChannel().send(
         PacketDistributor.TRACKING_ENTITY_AND_SELF.with(event::getPlayer),
@@ -319,18 +326,18 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-    startTracking(event.getPlayer(), (ServerPlayerEntity) event.getPlayer());
+    startTracking(event.getPlayer(), (ServerPlayer) event.getPlayer());
   }
 
   @SubscribeEvent
   public void handlePlayerStartTracking(PlayerEvent.StartTracking event) {
-    startTracking(event.getTarget(), (ServerPlayerEntity) event.getPlayer());
+    startTracking(event.getTarget(), (ServerPlayer) event.getPlayer());
   }
 
-  private static void startTracking(Entity targetEntity, ServerPlayerEntity playerEntity) {
-    targetEntity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(trackedLiving -> {
+  private static void startTracking(Entity targetEntity, ServerPlayer playerEntity) {
+    targetEntity.getCapability(LivingExtension.CAPABILITY).ifPresent(trackedLiving -> {
       trackedLiving.handleStartTracking(playerEntity);
-      PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+      FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
       trackedLiving.encode(data, true);
       NetworkChannel.PLAY.getSimpleChannel().send(
           PacketDistributor.PLAYER.with(() -> playerEntity),

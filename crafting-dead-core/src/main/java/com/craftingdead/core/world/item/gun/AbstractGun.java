@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
@@ -54,6 +52,7 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderType;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
@@ -63,64 +62,60 @@ import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.codec.EncoderException;
-import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.block.BellBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.TNTBlock;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.enchantment.UnbreakingEnchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.merchant.villager.WanderingTraderEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.monster.EndermanEntity;
-import net.minecraft.entity.monster.SkeletonEntity;
-import net.minecraft.entity.monster.VindicatorEntity;
-import net.minecraft.entity.monster.WitchEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTDynamicOps;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.concurrent.ThreadTaskExecutor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.thread.BlockableEventLoop;
+import net.minecraft.world.damagesource.CombatRules;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.Vindicator;
+import net.minecraft.world.entity.monster.Witch;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.TntBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor.PacketTarget;
 
-public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> {
+public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -141,8 +136,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
               .setPriority(Thread.MAX_PRIORITY)
               .build());
 
-  private static final DataParameter<ItemStack> PAINT_STACK =
-      new DataParameter<>(0x01, DataSerializers.ITEM_STACK);
+  private static final EntityDataAccessor<ItemStack> PAINT_STACK =
+      new EntityDataAccessor<>(0x01, EntityDataSerializers.ITEM_STACK);
 
   private final SynchedData dataManager = new SynchedData();
 
@@ -303,7 +298,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   @Override
-  public void validatePendingHit(PlayerExtension<ServerPlayerEntity> player,
+  public void validatePendingHit(PlayerExtension<ServerPlayer> player,
       LivingExtension<?, ?> hitLiving, PendingHit pendingHit) {
     final byte tickOffset = pendingHit.getTickOffset();
     if (tickOffset > HIT_VALIDATION_DELAY_TICKS) {
@@ -369,7 +364,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     this.lastShotMs = time;
 
     LogicalSide side = living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
-    ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
+    BlockableEventLoop<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
     if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
       if (side.isServer()) {
@@ -407,17 +402,17 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   protected void processShot(LivingExtension<?, ?> living, Random random) {
     Entity entity = living.getEntity();
-    World level = living.getLevel();
+    Level level = living.getLevel();
 
     MinecraftForge.EVENT_BUS.post(new GunEvent.Shoot(this, this.itemStack, living));
 
     // Magazine size will be synced to clients so only decrement this on the server.
     if (!level.isClientSide()
-        && !(living.getEntity() instanceof PlayerEntity
-            && ((PlayerEntity) living.getEntity()).isCreative())) {
+        && !(living.getEntity() instanceof Player
+            && ((Player) living.getEntity()).isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.itemStack);
-      if (!UnbreakingEnchantment.shouldIgnoreDurabilityDrop(
+      if (!DigDurabilityEnchantment.shouldIgnoreDurabilityDrop(
           this.itemStack, unbreakingLevel, level.getRandom())) {
         this.ammoProvider.getExpectedMagazine().decrementSize();
       }
@@ -431,7 +426,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
-      RayTraceResult rayTraceResult = RayTraceUtil
+      HitResult rayTraceResult = RayTraceUtil
           .rayTrace(entity,
               this.getRange(),
               this.getAccuracy(living, random),
@@ -442,21 +437,21 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       if (rayTraceResult != null) {
         switch (rayTraceResult.getType()) {
           case BLOCK:
-            final BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) rayTraceResult;
+            final BlockHitResult blockRayTraceResult = (BlockHitResult) rayTraceResult;
             BlockState blockState = level.getBlockState(blockRayTraceResult.getBlockPos());
-            this.hitBlock(living, (BlockRayTraceResult) rayTraceResult, blockState,
+            this.hitBlock(living, (BlockHitResult) rayTraceResult, blockState,
                 level.isClientSide() && (i == 0 || !blocksHit.contains(blockState)));
             blocksHit.add(blockState);
             break;
           case ENTITY:
-            EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) rayTraceResult;
+            EntityHitResult entityRayTraceResult = (EntityHitResult) rayTraceResult;
             if (!entityRayTraceResult.getEntity().isAlive()) {
               break;
             }
 
             // Handled by validatePendingHit
-            if (entityRayTraceResult.getEntity() instanceof ServerPlayerEntity
-                && entity instanceof ServerPlayerEntity) {
+            if (entityRayTraceResult.getEntity() instanceof ServerPlayer
+                && entity instanceof ServerPlayer) {
               break;
             }
 
@@ -480,7 +475,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
 
   protected abstract float getDamage();
 
-  private void hitEntity(LivingExtension<?, ?> living, Entity hitEntity, Vector3d hitPos,
+  private void hitEntity(LivingExtension<?, ?> living, Entity hitEntity, Vec3 hitPos,
       boolean playSound) {
     final LivingEntity entity = living.getEntity();
     float damage = this.getDamage();
@@ -504,15 +499,15 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     if (hitEntity instanceof LivingEntity) {
       LivingExtension<?, ?> hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
-      headshot = (hitEntity instanceof PlayerEntity || hitEntity instanceof ZombieEntity
-          || hitEntity instanceof SkeletonEntity || hitEntity instanceof CreeperEntity
-          || hitEntity instanceof EndermanEntity || hitEntity instanceof WitchEntity
-          || hitEntity instanceof VillagerEntity || hitEntity instanceof VindicatorEntity
-          || hitEntity instanceof WanderingTraderEntity) && hitPos.y >= chinHeight;
+      headshot = (hitEntity instanceof Player || hitEntity instanceof Zombie
+          || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
+          || hitEntity instanceof EnderMan || hitEntity instanceof Witch
+          || hitEntity instanceof Villager || hitEntity instanceof Vindicator
+          || hitEntity instanceof WanderingTrader) && hitPos.y >= chinHeight;
       if (headshot) {
         damage *= HEADSHOT_MULTIPLIER * (1.0F - hitLiving.getItemHandler()
             .getStackInSlot(ModEquipmentSlotType.HAT.getIndex())
-            .getCapability(Capabilities.HAT)
+            .getCapability(Hat.CAPABILITY)
             .map(Hat::getHeadshotReductionPercentage)
             .orElse(0.0F));
       }
@@ -552,21 +547,21 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
         final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
 
         // Alert client of hit (real hit as opposed to client prediction)
-        if (entity instanceof ServerPlayerEntity) {
+        if (entity instanceof ServerPlayer) {
           boolean dead = hitLivingEntity.isDeadOrDying();
           NetworkChannel.PLAY.getSimpleChannel().send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
+              PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
               new HitMessage(hitPos, dead));
         }
       }
     }
   }
 
-  private void hitBlock(LivingExtension<?, ?> living, BlockRayTraceResult result,
+  private void hitBlock(LivingExtension<?, ?> living, BlockHitResult result,
       BlockState blockState, boolean playSound) {
     final LivingEntity entity = living.getEntity();
     Block block = blockState.getBlock();
-    World level = entity.level;
+    Level level = entity.level;
     BlockPos blockPos = result.getBlockPos();
 
     // Post gun hit block event
@@ -583,11 +578,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     } else {
       if (block instanceof BellBlock) {
         ((BellBlock) block).onHit(level, blockState, result,
-            entity instanceof PlayerEntity ? (PlayerEntity) entity : null, playSound);
+            entity instanceof Player ? (Player) entity : null, playSound);
       }
 
-      if (block instanceof TNTBlock) {
-        block.catchFire(blockState, entity.level, blockPos, null,
+      if (block instanceof TntBlock) {
+        block.onCaughtFire(blockState, entity.level, blockPos, null,
             entity instanceof LivingEntity ? (LivingEntity) entity : null);
         entity.level.removeBlock(blockPos, false);
       }
@@ -601,8 +596,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
               blockState.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
         } else {
           BlockPos faceBlockPos = blockPos.relative(result.getDirection());
-          if (AbstractFireBlock.canBePlacedAt(level, faceBlockPos, entity.getDirection())) {
-            BlockState blockstate1 = AbstractFireBlock.getState(level, faceBlockPos);
+          if (BaseFireBlock.canBePlacedAt(level, faceBlockPos, entity.getDirection())) {
+            BlockState blockstate1 = BaseFireBlock.getState(level, faceBlockPos);
             level.setBlock(faceBlockPos, blockstate1, 11);
           }
         }
@@ -628,7 +623,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   @Override
   public void setPaintStack(ItemStack paintStack) {
     this.dataManager.set(PAINT_STACK, paintStack);
-    this.setSkin(paintStack.getCapability(Capabilities.PAINT)
+    this.setSkin(paintStack.getCapability(Paint.CAPABILITY)
         .map(Paint::getSkin)
         .map(Skins.REGISTRY::get)
         .orElse(null));
@@ -657,10 +652,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
     this.fireMode = fireMode;
 
     living.getEntity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
-    if (living.getEntity() instanceof PlayerEntity) {
-      ((PlayerEntity) living.getEntity())
-          .displayClientMessage(new TranslationTextComponent("message.switch_fire_mode",
-              new TranslationTextComponent(this.fireMode.getTranslationKey())), true);
+    if (living.getEntity() instanceof Player) {
+      ((Player) living.getEntity())
+          .displayClientMessage(new TranslatableComponent("message.switch_fire_mode",
+              new TranslatableComponent(this.fireMode.getTranslationKey())), true);
     }
 
     if (sendUpdate) {
@@ -733,46 +728,46 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
     nbt.put("ammoProvider", this.ammoProvider.serializeNBT());
-    ListNBT attachmentsNbt = this.attachments.stream()
+    ListTag attachmentsNbt = this.attachments.stream()
         .map(Attachment::getRegistryName)
         .map(ResourceLocation::toString)
-        .map(StringNBT::valueOf)
-        .collect(ListNBT::new, ListNBT::add, List::addAll);
+        .map(StringTag::valueOf)
+        .collect(ListTag::new, ListTag::add, List::addAll);
     nbt.put("attachments", attachmentsNbt);
     nbt.put("paintStack", this.getPaintStack().serializeNBT());
     if (this.skin != null) {
-      nbt.put("skin", Skin.CODEC.encodeStart(NBTDynamicOps.INSTANCE, () -> this.skin)
+      nbt.put("skin", Skin.CODEC.encodeStart(NbtOps.INSTANCE, () -> this.skin)
           .getOrThrow(false, logger::error));
     }
     return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    if (nbt.contains("ammoProviderType", Constants.NBT.TAG_STRING)) {
-      this.setAmmoProvider(GameRegistry.findRegistry(AmmoProviderType.class)
-          .getValue(new ResourceLocation(nbt.getString("ammoProviderType"))).create());
+  public void deserializeNBT(CompoundTag nbt) {
+    if (nbt.contains("ammoProviderType", Tag.TAG_STRING)) {
+      this.setAmmoProvider(AmmoProviderTypes.registry.get().getValue(
+          new ResourceLocation(nbt.getString("ammoProviderType"))).create());
       this.ammoProvider.deserializeNBT(nbt.getCompound("ammoProvider"));
       this.ammoProviderChanged = true;
     }
     this.setAttachments(nbt.getList("attachments", 8)
         .stream()
-        .map(INBT::getAsString)
+        .map(Tag::getAsString)
         .map(ResourceLocation::new)
         .map(Attachments.REGISTRY.get()::getValue)
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
-    this.skin = Skin.CODEC.parse(NBTDynamicOps.INSTANCE, nbt.get("skin")).result()
+    this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, nbt.get("skin")).result()
         .map(Supplier::get)
         .orElse(null);
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
@@ -800,12 +795,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
         out.writeBoolean(true);
       } else {
         out.writeBoolean(false);
-
-        try {
-          out.writeWithCodec(Skin.CODEC, () -> this.skin);
-        } catch (IOException e) {
-          throw new EncoderException(e);
-        }
+        out.writeWithCodec(Skin.CODEC, () -> this.skin);
       }
     } else {
       out.writeBoolean(false);
@@ -813,7 +803,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
 
     int size = in.readVarInt();
@@ -833,11 +823,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
       if (in.readBoolean()) {
         this.skin = null;
       } else {
-        try {
-          this.skin = in.readWithCodec(Skin.CODEC).get();
-        } catch (IOException e) {
-          throw new DecoderException(e);
-        }
+        this.skin = in.readWithCodec(Skin.CODEC).get();
       }
     }
   }
@@ -851,13 +837,14 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundNBT> 
   }
 
   private static void checkCreateExplosion(ItemStack magazineStack, Entity entity,
-      Vector3d position) {
+      Vec3 position) {
     float explosionSize =
         EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, magazineStack)
             / (float) Enchantments.POWER_ARROWS.getMaxLevel();
     if (explosionSize > 0) {
       entity.level.explode(
-          entity, position.x(), position.y(), position.z(), explosionSize, Explosion.Mode.NONE);
+          entity, position.x(), position.y(), position.z(), explosionSize,
+          Explosion.BlockInteraction.NONE);
     }
   }
 }

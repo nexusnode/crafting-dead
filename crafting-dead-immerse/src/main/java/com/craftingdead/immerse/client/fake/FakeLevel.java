@@ -20,35 +20,35 @@ package com.craftingdead.immerse.client.fake;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.tags.ITagCollectionSupplier;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagContainer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.storage.MapData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.ticks.LevelTickAccess;
 
-public class FakeLevel extends ClientWorld {
+public class FakeLevel extends ClientLevel {
 
   private static FakeLevel instance;
 
   private FakeLevel(Minecraft mc) {
-    super(mc.getConnection(), new ClientWorld.ClientWorldInfo(Difficulty.NORMAL, false, false),
-        World.OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 3, mc::getProfiler, mc.levelRenderer,
+    super(mc.getConnection(), new ClientLevel.ClientLevelData(Difficulty.NORMAL, false, false),
+        Level.OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 3, 3, mc::getProfiler, mc.levelRenderer,
         false, 0L);
   }
 
@@ -57,13 +57,13 @@ public class FakeLevel extends ClientWorld {
       BlockState newState, int flags) {}
 
   @Override
-  public void playSound(@Nullable PlayerEntity playerEntity, double x,
+  public void playSound(@Nullable Player playerEntity, double x,
       double y, double z, SoundEvent soundEvent,
-      SoundCategory soundCategory, float volume, float pitch) {}
+      SoundSource soundCategory, float volume, float pitch) {}
 
   @Override
-  public void playSound(@Nullable PlayerEntity playerEntity, Entity entity,
-      SoundEvent soundEvent, SoundCategory soundCategory, float volume,
+  public void playSound(@Nullable Player playerEntity, Entity entity,
+      SoundEvent soundEvent, SoundSource soundCategory, float volume,
       float pitch) {}
 
   @Override
@@ -72,12 +72,9 @@ public class FakeLevel extends ClientWorld {
   }
 
   @Override
-  public MapData getMapData(String mapName) {
+  public MapItemSavedData getMapData(String mapName) {
     return null;
   }
-
-  @Override
-  public void setMapData(MapData mapData) {}
 
   @Override
   public int getFreeMapId() {
@@ -98,26 +95,26 @@ public class FakeLevel extends ClientWorld {
   }
 
   @Override
-  public ITagCollectionSupplier getTagManager() {
+  public TagContainer getTagManager() {
     return null;
   }
 
   @Override
-  public ITickList<Block> getBlockTicks() {
+  public LevelTickAccess<Block> getBlockTicks() {
     return null;
   }
 
   @Override
-  public ITickList<Fluid> getLiquidTicks() {
+  public LevelTickAccess<Fluid> getFluidTicks() {
     return null;
   }
 
   @Override
-  public void levelEvent(@Nullable PlayerEntity playerEntity, int type,
+  public void levelEvent(@Nullable Player playerEntity, int type,
       BlockPos pos, int data) {}
 
   @Override
-  public List<AbstractClientPlayerEntity> players() {
+  public List<AbstractClientPlayer> players() {
     return null;
   }
 
@@ -127,8 +124,8 @@ public class FakeLevel extends ClientWorld {
   }
 
   @Override
-  public DynamicRegistries registryAccess() {
-    return DynamicRegistries.builtin();
+  public RegistryAccess registryAccess() {
+    return RegistryAccess.builtin();
   }
 
   @Override

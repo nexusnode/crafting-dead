@@ -1,10 +1,10 @@
 package com.craftingdead.core.client.animation.gun;
 
 import com.craftingdead.core.client.animation.TimedAnimation;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import com.mojang.math.Vector3f;
 
 public class SubmachineShootAnimation extends TimedAnimation {
 
@@ -13,12 +13,12 @@ public class SubmachineShootAnimation extends TimedAnimation {
   }
 
   @Override
-  public void apply(float partialTicks, MatrixStack poseStack) {
+  public void apply(float partialTicks, PoseStack poseStack) {
 
   }
 
   @Override
-  public void applyHand(Hand hand, HandSide handSide, float partialTicks, MatrixStack poseStack) {
+  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack) {
 
   }
 

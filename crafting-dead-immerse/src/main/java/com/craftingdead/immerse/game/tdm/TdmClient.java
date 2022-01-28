@@ -32,18 +32,19 @@ import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.craftingdead.immerse.game.module.team.ClientTeamModule;
 import com.craftingdead.immerse.game.module.team.TeamModule;
 import com.craftingdead.immerse.game.tdm.state.TdmState;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.network.play.NetworkPlayerInfo;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -72,28 +73,28 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
     super("");
   }
 
-  private ITextComponent getTimer() {
+  private Component getTimer() {
     int totalSeconds = this.getTimerValueSeconds();
     int mins = totalSeconds / 60;
     int seconds = totalSeconds % 60;
 
-    TextFormatting colour;
+    ChatFormatting colour;
     switch (this.getGameState()) {
       case PRE_GAME:
-        colour = TextFormatting.YELLOW;
+        colour = ChatFormatting.YELLOW;
         break;
       case GAME:
         if (totalSeconds <= 20) {
-          colour = TextFormatting.RED;
+          colour = ChatFormatting.RED;
           break;
         }
       default:
-        colour = TextFormatting.WHITE;
+        colour = ChatFormatting.WHITE;
         break;
     }
 
-    return new StringTextComponent(mins + ":" + (seconds < 10 ? "0" : "") + seconds)
-        .withStyle(TextFormatting.BOLD, colour);
+    return new TextComponent(mins + ":" + (seconds < 10 ? "0" : "") + seconds)
+        .withStyle(ChatFormatting.BOLD, colour);
   }
 
   @Override
@@ -126,22 +127,18 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
       switch (this.getGameState()) {
         case PRE_GAME:
           this.minecraft.gui.resetTitleTimes();
-          this.minecraft.gui.setTitles(
-              new TranslationTextComponent("title.warm_up").withStyle(TextFormatting.YELLOW), null,
-              -1, -1, -1);
+          this.minecraft.gui.setTitle(
+              new TranslatableComponent("title.warm_up").withStyle(ChatFormatting.YELLOW));
           break;
         case GAME:
           this.minecraft.gui.resetTitleTimes();
-          this.minecraft.gui.setTitles(
-              new TranslationTextComponent("title.game_start").withStyle(TextFormatting.AQUA), null,
-              -1, -1,
-              -1);
+          this.minecraft.gui.setTitle(
+              new TranslatableComponent("title.game_start").withStyle(ChatFormatting.AQUA));
           break;
         case POST_GAME:
           this.minecraft.gui.resetTitleTimes();
-          this.minecraft.gui.setTitles(
-              new TranslationTextComponent("title.game_over").withStyle(TextFormatting.RED), null,
-              -1, -1, -1);
+          this.minecraft.gui.setTitle(
+              new TranslatableComponent("title.game_over").withStyle(ChatFormatting.RED));
           break;
         default:
           break;
@@ -155,36 +152,39 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   }
 
   @Override
-  public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width,
+  public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
+      PoseStack matrixStack, int width,
       int height, float partialTicks) {
 
     final int middleWidth = width / 2;
 
-    ITextComponent redScore =
-        new StringTextComponent(
+    Component redScore =
+        new TextComponent(
             String.valueOf(TdmTeam.getScore(this.getTeamModule().getTeamInstance(TdmTeam.RED))))
                 .withStyle(TdmTeam.RED.getColourStyle());
-    ITextComponent blueScore =
-        new StringTextComponent(
+    Component blueScore =
+        new TextComponent(
             String.valueOf(TdmTeam.getScore(this.getTeamModule().getTeamInstance(TdmTeam.BLUE))))
                 .withStyle(TdmTeam.BLUE.getColourStyle());
 
-    ITextComponent timer = this.getTimer();
+    Component timer = this.getTimer();
 
     // Render Red Score
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fillWidthHeight(matrixStack, middleWidth - 19, 15, 18, 11, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, redScore,
+    GuiComponent.drawCenteredString(matrixStack, this.minecraft.font, redScore,
         middleWidth - 9, 17, 0);
 
     // Render Blue Score
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fillWidthHeight(matrixStack, middleWidth + 1, 15, 18, 11, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, blueScore,
+    GuiComponent.drawCenteredString(matrixStack, this.minecraft.font, blueScore,
         middleWidth + 10, 17, 0);
 
     // Render Time
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fillWidthHeight(matrixStack, middleWidth - 19, 1, 38, 13, 0x99000000);
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, timer, middleWidth + 1,
+    GuiComponent.drawCenteredString(matrixStack, this.minecraft.font, timer, middleWidth + 1,
         4, 0);
 
     final int headWidth = 20;
@@ -193,7 +193,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
     // Render Red Team Player Heads
     List<UUID> redMembers = this.getTeamModule().getTeamInstance(TdmTeam.RED).getMembers();
     for (int i = 0; i < redMembers.size(); i++) {
-      NetworkPlayerInfo playerInfo =
+      PlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(redMembers.get(i));
       if (playerInfo != null) {
         TdmPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
@@ -206,7 +206,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
         if (playerData.isDead()) {
           RenderUtil.fillWidthHeight(matrixStack, x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
-          RenderUtil.bind(DEAD);
+          RenderSystem.setShaderTexture(0, DEAD);
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
@@ -217,7 +217,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
         RenderUtil.fillWidthHeight(matrixStack, x - 1, y + headHeight + 2, headWidth + 2,
             this.minecraft.font.lineHeight + 2,
             0x80000000);
-        AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
+        GuiComponent.drawCenteredString(matrixStack, this.minecraft.font,
             String.valueOf(playerData.getScore()), x + headWidth / 2, y + headHeight + 4,
             0xFFFFFFFF);
       }
@@ -226,7 +226,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
     // Render Blue Team Player Heads
     List<UUID> blueMembers = this.getTeamModule().getTeamInstance(TdmTeam.BLUE).getMembers();
     for (int i = 0; i < blueMembers.size(); i++) {
-      NetworkPlayerInfo playerInfo =
+      PlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(blueMembers.get(i));
       if (playerInfo != null) {
         TdmPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
@@ -239,7 +239,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
         if (playerData.isDead()) {
           RenderUtil.fillWidthHeight(matrixStack, x, y, headWidth, headHeight, 0x80000000);
           RenderSystem.enableBlend();
-          RenderUtil.bind(DEAD);
+          RenderSystem.setShaderTexture(0, DEAD);
           RenderUtil.blit(matrixStack, x, y, headWidth, headHeight);
           RenderSystem.disableBlend();
         } else {
@@ -250,7 +250,7 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
         RenderUtil.fillWidthHeight(matrixStack, x - 1, y + headHeight + 2, headWidth + 2,
             this.minecraft.font.lineHeight + 2,
             0x80000000);
-        AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
+        GuiComponent.drawCenteredString(matrixStack, this.minecraft.font,
             String.valueOf(playerData.getScore()), x + headWidth / 2, y + headHeight + 4,
             0xFFFFFFFF);
       }
@@ -260,8 +260,8 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   }
 
   @Override
-  public boolean renderPlayerList(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks) {
+  public boolean renderPlayerList(PlayerExtension<? extends AbstractClientPlayer> player,
+      PoseStack matrixStack, int width, int height, float partialTicks) {
     int mwidth = width / 2;
     int mheight = height / 2;
 
@@ -271,82 +271,83 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
     int sby = mheight - (sbheight / 2) - 18;
 
     // Render SB Header
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fillWidthHeight(matrixStack, sbx, sby, sbwidth, 40, 0xCC000000);
     RenderUtil.fillWidthHeight(matrixStack, sbx, sby + 3, sbwidth, 34, 0x33FFFFFF);
 
     // Render Logo
     RenderSystem.enableBlend();
-    RenderUtil.bind(BANNER_INVERTED);
+    RenderSystem.setShaderTexture(0, BANNER_INVERTED);
     RenderUtil.blit(matrixStack, sbx + 2, sby + 5, 125, 27.5F);
     RenderSystem.disableBlend();
     // Render Game Information
 
-    ITextComponent gameTitle =
-        this.getType().getDisplayName().copy().withStyle(TextFormatting.WHITE,
-            TextFormatting.BOLD);
+    Component gameTitle =
+        this.getType().getDisplayName().copy().withStyle(ChatFormatting.WHITE,
+            ChatFormatting.BOLD);
     this.minecraft.font.drawShadow(matrixStack, gameTitle,
         sbx + sbwidth - 3 - this.minecraft.font.width(gameTitle),
         sby + 9, 0);
 
-    ITextComponent mapTitle =
-        new StringTextComponent(this.getDisplayName()).withStyle(TextFormatting.GRAY);
+    Component mapTitle =
+        new TextComponent(this.getDisplayName()).withStyle(ChatFormatting.GRAY);
     this.minecraft.font.drawShadow(matrixStack, mapTitle,
         sbx + sbwidth - 3 - this.minecraft.font.width(mapTitle),
         sby + 20, 0);
 
     // Render Time
     RenderSystem.enableBlend();
-    RenderUtil.bind(STOPWATCH);
+    RenderSystem.setShaderTexture(0, STOPWATCH);
     RenderUtil.blit(matrixStack, sbx + (sbwidth / 2) - 8, sby + 5, 16, 16);
     RenderSystem.disableBlend();
-    ITextComponent timer = this.getTimer();
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font, timer,
+    Component timer = this.getTimer();
+    GuiComponent.drawCenteredString(matrixStack, this.minecraft.font, timer,
         sbx + (sbwidth / 2),
         sby + 24, 0);
 
     // Render Teams and Player Information
     RenderUtil.fillWidthHeight(matrixStack, sbx, sby + 41, sbwidth, 193, 0x80000000);
     RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 41, sbwidth, 13,
-        new StringTextComponent("Ping"),
-        new StringTextComponent("Username"), new StringTextComponent("K"),
-        new StringTextComponent("A"), new StringTextComponent("D"),
-        new StringTextComponent("Score"));
+        new TextComponent("Ping"),
+        new TextComponent("Username"), new TextComponent("K"),
+        new TextComponent("A"), new TextComponent("D"),
+        new TextComponent("Score"));
 
     List<UUID> blueMembers = this.getTeamModule().getTeamInstance(TdmTeam.BLUE).getMembers();
     for (int i = 0; i < blueMembers.size(); i++) {
-      NetworkPlayerInfo playerInfo =
+      PlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(blueMembers.get(i));
       if (playerInfo != null) {
-        ITextComponent username =
+        Component username =
             playerInfo.getTabListDisplayName() == null
-                ? new StringTextComponent(playerInfo.getProfile().getName())
+                ? new TextComponent(playerInfo.getProfile().getName())
                 : playerInfo.getTabListDisplayName();
         TdmPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 55 + (i * 11), sbwidth, 10,
-            new StringTextComponent(String.valueOf(playerInfo.getLatency())),
-            username, new StringTextComponent(String.valueOf(playerData.getKills())),
-            new StringTextComponent(String.valueOf(playerData.getAssists())),
-            new StringTextComponent(String.valueOf(playerData.getDeaths())),
-            new StringTextComponent(String.valueOf(playerData.getScore())));
+            new TextComponent(String.valueOf(playerInfo.getLatency())),
+            username, new TextComponent(String.valueOf(playerData.getKills())),
+            new TextComponent(String.valueOf(playerData.getAssists())),
+            new TextComponent(String.valueOf(playerData.getDeaths())),
+            new TextComponent(String.valueOf(playerData.getScore())));
       }
     }
 
     List<UUID> redMembers = this.getTeamModule().getTeamInstance(TdmTeam.RED).getMembers();
     for (int i = 0; i < redMembers.size(); i++) {
-      NetworkPlayerInfo playerInfo =
+      PlayerInfo playerInfo =
           this.minecraft.getConnection().getPlayerInfo(redMembers.get(i));
       if (playerInfo != null) {
-        ITextComponent username =
+        Component username =
             playerInfo.getTabListDisplayName() == null
-                ? new StringTextComponent(playerInfo.getProfile().getName())
+                ? new TextComponent(playerInfo.getProfile().getName())
                 : playerInfo.getTabListDisplayName();
         TdmPlayerData playerData = this.getPlayerData(playerInfo.getProfile().getId());
         RenderUtil.renderPlayerListRow(matrixStack, sbx, sby + 147 + (i * 11), sbwidth, 10,
-            new StringTextComponent(String.valueOf(playerInfo.getLatency())),
-            username, new StringTextComponent(String.valueOf(playerData.getKills())),
-            new StringTextComponent(String.valueOf(playerData.getAssists())),
-            new StringTextComponent(String.valueOf(playerData.getDeaths())),
-            new StringTextComponent(String.valueOf(playerData.getScore())));
+            new TextComponent(String.valueOf(playerInfo.getLatency())),
+            username, new TextComponent(String.valueOf(playerData.getKills())),
+            new TextComponent(String.valueOf(playerData.getAssists())),
+            new TextComponent(String.valueOf(playerData.getDeaths())),
+            new TextComponent(String.valueOf(playerData.getScore())));
       }
     }
 
@@ -359,16 +360,16 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension
         && event.getLiving().getLevel().isClientSide()) {
-      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
+      var player = (PlayerExtension<?>) event.getLiving();
       player.registerHandler(TdmPlayerHandler.ID,
-          new TdmPlayerHandler(this, player));
+          new TdmPlayerHandler<>(this, player));
     }
   }
 
   @SubscribeEvent
   public void handleRenderNameplate(RenderNameplateEvent event) {
-    if (event.getEntity() instanceof PlayerEntity
-        && this.minecraft.player instanceof PlayerEntity) {
+    if (event.getEntity() instanceof Player
+        && this.minecraft.player instanceof Player) {
       TdmTeam playerTeam =
           this.getTeamModule().getPlayerTeam(event.getEntity().getUUID())
               .orElse(null);

@@ -35,23 +35,23 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.BlockParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.CameraType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.Util;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public abstract class AbstractGunClient<T extends AbstractGun> implements GunClient {
 
@@ -89,7 +89,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   protected abstract long getSecondaryActionSoundRepeatDelayMs();
 
   public void handleTick(LivingExtension<?, ?> living) {
-    if (living.getEntity() instanceof ClientPlayerEntity
+    if (living.getEntity() instanceof LocalPlayer
         && this.livingHitValidationBuffer.size() > 0
         && this.hitValidationTicks++ >= AbstractGun.HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
@@ -130,7 +130,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   protected abstract Optional<SoundEvent> getSilencedShootSound();
 
   protected boolean canFlash(LivingExtension<?, ?> living) {
-    return this.minecraft.options.getCameraType() == PointOfView.FIRST_PERSON
+    return this.minecraft.options.getCameraType() == CameraType.FIRST_PERSON
         && this.gun.getShotCount() != this.lastShotCount && this.gun.getShotCount() > 0;
   }
 
@@ -184,8 +184,8 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
 
 
   public void handleHitEntityPre(LivingExtension<?, ?> living, Entity hitEntity,
-      Vector3d hitPos, long randomSeed) {
-    if (living.getEntity() instanceof ClientPlayerEntity
+      Vec3 hitPos, long randomSeed) {
+    if (living.getEntity() instanceof LocalPlayer
         && hitEntity instanceof LivingEntity) {
       this.livingHitValidationBuffer.put(hitEntity.getId(),
           new PendingHit((byte) (AbstractGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
@@ -195,25 +195,25 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   }
 
   public void handleHitEntityPost(LivingExtension<?, ?> living, Entity hitEntity,
-      Vector3d hitPos, boolean playSound, boolean headshot) {
+      Vec3 hitPos, boolean playSound, boolean headshot) {
     if (!(hitEntity instanceof LivingEntity)) {
       return;
     }
 
-    final World level = hitEntity.level;
+    final Level level = hitEntity.level;
 
     if (headshot) {
       final int particleCount = 12;
       for (int i = 0; i < particleCount; ++i) {
         level.addParticle(
-            new BlockParticleData(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState()),
+            new BlockParticleOption(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState()),
             hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
       }
     }
 
     level.playSound(
-        living.getEntity() instanceof PlayerEntity ? (PlayerEntity) living.getEntity() : null,
-        hitEntity.blockPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundCategory.PLAYERS,
+        living.getEntity() instanceof Player ? (Player) living.getEntity() : null,
+        hitEntity.blockPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundSource.PLAYERS,
         1.0F, 1.0F);
 
     // If local player
@@ -224,16 +224,16 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
       level.addParticle(
-          new BlockParticleData(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
+          new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
           hitPos.x(), hitPos.y(), hitPos.z(), 0.0D, 0.0D, 0.0D);
     }
   }
 
   public void handleHitBlock(LivingExtension<?, ?> living,
-      BlockRayTraceResult result, BlockState blockState, boolean playSound) {
+      BlockHitResult result, BlockState blockState, boolean playSound) {
     Entity entity = living.getEntity();
-    World level = entity.level;
-    Vector3d location = result.getLocation();
+    Level level = entity.level;
+    Vec3 location = result.getLocation();
 
     if (playSound) {
       // Gets the hit sound to be played
@@ -250,13 +250,13 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         hitSound = ModSoundEvents.BULLET_IMPACT_GLASS.get();
       }
 
-      level.playSound(entity instanceof PlayerEntity ? (PlayerEntity) entity : null,
-          result.getBlockPos(), hitSound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+      level.playSound(entity instanceof Player ? (Player) entity : null,
+          result.getBlockPos(), hitSound, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     final int particleCount = 12;
     for (int i = 0; i < particleCount; ++i) {
-      level.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), location.x(),
+      level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockState), location.x(),
           location.y(), location.z(), 0.0D, 0.0D, 0.0D);
     }
   }
@@ -267,7 +267,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         this.secondaryActionSoundStartTimeMs = Util.getMillis();
         living.getEntity().playSound(sound, 1.0F, 1.0F);
       } else {
-        this.minecraft.getSoundManager().stop(sound.getRegistryName(), SoundCategory.PLAYERS);
+        this.minecraft.getSoundManager().stop(sound.getRegistryName(), SoundSource.PLAYERS);
       }
     });
   }

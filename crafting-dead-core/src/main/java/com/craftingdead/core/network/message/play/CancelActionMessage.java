@@ -19,10 +19,10 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class CancelActionMessage {
 
@@ -32,17 +32,17 @@ public class CancelActionMessage {
     this.entityId = entityId;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
   }
 
-  public static CancelActionMessage decode(PacketBuffer in) {
+  public static CancelActionMessage decode(FriendlyByteBuf in) {
     return new CancelActionMessage(in.readVarInt());
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> living.cancelAction(
             ctx.get().getDirection().getReceptionSide().isServer())));
     return true;

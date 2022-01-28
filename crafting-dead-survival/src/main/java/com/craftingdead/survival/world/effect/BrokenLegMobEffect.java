@@ -22,16 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.item.SurvivalItems;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class BrokenLegMobEffect extends Effect {
+public class BrokenLegMobEffect extends MobEffect {
 
   public BrokenLegMobEffect() {
-    super(EffectType.HARMFUL, 0x816C5A);
+    super(MobEffectCategory.HARMFUL, 0x816C5A);
     this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "021BEAA1-498F-4D7B-933E-F0FA0B88B9D1",
         -0.15D, AttributeModifier.Operation.MULTIPLY_TOTAL);
   }

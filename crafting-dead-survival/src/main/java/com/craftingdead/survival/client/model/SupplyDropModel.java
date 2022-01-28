@@ -18,81 +18,73 @@
 
 package com.craftingdead.survival.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import com.craftingdead.survival.world.entity.SupplyDrop;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
 
-public class SupplyDropModel extends Model {
+public class SupplyDropModel extends HierarchicalModel<SupplyDrop> {
 
-  private final ModelRenderer Shape1;
-  private final ModelRenderer Shape2;
-  private final ModelRenderer Shape3;
-  private final ModelRenderer Shape4;
-  private final ModelRenderer Shape5;
-  private final ModelRenderer parachute;
+  private final ModelPart root;
+  public final ModelPart parachute;
 
-  private boolean renderParachute;
-
-  public SupplyDropModel() {
-    super(RenderType::entityCutoutNoCull);
-    this.texWidth = 256;
-    this.texHeight = 256;
-
-    this.Shape1 = new ModelRenderer(this, 0, 0);
-    this.Shape1.addBox(0F, 0.01F, 0F, 32, 4, 32, true);
-    this.Shape1.setPos(-16F, 20F, -16F);
-    this.Shape1.setTexSize(256, 256);
-    this.Shape2 = new ModelRenderer(this, 0, 38);
-    this.Shape2.addBox(0F, 0F, 0F, 30, 18, 15, true);
-    this.Shape2.setPos(-15F, 2F, 0F);
-    this.Shape2.setTexSize(256, 256);
-    this.Shape3 = new ModelRenderer(this, 0, 73);
-    this.Shape3.addBox(0F, 0F, 0F, 14, 14, 14, true);
-    this.Shape3.setPos(0F, 6F, -15F);
-    this.Shape3.setTexSize(256, 256);
-    this.Shape4 = new ModelRenderer(this, 0, 105);
-    this.Shape4.addBox(0F, 0F, 0F, 11, 6, 6, true);
-    this.Shape4.setPos(-13F, 14F, -15F);
-    this.Shape4.setTexSize(256, 256);
-    this.Shape5 = new ModelRenderer(this, 0, 119);
-    this.Shape5.addBox(0F, 0F, 0F, 11, 6, 6, true);
-    this.Shape5.setPos(-13F, 14F, -7F);
-    this.Shape5.setTexSize(256, 256);
-    this.parachute = new ModelRenderer(this, 0, 133);
-    this.parachute.addBox(0F, 0F, 0F, 40, 30, 40, true);
-    this.parachute.setPos(-20F, -50F, -20F);
-    this.parachute.setTexSize(256, 256);
+  public SupplyDropModel(ModelPart root) {
+    this.root = root;
+    this.parachute = root.getChild("parachute");
   }
 
-  public void setRenderParachute(boolean renderParachute) {
-    this.renderParachute = renderParachute;
+  public static LayerDefinition createBodyLayer() {
+    var mesh = new MeshDefinition();
+    var root = mesh.getRoot();
+
+    root.addOrReplaceChild("shape1",
+        CubeListBuilder.create()
+            .texOffs(0, 0)
+            .addBox(0F, 0.01F, 0F, 32, 4, 32, true),
+        PartPose.offset(-16F, 20F, -16F));
+
+    root.addOrReplaceChild("shape2",
+        CubeListBuilder.create()
+            .texOffs(0, 38)
+            .addBox(0F, 0F, 0F, 30, 18, 15, true),
+        PartPose.offset(-15F, 2F, 0F));
+
+    root.addOrReplaceChild("shape3",
+        CubeListBuilder.create()
+            .texOffs(0, 73)
+            .addBox(0F, 0F, 0F, 14, 14, 14, true),
+        PartPose.offset(0F, 6F, -15F));
+
+    root.addOrReplaceChild("shape4",
+        CubeListBuilder.create()
+            .texOffs(0, 105)
+            .addBox(0F, 0F, 0F, 11, 6, 6, true),
+        PartPose.offset(-13F, 14F, -15F));
+
+    root.addOrReplaceChild("shape5",
+        CubeListBuilder.create()
+            .texOffs(0, 119)
+            .addBox(0F, 0F, 0F, 11, 6, 6, true),
+        PartPose.offset(-13F, 14F, -7F));
+
+    root.addOrReplaceChild("parachute",
+        CubeListBuilder.create()
+            .texOffs(0, 133)
+            .addBox(0F, 0F, 0F, 40, 30, 40, true),
+        PartPose.offset(-20F, -50F, -20F));
+
+    return LayerDefinition.create(mesh, 256, 256);
   }
 
   @Override
-  public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLight,
-      int packedOverlay, float red, float greeen, float blue, float alpha) {
-    this.Shape1
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-            blue, alpha);
-    this.Shape2
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-            blue, alpha);
-    this.Shape3
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-            blue, alpha);
-    this.Shape4
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-            blue, alpha);
-    this.Shape5
-        .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-            blue, alpha);
-
-    if (this.renderParachute) {
-      this.parachute
-          .render(matrixStack, vertexBuilder, packedLight, packedOverlay, red, greeen,
-              blue, alpha);
-    }
+  public ModelPart root() {
+    return this.root;
   }
+
+  @Override
+  public void setupAnim(SupplyDrop entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+      float netHeadYaw, float headPitch) {}
 }

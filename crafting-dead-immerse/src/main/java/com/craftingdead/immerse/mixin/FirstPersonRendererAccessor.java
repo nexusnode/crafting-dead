@@ -20,19 +20,19 @@ package com.craftingdead.immerse.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.FirstPersonRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
 
-@Mixin(FirstPersonRenderer.class)
+@Mixin(ItemInHandRenderer.class)
 public interface FirstPersonRendererAccessor {
 
   @Invoker
-  public void invokeRenderArmWithItem(AbstractClientPlayerEntity playerEntity,
-      float partialTicks, float pitch, Hand hand, float swingProgress, ItemStack itemStack,
-      float equippedProgress, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+  public void invokeRenderArmWithItem(AbstractClientPlayer playerEntity,
+      float partialTicks, float pitch, InteractionHand hand, float swingProgress, ItemStack itemStack,
+      float equippedProgress, PoseStack matrixStack, MultiBufferSource renderTypeBuffer,
       int packedLight);
 }

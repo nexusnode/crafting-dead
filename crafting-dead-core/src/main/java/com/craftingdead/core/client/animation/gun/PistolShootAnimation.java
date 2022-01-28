@@ -20,12 +20,12 @@ package com.craftingdead.core.client.animation.gun;
 
 import com.craftingdead.core.client.animation.TimedAnimation;
 import com.craftingdead.core.util.EasingFunction;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 
 public class PistolShootAnimation extends TimedAnimation {
 
@@ -34,7 +34,7 @@ public class PistolShootAnimation extends TimedAnimation {
   }
 
   @Override
-  public void apply(float partialTicks, MatrixStack matrixStack) {
+  public void apply(float partialTicks, PoseStack matrixStack) {
     float lerpProgress = this.lerpProgress(partialTicks);
     matrixStack.translate(0, 0, getPushbackTranslation(lerpProgress));
     matrixStack.mulPose(getBounceRotation(lerpProgress));
@@ -45,16 +45,17 @@ public class PistolShootAnimation extends TimedAnimation {
     float easedProgress =
         EasingFunction.SINE_IN.andThen(EasingFunction.ELASTIC_OUT).apply(lerpProgress);
     return Vector3f.XP
-        .rotationDegrees(amplification * MathHelper.sin(easedProgress * ((float) Math.PI)));
+        .rotationDegrees(amplification * Mth.sin(easedProgress * ((float) Math.PI)));
   }
 
   private static float getPushbackTranslation(float lerpProgress) {
     float easedProgress = EasingFunction.EXPO_OUT.apply(lerpProgress);
-    return MathHelper.sin(easedProgress * ((float) Math.PI)) * 0.5F;
+    return Mth.sin(easedProgress * ((float) Math.PI)) * 0.5F;
   }
 
   @Override
-  public void applyHand(Hand hand, HandSide handSide, float partialTicks, MatrixStack matrixStack) {
+  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks,
+      PoseStack matrixStack) {
     float lerpProgress = this.lerpProgress(partialTicks);
     float translation = getPushbackTranslation(lerpProgress);
     switch (handSide) {

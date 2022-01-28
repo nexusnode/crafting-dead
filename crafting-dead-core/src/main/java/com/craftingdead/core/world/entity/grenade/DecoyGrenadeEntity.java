@@ -25,24 +25,24 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.gun.GunItem;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.Util;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.Util;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.RegistryObject;
 
-public class DecoyGrenadeEntity extends GrenadeEntity {
+public class DecoyGrenadeEntity extends Grenade {
 
   private long lastShotMs;
   private final GunItem gunItem = getRandomGun(this.random);
 
-  public DecoyGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
+  public DecoyGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
   }
 
-  public DecoyGrenadeEntity(LivingEntity thrower, World worldIn) {
+  public DecoyGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.DECOY_GRENADE.get(), thrower, worldIn);
   }
 
@@ -57,10 +57,10 @@ public class DecoyGrenadeEntity extends GrenadeEntity {
   public void activatedChanged(boolean activated) {
     if (!activated) {
       if (!this.level.isClientSide()) {
-        this.remove();
+        this.kill();
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 1.3F, false,
-            Explosion.Mode.NONE);
+            Explosion.BlockInteraction.NONE);
       }
     } else {
       this.playFakeShoot();

@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.Random;
 import com.craftingdead.survival.world.damagesource.SurvivalDamageSource;
 import com.craftingdead.survival.world.item.SurvivalItems;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class InfectionMobEffect extends Effect {
+public class InfectionMobEffect extends MobEffect {
 
   private static final Random random = new Random();
 
   protected InfectionMobEffect() {
-    super(EffectType.HARMFUL, 0x4e9331);
+    super(MobEffectCategory.HARMFUL, 0x4e9331);
   }
 
   @Override

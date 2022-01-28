@@ -20,17 +20,17 @@ package com.craftingdead.survival.world.entity.ai.goal;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.world.item.ActionItem;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 public class ActionItemGoal extends Goal {
 
-  private final MobEntity entity;
+  private final Mob entity;
 
   private final Supplier<Boolean> condition;
   private final Runnable callback;
 
-  public ActionItemGoal(MobEntity entity, Supplier<Boolean> condition, Runnable callback) {
+  public ActionItemGoal(Mob entity, Supplier<Boolean> condition, Runnable callback) {
     this.entity = entity;
     this.condition = condition;
     this.callback = callback;

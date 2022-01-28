@@ -24,7 +24,7 @@ import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.module.Module;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -63,10 +63,10 @@ public abstract class SurvivalGame<M extends Module> implements Game<M> {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {}
+  public void encode(FriendlyByteBuf out, boolean writeAll) {}
 
   @Override
-  public void decode(PacketBuffer in) {}
+  public void decode(FriendlyByteBuf in) {}
 
   @Override
   public boolean requiresSync() {

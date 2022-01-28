@@ -19,13 +19,13 @@
 package com.craftingdead.core.world.item;
 
 import com.craftingdead.core.world.effect.ModMobEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ParachuteItem extends Item {
 
@@ -34,13 +34,13 @@ public class ParachuteItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> use(World level, PlayerEntity player, Hand hand) {
+  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
     ItemStack itemstack = player.getItemInHand(hand);
     player.addEffect(
-        new EffectInstance(ModMobEffects.PARACHUTE.get(), 1200, 0, false, false));
-    if (!player.abilities.invulnerable) {
+        new MobEffectInstance(ModMobEffects.PARACHUTE.get(), 1200, 0, false, false));
+    if (!player.getAbilities().invulnerable) {
       itemstack.shrink(1);
     }
-    return ActionResult.sidedSuccess(itemstack, level.isClientSide());
+    return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
   }
 }

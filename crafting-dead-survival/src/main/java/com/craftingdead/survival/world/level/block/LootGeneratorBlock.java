@@ -21,31 +21,31 @@ package com.craftingdead.survival.world.level.block;
 import java.util.Random;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import net.minecraft.block.AirBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.GameType;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.AirBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class LootGeneratorBlock extends AirBlock {
 
   private final Supplier<Block> lootBlock;
-  private final Supplier<? extends IParticleData> particleOptions;
+  private final Supplier<? extends ParticleOptions> particleOptions;
   private final IntSupplier refreshDelayTicks;
 
   public LootGeneratorBlock(Properties properties, Supplier<Block> lootBlock,
-      Supplier<? extends IParticleData> particleOptions, IntSupplier refreshDelayTicks) {
+      Supplier<? extends ParticleOptions> particleOptions, IntSupplier refreshDelayTicks) {
     super(properties);
     this.lootBlock = lootBlock;
     this.particleOptions = particleOptions;
@@ -53,18 +53,18 @@ public class LootGeneratorBlock extends AirBlock {
   }
 
   @Override
-  public BlockRenderType getRenderShape(BlockState blockState) {
-    return BlockRenderType.INVISIBLE;
+  public RenderShape getRenderShape(BlockState blockState) {
+    return RenderShape.INVISIBLE;
   }
 
   @Override
-  public VoxelShape getShape(BlockState blockState, IBlockReader level, BlockPos pos,
-      ISelectionContext context) {
+  public VoxelShape getShape(BlockState blockState, BlockGetter level, BlockPos pos,
+      CollisionContext context) {
     return Block.box(0, 0, 0, 16, 3, 16);
   }
 
   @Override
-  public void animateTick(BlockState blockState, World level, BlockPos pos, Random random) {
+  public void animateTick(BlockState blockState, Level level, BlockPos pos, Random random) {
     Minecraft mc = Minecraft.getInstance();
     if (mc.gameMode.getPlayerMode() == GameType.CREATIVE) {
       level.addParticle(this.particleOptions.get(), pos.getX() + 0.5D, pos.getY() + 0.5D,
@@ -75,22 +75,22 @@ public class LootGeneratorBlock extends AirBlock {
   @SuppressWarnings("deprecation")
   @Override
   public BlockState updateShape(BlockState blockState, Direction direction,
-      BlockState neighborState, IWorld level, BlockPos pos, BlockPos neighborPos) {
-    level.getBlockTicks().scheduleTick(pos, this, 0);
+      BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    level.scheduleTick(pos, this, 0);
     return super.updateShape(blockState, direction, neighborState, level, pos, neighborPos);
   }
 
   @SuppressWarnings("deprecation")
   @Override
-  public void tick(BlockState blockState, ServerWorld level, BlockPos pos, Random random) {
+  public void tick(BlockState blockState, ServerLevel level, BlockPos pos, Random random) {
     super.tick(blockState, level, pos, random);
 
-    level.getBlockTicks().scheduleTick(pos, this, this.refreshDelayTicks.getAsInt());
+    level.scheduleTick(pos, this, this.refreshDelayTicks.getAsInt());
 
     BlockState lootBlockState = this.lootBlock.get().defaultBlockState();
 
     boolean lootExists =
-        level.getBlockStates(new AxisAlignedBB(pos.north().west(), pos.south().east()))
+        level.getBlockStates(new AABB(pos.north().west(), pos.south().east()))
             .anyMatch(lootBlockState::equals);
     if (!lootExists) {
       if (level.isEmptyBlock(pos.north())) {

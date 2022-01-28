@@ -20,18 +20,18 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.world.item.hat.DefaultHat;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import com.craftingdead.core.world.item.hat.Hat;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -54,35 +54,37 @@ public class HatItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> lore,
-      ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> lore,
+      TooltipFlag tooltipFlag) {
     if (this.headshotReductionPercentage > 0.0F) {
-      ITextComponent percentageText =
-          new StringTextComponent(String.format("%.1f", this.headshotReductionPercentage) + "%")
-              .withStyle(TextFormatting.RED);
+      Component percentageText =
+          new TextComponent(String.format("%.1f", this.headshotReductionPercentage) + "%")
+              .withStyle(ChatFormatting.RED);
 
-      lore.add(new TranslationTextComponent("item_lore.hat_item.headshot_reduction")
-          .withStyle(TextFormatting.GRAY)
+      lore.add(new TranslatableComponent("item_lore.hat_item.headshot_reduction")
+          .withStyle(ChatFormatting.GRAY)
           .append(percentageText));
     }
     if (this.immuneToFlashes) {
-      lore.add(new TranslationTextComponent("item_lore.hat_item.immune_to_flashes")
-          .withStyle(TextFormatting.GRAY));
+      lore.add(new TranslatableComponent("item_lore.hat_item.immune_to_flashes")
+          .withStyle(ChatFormatting.GRAY));
     }
     if (this.immuneToGas) {
-      lore.add(new TranslationTextComponent("item_lore.hat_item.immune_to_gas")
-          .withStyle(TextFormatting.GRAY));
+      lore.add(new TranslatableComponent("item_lore.hat_item.immune_to_gas")
+          .withStyle(ChatFormatting.GRAY));
     }
     if (this.nightVision) {
-      lore.add(new TranslationTextComponent("item_lore.hat_item.has_night_vision")
-          .withStyle(TextFormatting.GRAY));
+      lore.add(new TranslatableComponent("item_lore.hat_item.has_night_vision")
+          .withStyle(ChatFormatting.GRAY));
     }
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
-    return new SimpleCapabilityProvider<>(LazyOptional.of(() -> new DefaultHat(this.nightVision,
-        this.headshotReductionPercentage, this.immuneToFlashes)), () -> Capabilities.HAT);
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
+    return new SimpleCapabilityProvider<>(
+        LazyOptional.of(() -> new DefaultHat(this.nightVision,
+            this.headshotReductionPercentage, this.immuneToFlashes)),
+        () -> Hat.CAPABILITY);
   }
 
   public static class Properties extends Item.Properties {

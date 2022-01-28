@@ -19,22 +19,22 @@
 package com.craftingdead.core.world.item.crafting;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModRecipeSerializers {
 
-  public static final DeferredRegister<IRecipeSerializer<?>> RECIPE_SERIALIZERS =
+  public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
       DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, CraftingDead.ID);
 
-  public static final RegistryObject<IRecipeSerializer<?>> UPGRADE_MAGAZINE =
+  public static final RegistryObject<RecipeSerializer<?>> UPGRADE_MAGAZINE =
       RECIPE_SERIALIZERS.register("upgrade_magazine",
           UpgradeMagazineRecipe.Serializer::new);
 
-  public static final RegistryObject<SpecialRecipeSerializer<?>> DUPLICATE_MAGAZINE =
+  public static final RegistryObject<SimpleRecipeSerializer<?>> DUPLICATE_MAGAZINE =
       RECIPE_SERIALIZERS.register("duplicate_magazine",
-          () -> new SpecialRecipeSerializer<>(DuplicateMagazineRecipe::new));
+          () -> new SimpleRecipeSerializer<>(DuplicateMagazineRecipe::new));
 }

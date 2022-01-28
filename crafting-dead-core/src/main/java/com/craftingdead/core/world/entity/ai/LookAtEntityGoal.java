@@ -19,26 +19,25 @@
 package com.craftingdead.core.world.entity.ai;
 
 import java.util.EnumSet;
-import java.util.List;
 import com.craftingdead.core.world.effect.ModMobEffects;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 public class LookAtEntityGoal<T extends Entity> extends Goal {
 
-  private final MobEntity goalOwner;
+  private final Mob goalOwner;
   private final float maxDistance;
   private final float chance;
   private final Class<T> watchedClass;
   private int lookDuration;
   private Entity watchedEntity;
 
-  public LookAtEntityGoal(MobEntity goalowner, Class<T> watchedClass, float maxDistance) {
+  public LookAtEntityGoal(Mob goalowner, Class<T> watchedClass, float maxDistance) {
     this(goalowner, watchedClass, maxDistance, 0.02F);
   }
 
-  public LookAtEntityGoal(MobEntity goalOwner, Class<T> watchedClass, float maxDistance,
+  public LookAtEntityGoal(Mob goalOwner, Class<T> watchedClass, float maxDistance,
       float chance) {
     this.goalOwner = goalOwner;
     this.watchedClass = watchedClass;
@@ -57,13 +56,13 @@ public class LookAtEntityGoal<T extends Entity> extends Goal {
       return false;
     }
 
-    List<Entity> possibleEntities =
+    var possibleEntities =
         this.goalOwner.level.getEntitiesOfClass(this.watchedClass, this.goalOwner
             .getBoundingBox().inflate((double) this.maxDistance, 4.0D, (double) this.maxDistance));
 
     double lastSqDistance = Double.MAX_VALUE;
 
-    for (Entity grenade : possibleEntities) {
+    for (var grenade : possibleEntities) {
       double sqDistance = this.goalOwner.distanceToSqr(grenade);
       if (sqDistance <= lastSqDistance) {
         lastSqDistance = sqDistance;

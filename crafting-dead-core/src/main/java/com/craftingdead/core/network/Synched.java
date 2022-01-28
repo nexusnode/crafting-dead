@@ -19,27 +19,27 @@
 package com.craftingdead.core.network;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.nbt.ByteArrayNBT;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.ByteArrayTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 public interface Synched {
 
-  void encode(PacketBuffer out, boolean writeAll);
+  void encode(FriendlyByteBuf out, boolean writeAll);
 
-  void decode(PacketBuffer in);
+  void decode(FriendlyByteBuf in);
 
   boolean requiresSync();
 
-  default void encodeNbt(CompoundNBT nbt, boolean writeAll) {
-    PacketBuffer capabilityData = new PacketBuffer(Unpooled.buffer());
+  default void encodeNbt(CompoundTag nbt, boolean writeAll) {
+    FriendlyByteBuf capabilityData = new FriendlyByteBuf(Unpooled.buffer());
     this.encode(capabilityData, writeAll);
     byte[] capabilityDataBytes = new byte[capabilityData.readableBytes()];
     capabilityData.readBytes(capabilityDataBytes);
-    nbt.put("__FORGE_CAPABILITY__", new ByteArrayNBT(capabilityDataBytes));
+    nbt.put("__FORGE_CAPABILITY__", new ByteArrayTag(capabilityDataBytes));
   }
 
-  default void decodeNbt(CompoundNBT nbt) {
-    this.decode(new PacketBuffer(Unpooled.wrappedBuffer(nbt.getByteArray("__FORGE_CAPABILITY__"))));
+  default void decodeNbt(CompoundTag nbt) {
+    this.decode(new FriendlyByteBuf(Unpooled.wrappedBuffer(nbt.getByteArray("__FORGE_CAPABILITY__"))));
   }
 }

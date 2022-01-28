@@ -19,29 +19,29 @@
 package com.craftingdead.core.world.entity;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.entity.grenade.C4ExplosiveEntity;
+import com.craftingdead.core.world.entity.grenade.C4Explosive;
 import com.craftingdead.core.world.entity.grenade.DecoyGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.entity.grenade.FragGrenadeEntity;
+import com.craftingdead.core.world.entity.grenade.FragGrenade;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModEntityTypes {
 
   public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
       DeferredRegister.create(ForgeRegistries.ENTITIES, CraftingDead.ID);
 
-  public static final RegistryObject<EntityType<C4ExplosiveEntity>> C4_EXPLOSIVE =
+  public static final RegistryObject<EntityType<C4Explosive>> C4_EXPLOSIVE =
       ENTITY_TYPES.register("c4_explosive", () -> create("c4_explosive",
           EntityType.Builder
-              .<C4ExplosiveEntity>of(C4ExplosiveEntity::new, EntityClassification.MISC)
+              .<C4Explosive>of(C4Explosive::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.65F, 0.25F)
@@ -49,7 +49,7 @@ public class ModEntityTypes {
   public static final RegistryObject<EntityType<DecoyGrenadeEntity>> DECOY_GRENADE =
       ENTITY_TYPES.register("decoy_grenade", () -> create("decoy_grenade",
           EntityType.Builder
-              .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, EntityClassification.MISC)
+              .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.5F)
@@ -58,7 +58,7 @@ public class ModEntityTypes {
   public static final RegistryObject<EntityType<FireGrenadeEntity>> FIRE_GRENADE =
       ENTITY_TYPES.register("fire_grenade", () -> create("fire_grenade",
           EntityType.Builder
-              .<FireGrenadeEntity>of(FireGrenadeEntity::new, EntityClassification.MISC)
+              .<FireGrenadeEntity>of(FireGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.5F)
@@ -67,16 +67,16 @@ public class ModEntityTypes {
   public static final RegistryObject<EntityType<FlashGrenadeEntity>> FLASH_GRENADE =
       ENTITY_TYPES.register("flash_grenade", () -> create("flash_grenade",
           EntityType.Builder
-              .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, EntityClassification.MISC)
+              .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.5F)
               .setShouldReceiveVelocityUpdates(false)));
 
-  public static final RegistryObject<EntityType<FragGrenadeEntity>> FRAG_GRENADE =
+  public static final RegistryObject<EntityType<FragGrenade>> FRAG_GRENADE =
       ENTITY_TYPES.register("frag_grenade", () -> create("frag_grenade",
           EntityType.Builder
-              .<FragGrenadeEntity>of(FragGrenadeEntity::new, EntityClassification.MISC)
+              .<FragGrenade>of(FragGrenade::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.25F)
@@ -85,7 +85,7 @@ public class ModEntityTypes {
   public static final RegistryObject<EntityType<SmokeGrenadeEntity>> SMOKE_GRENADE =
       ENTITY_TYPES.register("smoke_grenade", () -> create("smoke_grenade",
           EntityType.Builder
-              .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, EntityClassification.MISC)
+              .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.5F)

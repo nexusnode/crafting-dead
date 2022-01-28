@@ -21,23 +21,23 @@ package com.craftingdead.core.world.inventory;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class GunCraftSlot extends Slot {
 
-  private final Inventory craftingInventory;
+  private final SimpleContainer craftingInventory;
 
-  public GunCraftSlot(CraftResultInventory inventory, int slotIndex, int x, int y,
-      Inventory craftingInventory) {
+  public GunCraftSlot(ResultContainer inventory, int slotIndex, int x, int y,
+      SimpleContainer craftingInventory) {
     super(inventory, slotIndex, x, y);
     this.craftingInventory = craftingInventory;
   }
@@ -49,7 +49,7 @@ public class GunCraftSlot extends Slot {
 
   @Override
   public void set(ItemStack itemStack) {
-    itemStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
+    itemStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
       gun.getAttachments().forEach(
           attachment -> this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
               new ItemStack(attachment)));
@@ -63,8 +63,8 @@ public class GunCraftSlot extends Slot {
   }
 
   @Override
-  public ItemStack onTake(PlayerEntity playerEntity, ItemStack gunStack) {
-    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
+  public void onTake(Player playerEntity, ItemStack gunStack) {
+    gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
       gun.setPaintStack(ItemStack.EMPTY);
       Set<Attachment> attachments = new HashSet<>();
       for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
@@ -79,6 +79,5 @@ public class GunCraftSlot extends Slot {
       }
       gun.setAttachments(attachments);
     });
-    return super.onTake(playerEntity, gunStack);
   }
 }

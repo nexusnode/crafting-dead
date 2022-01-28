@@ -19,14 +19,14 @@
 package com.craftingdead.immerse.network.login;
 
 import java.util.function.Supplier;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class AcknowledgeGameMessage extends LoginIndexedMessage {
 
-  public static void encode(AcknowledgeGameMessage msg, PacketBuffer out) {}
+  public static void encode(AcknowledgeGameMessage msg, FriendlyByteBuf out) {}
 
-  public static AcknowledgeGameMessage decode(PacketBuffer in) {
+  public static AcknowledgeGameMessage decode(FriendlyByteBuf in) {
     return new AcknowledgeGameMessage();
   }
 

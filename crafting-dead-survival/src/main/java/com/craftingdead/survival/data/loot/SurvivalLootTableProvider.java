@@ -28,13 +28,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.LootTableProvider;
-import net.minecraft.loot.LootParameterSet;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTableManager;
-import net.minecraft.loot.ValidationTracker;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.resources.ResourceLocation;
 
 public class SurvivalLootTableProvider extends LootTableProvider {
 
@@ -43,22 +43,22 @@ public class SurvivalLootTableProvider extends LootTableProvider {
   }
 
   @Override
-  protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> getTables() {
-    ImmutableList.Builder<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> builder =
+  protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
+    ImmutableList.Builder<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> builder =
         ImmutableList.builder();
-    builder.add(Pair.of(SupplyDropLootTables::new, LootParameterSets.CHEST));
-    builder.add(Pair.of(SurvivalBlockLootTables::new, LootParameterSets.BLOCK));
+    builder.add(Pair.of(SupplyDropLootTables::new, LootContextParamSets.CHEST));
+    builder.add(Pair.of(SurvivalBlockLootTables::new, LootContextParamSets.BLOCK));
     return builder.build();
   }
 
   @Override
   protected void validate(Map<ResourceLocation, LootTable> map,
-      ValidationTracker validationTracker) {
+      ValidationContext validationTracker) {
     for (ResourceLocation location : Sets.difference(BuiltInLootTables.getLootTables(),
         map.keySet())) {
       validationTracker.reportProblem("Missing built-in table: " + location);
     }
-    map.forEach((location, lootTable) -> LootTableManager.validate(validationTracker,
+    map.forEach((location, lootTable) -> LootTables.validate(validationTracker,
         location, lootTable));
   }
 

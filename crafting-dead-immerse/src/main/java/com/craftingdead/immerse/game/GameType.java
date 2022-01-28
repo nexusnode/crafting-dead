@@ -22,10 +22,10 @@ import java.util.function.Supplier;
 import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.DistExecutor.SafeCallable;
@@ -70,7 +70,7 @@ public class GameType extends ForgeRegistryEntry<GameType> {
     return this.networkProtocol;
   }
 
-  public ITextComponent getDisplayName() {
-    return new TranslationTextComponent(Util.makeDescriptionId("game", this.getRegistryName()));
+  public Component getDisplayName() {
+    return new TranslatableComponent(Util.makeDescriptionId("game", this.getRegistryName()));
   }
 }

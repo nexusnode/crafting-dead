@@ -18,30 +18,28 @@
 
 package com.craftingdead.core.client.gui.widget.button;
 
-import com.craftingdead.core.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public class SimpleImageButton extends Button {
 
   private ResourceLocation textureLocation;
 
   public SimpleImageButton(int x, int y, int width, int height,
-      ResourceLocation textureLocation, ITextComponent text, Button.IPressable actionListener) {
+      ResourceLocation textureLocation, Component text, Button.OnPress actionListener) {
     super(x, y, width, height, text, actionListener);
     this.textureLocation = textureLocation;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
-    RenderUtil.bind(this.textureLocation);
+  public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
+    RenderSystem.setShaderTexture(0, this.textureLocation);
     blit(matrixStack, this.x, this.y, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
-    if (this.isHovered()) {
+    if (this.isHoveredOrFocused()) {
       final int opacity = Math.min((int) (this.alpha * 0.5F * 255.0F), 255);
       fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height,
           0xFFFFFF + (opacity << 24));

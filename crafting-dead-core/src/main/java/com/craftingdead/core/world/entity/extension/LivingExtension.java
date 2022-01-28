@@ -22,21 +22,26 @@ import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.item.gun.Gun;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 public interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
     extends LivingHandler {
+
+  Capability<LivingExtension<?, ?>> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   /**
    * @see {@link net.minecraftforge.event.AttachCapabilitiesEvent}
@@ -50,7 +55,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   @Nonnull
   @SuppressWarnings("unchecked")
   static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E living) {
-    return Capabilities.getOrThrow(Capabilities.LIVING_EXTENSION, living, LivingExtension.class);
+    return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, living, LivingExtension.class);
   }
 
   /**
@@ -202,7 +207,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
     }
 
     // Apply some random accuracy for non-players (bots)
-    if (!(this.getEntity() instanceof PlayerEntity)) {
+    if (!(this.getEntity() instanceof Player)) {
       accuracy -= random.nextFloat();
     }
 
@@ -221,7 +226,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * 
    * @return the {@link World}
    */
-  default World getLevel() {
+  default Level getLevel() {
     return this.getEntity().level;
   }
 
@@ -240,7 +245,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @return a {@link LazyOptional} gun.
    */
   default LazyOptional<Gun> getMainHandGun() {
-    return this.getMainHandItem().getCapability(Capabilities.GUN);
+    return this.getMainHandItem().getCapability(Gun.CAPABILITY);
   }
 
   /**
@@ -253,7 +258,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
      * 
      * @return a {@link ITextComponent} instance
      */
-    ITextComponent getMessage();
+    Component getMessage();
 
     /**
      * Get an optional sub-message.
@@ -261,7 +266,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
      * @return an {@link Optional} sub-message.
      * @see #getMessage()
      */
-    Optional<ITextComponent> getSubMessage();
+    Optional<Component> getSubMessage();
 
     /**
      * Get the progress percentage (0 - 1) of the action.

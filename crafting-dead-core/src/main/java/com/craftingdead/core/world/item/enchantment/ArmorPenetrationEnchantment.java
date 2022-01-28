@@ -18,12 +18,12 @@
 
 package com.craftingdead.core.world.item.enchantment;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 public class ArmorPenetrationEnchantment extends Enchantment {
 
-  protected ArmorPenetrationEnchantment(Rarity rarity, EquipmentSlotType... slotType) {
+  protected ArmorPenetrationEnchantment(Rarity rarity, EquipmentSlot... slotType) {
     super(rarity, ModEnchantmentTypes.GUN, slotType);
   }
 }

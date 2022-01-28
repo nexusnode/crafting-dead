@@ -18,61 +18,82 @@
 
 package com.craftingdead.core.mixin;
 
-import java.util.List;
-import org.spongepowered.asm.mixin.Final;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.craftingdead.core.capability.Capabilities;
-import com.craftingdead.core.network.Synched;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.message.play.SyncGunContainerSlotMessage;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.network.PacketDistributor;
+import com.craftingdead.core.world.item.gun.Gun;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerSynchronizer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.PacketDistributor;
 
 //TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
-@Mixin(Container.class)
+@Mixin(AbstractContainerMenu.class)
 public class ContainerMixin {
 
+  private static final Logger logger = LogManager.getLogger();
+
   @Shadow
-  @Final
-  private List<IContainerListener> containerListeners;
+  @Nullable
+  private ContainerSynchronizer synchronizer;
 
-  @Inject(at = @At("HEAD"), method = "broadcastChanges")
-  private void broadcastChanges(CallbackInfo callbackInfo) {
-    Container container = (Container) (Object) this;
-    for (Slot slot : container.slots) {
-      slot.getItem().getCapability(Capabilities.GUN)
-          .filter(Synched::requiresSync)
-          .ifPresent(gun -> {
-            for (IContainerListener listener : this.containerListeners) {
-              if (listener instanceof ServerPlayerEntity) {
-                ServerPlayerEntity playerEntity = (ServerPlayerEntity) listener;
+  @Redirect(at = @At(value = "INVOKE",
+      target = "Lnet/minecraft/world/item/ItemStack;matches(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"),
+      method = "synchronizeSlotToRemote")
+  private boolean matches(ItemStack lastStack, ItemStack currentStack, int slotIndex,
+      ItemStack __, Supplier<ItemStack> coppiedStack) {
 
-                if (slot.container == playerEntity.inventory) {
-                  for (ItemStack equipmentStack : playerEntity.getAllSlots()) {
-                    // If the item is equipment we don't need to sync it as Minecraft does
-                    // that in a separate method (and if we sync it twice the capability wont think
-                    // it's dirty anymore on the second call).
-                    if (equipmentStack == slot.getItem()) {
-                      return;
-                    }
+    if (this.synchronizer == null) {
+      return ItemStack.matches(currentStack, lastStack);
+    }
+
+    if (this.synchronizer.getClass().isAnonymousClass()) {
+      Object parent;
+      try {
+        final var parentField = this.synchronizer.getClass().getDeclaredField("this$0");
+        parentField.setAccessible(true);
+        parent = parentField.get(this.synchronizer);
+      } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+        logger.fatal("Failed to reflect", e);
+        return ItemStack.matches(currentStack, lastStack);
+      }
+
+      if (parent instanceof ServerPlayer playerEntity) {
+        var container = (AbstractContainerMenu) (Object) this;
+
+        if (!currentStack.equals(lastStack, true)) {
+          return false;
+        }
+
+        currentStack.getCapability(Gun.CAPABILITY)
+            .filter(Synched::requiresSync)
+            .ifPresent(gun -> {
+              if (container == playerEntity.inventoryMenu) {
+                for (ItemStack equipmentStack : playerEntity.getAllSlots()) {
+                  // If the item is equipment we don't need to sync it as Minecraft does
+                  // that in a separate method (and if we sync it twice the capability wont think
+                  // it's dirty anymore on the second call).
+                  if (equipmentStack == currentStack) {
+                    return;
                   }
                 }
-                NetworkChannel.PLAY.getSimpleChannel().send(
-                    PacketDistributor.PLAYER.with(() -> playerEntity),
-                    new SyncGunContainerSlotMessage(
-                        playerEntity.getId(), slot.getSlotIndex(), gun, false));
-                break;
               }
-            }
-          });
+              NetworkChannel.PLAY.getSimpleChannel().send(
+                  PacketDistributor.PLAYER.with(() -> playerEntity),
+                  new SyncGunContainerSlotMessage(
+                      playerEntity.getId(), slotIndex, gun, false));
+            });
+      }
     }
+    return true;
   }
 }

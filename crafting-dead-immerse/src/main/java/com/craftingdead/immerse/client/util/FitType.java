@@ -35,22 +35,22 @@
  */
 package com.craftingdead.immerse.client.util;
 
-import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.world.phys.Vec2;
 
 public enum FitType {
   FILL, COVER {
     @Override
-    public Vector2f getSize(float contentWidth, float contentHeight, float containerWidth,
+    public Vec2 getSize(float contentWidth, float contentHeight, float containerWidth,
         float containerHeight) {
       float widthScale = containerWidth / contentWidth;
       float heightScale = containerHeight / contentHeight;
       float finalScale = contentHeight * widthScale < containerHeight ? heightScale : widthScale;
-      return new Vector2f(contentWidth * finalScale, contentHeight * finalScale);
+      return new Vec2(contentWidth * finalScale, contentHeight * finalScale);
     }
   },
   CONTAIN {
     @Override
-    public Vector2f getSize(float contentWidth, float contentHeight, float containerWidth,
+    public Vec2 getSize(float contentWidth, float contentHeight, float containerWidth,
         float containerHeight) {
       float widthScale = containerWidth / contentWidth;
       float heightScale = containerHeight / contentHeight;
@@ -60,19 +60,19 @@ public enum FitType {
         contentHeight = finalScale * contentHeight;
         finalScale = containerWidth / (contentWidth);
       }
-      return new Vector2f(contentWidth * finalScale, contentHeight * finalScale);
+      return new Vec2(contentWidth * finalScale, contentHeight * finalScale);
     }
   },
   NONE {
     @Override
-    public Vector2f getSize(float contentWidth, float contentHeight, float containerWidth,
+    public Vec2 getSize(float contentWidth, float contentHeight, float containerWidth,
         float containerHeight) {
-      return new Vector2f(contentWidth, contentHeight);
+      return new Vec2(contentWidth, contentHeight);
     }
   };
 
-  public Vector2f getSize(float contentWidth, float contentHeight, float containerWidth,
+  public Vec2 getSize(float contentWidth, float contentHeight, float containerWidth,
       float containerHeight) {
-    return new Vector2f(containerWidth, containerHeight);
+    return new Vec2(containerWidth, containerHeight);
   }
 }

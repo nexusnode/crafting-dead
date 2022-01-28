@@ -19,9 +19,9 @@
 package com.craftingdead.core.tags;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags.IOptionalNamedTag;
 
 public class ModItemTags {

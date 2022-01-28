@@ -23,16 +23,15 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.monster.Zombie;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
@@ -77,7 +76,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   private void updateEffects() {
-    boolean invulnerable = this.player.getEntity().abilities.invulnerable
+    boolean invulnerable = this.player.getEntity().getAbilities().invulnerable
         || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
     if ((invulnerable || !CraftingDeadSurvival.serverConfig.bleedingEnabled.get())
@@ -98,28 +97,28 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleHurt(DamageSource source, float amount) {
-    if (source.getEntity() instanceof ZombieEntity) {
+    if (source.getEntity() instanceof Zombie) {
       this.infect(ZOMBIE_INFECTION_CHANCE);
     }
     return false;
   }
 
   public void infect(float chance) {
-    PlayerEntity playerEntity = this.player.getEntity();
+    var playerEntity = this.player.getEntity();
     if (!playerEntity.isCreative()
         && playerEntity.level.getDifficulty() != Difficulty.PEACEFUL
         && playerEntity.getRandom().nextFloat() < chance
         && !playerEntity.hasEffect(SurvivalMobEffects.INFECTION.get())
         && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
-      playerEntity.displayClientMessage(new TranslationTextComponent("message.infected")
-          .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
-      playerEntity.addEffect(new EffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
+      playerEntity.displayClientMessage(new TranslatableComponent("message.infected")
+          .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
+      playerEntity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
     }
   }
 
   @Override
   public float handleDamaged(DamageSource source, float amount) {
-    boolean invulnerable = this.player.getEntity().abilities.invulnerable
+    var invulnerable = this.player.getEntity().getAbilities().invulnerable
         || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
     if (!invulnerable
@@ -129,10 +128,10 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       if (random.nextFloat() < bleedChance
           && !this.player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
         this.player.getEntity()
-            .displayClientMessage(new TranslationTextComponent("message.bleeding")
-                .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
+            .displayClientMessage(new TranslatableComponent("message.bleeding")
+                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
         this.player.getEntity()
-            .addEffect(new EffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999));
+            .addEffect(new MobEffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999));
       }
     }
 
@@ -142,21 +141,21 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         && source == DamageSource.FALL
         && ((amount > 0.0F && random.nextInt(3) == 0) || amount > 4.0F)) {
       this.player.getEntity()
-          .displayClientMessage(new TranslationTextComponent("message.broken_leg")
-              .withStyle(TextFormatting.RED, TextFormatting.BOLD), true);
+          .displayClientMessage(new TranslatableComponent("message.broken_leg")
+              .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
       this.player.getEntity().addEffect(
-          new EffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4));
-      this.player.getEntity().addEffect(new EffectInstance(Effects.BLINDNESS, 100, 1));
+          new MobEffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4));
+      this.player.getEntity().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 1));
     }
 
     return amount;
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {}
+  public void encode(FriendlyByteBuf out, boolean writeAll) {}
 
   @Override
-  public void decode(PacketBuffer in) {}
+  public void decode(FriendlyByteBuf in) {}
 
   @Override
   public boolean requiresSync() {

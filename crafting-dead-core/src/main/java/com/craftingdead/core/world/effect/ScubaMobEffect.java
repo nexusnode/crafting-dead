@@ -18,22 +18,22 @@
 
 package com.craftingdead.core.world.effect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.phys.Vec3;
 
-public class ScubaMobEffect extends Effect {
+public class ScubaMobEffect extends MobEffect {
 
   protected ScubaMobEffect() {
-    super(EffectType.BENEFICIAL, 0x1F1FA1);
+    super(MobEffectCategory.BENEFICIAL, 0x1F1FA1);
   }
 
   @Override
   public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
     if (livingEntity.isInWater()) {
       livingEntity.setAirSupply(livingEntity.getMaxAirSupply());
-      livingEntity.moveRelative(0.1F, new Vector3d(0.0D, 0.0D, 0.2D));
+      livingEntity.moveRelative(0.1F, new Vec3(0.0D, 0.0D, 0.2D));
     }
   }
 

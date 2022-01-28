@@ -22,11 +22,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.Visibility;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 @Mixin(Entity.class)
 public class EntityMixin {
@@ -38,7 +37,7 @@ public class EntityMixin {
   private void isInvisible(CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
+    entity.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
       if (living.getVisibility() == Visibility.INVISIBLE
           || living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
         callbackInfo.setReturnValue(true);
@@ -50,11 +49,11 @@ public class EntityMixin {
    * Adds hook for {@link LivingExtension#isInvisible}.
    */
   @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
-  private void isInvisibleTo(PlayerEntity playerEntity,
+  private void isInvisibleTo(Player playerEntity,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     Entity entity = (Entity) (Object) this;
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
-    entity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
+    entity.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
       if (living.getVisibility() == Visibility.PARTIALLY_VISIBLE) {
         callbackInfo.setReturnValue(false);
       }

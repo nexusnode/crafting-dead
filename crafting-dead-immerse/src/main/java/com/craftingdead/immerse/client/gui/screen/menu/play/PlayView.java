@@ -40,8 +40,8 @@ import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
@@ -72,13 +72,13 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
         .addChild(new TabsView<>(new YogaLayout().setHeight(20))
             .setZOffset(5)
             .addTab((TabsView.Tab) new TabsView.Tab(
-                new TranslationTextComponent("menu.play.tab.survival"),
+                new TranslatableComponent("menu.play.tab.survival"),
                 () -> officialServerListView.queueAllForRemoval().addChild(survivalServerListView)
                     .layout())
                         .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
                         .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get()))
             .addTab((TabsView.Tab) new TabsView.Tab(
-                new TranslationTextComponent("menu.play.tab.tdm"),
+                new TranslatableComponent("menu.play.tab.tdm"),
                 () -> officialServerListView.queueAllForRemoval().addChild(deathmatchServerListView)
                     .layout())
                         .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
@@ -104,7 +104,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
                 .setHeight(30)
                 .setTopPadding(12)
                 .setLeftMargin(17),
-            new TranslationTextComponent("menu.play.title"))
+            new TranslatableComponent("menu.play.title"))
                 .setShadow(true)
                 .configure(view -> view.getXScaleProperty().setBaseValue(1.5F))
                 .configure(view -> view.getYScaleProperty().setBaseValue(1.5F)))
@@ -116,11 +116,11 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
             .setLeftMargin(10F))
                 .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
                 .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
-                .addItem(new TranslationTextComponent("menu.play.dropdown.official"),
+                .addItem(new TranslatableComponent("menu.play.dropdown.official"),
                     () -> this.dropDownSelect(officialView))
-                .addItem(new TranslationTextComponent("menu.play.dropdown.singleplayer"),
+                .addItem(new TranslatableComponent("menu.play.dropdown.singleplayer"),
                     () -> this.dropDownSelect(singleplayerView))
-                .addItem(new TranslationTextComponent("menu.play.dropdown.custom"),
+                .addItem(new TranslatableComponent("menu.play.dropdown.custom"),
                     () -> this.dropDownSelect(customServerListView)))
         .addChild(this.newSeparator())
         .addChild(this.dropdownContent);
@@ -128,7 +128,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
 
   private void dropDownSelect(View<?, YogaLayout> content) {
     this.minecraft.getSoundManager().play(
-        SimpleSound.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
+        SimpleSoundInstance.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
     this.displayContent(content);
   }
 
@@ -148,7 +148,7 @@ public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
   @Override
   protected void added() {
     this.minecraft.getSoundManager().play(
-        SimpleSound.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
+        SimpleSoundInstance.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
 
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.getXTranslationProperty())

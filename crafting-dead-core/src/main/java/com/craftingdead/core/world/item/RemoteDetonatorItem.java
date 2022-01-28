@@ -19,20 +19,20 @@
 package com.craftingdead.core.world.item;
 
 import java.util.List;
-import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import com.craftingdead.core.world.entity.grenade.Grenade;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 public class RemoteDetonatorItem extends Item {
 
@@ -43,38 +43,38 @@ public class RemoteDetonatorItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
-      Hand hand) {
+  public InteractionResultHolder<ItemStack> use(Level world, Player playerEntity,
+      InteractionHand hand) {
     ItemStack itemstack = playerEntity.getItemInHand(hand);
     playerEntity.startUsingItem(hand);
 
-    if (world instanceof ServerWorld) {
-      ServerWorld serverWorld = (ServerWorld) world;
+    if (world instanceof ServerLevel) {
+      ServerLevel serverWorld = (ServerLevel) world;
 
       serverWorld.playSound(null, playerEntity, SoundEvents.UI_BUTTON_CLICK,
-          SoundCategory.PLAYERS, 0.8F, 1.2F);
+          SoundSource.PLAYERS, 0.8F, 1.2F);
 
       serverWorld.getEntities(playerEntity,
           playerEntity.getBoundingBox().inflate(RANGE), (entity) -> {
-            if (!(entity instanceof GrenadeEntity)) {
+            if (!(entity instanceof Grenade)) {
               return false;
             }
-            GrenadeEntity grenadeEntity = (GrenadeEntity) entity;
+            Grenade grenadeEntity = (Grenade) entity;
 
             boolean isOwner =
                 grenadeEntity.getThrower().map(thrower -> thrower == playerEntity).orElse(false);
 
             return isOwner && grenadeEntity.canBeRemotelyActivated();
-          }).forEach(entity -> ((GrenadeEntity) entity).setActivated(true));
+          }).forEach(entity -> ((Grenade) entity).setActivated(true));
     }
-    return ActionResult.consume(itemstack);
+    return InteractionResultHolder.consume(itemstack);
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, World world,
-      List<ITextComponent> lines, ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack stack, Level world,
+      List<Component> lines, TooltipFlag tooltipFlag) {
     super.appendHoverText(stack, world, lines, tooltipFlag);
-    lines.add(new TranslationTextComponent("item_lore." + this.getRegistryName().getPath(), RANGE)
-        .withStyle(TextFormatting.GRAY));
+    lines.add(new TranslatableComponent("item_lore." + this.getRegistryName().getPath(), RANGE)
+        .withStyle(ChatFormatting.GRAY));
   }
 }

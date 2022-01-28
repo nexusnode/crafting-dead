@@ -19,23 +19,23 @@
 package com.craftingdead.core.world.inventory;
 
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-public abstract class AbstractMenu extends Container {
+public abstract class AbstractMenu extends AbstractContainerMenu {
 
   public static final int SLOT_SIZE = 18;
 
   @Nullable
   protected IItemHandler contents;
-  protected IInventory playerInventory;
+  protected Container playerInventory;
 
-  public AbstractMenu(ContainerType<?> type, int id, IInventory playerInventory,
+  public AbstractMenu(MenuType<?> type, int id, Container playerInventory,
       IItemHandler contents) {
     super(type, id);
     this.playerInventory = playerInventory;
@@ -68,12 +68,12 @@ public abstract class AbstractMenu extends Container {
   }
 
   @Nullable
-  public IInventory getPlayerInventory() {
+  public Container getPlayerInventory() {
     return this.playerInventory;
   }
 
   @Override
-  public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+  public ItemStack quickMoveStack(Player playerIn, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(index);
 

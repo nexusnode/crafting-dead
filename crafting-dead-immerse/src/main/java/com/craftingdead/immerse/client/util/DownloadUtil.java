@@ -27,11 +27,11 @@ import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.util.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.SharedConstants;
+import net.minecraft.Util;
 
 public class DownloadUtil {
 

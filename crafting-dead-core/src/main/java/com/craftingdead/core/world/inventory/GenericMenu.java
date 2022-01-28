@@ -19,12 +19,12 @@
 package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.gun.GunItem;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -32,14 +32,14 @@ public class GenericMenu extends AbstractMenu {
 
   private final int rows;
 
-  public GenericMenu(ContainerType<?> menuType, int windowId,
-      PlayerInventory playerInventory, int rows,
+  public GenericMenu(MenuType<?> menuType, int windowId,
+      Inventory playerInventory, int rows,
       BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
     this(menuType, windowId, playerInventory, new ItemStackHandler(9 * rows), rows, predicate);
   }
 
-  public GenericMenu(ContainerType<?> type, int id,
-      PlayerInventory playerInventory, IItemHandler itemHandler, int rows,
+  public GenericMenu(MenuType<?> type, int id,
+      Inventory playerInventory, IItemHandler itemHandler, int rows,
       BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
     super(type, id, playerInventory, itemHandler);
     assert itemHandler.getSlots() >= rows * 9;
@@ -66,21 +66,21 @@ public class GenericMenu extends AbstractMenu {
   }
 
   @Override
-  public boolean stillValid(PlayerEntity playerEntity) {
+  public boolean stillValid(Player playerEntity) {
     return true;
   }
 
-  public static GenericMenu createVest(int windowId, PlayerInventory playerInventory,
+  public static GenericMenu createVest(int windowId, Inventory playerInventory,
       IItemHandler itemHandler) {
     return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory,
         itemHandler, 2,
-        (slot, itemStack) -> !(itemStack.getCapability(Capabilities.STORAGE).isPresent()
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 
-  public static GenericMenu createVest(int windowId, PlayerInventory playerInventory) {
+  public static GenericMenu createVest(int windowId, Inventory playerInventory) {
     return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory, 2,
-        (slot, itemStack) -> !(itemStack.getCapability(Capabilities.STORAGE).isPresent()
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 }

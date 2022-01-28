@@ -22,26 +22,26 @@ import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.game.GameTypes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
   public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
 
-  private static final DataParameter<Integer> DAYS_SURVIVED =
-      new DataParameter<>(0x00, DataSerializers.INT);
-  private static final DataParameter<Integer> ZOMBIES_KILLED =
-      new DataParameter<>(0x01, DataSerializers.INT);
-  private static final DataParameter<Integer> PLAYERS_KILLED =
-      new DataParameter<>(0x02, DataSerializers.INT);
+  private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> ZOMBIES_KILLED =
+      new EntityDataAccessor<>(0x01, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> PLAYERS_KILLED =
+      new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
 
   private final PlayerExtension<?> player;
 
@@ -56,8 +56,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void tick() {
-    if (this.player.getEntity() instanceof ServerPlayerEntity) {
-      int aliveTicks = ((ServerPlayerEntity) this.player.getEntity()).getStats()
+    if (this.player.getEntity() instanceof ServerPlayer) {
+      int aliveTicks = ((ServerPlayer) this.player.getEntity()).getStats()
           .getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
       this.setDaysSurvived(aliveTicks / 20 / 60 / 20);
     }
@@ -65,9 +65,9 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleKill(Entity target) {
-    if (target instanceof ZombieEntity) {
+    if (target instanceof Zombie) {
       this.setZombiesKilled(this.getZombiesKilled() + 1);
-    } else if (target instanceof ServerPlayerEntity) {
+    } else if (target instanceof ServerPlayer) {
       this.setPlayersKilled(this.getPlayersKilled() + 1);
     }
     return false;
@@ -116,28 +116,28 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.putInt("zombiesKilled", this.getZombiesKilled());
     nbt.putInt("playersKilled", this.getPlayersKilled());
     return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
+  public void deserializeNBT(CompoundTag nbt) {
     this.setZombiesKilled(nbt.getInt("zombiesKilled"));
     this.setPlayersKilled(nbt.getInt("playersKilled"));
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
   }
 

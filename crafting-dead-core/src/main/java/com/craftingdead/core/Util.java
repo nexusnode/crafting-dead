@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.mojang.serialization.Codec;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
 
 public class Util {
 
@@ -25,12 +25,12 @@ public class Util {
     return codec.listOf().xmap(HashSet::new, ArrayList::new);
   }
 
-  public static <T> RegistryKey<T> createKey(
-      RegistryKey<? extends Registry<T>> registryKey, String name) {
-    return RegistryKey.create(registryKey, new ResourceLocation(CraftingDead.ID, name));
+  public static <T> ResourceKey<T> createKey(
+      ResourceKey<? extends Registry<T>> registryKey, String name) {
+    return ResourceKey.create(registryKey, new ResourceLocation(CraftingDead.ID, name));
   }
 
-  public static <T> RegistryKey<Registry<T>> createRegistryKey(String name) {
-    return RegistryKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, name));
+  public static <T> ResourceKey<Registry<T>> createRegistryKey(String name) {
+    return ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, name));
   }
 }

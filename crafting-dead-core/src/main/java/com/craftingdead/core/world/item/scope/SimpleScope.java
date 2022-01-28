@@ -19,10 +19,10 @@
 package com.craftingdead.core.world.item.scope;
 
 import java.util.Optional;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 public class SimpleScope implements Scope {
 
@@ -46,14 +46,13 @@ public class SimpleScope implements Scope {
   }
 
   @Override
-  public boolean isAiming(Entity entity) {
-    return entity instanceof LivingEntity
-        ? ((LivingEntity) entity).getUseItem() == this.itemStack
-        : false;
+  public boolean isScoping(Entity entity) {
+    return entity instanceof LivingEntity livingEntity
+        && livingEntity.getUseItem() == this.itemStack;
   }
 
   @Override
-  public float getZoomMultiplier(Entity entit) {
+  public float getZoomMultiplier(Entity entity) {
     return this.zoomMultiplier;
   }
 

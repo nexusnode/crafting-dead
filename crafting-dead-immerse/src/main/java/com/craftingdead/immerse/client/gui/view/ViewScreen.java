@@ -22,11 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import com.craftingdead.immerse.client.gui.view.layout.EmptyLayout;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public final class ViewScreen extends Screen implements EmptyLayout {
 
@@ -36,7 +36,7 @@ public final class ViewScreen extends Screen implements EmptyLayout {
 
   private boolean keepOpen;
 
-  public ViewScreen(ITextComponent title,
+  public ViewScreen(Component title,
       Function<ViewScreen, View<?, ViewScreen>> viewFactory) {
     super(title);
     this.minecraft = Minecraft.getInstance();
@@ -134,12 +134,12 @@ public final class ViewScreen extends Screen implements EmptyLayout {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.view.render(matrixStack, mouseX, mouseY, partialTicks);
   }
 
   @Override
-  public List<? extends IGuiEventListener> children() {
+  public List<? extends GuiEventListener> children() {
     return Collections.singletonList(this.view);
   }
 

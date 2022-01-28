@@ -23,11 +23,11 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 
-public class RGBFlashParticleData implements IParticleData {
+public class RGBFlashParticleData implements ParticleOptions {
 
   public static final Codec<RGBFlashParticleData> CODEC =
       RecordCodecBuilder.create(instance -> instance
@@ -38,8 +38,8 @@ public class RGBFlashParticleData implements IParticleData {
           .apply(instance, RGBFlashParticleData::new));
 
   @SuppressWarnings("deprecation")
-  public static final IParticleData.IDeserializer<RGBFlashParticleData> DESERIALIZER =
-      new IParticleData.IDeserializer<RGBFlashParticleData>() {
+  public static final ParticleOptions.Deserializer<RGBFlashParticleData> DESERIALIZER =
+      new ParticleOptions.Deserializer<RGBFlashParticleData>() {
         @Override
         public RGBFlashParticleData fromCommand(ParticleType<RGBFlashParticleData> particleType,
             StringReader stringReader) throws CommandSyntaxException {
@@ -56,7 +56,7 @@ public class RGBFlashParticleData implements IParticleData {
 
         @Override
         public RGBFlashParticleData fromNetwork(ParticleType<RGBFlashParticleData> particleType,
-            PacketBuffer packetBuffer) {
+            FriendlyByteBuf packetBuffer) {
           return new RGBFlashParticleData(packetBuffer.readFloat(), packetBuffer.readFloat(),
               packetBuffer.readFloat(), packetBuffer.readFloat());
         }
@@ -75,7 +75,7 @@ public class RGBFlashParticleData implements IParticleData {
   }
 
   @Override
-  public void writeToNetwork(PacketBuffer packetBuffer) {
+  public void writeToNetwork(FriendlyByteBuf packetBuffer) {
     packetBuffer.writeFloat(this.red);
     packetBuffer.writeFloat(this.green);
     packetBuffer.writeFloat(this.blue);

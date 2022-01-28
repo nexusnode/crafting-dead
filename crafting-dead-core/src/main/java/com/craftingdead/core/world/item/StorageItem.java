@@ -22,25 +22,24 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.inventory.GenericMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -60,24 +59,24 @@ public class StorageItem extends Item {
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
     return new SerializableCapabilityProvider<>(LazyOptional.of(this.storageContainer),
         ImmutableSet.of(
-            () -> Capabilities.STORAGE,
+            () -> Storage.CAPABILITY,
             () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
-        CompoundNBT::new);
+        CompoundTag::new);
   }
 
   @Override
-  public void appendHoverText(ItemStack backpackStack, World world, List<ITextComponent> lines,
-      ITooltipFlag tooltipFlag) {
+  public void appendHoverText(ItemStack backpackStack, Level world, List<Component> lines,
+      TooltipFlag tooltipFlag) {
     super.appendHoverText(backpackStack, world, lines, tooltipFlag);
 
-    backpackStack.getCapability(Capabilities.STORAGE).ifPresent(storage -> {
+    backpackStack.getCapability(Storage.CAPABILITY).ifPresent(storage -> {
       if (!storage.isEmpty()) {
-        lines.add(new StringTextComponent(" "));
-        lines.add(new TranslationTextComponent("container.inventory")
-            .withStyle(TextFormatting.RED, TextFormatting.BOLD));
+        lines.add(new TextComponent(" "));
+        lines.add(new TranslatableComponent("container.inventory")
+            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 
         int rowsBeyondLimit = 0;
 
@@ -87,31 +86,31 @@ public class StorageItem extends Item {
             if (i >= MAX_ROWS_TO_SHOW) {
               ++rowsBeyondLimit;
             } else {
-              IFormattableTextComponent amountText =
-                  new StringTextComponent(stack.getCount() + "x ")
-                      .withStyle(TextFormatting.DARK_GRAY);
-              ITextComponent itemText =
-                  stack.getHoverName().plainCopy().withStyle(TextFormatting.GRAY);
+              MutableComponent amountText =
+                  new TextComponent(stack.getCount() + "x ")
+                      .withStyle(ChatFormatting.DARK_GRAY);
+              Component itemText =
+                  stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY);
               lines.add(amountText.append(itemText));
             }
           }
         }
 
         if (rowsBeyondLimit > 0) {
-          lines.add(new StringTextComponent(". . . +" + rowsBeyondLimit)
-              .withStyle(TextFormatting.RED));
+          lines.add(new TextComponent(". . . +" + rowsBeyondLimit)
+              .withStyle(ChatFormatting.RED));
         }
       }
     });
   }
 
   @Override
-  public CompoundNBT getShareTag(ItemStack stack) {
-    CompoundNBT shareTag = stack.getTag();
+  public CompoundTag getShareTag(ItemStack stack) {
+    CompoundTag shareTag = stack.getTag();
     if (shareTag == null) {
-      shareTag = new CompoundNBT();
+      shareTag = new CompoundTag();
     }
-    CompoundNBT storageTag = stack.getCapability(Capabilities.STORAGE)
+    CompoundTag storageTag = stack.getCapability(Storage.CAPABILITY)
         .map(Storage::serializeNBT)
         .orElse(null);
     if (storageTag != null && !storageTag.isEmpty()) {
@@ -121,9 +120,9 @@ public class StorageItem extends Item {
   }
 
   @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-    if (nbt != null && nbt.contains("storage", Constants.NBT.TAG_COMPOUND)) {
-      stack.getCapability(Capabilities.STORAGE)
+  public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
+    if (nbt != null && nbt.contains("storage", Tag.TAG_COMPOUND)) {
+      stack.getCapability(Storage.CAPABILITY)
           .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("storage")));
     }
     super.readShareTag(stack, nbt);

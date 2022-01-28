@@ -18,9 +18,9 @@
 
 package com.craftingdead.core.world.damagesource;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public interface KillFeedProvider {
 
-  KillFeedEntry createKillFeedEntry(PlayerEntity killedEntity);
+  KillFeedEntry createKillFeedEntry(Player killedEntity);
 }

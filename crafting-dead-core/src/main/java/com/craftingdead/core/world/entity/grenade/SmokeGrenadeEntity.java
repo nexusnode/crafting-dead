@@ -22,28 +22,28 @@ import com.craftingdead.core.particle.GrenadeSmokeParticleData;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FireBlock;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
-public class SmokeGrenadeEntity extends GrenadeEntity {
+public class SmokeGrenadeEntity extends Grenade {
 
   public static final GrenadeSmokeParticleData LARGE_WHITE_SMOKE =
       new GrenadeSmokeParticleData(1F, 1F, 1F, 10F);
   private static final float START_DECREASING_PITCH_AT = 0.65F; // in %
   private static final int FIRE_BLOCK_STATE_FLAGS = 1;
 
-  public SmokeGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
+  public SmokeGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
   }
 
-  public SmokeGrenadeEntity(LivingEntity thrower, World worldIn) {
+  public SmokeGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.SMOKE_GRENADE.get(), thrower, worldIn);
   }
 
@@ -63,7 +63,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
   public void activatedChanged(boolean activated) {
     if (!activated) {
       if (!this.level.isClientSide()) {
-        this.remove();
+        this.kill();
       }
     }
   }
@@ -75,7 +75,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
     }
 
     int activatedTicksCount = this.getActivatedTicksCount();
-    double radius = MathHelper.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D);
+    double radius = Mth.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D);
 
     if (this.level.isClientSide()) {
       if (activatedTicksCount % 10 == 0) {
@@ -83,9 +83,9 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
         float progress =
             Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
                 / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
-        float gradualPitch = MathHelper.lerp(1F - progress, 0.5F, 1.7F);
+        float gradualPitch = Mth.lerp(1F - progress, 0.5F, 1.7F);
         this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
-            SoundEvents.FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1.5F, gradualPitch, false);
+            SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 1.5F, gradualPitch, false);
       }
 
       if (activatedTicksCount % 5 == 0) {
@@ -115,7 +115,7 @@ public class SmokeGrenadeEntity extends GrenadeEntity {
 
           double xDiff = this.getX() - blockPos.getX();
           double zDiff = this.getZ() - blockPos.getZ();
-          double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
+          double distance2D = Mth.sqrt((float) (xDiff * xDiff + zDiff * zDiff));
 
           if (distance2D <= detectionRadius) {
             BlockState blockState = this.level.getBlockState(blockPos);

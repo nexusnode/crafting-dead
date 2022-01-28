@@ -21,18 +21,18 @@ package com.craftingdead.core.world.entity.ai;
 import java.util.EnumSet;
 import java.util.List;
 import com.craftingdead.core.world.effect.ModMobEffects;
-import com.craftingdead.core.world.entity.grenade.GrenadeEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import com.craftingdead.core.world.entity.grenade.Grenade;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 public class FollowAttractiveGrenadeGoal extends Goal {
 
-  private final MobEntity goalOwner;
+  private final Mob goalOwner;
   private final double moveSpeedMultiplier;
-  private GrenadeEntity grenade;
+  private Grenade grenade;
   private int delayCounter;
 
-  public FollowAttractiveGrenadeGoal(MobEntity goalOwner, double moveSpeedMultiplier) {
+  public FollowAttractiveGrenadeGoal(Mob goalOwner, double moveSpeedMultiplier) {
     this.goalOwner = goalOwner;
     this.moveSpeedMultiplier = moveSpeedMultiplier;
     this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
@@ -43,13 +43,13 @@ public class FollowAttractiveGrenadeGoal extends Goal {
     if (this.goalOwner.hasEffect(ModMobEffects.FLASH_BLINDNESS.get())) {
       return false;
     }
-    List<GrenadeEntity> list = this.goalOwner.level.getEntitiesOfClass(GrenadeEntity.class,
+    List<Grenade> list = this.goalOwner.level.getEntitiesOfClass(Grenade.class,
         this.goalOwner.getBoundingBox().inflate(20.0D, 5.0D, 20.0D));
 
-    GrenadeEntity nearestGrenade = null;
+    Grenade nearestGrenade = null;
     double lastSqDistance = Double.MAX_VALUE;
 
-    for (GrenadeEntity grenade : list) {
+    for (Grenade grenade : list) {
       if (grenade.isAttracting()) {
         double sqDistance = this.goalOwner.distanceToSqr(grenade);
         if (sqDistance <= lastSqDistance) {

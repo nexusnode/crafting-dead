@@ -25,7 +25,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.delegated.DelegatedActionType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemActionType extends ActionType {
 

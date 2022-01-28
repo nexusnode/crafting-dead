@@ -23,11 +23,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
-import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 
 @Mixin(GameRenderer.class)
@@ -37,12 +37,12 @@ public class GameRendererMixin {
    * Renders first person items for spectating entity.
    */
   @Inject(at = @At("RETURN"), method = "renderItemInHand")
-  private void renderItemInHand(MatrixStack matrixStack, ActiveRenderInfo activeRenderInfo,
+  private void renderItemInHand(PoseStack matrixStack, Camera activeRenderInfo,
       float partialTicks, CallbackInfo callbackInfo) {
     final Minecraft mc = Minecraft.getInstance();
-    if (mc.getCameraEntity() instanceof RemoteClientPlayerEntity) {
-      AbstractClientPlayerEntity playerEntity =
-          (AbstractClientPlayerEntity) mc.getCameraEntity();
+    if (mc.getCameraEntity() instanceof RemotePlayer) {
+      AbstractClientPlayer playerEntity =
+          (AbstractClientPlayer) mc.getCameraEntity();
       CraftingDeadImmerse.getInstance().getClientDist().getSpectatorRenderer()
           .renderItemInFirstPerson(partialTicks, matrixStack,
               mc.renderBuffers().bufferSource(), playerEntity,

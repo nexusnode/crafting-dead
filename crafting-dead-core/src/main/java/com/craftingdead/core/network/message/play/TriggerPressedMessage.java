@@ -19,10 +19,10 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class TriggerPressedMessage {
 
@@ -34,18 +34,18 @@ public class TriggerPressedMessage {
     this.triggerPressed = triggerPressed;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
     out.writeBoolean(this.triggerPressed);
   }
 
-  public static TriggerPressedMessage decode(PacketBuffer in) {
+  public static TriggerPressedMessage decode(FriendlyByteBuf in) {
     return new TriggerPressedMessage(in.readVarInt(), in.readBoolean());
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(extension -> extension.getMainHandGun()
             .ifPresent(gun -> gun.setTriggerPressed(extension, this.triggerPressed,
                 ctx.get().getDirection().getReceptionSide().isServer()))));

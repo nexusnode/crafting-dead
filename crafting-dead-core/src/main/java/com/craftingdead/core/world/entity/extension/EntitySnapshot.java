@@ -21,25 +21,25 @@ package com.craftingdead.core.world.entity.extension;
 import java.util.Optional;
 import java.util.Random;
 import com.craftingdead.core.util.RayTraceUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class EntitySnapshot {
 
   private boolean complete;
-  private final AxisAlignedBB boundingBox;
-  private Vector3d pos;
-  private final Vector2f pitchYaw;
+  private final AABB boundingBox;
+  private Vec3 pos;
+  private final Vec2 pitchYaw;
   private final float eyeHeight;
 
-  public EntitySnapshot(AxisAlignedBB boundingBox, Vector2f pitchYaw) {
+  public EntitySnapshot(AABB boundingBox, Vec2 pitchYaw) {
     this(boundingBox, pitchYaw, -1);
     this.complete = false;
   }
@@ -48,8 +48,8 @@ public class EntitySnapshot {
     this(entity.getBoundingBox(), entity.getRotationVector(), entity.getEyeHeight());
   }
 
-  public EntitySnapshot(AxisAlignedBB boundingBox, Vector2f pitchYaw, float eyeHeight) {
-    this.pos = new Vector3d((boundingBox.minX + boundingBox.maxX) / 2.0D, boundingBox.minY,
+  public EntitySnapshot(AABB boundingBox, Vec2 pitchYaw, float eyeHeight) {
+    this.pos = new Vec3((boundingBox.minX + boundingBox.maxX) / 2.0D, boundingBox.minY,
         (boundingBox.minZ + boundingBox.maxZ) / 2.0D);
     this.boundingBox = boundingBox;
     this.pitchYaw = pitchYaw;
@@ -57,27 +57,27 @@ public class EntitySnapshot {
     this.complete = true;
   }
 
-  public Optional<Vector3d> rayTrace(World world, EntitySnapshot fromSnapshot, double distance,
+  public Optional<Vec3> rayTrace(Level world, EntitySnapshot fromSnapshot, double distance,
       float accuracy, int shotCount, Random random) {
     if (!fromSnapshot.complete || !this.complete) {
       return Optional.empty();
     }
 
-    Vector3d start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
-    Vector3d look = RayTraceUtil.getVectorForRotation(
+    Vec3 start = fromSnapshot.getPos().add(0.0D, fromSnapshot.eyeHeight, 0.0D);
+    Vec3 look = RayTraceUtil.getVectorForRotation(
         fromSnapshot.getPitchYaw().x + RayTraceUtil.getAccuracyOffset(accuracy, shotCount, random),
         fromSnapshot.getPitchYaw().y + RayTraceUtil.getAccuracyOffset(accuracy, shotCount, random));
 
-    Optional<BlockRayTraceResult> blockRayTraceResult =
+    Optional<BlockHitResult> blockRayTraceResult =
         RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);
 
-    Vector3d scaledLook = look.scale(distance);
+    Vec3 scaledLook = look.scale(distance);
 
-    Vector3d end = blockRayTraceResult
-        .map(RayTraceResult::getLocation)
+    Vec3 end = blockRayTraceResult
+        .map(HitResult::getLocation)
         .orElse(start.add(scaledLook));
 
-    Optional<Vector3d> potentialHit = this.getCollisionBox().clip(start, end);
+    Optional<Vec3> potentialHit = this.getCollisionBox().clip(start, end);
     if (this.getCollisionBox().contains(start)) {
       return Optional.of(potentialHit.orElse(start));
     } else {
@@ -86,15 +86,15 @@ public class EntitySnapshot {
   }
 
 
-  public Vector3d getPos() {
+  public Vec3 getPos() {
     return this.pos;
   }
 
-  public AxisAlignedBB getCollisionBox() {
+  public AABB getCollisionBox() {
     return this.boundingBox;
   }
 
-  public Vector2f getPitchYaw() {
+  public Vec2 getPitchYaw() {
     return this.pitchYaw;
   }
 
@@ -107,16 +107,16 @@ public class EntitySnapshot {
       throw new UnsupportedOperationException("Snapshot not complete");
     }
 
-    AxisAlignedBB boundingBox = snapshot.boundingBox;
+    AABB boundingBox = snapshot.boundingBox;
     if (this.pos.distanceTo(snapshot.pos) > 1.0D
         || Math.abs(this.boundingBox.getSize()
             - snapshot.boundingBox.getSize()) > 1.0E-10D) {
       boundingBox = this.boundingBox;
     }
 
-    Vector2f pitchYaw = snapshot.pitchYaw;
-    if (MathHelper.degreesDifferenceAbs(this.pitchYaw.x, snapshot.pitchYaw.x) > 10.0D
-        || MathHelper.degreesDifferenceAbs(this.pitchYaw.y, snapshot.pitchYaw.y) > 10.0D) {
+    Vec2 pitchYaw = snapshot.pitchYaw;
+    if (Mth.degreesDifferenceAbs(this.pitchYaw.x, snapshot.pitchYaw.x) > 10.0D
+        || Mth.degreesDifferenceAbs(this.pitchYaw.y, snapshot.pitchYaw.y) > 10.0D) {
       pitchYaw = this.pitchYaw;
     }
 
@@ -129,7 +129,7 @@ public class EntitySnapshot {
         + ", " + this.boundingBox.toString() + "]";
   }
 
-  public void write(PacketBuffer out) {
+  public void write(FriendlyByteBuf out) {
     out.writeDouble(this.boundingBox.minX);
     out.writeDouble(this.boundingBox.minY);
     out.writeDouble(this.boundingBox.minZ);
@@ -140,7 +140,7 @@ public class EntitySnapshot {
     out.writeFloat(this.pitchYaw.y);
   }
 
-  public static EntitySnapshot read(PacketBuffer in) {
+  public static EntitySnapshot read(FriendlyByteBuf in) {
     double minX = in.readDouble();
     double minY = in.readDouble();
     double minZ = in.readDouble();
@@ -149,7 +149,7 @@ public class EntitySnapshot {
     double maxZ = in.readDouble();
     float pitch = in.readFloat();
     float yaw = in.readFloat();
-    return new EntitySnapshot(new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ),
-        new Vector2f(pitch, yaw));
+    return new EntitySnapshot(new AABB(minX, minY, minZ, maxX, maxY, maxZ),
+        new Vec2(pitch, yaw));
   }
 }

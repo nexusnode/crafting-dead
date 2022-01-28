@@ -22,13 +22,13 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.particles.SurvivalParticleTypes;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.particles.IParticleData;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalBlocks {
 
@@ -37,31 +37,31 @@ public class SurvivalBlocks {
 
   public static final RegistryObject<Block> MILITARY_LOOT =
       BLOCKS.register("military_loot",
-          () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
+          () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> MEDICAL_LOOT =
       BLOCKS.register("medic_loot",
-          () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
+          () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> CIVILIAN_LOOT =
       BLOCKS.register("civilian_loot",
-          () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
+          () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> RARE_CIVILIAN_LOOT =
       BLOCKS.register("civilian_rare_loot",
-          () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
+          () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> POLICE_LOOT =
       BLOCKS.register("police_loot",
-          () -> new LootBlock(AbstractBlock.Properties.of(Material.STONE)
+          () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
@@ -92,9 +92,9 @@ public class SurvivalBlocks {
               CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks::get));
 
   private static LootGeneratorBlock lootGenerator(Supplier<Block> lootBlock,
-      Supplier<? extends IParticleData> particleOptions, IntSupplier refreshDelayTicks) {
+      Supplier<? extends ParticleOptions> particleOptions, IntSupplier refreshDelayTicks) {
     return new LootGeneratorBlock(
-        AbstractBlock.Properties.of(Material.STRUCTURAL_AIR)
+        BlockBehaviour.Properties.of(Material.STRUCTURAL_AIR)
             .strength(5.0F, 5.0F)
             .randomTicks()
             .noOcclusion()

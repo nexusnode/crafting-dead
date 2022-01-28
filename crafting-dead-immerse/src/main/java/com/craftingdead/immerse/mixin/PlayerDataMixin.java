@@ -25,10 +25,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.storage.PlayerData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.PlayerDataStorage;
 
-@Mixin(PlayerData.class)
+@Mixin(PlayerDataStorage.class)
 public class PlayerDataMixin {
 
   /**
@@ -45,7 +45,7 @@ public class PlayerDataMixin {
    * Adds hook for {@link GameServer#persistPlayerData}.
    */
   @Inject(method = "load", at = @At("HEAD"), cancellable = true)
-  private void load(CallbackInfoReturnable<CompoundNBT> callbackInfo) {
+  private void load(CallbackInfoReturnable<CompoundTag> callbackInfo) {
     if (!CraftingDeadImmerse.getInstance().getLogicalServer().getGame().persistPlayerData()) {
       callbackInfo.setReturnValue(null);
     }

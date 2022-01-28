@@ -20,14 +20,14 @@ package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
 import com.craftingdead.core.network.Synched;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
+public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
 
   default void tick() {}
 
@@ -90,7 +90,7 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
    * 
    * @param playerEntity - the player tracking us
    */
-  default void handleStartTracking(ServerPlayerEntity playerEntity) {}
+  default void handleStartTracking(ServerPlayer playerEntity) {}
 
   /**
    * Whether the {@link LivingExtension} is allowed to move or not.
@@ -106,10 +106,10 @@ public interface LivingHandler extends INBTSerializable<CompoundNBT>, Synched {
   }
 
   @Override
-  default CompoundNBT serializeNBT() {
-    return new CompoundNBT();
+  default CompoundTag serializeNBT() {
+    return new CompoundTag();
   }
 
   @Override
-  default void deserializeNBT(CompoundNBT nbt) {}
+  default void deserializeNBT(CompoundTag nbt) {}
 }

@@ -24,9 +24,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 
-@Mixin(PlayerInventory.class)
+@Mixin(Inventory.class)
 public class PlayerInventoryMixin {
 
   /**
@@ -39,7 +39,7 @@ public class PlayerInventoryMixin {
         .orElse(false)) {
       callbackInfo.cancel();
 
-      PlayerInventory inventory = (PlayerInventory) (Object) this;
+      Inventory inventory = (Inventory) (Object) this;
 
       if (direction > 0.0D) {
         direction = 1.0D;

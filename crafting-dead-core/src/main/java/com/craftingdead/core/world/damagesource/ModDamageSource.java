@@ -19,13 +19,13 @@
 package com.craftingdead.core.world.damagesource;
 
 import javax.annotation.Nullable;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
 
 public class ModDamageSource {
 
@@ -66,7 +66,7 @@ public class ModDamageSource {
       LivingEntity livingHit = (LivingEntity) victim;
 
       // Gets the KNOCKBACK RESISTANCE attribute of the victim
-      ModifiableAttributeInstance livingResistance =
+      AttributeInstance livingResistance =
           livingHit.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
       // Saves the previous resistance value to be used after applying the hit
       double previousResistance = livingResistance.getBaseValue();

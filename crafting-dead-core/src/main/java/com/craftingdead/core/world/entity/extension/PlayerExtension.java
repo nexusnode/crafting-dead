@@ -19,21 +19,21 @@
 package com.craftingdead.core.world.entity.extension;
 
 import javax.annotation.Nonnull;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
-public interface PlayerExtension<E extends PlayerEntity>
+public interface PlayerExtension<E extends Player>
     extends LivingExtension<E, PlayerHandler>, PlayerHandler {
 
-  static <E extends PlayerEntity> PlayerExtension<E> create(E entity) {
+  static <E extends Player> PlayerExtension<E> create(E entity) {
     return new PlayerExtensionImpl<>(entity);
   }
 
   @Nonnull
   @SuppressWarnings("unchecked")
-  static <E extends PlayerEntity> PlayerExtension<E> getOrThrow(E player) {
-    return Capabilities.getOrThrow(Capabilities.LIVING_EXTENSION, player, PlayerExtension.class);
+  static <E extends Player> PlayerExtension<E> getOrThrow(E player) {
+    return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, player, PlayerExtension.class);
   }
 
   boolean isCombatModeEnabled();

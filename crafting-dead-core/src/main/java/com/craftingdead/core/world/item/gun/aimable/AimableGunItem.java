@@ -18,12 +18,14 @@
 
 package com.craftingdead.core.world.item.gun.aimable;
 
-import com.craftingdead.core.capability.Capabilities;
+import java.util.Set;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import com.craftingdead.core.world.item.scope.Scope;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -40,14 +42,11 @@ public class AimableGunItem extends GunItem {
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundTag nbt) {
     return new SerializableCapabilityProvider<>(
         LazyOptional.of(() -> AimableGun.create(AimableGunClient::new, itemStack, this)),
-        ImmutableSet.of(
-            () -> Capabilities.GUN,
-            () -> Capabilities.COMBAT_SLOT_PROVIDER,
-            () -> Capabilities.SCOPE),
-        CompoundNBT::new);
+        Set.of(() -> Gun.CAPABILITY, () -> CombatSlotProvider.CAPABILITY, () -> Scope.CAPABILITY),
+        CompoundTag::new);
   }
 
   public boolean hasBoltAction() {

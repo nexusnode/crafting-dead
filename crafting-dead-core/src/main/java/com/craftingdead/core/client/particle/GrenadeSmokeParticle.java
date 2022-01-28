@@ -19,23 +19,23 @@
 package com.craftingdead.core.client.particle;
 
 import com.craftingdead.core.particle.GrenadeSmokeParticleData;
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.IParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.Mth;
 
 /**
  * Lightweight smoke particle for grenades.
  */
-public class GrenadeSmokeParticle extends SpriteTexturedParticle {
+public class GrenadeSmokeParticle extends TextureSheetParticle {
 
-  private final IAnimatedSprite animatedSprite;
+  private final SpriteSet animatedSprite;
 
-  private GrenadeSmokeParticle(GrenadeSmokeParticleData data, IAnimatedSprite animatedSprite,
-      ClientWorld world, double x, double y, double z) {
+  private GrenadeSmokeParticle(GrenadeSmokeParticleData data, SpriteSet animatedSprite,
+      ClientLevel world, double x, double y, double z) {
     super(world, x, y, z);
     this.animatedSprite = animatedSprite;
     float colorScale = 1.0F - (float) (Math.random() * (double) 0.3F);
@@ -53,13 +53,13 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
   }
 
   @Override
-  public IParticleRenderType getRenderType() {
-    return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+  public ParticleRenderType getRenderType() {
+    return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
   }
 
   @Override
   public float getQuadSize(float partialTicks) {
-    return this.quadSize * MathHelper
+    return this.quadSize * Mth
         .clamp(((float) this.age + partialTicks) / (float) this.lifetime * 32.0F, 0.0F, 1.0F);
   }
 
@@ -75,16 +75,16 @@ public class GrenadeSmokeParticle extends SpriteTexturedParticle {
     }
   }
 
-  public static class Factory implements IParticleFactory<GrenadeSmokeParticleData> {
+  public static class Factory implements ParticleProvider<GrenadeSmokeParticleData> {
 
-    private final IAnimatedSprite spriteSet;
+    private final SpriteSet spriteSet;
 
-    public Factory(IAnimatedSprite animatedSprite) {
+    public Factory(SpriteSet animatedSprite) {
       this.spriteSet = animatedSprite;
     }
 
     @Override
-    public Particle createParticle(GrenadeSmokeParticleData data, ClientWorld world, double xPos,
+    public Particle createParticle(GrenadeSmokeParticleData data, ClientLevel world, double xPos,
         double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
       return new GrenadeSmokeParticle(data, this.spriteSet, world, xPos, yPos, zPos);
     }

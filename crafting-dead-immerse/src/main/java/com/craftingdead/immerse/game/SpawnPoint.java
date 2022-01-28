@@ -20,29 +20,29 @@ package com.craftingdead.immerse.game;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SpawnPoint {
 
   public static final Codec<SpawnPoint> CODEC = RecordCodecBuilder
       .create(instance -> instance
           .group(
-              World.RESOURCE_KEY_CODEC.optionalFieldOf("dimension", World.OVERWORLD)
+              Level.RESOURCE_KEY_CODEC.optionalFieldOf("dimension", Level.OVERWORLD)
                   .forGetter(SpawnPoint::getDimension),
               BlockPos.CODEC.fieldOf("blockPos").forGetter(SpawnPoint::getBlockPos))
           .apply(instance, SpawnPoint::new));
 
-  private final RegistryKey<World> dimension;
+  private final ResourceKey<Level> dimension;
   private final BlockPos blockPos;
 
-  public SpawnPoint(RegistryKey<World> dimension, BlockPos blockPos) {
+  public SpawnPoint(ResourceKey<Level> dimension, BlockPos blockPos) {
     this.dimension = dimension;
     this.blockPos = blockPos;
   }
 
-  public RegistryKey<World> getDimension() {
+  public ResourceKey<Level> getDimension() {
     return dimension;
   }
 

@@ -18,12 +18,12 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.Set;
 import java.util.function.Function;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -34,11 +34,11 @@ public class SimpleGunType extends GunItem {
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundTag nbt) {
     return new SerializableCapabilityProvider<>(
         LazyOptional.of(() -> TypedGun.create(this.getClientFactory(), itemStack, this)),
-        ImmutableSet.of(() -> Capabilities.GUN, () -> Capabilities.COMBAT_SLOT_PROVIDER),
-        CompoundNBT::new);
+        Set.of(() -> Gun.CAPABILITY, () -> CombatSlotProvider.CAPABILITY),
+        CompoundTag::new);
   }
 
   protected <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {

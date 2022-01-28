@@ -19,19 +19,19 @@
 package com.craftingdead.core.world.inventory;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModMenuTypes {
 
-  public static final DeferredRegister<ContainerType<?>> MENUS =
+  public static final DeferredRegister<MenuType<?>> MENUS =
       DeferredRegister.create(ForgeRegistries.CONTAINERS, CraftingDead.ID);
 
-  public static final RegistryObject<ContainerType<EquipmentMenu>> EQUIPMENT =
-      MENUS.register("equipment", () -> new ContainerType<>(EquipmentMenu::new));
+  public static final RegistryObject<MenuType<EquipmentMenu>> EQUIPMENT =
+      MENUS.register("equipment", () -> new MenuType<>(EquipmentMenu::new));
 
-  public static final RegistryObject<ContainerType<GenericMenu>> VEST =
-      MENUS.register("vest", () -> new ContainerType<>(GenericMenu::createVest));
+  public static final RegistryObject<MenuType<GenericMenu>> VEST =
+      MENUS.register("vest", () -> new MenuType<>(GenericMenu::createVest));
 }

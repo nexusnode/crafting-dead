@@ -24,15 +24,15 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import com.craftingdead.immerse.game.module.team.ClientTeamModule;
 import com.craftingdead.immerse.game.module.team.Team;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.ResourceLocation;
 
-public class TeamClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
+public class TeamClothingLayer<T extends LivingEntity, M extends HumanoidModel<T>>
     extends AbstractClothingLayer<T, M> {
 
-  public TeamClothingLayer(IEntityRenderer<T, M> renderer) {
+  public TeamClothingLayer(RenderLayerParent<T, M> renderer) {
     super(renderer);
   }
 

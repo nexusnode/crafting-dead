@@ -20,22 +20,22 @@ package com.craftingdead.core.client.tutorial;
 
 import java.util.function.Function;
 import com.craftingdead.core.client.ClientDist;
-import net.minecraft.client.tutorial.ITutorialStep;
+import net.minecraft.client.tutorial.TutorialStepInstance;
 
 public enum ModTutorialSteps {
   OPEN_EQUIPMENT_MENU("open_equipment_menu", OpenEquipmentMenuTutorialStepInstance::new), NONE("none",
       CompletedModTutorialStepInstance::new);
 
   private final String name;
-  private final Function<ClientDist, ? extends ITutorialStep> tutorial;
+  private final Function<ClientDist, ? extends TutorialStepInstance> tutorial;
 
-  private <T extends ITutorialStep> ModTutorialSteps(String name,
+  private <T extends TutorialStepInstance> ModTutorialSteps(String name,
       Function<ClientDist, T> tutorial) {
     this.name = name;
     this.tutorial = tutorial;
   }
 
-  public ITutorialStep create(ClientDist client) {
+  public TutorialStepInstance create(ClientDist client) {
     return this.tutorial.apply(client);
   }
 

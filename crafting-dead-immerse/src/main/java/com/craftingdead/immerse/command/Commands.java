@@ -19,11 +19,11 @@
 package com.craftingdead.immerse.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public class Commands {
 
-  public static void register(CommandDispatcher<CommandSource> dispatcher) {
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
     GameCommand.register(dispatcher);
   }
 }

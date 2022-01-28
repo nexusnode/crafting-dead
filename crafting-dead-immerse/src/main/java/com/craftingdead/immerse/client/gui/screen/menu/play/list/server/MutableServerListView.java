@@ -25,13 +25,13 @@ import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import net.minecraft.client.gui.screen.AddServerScreen;
-import net.minecraft.client.gui.screen.ConnectingScreen;
-import net.minecraft.client.gui.screen.ServerListScreen;
-import net.minecraft.client.multiplayer.ServerAddress;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.gui.screens.DirectJoinServerScreen;
+import net.minecraft.client.gui.screens.EditServerScreen;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class MutableServerListView<L extends Layout> extends ServerListView<L> {
 
@@ -46,22 +46,27 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
     return super.createTopRowControls()
         .configure(view -> view.getLayout().setWidth(300))
         .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-            new TranslationTextComponent("view.mutable_server_list.button.direct_connect"), () -> {
+            new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = ((ViewScreen) this.getScreen());
-              screen.keepOpenAndSetScreen(new ServerListScreen(screen,
-                  connect -> this.minecraft.setScreen(connect
-                      ? new ConnectingScreen(screen, this.minecraft, tempServerData)
-                      : screen),
+              var screen = this.getScreen();
+              screen.keepOpenAndSetScreen(new DirectJoinServerScreen(screen,
+                  connect -> {
+                    if (connect) {
+                      ConnectScreen.startConnecting(screen, this.minecraft,
+                          ServerAddress.parseString(tempServerData.ip), tempServerData);
+                    } else {
+                      this.minecraft.setScreen(screen);
+                    }
+                  },
                   tempServerData));
             }).configure(view -> view.getLayout().setMargin(3)))
         .addChild(createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
-            new TranslationTextComponent("view.mutable_server_list.button.add"), () -> {
+            new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
               ViewScreen screen = ((ViewScreen) this.getScreen());
-              screen.keepOpenAndSetScreen(new AddServerScreen(screen,
+              screen.keepOpenAndSetScreen(new EditServerScreen(screen,
                   success -> {
                     if (success) {
                       this.addServer(tempServerData.ip);
@@ -75,7 +80,7 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   @Override
   protected ParentView<?, YogaLayout, YogaLayout> createBottomRowControls() {
     this.removeButton = createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
-        new TranslationTextComponent("view.mutable_server_list.button.remove"),
+        new TranslatableComponent("view.mutable_server_list.button.remove"),
         () -> this.getSelectedItem().ifPresent(this::removeServer))
             .configure(view -> view.getBackgroundColorProperty()
                 .registerState(Theme.RED_DISABLED, States.DISABLED))

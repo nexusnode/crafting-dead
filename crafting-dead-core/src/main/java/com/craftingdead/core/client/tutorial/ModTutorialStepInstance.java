@@ -18,9 +18,9 @@
 
 package com.craftingdead.core.client.tutorial;
 
-import net.minecraft.client.tutorial.ITutorialStep;
+import net.minecraft.client.tutorial.TutorialStepInstance;
 
-public interface ModTutorialStepInstance extends ITutorialStep {
+public interface ModTutorialStepInstance extends TutorialStepInstance {
 
   default void openEquipmentMenu() {}
 }

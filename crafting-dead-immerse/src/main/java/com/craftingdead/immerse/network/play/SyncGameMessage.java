@@ -21,22 +21,22 @@ package com.craftingdead.immerse.network.play;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.ClientGameWrapper;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SyncGameMessage {
 
-  private final PacketBuffer data;
+  private final FriendlyByteBuf data;
 
-  public SyncGameMessage(PacketBuffer data) {
+  public SyncGameMessage(FriendlyByteBuf data) {
     this.data = data;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeBytes(this.data);
   }
 
-  public static SyncGameMessage decode(PacketBuffer in) {
+  public static SyncGameMessage decode(FriendlyByteBuf in) {
     return new SyncGameMessage(in);
   }
 

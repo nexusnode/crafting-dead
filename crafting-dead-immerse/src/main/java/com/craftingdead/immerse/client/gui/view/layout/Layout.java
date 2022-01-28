@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.layout;
 
 import com.craftingdead.immerse.client.gui.view.Overflow;
-import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.world.phys.Vec2;
 
 public interface Layout {
 
@@ -61,6 +61,6 @@ public interface Layout {
 
   interface MeasureFunction {
 
-    Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height);
+    Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height);
   }
 }

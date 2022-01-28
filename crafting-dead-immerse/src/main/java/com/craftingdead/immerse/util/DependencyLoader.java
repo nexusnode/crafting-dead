@@ -26,13 +26,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 
 public final class DependencyLoader {
 
@@ -45,9 +43,9 @@ public final class DependencyLoader {
     if (FMLLoader.isProduction()) {
       logger.info("Loading dependencies");
 
-      ModFile modFile = ModList.get().getModFileById(CraftingDeadImmerse.ID).getFile();
-      Path resolvedDir = modFile.findResource(DEPENDENCIES_DIR);
-      try (Stream<Path> paths = Files.walk(resolvedDir)) {
+      var modFile = ModList.get().getModFileById(CraftingDeadImmerse.ID).getFile();
+      var resolvedDir = modFile.findResource(DEPENDENCIES_DIR);
+      try (var paths = Files.walk(resolvedDir)) {
         paths
             .filter(p -> p.toString().endsWith(".jar"))
             .map(DependencyLoader::toModJarUrl)

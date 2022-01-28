@@ -20,22 +20,22 @@ package com.craftingdead.core.world.entity;
 
 import java.util.Optional;
 import java.util.UUID;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 
 public abstract class BounceableProjectileEntity extends Entity
     implements IEntityAdditionalSpawnData {
@@ -46,21 +46,21 @@ public abstract class BounceableProjectileEntity extends Entity
   private int totalTicksInAir;
   private int motionStopCount;
 
-  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
-      World world) {
-    super(entityType, world);
+  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
+      Level level) {
+    super(type, level);
   }
 
-  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
-      double x, double y, double z, World world) {
-    this(entityType, world);
+  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
+      double x, double y, double z, Level level) {
+    this(type, level);
     this.setPos(x, y, z);
   }
 
-  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> entityType,
-      LivingEntity throwerEntity, World world) {
-    this(entityType, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
-        world);
+  public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
+      LivingEntity throwerEntity, Level level) {
+    this(type, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
+        level);
     this.ownerId = throwerEntity.getUUID();
   }
 
@@ -79,7 +79,7 @@ public abstract class BounceableProjectileEntity extends Entity
 
       boolean notCollided = (this.blockStanding != currentBlockState
           && this.level.noCollision(this.getBoundingBox().inflate(0.0625D)));
-      boolean shouldMove = !this.getDeltaMovement().equals(Vector3d.ZERO) || notCollided;
+      boolean shouldMove = !this.getDeltaMovement().equals(Vec3.ZERO) || notCollided;
 
       if (shouldMove) {
         this.stoppedInGround = false;
@@ -97,26 +97,26 @@ public abstract class BounceableProjectileEntity extends Entity
       }
 
       this.totalTicksInAir++;
-      Vector3d position = this.position();
-      Vector3d motionBeforeHit = this.getDeltaMovement();
+      Vec3 position = this.position();
+      Vec3 motionBeforeHit = this.getDeltaMovement();
 
-      BlockRayTraceResult blockRayTraceResult =
-          this.level.clip(new RayTraceContext(position, position.add(motionBeforeHit),
-              RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
+      BlockHitResult blockRayTraceResult =
+          this.level.clip(new ClipContext(position, position.add(motionBeforeHit),
+              ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
 
-      Vector3d nextBounceMotion = null;
+      Vec3 nextBounceMotion = null;
 
-      if (blockRayTraceResult.getType() != RayTraceResult.Type.MISS) {
+      if (blockRayTraceResult.getType() != HitResult.Type.MISS) {
         BlockState blockHitState = this.level.getBlockState(blockRayTraceResult.getBlockPos());
 
-        Vector3d difference =
+        Vec3 difference =
             blockRayTraceResult.getLocation().subtract(this.getX(), this.getY(),
                 this.getZ());
         this.setDeltaMovement(difference);
 
         // From vanilla's AbstractArrowEntity logic.
         // I didn't found a good name for the variable.
-        Vector3d vec = difference.normalize().scale(0.05D);
+        Vec3 vec = difference.normalize().scale(0.05D);
         this.setPos(this.getX() - vec.x, this.getY() - vec.y, this.getZ() - vec.z);
 
         Optional<Float> optional = this.getBounceFactor(blockRayTraceResult);
@@ -127,7 +127,7 @@ public abstract class BounceableProjectileEntity extends Entity
               // If the grenade is going up too slowly, set the next bounce to zero
               nextBounceMotion = Math.abs(motionBeforeHit.y) > 0.1D
                   ? motionBeforeHit.multiply(0.9D * 0.7D, (-bounceFactor), 0.9D * 0.7D)
-                  : Vector3d.ZERO;
+                  : Vec3.ZERO;
               break;
             case DOWN:
               nextBounceMotion = motionBeforeHit.multiply(0.9D, -bounceFactor, 0.9D);
@@ -144,7 +144,7 @@ public abstract class BounceableProjectileEntity extends Entity
               break;
           }
         } else {
-          nextBounceMotion = Vector3d.ZERO;
+          nextBounceMotion = Vec3.ZERO;
         }
 
         this.onSurfaceHit(blockRayTraceResult);
@@ -154,7 +154,7 @@ public abstract class BounceableProjectileEntity extends Entity
           if (nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP) {
             // Stops if the next bounce is too slow
             if (nextBounceMotion.length() < 0.1D) {
-              nextBounceMotion = Vector3d.ZERO;
+              nextBounceMotion = Vec3.ZERO;
               this.stoppedInGround = true;
               this.blockStanding = blockHitState;
               this.onMotionStop(++this.motionStopCount);
@@ -163,7 +163,7 @@ public abstract class BounceableProjectileEntity extends Entity
         }
       }
 
-      Vector3d currentMotion = this.getDeltaMovement();
+      Vec3 currentMotion = this.getDeltaMovement();
 
       double nextX = this.getX() + currentMotion.x;
       double nextY = this.getY() + currentMotion.y;
@@ -183,7 +183,7 @@ public abstract class BounceableProjectileEntity extends Entity
   /**
    * Called when the projectile hits a surface
    */
-  public abstract void onSurfaceHit(BlockRayTraceResult blockRayTraceResult);
+  public abstract void onSurfaceHit(BlockHitResult blockRayTraceResult);
 
   /**
    * Called when the projectile's motion gets zeroed.
@@ -192,30 +192,29 @@ public abstract class BounceableProjectileEntity extends Entity
 
   public void shootFromEntity(Entity entity, float x, float y, float z, float force,
       float p_184538_6_) {
-    float f = -MathHelper.sin(y * ((float) Math.PI / 180F))
-        * MathHelper.cos(x * ((float) Math.PI / 180F));
-    float f1 = -MathHelper.sin((x + z) * ((float) Math.PI / 180F));
+    float f = -Mth.sin(y * ((float) Math.PI / 180F))
+        * Mth.cos(x * ((float) Math.PI / 180F));
+    float f1 = -Mth.sin((x + z) * ((float) Math.PI / 180F));
     float f2 =
-        MathHelper.cos(y * ((float) Math.PI / 180F)) * MathHelper.cos(x * ((float) Math.PI / 180F));
+        Mth.cos(y * ((float) Math.PI / 180F)) * Mth.cos(x * ((float) Math.PI / 180F));
     this.shoot((double) f, (double) f1, (double) f2, force, p_184538_6_);
-    Vector3d vec3d = entity.getDeltaMovement();
+    Vec3 vec3d = entity.getDeltaMovement();
     this.setDeltaMovement(
         this.getDeltaMovement().add(vec3d.x, entity.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
   }
 
   public void shoot(double x, double y, double z, float force, float p_70186_8_) {
-    Vector3d vec = (new Vector3d(x, y, z)).normalize()
+    Vec3 vec = (new Vec3(x, y, z)).normalize()
         .add(this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
             this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_,
             this.random.nextGaussian() * (double) 0.0075F * (double) p_70186_8_)
         .scale((double) force);
     this.setDeltaMovement(vec);
-    float f = MathHelper.sqrt(getHorizontalDistanceSqr(vec));
-    this.yRot = (float) (MathHelper.atan2(vec.x, vec.z) * (double) (180F / (float) Math.PI));
-    this.xRot =
-        (float) (MathHelper.atan2(vec.y, (double) f) * (double) (180F / (float) Math.PI));
-    this.yRotO = this.yRot;
-    this.xRotO = this.xRot;
+    float f = Mth.sqrt((float) this.distanceToSqr(vec));
+    this.setYRot((float) (Mth.atan2(vec.x, vec.z) * (double) (180F / (float) Math.PI)));
+    this.setXRot((float) (Mth.atan2(vec.y, (double) f) * (double) (180F / (float) Math.PI)));
+    this.yRotO = this.getYRot();
+    this.xRotO = this.getXRot();
   }
 
   public int getTotalTicksInAir() {
@@ -250,12 +249,12 @@ public abstract class BounceableProjectileEntity extends Entity
   /**
    * @return the bounce factor
    */
-  public Optional<Float> getBounceFactor(BlockRayTraceResult blockRayTraceResult) {
+  public Optional<Float> getBounceFactor(BlockHitResult blockRayTraceResult) {
     return Optional.of(0.375F);
   }
 
   @Override
-  protected void addAdditionalSaveData(CompoundNBT compound) {
+  protected void addAdditionalSaveData(CompoundTag compound) {
     if (this.ownerId != null) {
       compound.putUUID("owner", this.ownerId);
     }
@@ -265,7 +264,7 @@ public abstract class BounceableProjectileEntity extends Entity
   }
 
   @Override
-  protected void readAdditionalSaveData(CompoundNBT compound) {
+  protected void readAdditionalSaveData(CompoundTag compound) {
     if (compound.contains("owner", 10)) {
       this.ownerId = compound.getUUID("owner");
     }
@@ -274,22 +273,22 @@ public abstract class BounceableProjectileEntity extends Entity
   }
 
   @Override
-  public void writeSpawnData(PacketBuffer buffer) {
+  public void writeSpawnData(FriendlyByteBuf buffer) {
     buffer.writeBoolean(this.stoppedInGround);
     buffer.writeInt(this.totalTicksInAir);
     buffer.writeInt(this.motionStopCount);
   }
 
   @Override
-  public void readSpawnData(PacketBuffer buffer) {
+  public void readSpawnData(FriendlyByteBuf buffer) {
     this.stoppedInGround = buffer.readBoolean();
     this.totalTicksInAir = buffer.readInt();
     this.motionStopCount = buffer.readInt();
   }
 
   public Optional<Entity> getThrower() {
-    return this.level instanceof ServerWorld
-        ? Optional.ofNullable(((ServerWorld) this.level).getEntity(this.ownerId))
+    return this.level instanceof ServerLevel
+        ? Optional.ofNullable(((ServerLevel) this.level).getEntity(this.ownerId))
         : Optional.empty();
   }
 }

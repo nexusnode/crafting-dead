@@ -19,29 +19,31 @@
 package com.craftingdead.core.client.gui.screen.inventory;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.storage.Storage;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.DisplayEffectsScreen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
+public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMenu> {
 
   private static final ResourceLocation BACKGROUND =
       new ResourceLocation(CraftingDead.ID, "textures/gui/container/equipment.png");
 
-  private static final ITextComponent ARROW = new StringTextComponent(">");
+  private static final Component ARROW = new TextComponent(">");
 
   private int oldMouseX;
   private int oldMouseY;
@@ -50,9 +52,8 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
 
   private boolean transitioning = false;
 
-  public EquipmentScreen(EquipmentMenu menu, PlayerInventory playerInventory,
-      ITextComponent title) {
-    super(menu, playerInventory, title);
+  public EquipmentScreen(EquipmentMenu menu, Inventory inventory, Component title) {
+    super(menu, inventory, title);
   }
 
   @Override
@@ -64,12 +65,12 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
               .sendToServer(new OpenStorageMessage(ModEquipmentSlotType.VEST));
           this.transitioning = true;
         });
-    this.addButton(this.vestButton);
+    this.addRenderableWidget(this.vestButton);
     this.refreshButtonStatus();
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
     this.renderTooltip(matrixStack, mouseX, mouseY);
     this.oldMouseX = mouseX;
@@ -77,8 +78,8 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
   }
 
   @Override
-  public void tick() {
-    super.tick();
+  protected void containerTick() {
+    super.containerTick();
     this.refreshButtonStatus();
   }
 
@@ -86,7 +87,7 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
     this.vestButton.active = this.menu
         .getItemHandler()
         .getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
-        .getCapability(Capabilities.STORAGE)
+        .getCapability(Storage.CAPABILITY)
         .isPresent();
   }
 
@@ -98,31 +99,31 @@ public class EquipmentScreen extends DisplayEffectsScreen<EquipmentMenu> {
   }
 
   @Override
-  protected void renderLabels(MatrixStack matrixStack, int x, int y) {}
+  protected void renderLabels(PoseStack matrixStack, int x, int y) {}
 
   @Override
-  protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+  protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
     this.renderBackground(matrixStack);
-    this.minecraft.getTextureManager().bind(BACKGROUND);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
 
     this.blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
     ItemStack gunStack = this.menu.getGunStack();
-    gunStack.getCapability(Capabilities.GUN).ifPresent(gun -> {
+    gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
 
       final int gunSlotX = this.leftPos + 122;
       final int gunSlotY = this.topPos + 26;
 
       this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
 
-      final boolean carriedItemAccepted = gun.isAcceptedAttachment(this.inventory.getCarried())
-          || Paint.isValid(this.menu.getGunStack(), this.inventory.getCarried());
+      final boolean carriedItemAccepted = gun.isAcceptedAttachment(this.menu.getCarried())
+          || Paint.isValid(this.menu.getGunStack(), this.menu.getCarried());
 
       if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
           || carriedItemAccepted) {
         // Green outline
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 22, 22, 22);
-      } else if (!this.inventory.getCarried().isEmpty() && !carriedItemAccepted) {
+      } else if (!this.menu.getCarried().isEmpty() && !carriedItemAccepted) {
         // Red outline
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 44, 22, 22);
       }

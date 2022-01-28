@@ -21,22 +21,22 @@ package com.craftingdead.immerse.game.tdm;
 import java.util.function.Consumer;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.SynchedData;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 
 public class TdmPlayerData implements Synched {
 
-  private static final DataParameter<Integer> SCORE =
-      new DataParameter<>(0x00, DataSerializers.INT);
-  private static final DataParameter<Integer> KILLS =
-      new DataParameter<>(0x01, DataSerializers.INT);
-  private static final DataParameter<Integer> ASSISTS =
-      new DataParameter<>(0x02, DataSerializers.INT);
-  private static final DataParameter<Integer> DEATHS =
-      new DataParameter<>(0x03, DataSerializers.INT);
-  private static final DataParameter<Boolean> DEAD =
-      new DataParameter<>(0x04, DataSerializers.BOOLEAN);
+  private static final EntityDataAccessor<Integer> SCORE =
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> KILLS =
+      new EntityDataAccessor<>(0x01, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> ASSISTS =
+      new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Integer> DEATHS =
+      new EntityDataAccessor<>(0x03, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Boolean> DEAD =
+      new EntityDataAccessor<>(0x04, EntityDataSerializers.BOOLEAN);
 
   private final SynchedData dataManager;
 
@@ -91,14 +91,14 @@ public class TdmPlayerData implements Synched {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
         ? this.dataManager.getAll()
         : this.dataManager.packDirty(), out);
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     this.dataManager.assignValues(SynchedData.unpack(in));
   }
 

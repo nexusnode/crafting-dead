@@ -18,8 +18,14 @@
 
 package com.craftingdead.core.world.item.hat;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+
 public interface Hat {
 
+  Capability<Hat> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+  
   boolean hasNightVision();
 
   float getHeadshotReductionPercentage();

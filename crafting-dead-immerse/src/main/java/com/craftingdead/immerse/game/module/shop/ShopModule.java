@@ -28,8 +28,8 @@ import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 
 class ShopModule implements Module, Synched {
 
@@ -48,7 +48,7 @@ class ShopModule implements Module, Synched {
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     if (writeAll) {
       out.writeVarInt(this.items.size());
       for (ShopItem item : this.items.values()) {
@@ -76,7 +76,7 @@ class ShopModule implements Module, Synched {
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     int itemsSize = in.readVarInt();
     if (itemsSize > 0) {
       this.items.clear();
@@ -90,8 +90,8 @@ class ShopModule implements Module, Synched {
     if (categoriesSize > 0) {
       this.categories.clear();
       for (int i = 0; i < categoriesSize; i++) {
-        ITextComponent displayName = in.readComponent();
-        ITextComponent info = in.readComponent();
+        Component displayName = in.readComponent();
+        Component info = in.readComponent();
         List<ShopItem> items = new ArrayList<>();
         int categoryItemsSize = in.readVarInt();
         for (int j = 0; j < categoryItemsSize; j++) {

@@ -20,19 +20,17 @@ package com.craftingdead.core.world.item.gun.ammoprovider;
 
 import com.craftingdead.core.CraftingDead;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class AmmoProviderTypes {
 
-  @SuppressWarnings("unchecked")
   public static final DeferredRegister<AmmoProviderType> AMMO_PROVIDER_TYPES =
-      DeferredRegister.create((Class<AmmoProviderType>) (Class<?>) AmmoProviderType.class,
-          CraftingDead.ID);
+      DeferredRegister.create(AmmoProviderType.class, CraftingDead.ID);
 
-  public static final Lazy<IForgeRegistry<AmmoProviderType>> REGISTRY =
+  public static final Lazy<IForgeRegistry<AmmoProviderType>> registry =
       Lazy.of(AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_type",
           RegistryBuilder::new));
 
@@ -43,5 +41,4 @@ public class AmmoProviderTypes {
   public static final RegistryObject<AmmoProviderType> REFILLABLE =
       AMMO_PROVIDER_TYPES.register("refillable",
           () -> new AmmoProviderType(RefillableAmmoProvider::new));
-
 }

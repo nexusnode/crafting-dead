@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.crosshair.Crosshair;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -36,23 +34,22 @@ import com.craftingdead.core.world.item.gun.GunItem;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.scope.Scope;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 
 public class IngameGui {
 
@@ -104,114 +101,107 @@ public class IngameGui {
     this.hitMarker = hitMarker;
   }
 
-  @SuppressWarnings("deprecation")
-  private void renderGunFlash(AbstractClientPlayerEntity playerEntity, Gun gun, int width,
-      int height,
+  private void renderGunFlash(PoseStack poseStack, Gun gun, int width, int height,
       float partialTicks) {
     if (gun.getClient().isFlashing()) {
-      RenderSystem.pushMatrix();
+      poseStack.pushPose();
       {
-        final float flashIntensity = (random.nextInt(3) + 5) / 10.0F;
-        final float scale = this.lastFlashScale =
-            MathHelper.lerp(partialTicks, this.lastFlashScale, flashIntensity);
-        this.minecraft.getTextureManager()
-            .bind(
-                new ResourceLocation(CraftingDead.ID, "textures/flash/white_flash.png"));
+        final var flashIntensity = (random.nextInt(3) + 5) / 10.0F;
+        final var scale = this.lastFlashScale =
+            Mth.lerp(partialTicks, this.lastFlashScale, flashIntensity);
+        RenderSystem.setShaderTexture(0,
+            new ResourceLocation(CraftingDead.ID, "textures/flash/white_flash.png"));
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, flashIntensity - 0.15F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, flashIntensity - 0.15F);
         final float x = width * 0.625F;
         final float y = height * 0.625F;
         final float flashWidth = 300;
         final float flashHeight = 300;
-        RenderSystem.translatef((x - x * scale), y - y * scale, 0.0F);
-        RenderSystem.scalef(scale, scale, 1.0F);
+        poseStack.translate((x - x * scale), y - y * scale, 0.0F);
+        poseStack.scale(scale, scale, 1.0F);
         RenderUtil.blit(x - flashWidth / 2, y - flashHeight / 2, flashWidth,
             flashHeight);
         RenderSystem.disableBlend();
       }
-      RenderSystem.popMatrix();
+      poseStack.popPose();
     }
   }
 
-  private static void renderScopeOverlay(AbstractClientPlayerEntity playerEntity, Scope scope,
-      int width,
-      int height) {
-    scope.getOverlayTexture(playerEntity)
-        .ifPresent(overlayTexture -> {
-          RenderUtil.bind(overlayTexture);
-          double overlayTextureWidth = scope.getOverlayTextureWidth();
-          double overlayTextureHeight = scope.getOverlayTextureHeight();
-          double scale = RenderUtil.getFitScale(overlayTextureWidth, overlayTextureHeight);
-          overlayTextureWidth *= scale;
-          overlayTextureHeight *= scale;
-          RenderSystem.enableBlend();
-          RenderUtil
-              .blit(width / 2 - overlayTextureWidth / 2,
-                  height / 2 - overlayTextureHeight / 2, overlayTextureWidth,
-                  overlayTextureHeight);
-          RenderSystem.disableBlend();
-        });
+  private static void renderScopeOverlay(Entity entity, Scope scope, int width, int height) {
+    scope.getOverlayTexture(entity).ifPresent(overlayTexture -> {
+      RenderSystem.setShaderTexture(0, overlayTexture);
+      var overlayTextureWidth = scope.getOverlayTextureWidth();
+      var overlayTextureHeight = scope.getOverlayTextureHeight();
+      var scale = RenderUtil.getFitScale(overlayTextureWidth, overlayTextureHeight);
+      overlayTextureWidth *= scale;
+      overlayTextureHeight *= scale;
+      RenderSystem.enableBlend();
+      RenderUtil.blit(width / 2.0F - overlayTextureWidth / 2.0F,
+          height / 2.0F - overlayTextureHeight / 2.0F, overlayTextureWidth,
+          overlayTextureHeight);
+      RenderSystem.disableBlend();
+    });
   }
 
-  public void renderOverlay(PlayerExtension<AbstractClientPlayerEntity> player, ItemStack heldStack,
-      @Nullable Gun gun, MatrixStack matrixStack, int width, int height, float partialTicks) {
+  public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, ItemStack heldStack,
+      @Nullable Gun gun, PoseStack poseStack, int width, int height, float partialTicks) {
 
     // TODO Fixes Minecraft bug when using post-processing shaders.
     RenderSystem.enableTexture();
 
     if (this.hitMarker != null) {
-      if (this.hitMarker.render(width, height, partialTicks)) {
+      if (this.hitMarker.render(poseStack, width, height, partialTicks)) {
         this.hitMarker = null;
       }
     }
 
-    this.renderKillFeed(matrixStack, partialTicks);
+    this.renderKillFeed(poseStack, partialTicks);
 
-    final AbstractClientPlayerEntity playerEntity = player.getEntity();
+    final AbstractClientPlayer playerEntity = player.getEntity();
 
-    heldStack.getCapability(Capabilities.SCOPE)
-        .filter(scope -> scope.isAiming(playerEntity))
+    heldStack.getCapability(Scope.CAPABILITY)
+        .filter(scope -> scope.isScoping(playerEntity))
         .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
 
     // Draws Flashbang effect
-    EffectInstance flashEffect =
+    MobEffectInstance flashEffect =
         player.getEntity()
             .getEffect(ModMobEffects.FLASH_BLINDNESS.get());
     if (flashEffect != null) {
       int alpha = (int) (255F
-          * (MathHelper.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
+          * (Mth.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
       int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
       RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
     }
 
     player.getProgressMonitor()
-        .ifPresent(observer -> renderProgress(matrixStack, this.minecraft.font, width,
+        .ifPresent(observer -> renderProgress(poseStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
 
     if (gun != null) {
-      this.renderGunFlash(playerEntity, gun, width, height, partialTicks);
+      this.renderGunFlash(poseStack, gun, width, height, partialTicks);
     }
 
     // Needs to render after blood or else it causes Z level issues
     if (gun != null) {
-      this.renderAmmo(matrixStack, width, height, gun);
+      this.renderAmmo(poseStack, width, height, gun);
     }
 
     if (player.isCombatModeEnabled()) {
-      this.renderCombatMode(player, matrixStack, width, height);
+      this.renderCombatMode(player, poseStack, width, height);
     }
   }
 
-  private void renderKillFeed(MatrixStack matrixStack, float partialTicks) {
+  private void renderKillFeed(PoseStack matrixStack, float partialTicks) {
     if (this.killFeedVisibleTimeMs == 0L) {
       this.killFeedVisibleTimeMs = Util.getMillis();
       this.killFeedAnimationTimeMs = 0L;
     }
 
     final long currentTime = Util.getMillis();
-    float durationPct = MathHelper.clamp(
+    float durationPct = Mth.clamp(
         (float) (currentTime - this.killFeedVisibleTimeMs) / KILL_FEED_MESSAGE_LIFE_MS, 0.0F, 1.0F);
     if (durationPct == 1.0F && !this.killFeedMessages.isEmpty()) {
       this.killFeedMessages.remove(0);
@@ -225,7 +215,7 @@ public class IngameGui {
 
     float animationPct =
         this.killFeedAnimationTimeMs != 0L
-            ? MathHelper.clamp((float) (currentTime - this.killFeedAnimationTimeMs)
+            ? Mth.clamp((float) (currentTime - this.killFeedAnimationTimeMs)
                 / ((KILL_FEED_MESSAGE_LIFE_MS / 4.0F) - partialTicks), 0.0F, 1.0F)
             : 0.0F;
 
@@ -238,8 +228,7 @@ public class IngameGui {
     }
   }
 
-  @SuppressWarnings("deprecation")
-  private void renderKillFeedEntry(KillFeedEntry entry, MatrixStack matrixStack, float x, float y,
+  private void renderKillFeedEntry(KillFeedEntry entry, PoseStack matrixStack, float x, float y,
       float alpha) {
     final String killerName = entry.getKillerName().getString();
     final String deadName = entry.getDeadName().getString();
@@ -277,24 +266,28 @@ public class IngameGui {
     switch (entry.getType()) {
       case HEADSHOT:
         RenderSystem.enableBlend();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
-        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+        RenderSystem.setShaderTexture(0,
+            new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
         RenderUtil.blit(x + killerNameWidth + 17, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG:
         RenderSystem.enableBlend();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
-        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+        RenderSystem.setShaderTexture(0,
+            new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
         RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
       case WALLBANG_HEADSHOT:
         RenderSystem.enableBlend();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
-        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+        RenderSystem.setShaderTexture(0,
+            new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
         RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
-        RenderUtil.bind(new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
+        RenderSystem.setShaderTexture(0,
+            new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
         RenderUtil.blit(x + killerNameWidth + 35 + 14, y - 1, 12, 12);
         RenderSystem.disableBlend();
         break;
@@ -303,13 +296,13 @@ public class IngameGui {
     }
 
     if (!entry.getWeaponStack().isEmpty()) {
-      RenderSystem.pushMatrix();
+      matrixStack.pushPose();
       {
-        RenderSystem.translated(x + killerNameWidth + 4, y - 1, 0);
+        matrixStack.translate(x + killerNameWidth + 4, y - 1, 0);
 
         if (entry.getWeaponStack().getItem() instanceof GunItem) {
-          double scale = 0.75D;
-          RenderSystem.scaled(scale, scale, scale);
+          var scale = 0.75F;
+          matrixStack.scale(scale, scale, scale);
         }
 
         // if (this.itemStack.getItem() instanceof ItemKnife) {
@@ -320,30 +313,26 @@ public class IngameGui {
         // }
 
         if (entry.getWeaponStack().getItem() instanceof GrenadeItem) {
-          double scale = 0.8D;
-          RenderSystem.scaled(scale, scale, scale);
-          RenderSystem.translated(4, 1, 0);
+          var scale = 0.8F;
+          matrixStack.scale(scale, scale, scale);
+          matrixStack.translate(4, 1, 0);
         }
 
         RenderUtil.renderGuiItem(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
       }
-      RenderSystem.popMatrix();
+      matrixStack.popPose();
     }
   }
 
-  private void renderAmmo(MatrixStack matrixStack, int width,
+  private void renderAmmo(PoseStack matrixStack, int width,
       int height, Gun gun) {
 
     int x = width - 115;
     int boxHeight = 25;
-    if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
-        && CapabilityUtils.isWearingBackpack(this.minecraft.player)) {
-      x -= 30;
-    }
 
     RenderUtil.drawGradientRectangle(x - 10, height - boxHeight, x + 30, height, 0x00000000,
         0x55000000);
-    AbstractGui.fill(matrixStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
+    GuiComponent.fill(matrixStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
 
     AmmoProvider ammoProvider = gun.getAmmoProvider();
     int ammoCount = ammoProvider.getMagazine().map(Magazine::getSize).orElse(0);
@@ -363,7 +352,7 @@ public class IngameGui {
         ammoText,
         x + 55 - ammoTextWidth - (empty ? 0 : reserveTextWidth),
         height - (boxHeight / 2) - this.minecraft.font.lineHeight / 2,
-        empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+        empty ? ChatFormatting.RED.getColor() : 0xFFFFFFFF);
 
     if (!empty) {
       matrixStack.pushPose();
@@ -371,7 +360,7 @@ public class IngameGui {
           height - (boxHeight / 2) - (reserveTextScale * 2), 0);
       matrixStack.scale(reserveTextScale, reserveTextScale, reserveTextScale);
       this.minecraft.font.drawShadow(matrixStack,
-          reserveText, 0, 0, empty ? TextFormatting.RED.getColor() : 0xFFFFFFFF);
+          reserveText, 0, 0, empty ? ChatFormatting.RED.getColor() : 0xFFFFFFFF);
       matrixStack.popPose();
     }
 
@@ -380,29 +369,26 @@ public class IngameGui {
         fireMode, x + 65, height - 16, 0xFFFFFFFF);
   }
 
-  private static void renderProgress(MatrixStack matrixStack, FontRenderer fontRenderer,
-      int width, int height,
-      ITextComponent message, @Nullable ITextComponent subMessage, float percent) {
+  private static void renderProgress(PoseStack poseStack, Font font,
+      int width, int height, Component message, @Nullable Component subMessage, float percent) {
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;
     final float x = width / 2 - barWidth / 2;
     final float y = height / 2;
-    fontRenderer.drawShadow(matrixStack, message.getString(), x,
-        y - barHeight - ((fontRenderer.lineHeight / 2) + 0.5F), 0xFFFFFF);
+    font.drawShadow(poseStack, message.getString(), x,
+        y - barHeight - ((font.lineHeight / 2) + 0.5F), 0xFFFFFF);
     RenderUtil.drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour,
         barColour);
     if (subMessage != null) {
-      fontRenderer.drawShadow(matrixStack, subMessage.getString(), x,
-          y + barHeight + ((fontRenderer.lineHeight / 2) + 0.5F), 0xFFFFFF);
+      font.drawShadow(poseStack, subMessage.getString(), x,
+          y + barHeight + ((font.lineHeight / 2) + 0.5F), 0xFFFFFF);
     }
   }
 
-  @SuppressWarnings("deprecation")
-  private void renderCombatMode(PlayerExtension<AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack,
-      int width, int height) {
-    final PlayerInventory inventory = player.getEntity().inventory;
+  private void renderCombatMode(PlayerExtension<AbstractClientPlayer> player,
+      PoseStack poseStack, int width, int height) {
+    final var inventory = player.getEntity().getInventory();
 
     int boxX = width - 115;
     int boxWidth = 110;
@@ -415,51 +401,51 @@ public class IngameGui {
     // Render primary
     ItemStack primaryStack = inventory.getItem(0);
     if (currentItemIndex == 0) {
-      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+      RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
-    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(matrixStack, "1", boxX + 5, boxY + 5,
+    RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.font.drawShadow(poseStack, "1", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    RenderSystem.pushMatrix();
-    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+    poseStack.pushPose();
+    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
-    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemCameraTransforms.TransformType.FIXED);
-    RenderSystem.popMatrix();
+    poseStack.scale(1.2F, 1.2F, 1.2F);
+    RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemTransforms.TransformType.FIXED);
+    poseStack.popPose();
 
     // Render secondary
     ItemStack secondaryStack = inventory.getItem(1);
     boxY += boxMarginY;
     if (currentItemIndex == 1) {
-      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+      RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
-    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(matrixStack, "2", boxX + 5, boxY + 5,
+    RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.font.drawShadow(poseStack, "2", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    RenderSystem.pushMatrix();
-    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+    poseStack.pushPose();
+    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
-    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
+    poseStack.scale(1.2F, 1.2F, 1.2F);
     RenderUtil.renderGuiItem(secondaryStack, 0, 0, 0xFFFFFFFF,
-        ItemCameraTransforms.TransformType.FIXED);
-    RenderSystem.popMatrix();
+        ItemTransforms.TransformType.FIXED);
+    poseStack.popPose();
 
     // Render melee
     ItemStack meleeStack = inventory.getItem(2);
     boxY += boxMarginY;
     if (currentItemIndex == 2) {
-      RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+      RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
-    RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(matrixStack, "3", boxX + 5, boxY + 5,
+    RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+    this.minecraft.font.drawShadow(poseStack, "3", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    RenderSystem.pushMatrix();
-    RenderSystem.translatef(boxX + boxWidth / 2 - 16 / 2,
+    poseStack.pushPose();
+    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
         boxY + (boxHeight / 2) - 16 / 2, 0);
-    RenderSystem.scalef(1.2F, 1.2F, 1.2F);
+    poseStack.scale(1.2F, 1.2F, 1.2F);
     RenderUtil.renderGuiItem(meleeStack, 0, 0, 0xFFFFFFFF,
-        ItemCameraTransforms.TransformType.FIXED);
-    RenderSystem.popMatrix();
+        ItemTransforms.TransformType.FIXED);
+    poseStack.popPose();
 
 
     // Render extras
@@ -469,17 +455,17 @@ public class IngameGui {
     for (int i = 0; i < 4; i++) {
       ItemStack extraStack = inventory.getItem(3 + i);
       if (currentItemIndex == 3 + i) {
-        RenderUtil.fill(matrixStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
+        RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
       }
-      RenderUtil.fill(matrixStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-      this.minecraft.font.drawShadow(matrixStack, String.valueOf(4 + i), boxX + 1,
+      RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
+      this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + 1,
           boxY + 1, 0xFFFFFFFF);
 
-      RenderSystem.pushMatrix();
+      poseStack.pushPose();
 
       RenderUtil.renderGuiItem(extraStack, boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 6, 0xFFFFFFFF);
-      RenderSystem.popMatrix();
+      poseStack.popPose();
 
       boxX += 28;
     }
@@ -497,74 +483,73 @@ public class IngameGui {
       healthWidth *= 2;
     }
 
-    AbstractGui.fill(matrixStack, 0, height - healthBoxHeight, healthWidth, height, 0x55000000);
+    GuiComponent.fill(poseStack, 0, height - healthBoxHeight, healthWidth, height, 0x55000000);
 
     RenderUtil.drawGradientRectangle(healthWidth, height - healthBoxHeight, healthWidth + 40,
         height, 0x55000000, 0x00000000);
 
-    RenderUtil.bind(HEALTH);
+    RenderSystem.setShaderTexture(0, HEALTH);
     RenderSystem.enableBlend();
     RenderUtil.blit(5, height - healthBoxHeight / 2 - 8, 16, 16);
     RenderSystem.disableBlend();
 
-    AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
+    GuiComponent.drawCenteredString(poseStack, this.minecraft.font,
         String.valueOf(Math.round(health)), 31,
         height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
-    RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
-    RenderUtil.fill(matrixStack, 42, height - healthBoxHeight / 2 - 5,
+    RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
+    RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5,
         Math.round(65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
 
     if (armour > 0) {
       int armourX = healthWidth / 2 + 7;
-      RenderUtil.bind(SHIELD);
+      RenderSystem.setShaderTexture(0, SHIELD);
       RenderSystem.enableBlend();
       RenderUtil.blit(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);
       RenderSystem.disableBlend();
 
-      AbstractGui.drawCenteredString(matrixStack, this.minecraft.font,
+      GuiComponent.drawCenteredString(poseStack, this.minecraft.font,
           String.valueOf(Math.round(armour)), armourX + 31,
           height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
-      RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5, 65, 10,
+      RenderUtil.fill(poseStack, armourX + 42, height - healthBoxHeight / 2 - 5, 65, 10,
           0x66000000);
-      RenderUtil.fill(matrixStack, armourX + 42, height - healthBoxHeight / 2 - 5,
+      RenderUtil.fill(poseStack, armourX + 42, height - healthBoxHeight / 2 - 5,
           Math.round(65 * (armour / 20)), 10, 0xCCFFFFFF);
     }
   }
 
-  @SuppressWarnings("deprecation")
-  public void renderCrosshairs(float accuracy, float partialTicks, int width, int height) {
-    final double imageWidth = 16.0D;
-    final double imageHeight = 16.0D;
+  public void renderCrosshairs(PoseStack poseStack, float accuracy, float partialTicks, int width,
+      int height) {
+    final var imageWidth = 16.0F;
+    final var imageHeight = 16.0F;
 
-    final double x = (width / 2.0D) - (imageWidth / 2.0D) - 0.5F;
-    final double y = (height / 2.0D) - (imageHeight / 2.0D);
+    final var x = (width / 2.0F) - (imageWidth / 2.0F) - 0.5F;
+    final var y = (height / 2.0F) - (imageHeight / 2.0F);
 
-    final float newSpread = (1.15F - accuracy) * 60.0F;
-    final float lerpSpread = MathHelper.lerp(0.5F, this.lastSpread, newSpread);
-    final Crosshair crosshair =
-        this.client.getCrosshairManager().getCrosshair(this.crosshairLocation);
+    final var newSpread = (1.15F - accuracy) * 60.0F;
+    final var lerpSpread = Mth.lerp(0.5F, this.lastSpread, newSpread);
+    final var crosshair = this.client.getCrosshairManager().getCrosshair(this.crosshairLocation);
 
-    RenderSystem.pushMatrix();
+    poseStack.pushPose();
     {
       RenderSystem.enableBlend();
 
-      RenderUtil.bind(crosshair.getMiddle());
+      RenderSystem.setShaderTexture(0, crosshair.getMiddle());
       RenderUtil.blit(x, y, imageWidth, imageHeight);
 
-      RenderUtil.bind(crosshair.getTop());
+      RenderSystem.setShaderTexture(0, crosshair.getTop());
       RenderUtil.blit(x, y - lerpSpread, imageWidth, imageHeight);
 
-      RenderUtil.bind(crosshair.getBottom());
+      RenderSystem.setShaderTexture(0, crosshair.getBottom());
       RenderUtil.blit(x, y + lerpSpread, imageWidth, imageHeight);
 
-      RenderUtil.bind(crosshair.getLeft());
+      RenderSystem.setShaderTexture(0, crosshair.getLeft());
       RenderUtil.blit(x - lerpSpread, y, imageWidth, imageHeight);
 
-      RenderUtil.bind(crosshair.getRight());
+      RenderSystem.setShaderTexture(0, crosshair.getRight());
       RenderUtil.blit(x + lerpSpread, y, imageWidth, imageHeight);
       RenderSystem.disableBlend();
     }
-    RenderSystem.popMatrix();
+    poseStack.popPose();
 
     this.lastSpread = lerpSpread;
   }

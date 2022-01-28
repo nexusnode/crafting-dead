@@ -20,13 +20,13 @@ package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.shop.ShopCategory;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public class CategoryButton extends GameButton implements InfoPanel {
 
-  private final ITextComponent info;
+  private final Component info;
 
   public CategoryButton(AbstractShopScreen screen, PlayerExtension<?> player, ShopCategory category) {
     super(0, 0, 0, 0, category.getDisplayName(),
@@ -36,7 +36,7 @@ public class CategoryButton extends GameButton implements InfoPanel {
   }
 
   @Override
-  public void renderInfo(int x, int y, MatrixStack matrixStack, int mouseX, int mouseY,
+  public void renderInfo(int x, int y, PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
     this.font.drawShadow(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
     this.font.drawWordWrap(this.info, x - 20, y - 45, 90, 0xFFFFFFFF);

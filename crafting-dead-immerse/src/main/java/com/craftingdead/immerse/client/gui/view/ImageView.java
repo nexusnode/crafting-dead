@@ -24,12 +24,13 @@ import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.vector.Vector2f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec2;
 
 public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
 
@@ -42,7 +43,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
       Util.make(ValueStyleProperty.create("colour", Color.class, Color.WHITE),
           this::registerValueProperty);
 
-  private Vector2f fittedImageSize;
+  private Vec2 fittedImageSize;
 
   public ImageView(L layout) {
     super(layout);
@@ -72,20 +73,21 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     return this;
   }
 
-  private Optional<Vector2f> getImageSize() {
-    if (this.bind()) {
-      return Optional.of(new Vector2f(
+  private Optional<Vec2> getImageSize() {
+    if (this.image != null) {
+      this.minecraft.getTextureManager().bindForSetup(this.image);
+      return Optional.of(new Vec2(
           GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH),
           GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT)));
     }
     return Optional.empty();
   }
 
-  private Optional<Vector2f> getFittedImageSize() {
+  private Optional<Vec2> getFittedImageSize() {
     return this.getFittedImageSize(this.getContentWidth(), this.getContentHeight());
   }
 
-  private Optional<Vector2f> getFittedImageSize(float containerWidth, float containerHeight) {
+  private Optional<Vec2> getFittedImageSize(float containerWidth, float containerHeight) {
     return this.getImageSize().map(imageSize -> this.fitType.getSize(imageSize.x,
         imageSize.y, containerWidth, containerHeight));
   }
@@ -97,46 +99,39 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
   }
 
   @Override
-  public Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  public Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
-        .orElse(new Vector2f(width, height));
+        .orElse(new Vec2(width, height));
   }
 
-  private boolean bind() {
-    if (this.image != null) {
-      RenderUtil.bind(this.image);
-      return true;
-    }
-    return false;
-  }
-
-  @SuppressWarnings("deprecation")
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     RenderSystem.enableBlend();
     RenderSystem.defaultBlendFunc();
     if (this.depthTest) {
       RenderSystem.enableDepthTest();
     }
-    final float[] colour = this.colour.get().getValue();
-    RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
-    if (this.bind()) {
+    final var colour = this.colour.get().getValue();
+    RenderSystem.setShaderColor(colour[0], colour[1], colour[2], colour[3]);
+    if (this.image != null) {
       if (this.bilinearFiltering) {
-        this.minecraft.getTextureManager().getTexture(image).setFilter(true, true);
+        this.minecraft.getTextureManager().getTexture(this.image).setFilter(true, true);
       }
 
+      RenderSystem.setShaderTexture(0, this.image);
       RenderUtil.blit(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.fittedImageSize.x * this.getXScale(), this.fittedImageSize.y * this.getYScale());
     } else {
+      RenderSystem.setShader(GameRenderer::getPositionColorShader);
       RenderUtil.fill(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledX() + this.getScaledContentWidth(),
           this.getScaledContentY() + this.getScaledContentHeight(),
           0xFFFFFFFF);
     }
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     if (this.depthTest) {
       RenderSystem.disableDepthTest();
     }

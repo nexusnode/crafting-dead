@@ -20,16 +20,16 @@ package com.craftingdead.core.client.tutorial;
 
 import com.craftingdead.core.client.ClientDist;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.toasts.TutorialToast;
+import net.minecraft.client.gui.components.toasts.TutorialToast;
 import net.minecraft.client.tutorial.Tutorial;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class OpenEquipmentMenuTutorialStepInstance implements ModTutorialStepInstance {
-  private static final ITextComponent TITLE =
-      new TranslationTextComponent("tutorial.open_equipment_menu.title");
-  private static final ITextComponent DESCRIPTION =
-      new TranslationTextComponent("tutorial.open_equipment_menu.description",
+  private static final Component TITLE =
+      new TranslatableComponent("tutorial.open_equipment_menu.title");
+  private static final Component DESCRIPTION =
+      new TranslatableComponent("tutorial.open_equipment_menu.description",
           Tutorial.key("equipment_menu"));
 
   private final ClientDist client;

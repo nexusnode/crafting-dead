@@ -23,16 +23,16 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
-import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.SpecialRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.Tags;
 
 public class ModRecipeProvider extends RecipeProvider {
@@ -42,7 +42,7 @@ public class ModRecipeProvider extends RecipeProvider {
   }
 
   @Override
-  protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
     UpgradeMagazineRecipeBuilder
         .create(Ingredient.of(ModItems.STANAG_DRUM_MAGAZINE.get()),
             ModItems.STANAG_BOX_MAGAZINE.get())
@@ -79,7 +79,7 @@ public class ModRecipeProvider extends RecipeProvider {
         .unlockedBy("has_rpk_magazine", has(ModItems.RPK_MAGAZINE.get()))
         .save(consumer);
 
-    CustomRecipeBuilder.special(ModRecipeSerializers.DUPLICATE_MAGAZINE.get())
+    SpecialRecipeBuilder.special(ModRecipeSerializers.DUPLICATE_MAGAZINE.get())
         .save(consumer, CraftingDead.ID + ":duplicate_magazine");
 
     // ================================================================================

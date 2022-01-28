@@ -24,7 +24,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
-import com.craftingdead.core.world.entity.extension.LivingHandler;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
@@ -49,24 +48,24 @@ import com.craftingdead.immerse.util.state.TimedStateInstance;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.BooleanValue;
-import net.minecraft.world.GameType;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.GameRules.BooleanValue;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class TdmServer extends TdmGame<ServerModule> implements GameServer, TeamHandler<TdmTeam> {
 
@@ -96,8 +95,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
           SpawnPoint.CODEC.fieldOf("blueSpawnPoint").forGetter(TdmServer::getBlueSpawnPoint))
       .apply(instance, TdmServer::new));
 
-  private static final ITextComponent NO_SWITCH_TEAM =
-      new TranslationTextComponent("message.no_switch_team");
+  private static final Component NO_SWITCH_TEAM =
+      new TranslatableComponent("message.no_switch_team");
 
   private final LogicalServer logicalServer = CraftingDeadImmerse.getInstance().getLogicalServer();
 
@@ -202,7 +201,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   public void resetPlayerData() {
-    for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
+    for (ServerPlayer playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       this.deletePlayerData(playerEntity.getUUID());
     }
   }
@@ -221,7 +220,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayerEntity> player) {
+  public Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
     return this.getTeamModule().getPlayerTeam(player.getEntity().getUUID())
         .map(team -> team == TdmTeam.RED ? this.getRedSpawnPoint() : this.getBlueSpawnPoint());
   }
@@ -268,7 +267,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
     this.immediateRespawnOld = immediateRespawn.get();
     immediateRespawn.set(true, this.getMinecraftServer());
 
-    ServerWorld world = this.getMinecraftServer().getLevel(World.OVERWORLD);
+    ServerLevel world = this.getMinecraftServer().getLevel(Level.OVERWORLD);
     // Set weather to clear
     world.setWeatherParameters(6000, 0, false, false);
     // Set time to day
@@ -297,7 +296,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
     this.getMinecraftServer().setDifficulty(this.oldDifficulty, true);
 
-    for (ServerPlayerEntity playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
+    for (ServerPlayer playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((TdmServerPlayerHandler) PlayerExtension.getOrThrow(playerEntity)
           .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
     }
@@ -311,22 +310,22 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void addPlayer(PlayerExtension<ServerPlayer> player) {
     this.getTeamModule().setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
-        new TranslationTextComponent("message.joined",
+        new TranslatableComponent("message.joined",
             player.getEntity().getDisplayName().getString()),
         this.getMinecraftServer());
   }
 
   @Override
-  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void removePlayer(PlayerExtension<ServerPlayer> player) {
     this.getTeamModule().setPlayerTeam(player, null);
 
     this.deletePlayerData(player.getEntity().getUUID());
 
     GameUtil.sendGameMessageToAll(
-        new TranslationTextComponent("message.left",
+        new TranslatableComponent("message.left",
             player.getEntity().getDisplayName().getString()),
         this.getMinecraftServer());
   }
@@ -347,8 +346,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
         (int) this.buyDuration.getSeconds());
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("Rifle"),
-        new StringTextComponent("Assault rifle selections."),
+        new TextComponent("Rifle"),
+        new TextComponent("Assault rifle selections."),
         ImmutableList.of(
             new ShopItem(ModItems.M4A1.get()),
             new ShopItem(ModItems.AK47.get()),
@@ -356,32 +355,32 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
             new ShopItem(ModItems.ACR.get()))));
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("SMG"),
-        new StringTextComponent("Sub-machine gun selections."),
+        new TextComponent("SMG"),
+        new TextComponent("Sub-machine gun selections."),
         ImmutableList.of(
             new ShopItem(ModItems.MAC10.get()),
             new ShopItem(ModItems.P90.get()),
             new ShopItem(ModItems.VECTOR.get()))));
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("Heavy"),
-        new StringTextComponent("Heavy-based gun selections."),
+        new TextComponent("Heavy"),
+        new TextComponent("Heavy-based gun selections."),
         ImmutableList.of(
             new ShopItem(ModItems.MOSSBERG.get()),
             new ShopItem(ModItems.M240B.get()),
             new ShopItem(ModItems.M1GARAND.get()))));
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("Sniper"),
-        new StringTextComponent("Sniper rifle selections."),
+        new TextComponent("Sniper"),
+        new TextComponent("Sniper rifle selections."),
         ImmutableList.of(
             new ShopItem(ModItems.M107.get()),
             new ShopItem(ModItems.AS50.get()),
             new ShopItem(ModItems.AWP.get()))));
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("Pistol"),
-        new StringTextComponent("Side arm and pistol selections."),
+        new TextComponent("Pistol"),
+        new TextComponent("Side arm and pistol selections."),
         ImmutableList.of(
             new ShopItem(ModItems.M1911.get()),
             new ShopItem(ModItems.G18.get()),
@@ -390,8 +389,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
             new ShopItem(ModItems.FN57.get()))));
 
     this.shopModule.addCategory(new ShopCategory(
-        new StringTextComponent("Grenades"),
-        new StringTextComponent("Utilities and grenades."),
+        new TextComponent("Grenades"),
+        new TextComponent("Utilities and grenades."),
         ImmutableList.of(
             new ShopItem(ModItems.FLASH_GRENADE.get()),
             new ShopItem(ModItems.DECOY_GRENADE.get()),
@@ -413,7 +412,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public boolean canChangeTeam(PlayerExtension<ServerPlayerEntity> player,
+  public boolean canChangeTeam(PlayerExtension<ServerPlayer> player,
       @Nullable TeamInstance<TdmTeam> oldTeam,
       @Nullable TeamInstance<TdmTeam> newTeam) {
     if (oldTeam != null && newTeam != null) {
@@ -435,42 +434,42 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public void teamChanged(PlayerExtension<ServerPlayerEntity> player,
+  public void teamChanged(PlayerExtension<ServerPlayer> player,
       @Nullable TeamInstance<TdmTeam> oldTeam,
       @Nullable TeamInstance<TdmTeam> newTeam) {
     if (newTeam == null) {
-      player.getEntity().inventory.clearContent();
+      player.getEntity().getInventory().clearContent();
       player.getEntity().setGameMode(GameType.SPECTATOR);
     } else {
       this.shopModule.resetBuyTime(player.getEntity().getUUID());
       player.getEntity().setGameMode(GameType.ADVENTURE);
-      this.logicalServer.respawnPlayer((ServerPlayerEntity) player.getEntity(), false);
+      this.logicalServer.respawnPlayer((ServerPlayer) player.getEntity(), false);
       GameUtil.sendGameMessageToAll(
-          new TranslationTextComponent("message.joined_team",
+          new TranslatableComponent("message.joined_team",
               player.getEntity().getDisplayName().getString(),
               newTeam.getTeam().getDisplayName().getString()),
           this.getMinecraftServer());
     }
   }
 
+  @SuppressWarnings("unchecked")
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension
+    if (event.getLiving()instanceof PlayerExtension<?> extension
         && !event.getLiving().getLevel().isClientSide()) {
-      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
-      player.registerHandler(TdmPlayerHandler.ID,
-          new TdmServerPlayerHandler(this, player));
+      extension.registerHandler(TdmPlayerHandler.ID,
+          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) extension));
     }
   }
 
   @SubscribeEvent
   public void handleLivingDeath(LivingDeathEvent event) {
     if (this.getGameState() == TdmState.GAME
-        && event.getSource().getEntity() instanceof ServerPlayerEntity
-        && event.getEntityLiving() instanceof ServerPlayerEntity && !this.firstBloodDrawn) {
-      GameUtil.sendGameMessageToAll(new TranslationTextComponent("message.first_blood_drawn",
+        && event.getSource().getEntity() instanceof ServerPlayer
+        && event.getEntityLiving() instanceof ServerPlayer && !this.firstBloodDrawn) {
+      GameUtil.sendGameMessageToAll(new TranslatableComponent("message.first_blood_drawn",
           event.getSource().getEntity().getDisplayName().getString())
-              .withStyle(TextFormatting.DARK_RED),
+              .withStyle(ChatFormatting.DARK_RED),
           this.getMinecraftServer());
       this.firstBloodDrawn = true;
     }
@@ -478,18 +477,17 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
-    LivingHandler handler =
-        event.getLiving().getHandlerOrThrow(TdmPlayerHandler.ID);
-    TdmPlayerHandler player = (TdmPlayerHandler) handler;
+    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.ID);
+    var player = (TdmPlayerHandler<?>) handler;
     player.setRemainingSpawnProtectionSeconds(0);
   }
 
   @SubscribeEvent
   public void handleEntityJoinWorld(EntityJoinWorldEvent event) {
-    if (event.getEntity() instanceof ServerPlayerEntity) {
-      ServerPlayerEntity playerEntity = (ServerPlayerEntity) event.getEntity();
+    if (event.getEntity() instanceof ServerPlayer) {
+      ServerPlayer playerEntity = (ServerPlayer) event.getEntity();
       CombatSlot.MELEE.addToInventory(ModItems.COMBAT_KNIFE.get().getDefaultInstance(),
-          playerEntity.inventory, false);
+          playerEntity.getInventory(), false);
       this.shopModule.resetBuyTime(event.getEntity().getUUID());
     }
   }

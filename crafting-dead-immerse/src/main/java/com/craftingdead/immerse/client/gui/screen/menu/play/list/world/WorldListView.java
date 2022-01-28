@@ -41,11 +41,11 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.client.AnvilConverterException;
-import net.minecraft.client.gui.screen.CreateWorldScreen;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.storage.WorldSummary;
+import net.minecraft.world.level.storage.LevelStorageException;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.storage.LevelSummary;
 
 public class WorldListView<L extends Layout>
     extends ParentView<WorldListView<L>, L, YogaLayout> {
@@ -79,7 +79,7 @@ public class WorldListView<L extends Layout>
 
     this.playButton =
         createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
-            new TranslationTextComponent("view.world_list.button.play"),
+            new TranslatableComponent("view.world_list.button.play"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
                 .configure(view -> view.getBackgroundColorProperty()
                     .registerState(Theme.GREEN_DISABLED, States.DISABLED))
@@ -88,14 +88,14 @@ public class WorldListView<L extends Layout>
 
     View<?, YogaLayout> createButton =
         createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-            new TranslationTextComponent("view.world_list.button.create"),
+            new TranslatableComponent("view.world_list.button.create"),
             () -> ((ViewScreen) this.getScreen())
                 .keepOpenAndSetScreen(CreateWorldScreen.create((ViewScreen) this.getScreen())))
                     .configure(view -> view.getLayout().setMargin(3F));
 
     this.editButton =
         createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-            new TranslationTextComponent("view.world_list.button.edit"),
+            new TranslatableComponent("view.world_list.button.edit"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
                 .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
@@ -103,7 +103,7 @@ public class WorldListView<L extends Layout>
 
     this.deleteButton =
         createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
-            new TranslationTextComponent("view.world_list.button.delete"),
+            new TranslatableComponent("view.world_list.button.delete"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
                 .setDisabledBackgroundColor(Theme.RED_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
@@ -111,7 +111,7 @@ public class WorldListView<L extends Layout>
 
     this.recreateButton =
         createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
-            new TranslationTextComponent("view.world_list.button.recreate"),
+            new TranslatableComponent("view.world_list.button.recreate"),
             () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
                 .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
                 .configure(view -> view.getLayout().setMargin(3))
@@ -152,7 +152,7 @@ public class WorldListView<L extends Layout>
   }
 
   private static ParentView<?, YogaLayout, YogaLayout> createButton(Color color,
-      Color hoveredColor, ITextComponent text, Runnable actionListener) {
+      Color hoveredColor, Component text, Runnable actionListener) {
     return new ParentView<>(
         new YogaLayout()
             .setWidth(30F)
@@ -197,12 +197,12 @@ public class WorldListView<L extends Layout>
 
   private void loadWorlds() {
     try {
-      List<WorldSummary> saveList = this.minecraft.getLevelSource().getLevelList();
+      List<LevelSummary> saveList = this.minecraft.getLevelSource().getLevelList();
       Collections.sort(saveList);
-      for (WorldSummary worldSummary : saveList) {
+      for (LevelSummary worldSummary : saveList) {
         this.listView.addChild(new WorldItemView(worldSummary, this));
       }
-    } catch (AnvilConverterException e) {
+    } catch (LevelStorageException e) {
       logger.error("Unable to load save list", e);
     }
   }

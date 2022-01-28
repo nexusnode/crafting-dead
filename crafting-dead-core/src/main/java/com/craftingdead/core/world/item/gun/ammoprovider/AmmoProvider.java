@@ -18,16 +18,15 @@
 
 package com.craftingdead.core.world.item.gun.ammoprovider;
 
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public interface AmmoProvider extends INBTSerializable<CompoundNBT>, Synched {
+public interface AmmoProvider extends INBTSerializable<CompoundTag>, Synched {
 
   void reload(LivingExtension<?, ?> living);
 
@@ -43,7 +42,7 @@ public interface AmmoProvider extends INBTSerializable<CompoundNBT>, Synched {
   }
 
   default LazyOptional<Magazine> getMagazine() {
-    return this.getMagazineStack().getCapability(Capabilities.MAGAZINE);
+    return this.getMagazineStack().getCapability(Magazine.CAPABILITY);
   }
 
   AmmoProviderType getType();

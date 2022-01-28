@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Predicate;
+import java.io.UncheckedIOException;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +28,7 @@ import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.sources.ManualTimingSource;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
@@ -37,49 +37,47 @@ import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
-import com.craftingdead.immerse.client.shader.RoundedFrameShader;
-import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
-import net.minecraft.client.gui.screen.MainMenuScreen;
-import net.minecraft.client.gui.screen.MultiplayerScreen;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderNameplateEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
-import net.minecraftforge.resource.IResourceType;
-import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 
-public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
+public class ClientDist implements ModDist {
 
   private static final ManualTimingSource TIMING_SOURCE = new ManualTimingSource();
 
-  public static final KeyBinding SWITCH_TEAMS =
-      new KeyBinding("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
-          InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_M), "key.categories.gameplay");
+  public static final KeyMapping SWITCH_TEAMS =
+      new KeyMapping("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
+          InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_M), "key.categories.gameplay");
 
   public static final ResourceLocation BLUR_SHADER =
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
@@ -101,11 +99,16 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
   private final IngameGui ingameGui;
 
+  private ShaderInstance roundedFrameShader;
+  private ShaderInstance roundedRectShader;
+
   public ClientDist() {
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::handleClientSetup);
+    final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    modBus.addListener(this::handleClientSetup);
+    modBus.addListener(this::handleEntityRenderersAddLayers);
+    modBus.addListener(this::handleRegisterShaders);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
-    ((IReloadableResourceManager) this.minecraft.getResourceManager()).registerReloadListener(this);
     this.spectatorRenderer = new SpectatorRenderer();
     this.ingameGui = new IngameGui();
   }
@@ -141,26 +144,33 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
     }
   }
 
-  @Override
-  public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {
-    return new LogicalServer(minecraftServer);
+  public ShaderInstance getRoundedFrameShader() {
+    return this.roundedFrameShader;
+  }
+
+  public ShaderInstance getRoundedRectShader() {
+    return this.roundedRectShader;
   }
 
   @Override
-  public void onResourceManagerReload(IResourceManager resourceManager,
-      Predicate<IResourceType> resourcePredicate) {
-    RoundedRectShader.INSTANCE.compile(resourceManager);
-    RoundedFrameShader.INSTANCE.compile(resourceManager);
+  public LogicalServer createLogicalServer(MinecraftServer minecraftServer) {
+    return new LogicalServer(minecraftServer);
   }
 
   // ================================================================================
   // Mod Events
   // ================================================================================
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {
+    event.getSkins().forEach(skin -> {
+      var renderer = event.getSkin(skin);
+      renderer.addLayer(new TeamClothingLayer(renderer));
+    });
+  }
+
   private void handleClientSetup(FMLClientSetupEvent event) {
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
-
-    CraftingDead.getInstance().getClientDist().registerPlayerLayer(TeamClothingLayer::new);
 
     // GLFW code needs to run on main thread
     this.minecraft.submit(() -> {
@@ -181,6 +191,19 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
         logger.error("Couldn't set icon", e);
       }
     });
+  }
+
+  private void handleRegisterShaders(RegisterShadersEvent event) {
+    try {
+      event.registerShader(new ShaderInstance(event.getResourceManager(),
+          new ResourceLocation(CraftingDeadImmerse.ID, "rounded_frame"),
+          DefaultVertexFormat.POSITION_COLOR), (shader) -> this.roundedFrameShader = shader);
+      event.registerShader(new ShaderInstance(event.getResourceManager(),
+          new ResourceLocation(CraftingDeadImmerse.ID, "rounded_rect"),
+          DefaultVertexFormat.POSITION_COLOR), (shader) -> this.roundedRectShader = shader);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   // ================================================================================
@@ -204,13 +227,13 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
 
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    final PlayerExtension<ClientPlayerEntity> player =
+    final PlayerExtension<LocalPlayer> player =
         CraftingDead.getInstance().getClientDist().getPlayerExtension().orElse(null);
-    final PlayerExtension<AbstractClientPlayerEntity> viewingPlayer =
-        this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? ((AbstractClientPlayerEntity) this.minecraft.getCameraEntity())
-                .getCapability(Capabilities.LIVING_EXTENSION)
-                .<PlayerExtension<AbstractClientPlayerEntity>>cast()
+    final PlayerExtension<AbstractClientPlayer> viewingPlayer =
+        this.minecraft.getCameraEntity() instanceof AbstractClientPlayer
+            ? ((AbstractClientPlayer) this.minecraft.getCameraEntity())
+                .getCapability(LivingExtension.CAPABILITY)
+                .<PlayerExtension<AbstractClientPlayer>>cast()
                 .orElse(null)
             : null;
 
@@ -240,10 +263,10 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   }
 
   @SubscribeEvent
-  public void handleGuiOpen(GuiOpenEvent event) {
-    if (event.getGui() instanceof MainMenuScreen
-        || event.getGui() instanceof MultiplayerScreen) {
-      event.setGui(MainMenuView.createScreen());
+  public void handleGuiOpen(ScreenOpenEvent event) {
+    if (event.getScreen() instanceof TitleScreen
+        || event.getScreen() instanceof JoinMultiplayerScreen) {
+      event.setScreen(MainMenuView.createScreen());
     }
   }
 
@@ -258,13 +281,13 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
         ServerPinger.INSTANCE.pingPendingNetworks();
 
         if (this.minecraft.player != null) {
-          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.overlay == null
+          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           if (this.minecraft.player.isSpectator()) {
-            if (this.minecraft.getCameraEntity() instanceof RemoteClientPlayerEntity) {
+            if (this.minecraft.getCameraEntity() instanceof RemotePlayer) {
               this.spectatorRenderer
-                  .tick((AbstractClientPlayerEntity) this.minecraft.getCameraEntity());
+                  .tick((AbstractClientPlayer) this.minecraft.getCameraEntity());
             }
           }
 

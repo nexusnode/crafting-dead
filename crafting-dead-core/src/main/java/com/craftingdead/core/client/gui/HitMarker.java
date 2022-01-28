@@ -20,23 +20,24 @@ package com.craftingdead.core.client.gui;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
-import org.lwjgl.opengl.GL11;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class HitMarker {
 
   private static final int HIT_MARKER_FADE_TIME_MS = 200;
   private static final int HIT_MARKER_SIZE = 12;
 
-  private final Vector3d pos;
-  private final Type kill;
+  private final Vec3 pos;
+  private final Type type;
 
   private long fadeStartTimeMs;
 
@@ -44,11 +45,11 @@ public class HitMarker {
    * To create a {@link HitMarker} use {@link Mode#createHitMarker(Vec3d, boolean)}.
    * 
    * @param pos
-   * @param kill
+   * @param type
    */
-  private HitMarker(Vector3d pos, Type kill) {
+  private HitMarker(Vec3 pos, Type type) {
     this.pos = pos;
-    this.kill = kill;
+    this.type = type;
   }
 
   /**
@@ -59,59 +60,79 @@ public class HitMarker {
    * @param partialTicks
    * @return if the hit marker has fully faded
    */
-  @SuppressWarnings("deprecation")
-  public boolean render(int width, int height, float partialTicks) {
+  public boolean render(PoseStack poseStack, int width, int height, float partialTicks) {
     if (this.fadeStartTimeMs == 0L) {
       this.fadeStartTimeMs = Util.getMillis();
     }
-    float zeroToOneFadePct = MathHelper.clamp(
+    final var zeroToOneFadePct = Mth.clamp(
         (float) (Util.getMillis() - this.fadeStartTimeMs) / HIT_MARKER_FADE_TIME_MS,
         0.0F, 1.0F);
-    final float oneToZeroFadePct = 1.0F - zeroToOneFadePct;
+    final var oneToZeroFadePct = 1.0F - zeroToOneFadePct;
 
     if (zeroToOneFadePct == 1.0F) {
       return true;
     }
 
-    RenderUtil.projectToPlayerView(this.pos.x(), this.pos.y(), this.pos.z(), partialTicks)
-        .ifPresent(pos -> {
-          float alpha = (float) (this.kill.colour >> 24 & 255) / 255.0F;
-          float red = (float) (this.kill.colour >> 16 & 255) / 255.0F;
-          float green = (float) (this.kill.colour >> 8 & 255) / 255.0F;
-          float blue = (float) (this.kill.colour & 255) / 255.0F;
+    final var pos =
+        RenderUtil.projectToPlayerView(this.pos.x(), this.pos.y(), this.pos.z(), partialTicks);
+    if (pos == null) {
+      return false;
+    }
 
-          RenderSystem.enableBlend();
-          RenderSystem.color4f(red, green, blue, alpha * oneToZeroFadePct);
-          RenderSystem.pushMatrix();
-          {
-            // To draw a cross, it is needed only two values: the least and the higher positions
-            float leastCrossEndPos = HIT_MARKER_SIZE * oneToZeroFadePct;
-            float higherCrossEndPos = leastCrossEndPos * 2;
-            // Mean, useful to centralize
-            float markerSizeMean = (higherCrossEndPos + leastCrossEndPos) / 2F;
+    final var alpha = (this.type.colour >> 24 & 255) / 255.0F;
+    final var red = (this.type.colour >> 16 & 255) / 255.0F;
+    final var green = (this.type.colour >> 8 & 255) / 255.0F;
+    final var blue = (this.type.colour & 255) / 255.0F;
 
-            RenderSystem.translatef((width / 2) + pos.x - markerSizeMean,
-                (height / 2) - pos.y - markerSizeMean, 0);
-            RenderSystem.lineWidth(oneToZeroFadePct * 4.5F);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferbuilder = tessellator.getBuilder();
-            bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.vertex(higherCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
-            bufferbuilder.vertex(leastCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
-            tessellator.end();
-            bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-            bufferbuilder.vertex(leastCrossEndPos, leastCrossEndPos, 0.0D).endVertex();
-            bufferbuilder.vertex(higherCrossEndPos, higherCrossEndPos, 0.0D).endVertex();
-            tessellator.end();
-          }
-          RenderSystem.popMatrix();
-          RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-          RenderSystem.disableBlend();
-        });
+    RenderSystem.enableBlend();
+    RenderSystem.setShaderColor(red, green, blue, alpha * oneToZeroFadePct);
+    RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+    poseStack.pushPose();
+    {
+      // To draw a cross, it is needed only two values: the least and the higher positions
+      final var leastCrossEndPos = HIT_MARKER_SIZE * oneToZeroFadePct;
+      final var higherCrossEndPos = leastCrossEndPos * 2;
+      // Mean, useful to centralize
+      final var markerSizeMean = (higherCrossEndPos + leastCrossEndPos) / 2F;
+
+      poseStack.translate((width / 2) + pos.x - markerSizeMean,
+          (height / 2) - pos.y - markerSizeMean, 0);
+      RenderSystem.lineWidth(oneToZeroFadePct * 4.5F);
+      final var tessellator = Tesselator.getInstance();
+      final var builder = tessellator.getBuilder();
+      final var matrix = poseStack.last().pose();
+      builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+      builder
+          .vertex(matrix, higherCrossEndPos, leastCrossEndPos, 0.0F)
+          .color(255, 255, 255, 255)
+          .normal(0.0F, 1.0F, 0.0F)
+          .endVertex();
+      builder
+          .vertex(matrix, leastCrossEndPos, higherCrossEndPos, 0.0F)
+          .color(255, 255, 255, 255)
+          .normal(0.0F, 1.0F, 0.0F)
+          .endVertex();
+      tessellator.end();
+      builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+      builder
+          .vertex(matrix, leastCrossEndPos, leastCrossEndPos, 0.0F)
+          .color(255, 255, 255, 255)
+          .normal(1.0F, 0.0F, 0.0F).endVertex();
+      builder
+          .vertex(matrix, higherCrossEndPos, higherCrossEndPos, 0.0F)
+          .color(255, 255, 255, 255)
+          .normal(1.0F, 0.0F, 0.0F).endVertex();
+      tessellator.end();
+    }
+    poseStack.popPose();
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.disableBlend();
+
     return false;
   }
 
-  public static enum Type {
+  public enum Type {
+
     HIT(0xFFFFFFFF), KILL(0xFFB30C00);
 
     private final int colour;
@@ -121,19 +142,21 @@ public class HitMarker {
     }
   }
 
-  public static enum Mode {
-    OFF((pos, kill) -> Optional.empty()), KILL(
-        (pos, kill) -> kill ? Optional.of(new HitMarker(pos, Type.KILL))
-            : Optional.empty()), HIT_AND_KILL(
-                (pos, kill) -> Optional.of(new HitMarker(pos, kill ? Type.KILL : Type.HIT)));
+  public enum Mode {
 
-    private final BiFunction<Vector3d, Boolean, Optional<HitMarker>> factory;
+    OFF((pos, kill) -> Optional.empty()),
+    KILL((pos, kill) -> kill
+        ? Optional.of(new HitMarker(pos, Type.KILL))
+        : Optional.empty()),
+    HIT_AND_KILL((pos, kill) -> Optional.of(new HitMarker(pos, kill ? Type.KILL : Type.HIT)));
 
-    private Mode(BiFunction<Vector3d, Boolean, Optional<HitMarker>> factory) {
+    private final BiFunction<Vec3, Boolean, Optional<HitMarker>> factory;
+
+    private Mode(BiFunction<Vec3, Boolean, Optional<HitMarker>> factory) {
       this.factory = factory;
     }
 
-    public Optional<HitMarker> createHitMarker(Vector3d pos, boolean kill) {
+    public Optional<HitMarker> createHitMarker(Vec3 pos, boolean kill) {
       return this.factory.apply(pos, kill);
     }
   }

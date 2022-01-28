@@ -22,10 +22,10 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.ModItems;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class Attachments {
 

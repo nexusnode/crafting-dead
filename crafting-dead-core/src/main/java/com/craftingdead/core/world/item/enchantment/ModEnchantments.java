@@ -19,11 +19,11 @@
 package com.craftingdead.core.world.item.enchantment;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModEnchantments {
 
@@ -33,5 +33,5 @@ public class ModEnchantments {
   public static final RegistryObject<ArmorPenetrationEnchantment> ARMOR_PENETRATION =
       ENCHANTMENTS.register("armor_penetration",
           () -> new ArmorPenetrationEnchantment(Enchantment.Rarity.COMMON,
-              EquipmentSlotType.MAINHAND));
+              EquipmentSlot.MAINHAND));
 }

@@ -18,11 +18,11 @@
 
 package com.craftingdead.core.world.item;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.core.NonNullList;
 
 public class ItemUtils {
 
@@ -33,11 +33,11 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param inventory the inventory
    */
-  public static void saveInventory(CompoundNBT compound, String name, IInventory inventory) {
-    ListNBT tagList = new ListNBT();
+  public static void saveInventory(CompoundTag compound, String name, Container inventory) {
+    ListTag tagList = new ListTag();
     for (int i = 0; i < inventory.getContainerSize(); i++) {
       if (!inventory.getItem(i).isEmpty()) {
-        CompoundNBT slot = new CompoundNBT();
+        CompoundTag slot = new CompoundTag();
         slot.putInt("slot", i);
         inventory.getItem(i).save(slot);
         tagList.add(slot);
@@ -53,12 +53,12 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param inventory the item list
    */
-  public static void saveInventory(CompoundNBT compound, String name,
+  public static void saveInventory(CompoundTag compound, String name,
       NonNullList<ItemStack> inventory) {
-    ListNBT tagList = new ListNBT();
+    ListTag tagList = new ListTag();
     for (int i = 0; i < inventory.size(); i++) {
       if (!inventory.get(i).isEmpty()) {
-        CompoundNBT slot = new CompoundNBT();
+        CompoundTag slot = new CompoundTag();
         slot.putInt("slot", i);
         inventory.get(i).save(slot);
         tagList.add(slot);
@@ -74,7 +74,7 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param list the item list
    */
-  public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+  public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
     saveItemList(compound, name, list, true);
   }
 
@@ -86,14 +86,14 @@ public class ItemUtils {
    * @param list the item list
    * @param includeEmpty if empty item stacks should be included
    */
-  public static void saveItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list,
+  public static void saveItemList(CompoundTag compound, String name, NonNullList<ItemStack> list,
       boolean includeEmpty) {
-    ListNBT itemList = new ListNBT();
+    ListTag itemList = new ListTag();
     for (ItemStack stack : list) {
       if (!includeEmpty && stack.isEmpty()) {
         continue;
       }
-      itemList.add(stack.save(new CompoundNBT()));
+      itemList.add(stack.save(new CompoundTag()));
     }
     compound.put(name, itemList);
   }
@@ -106,13 +106,13 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param inv the inventory
    */
-  public static void readInventory(CompoundNBT compound, String name, IInventory inv) {
+  public static void readInventory(CompoundTag compound, String name, Container inv) {
     if (!compound.contains(name)) {
       return;
     }
-    ListNBT tagList = compound.getList(name, 10);
+    ListTag tagList = compound.getList(name, 10);
     for (int i = 0; i < tagList.size(); i++) {
-      CompoundNBT slot = tagList.getCompound(i);
+      CompoundTag slot = tagList.getCompound(i);
       int j = slot.getInt("slot");
 
       if (j >= 0 && j < inv.getContainerSize()) {
@@ -129,16 +129,16 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param inventory the item list
    */
-  public static void readInventory(CompoundNBT compound, String name,
+  public static void readInventory(CompoundTag compound, String name,
       NonNullList<ItemStack> inventory) {
     if (!compound.contains(name)) {
       return;
     }
 
-    ListNBT tagList = compound.getList(name, 10);
+    ListTag tagList = compound.getList(name, 10);
 
     for (int i = 0; i < tagList.size(); i++) {
-      CompoundNBT slot = tagList.getCompound(i);
+      CompoundTag slot = tagList.getCompound(i);
       int j = slot.getInt("slot");
 
       if (j >= 0 && j < inventory.size()) {
@@ -155,14 +155,14 @@ public class ItemUtils {
    * @param includeEmpty if empty stacks should be included
    * @return the item list
    */
-  public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name,
+  public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name,
       boolean includeEmpty) {
     NonNullList<ItemStack> items = NonNullList.create();
     if (!compound.contains(name)) {
       return items;
     }
 
-    ListNBT itemList = compound.getList(name, 10);
+    ListTag itemList = compound.getList(name, 10);
     for (int i = 0; i < itemList.size(); i++) {
       ItemStack item = ItemStack.of(itemList.getCompound(i));
       if (!includeEmpty) {
@@ -183,7 +183,7 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @return the item list
    */
-  public static NonNullList<ItemStack> readItemList(CompoundNBT compound, String name) {
+  public static NonNullList<ItemStack> readItemList(CompoundTag compound, String name) {
     return readItemList(compound, name, true);
   }
 
@@ -194,12 +194,12 @@ public class ItemUtils {
    * @param name the name of the tag list in the compound
    * @param list the item list
    */
-  public static void readItemList(CompoundNBT compound, String name, NonNullList<ItemStack> list) {
+  public static void readItemList(CompoundTag compound, String name, NonNullList<ItemStack> list) {
     if (!compound.contains(name)) {
       return;
     }
 
-    ListNBT itemList = compound.getList(name, 10);
+    ListTag itemList = compound.getList(name, 10);
     for (int i = 0; i < itemList.size(); i++) {
       if (i >= list.size()) {
         break;

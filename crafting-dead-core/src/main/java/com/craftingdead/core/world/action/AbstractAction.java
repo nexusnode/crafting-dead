@@ -21,9 +21,9 @@ package com.craftingdead.core.world.action;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class AbstractAction<T extends ActionType> implements Action {
 
@@ -79,18 +79,18 @@ public abstract class AbstractAction<T extends ActionType> implements Action {
     }
 
     @Override
-    public ITextComponent getMessage() {
-      return new TranslationTextComponent(AbstractAction.this.getTranslationKey() + ".message");
+    public Component getMessage() {
+      return new TranslatableComponent(AbstractAction.this.getTranslationKey() + ".message");
     }
 
     @Override
-    public Optional<ITextComponent> getSubMessage() {
+    public Optional<Component> getSubMessage() {
       return this.performer
           ? AbstractAction.this.target == null
               ? Optional.empty()
-              : Optional.of(new TranslationTextComponent("action.target",
+              : Optional.of(new TranslatableComponent("action.target",
                   AbstractAction.this.target.getEntity().getDisplayName().getString()))
-          : Optional.of(new TranslationTextComponent("action.performer",
+          : Optional.of(new TranslatableComponent("action.performer",
               AbstractAction.this.performer.getEntity().getDisplayName().getString()));
     }
 

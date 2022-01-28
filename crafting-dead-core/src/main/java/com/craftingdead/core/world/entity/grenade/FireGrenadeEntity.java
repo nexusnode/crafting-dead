@@ -22,33 +22,33 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 
-public class FireGrenadeEntity extends GrenadeEntity {
+public class FireGrenadeEntity extends Grenade {
 
   private static final double FIRE_RADIUS = 2D;
   private static final Triple<SoundEvent, Float, Float> FIRE_GRENADE_BOUNCE_SOUND =
       Triple.of(SoundEvents.GLASS_BREAK, 1.0F, 0.9F);
 
-  public FireGrenadeEntity(EntityType<? extends GrenadeEntity> entityIn, World worldIn) {
+  public FireGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
   }
 
-  public FireGrenadeEntity(LivingEntity thrower, World worldIn) {
+  public FireGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.FIRE_GRENADE.get(), thrower, worldIn);
   }
 
   @Override
-  public void onSurfaceHit(BlockRayTraceResult blockRayTraceResult) {
+  public void onSurfaceHit(BlockHitResult blockRayTraceResult) {
     super.onSurfaceHit(blockRayTraceResult);
     if (blockRayTraceResult.getDirection() == Direction.UP) {
       this.setActivated(true);
@@ -59,11 +59,11 @@ public class FireGrenadeEntity extends GrenadeEntity {
   public void activatedChanged(boolean activated) {
     if (activated) {
       if (!this.level.isClientSide()) {
-        this.remove();
+        this.kill();
         this.level.explode(this,
             this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 2F, true,
-            Explosion.Mode.NONE);
+            Explosion.BlockInteraction.NONE);
 
         BlockPos.betweenClosedStream(this.blockPosition().offset(-FIRE_RADIUS, 0, -FIRE_RADIUS),
             this.blockPosition().offset(FIRE_RADIUS, 0, FIRE_RADIUS)).forEach(blockPos -> {
@@ -86,7 +86,7 @@ public class FireGrenadeEntity extends GrenadeEntity {
   }
 
   @Override
-  public Triple<SoundEvent, Float, Float> getBounceSound(BlockRayTraceResult blockRayTraceResult) {
+  public Triple<SoundEvent, Float, Float> getBounceSound(BlockHitResult blockRayTraceResult) {
     return blockRayTraceResult.getDirection() == Direction.UP
         ? FIRE_GRENADE_BOUNCE_SOUND
         : super.getBounceSound(blockRayTraceResult);

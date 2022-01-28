@@ -68,17 +68,17 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.client.gui.screen.OptionsScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.OptionsScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayout> {
 
-  private static final ITextComponent TITLE = new TranslationTextComponent("menu.home.title");
+  private static final Component TITLE = new TranslatableComponent("menu.home.title");
 
   private final ParentView<?, YogaLayout, YogaLayout> contentContainer =
       new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
@@ -87,14 +87,14 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
     super(screen,
         new YogaLayoutParent().setFlexDirection(FlexDirection.ROW_REVERSE));
 
-    HomeView homeView = new HomeView()
+    var homeView = new HomeView()
         .setZOffset(-2)
         .configure(view -> view.getLayout()
             .setWidthPercent(100)
             .setHeightPercent(100)
             .setPositionType(PositionType.ABSOLUTE));
 
-    PlayView playView = new PlayView()
+    var playView = new PlayView()
         .configure(view -> view.getLayout()
             .setWidthPercent(100)
             .setHeightPercent(100)
@@ -107,7 +107,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
         .setHeightPercent(100)
         .setWidthPercent(100)));
 
-    ParentView<?, YogaLayout, YogaLayout> sideBar = new ParentView<>(new YogaLayout()
+    var sideBar = new ParentView<>(new YogaLayout()
         .setRightBorderWidth(1)
         .setHeightPercent(100.0F)
         .setWidth(30.0F), new YogaLayoutParent().setAlignItems(Align.CENTER))
@@ -129,7 +129,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(homeView))
             .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslationTextComponent("menu.home_button"))));
+            .setTooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
 
     sideBar.addChild(new View<>(new YogaLayout()
         .setHeight(1)
@@ -155,7 +155,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class, (c, e) -> this.setContentView(playView))
             .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslationTextComponent("menu.play_button"))));
+            .setTooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
 
     sideBar.addChild(new ImageView<>(new YogaLayout()
         .setMargin(5)
@@ -178,7 +178,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
                 (c, e) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
                     new OptionsScreen((ViewScreen) this.getScreen(), this.minecraft.options)))
             .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslationTextComponent("menu.options"))));
+            .setTooltip(new Tooltip(new TranslatableComponent("menu.options"))));
 
     sideBar.addChild(new ImageView<>(new YogaLayout()
         .setMargin(5)
@@ -199,7 +199,7 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
             .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
             .addListener(ActionEvent.class, (c, e) -> this.minecraft.stop())
             .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslationTextComponent("menu.quit"))));
+            .setTooltip(new Tooltip(new TranslatableComponent("menu.quit"))));
 
     final FakePlayerEntity fakePlayerEntity =
         new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
@@ -245,16 +245,15 @@ public class MainMenuView extends ParentView<MainMenuView, ViewScreen, YogaLayou
   }
 
   public static View<?, YogaLayout> createBackgroundView() {
-    ImageView<YogaLayout> view =
-        new ImageView<>(new YogaLayout()
-            .setPositionType(PositionType.ABSOLUTE)
-            .setHeightPercent(100)
-            .setWidthPercent(100))
-                .setImage(
-                    new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
-                .setFitType(FitType.COVER)
-                .setBilinearFiltering(true)
-                .configure(v -> v.getScaleProperty().setBaseValue(1.25F));
+    var view = new ImageView<>(new YogaLayout()
+        .setPositionType(PositionType.ABSOLUTE)
+        .setHeightPercent(100)
+        .setWidthPercent(100))
+            .setImage(
+                new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
+            .setFitType(FitType.COVER)
+            .setBilinearFiltering(true)
+            .configure(v -> v.getScaleProperty().setBaseValue(1.25F));
 
     new Animator.Builder()
         .addTarget(Animation.forProperty(view.getXTranslationProperty())

@@ -20,20 +20,20 @@ package com.craftingdead.core.world.item;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.capability.SimpleCapabilityProvider;
 import com.craftingdead.core.sounds.ModSoundEvents;
+import com.craftingdead.core.world.item.scope.Scope;
 import com.craftingdead.core.world.item.scope.SimpleScope;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -52,22 +52,22 @@ public class BinocularsItem extends Item {
   }
 
   @Override
-  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity,
-      Hand hand) {
+  public InteractionResultHolder<ItemStack> use(Level world, Player playerEntity,
+      InteractionHand hand) {
     ItemStack itemstack = playerEntity.getItemInHand(hand);
     playerEntity.startUsingItem(hand);
     playerEntity.playSound(ModSoundEvents.SCOPE_ZOOM.get(), 0.75F, 1.0F);
     if (world.isClientSide()) {
       Minecraft mc = Minecraft.getInstance();
-      mc.options.setCameraType(PointOfView.FIRST_PERSON);
+      mc.options.setCameraType(CameraType.FIRST_PERSON);
     }
-    return ActionResult.consume(itemstack);
+    return InteractionResultHolder.consume(itemstack);
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
     return new SimpleCapabilityProvider<>(
         LazyOptional.of(() -> new SimpleScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack)),
-        () -> Capabilities.SCOPE);
+        () -> Scope.CAPABILITY);
   }
 }

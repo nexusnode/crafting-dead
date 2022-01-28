@@ -27,12 +27,12 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.SpawnPoint;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(ServerPlayer.class)
 public class ServerPlayerEntityMixin {
 
   /**
@@ -49,7 +49,7 @@ public class ServerPlayerEntityMixin {
    * Adds hook for {@link GameServer#getSpawnPoint}.
    */
   @Inject(method = "getRespawnDimension", at = @At("HEAD"), cancellable = true)
-  public void getRespawnDimension(CallbackInfoReturnable<RegistryKey<World>> callbackInfo) {
+  public void getRespawnDimension(CallbackInfoReturnable<ResourceKey<Level>> callbackInfo) {
     this.getSpawnPoint()
         .map(SpawnPoint::getDimension)
         .ifPresent(callbackInfo::setReturnValue);
@@ -67,6 +67,6 @@ public class ServerPlayerEntityMixin {
 
   private Optional<SpawnPoint> getSpawnPoint() {
     return CraftingDeadImmerse.getInstance().getLogicalServer().getGame()
-        .getSpawnPoint(PlayerExtension.getOrThrow((ServerPlayerEntity) (Object) this));
+        .getSpawnPoint(PlayerExtension.getOrThrow((ServerPlayer) (Object) this));
   }
 }

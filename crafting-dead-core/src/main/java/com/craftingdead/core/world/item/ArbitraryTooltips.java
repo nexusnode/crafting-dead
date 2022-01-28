@@ -23,11 +23,11 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IRegistryDelegate;
 
@@ -64,7 +64,7 @@ public class ArbitraryTooltips {
   public interface TooltipFunction {
 
     @Nullable
-    ITextComponent createTooltip(ItemStack itemStack, @Nullable World level,
-        ITooltipFlag tooltipFlag);
+    Component createTooltip(ItemStack itemStack, @Nullable Level level,
+        TooltipFlag tooltipFlag);
   }
 }

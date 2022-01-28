@@ -1,7 +1,7 @@
 {
     "required": true,
     "package": "com.craftingdead.core.mixin",
-    "compatibilityLevel": "JAVA_8",
+    "compatibilityLevel": "JAVA_17",
     "refmap": "craftingdead.refmap.json",
     "mixins": [
         "LivingEntityMixin",
@@ -14,7 +14,8 @@
         "PlayerRendererMixin",
         "PlayerInventoryMixin",
         "GameRendererMixin",
-        "ModelBakeryMixin"
+        "ModelBakeryMixin",
+        "MouseHandlerMixin"
     ],
     "injectors": {
         "defaultRequire": 1

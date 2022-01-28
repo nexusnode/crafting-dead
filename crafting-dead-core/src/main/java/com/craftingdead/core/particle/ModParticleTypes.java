@@ -20,11 +20,11 @@ package com.craftingdead.core.particle;
 
 import com.craftingdead.core.CraftingDead;
 import com.mojang.serialization.Codec;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleType;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModParticleTypes {
 
@@ -40,8 +40,8 @@ public class ModParticleTypes {
       PARTICLE_TYPES.register("rgb_flash",
           () -> create(true, RGBFlashParticleData.DESERIALIZER, RGBFlashParticleData.CODEC));
 
-  private static <T extends IParticleData> ParticleType<T> create(boolean alwaysShow,
-      @SuppressWarnings("deprecation") IParticleData.IDeserializer<T> deserializer,
+  private static <T extends ParticleOptions> ParticleType<T> create(boolean alwaysShow,
+      @SuppressWarnings("deprecation") ParticleOptions.Deserializer<T> deserializer,
       Codec<T> codec) {
     return new ParticleType<T>(alwaysShow, deserializer) {
       @Override

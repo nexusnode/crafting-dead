@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game;
 import java.util.function.Consumer;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.Module;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public interface Game<M extends Module> extends Synched {
 

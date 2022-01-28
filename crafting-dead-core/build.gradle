@@ -13,9 +13,7 @@ repositories {
     }
 }
 
-dependencies {
-    api fg.deobf("curse.maven:travelers_backpack-${travelers_backpack_project_id}:${travelers_backpack_file_id}")
-}
+dependencies {}
 
 jar {
     manifest {

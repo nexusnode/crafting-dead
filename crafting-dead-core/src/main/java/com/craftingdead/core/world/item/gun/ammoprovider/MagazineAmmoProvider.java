@@ -21,10 +21,10 @@ package com.craftingdead.core.world.item.gun.ammoprovider;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
 
 public class MagazineAmmoProvider implements AmmoProvider {
 
@@ -40,22 +40,22 @@ public class MagazineAmmoProvider implements AmmoProvider {
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.put("magazineStack", this.magazineStack.serializeNBT());
     return nbt;
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
-    if (nbt.contains("magazineStack", Constants.NBT.TAG_COMPOUND)) {
+  public void deserializeNBT(CompoundTag nbt) {
+    if (nbt.contains("magazineStack", Tag.TAG_COMPOUND)) {
       this.magazineStack = ItemStack.of(nbt.getCompound("magazineStack"));
       this.stackChanged = true;
     }
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     if (this.stackChanged || writeAll) {
       out.writeBoolean(true);
       out.writeItem(this.magazineStack);
@@ -67,7 +67,7 @@ public class MagazineAmmoProvider implements AmmoProvider {
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     if (in.readBoolean()) {
       this.magazineStack = in.readItem();
     }

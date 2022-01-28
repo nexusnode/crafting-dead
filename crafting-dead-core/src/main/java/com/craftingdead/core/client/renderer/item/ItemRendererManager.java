@@ -19,15 +19,11 @@
 package com.craftingdead.core.client.renderer.item;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,27 +31,30 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IRegistryDelegate;
 
-public class ItemRendererManager {
+public class ItemRendererManager implements ResourceManagerReloadListener {
 
   private static final String FILE_EXTENSION = ".json";
   private static final int PATH_SUFFIX_LENGTH = FILE_EXTENSION.length();
@@ -65,14 +64,11 @@ public class ItemRendererManager {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private Map<IRegistryDelegate<Item>, CustomItemRenderer> renderers = Collections.emptyMap();
+  private final Minecraft minecraft = Minecraft.getInstance();
 
-  private Map<ResourceLocation, Set<ResourceLocation>> materials = Collections.emptyMap();
+  private Map<IRegistryDelegate<Item>, CustomItemRenderer> renderers = Map.of();
 
-  public void refreshCachedModels() {
-    StartupMessageManager.addModMessage("Refreshing cached models");
-    this.renderers.values().forEach(CustomItemRenderer::refreshCachedModels);
-  }
+  private Map<ResourceLocation, Set<ResourceLocation>> materials = Map.of();
 
   public Set<ResourceLocation> getTextures(ResourceLocation atlasLocation) {
     return this.materials.getOrDefault(atlasLocation, Collections.emptySet());
@@ -82,59 +78,55 @@ public class ItemRendererManager {
     return this.renderers.get(item.delegate);
   }
 
-  public boolean renderItem(ItemStack itemStack, ItemCameraTransforms.TransformType transformType,
-      @Nullable LivingEntity livingEntity, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int packedLight, int packedOverlay) {
-    CustomItemRenderer renderer = this.renderers.get(itemStack.getItem().delegate);
+  public boolean renderItem(ItemStack itemStack, ItemTransforms.TransformType transformType,
+      @Nullable LivingEntity livingEntity, PoseStack poseStack, MultiBufferSource bufferSource,
+      int packedLight, int packedOverlay) {
+    var renderer = this.renderers.get(itemStack.getItem().delegate);
     if (renderer != null && renderer.handlePerspective(itemStack, transformType)) {
-      renderer.renderItem(itemStack, transformType, livingEntity, matrixStack, renderTypeBuffer,
+      renderer.renderItem(itemStack, transformType, livingEntity, poseStack, bufferSource,
           packedLight, packedOverlay);
       return true;
     }
     return false;
   }
 
-  public Set<ResourceLocation> gatherItemRenderers(IResourceManager resourceManager,
-      IProfiler profiler) {
+  public Set<ResourceLocation> gatherItemRenderers(ResourceManager resourceManager,
+      ProfilerFiller profiler) {
     logger.debug("Gathering item renderers");
     profiler.startTick();
 
     Set<ResourceLocation> modelDependencies = new HashSet<>();
-    this.renderers = new HashMap<>();
+    var renderers = ImmutableMap.<IRegistryDelegate<Item>, CustomItemRenderer>builder();
 
     int i = DIRECTORY.length() + 1;
 
-    for (ResourceLocation location : resourceManager.listResources(DIRECTORY,
+    for (var location : resourceManager.listResources(DIRECTORY,
         file -> file.endsWith(FILE_EXTENSION))) {
 
-      String path = location.getPath();
-      ResourceLocation pathNoFileExtension = new ResourceLocation(location.getNamespace(),
+      var path = location.getPath();
+      var pathNoFileExtension = new ResourceLocation(location.getNamespace(),
           path.substring(i, path.length() - PATH_SUFFIX_LENGTH));
 
-      Item item = ForgeRegistries.ITEMS.getValue(pathNoFileExtension);
+      var item = ForgeRegistries.ITEMS.getValue(pathNoFileExtension);
       if (item == null) {
         logger.warn("No matching item for item renderer: {}", pathNoFileExtension.toString());
         continue;
       }
 
       try (
-          IResource resource = resourceManager.getResource(location);
-          InputStream inputStream = resource.getInputStream();
-          Reader reader =
+          var resource = resourceManager.getResource(location);
+          var inputStream = resource.getInputStream();
+          var reader =
               new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
         profiler.push(resource.getSourceName());
         profiler.push("parse");
-        JsonElement json = JSONUtils.fromJson(gson, reader, JsonElement.class);
+        var json = GsonHelper.fromJson(gson, reader, JsonElement.class);
         if (json != null) {
-          CustomItemRenderer renderer = CustomItemRenderer.CODEC
-              .parse(JsonOps.INSTANCE, json)
-              .getOrThrow(false, logger::error);
-          CustomItemRenderer existing = this.renderers.put(item.delegate, renderer);
-          if (existing != null) {
-            throw new IllegalStateException(
-                "Duplicate data file ignored with ID " + pathNoFileExtension);
+          var renderer = tryCreate(item, new Dynamic<>(JsonOps.INSTANCE, json));
+          if (renderer != null) {
+            renderers.put(item.delegate, renderer);
+            modelDependencies.addAll(renderer.getModelDependencies());
           }
-          modelDependencies.addAll(renderer.getModelDependencies(item));
         } else {
           logger.error("Couldn't load data file {} from {} as it's null or empty",
               pathNoFileExtension, location);
@@ -147,12 +139,14 @@ public class ItemRendererManager {
       }
     }
 
+    this.renderers = renderers.build();
+
     profiler.push("materials");
     this.materials = this.renderers.values().stream()
         .map(CustomItemRenderer::getMaterials)
         .flatMap(Collection::stream)
-        .collect(Collectors.groupingBy(RenderMaterial::atlasLocation,
-            Collectors.mapping(RenderMaterial::texture, Collectors.toSet())));
+        .collect(Collectors.groupingBy(Material::atlasLocation,
+            Collectors.mapping(Material::texture, Collectors.toSet())));
     profiler.pop();
 
     profiler.endTick();
@@ -160,8 +154,29 @@ public class ItemRendererManager {
     return modelDependencies;
   }
 
-  protected ResourceLocation getPreparedPath(ResourceLocation rl) {
-    return new ResourceLocation(rl.getNamespace(),
-        DIRECTORY + File.separator + rl.getPath() + FILE_EXTENSION);
+  private static <I extends Item, P extends ItemRendererProperties, T extends ItemRendererType<I, P>> CustomItemRenderer tryCreate(
+      Item item, Dynamic<?> dynamic) {
+    @SuppressWarnings("unchecked")
+    var properties =
+        (P) ItemRendererProperties.CODEC.parse(dynamic).getOrThrow(false, logger::error);
+
+    @SuppressWarnings("unchecked")
+    var type = (ItemRendererType<I, P>) properties.getItemRendererType();
+
+    if (type.getItemType().isInstance(item)) {
+      return type.create(type.getItemType().cast(item), properties);
+    } else {
+      logger.error("Item renderer {} expects item of type: {}", type.getRegistryName().toString(),
+          type.getItemType().getName());
+      return null;
+    }
+  }
+
+  @Override
+  public void onResourceManagerReload(ResourceManager resourceManager) {
+    StartupMessageManager.addModMessage("Refreshing cached models");
+    this.renderers.values()
+        .forEach(
+            renderer -> renderer.refreshCachedModels(this.minecraft.getEntityModels()::bakeLayer));
   }
 }

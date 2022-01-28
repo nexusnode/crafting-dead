@@ -23,14 +23,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import com.mojang.serialization.Codec;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 
-public enum GunAnimationEvent implements IStringSerializable {
+public enum GunAnimationEvent implements StringRepresentable {
 
   SHOOT("shoot"), RELOAD("reload"), INSPECT("inspect");
 
   public static final Codec<GunAnimationEvent> CODEC =
-      IStringSerializable.fromEnum(GunAnimationEvent::values, GunAnimationEvent::byName);
+      StringRepresentable.fromEnum(GunAnimationEvent::values, GunAnimationEvent::byName);
   private static final Map<String, GunAnimationEvent> BY_NAME = Arrays.stream(values())
       .collect(Collectors.toMap(GunAnimationEvent::getSerializedName, Function.identity()));
 

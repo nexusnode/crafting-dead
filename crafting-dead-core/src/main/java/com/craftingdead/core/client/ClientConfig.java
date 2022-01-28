@@ -21,8 +21,8 @@ package com.craftingdead.core.client;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.HitMarker;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig {

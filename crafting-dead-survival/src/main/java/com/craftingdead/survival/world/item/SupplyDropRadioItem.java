@@ -18,15 +18,12 @@
 
 package com.craftingdead.survival.world.item;
 
-import com.craftingdead.survival.world.entity.SupplyDropEntity;
+import com.craftingdead.survival.world.entity.SupplyDrop;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
 
 public class SupplyDropRadioItem extends Item {
 
@@ -40,17 +37,17 @@ public class SupplyDropRadioItem extends Item {
   }
 
   @Override
-  public ActionResultType useOn(ItemUseContext context) {
-    World world = context.getLevel();
-    BlockPos blockPos = context.getClickedPos();
-    ItemStack itemStack = context.getItemInHand();
-    SupplyDropEntity airDropEntity =
-        new SupplyDropEntity(SurvivalEntityTypes.SUPPLY_DROP.get(), world, this.lootTable,
-            random.nextLong(),
+  public InteractionResult useOn(UseOnContext context) {
+    var level = context.getLevel();
+    var blockPos = context.getClickedPos();
+    var itemStack = context.getItemInHand();
+    var supplyDrop =
+        new SupplyDrop(SurvivalEntityTypes.SUPPLY_DROP.get(), level, this.lootTable,
+            level.getRandom().nextLong(),
             blockPos.getX(), blockPos.getY() + SPAWN_HEIGHT_OFFSET, blockPos.getZ());
-    world.addFreshEntity(airDropEntity);
+    level.addFreshEntity(supplyDrop);
     itemStack.shrink(1);
-    return ActionResultType.SUCCESS;
+    return InteractionResult.SUCCESS;
   }
 
   public static class Properties extends Item.Properties {

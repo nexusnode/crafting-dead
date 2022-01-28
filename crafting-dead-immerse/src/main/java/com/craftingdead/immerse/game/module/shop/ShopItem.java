@@ -19,9 +19,9 @@
 package com.craftingdead.immerse.game.module.shop;
 
 import java.util.UUID;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 public class ShopItem {
 
@@ -37,7 +37,7 @@ public class ShopItem {
     this(UUID.randomUUID(), itemStack, 0);
   }
 
-  public ShopItem(UUID id, IItemProvider item, int price) {
+  public ShopItem(UUID id, ItemLike item, int price) {
     this(id, item.asItem().getDefaultInstance(), price);
   }
 

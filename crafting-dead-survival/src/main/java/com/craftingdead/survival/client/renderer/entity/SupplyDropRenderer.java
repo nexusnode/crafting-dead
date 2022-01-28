@@ -20,41 +20,42 @@ package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.SupplyDropModel;
-import com.craftingdead.survival.world.entity.SupplyDropEntity;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import com.craftingdead.survival.client.model.geom.SurvivalModelLayers;
+import com.craftingdead.survival.world.entity.SupplyDrop;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
 
-public class SupplyDropRenderer extends EntityRenderer<SupplyDropEntity> {
+public class SupplyDropRenderer extends EntityRenderer<SupplyDrop> {
 
-  private final SupplyDropModel model = new SupplyDropModel();
+  private final SupplyDropModel model;
 
-  public SupplyDropRenderer(EntityRendererManager renderManager) {
-    super(renderManager);
+  public SupplyDropRenderer(EntityRendererProvider.Context context) {
+    super(context);
+    this.model = new SupplyDropModel(context.bakeLayer(SurvivalModelLayers.SUPPLY_DROP));
   }
 
   @Override
-  public void render(SupplyDropEntity entity, float entityYaw, float partialTicks,
-      MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int p_225623_6_) {
+  public void render(SupplyDrop entity, float entityYaw, float partialTicks,
+      PoseStack poseStack, MultiBufferSource bufferSource, int p_225623_6_) {
 
-    matrixStack.translate(0, 1.51D, 0);
-    matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+    poseStack.translate(0, 1.51D, 0);
+    poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
 
-    this.model.setRenderParachute(entity.fallDistance > 0 && !entity.isOnGround());
+    this.model.parachute.visible = entity.fallDistance > 0 && !entity.isOnGround();
 
-    IVertexBuilder vertexBuilder =
-        renderTypeBuffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-    this.model.renderToBuffer(matrixStack, vertexBuilder, p_225623_6_, OverlayTexture.NO_OVERLAY,
+    var vertexConsumer =
+        bufferSource.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
+    this.model.renderToBuffer(poseStack, vertexConsumer, p_225623_6_, OverlayTexture.NO_OVERLAY,
         1.0F, 1.0F, 1.0F, 0.15F);
   }
 
   @Override
-  public ResourceLocation getTextureLocation(SupplyDropEntity entity) {
+  public ResourceLocation getTextureLocation(SupplyDrop entity) {
     return new ResourceLocation(CraftingDeadSurvival.ID, "textures/entity/supply_drop.png");
   }
 }

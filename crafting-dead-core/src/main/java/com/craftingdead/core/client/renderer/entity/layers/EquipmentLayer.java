@@ -19,28 +19,27 @@
 package com.craftingdead.core.client.renderer.entity.layers;
 
 import org.apache.commons.lang3.Validate;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.TransformationMatrix;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
  */
-public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
-    extends LayerRenderer<T, M> {
+public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
+    extends RenderLayer<T, M> {
 
   private final ModEquipmentSlotType slot;
 
@@ -57,7 +56,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
   /**
    * Optional arbitrary transformation right before rendering the {@link ItemStack}.
    */
-  private final TransformationMatrix transformation;
+  private final Transformation transformation;
 
   private EquipmentLayer(Builder<T, M> builder) {
     super(builder.entityRenderer);
@@ -68,7 +67,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
   }
 
   @Override
-  public void render(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
+  public void render(PoseStack matrixStack, MultiBufferSource renderTypeBuffer,
       int packedLight, T livingEntity, float limbSwing, float limbSwingAmount,
       float partialTicks, float ageTicks, float headYaw, float headPitch) {
 
@@ -80,13 +79,12 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
 
       ItemRenderer itemRenderer = minecraft.getItemRenderer();
 
-      livingEntity.getCapability(Capabilities.LIVING_EXTENSION).ifPresent(living -> {
+      livingEntity.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
 
         ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
 
         if (!itemStack.isEmpty()) {
-          IBakedModel bakedModel =
-              itemRenderer.getModel(itemStack, livingEntity.level, livingEntity);
+          var bakedModel = itemRenderer.getModel(itemStack, livingEntity.level, livingEntity, 0);
 
           matrixStack.pushPose();
 
@@ -113,7 +111,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
           }
 
           // Renders the item. Also note the TransformType.
-          itemRenderer.render(itemStack, ItemCameraTransforms.TransformType.HEAD, false,
+          itemRenderer.render(itemStack, ItemTransforms.TransformType.HEAD, false,
               matrixStack, renderTypeBuffer, packedLight, OverlayTexture.NO_OVERLAY, bakedModel);
 
           if (this.transformation != null) {
@@ -126,15 +124,15 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
     }
   }
 
-  public static class Builder<T extends LivingEntity, M extends BipedModel<T>> {
+  public static class Builder<T extends LivingEntity, M extends HumanoidModel<T>> {
 
-    private LivingRenderer<T, M> entityRenderer;
+    private LivingEntityRenderer<T, M> entityRenderer;
     private ModEquipmentSlotType slot;
-    private TransformationMatrix tranformation;
+    private Transformation tranformation;
     private boolean useCrouchingOrientation;
     private boolean useHeadOrientation;
 
-    public Builder<T, M> withRenderer(LivingRenderer<T, M> entityRenderer) {
+    public Builder<T, M> withRenderer(LivingEntityRenderer<T, M> entityRenderer) {
       this.entityRenderer = entityRenderer;
       return this;
     }
@@ -144,7 +142,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends BipedModel<T>>
       return this;
     }
 
-    public Builder<T, M> withArbitraryTransformation(TransformationMatrix transformation) {
+    public Builder<T, M> withArbitraryTransformation(Transformation transformation) {
       this.tranformation = transformation;
       return this;
     }

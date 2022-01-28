@@ -19,10 +19,10 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SecondaryActionMessage {
 
@@ -34,18 +34,18 @@ public class SecondaryActionMessage {
     this.performing = performing;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
     out.writeBoolean(this.performing);
   }
 
-  public static SecondaryActionMessage decode(PacketBuffer in) {
+  public static SecondaryActionMessage decode(FriendlyByteBuf in) {
     return new SecondaryActionMessage(in.readVarInt(), in.readBoolean());
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
-        .getCapability(Capabilities.LIVING_EXTENSION)
+        .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> living.getMainHandGun()
             .ifPresent(gun -> gun.setPerformingSecondaryAction(living, this.performing,
                 ctx.get().getDirection().getReceptionSide().isServer()))));

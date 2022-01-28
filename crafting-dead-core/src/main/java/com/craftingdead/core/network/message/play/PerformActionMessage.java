@@ -19,13 +19,12 @@
 package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PerformActionMessage {
 
@@ -43,13 +42,13 @@ public class PerformActionMessage {
     this.targetEntityId = targetEntityId;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeRegistryId(this.actionType);
     out.writeVarInt(this.performerEntityId);
     out.writeVarInt(this.targetEntityId);
   }
 
-  public static PerformActionMessage decode(PacketBuffer in) {
+  public static PerformActionMessage decode(FriendlyByteBuf in) {
     return new PerformActionMessage(in.readRegistryId(), in.readVarInt(), in.readVarInt());
   }
 
@@ -60,7 +59,7 @@ public class PerformActionMessage {
       LivingExtension<?, ?> performer = LivingExtension.getOrThrow(performerEntity);
       LivingExtension<?, ?> target = this.targetEntityId == -1 ? null
           : performerEntity.level.getEntity(this.targetEntityId)
-              .getCapability(Capabilities.LIVING_EXTENSION)
+              .getCapability(LivingExtension.CAPABILITY)
               .orElse(null);
       final boolean serverSide = ctx.get().getDirection().getReceptionSide().isServer();
       if (!serverSide || this.actionType.isTriggeredByClient()) {

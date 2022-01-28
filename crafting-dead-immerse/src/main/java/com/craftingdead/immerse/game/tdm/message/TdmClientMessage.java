@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.tdm.message;
 
 import com.craftingdead.immerse.game.tdm.TdmClient;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public interface TdmClientMessage {
 

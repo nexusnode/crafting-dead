@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.immerse.Permissions;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.immerse.Permissions;
 import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
@@ -32,11 +32,11 @@ import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.network.MessageHandlerRegistry;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.NetworkManager;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class ServerShopModule extends ShopModule implements ServerModule, Module.Tickable {
@@ -44,7 +44,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
   public static final BiConsumer<PlayerExtension<?>, ItemStack> COMBAT_PURCHASE_HANDLER =
       (player, item) -> CombatSlot.getSlotType(item)
           .orElseThrow(() -> new IllegalStateException("Invalid item"))
-          .addToInventory(item, player.getEntity().inventory, true);
+          .addToInventory(item, player.getEntity().getInventory(), true);
 
   private static final MessageHandlerRegistry<ServerShopModule> messageHandlers =
       new MessageHandlerRegistry<>();
@@ -67,7 +67,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
     this.defaultBuyTimeSeconds = defaultBuyTimeSeconds;
   }
 
-  public void buyItem(PlayerExtension<ServerPlayerEntity> player, UUID itemId) {
+  public void buyItem(PlayerExtension<ServerPlayer> player, UUID itemId) {
     ShopItem item = this.items.get(itemId);
     if (item == null) {
       throw new IllegalArgumentException("Unknown item ID: " + itemId.toString());
@@ -104,7 +104,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
       this.secondTimer = 0;
       for (ShopUser user : this.users.values()) {
         if (user.buyTimeSeconds > 0
-            && PermissionAPI.hasPermission(user.gameProfile, Permissions.GAME_OP, null)) {
+            && PermissionAPI.getOfflinePermission(user.gameProfile.getId(), Permissions.GAME_OP)) {
           user.buyTimeSeconds--;
           user.sync();
         }
@@ -113,7 +113,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
   }
 
   @Override
-  public void addPlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void addPlayer(PlayerExtension<ServerPlayer> player) {
     ShopUser user =
         new ShopUser(player.getEntity().getGameProfile(), player.getEntity().connection.connection);
     this.users.put(player.getEntity().getUUID(), user);
@@ -121,18 +121,18 @@ public class ServerShopModule extends ShopModule implements ServerModule, Module
   }
 
   @Override
-  public void removePlayer(PlayerExtension<ServerPlayerEntity> player) {
+  public void removePlayer(PlayerExtension<ServerPlayer> player) {
     this.users.remove(player.getEntity().getUUID());
   }
 
   private class ShopUser {
 
     private final GameProfile gameProfile;
-    private final NetworkManager connection;
+    private final Connection connection;
     private int buyTimeSeconds = ServerShopModule.this.defaultBuyTimeSeconds;
     private int money;
 
-    private ShopUser(GameProfile gameProfile, NetworkManager connection) {
+    private ShopUser(GameProfile gameProfile, Connection connection) {
       this.gameProfile = gameProfile;
       this.connection = connection;
     }

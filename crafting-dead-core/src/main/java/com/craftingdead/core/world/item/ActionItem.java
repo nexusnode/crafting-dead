@@ -21,19 +21,18 @@ package com.craftingdead.core.world.item;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.action.Action;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ActionItem extends Item {
 
@@ -49,29 +48,29 @@ public class ActionItem extends Item {
   }
 
   @Override
-  public ActionResultType interactLivingEntity(ItemStack itemStack, PlayerEntity playerEntity,
-      LivingEntity targetEntity, Hand hand) {
+  public InteractionResult interactLivingEntity(ItemStack itemStack, Player playerEntity,
+      LivingEntity targetEntity, InteractionHand hand) {
     if (!playerEntity.getCommandSenderWorld().isClientSide()) {
       this.performAction(playerEntity, targetEntity);
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   @Override
-  public ActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
+  public InteractionResultHolder<ItemStack> use(Level world, Player playerEntity, InteractionHand hand) {
     if (!playerEntity.level.isClientSide()) {
       this.performAction(playerEntity, null);
     }
-    return new ActionResult<>(ActionResultType.PASS, playerEntity.getItemInHand(hand));
+    return new InteractionResultHolder<>(InteractionResult.PASS, playerEntity.getItemInHand(hand));
   }
 
   public void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
     if (this.entityActionFactory != null) {
-      performerEntity.getCapability(Capabilities.LIVING_EXTENSION)
+      performerEntity.getCapability(LivingExtension.CAPABILITY)
           .ifPresent(performer -> performer.performAction(
               this.entityActionFactory.apply(performer, targetEntity == null
                   ? null
-                  : targetEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null)),
+                  : targetEntity.getCapability(LivingExtension.CAPABILITY).orElse(null)),
               false, true));
     }
   }

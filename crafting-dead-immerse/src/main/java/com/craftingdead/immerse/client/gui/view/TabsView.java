@@ -27,9 +27,11 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexWrap;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class TabsView<L extends Layout>
     extends ParentView<TabsView<L>, L, YogaLayout> {
@@ -115,7 +117,7 @@ public class TabsView<L extends Layout>
 
     private Runnable selectedListener;
 
-    public Tab(ITextComponent text, Runnable selectedListener) {
+    public Tab(Component text, Runnable selectedListener) {
       super(new YogaLayout(), text);
       this.underscoreColor = DEFAULT_UNDERSCORE_COLOR;
       this.underscoreHeight = DEFAULT_UNDERSCORE_HEIGHT;
@@ -127,13 +129,14 @@ public class TabsView<L extends Layout>
     }
 
     public Tab(String text, Runnable selectedListener) {
-      this(new StringTextComponent(text), selectedListener);
+      this(new TextComponent(text), selectedListener);
     }
 
     @Override
-    public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
       super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
+      RenderSystem.setShader(GameRenderer::getPositionColorShader);
       if (this.isSelected()) {
         RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight

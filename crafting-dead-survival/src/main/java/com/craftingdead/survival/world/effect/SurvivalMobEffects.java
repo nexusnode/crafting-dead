@@ -19,22 +19,22 @@
 package com.craftingdead.survival.world.effect;
 
 import com.craftingdead.survival.CraftingDeadSurvival;
-import net.minecraft.potion.Effect;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalMobEffects {
 
-  public static final DeferredRegister<Effect> MOB_EFFECTS =
-      DeferredRegister.create(ForgeRegistries.POTIONS, CraftingDeadSurvival.ID);
+  public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+      DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CraftingDeadSurvival.ID);
 
-  public static final RegistryObject<Effect> INFECTION =
+  public static final RegistryObject<MobEffect> INFECTION =
       MOB_EFFECTS.register("infection", InfectionMobEffect::new);
 
-  public static final RegistryObject<Effect> BLEEDING =
+  public static final RegistryObject<MobEffect> BLEEDING =
       MOB_EFFECTS.register("bleeding", BleedingMobEffect::new);
 
-  public static final RegistryObject<Effect> BROKEN_LEG =
+  public static final RegistryObject<MobEffect> BROKEN_LEG =
       MOB_EFFECTS.register("broken_leg", BrokenLegMobEffect::new);
 }

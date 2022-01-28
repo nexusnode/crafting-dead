@@ -29,6 +29,6 @@ public class AimableGunClient extends TypedGunClient<AimableGun> {
 
   @Override
   protected boolean canFlash(LivingExtension<?, ?> living) {
-    return super.canFlash(living) && !this.gun.isAiming(living.getEntity());
+    return super.canFlash(living) && !this.gun.isScoping(living.getEntity());
   }
 }

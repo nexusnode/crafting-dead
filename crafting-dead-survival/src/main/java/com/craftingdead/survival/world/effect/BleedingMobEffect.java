@@ -23,19 +23,19 @@ import java.util.List;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.damagesource.SurvivalDamageSource;
 import com.craftingdead.survival.world.item.SurvivalItems;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class BleedingMobEffect extends Effect {
+public class BleedingMobEffect extends MobEffect {
 
   private static final int MAXIMUM_DELAY = 20 * 6;
   private static final int MINIMUM_DELAY = 10;
   private static final int DELAY_REDUCTION_PER_LEVEL = 20;
 
   protected BleedingMobEffect() {
-    super(EffectType.HARMFUL, 0x8B0000);
+    super(MobEffectCategory.HARMFUL, 0x8B0000);
   }
 
   @Override

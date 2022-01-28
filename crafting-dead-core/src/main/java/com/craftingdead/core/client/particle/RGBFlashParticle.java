@@ -19,19 +19,19 @@
 package com.craftingdead.core.client.particle;
 
 import com.craftingdead.core.particle.RGBFlashParticleData;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.IParticleRenderType;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.Mth;
 
-public class RGBFlashParticle extends SpriteTexturedParticle {
+public class RGBFlashParticle extends TextureSheetParticle {
 
-  private RGBFlashParticle(RGBFlashParticleData data, ClientWorld world, double x, double y,
+  private RGBFlashParticle(RGBFlashParticleData data, ClientLevel world, double x, double y,
       double z) {
     super(world, x, y, z);
     this.lifetime = 4;
@@ -42,12 +42,12 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
   }
 
   @Override
-  public IParticleRenderType getRenderType() {
-    return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+  public ParticleRenderType getRenderType() {
+    return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
   }
 
   @Override
-  public void render(IVertexBuilder vertexBuilder, ActiveRenderInfo activeRenderInfo,
+  public void render(VertexConsumer vertexBuilder, Camera activeRenderInfo,
       float partialTicks) {
     this.setAlpha(0.6F - ((float) this.age + partialTicks - 1.0F) * 0.25F * 0.5F);
     super.render(vertexBuilder, activeRenderInfo, partialTicks);
@@ -55,20 +55,20 @@ public class RGBFlashParticle extends SpriteTexturedParticle {
 
   @Override
   public float getQuadSize(float partialTicks) {
-    return 3.1F * MathHelper.sin(((float) this.age + partialTicks - 1.0F) * 0.25F * (float) Math.PI)
+    return 3.1F * Mth.sin(((float) this.age + partialTicks - 1.0F) * 0.25F * (float) Math.PI)
         * this.quadSize;
   }
 
-  public static class Factory implements IParticleFactory<RGBFlashParticleData> {
+  public static class Factory implements ParticleProvider<RGBFlashParticleData> {
 
-    private final IAnimatedSprite animatedSprite;
+    private final SpriteSet animatedSprite;
 
-    public Factory(IAnimatedSprite animatedSprite) {
+    public Factory(SpriteSet animatedSprite) {
       this.animatedSprite = animatedSprite;
     }
 
     @Override
-    public Particle createParticle(RGBFlashParticleData data, ClientWorld world, double xPos,
+    public Particle createParticle(RGBFlashParticleData data, ClientLevel world, double xPos,
         double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
       RGBFlashParticle flashParticle = new RGBFlashParticle(data, world, xPos, yPos, zPos);
       flashParticle.pickSprite(this.animatedSprite);

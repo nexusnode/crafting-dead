@@ -19,13 +19,14 @@
 package com.craftingdead.survival.client;
 
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.core.capability.Capabilities;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientConfig;
 import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
-import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.ModDist;
+import com.craftingdead.survival.client.model.SupplyDropModel;
+import com.craftingdead.survival.client.model.geom.SurvivalModelLayers;
 import com.craftingdead.survival.client.renderer.entity.AdvancedZombieRenderer;
 import com.craftingdead.survival.client.renderer.entity.GiantZombieRenderer;
 import com.craftingdead.survival.client.renderer.entity.SupplyDropRenderer;
@@ -34,10 +35,9 @@ import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.particle.SpellParticle;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -45,9 +45,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientDist implements ModDist {
@@ -72,57 +70,59 @@ public class ClientDist implements ModDist {
   public ClientDist() {
     this.minecraft = Minecraft.getInstance();
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modEventBus.addListener(this::handleClientSetup);
+    modEventBus.addListener(this::handleEntityRenderers);
     modEventBus.addListener(this::handleParticleFactoryRegisterEvent);
+    modEventBus.addListener(this::handleEntityRenderersLayerDefinitions);
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientConfigSpec);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
 
-  private void handleClientSetup(FMLClientSetupEvent event) {
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.PIPE_GRENADE.get(),
+  private void handleEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    event.registerEntityRenderer(SurvivalEntityTypes.PIPE_GRENADE.get(),
         CylinderGrenadeRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.SUPPLY_DROP.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.FAST_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.FAST_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.TANK_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.TANK_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.WEAK_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.WEAK_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.POLICE_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.POLICE_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.DOCTOR_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.DOCTOR_ZOMBIE.get(),
         AdvancedZombieRenderer::new);
-    RenderingRegistry.registerEntityRenderingHandler(SurvivalEntityTypes.GIANT_ZOMBIE.get(),
+    event.registerEntityRenderer(SurvivalEntityTypes.GIANT_ZOMBIE.get(),
         GiantZombieRenderer::new);
   }
 
+  private void handleEntityRenderersLayerDefinitions(
+      EntityRenderersEvent.RegisterLayerDefinitions event) {
+    event.registerLayerDefinition(SurvivalModelLayers.SUPPLY_DROP,
+        SupplyDropModel::createBodyLayer);
+  }
+
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    ParticleManager particleEngine = this.minecraft.particleEngine;
+    final var particleEngine = this.minecraft.particleEngine;
     particleEngine.register(SurvivalParticleTypes.MILITARY_LOOT_GEN.get(),
-        SpellParticle.Factory::new);
+        SpellParticle.Provider::new);
     particleEngine.register(SurvivalParticleTypes.MEDIC_LOOT_GEN.get(),
-        SpellParticle.Factory::new);
+        SpellParticle.Provider::new);
     particleEngine.register(SurvivalParticleTypes.CIVILIAN_LOOT_GEN.get(),
-        SpellParticle.Factory::new);
+        SpellParticle.Provider::new);
     particleEngine.register(SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN.get(),
-        SpellParticle.Factory::new);
+        SpellParticle.Provider::new);
     particleEngine.register(SurvivalParticleTypes.POLICE_LOOT_GEN.get(),
-        SpellParticle.Factory::new);
+        SpellParticle.Provider::new);
   }
 
   @SubscribeEvent
   public void handleRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-    PlayerExtension<AbstractClientPlayerEntity> player =
-        this.minecraft.getCameraEntity() instanceof AbstractClientPlayerEntity
-            ? this.minecraft.getCameraEntity().getCapability(Capabilities.LIVING_EXTENSION)
-                .<PlayerExtension<AbstractClientPlayerEntity>>cast()
-                .orElse(null)
-            : null;
+    var player = CraftingDead.getInstance().getClientDist().getCameraPlayer();
     if (player == null) {
       return;
     }
@@ -145,18 +145,12 @@ public class ClientDist implements ModDist {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private static void renderBlood(int width, int height, float healthPercentage) {
-    ResourceLocation res = healthPercentage <= 0.25F ? BLOOD_2 : BLOOD;
-
     RenderSystem.enableBlend();
-    RenderSystem.disableAlphaTest();
-
-    RenderUtil.bind(res);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
+    RenderSystem.setShaderTexture(0, healthPercentage <= 0.25F ? BLOOD_2 : BLOOD);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1 - healthPercentage);
     RenderUtil.blit(0, 0, width, height);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.enableAlphaTest();
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.disableBlend();
   }
 }

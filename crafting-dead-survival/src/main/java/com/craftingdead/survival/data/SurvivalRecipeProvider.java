@@ -22,12 +22,12 @@ import java.util.function.Consumer;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.world.item.SurvivalItems;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.Tags;
 
 public class SurvivalRecipeProvider extends RecipeProvider {
@@ -37,7 +37,7 @@ public class SurvivalRecipeProvider extends RecipeProvider {
   }
 
   @Override
-  protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
     ShapelessRecipeBuilder.shapeless(Items.STRING, 3)
         .requires(Ingredient.of(SurvivalItems.CLEAN_RAG.get(), SurvivalItems.DIRTY_RAG.get()))
         .unlockedBy("has_clean_rag", has(SurvivalItems.CLEAN_RAG.get()))

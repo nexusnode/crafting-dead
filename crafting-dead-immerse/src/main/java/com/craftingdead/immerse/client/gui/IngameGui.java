@@ -19,10 +19,10 @@
 package com.craftingdead.immerse.client.gui;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.util.Util;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.Util;
 
 public class IngameGui {
 
@@ -34,12 +34,12 @@ public class IngameGui {
 
   private KilledMessage killedMessage;
 
-  public void renderOverlay(PlayerExtension<AbstractClientPlayerEntity> player, MatrixStack matrixStack,
+  public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, PoseStack matrixStack,
       int width, int height, float partialTicks) {
     this.renderKilledMessage(matrixStack, width, height);
   }
 
-  private void renderKilledMessage(MatrixStack matrixStack, int width, int height) {
+  private void renderKilledMessage(PoseStack matrixStack, int width, int height) {
     if (this.killedMessage != null) {
       final long currentTime = Util.getMillis();
       if (currentTime - this.killedMessageVisibleTimeMs > KILLED_MESSAGE_LIFE_MS) {

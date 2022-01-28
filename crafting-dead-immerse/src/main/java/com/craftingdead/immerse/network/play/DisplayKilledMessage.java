@@ -22,10 +22,10 @@ import java.util.function.Supplier;
 import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.KilledMessage;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.NetworkEvent;
 
 public class DisplayKilledMessage {
 
@@ -37,12 +37,12 @@ public class DisplayKilledMessage {
     this.itemStack = itemStack;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.killerEntityId);
     out.writeItem(this.itemStack);
   }
 
-  public static DisplayKilledMessage decode(PacketBuffer in) {
+  public static DisplayKilledMessage decode(FriendlyByteBuf in) {
     return new DisplayKilledMessage(in.readVarInt(), in.readItem());
   }
 
@@ -51,7 +51,7 @@ public class DisplayKilledMessage {
         () -> CraftingDeadImmerse.getInstance().getClientDist().getIngameGui().displayKilledMessage(
             new KilledMessage(
                 NetworkUtil.getEntity(ctx.get(), this.killerEntityId,
-                    AbstractClientPlayerEntity.class),
+                    AbstractClientPlayer.class),
                 this.itemStack)));
     return true;
   }

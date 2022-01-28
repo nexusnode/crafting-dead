@@ -21,12 +21,12 @@ package com.craftingdead.immerse.client.gui.view;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.immerse.client.fake.FakeLevel;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.entity.LivingEntity;
+import com.mojang.math.Vector3f;
 
 public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
 
@@ -39,7 +39,7 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
 
   @SuppressWarnings("deprecation")
   @Override
-  public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     this.minecraft.getEntityRenderDispatcher().prepare(FakeLevel.getInstance(),
         this.minecraft.gameRenderer.getMainCamera(), null);
@@ -56,8 +56,8 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
       matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 
       final float oldYawOffset = this.livingEntity.yBodyRot;
-      final float oldYaw = this.livingEntity.yRot;
-      final float oldPitch = this.livingEntity.xRot;
+      final float oldYaw = this.livingEntity.getYRot();
+      final float oldPitch = this.livingEntity.getXRot();
       final float oldPrevHeadYaw = this.livingEntity.yHeadRotO;
       final float oldHeadYaw = this.livingEntity.yHeadRot;
 
@@ -66,15 +66,15 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
       float headPitch = (float) Math
           .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4.0F - mouseY) / 40.0F);
       this.livingEntity.yBodyRot = 180.0F + headYaw * 20.0F;
-      this.livingEntity.yRot = 180.0F + headYaw * 40.0F;
-      this.livingEntity.xRot = -headPitch * 20.0F;
-      this.livingEntity.yHeadRot = this.livingEntity.yRot;
-      this.livingEntity.yHeadRotO = this.livingEntity.yRot;
-      final EntityRendererManager entityRendererManager =
+      this.livingEntity.setYRot(180.0F + headYaw * 40.0F);
+      this.livingEntity.setXRot(-headPitch * 20.0F);
+      this.livingEntity.yHeadRot = this.livingEntity.getYRot();
+      this.livingEntity.yHeadRotO = this.livingEntity.getYRot();
+      final EntityRenderDispatcher entityRendererManager =
           this.minecraft.getEntityRenderDispatcher();
 
       entityRendererManager.setRenderShadow(false);
-      IRenderTypeBuffer.Impl renderTypeBufferImpl =
+      MultiBufferSource.BufferSource renderTypeBufferImpl =
           this.minecraft.renderBuffers().bufferSource();
 
       RenderSystem.runAsFancy(() -> entityRendererManager.render(this.livingEntity, 0.0D, 0.0D,
@@ -84,8 +84,8 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
       entityRendererManager.setRenderShadow(false);
 
       this.livingEntity.yBodyRot = oldYawOffset;
-      this.livingEntity.yRot = oldYaw;
-      this.livingEntity.xRot = oldPitch;
+      this.livingEntity.setYRot(oldYaw);
+      this.livingEntity.setXRot(oldPitch);
       this.livingEntity.yHeadRotO = oldPrevHeadYaw;
       this.livingEntity.yHeadRot = oldHeadYaw;
     }

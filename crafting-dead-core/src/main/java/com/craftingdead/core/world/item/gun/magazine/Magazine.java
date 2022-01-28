@@ -19,10 +19,15 @@
 package com.craftingdead.core.world.item.gun.magazine;
 
 import com.craftingdead.core.network.Synched;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface Magazine extends INBTSerializable<CompoundNBT>, Synched {
+public interface Magazine extends INBTSerializable<CompoundTag>, Synched {
+  
+  Capability<Magazine> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   float getArmorPenetration();
 

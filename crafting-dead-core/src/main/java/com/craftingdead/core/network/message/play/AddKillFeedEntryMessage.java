@@ -21,8 +21,8 @@ package com.craftingdead.core.network.message.play;
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.damagesource.KillFeedEntry;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class AddKillFeedEntryMessage {
 
@@ -32,11 +32,11 @@ public class AddKillFeedEntryMessage {
     this.entry = entry;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     this.entry.encode(out);
   }
 
-  public static AddKillFeedEntryMessage decode(PacketBuffer in) {
+  public static AddKillFeedEntryMessage decode(FriendlyByteBuf in) {
     return new AddKillFeedEntryMessage(KillFeedEntry.decode(in));
   }
 

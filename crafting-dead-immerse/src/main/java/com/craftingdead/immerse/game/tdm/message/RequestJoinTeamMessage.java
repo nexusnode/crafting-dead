@@ -23,8 +23,8 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.team.ServerTeamModule;
 import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class RequestJoinTeamMessage implements TdmServerMessage {
 
@@ -35,20 +35,20 @@ public class RequestJoinTeamMessage implements TdmServerMessage {
     this.team = team;
   }
 
-  public void encode(PacketBuffer out) {
+  public void encode(FriendlyByteBuf out) {
     out.writeBoolean(this.team == null);
     if (this.team != null) {
       out.writeEnum(this.team);
     }
   }
 
-  public static RequestJoinTeamMessage decode(PacketBuffer in) {
+  public static RequestJoinTeamMessage decode(FriendlyByteBuf in) {
     return new RequestJoinTeamMessage(
         in.readBoolean() ? null : in.readEnum(TdmTeam.class));
   }
 
   @Override
-  public void handle(TdmServer gameServer, Context context) {
+  public void handle(TdmServer gameServer, NetworkEvent.Context context) {
     ServerTeamModule<TdmTeam> teamModule = gameServer.getTeamModule();
     teamModule.setPlayerTeam(PlayerExtension.getOrThrow(context.getSender()),
         this.team == null ? null : teamModule.getTeamInstance(this.team));

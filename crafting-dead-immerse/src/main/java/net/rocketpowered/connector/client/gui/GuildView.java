@@ -17,7 +17,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
 
 public class GuildView extends ParentView<GuildView, ViewScreen, YogaLayout> {
 
@@ -41,7 +41,7 @@ public class GuildView extends ParentView<GuildView, ViewScreen, YogaLayout> {
                     view -> view.getBackgroundColorProperty().setBaseValue(new Color(0xA0363636)))
                 .setBackgroundBlur(50)
                 .addChild(new TextView<>(new YogaLayout().setTopPadding(5),
-                    new StringTextComponent("Guild Members")).setCentered(true));
+                    new TextComponent("Guild Members")).setCentered(true));
 
     ParentView<?, YogaLayout, YogaLayout> membersListView =
         new ParentView<>(
@@ -85,6 +85,6 @@ public class GuildView extends ParentView<GuildView, ViewScreen, YogaLayout> {
             .configure(view -> view.getBorderColorProperty().setBaseValue(Color.GRAY))
             .addChild(new TextView<>(
                 new YogaLayout(),
-                new StringTextComponent("Sm0keySa1m0n")));
+                new TextComponent("Sm0keySa1m0n")));
   }
 }

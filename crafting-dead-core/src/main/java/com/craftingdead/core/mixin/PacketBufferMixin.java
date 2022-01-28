@@ -22,28 +22,27 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.item.gun.Gun;
 import io.netty.buffer.Unpooled;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
 
 // TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
-@Mixin(PacketBuffer.class)
+@Mixin(FriendlyByteBuf.class)
 public class PacketBufferMixin {
 
   @Inject(at = @At(value = "RETURN"),
-      method = "Lnet/minecraft/network/PacketBuffer;writeItemStack(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/network/PacketBuffer;",
+      method = "Lnet/minecraft/network/FriendlyByteBuf;writeItemStack(Lnet/minecraft/world/item/ItemStack;Z)Lnet/minecraft/network/FriendlyByteBuf;",
       remap = false)
   private void writeItemStack(ItemStack itemStack, boolean limitedTag,
-      CallbackInfoReturnable<PacketBuffer> callbackInfo) {
-    PacketBuffer packetBuffer = (PacketBuffer) (Object) this;
-    Gun gun = itemStack.getCapability(Capabilities.GUN).orElse(null);
+      CallbackInfoReturnable<FriendlyByteBuf> callbackInfo) {
+    FriendlyByteBuf packetBuffer = (FriendlyByteBuf) (Object) this;
+    Gun gun = itemStack.getCapability(Gun.CAPABILITY).orElse(null);
 
     if (gun == null) {
       packetBuffer.writeVarInt(0);
     } else {
-      PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+      FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
       gun.encode(data, true);
       packetBuffer.writeVarInt(data.readableBytes());
       packetBuffer.writeBytes(data);
@@ -52,14 +51,14 @@ public class PacketBufferMixin {
 
   @Inject(at = @At(value = "RETURN"), method = "readItem")
   private void readItem(CallbackInfoReturnable<ItemStack> callbackInfo) {
-    PacketBuffer packetBuffer = (PacketBuffer) (Object) this;
+    FriendlyByteBuf packetBuffer = (FriendlyByteBuf) (Object) this;
     ItemStack itemStack = callbackInfo.getReturnValue();
     byte[] data = new byte[packetBuffer.readVarInt()];
     if (data.length > 0) {
       packetBuffer.readBytes(data);
-      Gun gun = itemStack.getCapability(Capabilities.GUN).orElse(null);
+      Gun gun = itemStack.getCapability(Gun.CAPABILITY).orElse(null);
       if (gun != null) {
-        gun.decode(new PacketBuffer(Unpooled.wrappedBuffer(data)));
+        gun.decode(new FriendlyByteBuf(Unpooled.wrappedBuffer(data)));
       }
     }
   }

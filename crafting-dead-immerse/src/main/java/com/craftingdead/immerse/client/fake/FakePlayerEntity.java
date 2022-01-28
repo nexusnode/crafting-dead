@@ -24,15 +24,15 @@ import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.scores.Team;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
-public class FakePlayerEntity extends AbstractClientPlayerEntity {
+public class FakePlayerEntity extends AbstractClientPlayer {
 
   private final Map<Type, ResourceLocation> textureLocations = Maps.newEnumMap(Type.class);
   private boolean pendingTextures;
@@ -102,12 +102,12 @@ public class FakePlayerEntity extends AbstractClientPlayerEntity {
   }
 
   @Override
-  public Vector3d position() {
-    return new Vector3d(0.0D, 0.0D, 0.0D);
+  public Vec3 position() {
+    return new Vec3(0.0D, 0.0D, 0.0D);
   }
 
   @Override
-  protected NetworkPlayerInfo getPlayerInfo() {
+  protected PlayerInfo getPlayerInfo() {
     return null;
   }
 
@@ -117,7 +117,7 @@ public class FakePlayerEntity extends AbstractClientPlayerEntity {
   }
 
   @Override
-  public boolean isInvisibleTo(PlayerEntity playerEntity) {
+  public boolean isInvisibleTo(Player playerEntity) {
     return false;
   }
 

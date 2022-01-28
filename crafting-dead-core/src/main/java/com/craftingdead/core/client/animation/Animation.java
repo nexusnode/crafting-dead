@@ -1,16 +1,16 @@
 package com.craftingdead.core.client.animation;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import com.mojang.math.Vector3f;
 
 public interface Animation {
 
-  void apply(float partialTicks, MatrixStack poseStack);
+  void apply(float partialTicks, PoseStack poseStack);
 
-  void applyHand(Hand hand, HandSide handSide, float partialTicks, MatrixStack poseStack);
+  void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack);
 
   void applyCamera(float partialTicks, Vector3f rotations);
 
@@ -20,7 +20,7 @@ public interface Animation {
 
   void remove();
 
-  default boolean handlePerspective(ItemCameraTransforms.TransformType transformType) {
+  default boolean handlePerspective(ItemTransforms.TransformType transformType) {
     return true;
   }
 }

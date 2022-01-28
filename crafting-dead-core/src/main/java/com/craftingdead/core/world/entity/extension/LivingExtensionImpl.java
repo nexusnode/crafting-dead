@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
@@ -35,27 +34,28 @@ import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.hat.Hat;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor.PacketTarget;
 
 class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     implements LivingExtension<E, H> {
@@ -98,7 +98,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   private boolean crouching;
 
-  private Vector3d lastPos;
+  private Vec3 lastPos;
 
   private boolean moving;
 
@@ -240,10 +240,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     if (heldStack != this.lastHeldStack) {
       this.getProgressMonitor().ifPresent(ProgressMonitor::stop);
       if (this.lastHeldStack != null) {
-        this.lastHeldStack.getCapability(Capabilities.GUN)
+        this.lastHeldStack.getCapability(Gun.CAPABILITY)
             .ifPresent(gun -> gun.reset(this));
       }
-      if (heldStack.getCapability(Capabilities.GUN).isPresent()) {
+      if (heldStack.getCapability(Gun.CAPABILITY).isPresent()) {
         this.entity.playSound(ModSoundEvents.GUN_EQUIP.get(), 0.25F, 1.0F);
       }
       this.lastHeldStack = heldStack;
@@ -256,7 +256,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
       this.removeAction();
     }
 
-    heldStack.getCapability(Capabilities.GUN).ifPresent(gun -> gun.tick(this));
+    heldStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.tick(this));
 
     this.updateClothing();
     this.updateHat();
@@ -303,22 +303,22 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   private void updateHat() {
     ItemStack headStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.HAT.getIndex());
-    Hat hat = headStack.getCapability(Capabilities.HAT).orElse(null);
+    Hat hat = headStack.getCapability(Hat.CAPABILITY).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
-      this.entity.addEffect(new EffectInstance(Effects.WATER_BREATHING, 2, 0, false, false, false));
+      this.entity.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 2, 0, false, false, false));
     } else if (hat != null && hat.hasNightVision()) {
-      this.entity.addEffect(new EffectInstance(Effects.NIGHT_VISION, 2, 0, false, false, false));
+      this.entity.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 2, 0, false, false, false));
     }
   }
 
   private void updateClothing() {
     ItemStack clothingStack =
         this.itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex());
-    Clothing clothing = clothingStack.getCapability(Capabilities.CLOTHING).orElse(null);
+    Clothing clothing = clothingStack.getCapability(Clothing.CAPABILITY).orElse(null);
 
     if (clothingStack != this.lastClothingStack) {
-      this.lastClothingStack.getCapability(Capabilities.CLOTHING)
+      this.lastClothingStack.getCapability(Clothing.CAPABILITY)
           .map(Clothing::getAttributeModifiers)
           .ifPresent(this.entity.getAttributes()::removeAttributeModifiers);
       if (clothing != null) {
@@ -335,14 +335,14 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         }
 
         this.entity
-            .addEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 2, 0, false, false, false));
+            .addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
     }
 
     if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity
-          .addEffect(new EffectInstance(Effects.DOLPHINS_GRACE, 2, 0, false, false, false));
+          .addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2, 0, false, false, false));
     }
 
     this.lastClothingStack = clothingStack;
@@ -451,11 +451,11 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.put("inventory", this.itemHandler.serializeNBT());
     for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
-      CompoundNBT extensionNbt = entry.getValue().serializeNBT();
+      CompoundTag extensionNbt = entry.getValue().serializeNBT();
       if (!extensionNbt.isEmpty()) {
         nbt.put(entry.getKey().toString(), extensionNbt);
       }
@@ -464,10 +464,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
+  public void deserializeNBT(CompoundTag nbt) {
     this.itemHandler.deserializeNBT(nbt.getCompound("inventory"));
     for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
-      CompoundNBT extensionNbt = nbt.getCompound(entry.getKey().toString());
+      CompoundTag extensionNbt = nbt.getCompound(entry.getKey().toString());
       if (!extensionNbt.isEmpty()) {
         entry.getValue().deserializeNBT(extensionNbt);
       }
@@ -487,7 +487,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void encode(PacketBuffer out, boolean writeAll) {
+  public void encode(FriendlyByteBuf out, boolean writeAll) {
     // Item Handler
     if (writeAll) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
@@ -509,7 +509,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     out.writeVarInt(handlersToSend.size());
     for (Map.Entry<ResourceLocation, H> entry : handlersToSend) {
       out.writeResourceLocation(entry.getKey());
-      PacketBuffer handlerData = new PacketBuffer(Unpooled.buffer());
+      FriendlyByteBuf handlerData = new FriendlyByteBuf(Unpooled.buffer());
       entry.getValue().encode(handlerData, writeAll);
       out.writeVarInt(handlerData.readableBytes());
       out.writeBytes(handlerData);
@@ -518,7 +518,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void decode(PacketBuffer in) {
+  public void decode(FriendlyByteBuf in) {
     // Item Handler
     int slot;
     while ((slot = in.readShort()) != 255) {

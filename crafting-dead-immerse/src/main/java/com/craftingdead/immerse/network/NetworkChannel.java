@@ -25,11 +25,11 @@ import com.craftingdead.immerse.network.login.SetupGameMessage;
 import com.craftingdead.immerse.network.play.ChangeGameMessage;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
 import com.craftingdead.immerse.network.play.SyncGameMessage;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.FMLHandshakeHandler;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.HandshakeHandler;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 
@@ -39,7 +39,7 @@ public enum NetworkChannel {
       simpleChannel.messageBuilder(SetupGameMessage.class, 0x00, NetworkDirection.LOGIN_TO_CLIENT)
           .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
           .encoder(SetupGameMessage::encode).decoder(SetupGameMessage::decode)
-          .consumer(FMLHandshakeHandler
+          .consumer(HandshakeHandler
               .biConsumerFor((handler, msg, ctx) -> SetupGameMessage.handle(msg, ctx)))
           .buildLoginPacketList(isLocal -> CraftingDeadImmerse.getInstance().getLogicalServer()
               .generateSetupGameMessage(isLocal))
@@ -49,7 +49,7 @@ public enum NetworkChannel {
           .messageBuilder(AcknowledgeGameMessage.class, 0x01, NetworkDirection.LOGIN_TO_SERVER)
           .loginIndex(LoginIndexedMessage::getLoginIndex, LoginIndexedMessage::setLoginIndex)
           .encoder(AcknowledgeGameMessage::encode).decoder(AcknowledgeGameMessage::decode)
-          .consumer(FMLHandshakeHandler
+          .consumer(HandshakeHandler
               .indexFirst((handler, msg, ctx) -> AcknowledgeGameMessage.handle(msg, ctx)))
           .add();
     }

@@ -19,23 +19,23 @@
 package com.craftingdead.core.event;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 
 public class RenderArmClothingEvent extends Event {
 
-  private final AbstractClientPlayerEntity playerEntity;
+  private final AbstractClientPlayer playerEntity;
   @Nullable
   private ResourceLocation clothingTexture;
 
-  public RenderArmClothingEvent(AbstractClientPlayerEntity playerEntity,
+  public RenderArmClothingEvent(AbstractClientPlayer playerEntity,
       ResourceLocation clothingTexture) {
     this.playerEntity = playerEntity;
     this.clothingTexture = clothingTexture;
   }
 
-  public AbstractClientPlayerEntity getPlayerEntity() {
+  public AbstractClientPlayer getPlayerEntity() {
     return this.playerEntity;
   }
 

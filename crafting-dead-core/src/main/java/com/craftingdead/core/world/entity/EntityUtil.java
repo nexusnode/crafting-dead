@@ -19,10 +19,9 @@
 package com.craftingdead.core.world.entity;
 
 import com.craftingdead.core.util.MutableVector2f;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class EntityUtil {
 
@@ -41,11 +40,11 @@ public class EntityUtil {
     float yawToTarget = ROTATIONS_TO_TARGET.getX();
     float pitchToTarget = ROTATIONS_TO_TARGET.getY();
 
-    float currentYaw = MathHelper.wrapDegrees(viewer.yHeadRot);
-    float currentPitch = MathHelper.wrapDegrees(viewer.xRot);
+    float currentYaw = Mth.wrapDegrees(viewer.yHeadRot);
+    float currentPitch = Mth.wrapDegrees(viewer.getXRot());
 
-    float yawDifference = Math.abs(MathHelper.wrapDegrees(currentYaw - yawToTarget));
-    float pitchDifference = Math.abs(MathHelper.wrapDegrees(currentPitch - pitchToTarget));
+    float yawDifference = Math.abs(Mth.wrapDegrees(currentYaw - yawToTarget));
+    float pitchDifference = Math.abs(Mth.wrapDegrees(currentPitch - pitchToTarget));
 
     boolean insideYaw = yawDifference <= fov;
     boolean insidePitch = pitchDifference <= fov;
@@ -59,17 +58,17 @@ public class EntityUtil {
    */
   public static void getRotationsToTarget(LivingEntity viewer, Entity target,
       MutableVector2f result) {
-    Vector3d entityVec = target.position();
-    Vector3d livingVec = viewer.position();
+    var entityVec = target.position();
+    var livingVec = viewer.position();
 
-    double xDiff = livingVec.x - entityVec.x;
-    double zDiff = entityVec.z - livingVec.z;
-    double yDiff = (entityVec.y + target.getEyeHeight()) - (livingVec.y + viewer.getEyeHeight());
+    var xDiff = livingVec.x - entityVec.x;
+    var zDiff = entityVec.z - livingVec.z;
+    var yDiff = (entityVec.y + target.getEyeHeight()) - (livingVec.y + viewer.getEyeHeight());
 
-    double distance2D = MathHelper.sqrt(xDiff * xDiff + zDiff * zDiff);
+    var distance2D = Mth.sqrt((float) (xDiff * xDiff + zDiff * zDiff));
     float yawToTarget = (float) (Math.atan2(xDiff, zDiff) * 180.0D / Math.PI);
     float pitchToTarget = (float) (-(Math.atan2(yDiff, distance2D) * 180.0D / Math.PI));
 
-    result.set(MathHelper.wrapDegrees(yawToTarget), MathHelper.wrapDegrees(pitchToTarget));
+    result.set(Mth.wrapDegrees(yawToTarget), Mth.wrapDegrees(pitchToTarget));
   }
 }

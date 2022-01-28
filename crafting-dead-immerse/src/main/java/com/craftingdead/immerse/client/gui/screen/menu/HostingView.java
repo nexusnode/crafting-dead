@@ -39,13 +39,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.gui.screen.ConfirmOpenLinkScreen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout> {
 
@@ -55,8 +55,8 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
       .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
       .create();
 
-  private static final ITextComponent ORDER_NOW_TEXT =
-      new TranslationTextComponent("view.hosting.order_now");
+  private static final Component ORDER_NOW_TEXT =
+      new TranslatableComponent("view.hosting.order_now");
 
   private static final Path PLANS_FILE = Paths.get("plans.json");
 
@@ -73,8 +73,8 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
             new YogaLayoutParent().setAlignItems(Align.CENTER))
                 .addChild(
                     new TextView<>(new YogaLayout(),
-                        new TranslationTextComponent("view.hosting.partners")
-                            .withStyle(TextFormatting.ITALIC))
+                        new TranslatableComponent("view.hosting.partners")
+                            .withStyle(ChatFormatting.ITALIC))
                                 .setCentered(true))
                 .addChild(new ImageView<>(new YogaLayout()
                     .setWidth(200))
@@ -125,15 +125,15 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
           plansView.addChild(
               HostingView.this.createPlan(recommendedJson != null && recommendedJson.getAsBoolean(),
                   gson.fromJson(planJson.get("image"), ResourceLocation.class),
-                  new StringTextComponent(planJson.get("title").getAsString())
-                      .withStyle(TextFormatting.BOLD),
-                  new StringTextComponent(planJson.get("subtitle").getAsString()),
-                  new StringTextComponent(planJson.get("price").getAsString())
-                      .withStyle(TextFormatting.BOLD),
+                  new TextComponent(planJson.get("title").getAsString())
+                      .withStyle(ChatFormatting.BOLD),
+                  new TextComponent(planJson.get("subtitle").getAsString()),
+                  new TextComponent(planJson.get("price").getAsString())
+                      .withStyle(ChatFormatting.BOLD),
                   URI.create(planJson.get("link").getAsString()),
                   Streams.stream(planJson.get("details").getAsJsonArray())
                       .map(JsonElement::getAsString)
-                      .map(StringTextComponent::new)
+                      .map(TextComponent::new)
                       .collect(Collectors.toList())));
         }
 
@@ -150,10 +150,10 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
   }
 
   private View<?, YogaLayout> createPlan(boolean recommended, ResourceLocation image,
-      ITextComponent title,
-      ITextComponent subtitle,
-      ITextComponent price,
-      URI link, Collection<ITextComponent> specs) {
+      Component title,
+      Component subtitle,
+      Component price,
+      URI link, Collection<Component> specs) {
 
     ParentView<?, YogaLayout, YogaLayout> view = new ParentView<>(
         new YogaLayout()
@@ -190,7 +190,7 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                     .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
                     .addListener(ActionEvent.class,
                         (__, event) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
-                            new ConfirmOpenLinkScreen(
+                            new ConfirmLinkScreen(
                                 result -> {
                                   if (result) {
                                     Util.getPlatform().openUri(link);
@@ -198,7 +198,7 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                                   this.minecraft.setScreen((ViewScreen) this.getScreen());
                                 }, link.toString(), true))));
 
-    for (ITextComponent text : specs) {
+    for (Component text : specs) {
       view.addChild(new TextView<>(new YogaLayout().setMargin(2), text).setCentered(true));
     }
 

@@ -18,16 +18,16 @@
 
 package com.craftingdead.core.world.effect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.common.ForgeMod;
 
-public class ParachuteMobEffect extends Effect {
+public class ParachuteMobEffect extends MobEffect {
 
   public ParachuteMobEffect() {
-    super(EffectType.BENEFICIAL, 0xFFEFD1);
+    super(MobEffectCategory.BENEFICIAL, 0xFFEFD1);
     this.addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "c5a9e5c2-bd74-11eb-8529-0242ac130003",
         -0.07, AttributeModifier.Operation.ADDITION);
   }

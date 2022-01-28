@@ -18,31 +18,29 @@
 
 package com.craftingdead.core.client.renderer.entity.layers;
 
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
 import com.craftingdead.core.world.item.clothing.Clothing;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 
-public class ClothingLayer<T extends LivingEntity, M extends BipedModel<T>>
+public class ClothingLayer<T extends LivingEntity, M extends HumanoidModel<T>>
     extends AbstractClothingLayer<T, M> {
 
-  public ClothingLayer(IEntityRenderer<T, M> renderer) {
+  public ClothingLayer(RenderLayerParent<T, M> renderer) {
     super(renderer);
   }
 
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
     // Resolve optionals to nullable for better performance.
-    LivingExtension<?, ?> livingExtension =
-        livingEntity.getCapability(Capabilities.LIVING_EXTENSION).orElse(null);
+    var livingExtension = livingEntity.getCapability(LivingExtension.CAPABILITY).orElse(null);
     if (livingExtension != null) {
-      Clothing clothing =
+      var clothing =
           livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex())
-              .getCapability(Capabilities.CLOTHING)
+              .getCapability(Clothing.CAPABILITY)
               .orElse(null);
       if (clothing != null) {
         return clothing.getTexture(skinType);

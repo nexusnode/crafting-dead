@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 
 public class ServerEntry {
 
@@ -44,5 +45,9 @@ public class ServerEntry {
 
   public int getPort() {
     return this.port;
+  }
+
+  public ServerAddress toServerAddress() {
+    return new ServerAddress(this.hostName, this.port);
   }
 }

@@ -23,11 +23,11 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.module.Module;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.resources.ResourceLocation;
 
 public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
 
@@ -41,8 +41,8 @@ public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
   private final Minecraft minecraft = Minecraft.getInstance();
 
   @Override
-  public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayerEntity> player,
-      MatrixStack matrixStack, int width, int height, float partialTicks) {
+  public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
+      PoseStack matrixStack, int width, int height, float partialTicks) {
     SurvivalPlayerHandler survivalPlayer =
         (SurvivalPlayerHandler) player.getHandlerOrThrow(SurvivalPlayerHandler.EXTENSION_ID);
     int y = height / 2;
@@ -50,17 +50,17 @@ public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
 
     RenderSystem.enableBlend();
 
-    RenderUtil.bind(DAYS_SURVIVED);
+    RenderSystem.setShaderTexture(0, DAYS_SURVIVED);
     RenderUtil.blit(x, y - 20, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
-    RenderUtil.bind(ZOMBIES_KILLED);
+    RenderSystem.setShaderTexture(0, ZOMBIES_KILLED);
     RenderUtil.blit(x, y, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
-    RenderUtil.bind(PLAYERS_KILLED);
+    RenderSystem.setShaderTexture(0, PLAYERS_KILLED);
     RenderUtil.blit(x, y + 20, 16, 16);
     this.minecraft.font.drawShadow(matrixStack,
         String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);

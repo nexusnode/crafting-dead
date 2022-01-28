@@ -31,13 +31,18 @@ import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachment.MultiplierType;
 import com.craftingdead.core.world.item.gun.skin.Skin;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 
 public interface Gun extends CombatSlotProvider, Synched {
+
+  Capability<Gun> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   /**
    * Ticked when held by the passed in {@link LivingExtension}.
@@ -76,7 +81,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * @param hitLiving - the entity hit
    * @param pendingHit - hit data
    */
-  void validatePendingHit(PlayerExtension<ServerPlayerEntity> player,
+  void validatePendingHit(PlayerExtension<ServerPlayer> player,
       LivingExtension<?, ?> hitLiving, PendingHit pendingHit);
 
   /**

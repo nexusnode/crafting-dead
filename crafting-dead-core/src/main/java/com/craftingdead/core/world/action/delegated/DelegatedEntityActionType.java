@@ -29,12 +29,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public final class DelegatedEntityActionType extends AbstractDelegatedActionType {
 
   private final TargetSelector targetSelector;
-  private final List<Pair<Supplier<EffectInstance>, Float>> effects;
+  private final List<Pair<Supplier<MobEffectInstance>, Float>> effects;
   @Nullable
   private final Pair<Consumer<LivingExtension<?, ?>>, Float> customAction;
   private final BooleanSupplier condition;
@@ -51,7 +51,7 @@ public final class DelegatedEntityActionType extends AbstractDelegatedActionType
     return this.targetSelector;
   }
 
-  public List<Pair<Supplier<EffectInstance>, Float>> getEffects() {
+  public List<Pair<Supplier<MobEffectInstance>, Float>> getEffects() {
     return this.effects;
   }
 
@@ -76,7 +76,7 @@ public final class DelegatedEntityActionType extends AbstractDelegatedActionType
   public static final class Builder extends AbstractDelegatedActionType.Builder<Builder> {
 
     private TargetSelector targetSelector = TargetSelector.SELF_ONLY;
-    private final List<Pair<Supplier<EffectInstance>, Float>> effects = new ArrayList<>();
+    private final List<Pair<Supplier<MobEffectInstance>, Float>> effects = new ArrayList<>();
     @Nullable
     private Pair<Consumer<LivingExtension<?, ?>>, Float> customAction;
     private BooleanSupplier condition = () -> true;
@@ -90,7 +90,7 @@ public final class DelegatedEntityActionType extends AbstractDelegatedActionType
       return this;
     }
 
-    public Builder addEffect(Supplier<EffectInstance> effect, Float chance) {
+    public Builder addEffect(Supplier<MobEffectInstance> effect, Float chance) {
       this.effects.add(Pair.of(effect, chance));
       return this;
     }

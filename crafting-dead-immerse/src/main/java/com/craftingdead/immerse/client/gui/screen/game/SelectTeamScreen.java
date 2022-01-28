@@ -23,21 +23,21 @@ import com.craftingdead.immerse.client.gui.view.Blur;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
 import com.craftingdead.immerse.game.tdm.message.RequestJoinTeamMessage;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SelectTeamScreen extends Screen {
 
-  private static final ITextComponent TITLE =
-      new TranslationTextComponent("gui.screen.select_team.title");
-  private static final ITextComponent JOIN_RED =
-      new TranslationTextComponent("gui.screen.select_team.join_red");
-  private static final ITextComponent JOIN_BLUE =
-      new TranslationTextComponent("gui.screen.select_team.join_blue");
-  private static final ITextComponent SPECTATE =
-      new TranslationTextComponent("gui.screen.select_team.spectate");
+  private static final Component TITLE =
+      new TranslatableComponent("gui.screen.select_team.title");
+  private static final Component JOIN_RED =
+      new TranslatableComponent("gui.screen.select_team.join_red");
+  private static final Component JOIN_BLUE =
+      new TranslatableComponent("gui.screen.select_team.join_blue");
+  private static final Component SPECTATE =
+      new TranslatableComponent("gui.screen.select_team.spectate");
 
   private final Blur blur = new Blur();
 
@@ -49,7 +49,7 @@ public class SelectTeamScreen extends Screen {
   public void init() {
     super.init();
 
-    this.addButton(new GameButton((int) (this.width * 0.25F) - 50,
+    this.addRenderableWidget(new GameButton((int) (this.width * 0.25F) - 50,
         (int) (this.height * 0.5F), 100, 20,
         JOIN_RED,
         btn -> {
@@ -57,7 +57,7 @@ public class SelectTeamScreen extends Screen {
           this.onClose();
         }));
 
-    this.addButton(new GameButton(this.width - (int) (this.width * 0.25F) - 50,
+    this.addRenderableWidget(new GameButton(this.width - (int) (this.width * 0.25F) - 50,
         (int) (this.height * 0.5F), 100, 20,
         JOIN_BLUE,
         btn -> {
@@ -65,7 +65,7 @@ public class SelectTeamScreen extends Screen {
           this.onClose();
         }));
 
-    this.addButton(new GameButton(this.width - (int) (this.width * 0.5F) - 25,
+    this.addRenderableWidget(new GameButton(this.width - (int) (this.width * 0.5F) - 25,
         (int) (this.height * 0.75F), 50, 10,
         SPECTATE,
         btn -> {
@@ -81,7 +81,7 @@ public class SelectTeamScreen extends Screen {
   }
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
     this.blur.render(matrixStack, 0, 0, this.width, this.height, partialTicks);
 

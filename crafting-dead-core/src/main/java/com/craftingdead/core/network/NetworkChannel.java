@@ -19,10 +19,10 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.HitMessage;
-import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
@@ -33,10 +33,10 @@ import com.craftingdead.core.network.message.play.SyncGunEquipmentSlotMessage;
 import com.craftingdead.core.network.message.play.SyncLivingMessage;
 import com.craftingdead.core.network.message.play.TriggerPressedMessage;
 import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public enum NetworkChannel {
 

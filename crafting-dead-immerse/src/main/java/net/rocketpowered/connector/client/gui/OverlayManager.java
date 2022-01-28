@@ -1,18 +1,17 @@
 package net.rocketpowered.connector.client.gui;
 
-import java.util.Collections;
 import java.util.List;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.layout.EmptyLayout;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.INestedGuiEventHandler;
-import net.minecraft.client.gui.LoadingGui;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.client.ForgeHooksClient;
 
-public class OverlayManager extends LoadingGui implements EmptyLayout, INestedGuiEventHandler {
+public class OverlayManager extends Overlay implements EmptyLayout, ContainerEventHandler {
 
   public static final OverlayManager INSTANCE = new OverlayManager();
 
@@ -21,11 +20,11 @@ public class OverlayManager extends LoadingGui implements EmptyLayout, INestedGu
   private final OverlayView overlayView = OverlayView.create(this);
 
   @Override
-  public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
     if (this.minecraft.screen != null) {
-      ForgeHooksClient.drawScreen(this.minecraft.screen, matrixStack, mouseX, mouseY, partialTicks);
+      ForgeHooksClient.drawScreen(this.minecraft.screen, PoseStack, mouseX, mouseY, partialTicks);
     }
-    this.overlayView.render(new MatrixStack(), mouseX, mouseY, partialTicks);
+    this.overlayView.render(new PoseStack(), mouseX, mouseY, partialTicks);
   }
 
   public void toggle() {
@@ -37,7 +36,7 @@ public class OverlayManager extends LoadingGui implements EmptyLayout, INestedGu
   }
 
   public void show() {
-    this.minecraft.setScreen(new ViewScreen(StringTextComponent.EMPTY, GuildView::new));
+    this.minecraft.setScreen(new ViewScreen(TextComponent.EMPTY, GuildView::new));
 
     // if (!this.isVisible()) {
     // this.minecraft.setOverlay(this);
@@ -77,8 +76,8 @@ public class OverlayManager extends LoadingGui implements EmptyLayout, INestedGu
   }
 
   @Override
-  public List<? extends IGuiEventListener> children() {
-    return Collections.singletonList(this.overlayView);
+  public List<? extends GuiEventListener> children() {
+    return List.of(this.overlayView);
   }
 
   @Override
@@ -92,12 +91,12 @@ public class OverlayManager extends LoadingGui implements EmptyLayout, INestedGu
   }
 
   @Override
-  public IGuiEventListener getFocused() {
+  public GuiEventListener getFocused() {
     return this.overlayView.getFocused();
   }
 
   @Override
-  public void setFocused(IGuiEventListener focusedListener) {
+  public void setFocused(GuiEventListener focusedListener) {
     this.overlayView.setFocused(focusedListener);
   }
 }

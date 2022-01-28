@@ -26,19 +26,19 @@ import com.craftingdead.core.world.action.reload.MagazineReloadAction;
 import com.craftingdead.core.world.action.reload.RefillableReloadAction;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.SkeletonEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ActionTypes {
 
@@ -69,7 +69,7 @@ public class ActionTypes {
                   .setTargetSelector((performer, target) -> {
                     if (target == null
                         || performer == target
-                        || target.getEntity() instanceof SkeletonEntity) {
+                        || target.getEntity() instanceof Skeleton) {
                       return Optional.empty();
                     }
 
@@ -78,10 +78,10 @@ public class ActionTypes {
                       return Optional.ofNullable(target);
                     }
 
-                    if (performer.getEntity() instanceof PlayerEntity) {
-                      ((PlayerEntity) performer.getEntity()).displayClientMessage(
-                          new TranslationTextComponent("message.low_health",
-                              targetEntity.getDisplayName()).withStyle(TextFormatting.RED),
+                    if (performer.getEntity() instanceof Player) {
+                      ((Player) performer.getEntity()).displayClientMessage(
+                          new TranslatableComponent("message.low_health",
+                              targetEntity.getDisplayName()).withStyle(ChatFormatting.RED),
                           true);
                     }
 
@@ -101,7 +101,7 @@ public class ActionTypes {
               .setFreezeMovement(true)
               .addDelegatedAction(DelegatedEntityActionType.builder()
                   .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 1), 1.0F)
+                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 1), 1.0F)
                   .build())
               .build());
 
@@ -116,7 +116,7 @@ public class ActionTypes {
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
                   .addEffect(
-                      () -> new EffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1), 1.0F)
+                      () -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1), 1.0F)
                   .build())
               .build());
 
@@ -130,7 +130,7 @@ public class ActionTypes {
                   .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
                   .setReturnItem(ModItems.SYRINGE)
                   .setReturnItemInCreative(false)
-                  .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 0), 1.0F)
+                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0), 1.0F)
                   .build())
               .build());
 
@@ -141,7 +141,7 @@ public class ActionTypes {
               .setTotalDurationTicks(16)
               .addDelegatedAction(DelegatedEntityActionType.builder()
                   .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .addEffect(() -> new EffectInstance(Effects.HEAL, 1, 0), 1.0F)
+                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0), 1.0F)
                   .build())
               .build());
 }

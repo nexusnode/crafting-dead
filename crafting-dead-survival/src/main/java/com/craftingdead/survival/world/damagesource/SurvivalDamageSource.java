@@ -18,7 +18,7 @@
 
 package com.craftingdead.survival.world.damagesource;
 
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.damagesource.DamageSource;
 
 public class SurvivalDamageSource {
 

@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
 import com.craftingdead.immerse.game.Game;
@@ -37,11 +36,12 @@ import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.DependencyLoader;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.LogicalSide;
@@ -49,13 +49,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
-import net.rocketpowered.connector.client.gui.OverlayManager;
+import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {
@@ -116,8 +113,7 @@ public class CraftingDeadImmerse {
 
     this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
-    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+    final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
 
     ImmerseSoundEvents.SOUND_EVENTS.register(modEventBus);
@@ -163,13 +159,21 @@ public class CraftingDeadImmerse {
   }
 
   // ================================================================================
+  // Mod Events
+  // ================================================================================
+
+  private void handleCommonSetup(FMLCommonSetupEvent event) {
+    NetworkChannel.loadChannels();
+    GameNetworkChannel.load();
+  }
+
+  // ================================================================================
   // Forge Events
   // ================================================================================
 
-  public void handleCommonSetup(FMLCommonSetupEvent event) {
-    NetworkChannel.loadChannels();
-    GameNetworkChannel.load();
-    Permissions.register();
+  @SubscribeEvent
+  public void handlePermissionNodesGather(PermissionGatherEvent.Nodes event) {
+    event.addNodes(Permissions.GAME_OP);
   }
 
   @SubscribeEvent
@@ -178,19 +182,19 @@ public class CraftingDeadImmerse {
   }
 
   @SubscribeEvent
-  public void handleServerAboutToStart(FMLServerAboutToStartEvent event) {
+  public void handleServerAboutToStart(ServerAboutToStartEvent event) {
     this.logicalServer = this.modDist.createLogicalServer(event.getServer());
     this.logicalServer.startLoading();
     MinecraftForge.EVENT_BUS.register(this.logicalServer);
   }
 
   @SubscribeEvent
-  public void handleServerStarting(FMLServerStartingEvent event) {
+  public void handleServerStarting(ServerStartingEvent event) {
     this.logicalServer.finishLoading();
   }
 
   @SubscribeEvent
-  public void handleServerStopped(FMLServerStoppedEvent event) {
+  public void handleServerStopped(ServerStoppedEvent event) {
     // Server may not have fully started yet so could be null
     if (this.logicalServer != null) {
       MinecraftForge.EVENT_BUS.unregister(this.logicalServer);

@@ -27,9 +27,9 @@ import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundEvent;
 
 public class TypedGun<T extends GunItem> extends AbstractGun {
 

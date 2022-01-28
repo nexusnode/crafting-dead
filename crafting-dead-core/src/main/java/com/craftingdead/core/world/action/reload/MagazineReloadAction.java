@@ -21,8 +21,6 @@ package com.craftingdead.core.world.action.reload;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.Capabilities;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -31,10 +29,8 @@ import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.common.collect.ImmutableList;
-import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
-import com.tiviacz.travelersbackpack.inventory.TravelersBackpackInventory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -76,8 +72,8 @@ public class MagazineReloadAction extends AbstractReloadAction {
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
     if (!displayOnly
         && !this.oldMagazineStack.isEmpty()
-        && this.getPerformer().getEntity() instanceof PlayerEntity) {
-      ((PlayerEntity) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
+        && this.getPerformer().getEntity() instanceof Player) {
+      ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
     }
   }
 
@@ -99,15 +95,9 @@ public class MagazineReloadAction extends AbstractReloadAction {
     // Vest - first
     living.getItemHandler().getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
-    // Backpack - second
-    if (CraftingDead.getInstance().isTravelersBackpacksLoaded()
-        && living.getEntity() instanceof PlayerEntity) {
-      PlayerEntity playerEntity = (PlayerEntity) living.getEntity();
-      TravelersBackpackInventory backpackInventory = CapabilityUtils.getBackpackInv(playerEntity);
-      if (backpackInventory != null) {
-        builder.add(backpackInventory.getInventory());
-      }
-    }
+
+    // TODO Backpack - second
+
     // Inventory - third
     living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
         .ifPresent(builder::add);
@@ -119,7 +109,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
       for (int i = 0; i < itemHandler.getSlots(); ++i) {
         ItemStack itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
-            && !itemStack.getCapability(Capabilities.MAGAZINE)
+            && !itemStack.getCapability(Magazine.CAPABILITY)
                 .map(Magazine::isEmpty)
                 .orElse(true)) {
           return Optional.of(new MagazineLocation(itemHandler, i));

@@ -19,27 +19,27 @@
 package com.craftingdead.immerse.client.gui;
 
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
 
 public class KilledMessage {
 
-  private final AbstractClientPlayerEntity killerEntity;
+  private final AbstractClientPlayer killerEntity;
   private final ItemStack itemStack;
 
-  public KilledMessage(AbstractClientPlayerEntity killerEntity, ItemStack itemStack) {
+  public KilledMessage(AbstractClientPlayer killerEntity, ItemStack itemStack) {
     this.killerEntity = killerEntity;
     this.itemStack = itemStack;
   }
 
-  @SuppressWarnings("deprecation")
-  public void render(MatrixStack matrixStack, FontRenderer fontRenderer, int width, int height) {
+  public void render(PoseStack poseStack, Font font, int width, int height) {
     int boxWidth = 200;
     int boxContentsHeight = 80;
     int boxTitleHeight = 20;
@@ -47,46 +47,49 @@ public class KilledMessage {
     int x = width / 2 - (boxWidth / 2);
     int y = height / 2 + 10;
 
-    RenderUtil.fillWithShadow(matrixStack, x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
+    RenderUtil.fillWithShadow(poseStack, x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
 
-    matrixStack.pushPose();
+    poseStack.pushPose();
     {
-      matrixStack.translate(x + 5, y + 5, 0);
-      matrixStack.scale(1.5F, 1.5F, 1.5F);
-      fontRenderer.drawShadow(matrixStack,
-          new TranslationTextComponent("gui.killed_message.killed_by",
-              this.killerEntity.getDisplayName()).withStyle(TextFormatting.DARK_RED),
+      poseStack.translate(x + 5, y + 5, 0);
+      poseStack.scale(1.5F, 1.5F, 1.5F);
+      font.drawShadow(poseStack,
+          new TranslatableComponent("gui.killed_message.killed_by",
+              this.killerEntity.getDisplayName()).withStyle(ChatFormatting.DARK_RED),
           0, 0, 0);
     }
-    matrixStack.popPose();
+    poseStack.popPose();
 
-    RenderUtil.fillWithShadow(matrixStack, x, y + boxTitleHeight, boxWidth,
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
+    RenderUtil.fillWithShadow(poseStack, x, y + boxTitleHeight, boxWidth,
         boxContentsHeight - boxTitleHeight, 0xDD000000);
 
-    matrixStack.pushPose();
+    poseStack.pushPose();
     {
-      matrixStack.translate(x + 5, y + 24, 0);
-      matrixStack.scale(1.5F, 1.5F, 1.5F);
-      fontRenderer.drawShadow(matrixStack,
-          new TranslationTextComponent("gui.killed_message.hp", this.killerEntity.getHealth()), 0,
+      poseStack.translate(x + 5, y + 24, 0);
+      poseStack.scale(1.5F, 1.5F, 1.5F);
+      font.drawShadow(poseStack,
+          new TranslatableComponent("gui.killed_message.hp", this.killerEntity.getHealth()), 0,
           0, 0xFFFFFFFF);
     }
-    matrixStack.popPose();
+    poseStack.popPose();
 
     RenderUtil.blitAvatar(
-        this.killerEntity.getSkinTextureLocation(), matrixStack, x + 5, y + 40, 35, 35);
+        this.killerEntity.getSkinTextureLocation(), poseStack, x + 5, y + 40, 35, 35);
 
-    fontRenderer.drawShadow(
-        matrixStack, this.itemStack.getDisplayName(), x + 80, y + 30, 0xFFFFFFFF);
+    font.drawShadow(
+        poseStack, this.itemStack.getDisplayName(), x + 80, y + 30, 0xFFFFFFFF);
 
-    RenderSystem.pushMatrix();
+    final var modelViewStack = RenderSystem.getModelViewStack();
+    modelViewStack.pushPose();
     {
-      RenderSystem.translatef(x + 110, y + 50, 0);
-      double scale = 1.2D;
-      RenderSystem.scaled(scale, scale, scale);
+      modelViewStack.translate(x + 110, y + 50, 0);
+      var scale = 1.2F;
+      modelViewStack.scale(scale, scale, scale);
       com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
-          0xFFFFFFFF, ItemCameraTransforms.TransformType.FIXED);
+          0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
     }
-    RenderSystem.popMatrix();
+    modelViewStack.popPose();
   }
 }

@@ -18,10 +18,11 @@
 
 package com.craftingdead.immerse.client.util;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -29,201 +30,220 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.client.network.status.IClientStatusNetHandler;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.ProtocolType;
-import net.minecraft.network.ServerStatusResponse;
-import net.minecraft.network.handshake.client.CHandshakePacket;
-import net.minecraft.network.status.client.CPingPacket;
-import net.minecraft.network.status.client.CServerQueryPacket;
-import net.minecraft.network.status.server.SPongPacket;
-import net.minecraft.network.status.server.SServerInfoPacket;
-import net.minecraft.util.DefaultUncaughtExceptionHandler;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.DefaultUncaughtExceptionHandler;
+import net.minecraft.Util;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.multiplayer.resolver.ResolvedServerAddress;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.multiplayer.resolver.ServerNameResolver;
+import net.minecraft.network.Connection;
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
+import net.minecraft.network.protocol.status.ClientStatusPacketListener;
+import net.minecraft.network.protocol.status.ClientboundPongResponsePacket;
+import net.minecraft.network.protocol.status.ClientboundStatusResponsePacket;
+import net.minecraft.network.protocol.status.ServerStatus;
+import net.minecraft.network.protocol.status.ServerboundPingRequestPacket;
+import net.minecraft.network.protocol.status.ServerboundStatusRequestPacket;
 
 /**
  * Edited version of {@link net.minecraft.client.network.ServerPinger}
  */
 public class ServerPinger {
 
-	public static final ServerPinger INSTANCE = new ServerPinger();
+  public static final ServerPinger INSTANCE = new ServerPinger();
 
-	private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogManager.getLogger();
 
-	private static final Executor executor = Executors.newFixedThreadPool(5,
-			new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true)
-					.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger)).build());
+  private static final Executor executor = Executors.newFixedThreadPool(5,
+      new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true)
+          .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger)).build());
 
-	private final List<NetworkManager> pendingPings = Collections.synchronizedList(Lists.newArrayList());
+  private final List<Connection> pendingPings = Collections.synchronizedList(Lists.newArrayList());
 
-	private ServerPinger() {
-	}
+  private ServerPinger() {}
 
-	public void ping(String hostName, int port, Consumer<PingData> callback) {
-		executor.execute(() -> {
-			NetworkManager networkManagger;
-			try {
-				networkManagger = NetworkManager.connectToServer(InetAddress.getByName(hostName), port, false);
-			} catch (Throwable e) {
-				callback.accept(PingData.FAILED);
-				return;
-			}
+  public void ping(ServerAddress serveraddress, Consumer<PingData> callback) {
+    Optional<InetSocketAddress> optional = ServerNameResolver.DEFAULT.resolveAddress(serveraddress)
+        .map(ResolvedServerAddress::asInetSocketAddress);
+    var pingData = new PingData();
 
-			this.pendingPings.add(networkManagger);
+    if (!optional.isPresent()) {
+      pingFailed(serveraddress, ConnectScreen.UNKNOWN_HOST_MESSAGE, pingData);
+      return;
+    }
+    final var inetsocketaddress = optional.get();
 
-			networkManagger.setListener(new IClientStatusNetHandler() {
+    executor.execute(() -> {
+      Connection connection;
+      try {
+        connection = Connection.connectToServer(inetsocketaddress, false);
+      } catch (Throwable e) {
+        callback.accept(PingData.FAILED);
+        return;
+      }
 
-				private boolean successful;
-				private boolean receivedStatus;
-				private long pingSentAt;
-				private PingData pingData = new PingData();
+      this.pendingPings.add(connection);
 
-				@Override
-				public void handleStatusResponse(SServerInfoPacket packet) {
-					if (this.receivedStatus) {
-						networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.unrequested"));
-					} else {
-						this.receivedStatus = true;
-						ServerStatusResponse status = packet.getStatus();
-						if (status.getDescription() != null) {
-							this.pingData.motd = status.getDescription();
-						} else {
-							this.pingData.motd = StringTextComponent.EMPTY;
-						}
-						this.pingData.setServerVersion(new StringTextComponent(status.getVersion().getName()));
-						this.pingData.setVersion(status.getVersion().getProtocol());
-						this.pingData.setPlayersAmount(new StringTextComponent(
-								status.getPlayers().getNumPlayers() + "/" + status.getPlayers().getMaxPlayers()));
-						this.pingSentAt = Util.getMillis();
-						networkManagger.send(new CPingPacket(this.pingSentAt));
-						this.successful = true;
-					}
-				}
+      connection.setListener(new ClientStatusPacketListener() {
 
-				@Override
-				public void handlePongResponse(SPongPacket packetIn) {
-					long i = this.pingSentAt;
-					long j = Util.getMillis();
-					pingData.setPing(j - i);
-					networkManagger.disconnect(new TranslationTextComponent("multiplayer.status.finished"));
-				}
+        private boolean successful;
+        private boolean receivedStatus;
+        private long pingSentAt;
 
-				@Override
-				public void onDisconnect(ITextComponent reason) {
-					if (!this.successful) {
-						logger.error("Can't ping {}:{} Reason: {}", hostName, port, reason.getString());
-						pingData.setMotd(new TranslationTextComponent("multiplayer.status.cannot_connect"));
-						pingData.setPlayersAmount(new StringTextComponent("?"));
-					}
-					callback.accept(pingData);
-				}
+        @Override
+        public void handleStatusResponse(ClientboundStatusResponsePacket packet) {
+          if (this.receivedStatus) {
+            connection.disconnect(new TranslatableComponent("multiplayer.status.unrequested"));
+          } else {
+            this.receivedStatus = true;
+            ServerStatus status = packet.getStatus();
+            if (status.getDescription() != null) {
+              pingData.motd = status.getDescription();
+            } else {
+              pingData.motd = TextComponent.EMPTY;
+            }
+            pingData.setServerVersion(new TextComponent(status.getVersion().getName()));
+            pingData.setVersion(status.getVersion().getProtocol());
+            pingData.setPlayersAmount(new TextComponent(
+                status.getPlayers().getNumPlayers() + "/" + status.getPlayers().getMaxPlayers()));
+            this.pingSentAt = Util.getMillis();
+            connection.send(new ServerboundPingRequestPacket(this.pingSentAt));
+            this.successful = true;
+          }
+        }
 
-				@Override
-				public NetworkManager getConnection() {
-					return networkManagger;
-				}
-			});
+        @Override
+        public void handlePongResponse(ClientboundPongResponsePacket packetIn) {
+          long i = this.pingSentAt;
+          long j = Util.getMillis();
+          pingData.setPing(j - i);
+          connection.disconnect(new TranslatableComponent("multiplayer.status.finished"));
+        }
 
-			try {
-				networkManagger.send(new CHandshakePacket(hostName, port, ProtocolType.STATUS));
-				networkManagger.send(new CServerQueryPacket());
-			} catch (Throwable t) {
-				callback.accept(PingData.FAILED);
-			}
-		});
-	}
+        @Override
+        public void onDisconnect(Component reason) {
+          if (!this.successful) {
+            pingFailed(serveraddress, reason, pingData);
+          }
+          callback.accept(pingData);
+        }
 
-	public void pingPendingNetworks() {
-		synchronized (this.pendingPings) {
-			Iterator<NetworkManager> iterator = this.pendingPings.iterator();
+        @Override
+        public Connection getConnection() {
+          return connection;
+        }
+      });
 
-			while (iterator.hasNext()) {
-				NetworkManager networkmanager = iterator.next();
-				if (networkmanager.isConnected()) {
-					networkmanager.tick();
-				} else {
-					iterator.remove();
-					networkmanager.handleDisconnection();
-				}
-			}
+      try {
+        connection.send(
+            new ClientIntentionPacket(inetsocketaddress.getHostName(), inetsocketaddress.getPort(),
+                ConnectionProtocol.STATUS));
+        connection.send(new ServerboundStatusRequestPacket());
+      } catch (Throwable t) {
+        callback.accept(PingData.FAILED);
+      }
+    });
+  }
 
-		}
-	}
+  private static void pingFailed(ServerAddress address, Component reason, PingData pingData) {
+    logger.error("Can't ping {}:{} Reason: {}", address.getHost(), address.getPort(),
+        reason.getString());
+    pingData.setMotd(new TranslatableComponent("multiplayer.status.cannot_connect"));
+    pingData.setPlayersAmount(new TextComponent("?"));
+  }
 
-	public void clearPendingNetworks() {
-		synchronized (this.pendingPings) {
-			Iterator<NetworkManager> iterator = this.pendingPings.iterator();
-			while (iterator.hasNext()) {
-				NetworkManager networkmanager = iterator.next();
-				if (networkmanager.isConnected()) {
-					iterator.remove();
-					networkmanager.disconnect(new TranslationTextComponent("multiplayer.status.cancelled"));
-				}
-			}
+  public void pingPendingNetworks() {
+    synchronized (this.pendingPings) {
+      Iterator<Connection> iterator = this.pendingPings.iterator();
 
-		}
-	}
+      while (iterator.hasNext()) {
+        Connection networkmanager = iterator.next();
+        if (networkmanager.isConnected()) {
+          networkmanager.tick();
+        } else {
+          iterator.remove();
+          networkmanager.handleDisconnection();
+        }
+      }
 
-	public static class PingData {
-		public static final PingData FAILED;
-		static {
-			FAILED = new PingData();
-			FAILED.ping = -1L;
-			FAILED.motd = new TranslationTextComponent("multiplayer.status.cannot_connect")
-					.withStyle(TextFormatting.RED);
-			FAILED.serverVersion = new TranslationTextComponent("multiplayer.status.old");
-			FAILED.version = 0;
-			FAILED.playersAmount = new StringTextComponent("?");
-		}
+    }
+  }
 
-		private long ping;
-		private ITextComponent motd;
-		private ITextComponent serverVersion;
-		private ITextComponent playersAmount;
-		private int version;
+  public void clearPendingNetworks() {
+    synchronized (this.pendingPings) {
+      Iterator<Connection> iterator = this.pendingPings.iterator();
+      while (iterator.hasNext()) {
+        Connection networkmanager = iterator.next();
+        if (networkmanager.isConnected()) {
+          iterator.remove();
+          networkmanager.disconnect(new TranslatableComponent("multiplayer.status.cancelled"));
+        }
+      }
 
-		public long getPing() {
-			return ping;
-		}
+    }
+  }
 
-		public void setPing(long ping) {
-			this.ping = ping;
-		}
+  public static class PingData {
+    public static final PingData FAILED;
+    static {
+      FAILED = new PingData();
+      FAILED.ping = -1L;
+      FAILED.motd = new TranslatableComponent("multiplayer.status.cannot_connect")
+          .withStyle(ChatFormatting.RED);
+      FAILED.serverVersion = new TranslatableComponent("multiplayer.status.old");
+      FAILED.version = 0;
+      FAILED.playersAmount = new TextComponent("?");
+    }
 
-		public ITextComponent getMotd() {
-			return motd;
-		}
+    private long ping;
+    private Component motd;
+    private Component serverVersion;
+    private Component playersAmount;
+    private int version;
 
-		public void setMotd(ITextComponent motd) {
-			this.motd = motd;
-		}
+    public long getPing() {
+      return ping;
+    }
 
-		public ITextComponent getPlayersAmount() {
-			return playersAmount;
-		}
+    public void setPing(long ping) {
+      this.ping = ping;
+    }
 
-		public void setPlayersAmount(ITextComponent playersAmount) {
-			this.playersAmount = playersAmount;
-		}
+    public Component getMotd() {
+      return motd;
+    }
 
-		public ITextComponent getServerVersion() {
-			return serverVersion;
-		}
+    public void setMotd(Component motd) {
+      this.motd = motd;
+    }
 
-		public void setServerVersion(ITextComponent serverVersion) {
-			this.serverVersion = serverVersion;
-		}
+    public Component getPlayersAmount() {
+      return playersAmount;
+    }
 
-		public int getVersion() {
-			return version;
-		}
+    public void setPlayersAmount(Component playersAmount) {
+      this.playersAmount = playersAmount;
+    }
 
-		public void setVersion(int version) {
-			this.version = version;
-		}
-	}
+    public Component getServerVersion() {
+      return serverVersion;
+    }
+
+    public void setServerVersion(Component serverVersion) {
+      this.serverVersion = serverVersion;
+    }
+
+    public int getVersion() {
+      return version;
+    }
+
+    public void setVersion(int version) {
+      this.version = version;
+    }
+  }
 }

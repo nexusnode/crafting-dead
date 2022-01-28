@@ -23,21 +23,21 @@ import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.module.team.Team;
 import com.craftingdead.immerse.game.module.team.TeamInstance;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ChatFormatting;
 
 public enum TdmTeam implements Team {
 
-  RED("Red", TextFormatting.RED.getColor(),
+  RED("Red", ChatFormatting.RED.getColor(),
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/skins/red_team.png")),
-  BLUE("Blue", TextFormatting.BLUE.getColor(),
+  BLUE("Blue", ChatFormatting.BLUE.getColor(),
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/skins/blue_team.png"));
 
-  private static final DataParameter<Integer> SCORE =
-      new DataParameter<>(0x00, DataSerializers.INT);
+  private static final EntityDataAccessor<Integer> SCORE =
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
 
   private final String name;
   private final int colour;
@@ -72,10 +72,10 @@ public enum TdmTeam implements Team {
   }
 
   @Override
-  public void save(TeamInstance<?> teamInstance, CompoundNBT nbt) {}
+  public void save(TeamInstance<?> teamInstance, CompoundTag nbt) {}
 
   @Override
-  public void load(TeamInstance<?> teamInstance, CompoundNBT nbt) {}
+  public void load(TeamInstance<?> teamInstance, CompoundTag nbt) {}
 
   @Override
   public int getColour() {

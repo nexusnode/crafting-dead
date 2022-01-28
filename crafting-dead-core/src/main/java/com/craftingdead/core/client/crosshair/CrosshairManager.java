@@ -30,12 +30,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
-public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Crosshair>> {
+public class CrosshairManager extends SimplePreparableReloadListener<Map<ResourceLocation, Crosshair>> {
 
   public static final ResourceLocation DEFAULT_CROSSHAIR =
       new ResourceLocation(CraftingDead.ID, "standard");
@@ -52,8 +52,8 @@ public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Cross
   }
 
   @Override
-  protected Map<ResourceLocation, Crosshair> prepare(IResourceManager resourceManager,
-      IProfiler profiler) {
+  protected Map<ResourceLocation, Crosshair> prepare(ResourceManager resourceManager,
+      ProfilerFiller profiler) {
     ImmutableMap.Builder<ResourceLocation, Crosshair> crosshairs = ImmutableMap.builder();
     for (String domain : resourceManager.getNamespaces()) {
       ResourceLocation fileLocation = new ResourceLocation(domain, "crosshairs.json");
@@ -79,7 +79,7 @@ public class CrosshairManager extends ReloadListener<Map<ResourceLocation, Cross
 
   @Override
   protected void apply(Map<ResourceLocation, Crosshair> crosshairs,
-      IResourceManager resourceManager, IProfiler profiler) {
+      ResourceManager resourceManager, ProfilerFiller profiler) {
     this.loadedCrosshairs.clear();
     this.loadedCrosshairs.putAll(crosshairs);
   }

@@ -19,12 +19,17 @@
 package com.craftingdead.core.world.inventory.storage;
 
 import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
-import net.minecraft.inventory.container.IContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.MenuConstructor;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 
-public interface Storage extends IContainerProvider, IItemHandler, INBTSerializable<CompoundNBT> {
+public interface Storage extends MenuConstructor, IItemHandler, INBTSerializable<CompoundTag> {
+
+  Capability<Storage> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   boolean isValidForSlot(ModEquipmentSlotType slotType);
 
