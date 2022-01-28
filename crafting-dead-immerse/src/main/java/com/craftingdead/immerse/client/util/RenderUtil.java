@@ -19,8 +19,6 @@
 package com.craftingdead.immerse.client.util;
 
 import org.lwjgl.opengl.GL11;
-import com.craftingdead.immerse.client.shader.RoundedFrameShader;
-import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -57,40 +55,28 @@ public class RenderUtil {
         shadow);
   }
 
-  public static void enableRoundedFrameShader(float x, float y, float x2, float y2, float radius) {
-    ShaderLinkHelper.glUseProgram(RoundedRectShader.INSTANCE.getId());
-    RoundedFrameShader.INSTANCE.setRadius(radius - 1);
-    RoundedRectShader.INSTANCE.setInnerRect(x + radius, y + radius, x2 - radius, y2 - radius);
-  }
-
-  public static void enableRoundedRectShader(float x, float y, float x2, float y2, float radius) {
-    ShaderLinkHelper.glUseProgram(RoundedRectShader.INSTANCE.getId());
-    RoundedRectShader.INSTANCE.setRadius(radius - 1);
-    RoundedRectShader.INSTANCE.setInnerRect(x + radius, y + radius, x2 - radius, y2 - radius);
-  }
-
   public static void resetShader() {
     ShaderLinkHelper.glUseProgram(0);
   }
 
-  public static void fillWithShadow(MatrixStack matrixStack, double x, double y, double width,
-      double height, int colour) {
+  public static void fillWithShadow(MatrixStack matrixStack, float x, float y, float width,
+      float height, int colour) {
     fill(matrixStack, x - 1, y - 1, x + width + 1, y + height + 1, 0x4D000000);
     fill(matrixStack, x, y, x + width, y + height, colour);
   }
 
-  public static void fillWidthHeight(MatrixStack matrixStack, double x, double y, double width,
-      double height, int colour) {
+  public static void fillWidthHeight(MatrixStack matrixStack, float x, float y, float width,
+      float height, int colour) {
     fill(matrixStack, x, y, x + width, y + height, colour);
   }
 
-  public static void fill(MatrixStack matrixStack, double x, double y, double x2, double y2,
+  public static void fill(MatrixStack matrixStack, float x, float y, float x2, float y2,
       long colour) {
-    fill(matrixStack, x, y, 0.0D, x2, y2, colour);
+    fill(matrixStack, x, y, 0.0F, x2, y2, colour);
   }
 
-  public static void fill(MatrixStack matrixStack, double x, double y, double z, double x2,
-      double y2, long colour) {
+  public static void fill(MatrixStack matrixStack, float x, float y, float z, float x2,
+      float y2, long colour) {
     float alpha = (float) (colour >> 24 & 255) / 255.0F;
     float red = (float) (colour >> 16 & 255) / 255.0F;
     float green = (float) (colour >> 8 & 255) / 255.0F;
@@ -98,16 +84,15 @@ public class RenderUtil {
     fill(matrixStack.last().pose(), x, y, z, x2, y2, red, green, blue, alpha);
   }
 
-  public static void fill(Matrix4f matrix, double x, double y, double z, double x2, double y2,
-      float red,
-      float green, float blue, float alpha) {
+  public static void fill(Matrix4f matrix, float x, float y, float z, float x2, float y2,
+      float red, float green, float blue, float alpha) {
     if (x < x2) {
-      double i = x;
+      float i = x;
       x = x2;
       x2 = i;
     }
     if (y < y2) {
-      double j = y;
+      float j = y;
       y = y2;
       y2 = j;
     }
@@ -117,10 +102,10 @@ public class RenderUtil {
     RenderSystem.disableTexture();
     RenderSystem.defaultBlendFunc();
     builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-    builder.vertex(x, y2, z).color(red, green, blue, alpha).endVertex();
-    builder.vertex(x2, y2, z).color(red, green, blue, alpha).endVertex();
-    builder.vertex(x2, y, z).color(red, green, blue, alpha).endVertex();
-    builder.vertex(x, y, z).color(red, green, blue, alpha).endVertex();
+    builder.vertex(matrix, x, y2, z).color(red, green, blue, alpha).endVertex();
+    builder.vertex(matrix, x2, y2, z).color(red, green, blue, alpha).endVertex();
+    builder.vertex(matrix, x2, y, z).color(red, green, blue, alpha).endVertex();
+    builder.vertex(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
     tessellator.end();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
@@ -200,26 +185,33 @@ public class RenderUtil {
   }
 
   public static float[] getColour4f(int[] colour4i) {
-    return new float[] {colour4i[0] / 255.0F, colour4i[1] / 255.0F, colour4i[2] / 255.0F,
+    return new float[] {
+        colour4i[0] / 255.0F,
+        colour4i[1] / 255.0F,
+        colour4i[2] / 255.0F,
         colour4i[3] / 255.0F};
   }
 
-  public static int[] getColour4i(long colour) {
+  public static int[] getColour4i(int colour) {
     int[] rgba = new int[4];
-    rgba[0] = (int) ((colour >> 16) & 0xFF);
-    rgba[1] = (int) (colour >> 8) & 0xFF;
-    rgba[2] = (int) (colour >> 0) & 0xFF;
-    rgba[3] = (int) (colour >> 24) & 0xFF;
+    rgba[0] = (colour >> 16) & 0xFF;
+    rgba[1] = (colour >> 8) & 0xFF;
+    rgba[2] = (colour >> 0) & 0xFF;
+    rgba[3] = (colour >> 24) & 0xFF;
     return rgba;
   }
 
   public static int[] getColour4i(float[] colour4f) {
-    return new int[] {MathHelper.ceil(colour4f[0] * 255), MathHelper.ceil(colour4f[1] * 255),
-        MathHelper.ceil(colour4f[2] * 255), MathHelper.ceil(colour4f[3] * 255)};
+    return new int[] {
+        MathHelper.ceil(colour4f[0] * 255),
+        MathHelper.ceil(colour4f[1] * 255),
+        MathHelper.ceil(colour4f[2] * 255),
+        MathHelper.ceil(colour4f[3] * 255)};
   }
 
-  public static long getColour(int[] colour4i) {
-    return ((long) (colour4i[3] & 0xFF) << 24) | ((colour4i[0] & 0xFF) << 16)
+  public static int getColour(int[] colour4i) {
+    return ((colour4i[3] & 0xFF) << 24)
+        | ((colour4i[0] & 0xFF) << 16)
         | ((colour4i[1] & 0xFF) << 8)
         | ((colour4i[2] & 0xFF) << 0);
   }

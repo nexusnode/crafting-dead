@@ -38,27 +38,30 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
   private boolean depthTest = false;
   private boolean bilinearFiltering = false;
 
-  private final ValueStyleProperty<Color> colour =
-      Util.make(ValueStyleProperty.create("colour", Color.class, Color.WHITE),
+  private final ValueStyleProperty<Color> color =
+      Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
           this::registerValueProperty);
 
   private Vector2f fittedImageSize;
 
   public ImageView(L layout) {
     super(layout);
+    this.layout.setMeasureFunction(this::measure);
   }
 
   public ValueStyleProperty<Color> getColorProperty() {
-    return this.colour;
+    return this.color;
   }
 
   public final ImageView<L> setImage(ResourceLocation image) {
     this.image = image;
+    this.layout.markDirty();
     return this;
   }
 
   public final ImageView<L> setFitType(FitType fitType) {
     this.fitType = fitType;
+    this.layout.markDirty();
     return this;
   }
 
@@ -96,8 +99,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     this.fittedImageSize = this.getFittedImageSize().orElse(null);
   }
 
-  @Override
-  public Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  private Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     return this.getFittedImageSize(widthMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : width,
         heightMode == MeasureMode.UNDEFINED ? Integer.MAX_VALUE : height)
@@ -121,8 +123,8 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
     if (this.depthTest) {
       RenderSystem.enableDepthTest();
     }
-    final float[] colour = this.colour.get().getValue();
-    RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3]);
+    final float[] colour = this.color.get().getValue4f();
+    RenderSystem.color4f(colour[0], colour[1], colour[2], colour[3] * this.getAlpha());
     if (this.bind()) {
       if (this.bilinearFiltering) {
         this.minecraft.getTextureManager().getTexture(image).setFilter(true, true);

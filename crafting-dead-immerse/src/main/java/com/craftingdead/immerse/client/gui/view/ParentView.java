@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.util.ThreadSafe;
@@ -63,6 +62,13 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     return this.layoutParent;
   }
 
+  @Override
+  public SELF setVisible(boolean visible) {
+    super.setVisible(visible);
+    this.children.forEach(child -> child.setVisible(visible));
+    return this.self();
+  }
+
   @ThreadSafe
   @SuppressWarnings("unchecked")
   public final SELF addChild(View<?, C> view) {
@@ -83,6 +89,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
     this.layoutParent.addChild(view.getLayout(), view.index);
     view.parent = this;
+    view.setVisible(this.visible);
     view.layout();
     view.added();
 
@@ -90,10 +97,10 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   }
 
   /**
-   * Forces a child to be removed. If the child is not present an {@link IllegalArgumentException}
-   * will be thrown.
+   * Forces a child to be removed.
    * 
    * @param view - child to remove
+   * @throws IllegalStateException - if the child is not present
    * @return ourself
    */
   @ThreadSafe
@@ -102,7 +109,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       return this.minecraft.submit(() -> this.removeChild(view)).join();
     }
     this.assertChildPresent(view);
-    this.prepareForRemoval(view);
+    this.removed(view);
     this.children.remove(view);
     this.indexAndSortChildren();
     return this.self();
@@ -119,7 +126,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     if (!this.minecraft.isSameThread()) {
       return this.minecraft.submit(this::clearChildren).join();
     }
-    this.children.forEach(this::prepareForRemoval);
+    this.children.forEach(this::removed);
     this.children.clear();
     this.sortedChildren = new View[0];
     return this.self();
@@ -189,7 +196,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * 
    * @param view - child to remove
    */
-  private void prepareForRemoval(View<?, C> view) {
+  private void removed(View<?, C> view) {
     view.removed();
     view.parent = null;
     this.layoutParent.removeChild(view.getLayout());
@@ -216,7 +223,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     if (!this.pendingRemoval.isEmpty()) {
       this.pendingRemoval.forEach(pair -> {
         View<?, C> view = pair.getLeft();
-        this.prepareForRemoval(view);
+        this.removed(view);
         this.children.remove(view);
         Runnable callback = pair.getRight();
         if (callback != null) {
@@ -232,14 +239,15 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
 
   @Override
   public float computeFullHeight() {
-    final float height = (float) (this.children
-        .stream()
-        .mapToDouble(c -> c.getY() + c.getHeight())
-        .max()
-        .orElse(0.0F)
-        - super.getScaledContentY());
+    float minY = 0.0F;
+    float maxY = 0.0F;
+    for (View<?, ?> child : this.children) {
+      float y = child.getY() - this.getScaledContentY();
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y + child.getHeight());
+    }
 
-    return Math.max(height, 0);
+    return Math.max(maxY - minY, 0);
   }
 
   @ThreadSafe
@@ -250,17 +258,15 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       return;
     }
 
-    // Two passes required due to cyclic relationship: content height -> full height ->
-    // children height -> content height
+    // Do this twice because the content width depends on if a scrollbar exists which depends on the
+    // content height etc.
 
-    this.layoutParent.layout(Yoga.YGUndefined, Yoga.YGUndefined);
+    this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
-
     super.layout();
 
     this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
-
     super.layout();
   }
 

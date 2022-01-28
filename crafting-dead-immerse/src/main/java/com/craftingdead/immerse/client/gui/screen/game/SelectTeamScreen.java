@@ -83,7 +83,8 @@ public class SelectTeamScreen extends Screen {
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
-    this.blur.render(matrixStack, 0, 0, this.width, this.height, partialTicks);
+    this.blur.renderToTempTarget(partialTicks);
+    this.blur.render(matrixStack, 0, 0, this.width, this.height);
 
     super.render(matrixStack, mouseX, mouseY, partialTicks);
 

@@ -1,10 +1,9 @@
 #version 430 compatibility
 
-out vec2 f_Position;
+out vec2 f_VertexPosition;
 
 void main() {
-    f_Position = gl_Vertex.xy;
-
+	f_VertexPosition = gl_Vertex.xy;
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
     gl_FrontColor = gl_Color;
 }

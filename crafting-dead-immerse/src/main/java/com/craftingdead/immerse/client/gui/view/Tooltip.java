@@ -41,10 +41,8 @@ public class Tooltip {
     final float height = 14;
 
     RenderSystem.enableBlend();
-    RenderUtil.enableRoundedRectShader(x, y, x + width, y + height, 2);
     RenderUtil.fill(matrixStack,
-        x, y, x + width, y + height, 0x111111 | (this.opacityProperty.get() << 24));
-    RenderUtil.resetShader();
+        x, y, x + width, y + height, 0x222222 | (this.opacityProperty.get() << 24));
 
     int shiftedOpacity = this.textOpacityProperty.get() << 24;
     if ((shiftedOpacity & 0xFC000000) != 0) {

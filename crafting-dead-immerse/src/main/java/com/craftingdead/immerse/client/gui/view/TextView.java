@@ -19,9 +19,10 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import com.craftingdead.core.client.util.RenderUtil;
+import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -29,35 +30,59 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.ITextProperties;
+import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 
 public class TextView<L extends Layout> extends View<TextView<L>, L> {
 
-  private ITextComponent text;
+  private static final ITextComponent ELLIPSIS = new StringTextComponent("...");
+
+  private final ValueStyleProperty<Color> colorProperty =
+      Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
+          this::registerValueProperty);
+
+  private ITextComponent text = StringTextComponent.EMPTY;
   private FontRenderer font;
   private boolean shadow;
   private boolean centered;
+  private boolean wrap = true;
 
   private List<IReorderingProcessor> lines = new ArrayList<>();
 
-  public TextView(L layout, ITextComponent text) {
+  public TextView(L layout) {
     super(layout);
-    this.text = text;
-    this.font = super.minecraft.font;
+    this.font = this.minecraft.font;
     this.shadow = true;
     this.centered = false;
+
+    this.layout.setMeasureFunction(this::measure);
   }
 
-  public TextView(L layout, String text) {
-    this(layout, new StringTextComponent(text));
+  public ValueStyleProperty<Color> getColorProperty() {
+    return this.colorProperty;
+  }
+
+  public TextView<L> setWrap(boolean wrap) {
+    this.wrap = wrap;
+    if (this.isAdded()) {
+      this.layout.markDirty();
+      this.parent.layout();
+    }
+    return this;
   }
 
   public TextView<L> setFontRenderer(FontRenderer fontRenderer) {
     this.font = fontRenderer;
+    if (this.isAdded()) {
+      this.layout.markDirty();
+      this.parent.layout();
+    }
     return this;
   }
 
@@ -71,31 +96,58 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
     return this;
   }
 
+  public TextView<L> setText(@Nullable String text) {
+    return this.setText(ITextComponent.nullToEmpty(text));
+  }
+
   public TextView<L> setText(ITextComponent text) {
     this.text = text;
-    this.generateLines(this.getContentWidth());
+    if (this.isAdded()) {
+      this.layout.markDirty();
+      this.parent.layout();
+    }
     return this;
   }
 
   @Override
   public void layout() {
-    this.generateLines(this.getContentWidth());
     super.layout();
+    this.generateLines(this.getContentWidth());
   }
 
-  @Override
-  protected Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
+  private Vector2f measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
-    if (widthMode == MeasureMode.UNDEFINED) {
-      width = this.font.width(this.text.getString());
+    float actualWidth = this.font.width(this.text);
+    switch (widthMode) {
+      case UNDEFINED:
+        width = actualWidth;
+        break;
+      case AT_MOST:
+        width = Math.min(actualWidth, width);
+        break;
+      default:
+        break;
     }
-
     this.generateLines(width);
     return new Vector2f(width, this.lines.size() * this.font.lineHeight);
   }
 
   private void generateLines(float width) {
-    this.lines = this.font.split(this.text, MathHelper.ceil(width));
+    int ceilWidth = MathHelper.floor(width);
+    if (this.wrap) {
+      this.lines = this.font.split(this.text, ceilWidth);
+    } else {
+      int textWidth = this.font.width(this.text);
+      ITextProperties finalText;
+      if (textWidth > ceilWidth) {
+        int ellipsisWidth = this.font.width(ELLIPSIS);
+        finalText = ITextProperties.composite(
+            this.font.substrByWidth(this.text, ceilWidth - ellipsisWidth), ELLIPSIS);
+      } else {
+        finalText = this.font.substrByWidth(this.text, ceilWidth);
+      }
+      this.lines = Collections.singletonList(LanguageMap.getInstance().getVisualOrder(finalText));
+    }
   }
 
   @Override
@@ -114,10 +166,19 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   @Override
   public void renderContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    int opacity = MathHelper.ceil(this.getAlpha() * 255.0F) << 24;
+
+    final int[] color4i = this.colorProperty.get().getValue4i();
+
+    final int opacity = MathHelper.ceil(this.getAlpha() * color4i[3]) << 24;
     if ((opacity & 0xFC000000) == 0) {
       return;
     }
+
+    int color = opacity
+        | ((color4i[0] & 0xFF) << 16)
+        | ((color4i[1] & 0xFF) << 8)
+        | ((color4i[2] & 0xFF) << 0);
+
 
     matrixStack.pushPose();
     {
@@ -138,9 +199,9 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
           this.font.drawInBatch(line, x, 0.0F,
-              0xFFFFFF | opacity,
+              color,
               this.shadow, matrixStack.last().pose(), renderTypeBuffer, false, 0,
-              RenderUtil.FULL_LIGHT);
+              com.craftingdead.core.client.util.RenderUtil.FULL_LIGHT);
         }
         matrixStack.popPose();
       }

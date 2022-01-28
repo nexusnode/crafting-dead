@@ -19,6 +19,18 @@
 package com.craftingdead.immerse.client.gui.screen;
 
 import com.craftingdead.immerse.client.gui.view.Color;
+import com.craftingdead.immerse.client.gui.view.ParentView;
+import com.craftingdead.immerse.client.gui.view.States;
+import com.craftingdead.immerse.client.gui.view.TextView;
+import com.craftingdead.immerse.client.gui.view.Transition;
+import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
+import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
+import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
+import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
+import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
+import net.minecraft.util.text.ITextComponent;
 
 public class Theme {
 
@@ -31,4 +43,43 @@ public class Theme {
   public static final Color BLUE_DISABLED = new Color(0x330761b0);
   public static final Color BLUE = new Color(0x6674b9f7);
   public static final Color BLUE_HIGHLIGHTED = new Color(0x6691cbff);
+
+  public static final Color ONLINE = new Color(0xFF90ba3c);
+  public static final Color OFFLINE = Color.GRAY;
+
+  public static View<?, YogaLayout> createRedButton(ITextComponent text, Runnable actionListener) {
+    return createButton(RED, RED_HIGHLIGHTED, text, actionListener);
+  }
+
+  public static View<?, YogaLayout> createGreenButton(ITextComponent text,
+      Runnable actionListener) {
+    return createButton(GREEN, GREEN_HIGHLIGHTED, text, actionListener);
+  }
+
+  public static View<?, YogaLayout> createBlueButton(ITextComponent text, Runnable actionListener) {
+    return createButton(BLUE, BLUE_HIGHLIGHTED, text, actionListener);
+  }
+
+  public static View<?, YogaLayout> createButton(Color color, Color hoveredColor,
+      ITextComponent text, Runnable actionListener) {
+    return new ParentView<>(
+        new YogaLayout()
+            .setWidth(30F)
+            .setHeight(20F)
+            .setFlex(1F),
+        new YogaLayoutParent()
+            .setJustifyContent(Justify.CENTER)
+            .setAlignItems(Align.CENTER))
+                .addChild(new TextView<>(new YogaLayout().setHeight(8F))
+                    .setText(text)
+                    .setShadow(false)
+                    .setCentered(true))
+                .configure(view -> view.getBackgroundColorProperty()
+                    .setBaseValue(color)
+                    .defineState(hoveredColor, States.HOVERED, States.ENABLED)
+                    .setTransition(Transition.linear(100L)))
+                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
+                .setFocusable(true)
+                .addListener(ActionEvent.class, (view, event) -> actionListener.run());
+  }
 }

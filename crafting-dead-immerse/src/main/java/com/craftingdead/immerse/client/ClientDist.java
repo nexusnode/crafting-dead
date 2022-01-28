@@ -37,8 +37,7 @@ import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
-import com.craftingdead.immerse.client.shader.RoundedFrameShader;
-import com.craftingdead.immerse.client.shader.RoundedRectShader;
+import com.craftingdead.immerse.client.shader.ShaderPrograms;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
@@ -149,8 +148,9 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   @Override
   public void onResourceManagerReload(IResourceManager resourceManager,
       Predicate<IResourceType> resourcePredicate) {
-    RoundedRectShader.INSTANCE.compile(resourceManager);
-    RoundedFrameShader.INSTANCE.compile(resourceManager);
+    ShaderPrograms.RECT.compile(resourceManager);
+    ShaderPrograms.ROUNDED_RECT.compile(resourceManager);
+    ShaderPrograms.ROUNDED_TEX.compile(resourceManager);
   }
 
   // ================================================================================
@@ -283,7 +283,7 @@ public class ClientDist implements ModDist, ISelectiveResourceReloadListener {
   @SubscribeEvent
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
-      case END:
+      case START:
         TIMING_SOURCE.tick();
         break;
       default:

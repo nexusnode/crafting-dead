@@ -45,22 +45,22 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   protected ParentView<?, YogaLayout, YogaLayout> createTopRowControls() {
     return super.createTopRowControls()
         .configure(view -> view.getLayout().setWidth(300))
-        .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+        .addChild(Theme.createBlueButton(
             new TranslationTextComponent("view.mutable_server_list.button.direct_connect"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = ((ViewScreen) this.getScreen());
+              ViewScreen screen = this.getScreen();
               screen.keepOpenAndSetScreen(new ServerListScreen(screen,
                   connect -> this.minecraft.setScreen(connect
                       ? new ConnectingScreen(screen, this.minecraft, tempServerData)
                       : screen),
                   tempServerData));
             }).configure(view -> view.getLayout().setMargin(3)))
-        .addChild(createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
+        .addChild(Theme.createGreenButton(
             new TranslationTextComponent("view.mutable_server_list.button.add"), () -> {
               ServerData tempServerData =
                   new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = ((ViewScreen) this.getScreen());
+              ViewScreen screen = this.getScreen();
               screen.keepOpenAndSetScreen(new AddServerScreen(screen,
                   success -> {
                     if (success) {
@@ -74,13 +74,13 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
 
   @Override
   protected ParentView<?, YogaLayout, YogaLayout> createBottomRowControls() {
-    this.removeButton = createButton(Theme.RED, Theme.RED_HIGHLIGHTED,
+    this.removeButton = Theme.createRedButton(
         new TranslationTextComponent("view.mutable_server_list.button.remove"),
         () -> this.getSelectedItem().ifPresent(this::removeServer))
-            .configure(view -> view.getBackgroundColorProperty()
-                .registerState(Theme.RED_DISABLED, States.DISABLED))
-            .setEnabled(false)
-            .configure(view -> view.getLayout().setMargin(3));
+        .configure(view -> view.getBackgroundColorProperty()
+            .defineState(Theme.RED_DISABLED, States.DISABLED))
+        .setEnabled(false)
+        .configure(view -> view.getLayout().setMargin(3));
     return super.createBottomRowControls()
         .configure(view -> view.getLayout().setWidth(300))
         .addChild(this.removeButton);

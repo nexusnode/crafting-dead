@@ -86,6 +86,7 @@ class WorldItemView
   WorldItemView(WorldSummary worldSummary, WorldListView<?> parentWorldList) {
     super(
         new YogaLayout()
+            .setWidthPercent(100)
             .setHeight(46F)
             .setTopMargin(6F)
             .setMaxWidth(300F)
@@ -111,13 +112,13 @@ class WorldItemView
     }
 
     this.getOutlineWidthProperty()
-        .registerState(1.0F, States.SELECTED)
-        .registerState(1.0F, States.HOVERED)
-        .registerState(1.0F, States.FOCUSED);
+        .defineState(1.0F, States.SELECTED)
+        .defineState(1.0F, States.HOVERED)
+        .defineState(1.0F, States.FOCUSED);
     this.getOutlineColorProperty()
-        .registerState(Color.WHITE, States.SELECTED)
-        .registerState(Color.GRAY, States.HOVERED)
-        .registerState(Color.GRAY, States.FOCUSED);
+        .defineState(Color.WHITE, States.SELECTED)
+        .defineState(Color.GRAY, States.HOVERED)
+        .defineState(Color.GRAY, States.FOCUSED);
 
     this.getBackgroundColorProperty().setBaseValue(new Color(0X882C2C2C));
 
@@ -137,17 +138,17 @@ class WorldItemView
             new YogaLayoutParent()
                 .setFlexDirection(FlexDirection.COLUMN)
                 .setJustifyContent(Justify.CENTER))
-                    .addChild(new TextView<>(new YogaLayout(),
-                        new StringTextComponent(displayName))
-                            .setShadow(false))
-                    .addChild(new TextView<>(new YogaLayout().setTopMargin(2F),
-                        new StringTextComponent(info)
+                    .addChild(new TextView<>(new YogaLayout())
+                        .setText(displayName)
+                        .setShadow(false))
+                    .addChild(new TextView<>(new YogaLayout().setTopMargin(2F))
+                        .setText(new StringTextComponent(info)
                             .withStyle(TextFormatting.GRAY))
-                                .setShadow(false))
-                    .addChild(new TextView<>(new YogaLayout(),
-                        new StringTextComponent(description)
+                        .setShadow(false))
+                    .addChild(new TextView<>(new YogaLayout())
+                        .setText(new StringTextComponent(description)
                             .withStyle(TextFormatting.GRAY))
-                                .setShadow(false)));
+                        .setShadow(false)));
   }
 
   @Nullable
@@ -174,7 +175,7 @@ class WorldItemView
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.hasState(States.FOCUSED)) {
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
       this.toggleState(States.SELECTED);
       this.updateProperties(false);
       return true;
@@ -197,7 +198,7 @@ class WorldItemView
       return;
     }
 
-    ViewScreen screen = (ViewScreen) this.getScreen();
+    ViewScreen screen = this.getScreen();
     if (this.worldSummary.shouldBackup()) {
       ITextComponent backupQuestion = new TranslationTextComponent("selectWorld.backupQuestion");
       ITextComponent backupWarning = new TranslationTextComponent("selectWorld.backupWarning",
@@ -261,7 +262,7 @@ class WorldItemView
     String fileName = this.worldSummary.getLevelName();
     try {
       SaveFormat.LevelSave levelSave = this.minecraft.getLevelSource().createAccess(fileName);
-      ViewScreen screen = (ViewScreen) this.getScreen();
+      ViewScreen screen = this.getScreen();
       screen.keepOpenAndSetScreen(new EditWorldScreen(confirm -> {
         try {
           levelSave.close();
@@ -284,7 +285,7 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
   public void deleteWorld() {
-    ViewScreen screen = (ViewScreen) this.getScreen();
+    ViewScreen screen = this.getScreen();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
         this.minecraft.setScreen(new WorkingScreen());
@@ -310,7 +311,7 @@ class WorldItemView
    * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
   public void recreateWorld() {
-    ViewScreen screen = (ViewScreen) this.getScreen();
+    ViewScreen screen = this.getScreen();
     screen.keepOpen();
 
     this.minecraft.forceSetScreen(

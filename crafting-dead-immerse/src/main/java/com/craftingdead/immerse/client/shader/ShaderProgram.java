@@ -21,84 +21,86 @@ package com.craftingdead.immerse.client.shader;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.immerse.CraftingDeadImmerse;
-import net.minecraft.client.shader.IShaderManager;
+import org.lwjgl.opengl.GL20;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.shader.ShaderLinkHelper;
-import net.minecraft.client.shader.ShaderLoader;
-import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
-public class ShaderProgram implements IShaderManager {
+public class ShaderProgram {
 
   public static final Logger logger = LogManager.getLogger();
 
-  private int program;
+  private final Map<Shader.Type, ResourceLocation> shaderLocations;
 
-  private ShaderLoader vertexShader;
-  private ShaderLoader fragmentShader;
+  private final String name;
 
-  @Nonnull
-  private final ResourceLocation vertexShaderLocation;
-  @Nonnull
-  private final ResourceLocation fragmentShaderLocation;
+  private int programId;
 
-  public ShaderProgram(@Nonnull ResourceLocation vert, @Nonnull ResourceLocation frag) {
-    this.vertexShaderLocation = vert;
-    this.fragmentShaderLocation = frag;
+  private Set<Shader> shaders = Collections.emptySet();
+
+  public ShaderProgram(String name, Map<Shader.Type, ResourceLocation> shaderLocations) {
+    this.name = name;
+    this.shaderLocations = new EnumMap<>(shaderLocations);
   }
 
-  public ShaderProgram(@Nonnull String vert, @Nonnull String frag) {
-    this(new ResourceLocation(CraftingDeadImmerse.ID, String.format("shaders/%s.vert", vert)),
-        new ResourceLocation(CraftingDeadImmerse.ID, String.format("shaders/%s.frag", frag)));
+  public void use() {
+    RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+    ShaderLinkHelper.glUseProgram(this.programId);
   }
 
-  public void compile(IResourceManager manager) {
-    if (this.vertexShader != null || this.fragmentShader != null) {
-      ShaderLinkHelper.releaseProgram(this);
+  public void link() throws IOException {
+    RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+    this.shaders.forEach(shader -> shader.attach(this.programId));
+    GlStateManager.glLinkProgram(this.programId);
+    if (GlStateManager.glGetProgrami(this.programId, GL20.GL_LINK_STATUS) == 0) {
+      logger.warn("Failed to link program {}:", this.name);
+      logger.warn(GlStateManager.glGetProgramInfoLog(this.programId, 0x8000));
+    }
+  }
+
+  public void release() {
+    RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+    this.shaders.forEach(Shader::close);
+    this.shaders.clear();
+    GlStateManager.glDeleteProgram(this.programId);
+  }
+
+  public void compile(IResourceManager resourceManager) {
+    if (!this.shaders.isEmpty()) {
+      this.release();
     }
     try {
-      this.vertexShader =
-          createShader(manager, this.vertexShaderLocation, ShaderLoader.ShaderType.VERTEX);
-      this.fragmentShader =
-          createShader(manager, this.fragmentShaderLocation, ShaderLoader.ShaderType.FRAGMENT);
-      this.program = ShaderLinkHelper.createProgram();
-      ShaderLinkHelper.linkProgram(this);
+      this.shaders = this.shaderLocations.entrySet().stream()
+          .map(entry -> createShader(resourceManager, entry.getKey(), entry.getValue()))
+          .filter(Objects::nonNull)
+          .collect(Collectors.toSet());
+      this.programId = ShaderLinkHelper.createProgram();
+      this.link();
     } catch (IOException e) {
-      logger.fatal("Can't create program {}", getClass().getSimpleName(), e);
+      logger.fatal("Failed to create program {}: ", this.name, e);
     }
   }
 
-  @Nonnull
-  private static ShaderLoader createShader(IResourceManager manager,
-      @Nonnull ResourceLocation location, ShaderLoader.ShaderType type) throws IOException {
-    IResource resource = manager.getResource(location);
-    try (InputStream stream = new BufferedInputStream(resource.getInputStream())) {
-      return ShaderLoader.compileShader(type, location.toString(), stream,
-          resource.getSourceName());
+  @Nullable
+  private static Shader createShader(IResourceManager resourceManager, Shader.Type type,
+      ResourceLocation location) {
+    try (InputStream stream =
+        new BufferedInputStream(resourceManager.getResource(location).getInputStream())) {
+      return Shader.compile(type, location.toString(), stream);
+    } catch (IOException e) {
+      logger.warn("Failed to load shader {}: ", location.toString(), e);
+      return null;
     }
-  }
-
-  @Override
-  public int getId() {
-    return this.program;
-  }
-
-  @Override
-  public void markDirty() {}
-
-  @Nonnull
-  @Override
-  public ShaderLoader getVertexProgram() {
-    return this.vertexShader;
-  }
-
-  @Nonnull
-  @Override
-  public ShaderLoader getFragmentProgram() {
-    return this.fragmentShader;
   }
 }

@@ -34,6 +34,7 @@ import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
+import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
@@ -58,7 +59,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout> {
+public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
 
   private static final Logger logger = LogManager.getLogger();
   private static final ExecutorService executorService = Executors.newSingleThreadExecutor(
@@ -76,7 +77,7 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
   private final TextView<YogaLayout> statusView;
   private final TextView<YogaLayout> animationView;
 
-  public ConnectView(ViewScreen layout, Screen lastScreen, String host, int port) {
+  public ConnectView(Layout layout, Screen lastScreen, String host, int port) {
     super(layout,
         new YogaLayoutParent().setAlignItems(Align.CENTER).setJustifyContent(Justify.CENTER));
     this.lastScreen = lastScreen;
@@ -98,22 +99,23 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
                             .setBaseValue(new Color(0x40111111)))
                     .addChild(
                         this.statusView =
-                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15),
-                                new TranslationTextComponent("connect.connecting"))
-                                    .setCentered(true))
+                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
+                                .setText(new TranslationTextComponent("connect.connecting"))
+                                .setCentered(true))
                     .addChild(
                         this.animationView =
-                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15),
-                                this.nextAnimation()).setCentered(true))
+                            new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
+                                .setText(this.nextAnimation())
+                                .setCentered(true))
                     .addChild(
                         new TextView<>(
-                            new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50),
-                            DialogTexts.GUI_CANCEL)
+                            new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50))
+                                .setText(DialogTexts.GUI_CANCEL)
                                 .setCentered(true)
                                 .configure(view -> view.getBackgroundColorProperty()
                                     .setBaseValue(
                                         new Color(TextFormatting.RED.getColor() + (100 << 24)))
-                                    .registerState(
+                                    .defineState(
                                         new Color(TextFormatting.DARK_RED.getColor() + (100 << 24)),
                                         States.HOVERED, States.ENABLED)
                                     .setTransition(Transition.linear(150L)))
@@ -147,7 +149,7 @@ public class ConnectView extends ParentView<ConnectView, ViewScreen, YogaLayout>
         ConnectView.this.connection.setListener(
             new ClientLoginNetHandler(ConnectView.this.connection,
                 ConnectView.this.minecraft, ConnectView.this.lastScreen,
-                ConnectView.this.statusView::setText));
+                text -> this.minecraft.execute(() -> ConnectView.this.statusView.setText(text))));
         ConnectView.this.connection
             .send(new CHandshakePacket(host, port, ProtocolType.LOGIN));
         ConnectView.this.connection.send(

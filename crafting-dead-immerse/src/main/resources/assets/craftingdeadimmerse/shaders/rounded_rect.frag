@@ -1,24 +1,40 @@
 #version 430 compatibility
 
-precision highp float;
 
-layout(location = 0) uniform float u_Radius;
-layout(location = 1) uniform vec4 u_InnerRect;
+layout(location = 0) uniform vec4 u_Radius;
+layout(location = 1) uniform vec2 u_Position;
+layout(location = 2) uniform vec2 u_Size;
+layout(location = 3) uniform float u_OutlineWidth;
+layout(location = 4) uniform vec4 u_OutlineColor;
 
-in vec2 f_Position;
+in vec2 f_VertexPosition;
 
 out vec4 fragColor;
 
+// from http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+// additional thanks to iq for optimizing my conditional block for individual corner radii!
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, vec4 Radius) {
+    Radius.xy = (CenterPosition.x > 0.0) ? Radius.xy : Radius.zw;
+    Radius.x = (CenterPosition.y > 0.0) ? Radius.x  : Radius.y;
+    
+    vec2 q = abs(CenterPosition)-Size+Radius.x;
+    return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - Radius.x;
+}
+
 void main() {
+    // How soft the edges should be (in pixels). Higher values could be used to simulate a drop shadow.
+    float edgeSoftness  = 0.5f;
 
-    vec2 tl = u_InnerRect.xy - f_Position;
-    vec2 br = f_Position - u_InnerRect.zw;
+    // Calculate distance to edge.   
+    float distance = roundedBoxSDF(  f_VertexPosition - u_Position - u_Size / 2.0f, u_Size / 2.0f, u_Radius);
 
-    vec2 dis = max(br, tl);
+    float borderAlpha = 1.0f - smoothstep(u_OutlineWidth - 0.15f, u_OutlineWidth, abs(distance));
 
-    float v = length(max(vec2(0.0), dis)) - u_Radius;
+    // Smooth the result (free antialiasing).
+    float smoothedAlpha =  1.0f - smoothstep(0.0f, edgeSoftness, distance);
 
-    float a = 1.0 - smoothstep(0.0, 1.0, v);
-
-    fragColor = gl_Color * vec4(1.0, 1.0, 1.0, a);
+    fragColor = mix(gl_Color, u_OutlineColor, borderAlpha) * vec4(1.0f, 1.0f, 1.0f, smoothedAlpha);
+    if (fragColor.w <= 0.0f) {
+        discard;
+    }
 }

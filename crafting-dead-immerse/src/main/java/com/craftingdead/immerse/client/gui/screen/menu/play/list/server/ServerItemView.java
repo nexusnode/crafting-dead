@@ -26,7 +26,6 @@ import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -53,6 +52,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   ServerItemView(ServerEntry serverEntry) {
     super(
         new YogaLayout()
+            .setWidthPercent(90)
             .setTopMargin(3F)
             .setLeftMargin(7F)
             .setRightMargin(7F)
@@ -66,30 +66,34 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
     this.serverEntry = serverEntry;
 
     this.getOutlineWidthProperty()
-        .registerState(1.0F, States.SELECTED)
-        .registerState(1.0F, States.HOVERED);
+        .defineState(1.0F, States.SELECTED)
+        .defineState(1.0F, States.HOVERED);
     this.getOutlineColorProperty()
-        .registerState(Color.WHITE, States.SELECTED)
-        .registerState(Color.GRAY, States.HOVERED);
+        .defineState(Color.WHITE, States.SELECTED)
+        .defineState(Color.GRAY, States.HOVERED);
 
     this.motdComponent = new TextView<>(new YogaLayout()
-        .setOverflow(Overflow.HIDDEN)
+        .setMinHeight(8)
         .setFlex(2)
         .setWidthPercent(100)
-        .setHeight(8), "...")
+        .setHeight(8))
+            .setText("...")
             .setShadow(false)
-            .setCentered(true);
+            .setCentered(true)
+            .setWrap(false);
 
     this.pingComponent = new TextView<>(new YogaLayout()
         .setWidth(60F)
         .setLeftMargin(10F)
-        .setHeight(8), "...")
+        .setHeight(8))
+            .setText("...")
             .setShadow(false)
             .setCentered(true);
     this.playersAmountComponent = new TextView<>(new YogaLayout()
         .setWidth(60F)
         .setLeftMargin(10F)
-        .setHeight(8), "...")
+        .setHeight(8))
+            .setText("...")
             .setShadow(false)
             .setCentered(true);
 
@@ -101,11 +105,11 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
         .addListener(ActionEvent.class, (c, e) -> this.connect())
         .addChild(this.motdComponent)
         .addChild(new TextView<>(
-            new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8),
-            new StringTextComponent(this.serverEntry.getMap().orElse("-"))
-                .withStyle(TextFormatting.GRAY))
-                    .setShadow(false)
-                    .setCentered(true))
+            new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8))
+                .setText(new StringTextComponent(this.serverEntry.getMap().orElse("-"))
+                    .withStyle(TextFormatting.GRAY))
+                .setShadow(false)
+                .setCentered(true))
         .addChild(this.pingComponent)
         .addChild(this.playersAmountComponent);
 
@@ -124,9 +128,9 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
 
   public void connect() {
     // Call this before creating a ConnectingScreen instance.
-    ((ViewScreen) this.getScreen()).keepOpen();
+    this.getScreen().keepOpen();
     this.minecraft.setScreen(ConnectView.createScreen(
-        ((ViewScreen) this.getScreen()), this.serverEntry.getHostName(),
+        this.getScreen(), this.serverEntry.getHostName(),
         this.serverEntry.getPort()));
   }
 
@@ -135,9 +139,9 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   }
 
   public void ping() {
-    this.motdComponent.setText(new StringTextComponent("..."));
-    this.pingComponent.setText(new StringTextComponent("..."));
-    this.playersAmountComponent.setText(new StringTextComponent("..."));
+    this.motdComponent.setText("...");
+    this.pingComponent.setText("...");
+    this.playersAmountComponent.setText("...");
     this.lastAnimationUpdateMs = 0;
 
     ServerPinger.INSTANCE.ping(this.serverEntry.getHostName(), this.serverEntry.getPort(),
@@ -168,7 +172,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.hasState(States.FOCUSED)) {
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
       this.toggleState(States.SELECTED);
       this.updateProperties(false);
       return true;

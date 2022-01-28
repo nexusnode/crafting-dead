@@ -18,46 +18,73 @@
 
 package com.craftingdead.immerse.client.gui.view.layout;
 
+import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import net.minecraft.util.math.vector.Vector2f;
 
 public interface Layout {
 
-  Overflow getOverflow();
+  default Overflow getOverflow() {
+    return Overflow.VISIBLE;
+  }
 
-  float getLeft();
+  default float getLeft() {
+    return 0;
+  }
 
-  float getLeftPadding();
+  default float getLeftPadding() {
+    return 0;
+  }
 
-  float getLeftBorder();
+  default float getLeftBorder() {
+    return 0;
+  }
 
-  float getRight();
+  default float getRight() {
+    return 0;
+  }
 
-  float getRightPadding();
+  default float getRightPadding() {
+    return 0;
+  }
 
-  float getRightBorder();
+  default float getRightBorder() {
+    return 0;
+  }
 
-  float getTop();
+  default float getTop() {
+    return 0;
+  }
 
-  float getTopPadding();
+  default float getTopPadding() {
+    return 0;
+  }
 
-  float getTopBorder();
+  default float getTopBorder() {
+    return 0;
+  }
 
-  float getBottom();
+  default float getBottom() {
+    return 0;
+  }
 
-  float getBottomPadding();
+  default float getBottomPadding() {
+    return 0;
+  }
 
-  float getBottomBorder();
+  default float getBottomBorder() {
+    return 0;
+  }
 
   float getWidth();
 
   float getHeight();
 
-  void setMeasureFunction(MeasureFunction measureFunction);
+  default void setMeasureFunction(@Nullable MeasureFunction measureFunction) {}
 
-  void layout();
+  default void markDirty() {}
 
-  void close();
+  default void close() {}
 
   interface MeasureFunction {
 

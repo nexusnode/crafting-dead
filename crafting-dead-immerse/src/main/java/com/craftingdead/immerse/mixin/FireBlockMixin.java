@@ -40,7 +40,7 @@ public class FireBlockMixin {
   /**
    * Adds hook for {@link GameServer#disableBlockBurning()}.
    */
-  @Inject(method = "tryCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
+  @Inject(method = "tryCatchFire", at = @At(value = "HEAD"), cancellable = true)
   private void tryCatchFire(World level, BlockPos pos, int chance, Random random, int age,
       Direction face, CallbackInfo callbackInfo) {
     if (this.blockBurningDisabled(level)) {
@@ -51,7 +51,7 @@ public class FireBlockMixin {
   /**
    * Adds hook for {@link GameServer#disableBlockBurning()}.
    */
-  @Inject(method = "canCatchFire", at = @At(value = "HEAD"), cancellable = true, remap = false)
+  @Inject(method = "canCatchFire", at = @At(value = "HEAD"), cancellable = true)
   private void canCatchFire(IBlockReader blockGetter, BlockPos pos, Direction face,
       CallbackInfoReturnable<Boolean> callbackInfo) {
     if (blockGetter instanceof World && this.blockBurningDisabled((World) blockGetter)) {

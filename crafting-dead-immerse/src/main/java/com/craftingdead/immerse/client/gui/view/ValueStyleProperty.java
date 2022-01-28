@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Collections;
@@ -6,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.google.common.collect.Sets;
 
 public class ValueStyleProperty<T> extends StyleProperty<T> {
@@ -21,6 +40,12 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
   private T value;
 
   private Transition<T> transition = Transition.instant();
+
+  @Nullable
+  private Runnable transitionStopListener;
+
+  @Nullable
+  private T overrideValue;
 
   protected ValueStyleProperty(String name, Class<T> type, @Nonnull T baseValue) {
     super(name);
@@ -45,7 +70,7 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
   }
 
   @Override
-  public StyleProperty<T> registerState(T value, State... states) {
+  public StyleProperty<T> defineState(T value, State... states) {
     if (states.length == 0) {
       return this;
     }
@@ -63,22 +88,33 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     return this.defined;
   }
 
-  public T get() {
-    return this.value;
+  public void setOverrideValue(@Nullable T overrideValue) {
+    this.overrideValue = overrideValue;
   }
 
-  public void transition(Set<State> states, boolean instant) {
+  public T get() {
+    return this.overrideValue != null ? this.overrideValue : this.value;
+  }
+
+  public boolean transition(Set<State> states, boolean instant) {
     T newValue = this.stateValues.get(states);
-    if (newValue != null && !Objects.equals(newValue, this.value)) {
+    if (newValue == null) {
+      return false;
+    }
+
+    if (this.transitionStopListener != null) {
+      this.transitionStopListener.run();
+    }
+
+    if (!Objects.equals(newValue, this.value)) {
       if (instant) {
         this.set(newValue);
       } else {
-
-
-//        this.value = newValue;
-         this.transition.transition(this, newValue);
+        this.transitionStopListener = this.transition.transition(this, newValue);
       }
     }
+
+    return true;
   }
 
   public Class<T> getValueType() {

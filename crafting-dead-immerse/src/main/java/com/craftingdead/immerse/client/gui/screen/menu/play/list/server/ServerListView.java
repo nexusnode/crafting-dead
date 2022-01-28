@@ -31,18 +31,13 @@ import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.States;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class ServerListView<L extends Layout>
@@ -66,25 +61,23 @@ public class ServerListView<L extends Layout>
     super(layout, new YogaLayoutParent().setFlexDirection(FlexDirection.COLUMN));
     this.serverProvider = serverEntryProvider;
 
+
     this.listView = new ParentView<>(
         new YogaLayout()
-            .setFlexBasis(1)
-            .setFlexGrow(1)
+            .setFlex(1)
             .setBottomPadding(7F)
-            .setHeight(60F)
             .setOverflow(Overflow.SCROLL),
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.COLUMN)
-            .setAlignItems(Align.CENTER))
-                .addChild(this.firstTableRow());
+            .setAlignItems(Align.CENTER));
     this.addChild(this.listView);
 
-    this.playButton = createButton(Theme.GREEN, Theme.GREEN_HIGHLIGHTED,
+    this.playButton = Theme.createGreenButton(
         new TranslationTextComponent("view.server_list.button.play"),
         () -> this.getSelectedItem().ifPresent(ServerItemView::connect))
-            .configure(view -> view.getBackgroundColorProperty()
-                .registerState(Theme.GREEN_DISABLED, States.DISABLED))
-            .setEnabled(false);
+        .configure(view -> view.getBackgroundColorProperty()
+            .defineState(Theme.GREEN_DISABLED, States.DISABLED))
+        .setEnabled(false);
 
     this.controlsView = new ParentView<>(
         new YogaLayout().setHeight(56),
@@ -121,72 +114,12 @@ public class ServerListView<L extends Layout>
         new YogaLayoutParent()
             .setFlexDirection(FlexDirection.ROW)
             .setAlignItems(Align.CENTER))
-                .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+                .addChild(Theme.createBlueButton(
                     new TranslationTextComponent("view.server_list.button.quick_refresh"),
                     this::quickRefresh).configure(view -> view.getLayout().setMargin(3)))
-                .addChild(createButton(Theme.BLUE, Theme.BLUE_HIGHLIGHTED,
+                .addChild(Theme.createBlueButton(
                     new TranslationTextComponent("view.server_list.button.refresh"),
                     this::refresh).configure(view -> view.getLayout().setMargin(3)));
-  }
-
-  protected static View<?, YogaLayout> createButton(Color color, Color hoveredColor,
-      ITextComponent text, Runnable actionListener) {
-    return new ParentView<>(
-        new YogaLayout()
-            .setWidth(30F)
-            .setHeight(20F)
-            .setFlex(1F),
-        new YogaLayoutParent()
-            .setJustifyContent(Justify.CENTER)
-            .setAlignItems(Align.CENTER))
-                .addChild(new TextView<>(new YogaLayout().setHeight(8F), text)
-                    .setShadow(false)
-                    .setCentered(true))
-                .configure(view -> view.getBackgroundColorProperty()
-                    .setBaseValue(color)
-                    .registerState(hoveredColor, States.HOVERED, States.ENABLED)
-                    .setTransition(Transition.linear(150L)))
-                .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                .setFocusable(true)
-                .addListener(ActionEvent.class, (c, e) -> actionListener.run());
-  }
-
-  private View<?, YogaLayout> firstTableRow() {
-    return new ParentView<>(
-        new YogaLayout()
-            .setTopMargin(5F)
-            .setBottomMargin(1F)
-            .setLeftMargin(7F)
-            .setRightMargin(7F)
-            .setLeftPadding(10F)
-            .setRightPadding(20F)
-            .setHeight(22F)
-            .setMaxWidth(520F),
-        new YogaLayoutParent()
-            .setFlexDirection(FlexDirection.ROW)
-            .setAlignItems(Align.CENTER))
-                .configure(
-                    view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x88121212)))
-                .addChild(new TextView<>(new YogaLayout().setFlex(2F).setHeight(8),
-                    new TranslationTextComponent("view.server_list.motd"))
-                        .setShadow(false)
-                        .setCentered(true))
-                .addChild(new TextView<>(new YogaLayout().setFlex(1).setHeight(8),
-                    new TranslationTextComponent("view.server_list.map"))
-                        .setShadow(false)
-                        .setCentered(true))
-                .addChild(new TextView<>(
-                    new YogaLayout().setWidth(60F).setHeight(8).setLeftMargin(10F),
-                    new TranslationTextComponent("view.server_list.ping"))
-                        .setShadow(false)
-                        .setCentered(true))
-                .addChild(new TextView<>(new YogaLayout()
-                    .setWidth(60F)
-                    .setHeight(8)
-                    .setLeftMargin(10F),
-                    new TranslationTextComponent("view.server_list.players"))
-                        .setShadow(false)
-                        .setCentered(true));
   }
 
   @Override
@@ -239,7 +172,8 @@ public class ServerListView<L extends Layout>
       this.listView.clearChildren();
       this.selectedItem = null;
       this.updateSelected();
-      this.serverProvider.load().thenAccept(servers -> servers.forEach(this::addServer));
+      this.serverProvider.load()
+          .thenAcceptAsync(servers -> servers.forEach(this::addServer), this.minecraft);
     }
   }
 

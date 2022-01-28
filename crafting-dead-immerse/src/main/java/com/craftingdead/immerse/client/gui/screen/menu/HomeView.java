@@ -21,7 +21,6 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
-import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.Color;
@@ -51,7 +50,7 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
         new YogaLayout()
             .setWidthPercent(45.0F)
             .setHeightPercent(75.0F)
-            .setPadding(10.0F)
+            .setPadding(10)
             .setLeftMarginPercent(10.0F)
             .setOverflow(Overflow.SCROLL),
         new YogaLayoutParent())
@@ -59,6 +58,8 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
                 view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x70777777)))
             .setBackgroundBlur(50.0F)
             .configure(view -> ViewUtil.addAll(view, new File("news.xml")));
+
+
     this.addChild(this.newsComponent);
   }
 
@@ -66,14 +67,10 @@ public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
   protected void added() {
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
-            .keyFrames(new KeyFrames.Builder<>(0.3F)
-                .addFrame(1.0F)
-                .build())
+            .to(0.3F, 1.0F)
             .build())
         .addTarget(Animation.forProperty(this.newsComponent.getYScaleProperty())
-            .keyFrames(new KeyFrames.Builder<>(0.3F)
-                .addFrame(1.0F)
-                .build())
+            .to(0.3F, 1.0F)
             .build())
         .setDuration(250L, TimeUnit.MILLISECONDS)
         .build()

@@ -1,3 +1,21 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2021  NexusNode LTD
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.io.IOException;
@@ -22,7 +40,6 @@ import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -72,10 +89,10 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
             .setBottomMargin(10),
             new YogaLayoutParent().setAlignItems(Align.CENTER))
                 .addChild(
-                    new TextView<>(new YogaLayout(),
-                        new TranslationTextComponent("view.hosting.partners")
+                    new TextView<>(new YogaLayout())
+                        .setText(new TranslationTextComponent("view.hosting.partners")
                             .withStyle(TextFormatting.ITALIC))
-                                .setCentered(true))
+                        .setCentered(true))
                 .addChild(new ImageView<>(new YogaLayout()
                     .setWidth(200))
                         .setFitType(FitType.CONTAIN)
@@ -155,7 +172,7 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
       ITextComponent price,
       URI link, Collection<ITextComponent> specs) {
 
-    ParentView<?, YogaLayout, YogaLayout> view = new ParentView<>(
+    ParentView<?, YogaLayout, YogaLayout> planView = new ParentView<>(
         new YogaLayout()
             .setWidth(100)
             .setHeight(165)
@@ -169,44 +186,54 @@ public class HostingView extends ParentView<HostingView, YogaLayout, YogaLayout>
                 .setBottom(150).setWidth(30).setHeight(30))
                     .setImage(image)
                     .setBilinearFiltering(true))
-            .addChild(new TextView<>(new YogaLayout(), title).setCentered(true))
-            .addChild(new TextView<>(new YogaLayout().setMargin(2), subtitle).setCentered(true))
-            .addChild(new TextView<>(new YogaLayout().setTopMargin(10).setBottomMargin(10), price)
-                .setCentered(true)
-                .configure(v -> v.getScaleProperty().setBaseValue(1.25F)))
+            .addChild(new TextView<>(new YogaLayout())
+                .setText(title)
+                .setCentered(true))
+            .addChild(new TextView<>(new YogaLayout()
+                .setMargin(2))
+                    .setText(subtitle)
+                    .setCentered(true))
+            .addChild(new TextView<>(new YogaLayout()
+                .setTopMargin(10)
+                .setBottomMargin(10))
+                    .setText(price)
+                    .setCentered(true)
+                    .configure(view -> view.getScaleProperty().setBaseValue(1.25F)))
             .addChild(new TextView<>(
                 new YogaLayout()
                     .setWidthPercent(80)
                     .setHeight(20)
-                    .setBottomMargin(10),
-                ORDER_NOW_TEXT)
-                    .setCentered(true)
-                    .setShadow(false)
-                    .configure(v -> v.getBackgroundColorProperty()
-                        .setBaseValue(new Color(0x66EE0000))
-                        .registerState(new Color(0x88EE0000), States.HOVERED, States.ENABLED)
-                        .setTransition(Transition.linear(150L)))
-                    .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
-                    .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                    .addListener(ActionEvent.class,
-                        (__, event) -> ((ViewScreen) this.getScreen()).keepOpenAndSetScreen(
-                            new ConfirmOpenLinkScreen(
-                                result -> {
-                                  if (result) {
-                                    Util.getPlatform().openUri(link);
-                                  }
-                                  this.minecraft.setScreen((ViewScreen) this.getScreen());
-                                }, link.toString(), true))));
+                    .setBottomMargin(10))
+                        .setText(ORDER_NOW_TEXT)
+                        .setCentered(true)
+                        .setShadow(false)
+                        .configure(view -> view.getBackgroundColorProperty()
+                            .setBaseValue(new Color(0x66EE0000))
+                            .defineState(new Color(0x88EE0000), States.HOVERED, States.ENABLED)
+                            .setTransition(Transition.linear(150L)))
+                        .configure(v -> v.getBorderRadiusProperty().setBaseValue(3.0F))
+                        .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
+                        .addListener(ActionEvent.class,
+                            (__, event) -> this.getScreen().keepOpenAndSetScreen(
+                                new ConfirmOpenLinkScreen(
+                                    result -> {
+                                      if (result) {
+                                        Util.getPlatform().openUri(link);
+                                      }
+                                      this.minecraft.setScreen(this.getScreen());
+                                    }, link.toString(), true))));
 
     for (ITextComponent text : specs) {
-      view.addChild(new TextView<>(new YogaLayout().setMargin(2), text).setCentered(true));
+      planView.addChild(new TextView<>(new YogaLayout().setMargin(2))
+          .setText(text)
+          .setCentered(true));
     }
 
     if (recommended) {
-      view.getBorderColorProperty().setBaseValue(Color.DARK_RED);
-      view.getLayout().setBorderWidth(10);
+      planView.getBorderColorProperty().setBaseValue(Color.DARK_RED);
+      planView.getLayout().setBorderWidth(10);
     }
 
-    return view;
+    return planView;
   }
 }

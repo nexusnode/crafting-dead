@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
@@ -28,14 +29,12 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 
 public class TabsView<L extends Layout>
     extends ParentView<TabsView<L>, L, YogaLayout> {
 
-  private final List<Tab> tabList = new ArrayList<>();
-  private Tab selectedTab = null;
+  private final List<TabView> tabList = new ArrayList<>();
+  private TabView selectedTab = null;
   private float tabWidth = 60f;
   private float tabHeight = 20f;
   private boolean init = false;
@@ -49,7 +48,7 @@ public class TabsView<L extends Layout>
   /**
    * If called after adding this component as a child,
    */
-  public TabsView<L> addTab(Tab tab) {
+  public TabsView<L> addTab(TabView tab) {
     this.tabList.add(tab);
     return this;
   }
@@ -65,8 +64,8 @@ public class TabsView<L extends Layout>
       return;
     }
     this.init = true;
-    Tab newSelectedTab = null;
-    for (Tab tab : this.tabList) {
+    TabView newSelectedTab = null;
+    for (TabView tab : this.tabList) {
       tab.getLayout().setWidth(this.tabWidth);
       float y = (this.tabHeight - this.minecraft.font.lineHeight) / 2F;
       tab.getLayout().setTopPadding(y);
@@ -78,7 +77,7 @@ public class TabsView<L extends Layout>
         tab.setSelected(false);
       }
       tab.layout();
-      tab.addListener(ActionEvent.class, (c, e) -> this.changeTab((Tab) c));
+      tab.addListener(ActionEvent.class, (c, e) -> this.changeTab((TabView) c));
     }
 
     if (newSelectedTab != null) {
@@ -88,8 +87,8 @@ public class TabsView<L extends Layout>
     }
   }
 
-  private void changeTab(Tab newTab) {
-    Tab previousTab = this.selectedTab;
+  private void changeTab(TabView newTab) {
+    TabView previousTab = this.selectedTab;
     this.selectedTab = newTab;
     if (previousTab != newTab) {
       if (previousTab != null) {
@@ -99,35 +98,31 @@ public class TabsView<L extends Layout>
     }
   }
 
-  public static class Tab extends TextView<YogaLayout> {
+  public static class TabView extends TextView<YogaLayout> {
 
     public static final Color DEFAULT_UNDERSCORE_COLOR = Color.WHITE;
-    public static final double DEFAULT_UNDERSCORE_HEIGHT = 2.5D;
+    public static final float DEFAULT_UNDERSCORE_HEIGHT = 2.5F;
     public static final int DEFAULT_UNDERSCORE_OFFSET = 1;
     public static final boolean DEFAULT_DISABLED = false;
     public static final boolean DEFAULT_SHADOW = false;
     public static final boolean DEFAULT_CENTERED = true;
 
     private Color underscoreColor;
-    private double underscoreHeight;
+    private float underscoreHeight;
     private boolean disabled;
     private float underscoreYOffset;
 
+    @Nullable
     private Runnable selectedListener;
 
-    public Tab(ITextComponent text, Runnable selectedListener) {
-      super(new YogaLayout(), text);
+    public TabView() {
+      super(new YogaLayout());
       this.underscoreColor = DEFAULT_UNDERSCORE_COLOR;
       this.underscoreHeight = DEFAULT_UNDERSCORE_HEIGHT;
       this.underscoreYOffset = DEFAULT_UNDERSCORE_OFFSET;
       this.disabled = DEFAULT_DISABLED;
       this.setShadow(DEFAULT_SHADOW);
       this.setCentered(DEFAULT_CENTERED);
-      this.selectedListener = selectedListener;
-    }
-
-    public Tab(String text, Runnable selectedListener) {
-      this(new StringTextComponent(text), selectedListener);
     }
 
     @Override
@@ -143,7 +138,7 @@ public class TabsView<L extends Layout>
             this.underscoreColor.getHex());
       } else if (this.isHovered()) {
         RenderUtil.fill(matrixStack, this.getScaledX(),
-            this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5D
+            this.getScaledY() + this.getScaledHeight() - this.underscoreHeight / 1.5F
                 + this.underscoreYOffset,
             this.getScaledX() + this.getScaledWidth(),
             this.getScaledY() + this.getScaledHeight() + this.underscoreYOffset,
@@ -152,11 +147,16 @@ public class TabsView<L extends Layout>
     }
 
     @Override
-    public Tab setSelected(boolean selected) {
-      if (selected) {
+    public TabView setSelected(boolean selected) {
+      if (selected && this.selectedListener != null) {
         this.selectedListener.run();
       }
       super.setSelected(selected);
+      return this;
+    }
+
+    public TabView setSelectedListener(Runnable selectedListener) {
+      this.selectedListener = selectedListener;
       return this;
     }
 
@@ -164,16 +164,16 @@ public class TabsView<L extends Layout>
       return this.underscoreColor;
     }
 
-    public Tab setUnderscoreColor(Color underscoreColor) {
+    public TabView setUnderscoreColor(Color underscoreColor) {
       this.underscoreColor = underscoreColor;
       return this;
     }
 
-    public double getUnderscoreHeight() {
+    public float getUnderscoreHeight() {
       return this.underscoreHeight;
     }
 
-    public Tab setUnderscoreHeight(double underscoreHeight) {
+    public TabView setUnderscoreHeight(float underscoreHeight) {
       this.underscoreHeight = underscoreHeight;
       return this;
     }
@@ -182,7 +182,7 @@ public class TabsView<L extends Layout>
       return this.disabled;
     }
 
-    public Tab setDisabled(boolean disabled) {
+    public TabView setDisabled(boolean disabled) {
       this.disabled = disabled;
       return this;
     }
@@ -191,7 +191,7 @@ public class TabsView<L extends Layout>
       return this.underscoreYOffset;
     }
 
-    public Tab setUnderscoreYOffset(float underscoreYOffset) {
+    public TabView setUnderscoreYOffset(float underscoreYOffset) {
       this.underscoreYOffset = underscoreYOffset;
       return this;
     }

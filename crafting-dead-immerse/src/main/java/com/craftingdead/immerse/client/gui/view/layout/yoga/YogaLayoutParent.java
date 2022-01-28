@@ -56,6 +56,9 @@ public class YogaLayoutParent implements LayoutParent<YogaLayout> {
 
   @Override
   public void addChild(YogaLayout layout, int index) {
+    if (Yoga.YGNodeHasMeasureFunc(this.node)) {
+      throw new IllegalStateException("This shouldn't happen...");
+    }
     Yoga.YGNodeInsertChild(this.node, layout.node, index);
   }
 
