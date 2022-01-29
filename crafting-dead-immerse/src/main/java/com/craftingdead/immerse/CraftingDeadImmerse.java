@@ -82,7 +82,7 @@ public class CraftingDeadImmerse {
   }
 
   private static final String SENTRY_DSN =
-      "https://6b38ee4b782e462f8de7a60835107fc2@o1130188.ingest.sentry.io/6174141";
+      "https://31d8ac34b0c24ddf98223098d42fd526@o1128514.ingest.sentry.io/6174174";
 
   /**
    * Singleton.

@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft;
 public abstract class MinecraftMixin {
 
   /**
-   * Modifys window title.
+   * Modifies window title.
    */
   @Inject(method = "createTitle", at = @At("HEAD"), cancellable = true)
   private void createTitle(CallbackInfoReturnable<String> callbackInfo) {
