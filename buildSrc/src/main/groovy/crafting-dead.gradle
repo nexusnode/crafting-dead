@@ -28,7 +28,15 @@ repositories {
 }
 
 configurations {
-    implementation.extendsFrom shaded
+    library
+    implementation.extendsFrom library
+    shadow.extendsFrom library
+}
+
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
 }
 
 dependencies {
