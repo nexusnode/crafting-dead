@@ -5,7 +5,8 @@ import com.mojang.serialization.Codec;
 public interface ItemRendererProperties {
 
   Codec<? extends ItemRendererProperties> CODEC =
-      ItemRendererType.CODEC.dispatch(ItemRendererProperties::getItemRendererType,
+      ItemRendererTypes.CODEC.dispatch(
+          ItemRendererProperties::getItemRendererType,
           ItemRendererType::getPropertiesCodec);
 
   ItemRendererType<?, ?> getItemRendererType();

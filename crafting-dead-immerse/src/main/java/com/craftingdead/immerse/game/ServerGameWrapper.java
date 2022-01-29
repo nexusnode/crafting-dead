@@ -42,7 +42,7 @@ public class ServerGameWrapper extends GameWrapper<GameServer, ServerModule> {
   }
 
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
-    for (ServerModule module : this.modules.values()) {
+    for (var module : this.modules.values()) {
       module.addPlayer(player);
     }
     this.getGame().addPlayer(player);
@@ -51,7 +51,7 @@ public class ServerGameWrapper extends GameWrapper<GameServer, ServerModule> {
 
   public void removePlayer(PlayerExtension<ServerPlayer> player) {
     this.getGame().removePlayer(player);
-    for (ServerModule module : this.modules.values()) {
+    for (var module : this.modules.values()) {
       module.removePlayer(player);
     }
   }

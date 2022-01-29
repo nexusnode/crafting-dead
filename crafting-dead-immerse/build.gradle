@@ -63,18 +63,6 @@ minecraft {
     }
 }
 
-configurations {
-    library
-    implementation.extendsFrom library
-    shadow.extendsFrom library
-}
-
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-    }
-}
-
 def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
 
 dependencies {

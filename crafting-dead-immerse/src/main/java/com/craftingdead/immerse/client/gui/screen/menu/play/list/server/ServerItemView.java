@@ -127,7 +127,7 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
   }
 
   public void connect() {
-    // Call this before creating a ConnectingScreen instance.
+    // Call this before creating a ConnectView instance.
     this.getScreen().keepOpen();
     this.minecraft.setScreen(
         ConnectView.createScreen(this.getScreen(), this.serverEntry.toServerAddress()));

@@ -111,7 +111,7 @@ public class CraftingDeadImmerse {
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
 
-    this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
+    this.modDist = DistExecutor.unsafeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
     final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);

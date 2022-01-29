@@ -26,14 +26,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
-import com.craftingdead.immerse.game.SpawnPoint;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerEntityMixin {
+public class ServerPlayerMixin {
 
   /**
    * Adds hook for {@link GameServer#getSpawnPoint}.
@@ -41,7 +41,7 @@ public class ServerPlayerEntityMixin {
   @Inject(method = "getRespawnPosition", at = @At("HEAD"), cancellable = true)
   public void getRespawnPosition(CallbackInfoReturnable<BlockPos> callbackInfo) {
     this.getSpawnPoint()
-        .map(SpawnPoint::getBlockPos)
+        .map(GlobalPos::pos)
         .ifPresent(callbackInfo::setReturnValue);
   }
 
@@ -51,7 +51,7 @@ public class ServerPlayerEntityMixin {
   @Inject(method = "getRespawnDimension", at = @At("HEAD"), cancellable = true)
   public void getRespawnDimension(CallbackInfoReturnable<ResourceKey<Level>> callbackInfo) {
     this.getSpawnPoint()
-        .map(SpawnPoint::getDimension)
+        .map(GlobalPos::dimension)
         .ifPresent(callbackInfo::setReturnValue);
   }
 
@@ -65,8 +65,10 @@ public class ServerPlayerEntityMixin {
     }
   }
 
-  private Optional<SpawnPoint> getSpawnPoint() {
+  private Optional<GlobalPos> getSpawnPoint() {
+    var self = (ServerPlayer) (Object) this;
+    self.reviveCaps();
     return CraftingDeadImmerse.getInstance().getLogicalServer().getGame()
-        .getSpawnPoint(PlayerExtension.getOrThrow((ServerPlayer) (Object) this));
+        .getSpawnPoint(PlayerExtension.getOrThrow(self));
   }
 }

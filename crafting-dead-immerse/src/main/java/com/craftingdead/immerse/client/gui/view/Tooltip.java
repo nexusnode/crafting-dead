@@ -22,6 +22,7 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 
 public class Tooltip {
@@ -41,6 +42,7 @@ public class Tooltip {
     final float height = 14;
 
     RenderSystem.enableBlend();
+    RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fill(matrixStack,
         x, y, x + width, y + height, 0x222222 | (this.opacityProperty.get() << 24));
 

@@ -89,7 +89,7 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
   }
 
   public Packet<?> buildSyncPacket(boolean writeAll) {
-    FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
+    var packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
     this.encode(packetBuffer, writeAll);
     return NetworkChannel.PLAY.getSimpleChannel()
         .toVanillaPacket(new SyncGameMessage(packetBuffer), NetworkDirection.PLAY_TO_CLIENT);

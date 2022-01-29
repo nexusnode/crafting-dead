@@ -11,8 +11,8 @@
     ],
     "mixins": [
         "PlayerDataMixin",
-        "ServerPlayerEntityMixin",
-        "FireBlockMixin"
+        "FireBlockMixin",
+        "ServerPlayerMixin"
     ],
     "injectors": {
         "defaultRequire": 1

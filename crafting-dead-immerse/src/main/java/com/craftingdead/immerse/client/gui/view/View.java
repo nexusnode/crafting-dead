@@ -175,6 +175,8 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   private boolean doubleClick;
 
+  private boolean closed;
+
   public View(L layout) {
     this.layout = layout;
     this.eventBus.start();
@@ -787,10 +789,14 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   public void close() {
+    if (this.closed) {
+      throw new IllegalStateException("Already closed");
+    }
     if (this.backgroundBlur != null) {
       this.backgroundBlur.close();
     }
     this.layout.close();
+    this.closed = true;
   }
 
   public final SELF setDisabledBackgroundColor(Color color) {
@@ -1143,6 +1149,10 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   protected SELF setVisible(boolean visible) {
     this.visible = visible;
     return this.self();
+  }
+
+  public final boolean isClosed() {
+    return this.closed;
   }
 
   @Override

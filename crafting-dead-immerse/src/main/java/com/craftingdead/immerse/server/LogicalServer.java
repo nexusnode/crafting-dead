@@ -21,14 +21,12 @@ package com.craftingdead.immerse.server;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
@@ -37,6 +35,7 @@ import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
 import com.craftingdead.immerse.network.play.ChangeGameMessage;
+import com.google.common.base.Predicates;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
@@ -153,9 +152,9 @@ public class LogicalServer extends SavedData {
   }
 
   private void loadGame(ServerGameWrapper gameWrapper) {
-    List<ServerPlayer> players = this.minecraftServer.getPlayerList().getPlayers();
+    var players = this.minecraftServer.getPlayerList().getPlayers();
 
-    ServerGameWrapper oldGameWrapper = this.gameWrapper;
+    var oldGameWrapper = this.gameWrapper;
     if (oldGameWrapper != null) {
       logger.info("Unloading current game");
       players.stream()
@@ -171,20 +170,18 @@ public class LogicalServer extends SavedData {
     gameWrapper.load();
 
     logger.info("Loading players");
-    for (ServerPlayer playerEntity : players) {
-      playerEntity.connection.send(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
+    for (var player : players) {
+      player.connection.send(NetworkChannel.PLAY.getSimpleChannel().toVanillaPacket(
           new ChangeGameMessage(gameWrapper.getGame().getType()),
           NetworkDirection.PLAY_TO_CLIENT));
 
       if (oldGameWrapper != null && gameWrapper.getGame().persistPlayerData()
           && !oldGameWrapper.getGame().persistPlayerData()) {
-        this.minecraftServer.getPlayerList().load(playerEntity);
+        this.minecraftServer.getPlayerList().load(player);
       }
-    }
 
-    players.stream()
-        .map(PlayerExtension::getOrThrow)
-        .forEach(gameWrapper::addPlayer);
+      gameWrapper.addPlayer(PlayerExtension.getOrThrow(player));
+    }
 
     // Respawn all players - keep data if new game uses persisted player data, otherwise discard
     // player data.
@@ -201,13 +198,13 @@ public class LogicalServer extends SavedData {
   }
 
   public void respawnPlayers(boolean keepData) {
-    this.respawnPlayers(player -> true, keepData);
+    this.respawnPlayers(Predicates.alwaysTrue(), keepData);
   }
 
   public void respawnPlayers(Predicate<ServerPlayer> predicate, boolean keepData) {
-    List<ServerPlayer> players =
-        new ArrayList<>(this.minecraftServer.getPlayerList().getPlayers());
-    for (ServerPlayer playerEntity : players) {
+    // Copy this as respawn will modify the list
+    var players = List.copyOf(this.minecraftServer.getPlayerList().getPlayers());
+    for (var playerEntity : players) {
       if (predicate.test(playerEntity)) {
         this.respawnPlayer(playerEntity, keepData);
       }
@@ -258,14 +255,14 @@ public class LogicalServer extends SavedData {
 
   @SubscribeEvent
   public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-    ServerPlayer playerEntity = (ServerPlayer) event.getPlayer();
-    this.gameWrapper.addPlayer(PlayerExtension.getOrThrow(playerEntity));
+    final var player = (ServerPlayer) event.getPlayer();
+    this.gameWrapper.addPlayer(PlayerExtension.getOrThrow(player));
   }
 
   @SubscribeEvent
   public void handlePlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-    event.getPlayer().getCapability(LivingExtension.CAPABILITY)
-        .<PlayerExtension<ServerPlayer>>cast()
-        .ifPresent(this.gameWrapper::removePlayer);
+    final var player = (ServerPlayer) event.getPlayer();
+    player.reviveCaps();
+    this.gameWrapper.removePlayer(PlayerExtension.getOrThrow(player));
   }
 }

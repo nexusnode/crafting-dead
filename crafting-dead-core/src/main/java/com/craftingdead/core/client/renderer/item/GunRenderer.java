@@ -609,7 +609,7 @@ public class GunRenderer implements CustomItemRenderer {
 
   @Override
   public ItemRendererType<?, ?> getType() {
-    return ItemRendererTypes.GUN.get();
+    return ItemRendererTypes.GUN;
   }
 
   private static ResourceLocation getAttachmentModelLocation(ResourceLocation attachmentName) {

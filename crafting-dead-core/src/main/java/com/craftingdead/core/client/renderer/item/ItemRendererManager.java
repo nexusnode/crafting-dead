@@ -166,8 +166,8 @@ public class ItemRendererManager implements ResourceManagerReloadListener {
     if (type.getItemType().isInstance(item)) {
       return type.create(type.getItemType().cast(item), properties);
     } else {
-      logger.error("Item renderer {} expects item of type: {}", type.getRegistryName().toString(),
-          type.getItemType().getName());
+      logger.error("Item renderer {} expects item of type: {}",
+          ItemRendererTypes.getKey(type).get(), type.getItemType().getName());
       return null;
     }
   }

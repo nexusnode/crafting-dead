@@ -71,7 +71,7 @@ public record GunRendererProperties(
 
   @Override
   public ItemRendererType<?, ?> getItemRendererType() {
-    return ItemRendererTypes.GUN.get();
+    return ItemRendererTypes.GUN;
   }
 
   public enum HandTransform implements StringRepresentable {

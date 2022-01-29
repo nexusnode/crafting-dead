@@ -2,17 +2,9 @@ package com.craftingdead.core.client.renderer.item;
 
 import java.util.function.BiFunction;
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class ItemRendererType<I extends Item, P extends ItemRendererProperties>
-    extends ForgeRegistryEntry<ItemRendererType<?, ?>> {
-
-  public final static Codec<ItemRendererType<?, ?>> CODEC =
-      ResourceLocation.CODEC.xmap(
-          registryName -> ItemRendererTypes.REGISTRY.get().getValue(registryName),
-          ItemRendererType::getRegistryName);
+public class ItemRendererType<I extends Item, P extends ItemRendererProperties> {
 
   private final BiFunction<I, P, CustomItemRenderer> factory;
   private final Class<I> itemType;

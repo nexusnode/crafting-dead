@@ -128,7 +128,7 @@ public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
                                     new TranslatableComponent("connect.aborted"));
                               }
                               this.minecraft.setScreen(this.lastScreen);
-                            })));
+                            }, true)));
 
     this.minecraft.clearLevel();
     this.connect(address);
@@ -193,6 +193,7 @@ public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
         this.connection.tick();
       } else {
         this.connection.handleDisconnection();
+        return;
       }
     }
     long currentTime = Util.getMillis();

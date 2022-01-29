@@ -22,6 +22,7 @@ import java.util.Optional;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface GameServer extends Game<ServerModule> {
@@ -57,7 +58,7 @@ public interface GameServer extends Game<ServerModule> {
    * @return an optional spawn point. If no spawn point is returned, the player's default spawn
    *         point will be used.
    */
-  default Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
+  default Optional<GlobalPos> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
     return Optional.empty();
   }
 

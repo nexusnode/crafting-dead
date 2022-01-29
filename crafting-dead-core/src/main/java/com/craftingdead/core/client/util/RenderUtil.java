@@ -226,9 +226,8 @@ public class RenderUtil {
     return frustum;
   }
 
-  public static void fill(PoseStack matrixStack, int x, int y, int width, int height,
-      int colour) {
-    GuiComponent.fill(matrixStack, x, y, x + width, y + height, colour);
+  public static void fill(PoseStack poseStack, int x, int y, int width, int height, int colour) {
+    GuiComponent.fill(poseStack, x, y, x + width, y + height, colour);
   }
 
   public static void drawGradientRectangle(float x, float y, float x2, float y2, int startColor,

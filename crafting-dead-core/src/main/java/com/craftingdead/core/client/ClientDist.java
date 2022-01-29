@@ -688,7 +688,7 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handeFOVModifier(FOVModifierEvent event) {
-    if (this.minecraft.getCameraEntity()instanceof LivingEntity livingEntity) {
+    if (this.minecraft.getCameraEntity() instanceof LivingEntity livingEntity) {
       final var scope = livingEntity.getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
       if (scope != null && scope.isScoping(livingEntity)) {
         event.setNewfov(1.0F / scope.getZoomMultiplier(livingEntity));

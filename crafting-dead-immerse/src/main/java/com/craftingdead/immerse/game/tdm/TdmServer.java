@@ -30,7 +30,6 @@ import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.GameUtil;
-import com.craftingdead.immerse.game.SpawnPoint;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.ServerShopModule;
 import com.craftingdead.immerse.game.module.shop.ShopCategory;
@@ -50,6 +49,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -71,28 +71,28 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
   public static final Codec<TdmServer> CODEC = RecordCodecBuilder.create(instance -> instance
       .group(
-          Codec.STRING.fieldOf("displayName").forGetter(TdmServer::getDisplayName),
+          Codec.STRING.fieldOf("display_name").forGetter(TdmServer::getDisplayName),
           Codec.INT.optionalFieldOf("maxScore", 100).forGetter(TdmServer::getMaxScore),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("preGameDuration", Duration.ofMinutes(1L))
+              .optionalFieldOf("pre_game_duration", Duration.ofMinutes(1L))
               .forGetter(TdmServer::getPreGameDuration),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("gameDuration", Duration.ofMinutes(10L))
+              .optionalFieldOf("game_duration", Duration.ofMinutes(10L))
               .forGetter(TdmServer::getPreGameDuration),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("postGameDuration", Duration.ofSeconds(30L))
+              .optionalFieldOf("post_game_duration", Duration.ofSeconds(30L))
               .forGetter(TdmServer::getPreGameDuration),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("buyDuration", Duration.ofSeconds(20L))
+              .optionalFieldOf("buy_duration", Duration.ofSeconds(20L))
               .forGetter(TdmServer::getPreGameDuration),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("spawnProtectionDuration", Duration.ofSeconds(8L))
+              .optionalFieldOf("spawn_protection_duration", Duration.ofSeconds(8L))
               .forGetter(TdmServer::getPreGameDuration),
           Codec.STRING.xmap(Duration::parse, Duration::toString)
-              .optionalFieldOf("ghostDuration", Duration.ofSeconds(5L))
+              .optionalFieldOf("ghost_duration", Duration.ofSeconds(5L))
               .forGetter(TdmServer::getPreGameDuration),
-          SpawnPoint.CODEC.fieldOf("redSpawnPoint").forGetter(TdmServer::getRedSpawnPoint),
-          SpawnPoint.CODEC.fieldOf("blueSpawnPoint").forGetter(TdmServer::getBlueSpawnPoint))
+          GlobalPos.CODEC.fieldOf("red_spawn_point").forGetter(TdmServer::getRedSpawnPoint),
+          GlobalPos.CODEC.fieldOf("blue_spawn_point").forGetter(TdmServer::getBlueSpawnPoint))
       .apply(instance, TdmServer::new));
 
   private static final Component NO_SWITCH_TEAM =
@@ -114,8 +114,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   private final Duration spawnProtectionDuration;
   private final Duration ghostDuration;
 
-  private final SpawnPoint redSpawnPoint;
-  private final SpawnPoint blueSpawnPoint;
+  private final GlobalPos redSpawnPoint;
+  private final GlobalPos blueSpawnPoint;
 
   /*
    * Keeps track of game state before we were loaded so that we can reset everything afterwards.
@@ -132,8 +132,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
   public TdmServer(String displayName, int maxScore, Duration preGameDuration,
       Duration gameDuration, Duration postGameDuration, Duration buyDuration,
-      Duration spawnProtectionDuration, Duration ghostDuration, SpawnPoint redSpawnPoint,
-      SpawnPoint blueSpawnPoint) {
+      Duration spawnProtectionDuration, Duration ghostDuration, GlobalPos redSpawnPoint,
+      GlobalPos blueSpawnPoint) {
     super(displayName);
     this.maxScore = maxScore;
     this.preGameDuration = preGameDuration;
@@ -175,11 +175,11 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
     return this.ghostDuration;
   }
 
-  public SpawnPoint getRedSpawnPoint() {
+  public GlobalPos getRedSpawnPoint() {
     return this.redSpawnPoint;
   }
 
-  public SpawnPoint getBlueSpawnPoint() {
+  public GlobalPos getBlueSpawnPoint() {
     return this.blueSpawnPoint;
   }
 
@@ -220,7 +220,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public Optional<SpawnPoint> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
+  public Optional<GlobalPos> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
     return this.getTeamModule().getPlayerTeam(player.getEntity().getUUID())
         .map(team -> team == TdmTeam.RED ? this.getRedSpawnPoint() : this.getBlueSpawnPoint());
   }
@@ -455,7 +455,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   @SuppressWarnings("unchecked")
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving()instanceof PlayerExtension<?> extension
+    if (event.getLiving() instanceof PlayerExtension<?> extension
         && !event.getLiving().getLevel().isClientSide()) {
       extension.registerHandler(TdmPlayerHandler.ID,
           new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) extension));

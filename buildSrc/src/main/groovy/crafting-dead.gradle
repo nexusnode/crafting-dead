@@ -48,9 +48,6 @@ dependencies {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 jar {
-    into('dependencies') {
-        from  configurations.shaded
-    }
     archiveBaseName = project.name
     archiveVersion = "${minecraft_version}-${version}"
     from rootProject.file('LICENSE.txt')

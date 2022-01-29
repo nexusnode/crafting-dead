@@ -399,22 +399,26 @@ public class IngameGui {
     int currentItemIndex = inventory.selected;
 
     // Render primary
-    ItemStack primaryStack = inventory.getItem(0);
+    var primaryStack = inventory.getItem(0);
     if (currentItemIndex == 0) {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "1", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    poseStack.pushPose();
-    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-        boxY + (boxHeight / 2) - 16 / 2, 0);
-    poseStack.scale(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemTransforms.TransformType.FIXED);
-    poseStack.popPose();
+    final var modelViewStack = RenderSystem.getModelViewStack();
+    modelViewStack.pushPose();
+    {
+      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+          boxY + (boxHeight / 2) - 16 / 2, 0);
+      modelViewStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemTransforms.TransformType.FIXED);
+    }
+    modelViewStack.popPose();
+    RenderSystem.applyModelViewMatrix();
 
     // Render secondary
-    ItemStack secondaryStack = inventory.getItem(1);
+    var secondaryStack = inventory.getItem(1);
     boxY += boxMarginY;
     if (currentItemIndex == 1) {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
@@ -422,16 +426,19 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "2", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    poseStack.pushPose();
-    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-        boxY + (boxHeight / 2) - 16 / 2, 0);
-    poseStack.scale(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderGuiItem(secondaryStack, 0, 0, 0xFFFFFFFF,
-        ItemTransforms.TransformType.FIXED);
-    poseStack.popPose();
+    modelViewStack.pushPose();
+    {
+      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+          boxY + (boxHeight / 2) - 16 / 2, 0);
+      modelViewStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(secondaryStack, 0, 0, 0xFFFFFFFF,
+          ItemTransforms.TransformType.FIXED);
+    }
+    modelViewStack.popPose();
+    RenderSystem.applyModelViewMatrix();
 
     // Render melee
-    ItemStack meleeStack = inventory.getItem(2);
+    var meleeStack = inventory.getItem(2);
     boxY += boxMarginY;
     if (currentItemIndex == 2) {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
@@ -439,14 +446,16 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "3", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    poseStack.pushPose();
-    poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-        boxY + (boxHeight / 2) - 16 / 2, 0);
-    poseStack.scale(1.2F, 1.2F, 1.2F);
-    RenderUtil.renderGuiItem(meleeStack, 0, 0, 0xFFFFFFFF,
-        ItemTransforms.TransformType.FIXED);
-    poseStack.popPose();
-
+    modelViewStack.pushPose();
+    {
+      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+          boxY + (boxHeight / 2) - 16 / 2, 0);
+      modelViewStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(meleeStack, 0, 0, 0xFFFFFFFF,
+          ItemTransforms.TransformType.FIXED);
+    }
+    modelViewStack.popPose();
+    RenderSystem.applyModelViewMatrix();
 
     // Render extras
     boxY += boxMarginY;
@@ -461,22 +470,16 @@ public class IngameGui {
       this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + 1,
           boxY + 1, 0xFFFFFFFF);
 
-      poseStack.pushPose();
-
       RenderUtil.renderGuiItem(extraStack, boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 6, 0xFFFFFFFF);
-      poseStack.popPose();
 
       boxX += 28;
     }
 
-
     final int healthBoxHeight = 25;
     // Render Health
-    final float health = player.getEntity().getHealth();
-    final float armour = player.getEntity().getArmorValue();
-
-
+    final var health = player.getEntity().getHealth();
+    final var armour = player.getEntity().getArmorValue();
 
     int healthWidth = 100;
     if (armour > 0) {
@@ -501,7 +504,7 @@ public class IngameGui {
         Math.round(65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
 
     if (armour > 0) {
-      int armourX = healthWidth / 2 + 7;
+      final var armourX = healthWidth / 2 + 7;
       RenderSystem.setShaderTexture(0, SHIELD);
       RenderSystem.enableBlend();
       RenderUtil.blit(armourX + 5, height - healthBoxHeight / 2 - 8, 16, 16);

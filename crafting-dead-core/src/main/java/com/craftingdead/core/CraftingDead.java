@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.renderer.item.ItemRendererTypes;
 import com.craftingdead.core.data.ModItemTagsProvider;
 import com.craftingdead.core.data.ModRecipeProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -117,7 +116,7 @@ public class CraftingDead {
   public CraftingDead() {
     instance = this;
 
-    this.modDist = DistExecutor.safeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
+    this.modDist = DistExecutor.unsafeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
     final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
@@ -137,7 +136,6 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
-    ItemRendererTypes.ITEM_RENDERER_TYPES.register(modEventBus);
 
     modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
@@ -271,6 +269,7 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
+    event.getOriginal().reviveCaps();
     PlayerExtension.getOrThrow(event.getPlayer())
         .copyFrom(PlayerExtension.getOrThrow(event.getOriginal()), event.isWasDeath());
   }
