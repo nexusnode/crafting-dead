@@ -36,6 +36,7 @@ import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.DependencyLoader;
+import io.sentry.Sentry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -80,6 +81,9 @@ public class CraftingDeadImmerse {
     serverConfig = serverConfigPair.getLeft();
   }
 
+  private static final String SENTRY_DSN =
+      "https://6b38ee4b782e462f8de7a60835107fc2@o1130188.ingest.sentry.io/6174141";
+
   /**
    * Singleton.
    */
@@ -121,6 +125,15 @@ public class CraftingDeadImmerse {
     ModuleTypes.MODULE_TYPES.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
+
+    Sentry.init(options -> {
+      options.setDsn(SENTRY_DSN);
+      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+      // We recommend adjusting this value in production.
+      options.setTracesSampleRate(1.0);
+      // When first trying Sentry it's good to see what the SDK is doing:
+      options.setDebug(true);
+    });
   }
 
   @Nullable

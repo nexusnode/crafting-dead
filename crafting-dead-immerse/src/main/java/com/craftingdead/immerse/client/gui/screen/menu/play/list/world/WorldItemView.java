@@ -125,7 +125,7 @@ class WorldItemView
     this
         .setFocusable(true)
         .setDoubleClick(true)
-        .addListener(ActionEvent.class, (c, e) -> this.joinWorld())
+        .addListener(ActionEvent.class, (c, e) -> this.joinWorld(), true)
         .addChild(new ImageView<>(new YogaLayout().setHeight(38F)
             .setWidth(38F)
             .setRightMargin(5F))

@@ -77,6 +77,9 @@ dependencies {
     }
 
 	library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+	library ('io.sentry:sentry:5.6.0') {
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
 }
 
 jar {

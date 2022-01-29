@@ -131,21 +131,21 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
   }
 
   private void generateLines(float width) {
-    int ceilWidth = Mth.floor(width);
+    int floorWidth = Mth.floor(width);
     if (this.wrap) {
-      this.lines = this.font.split(this.text, ceilWidth);
+      this.lines = this.font.split(this.text, floorWidth);
       return;
     }
 
     int textWidth = this.font.width(this.text);
     FormattedText finalText;
-    if (textWidth > ceilWidth) {
+    if (textWidth > floorWidth) {
       final var ellipsis = ELLIPSIS.copy().withStyle(this.text.getStyle());
       final var ellipsisWidth = this.font.width(ellipsis);
       finalText = FormattedText.composite(
-          this.font.substrByWidth(this.text, ceilWidth - ellipsisWidth), ellipsis);
+          this.font.substrByWidth(this.text, floorWidth - ellipsisWidth), ellipsis);
     } else {
-      finalText = this.font.substrByWidth(this.text, ceilWidth);
+      finalText = this.font.substrByWidth(this.text, floorWidth);
     }
     this.lines = List.of(ClientLanguage.getInstance().getVisualOrder(finalText));
   }

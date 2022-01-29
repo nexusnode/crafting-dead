@@ -21,9 +21,12 @@ package com.craftingdead.immerse.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.Minecraft;
+import io.sentry.Sentry;
+import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.Minecraft;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -43,5 +46,10 @@ public abstract class MinecraftMixin {
   @Inject(method = "getFramerateLimit", at = @At("HEAD"), cancellable = true)
   private void getFramerateLimit(CallbackInfoReturnable<Integer> callbackInfo) {
     callbackInfo.setReturnValue(Minecraft.getInstance().getWindow().getFramerateLimit());
+  }
+
+  @Inject(method = "crash", at = @At("HEAD"))
+  private static void crash(CrashReport crashReport, CallbackInfo callbackInfo) {
+    Sentry.captureException(crashReport.getException());
   }
 }
