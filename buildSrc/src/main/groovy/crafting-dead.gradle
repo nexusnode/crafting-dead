@@ -20,6 +20,7 @@ java {
 }
 
 repositories {
+	mavenCentral()
     maven {
         name 'sponge'
         url 'https://repo.spongepowered.org/repository/maven-public/'
@@ -35,6 +36,8 @@ dependencies {
     implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
     annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
     testAnnotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
+    implementation 'io.sentry:sentry:5.6.0'
+    implementation 'io.sentry:sentry-log4j2:5.6.0'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
