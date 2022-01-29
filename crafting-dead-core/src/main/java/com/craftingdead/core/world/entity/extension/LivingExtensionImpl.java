@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +36,8 @@ import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.hat.Hat;
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -69,7 +69,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   protected final Map<ResourceLocation, H> dirtyHandlers = new Object2ObjectArrayMap<>();
 
-  private final List<Integer> dirtySlots = new IntArrayList();
+  private final IntSet dirtySlots = new IntOpenHashSet();
 
   private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
@@ -302,28 +302,29 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   private void updateHat() {
-    ItemStack headStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.HAT.getIndex());
-    Hat hat = headStack.getCapability(Hat.CAPABILITY).orElse(null);
+    var headStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.HAT.getIndex());
+    var hat = headStack.getCapability(Hat.CAPABILITY).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
-      this.entity.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 2, 0, false, false, false));
+      this.entity.addEffect(
+          new MobEffectInstance(MobEffects.WATER_BREATHING, 2, 0, false, false, false));
     } else if (hat != null && hat.hasNightVision()) {
-      this.entity.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 2, 0, false, false, false));
+      this.entity.addEffect(
+          new MobEffectInstance(MobEffects.NIGHT_VISION, 2, 0, false, false, false));
     }
   }
 
   private void updateClothing() {
-    ItemStack clothingStack =
-        this.itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex());
-    Clothing clothing = clothingStack.getCapability(Clothing.CAPABILITY).orElse(null);
+    var clothingStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex());
+    var clothing = clothingStack.getCapability(Clothing.CAPABILITY).orElse(null);
 
     if (clothingStack != this.lastClothingStack) {
       this.lastClothingStack.getCapability(Clothing.CAPABILITY)
           .map(Clothing::getAttributeModifiers)
           .ifPresent(this.entity.getAttributes()::removeAttributeModifiers);
       if (clothing != null) {
-        this.entity.getAttributes()
-            .addTransientAttributeModifiers(clothing.getAttributeModifiers());
+        this.entity.getAttributes().addTransientAttributeModifiers(
+            clothing.getAttributeModifiers());
       }
     }
 
@@ -335,14 +336,15 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         }
 
         this.entity
-            .addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2, 0, false, false, false));
+            .addEffect(
+                new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2, 0, false, false, false));
       }
     }
 
     if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
-      this.entity
-          .addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2, 0, false, false, false));
+      this.entity.addEffect(
+          new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2, 0, false, false, false));
     }
 
     this.lastClothingStack = clothingStack;
@@ -381,10 +383,9 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
     if (!this.keepInventory()) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
-        ItemStack itemStack =
-            this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
+        var itemStack = this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
         if (!itemStack.isEmpty()) {
-          ItemEntity itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
+          var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
               this.getEntity().getY(), this.getEntity().getZ(), itemStack);
           itemEntity.setDefaultPickUpDelay();
           drops.add(itemEntity);
@@ -418,7 +419,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
 
     final int snapshotIndex = tick % 20;
-    EntitySnapshot snapshot = this.snapshots[snapshotIndex];
+    var snapshot = this.snapshots[snapshotIndex];
     if (snapshot == null) {
       throw new IndexOutOfBoundsException();
     }
@@ -437,7 +438,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
     this.crouching = crouching;
     if (sendUpdate) {
-      PacketTarget target = this.getLevel().isClientSide()
+      var target = this.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
@@ -495,10 +496,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
         out.writeItem(this.itemHandler.getStackInSlot(i));
       }
     } else {
-      for (int i : this.dirtySlots) {
-        out.writeShort(i);
-        out.writeItem(this.itemHandler.getStackInSlot(i));
-      }
+      this.dirtySlots.forEach(slot -> {
+        out.writeShort(slot);
+        out.writeItem(this.itemHandler.getStackInSlot(slot));
+      });
       this.dirtySlots.clear();
     }
     out.writeShort(255);

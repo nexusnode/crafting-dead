@@ -19,10 +19,8 @@
 package com.craftingdead.core.world.inventory;
 
 import java.util.function.BiPredicate;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.inventory.storage.Storage;
-import com.craftingdead.core.world.item.HatItem;
-import com.craftingdead.core.world.item.MeleeWeaponItem;
-import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
@@ -75,15 +73,15 @@ public class EquipmentMenu extends AbstractContainerMenu {
     this.addSlot(
         new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.MELEE.getIndex(),
             equipmentColumnX, equipmentColumnY += slotSize,
-            (slot, itemStack) -> itemStack.getItem() instanceof MeleeWeaponItem));
+            (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.HAT.getIndex(),
         equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.getItem() instanceof HatItem));
+        (slot, itemStack) -> itemStack.is(ModItemTags.HATS)));
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
         ModEquipmentSlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.getCapability(Clothing.CAPABILITY).isPresent()));
+        (slot, itemStack) -> itemStack.is(ModItemTags.CLOTHING)));
 
     this.addSlot(
         new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.VEST.getIndex(),

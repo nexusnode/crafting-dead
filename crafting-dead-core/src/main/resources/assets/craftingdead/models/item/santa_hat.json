@@ -9,9 +9,9 @@
   },
   "perspectives": {
     "head": {
-      "parent": "craftingdead:hats/textured_helmet_multiple_of_8",
+      "parent": "craftingdead:hats/textured_helmet_multiple_of_9",
       "textures": {
-        "base": "craftingdead:hats/riot_hat"
+        "base": "craftingdead:hats/santa_hat"
       }
     }
   }

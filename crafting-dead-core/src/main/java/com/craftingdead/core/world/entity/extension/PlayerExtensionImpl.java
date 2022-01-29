@@ -35,7 +35,6 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.PacketDistributor;
@@ -108,7 +107,7 @@ class PlayerExtensionImpl<E extends Player>
 
   @Override
   public void openStorage(ModEquipmentSlotType slotType) {
-    ItemStack storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
+    var storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack.getCapability(Storage.CAPABILITY)
         .ifPresent(storage -> this.getEntity().openMenu(
             new SimpleMenuProvider(storage, storageStack.getHoverName())));
@@ -118,10 +117,9 @@ class PlayerExtensionImpl<E extends Player>
   public boolean handleDeath(DamageSource source) {
     if (super.handleDeath(source)) {
       return true;
-    } else if (source instanceof KillFeedProvider) {
+    } else if (source instanceof KillFeedProvider provider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new AddKillFeedEntryMessage(
-              ((KillFeedProvider) source).createKillFeedEntry(this.getEntity())));
+          new AddKillFeedEntryMessage(provider.createKillFeedEntry(this.getEntity())));
     }
     return false;
   }
@@ -139,7 +137,7 @@ class PlayerExtensionImpl<E extends Player>
       this.getItemHandler().setStackInSlot(i, that.getItemHandler().getStackInSlot(i));
     }
 
-    for (PlayerHandler extension : this.handlers.values()) {
+    for (var extension : this.handlers.values()) {
       extension.copyFrom(that, wasDeath);
     }
   }
