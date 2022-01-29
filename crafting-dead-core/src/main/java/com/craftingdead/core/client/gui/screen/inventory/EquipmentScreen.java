@@ -23,7 +23,7 @@ import com.craftingdead.core.client.gui.SimpleButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.skin.Paint;
@@ -48,6 +48,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
   private int oldMouseX;
   private int oldMouseY;
 
+  private Button backpackButton;
   private Button vestButton;
 
   private boolean transitioning = false;
@@ -59,10 +60,17 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
   @Override
   public void init() {
     super.init();
+    this.backpackButton =
+        new SimpleButton(this.leftPos + 98, this.topPos + 7, 10, 17, ARROW, (button) -> {
+          NetworkChannel.PLAY.getSimpleChannel()
+              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.BACKPACK));
+          this.transitioning = true;
+        });
+    this.addRenderableWidget(this.backpackButton);
     this.vestButton =
         new SimpleButton(this.leftPos + 98, this.topPos + 61, 10, 17, ARROW, (button) -> {
           NetworkChannel.PLAY.getSimpleChannel()
-              .sendToServer(new OpenStorageMessage(ModEquipmentSlotType.VEST));
+              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.VEST));
           this.transitioning = true;
         });
     this.addRenderableWidget(this.vestButton);
@@ -84,9 +92,14 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
   }
 
   private void refreshButtonStatus() {
+    this.backpackButton.active = this.menu
+        .getItemHandler()
+        .getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
+        .getCapability(Storage.CAPABILITY)
+        .isPresent();
     this.vestButton.active = this.menu
         .getItemHandler()
-        .getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
+        .getStackInSlot(ModEquipmentSlot.VEST.getIndex())
         .getCapability(Storage.CAPABILITY)
         .isPresent();
   }

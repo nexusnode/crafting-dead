@@ -19,7 +19,7 @@
 package com.craftingdead.core.client.renderer.entity.layers;
 
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -39,7 +39,7 @@ public class ClothingLayer<T extends LivingEntity, M extends HumanoidModel<T>>
     var livingExtension = livingEntity.getCapability(LivingExtension.CAPABILITY).orElse(null);
     if (livingExtension != null) {
       var clothing =
-          livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex())
+          livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex())
               .getCapability(Clothing.CAPABILITY)
               .orElse(null);
       if (clothing != null) {

@@ -24,7 +24,7 @@ import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -100,13 +100,13 @@ class PlayerExtensionImpl<E extends Player>
       return;
     }
     this.getEntity().openMenu(new SimpleMenuProvider(
-        (windowId, playerInventory, playerEntity) -> new EquipmentMenu(windowId,
+        (windowId, inventory, player) -> new EquipmentMenu(windowId,
             this.getEntity().getInventory(), this.getItemHandler()),
         new TranslatableComponent("container.equipment")));
   }
 
   @Override
-  public void openStorage(ModEquipmentSlotType slotType) {
+  public void openStorage(ModEquipmentSlot slotType) {
     var storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack.getCapability(Storage.CAPABILITY)
         .ifPresent(storage -> this.getEntity().openMenu(

@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
@@ -93,7 +93,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
     builder.addAll(event.getItemHandlers());
 
     // Vest - first
-    living.getItemHandler().getStackInSlot(ModEquipmentSlotType.VEST.getIndex())
+    living.getItemHandler().getStackInSlot(ModEquipmentSlot.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
     // TODO Backpack - second

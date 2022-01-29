@@ -34,4 +34,16 @@ public class ModMenuTypes {
 
   public static final RegistryObject<MenuType<GenericMenu>> VEST =
       MENUS.register("vest", () -> new MenuType<>(GenericMenu::createVest));
+
+  public static final RegistryObject<MenuType<GenericMenu>> SMALL_BACKPACK =
+      MENUS.register("small_backpack", () -> new MenuType<>(GenericMenu::createSmallBackpack));
+
+  public static final RegistryObject<MenuType<GenericMenu>> MEDIUM_BACKPACK =
+      MENUS.register("medium_backpack", () -> new MenuType<>(GenericMenu::createMediumBackpack));
+
+  public static final RegistryObject<MenuType<GenericMenu>> LARGE_BACKPACK =
+      MENUS.register("large_backpack", () -> new MenuType<>(GenericMenu::createLargeBackpack));
+
+  public static final RegistryObject<MenuType<GenericMenu>> GUN_BAG =
+      MENUS.register("gun_bag", () -> new MenuType<>(GenericMenu::createGunBag));
 }

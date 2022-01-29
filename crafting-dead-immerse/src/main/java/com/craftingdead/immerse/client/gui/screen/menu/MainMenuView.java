@@ -41,7 +41,7 @@ import org.jdesktop.core.animation.timing.Animator.RepeatBehavior;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
@@ -205,7 +205,7 @@ public class MainMenuView extends ParentView<MainMenuView, Layout, YogaLayout> {
     Item randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
 
     LivingExtension<?, ?> livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
-    livingExtension.getItemHandler().insertItem(ModEquipmentSlotType.HAT.getIndex(),
+    livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);
 
     this.addChild(new ParentView<>(new YogaLayout()

@@ -33,15 +33,14 @@ public class GenericMenu extends AbstractMenu {
   private final int rows;
 
   public GenericMenu(MenuType<?> menuType, int windowId,
-      Inventory playerInventory, int rows,
-      BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
-    this(menuType, windowId, playerInventory, new ItemStackHandler(9 * rows), rows, predicate);
+      Inventory inventory, int rows, BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
+    this(menuType, windowId, inventory, new ItemStackHandler(9 * rows), rows, predicate);
   }
 
   public GenericMenu(MenuType<?> type, int id,
-      Inventory playerInventory, IItemHandler itemHandler, int rows,
+      Inventory inventory, IItemHandler itemHandler, int rows,
       BiPredicate<PredicateItemHandlerSlot, ItemStack> predicate) {
-    super(type, id, playerInventory, itemHandler);
+    super(type, id, inventory, itemHandler);
     assert itemHandler.getSlots() >= rows * 9;
     this.rows = rows;
 
@@ -66,21 +65,78 @@ public class GenericMenu extends AbstractMenu {
   }
 
   @Override
-  public boolean stillValid(Player playerEntity) {
+  public boolean stillValid(Player player) {
     return true;
   }
 
-  public static GenericMenu createVest(int windowId, Inventory playerInventory,
+  public static GenericMenu createVest(int windowId, Inventory inventory,
       IItemHandler itemHandler) {
-    return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory,
+    return new GenericMenu(ModMenuTypes.VEST.get(), windowId, inventory,
         itemHandler, 2,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 
-  public static GenericMenu createVest(int windowId, Inventory playerInventory) {
-    return new GenericMenu(ModMenuTypes.VEST.get(), windowId, playerInventory, 2,
+  public static GenericMenu createVest(int windowId, Inventory inventory) {
+    return new GenericMenu(ModMenuTypes.VEST.get(), windowId, inventory, 2,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createSmallBackpack(int windowId, Inventory inventory,
+      IItemHandler itemHandler) {
+    return new GenericMenu(ModMenuTypes.SMALL_BACKPACK.get(), windowId, inventory,
+        itemHandler, 2,
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createSmallBackpack(int windowId,
+      Inventory inventory) {
+    return new GenericMenu(ModMenuTypes.SMALL_BACKPACK.get(), windowId, inventory,
+        2, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createMediumBackpack(int windowId, Inventory inventory,
+      IItemHandler itemHandler) {
+    return new GenericMenu(ModMenuTypes.MEDIUM_BACKPACK.get(), windowId, inventory,
+        itemHandler, 4,
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createMediumBackpack(int windowId,
+      Inventory inventory) {
+    return new GenericMenu(ModMenuTypes.MEDIUM_BACKPACK.get(), windowId, inventory,
+        4, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createLargeBackpack(int windowId, Inventory inventory,
+      IItemHandler itemHandler) {
+    return new GenericMenu(ModMenuTypes.LARGE_BACKPACK.get(), windowId, inventory,
+        itemHandler, 6,
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createLargeBackpack(int windowId,
+      Inventory inventory) {
+    return new GenericMenu(ModMenuTypes.LARGE_BACKPACK.get(), windowId, inventory,
+        6, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+            || itemStack.getItem() instanceof GunItem));
+  }
+
+  public static GenericMenu createGunBag(int windowId, Inventory inventory,
+      IItemHandler itemHandler) {
+    return new GenericMenu(ModMenuTypes.GUN_BAG.get(), windowId, inventory,
+        itemHandler, 4,
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()));
+  }
+
+  public static GenericMenu createGunBag(int windowId, Inventory inventory) {
+    return new GenericMenu(ModMenuTypes.GUN_BAG.get(), windowId, inventory, 4,
+        (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()));
   }
 }

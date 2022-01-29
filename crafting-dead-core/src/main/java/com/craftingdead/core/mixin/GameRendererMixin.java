@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.hat.Hat;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,7 +39,7 @@ public class GameRendererMixin {
       CallbackInfoReturnable<Float> callbackInfo) {
     // It's faster not flat-mapping or filtering (we want to be fast in a render method)
     livingEntity.getCapability(LivingExtension.CAPABILITY)
-        .ifPresent(l -> l.getItemHandler().getStackInSlot(ModEquipmentSlotType.HAT.getIndex())
+        .ifPresent(l -> l.getItemHandler().getStackInSlot(ModEquipmentSlot.HAT.getIndex())
             .getCapability(Hat.CAPABILITY).ifPresent(hat -> {
               if (hat.hasNightVision()) {
                 callbackInfo.setReturnValue(1.0F);

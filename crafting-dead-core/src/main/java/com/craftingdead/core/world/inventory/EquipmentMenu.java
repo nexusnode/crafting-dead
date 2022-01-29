@@ -38,17 +38,17 @@ public class EquipmentMenu extends AbstractContainerMenu {
 
   private final IItemHandler equipment;
 
-  private final ResultContainer outputInventory = new ResultContainer();
-  private final SimpleContainer craftingInventory = new SimpleContainer(4);
+  private final ResultContainer outputContainer = new ResultContainer();
+  private final SimpleContainer craftingContainer = new SimpleContainer(4);
 
   public EquipmentMenu(int id, Inventory playerInventory) {
-    this(id, playerInventory, new ItemStackHandler(ModEquipmentSlotType.values().length));
+    this(id, playerInventory, new ItemStackHandler(ModEquipmentSlot.values().length));
   }
 
   public EquipmentMenu(int id, Inventory playerInventory, IItemHandler equipment) {
     super(ModMenuTypes.EQUIPMENT.get(), id);
     this.equipment = equipment;
-    this.craftingInventory.addListener(this::slotsChanged);
+    this.craftingContainer.addListener(this::slotsChanged);
 
     final int slotSize = 18;
 
@@ -66,35 +66,50 @@ public class EquipmentMenu extends AbstractContainerMenu {
     int equipmentColumnX = 8 + (slotSize * 3);
     int equipmentColumnY = 8;
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.GUN.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.GUN.getIndex(),
         equipmentColumnX, equipmentColumnY,
         (slot, itemStack) -> itemStack.getCapability(Gun.CAPABILITY).isPresent()));
 
-    this.addSlot(
-        new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.MELEE.getIndex(),
-            equipmentColumnX, equipmentColumnY += slotSize,
-            (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.BACKPACK.getIndex(),
+        equipmentColumnX + slotSize, equipmentColumnY,
+        (slot, itemStack) -> itemStack
+            .getCapability(Storage.CAPABILITY)
+            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.BACKPACK))
+            .orElse(false)));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.HAT.getIndex(),
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.MELEE.getIndex(),
+        equipmentColumnX, equipmentColumnY += slotSize,
+        (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.HAT.getIndex(),
         equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.is(ModItemTags.HATS)));
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlotType.CLOTHING.getIndex(), equipmentColumnX, equipmentColumnY += slotSize,
+        ModEquipmentSlot.CLOTHING.getIndex(),
+        equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack.is(ModItemTags.CLOTHING)));
 
-    this.addSlot(
-        new PredicateItemHandlerSlot(this.equipment, ModEquipmentSlotType.VEST.getIndex(),
-            equipmentColumnX + slotSize, equipmentColumnY, (slot, itemStack) -> itemStack
-                .getCapability(Storage.CAPABILITY)
-                .map(storage -> storage.isValidForSlot(ModEquipmentSlotType.VEST))
-                .orElse(false)));
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.VEST.getIndex(),
+        equipmentColumnX + slotSize, equipmentColumnY,
+        (slot, itemStack) -> itemStack
+            .getCapability(Storage.CAPABILITY)
+            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.VEST))
+            .orElse(false)));
 
     final int gunCraftSlotGap = 3;
-    final int gunCraftY = 8;
+    final int gunCraftY = 14;
+    final int gunCraftX = 106;
 
-    this.addSlot(new GunCraftSlot(this.outputInventory, 0, 125, gunCraftY + slotSize + 3,
-        this.craftingInventory));
+    this.addSlot(new GunCraftSlot(this.outputContainer, 0,
+        gunCraftX + slotSize + gunCraftSlotGap,
+        gunCraftY + slotSize + gunCraftSlotGap,
+        this.craftingContainer));
 
     final BiPredicate<PredicateSlot, ItemStack> attachmentOrPaintPredicate =
         (slot, itemStack) -> this.getGunStack().getCapability(Gun.CAPABILITY)
@@ -105,20 +120,26 @@ public class EquipmentMenu extends AbstractContainerMenu {
             && ((AttachmentLike) itemStack.getItem())
                 .asAttachment().getInventorySlot().getIndex() == slot.getSlotIndex();
 
-    this.addSlot(new PredicateSlot(this.craftingInventory,
-        GunCraftSlotType.MUZZLE_ATTACHMENT.getIndex(), 104,
+    this.addSlot(new PredicateSlot(this.craftingContainer,
+        GunCraftSlotType.MUZZLE_ATTACHMENT.getIndex(),
+        gunCraftX,
         gunCraftY + slotSize + gunCraftSlotGap,
         attachmentPredicate.and(attachmentOrPaintPredicate)));
-    this.addSlot(new PredicateSlot(this.craftingInventory,
-        GunCraftSlotType.UNDERBARREL_ATTACHMENT.getIndex(), 125,
+    this.addSlot(new PredicateSlot(this.craftingContainer,
+        GunCraftSlotType.UNDERBARREL_ATTACHMENT.getIndex(),
+        gunCraftX + slotSize + gunCraftSlotGap,
         gunCraftY + slotSize * 2 + gunCraftSlotGap * 2,
         attachmentPredicate.and(attachmentOrPaintPredicate)));
-    this.addSlot(new PredicateSlot(this.craftingInventory,
-        GunCraftSlotType.OVERBARREL_ATTACHMENT.getIndex(), 125, gunCraftY,
+    this.addSlot(new PredicateSlot(this.craftingContainer,
+        GunCraftSlotType.OVERBARREL_ATTACHMENT.getIndex(),
+        gunCraftX + slotSize + gunCraftSlotGap,
+        gunCraftY,
         attachmentPredicate.and(attachmentOrPaintPredicate)));
 
-    this.addSlot(new PredicateSlot(this.craftingInventory,
-        GunCraftSlotType.PAINT.getIndex(), 146, gunCraftY + slotSize + gunCraftSlotGap,
+    this.addSlot(new PredicateSlot(this.craftingContainer,
+        GunCraftSlotType.PAINT.getIndex(),
+        gunCraftX + slotSize * 2 + gunCraftSlotGap * 2,
+        gunCraftY + slotSize + gunCraftSlotGap,
         (slot, itemStack) -> Paint.isValid(this.getGunStack(), itemStack)));
   }
 
@@ -131,8 +152,8 @@ public class EquipmentMenu extends AbstractContainerMenu {
   public void removed(Player playerEntity) {
     super.removed(playerEntity);
     if (!playerEntity.level.isClientSide()) {
-      this.clearContainer(playerEntity, this.craftingInventory);
-      this.clearContainer(playerEntity, this.outputInventory);
+      this.clearContainer(playerEntity, this.craftingContainer);
+      this.clearContainer(playerEntity, this.outputContainer);
     }
   }
 
@@ -141,18 +162,18 @@ public class EquipmentMenu extends AbstractContainerMenu {
   }
 
   public ItemStack getGunStack() {
-    return this.outputInventory.getItem(0);
+    return this.outputContainer.getItem(0);
   }
 
   public boolean isCraftingInventoryEmpty() {
-    return this.craftingInventory.isEmpty();
+    return this.craftingContainer.isEmpty();
   }
 
   public boolean isCraftable() {
     return this.getGunStack().getCapability(Gun.CAPABILITY)
         .map(gun -> {
-          for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
-            ItemStack itemStack = this.craftingInventory.getItem(i);
+          for (int i = 0; i < this.craftingContainer.getContainerSize(); i++) {
+            ItemStack itemStack = this.craftingContainer.getItem(i);
             if (!itemStack.isEmpty()
                 && !gun.isAcceptedAttachment(itemStack)
                 && !Paint.isValid(this.getGunStack(), itemStack)) {

@@ -1,0 +1,18 @@
+{
+	"parent": "forge:item/default",
+	"loader": "forge:separate-perspective",
+	"base": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/large_ghillie_backpack"
+		}
+	},
+	"perspectives": {
+		"head": {
+			"parent": "craftingdead:backpack/large_backpack",
+			"textures": {
+				"base": "craftingdead:backpack/large_ghillie_backpack"
+			}
+		}
+	}
+}

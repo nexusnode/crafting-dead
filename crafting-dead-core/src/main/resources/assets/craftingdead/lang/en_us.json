@@ -316,6 +316,30 @@
   "item.craftingdead.riot_vest": "Riot Vest",
   "item.craftingdead.tan_tactical_vest": "Tan Tactical Vest",
 
+  "item.craftingdead.small_red_backpack": "Small Red Backpack",
+  "item.craftingdead.small_orange_backpack": "Small Orange Backpack",
+  "item.craftingdead.small_yellow_backpack": "Small Yellow Backpack",
+  "item.craftingdead.small_green_backpack": "Small Green Backpack",
+  "item.craftingdead.small_blue_backpack": "Small Blue Backpack",
+  "item.craftingdead.small_purple_backpack": "Small Purple Backpack",
+  "item.craftingdead.medium_red_backpack": "Medium Red Backpack",
+  "item.craftingdead.medium_orange_backpack": "Medium Orange Backpack",
+  "item.craftingdead.medium_yellow_backpack": "Medium Yellow Backpack",
+  "item.craftingdead.medium_green_backpack": "Medium Green Backpack",
+  "item.craftingdead.medium_blue_backpack": "Medium Blue Backpack",
+  "item.craftingdead.medium_purple_backpack": "Medium Purple Backpack",
+  "item.craftingdead.medium_grey_backpack": "Medium Gray Backpack",
+  "item.craftingdead.medium_black_backpack": "Medium Black Backpack",
+  "item.craftingdead.medium_ghillie_backpack": "Medium Ghillie Backpack",
+  "item.craftingdead.medium_white_backpack": "Medium White Backpack",
+  "item.craftingdead.large_grey_backpack": "Large Grey Backpack",
+  "item.craftingdead.large_green_backpack": "Large Green Backpack",
+  "item.craftingdead.large_tan_backpack": "Large Tan Backpack",
+  "item.craftingdead.large_black_backpack": "Large Black Backpack",
+  "item.craftingdead.large_ghillie_backpack": "Large Ghillie Backpack",
+  "item.craftingdead.tan_gun_bag": "Tan Gun Bag",
+  "item.craftingdead.grey_gun_bag": "Gray Gun Bag",
+
   "item.craftingdead.parachute": "Parachute",
 
   "item.modifiers.clothing":"When wearing:",
@@ -346,5 +370,7 @@
 
   "attachment_multiplier_type.damage": "Damage",
   "attachment_multiplier_type.accuracy": "Accuracy",
-  "attachment_multiplier_type.zoom": "Zoom"
+  "attachment_multiplier_type.zoom": "Zoom",
+
+  "storage_item.contents": "Contents"
 }

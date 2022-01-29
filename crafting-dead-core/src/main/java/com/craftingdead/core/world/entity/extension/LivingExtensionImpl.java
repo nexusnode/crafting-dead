@@ -21,7 +21,6 @@ package com.craftingdead.core.world.entity.extension;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -30,7 +29,7 @@ import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -74,7 +73,14 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
   private final ItemStackHandler itemHandler =
-      new ItemStackHandler(ModEquipmentSlotType.values().length) {
+      new ItemStackHandler(ModEquipmentSlot.values().length) {
+        @Override
+        protected void onLoad() {
+          if (this.getSlots() != ModEquipmentSlot.values().length) {
+            this.setSize(ModEquipmentSlot.values().length);
+          }
+        }
+
         @Override
         public void onContentsChanged(int slot) {
           if (!LivingExtensionImpl.this.entity.getCommandSenderWorld().isClientSide()) {
@@ -172,7 +178,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     this.progressMonitor = action.getPerformerProgress();
     action.getTarget().ifPresent(target -> target.setProgressMonitor(action.getTargetProgress()));
     if (sendUpdate) {
-      PacketTarget target = this.getLevel().isClientSide()
+      var target = this.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       int targetId = action.getTarget()
@@ -270,7 +276,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     this.moving = !this.entity.position().equals(this.lastPos);
     this.lastPos = this.entity.position();
 
-    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
+    for (var entry : this.handlers.entrySet()) {
       this.tickHandler(entry.getKey(), entry.getValue());
     }
   }
@@ -302,7 +308,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   private void updateHat() {
-    var headStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.HAT.getIndex());
+    var headStack = this.itemHandler.getStackInSlot(ModEquipmentSlot.HAT.getIndex());
     var hat = headStack.getCapability(Hat.CAPABILITY).orElse(null);
     if (headStack.getItem() == ModItems.SCUBA_MASK.get()
         && this.entity.isEyeInFluid(FluidTags.WATER)) {
@@ -315,7 +321,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   private void updateClothing() {
-    var clothingStack = this.itemHandler.getStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex());
+    var clothingStack = this.itemHandler.getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex());
     var clothing = clothingStack.getCapability(Clothing.CAPABILITY).orElse(null);
 
     if (clothingStack != this.lastClothingStack) {
@@ -453,24 +459,24 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public CompoundTag serializeNBT() {
-    CompoundTag nbt = new CompoundTag();
-    nbt.put("inventory", this.itemHandler.serializeNBT());
-    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
-      CompoundTag extensionNbt = entry.getValue().serializeNBT();
-      if (!extensionNbt.isEmpty()) {
-        nbt.put(entry.getKey().toString(), extensionNbt);
+    var tag = new CompoundTag();
+    tag.put("inventory", this.itemHandler.serializeNBT());
+    for (var entry : this.handlers.entrySet()) {
+      var extensionTag = entry.getValue().serializeNBT();
+      if (!extensionTag.isEmpty()) {
+        tag.put(entry.getKey().toString(), extensionTag);
       }
     }
-    return nbt;
+    return tag;
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    this.itemHandler.deserializeNBT(nbt.getCompound("inventory"));
-    for (Map.Entry<ResourceLocation, H> entry : this.handlers.entrySet()) {
-      CompoundTag extensionNbt = nbt.getCompound(entry.getKey().toString());
-      if (!extensionNbt.isEmpty()) {
-        entry.getValue().deserializeNBT(extensionNbt);
+  public void deserializeNBT(CompoundTag tag) {
+    this.itemHandler.deserializeNBT(tag.getCompound("inventory"));
+    for (var entry : this.handlers.entrySet()) {
+      var extensionTag = tag.getCompound(entry.getKey().toString());
+      if (!extensionTag.isEmpty()) {
+        entry.getValue().deserializeNBT(extensionTag);
       }
     }
   }
@@ -483,8 +489,8 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj)
-        || (obj instanceof LivingExtension
-            && ((LivingExtension<?, ?>) obj).getEntity().equals(this.entity));
+        || (obj instanceof LivingExtension<?, ?> extension
+            && extension.getEntity().equals(this.entity));
   }
 
   @Override
@@ -505,12 +511,11 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     out.writeShort(255);
 
     // Handlers
-    Set<Map.Entry<ResourceLocation, H>> handlersToSend =
-        writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
+    var handlersToSend = writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
     out.writeVarInt(handlersToSend.size());
-    for (Map.Entry<ResourceLocation, H> entry : handlersToSend) {
+    for (var entry : handlersToSend) {
       out.writeResourceLocation(entry.getKey());
-      FriendlyByteBuf handlerData = new FriendlyByteBuf(Unpooled.buffer());
+      var handlerData = new FriendlyByteBuf(Unpooled.buffer());
       entry.getValue().encode(handlerData, writeAll);
       out.writeVarInt(handlerData.readableBytes());
       out.writeBytes(handlerData);
@@ -529,7 +534,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     // Handlers
     int handlersSize = in.readVarInt();
     for (int x = 0; x < handlersSize; x++) {
-      ResourceLocation id = in.readResourceLocation();
+      var id = in.readResourceLocation();
       int dataSize = in.readVarInt();
       H handler = this.handlers.get(id);
       if (handler == null) {

@@ -1,0 +1,18 @@
+{
+	"parent": "forge:item/default",
+	"loader": "forge:separate-perspective",
+	"base": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/tan_gun_bag"
+		}
+	},
+	"perspectives": {
+		"head": {
+			"parent": "craftingdead:backpack/gun_bag",
+			"textures": {
+				"base": "craftingdead:backpack/tan_gun_bag"
+			}
+		}
+	}
+}

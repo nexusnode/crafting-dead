@@ -20,11 +20,10 @@ package com.craftingdead.core.world.item;
 
 
 import java.util.List;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.SerializableCapabilityProvider;
 import com.craftingdead.core.world.inventory.GenericMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.google.common.collect.ImmutableSet;
@@ -32,7 +31,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
@@ -48,8 +46,24 @@ public class StorageItem extends Item {
 
   public static final int MAX_ROWS_TO_SHOW = 6;
 
-  public static final Supplier<Storage> VEST =
-      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlotType.VEST, GenericMenu::createVest);
+  public static final NonNullSupplier<Storage> VEST =
+      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.VEST, GenericMenu::createVest);
+
+  public static final NonNullSupplier<Storage> SMALL_BACKPACK =
+      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.BACKPACK,
+          GenericMenu::createSmallBackpack);
+
+  public static final NonNullSupplier<Storage> MEDIUM_BACKPACK =
+      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
+          GenericMenu::createMediumBackpack);
+
+  public static final NonNullSupplier<Storage> LARGE_BACKPACK =
+      () -> new ItemStackHandlerStorage(6 * 9, ModEquipmentSlot.BACKPACK,
+          GenericMenu::createLargeBackpack);
+
+  public static final NonNullSupplier<Storage> GUN_BAG =
+      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
+          GenericMenu::createGunBag);
 
   private final NonNullSupplier<Storage> storageContainer;
 
@@ -75,29 +89,28 @@ public class StorageItem extends Item {
     backpackStack.getCapability(Storage.CAPABILITY).ifPresent(storage -> {
       if (!storage.isEmpty()) {
         lines.add(new TextComponent(" "));
-        lines.add(new TranslatableComponent("container.inventory")
+        lines.add(new TranslatableComponent("storage_item.contents")
             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 
-        int rowsBeyondLimit = 0;
+        int itemsBeyondLimit = 0;
+        int itemsDisplayed = 0;
 
         for (int i = 0; i < storage.getSlots(); i++) {
-          ItemStack stack = storage.getStackInSlot(i);
+          var stack = storage.getStackInSlot(i);
           if (!stack.isEmpty()) {
-            if (i >= MAX_ROWS_TO_SHOW) {
-              ++rowsBeyondLimit;
-            } else {
-              MutableComponent amountText =
-                  new TextComponent(stack.getCount() + "x ")
-                      .withStyle(ChatFormatting.DARK_GRAY);
-              Component itemText =
-                  stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY);
-              lines.add(amountText.append(itemText));
+            if (itemsDisplayed++ >= MAX_ROWS_TO_SHOW) {
+              itemsBeyondLimit++;
+              continue;
             }
+            var amountText = new TextComponent(stack.getCount() + "x ")
+                .withStyle(ChatFormatting.DARK_GRAY);
+            var itemText = stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY);
+            lines.add(amountText.append(itemText));
           }
         }
 
-        if (rowsBeyondLimit > 0) {
-          lines.add(new TextComponent(". . . +" + rowsBeyondLimit)
+        if (itemsBeyondLimit > 0) {
+          lines.add(new TextComponent(". . . +" + itemsBeyondLimit)
               .withStyle(ChatFormatting.RED));
         }
       }
@@ -106,11 +119,11 @@ public class StorageItem extends Item {
 
   @Override
   public CompoundTag getShareTag(ItemStack stack) {
-    CompoundTag shareTag = stack.getTag();
+    var shareTag = stack.getTag();
     if (shareTag == null) {
       shareTag = new CompoundTag();
     }
-    CompoundTag storageTag = stack.getCapability(Storage.CAPABILITY)
+    var storageTag = stack.getCapability(Storage.CAPABILITY)
         .map(Storage::serializeNBT)
         .orElse(null);
     if (storageTag != null && !storageTag.isEmpty()) {
@@ -120,12 +133,12 @@ public class StorageItem extends Item {
   }
 
   @Override
-  public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
-    if (nbt != null && nbt.contains("storage", Tag.TAG_COMPOUND)) {
+  public void readShareTag(ItemStack stack, @Nullable CompoundTag tag) {
+    if (tag != null && tag.contains("storage", Tag.TAG_COMPOUND)) {
       stack.getCapability(Storage.CAPABILITY)
-          .ifPresent(gun -> gun.deserializeNBT(nbt.getCompound("storage")));
+          .ifPresent(gun -> gun.deserializeNBT(tag.getCompound("storage")));
     }
-    super.readShareTag(stack, nbt);
+    super.readShareTag(stack, tag);
   }
 
 }

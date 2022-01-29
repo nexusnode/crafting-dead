@@ -60,13 +60,14 @@ public class ModItems {
   public static final DeferredRegister<Item> ITEMS =
       DeferredRegister.create(ForgeRegistries.ITEMS, CraftingDead.ID);
 
-  public static final CreativeModeTab COSMETICS_TAB = new CreativeModeTab("craftingdead.cosmetics") {
+  public static final CreativeModeTab COSMETICS_TAB =
+      new CreativeModeTab("craftingdead.cosmetics") {
 
-    @Override
-    public ItemStack makeIcon() {
-      return new ItemStack(ModItems.BUILDER_CLOTHING::get);
-    }
-  };
+        @Override
+        public ItemStack makeIcon() {
+          return new ItemStack(ModItems.BUILDER_CLOTHING::get);
+        }
+      };
 
   public static final CreativeModeTab COMBAT_TAB = new CreativeModeTab("craftingdead.combat") {
 
@@ -1536,37 +1537,37 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> BLACK_TACTICAL_VEST =
-      ITEMS.register("black_tactical_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("black_tactical_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GHILLIE_TACTICAL_VEST =
-      ITEMS.register("ghillie_tactical_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("ghillie_tactical_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREEN_TACTICAL_VEST =
-      ITEMS.register("green_tactical_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("green_tactical_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREY_TACTICAL_VEST =
-      ITEMS.register("grey_tactical_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("grey_tactical_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> RIOT_VEST =
-      ITEMS.register("riot_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("riot_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> TAN_TACTICAL_VEST =
-      ITEMS.register("tan_tactical_vest", () -> new StorageItem(StorageItem.VEST::get,
+      ITEMS.register("tan_tactical_vest", () -> new StorageItem(StorageItem.VEST,
           new Item.Properties()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -2345,4 +2346,100 @@ public class ModItems {
               .setAction(ActionTypes.USE_BANDAGE)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
+
+  // ================================================================================
+  // Backpacks
+  // ================================================================================
+
+  public static final RegistryObject<Item> SMALL_RED_BACKPACK = ITEMS
+      .register("small_red_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> SMALL_ORANGE_BACKPACK = ITEMS
+      .register("small_orange_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> SMALL_YELLOW_BACKPACK = ITEMS
+      .register("small_yellow_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> SMALL_GREEN_BACKPACK = ITEMS
+      .register("small_green_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> SMALL_BLUE_BACKPACK = ITEMS
+      .register("small_blue_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> SMALL_PURPLE_BACKPACK = ITEMS
+      .register("small_purple_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_RED_BACKPACK = ITEMS
+      .register("medium_red_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_ORANGE_BACKPACK = ITEMS
+      .register("medium_orange_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_YELLOW_BACKPACK = ITEMS
+      .register("medium_yellow_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_GREEN_BACKPACK = ITEMS
+      .register("medium_green_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_BLUE_BACKPACK = ITEMS
+      .register("medium_blue_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_PURPLE_BACKPACK = ITEMS
+      .register("medium_purple_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_GREY_BACKPACK = ITEMS
+      .register("medium_grey_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_BLACK_BACKPACK = ITEMS
+      .register("medium_black_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_GHILLIE_BACKPACK = ITEMS
+      .register("medium_ghillie_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> MEDIUM_WHITE_BACKPACK = ITEMS
+      .register("medium_white_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> LARGE_GREY_BACKPACK = ITEMS
+      .register("large_grey_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> LARGE_GREEN_BACKPACK = ITEMS
+      .register("large_green_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> LARGE_TAN_BACKPACK = ITEMS
+      .register("large_tan_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> LARGE_BLACK_BACKPACK = ITEMS
+      .register("large_black_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> LARGE_GHILLIE_BACKPACK = ITEMS
+      .register("large_ghillie_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> TAN_GUN_BAG = ITEMS
+      .register("tan_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  public static final RegistryObject<Item> GREY_GUN_BAG = ITEMS
+      .register("grey_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
+          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
 }

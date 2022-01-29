@@ -20,7 +20,7 @@ package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
@@ -39,24 +39,24 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombie, M
     this.addLayer(new ClothingLayer<>(this));
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(ModEquipmentSlotType.MELEE)
+        .withSlot(ModEquipmentSlot.MELEE)
         .withCrouchingOrientation(true)
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(ModEquipmentSlotType.VEST)
+        .withSlot(ModEquipmentSlot.VEST)
         .withCrouchingOrientation(true)
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(ModEquipmentSlotType.HAT)
+        .withSlot(ModEquipmentSlot.HAT)
         .withHeadOrientation(true)
         .withArbitraryTransformation(
             new Transformation(null, null, new Vector3f(-1F, -1F, 1F), null))
         .build());
     this.addLayer(new EquipmentLayer.Builder<T, M>()
         .withRenderer(this)
-        .withSlot(ModEquipmentSlotType.GUN)
+        .withSlot(ModEquipmentSlot.GUN)
         .withCrouchingOrientation(true)
         .build());
   }

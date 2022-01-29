@@ -163,7 +163,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * equipment storage)
    * 
    * @return the {@link IItemHandler}
-   * @see {@link com.craftingdead.core.world.inventory.ModEquipmentSlotType}
+   * @see {@link com.craftingdead.core.world.inventory.ModEquipmentSlot}
    */
   IItemHandlerModifiable getItemHandler();
 

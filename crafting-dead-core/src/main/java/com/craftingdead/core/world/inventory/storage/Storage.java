@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.inventory.storage;
 
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraftforge.common.capabilities.Capability;
@@ -31,7 +31,7 @@ public interface Storage extends MenuConstructor, IItemHandler, INBTSerializable
 
   Capability<Storage> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
-  boolean isValidForSlot(ModEquipmentSlotType slotType);
+  boolean isValidForSlot(ModEquipmentSlot slotType);
 
   /**
    * Whether this storage is empty or not.

@@ -21,7 +21,7 @@ package com.craftingdead.core.client.renderer.entity.layers;
 import org.apache.commons.lang3.Validate;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
@@ -41,7 +41,7 @@ import net.minecraft.world.item.ItemStack;
 public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
     extends RenderLayer<T, M> {
 
-  private final ModEquipmentSlotType slot;
+  private final ModEquipmentSlot slot;
 
   /**
    * Whether this model should be rotated when the player is crouching.
@@ -127,7 +127,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
   public static class Builder<T extends LivingEntity, M extends HumanoidModel<T>> {
 
     private LivingEntityRenderer<T, M> entityRenderer;
-    private ModEquipmentSlotType slot;
+    private ModEquipmentSlot slot;
     private Transformation tranformation;
     private boolean useCrouchingOrientation;
     private boolean useHeadOrientation;
@@ -137,7 +137,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
       return this;
     }
 
-    public Builder<T, M> withSlot(ModEquipmentSlotType slot) {
+    public Builder<T, M> withSlot(ModEquipmentSlot slot) {
       this.slot = slot;
       return this;
     }

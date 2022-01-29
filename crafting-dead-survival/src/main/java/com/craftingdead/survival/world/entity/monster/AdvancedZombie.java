@@ -26,7 +26,7 @@ import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.inventory.ModEquipmentSlotType;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.ClothingItem;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
@@ -183,9 +183,9 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
     this.entityData.set(TEXTURE_NUMBER, this.random.nextInt(23));
     this.setItemSlot(EquipmentSlot.MAINHAND, this.getHeldStack());
     this.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
-      living.getItemHandler().setStackInSlot(ModEquipmentSlotType.CLOTHING.getIndex(),
+      living.getItemHandler().setStackInSlot(ModEquipmentSlot.CLOTHING.getIndex(),
           this.getClothingStack());
-      living.getItemHandler().setStackInSlot(ModEquipmentSlotType.HAT.getIndex(),
+      living.getItemHandler().setStackInSlot(ModEquipmentSlot.HAT.getIndex(),
           this.getHatStack());
     });
   }

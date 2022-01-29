@@ -1,0 +1,18 @@
+{
+	"parent": "forge:item/default",
+	"loader": "forge:separate-perspective",
+	"base": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "craftingdead:item/medium_white_backpack"
+		}
+	},
+	"perspectives": {
+		"head": {
+			"parent": "craftingdead:backpack/medium_backpack",
+			"textures": {
+				"base": "craftingdead:backpack/medium_white_backpack"
+			}
+		}
+	}
+}
