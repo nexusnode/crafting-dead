@@ -13,6 +13,7 @@ public class ModModelLayers {
 
   public static final ModelLayerLocation MUZZLE_FLASH = register("muzzle_flash");
   public static final ModelLayerLocation PARACHUTE = register("parachute");
+  public static final ModelLayerLocation HANDCUFFS = register("handcuffs");
   public static final ModelLayerLocation C4_EXPLOSIVE = register("c4_explosive");
   public static final ModelLayerLocation CYLINDER_GRENADE = register("cylinder_grenade");
   public static final ModelLayerLocation FRAG_GRENADE = register("frag_grenade");

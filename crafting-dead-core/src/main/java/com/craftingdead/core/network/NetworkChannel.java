@@ -22,6 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
+import com.craftingdead.core.network.message.play.EnableCombatModeMessage;
 import com.craftingdead.core.network.message.play.HitMessage;
 import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
@@ -139,6 +140,13 @@ public enum NetworkChannel {
           .encoder(SyncGunEquipmentSlotMessage::encode)
           .decoder(SyncGunEquipmentSlotMessage::decode)
           .consumer(SyncGunEquipmentSlotMessage::handle)
+          .add();
+
+      simpleChannel
+          .messageBuilder(EnableCombatModeMessage.class, 0x0E, NetworkDirection.PLAY_TO_SERVER)
+          .encoder(EnableCombatModeMessage::encode)
+          .decoder(EnableCombatModeMessage::decode)
+          .consumer(EnableCombatModeMessage::handle)
           .add();
     }
   };

@@ -34,6 +34,7 @@ import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
@@ -144,15 +145,15 @@ public class GunRenderer implements CustomItemRenderer {
   public void renderItem(
       ItemStack itemStack,
       ItemTransforms.TransformType transformType,
-      LivingEntity entity,
-      PoseStack matrixStack,
-      MultiBufferSource renderTypeBuffer,
+      @Nullable LivingExtension<?, ?> living,
+      PoseStack poseStack,
+      MultiBufferSource bufferSource,
       int packedLight,
       int packedOverlay) {
 
     var scope = itemStack.getCapability(Scope.CAPABILITY).orElse(null);
-    var aiming = scope != null && scope.isScoping(entity);
-    if (aiming && scope.getOverlayTexture(entity).isPresent()) {
+    var scoping = scope != null && living != null && scope.isScoping(living);
+    if (scoping && scope.getOverlayTexture(living).isPresent()) {
       return;
     }
 
@@ -160,56 +161,55 @@ public class GunRenderer implements CustomItemRenderer {
 
     var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
 
-    matrixStack.pushPose();
+    poseStack.pushPose();
     {
       switch (transformType) {
         case FIRST_PERSON_LEFT_HAND:
         case FIRST_PERSON_RIGHT_HAND:
-          if (entity instanceof AbstractClientPlayer) {
-            AbstractClientPlayer playerEntity = (AbstractClientPlayer) entity;
-            this.renderFirstPerson(playerEntity, itemStack, gun, aiming, transformType,
-                partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+          if (living != null && living.getEntity() instanceof AbstractClientPlayer player) {
+            this.renderFirstPerson(player, itemStack, gun, scoping, transformType,
+                partialTicks, poseStack, bufferSource, packedLight, packedOverlay);
           }
           break;
         case THIRD_PERSON_LEFT_HAND:
         case THIRD_PERSON_RIGHT_HAND:
-          gun.getClient().getAnimationController().apply(partialTicks, matrixStack);
+          gun.getClient().getAnimationController().apply(partialTicks, poseStack);
           this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
-              transformType, partialTicks, matrixStack, renderTypeBuffer, packedLight,
+              transformType, partialTicks, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
         case FIXED:
-          matrixStack.scale(1.5F, 1.5F, 1.5F);
-          matrixStack.translate(-0.25F, 0, 0);
-          matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
-          matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+          poseStack.scale(1.5F, 1.5F, 1.5F);
+          poseStack.translate(-0.25F, 0, 0);
+          poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
+          poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
         default:
           this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
-              transformType, partialTicks, matrixStack, renderTypeBuffer, packedLight,
+              transformType, partialTicks, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
       }
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
-  private void renderFirstPersonHands(
+  private void renderFirstPersonArms(
       AbstractClientPlayer playerEntity,
       ItemStack itemStack,
       Gun gun,
       float aimingPct,
       float partialTicks,
-      PoseStack matrixStack,
-      MultiBufferSource renderTypeBuffer,
+      PoseStack poseStack,
+      MultiBufferSource bufferSource,
       int packedLight) {
 
     final var playerRenderer =
         (PlayerRenderer) this.minecraft.getEntityRenderDispatcher().getRenderer(playerEntity);
 
-    var handSide = playerEntity.getMainArm();
+    var mainArm = playerEntity.getMainArm();
 
     var heldTransforms = this.properties.handTransforms().getOrDefault(
-        handSide == HumanoidArm.RIGHT
+        mainArm == HumanoidArm.RIGHT
             ? GunRendererProperties.HandTransform.HELD_RIGHT_HANDED
             : GunRendererProperties.HandTransform.HELD_LEFT_HANDED,
         IDENTITY_HAND_TRANSFORMS);
@@ -217,12 +217,11 @@ public class GunRenderer implements CustomItemRenderer {
     Transformation rightHandTransforms;
     Transformation leftHandTransforms;
     if (aimingPct > 0) {
-      Pair<Transformation, Transformation> aimingTransforms =
-          this.properties.handTransforms().getOrDefault(
-              handSide == HumanoidArm.RIGHT
-                  ? GunRendererProperties.HandTransform.AIMING_RIGHT_HANDED
-                  : GunRendererProperties.HandTransform.AIMING_LEFT_HANDED,
-              IDENTITY_HAND_TRANSFORMS);
+      var aimingTransforms = this.properties.handTransforms().getOrDefault(
+          mainArm == HumanoidArm.RIGHT
+              ? GunRendererProperties.HandTransform.AIMING_RIGHT_HANDED
+              : GunRendererProperties.HandTransform.AIMING_LEFT_HANDED,
+          IDENTITY_HAND_TRANSFORMS);
       rightHandTransforms = TransformationHelper.slerp(heldTransforms.getFirst(),
           aimingTransforms.getFirst(), aimingPct);
       leftHandTransforms = TransformationHelper.slerp(heldTransforms.getSecond(),
@@ -232,55 +231,55 @@ public class GunRenderer implements CustomItemRenderer {
       leftHandTransforms = heldTransforms.getSecond();
     }
 
-    // Right Hand
-    matrixStack.pushPose();
+    // Right Arm
+    poseStack.pushPose();
     {
-      gun.getClient().getAnimationController().applyHand(
+      gun.getClient().getAnimationController().applyArm(
           playerEntity.getMainArm() == HumanoidArm.RIGHT
               ? InteractionHand.MAIN_HAND
               : InteractionHand.OFF_HAND,
           HumanoidArm.RIGHT,
-          partialTicks, matrixStack);
-      matrixStack.translate(0.75F, -0.75F, -0.6F);
+          partialTicks, poseStack);
+      poseStack.translate(0.75F, -0.75F, -0.6F);
 
-      rightHandTransforms.push(matrixStack);
+      rightHandTransforms.push(poseStack);
       {
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(95.0F));
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(100.0F));
-        matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+        poseStack.mulPose(Vector3f.YP.rotationDegrees(95.0F));
+        poseStack.mulPose(Vector3f.ZP.rotationDegrees(100.0F));
+        poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
 
-        matrixStack.translate(0.9F, -0.75F, 0.5F);
+        poseStack.translate(0.9F, -0.75F, 0.5F);
 
-        playerRenderer.renderRightHand(matrixStack, renderTypeBuffer, packedLight, playerEntity);
+        playerRenderer.renderRightHand(poseStack, bufferSource, packedLight, playerEntity);
       }
-      matrixStack.popPose();
+      poseStack.popPose();
     }
-    matrixStack.popPose();
+    poseStack.popPose();
 
-    // Left Hand
-    matrixStack.pushPose();
+    // Left Arm
+    poseStack.pushPose();
     {
-      gun.getClient().getAnimationController().applyHand(
+      gun.getClient().getAnimationController().applyArm(
           playerEntity.getMainArm() == HumanoidArm.LEFT ? InteractionHand.MAIN_HAND
               : InteractionHand.OFF_HAND,
           HumanoidArm.LEFT,
-          partialTicks, matrixStack);
+          partialTicks, poseStack);
 
-      matrixStack.translate(0.75F, -0.75F, -0.75F);
+      poseStack.translate(0.75F, -0.75F, -0.75F);
 
-      leftHandTransforms.push(matrixStack);
+      leftHandTransforms.push(poseStack);
       {
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(95.0F));
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(95.0F));
-        matrixStack.mulPose(Vector3f.XP.rotationDegrees(120.0F));
+        poseStack.mulPose(Vector3f.YP.rotationDegrees(95.0F));
+        poseStack.mulPose(Vector3f.ZP.rotationDegrees(95.0F));
+        poseStack.mulPose(Vector3f.XP.rotationDegrees(120.0F));
 
-        matrixStack.translate(0.05F, -1.05F, 0.30F);
+        poseStack.translate(0.05F, -1.05F, 0.30F);
 
-        playerRenderer.renderLeftHand(matrixStack, renderTypeBuffer, packedLight, playerEntity);
+        playerRenderer.renderLeftHand(poseStack, bufferSource, packedLight, playerEntity);
       }
-      matrixStack.popPose();
+      poseStack.popPose();
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
   private void renderFlash(Gun gun, PoseStack matrixStack, MultiBufferSource bufferSource,
@@ -390,7 +389,7 @@ public class GunRenderer implements CustomItemRenderer {
         this.renderFlash(gun, poseStack, renderTypeBuffer, packedOverlay);
       }
 
-      this.renderFirstPersonHands(playerEntity, itemStack, gun, aimingPct, partialTicks,
+      this.renderFirstPersonArms(playerEntity, itemStack, gun, aimingPct, partialTicks,
           poseStack, renderTypeBuffer, packedLight);
 
       gun.getClient().getAnimationController().apply(partialTicks, poseStack);

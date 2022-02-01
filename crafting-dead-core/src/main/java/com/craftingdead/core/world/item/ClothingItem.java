@@ -21,7 +21,7 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.clothing.DefaultClothing;
 import com.google.common.collect.ImmutableMultimap;
@@ -40,7 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class ClothingItem extends Item {
 
@@ -55,13 +54,13 @@ public class ClothingItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> new DefaultClothing(
+    return CapabilityUtil.provider(
+        () -> new DefaultClothing(
             this.attributeModifiers,
             this.fireImmunity,
             new ResourceLocation(this.getRegistryName().getNamespace(), "textures/clothing/"
-                + this.getRegistryName().getPath() + "_" + "default" + ".png"))),
-        () -> Clothing.CAPABILITY);
+                + this.getRegistryName().getPath() + "_" + "default" + ".png")),
+        Clothing.CAPABILITY);
   }
 
   @Override
@@ -70,7 +69,7 @@ public class ClothingItem extends Item {
     super.appendHoverText(stack, world, lines, tooltipFlag);
 
     if (this.fireImmunity) {
-      lines.add(new TranslatableComponent("item_lore.clothing.immune_to_fire")
+      lines.add(new TranslatableComponent("clothing.immune_to_fire")
           .withStyle(ChatFormatting.GRAY));
     }
 

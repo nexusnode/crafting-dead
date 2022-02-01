@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.item.scope.Scope;
 import com.craftingdead.core.world.item.scope.SimpleScope;
@@ -35,7 +35,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class BinocularsItem extends Item {
 
@@ -66,8 +65,8 @@ public class BinocularsItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> new SimpleScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack)),
-        () -> Scope.CAPABILITY);
+    return CapabilityUtil.provider(
+        () -> new SimpleScope(14, SCOPE_OVERLAY_TEXTURE, 2048, 512, itemStack),
+        Scope.CAPABILITY);
   }
 }

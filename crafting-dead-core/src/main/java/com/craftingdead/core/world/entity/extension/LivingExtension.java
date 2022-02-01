@@ -21,16 +21,22 @@ package com.craftingdead.core.world.entity.extension;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.item.gun.Gun;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -52,10 +58,15 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
     return new LivingExtensionImpl<>(entity);
   }
 
-  @Nonnull
   @SuppressWarnings("unchecked")
-  static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E living) {
-    return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, living, LivingExtension.class);
+  static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E entity) {
+    return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, entity, LivingExtension.class);
+  }
+
+  @Nullable
+  @SuppressWarnings("unchecked")
+  static <E extends LivingEntity> LivingExtension<E, ?> get(E entity) {
+    return CapabilityUtil.get(LivingExtension.CAPABILITY, entity, LivingExtension.class);
   }
 
   /**
@@ -222,12 +233,21 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   E getEntity();
 
   /**
-   * Shorthand for {@link LivingEntity#level}.
+   * Shorthand for {@link LivingEntity#getLevel()}.
    * 
-   * @return the {@link World}
+   * @return the {@link Level}
    */
   default Level getLevel() {
-    return this.getEntity().level;
+    return this.getEntity().getLevel();
+  }
+
+  /**
+   * Shorthand for {@link LivingEntity#getRandom()}.
+   * 
+   * @return the {@link Random}
+   */
+  default Random getRandom() {
+    return this.getEntity().getRandom();
   }
 
   /**
@@ -236,7 +256,8 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @return the main hand {@link ItemStack}
    */
   default ItemStack getMainHandItem() {
-    return this.getEntity().getMainHandItem();
+    final var item = this.getEntity().getMainHandItem();
+    return item.isEmpty() ? ItemStack.EMPTY : item;
   }
 
   /**
@@ -246,6 +267,42 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    */
   default LazyOptional<Gun> getMainHandGun() {
     return this.getMainHandItem().getCapability(Gun.CAPABILITY);
+  }
+
+  default void breakItem(ItemStack itemStack) {
+    if (!itemStack.isEmpty()) {
+      if (!this.getEntity().isSilent()) {
+        this.getLevel().playLocalSound(this.getEntity().getX(), this.getEntity().getY(),
+            this.getEntity().getZ(), SoundEvents.ITEM_BREAK,
+            this.getEntity().getSoundSource(), 0.8F,
+            0.8F + this.getLevel().getRandom().nextFloat() * 0.4F, false);
+      }
+
+      this.spawnItemParticles(itemStack, 5);
+    }
+  }
+
+  default void spawnItemParticles(ItemStack itemStack, int count) {
+    for (int i = 0; i < count; ++i) {
+      var velocity = new Vec3((this.getRandom().nextFloat() - 0.5D) * 0.1D,
+          Math.random() * 0.1D + 0.1D, 0.0D);
+      velocity = velocity.xRot(-this.getEntity().getXRot() * ((float) Math.PI / 180F));
+      velocity = velocity.yRot(-this.getEntity().getYRot() * ((float) Math.PI / 180F));
+      var yPos = -this.getRandom().nextFloat() * 0.6D - 0.3D;
+      var pos = new Vec3((this.getRandom().nextFloat() - 0.5D) * 0.3D, yPos, 0.6D);
+      pos = pos.xRot(-this.getEntity().getXRot() * ((float) Math.PI / 180F));
+      pos = pos.yRot(-this.getEntity().getYRot() * ((float) Math.PI / 180F));
+      pos =
+          pos.add(this.getEntity().getX(), this.getEntity().getEyeY(), this.getEntity().getZ());
+      if (this.getLevel() instanceof ServerLevel level) {
+        level.sendParticles(
+            new ItemParticleOption(ParticleTypes.ITEM, itemStack), pos.x, pos.y, pos.z, 1,
+            velocity.x, velocity.y + 0.05D, velocity.z, 0.0D);
+      } else {
+        this.getLevel().addParticle(new ItemParticleOption(ParticleTypes.ITEM, itemStack), pos.x,
+            pos.y, pos.z, velocity.x, velocity.y + 0.05D, velocity.z);
+      }
+    }
   }
 
   /**

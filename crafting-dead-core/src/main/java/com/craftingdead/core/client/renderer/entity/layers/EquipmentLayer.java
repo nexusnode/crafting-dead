@@ -18,17 +18,18 @@
 
 package com.craftingdead.core.client.renderer.entity.layers;
 
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -38,7 +39,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * Layer that renders {@link IEquipableModel}s attached to a player's body.
  */
-public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
+public class EquipmentLayer<T extends LivingEntity, M extends EntityModel<T> & HeadedModel>
     extends RenderLayer<T, M> {
 
   private final ModEquipmentSlot slot;
@@ -46,7 +47,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
   /**
    * Whether this model should be rotated when the player is crouching.
    */
-  private final boolean useCrouchingOrientation;
+  private final boolean useCrouchOrientation;
 
   /**
    * Whether this model should be rotated accordingly to the player's head.
@@ -56,110 +57,111 @@ public class EquipmentLayer<T extends LivingEntity, M extends HumanoidModel<T>>
   /**
    * Optional arbitrary transformation right before rendering the {@link ItemStack}.
    */
-  private final Transformation transformation;
+  @Nullable
+  private final Consumer<PoseStack> transformation;
 
   private EquipmentLayer(Builder<T, M> builder) {
-    super(builder.entityRenderer);
+    super(builder.renderer);
     this.slot = builder.slot;
-    this.useCrouchingOrientation = builder.useCrouchingOrientation;
+    this.useCrouchOrientation = builder.useCrouchOrientation;
     this.transformation = builder.tranformation;
     this.useHeadOrientation = builder.useHeadOrientation;
   }
 
   @Override
-  public void render(PoseStack matrixStack, MultiBufferSource renderTypeBuffer,
+  public void render(PoseStack poseStack, MultiBufferSource bufferSource,
       int packedLight, T livingEntity, float limbSwing, float limbSwingAmount,
       float partialTicks, float ageTicks, float headYaw, float headPitch) {
-
-    Minecraft minecraft = Minecraft.getInstance();
-    boolean invisible = livingEntity.isInvisible();
-    boolean partiallyVisible =
+    final var minecraft = Minecraft.getInstance();
+    final var invisible = livingEntity.isInvisible();
+    final var partiallyVisible =
         livingEntity.isInvisible() && !livingEntity.isInvisibleTo(minecraft.player);
     if (partiallyVisible || !invisible) {
 
-      ItemRenderer itemRenderer = minecraft.getItemRenderer();
+      final var itemRenderer = minecraft.getItemRenderer();
 
       livingEntity.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
 
-        ItemStack itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
+        final var itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
 
         if (!itemStack.isEmpty()) {
           var bakedModel = itemRenderer.getModel(itemStack, livingEntity.level, livingEntity, 0);
 
-          matrixStack.pushPose();
+          poseStack.pushPose();
 
           // Applies crouching rotation is needed
-          if (this.useCrouchingOrientation && livingEntity.isCrouching()) {
-            RenderUtil.applyPlayerCrouchRotation(matrixStack);
+          if (this.useCrouchOrientation && livingEntity.isCrouching()) {
+            RenderUtil.applyPlayerCrouchRotation(poseStack);
           }
 
           // Applies the head orientation if needed
           if (this.useHeadOrientation) {
             // Vanilla's transformation for child entities, like baby zombies
             if (livingEntity.isBaby()) {
-              matrixStack.translate(0.0D, 0.03125D, 0.0D);
-              matrixStack.scale(0.7F, 0.7F, 0.7F);
-              matrixStack.translate(0.0D, 1.0D, 0.0D);
+              poseStack.translate(0.0D, 0.03125D, 0.0D);
+              poseStack.scale(0.7F, 0.7F, 0.7F);
+              poseStack.translate(0.0D, 1.0D, 0.0D);
             }
 
-            this.getParentModel().getHead().translateAndRotate(matrixStack);
+            this.getParentModel().getHead().translateAndRotate(poseStack);
           }
 
           // Applies the arbitrary transformation if needed
           if (this.transformation != null) {
-            this.transformation.push(matrixStack);
+            this.transformation.accept(poseStack);
           }
 
           // Renders the item. Also note the TransformType.
           itemRenderer.render(itemStack, ItemTransforms.TransformType.HEAD, false,
-              matrixStack, renderTypeBuffer, packedLight, OverlayTexture.NO_OVERLAY, bakedModel);
+              poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY, bakedModel);
 
-          if (this.transformation != null) {
-            matrixStack.popPose();
-          }
-
-          matrixStack.popPose();
+          poseStack.popPose();
         }
       });
     }
   }
 
-  public static class Builder<T extends LivingEntity, M extends HumanoidModel<T>> {
+  public static <T extends LivingEntity, M extends EntityModel<T> & HeadedModel> Builder<T, M> builder(
+      LivingEntityRenderer<T, M> renderer) {
+    return new Builder<>(renderer);
+  }
 
-    private LivingEntityRenderer<T, M> entityRenderer;
+  public static class Builder<T extends LivingEntity, M extends EntityModel<T> & HeadedModel> {
+
+    private final LivingEntityRenderer<T, M> renderer;
     private ModEquipmentSlot slot;
-    private Transformation tranformation;
-    private boolean useCrouchingOrientation;
+    @Nullable
+    private Consumer<PoseStack> tranformation;
+    private boolean useCrouchOrientation;
     private boolean useHeadOrientation;
 
-    public Builder<T, M> withRenderer(LivingEntityRenderer<T, M> entityRenderer) {
-      this.entityRenderer = entityRenderer;
-      return this;
+    private Builder(LivingEntityRenderer<T, M> renderer) {
+      this.renderer = renderer;
     }
 
-    public Builder<T, M> withSlot(ModEquipmentSlot slot) {
+    public Builder<T, M> slot(ModEquipmentSlot slot) {
       this.slot = slot;
       return this;
     }
 
-    public Builder<T, M> withArbitraryTransformation(Transformation transformation) {
+    public Builder<T, M> transformation(Consumer<PoseStack> transformation) {
       this.tranformation = transformation;
       return this;
     }
 
-    public Builder<T, M> withCrouchingOrientation(boolean useCrouchingOrientation) {
-      this.useCrouchingOrientation = useCrouchingOrientation;
+    public Builder<T, M> useCrouchOrientation(boolean useCrouchOrientation) {
+      this.useCrouchOrientation = useCrouchOrientation;
       return this;
     }
 
-    public Builder<T, M> withHeadOrientation(boolean useHeadOrientation) {
+    public Builder<T, M> useHeadOrientation(boolean useHeadOrientation) {
       this.useHeadOrientation = useHeadOrientation;
       return this;
     }
 
     public EquipmentLayer<T, M> build() {
-      Validate.notNull(this.entityRenderer, "The renderer must not be null");
-      Validate.notNull(this.slot, "The slot must not be null");
+      Objects.requireNonNull(this.renderer, "The renderer must not be null");
+      Objects.requireNonNull(this.slot, "The slot must not be null");
       return new EquipmentLayer<>(this);
     }
   }

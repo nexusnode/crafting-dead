@@ -24,8 +24,6 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
-import com.mojang.math.Transformation;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -37,27 +35,22 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombie, M
       float scale) {
     super(context, model, scale);
     this.addLayer(new ClothingLayer<>(this));
-    this.addLayer(new EquipmentLayer.Builder<T, M>()
-        .withRenderer(this)
-        .withSlot(ModEquipmentSlot.MELEE)
-        .withCrouchingOrientation(true)
+    this.addLayer(EquipmentLayer.builder(this)
+        .slot(ModEquipmentSlot.MELEE)
+        .useCrouchOrientation(true)
         .build());
-    this.addLayer(new EquipmentLayer.Builder<T, M>()
-        .withRenderer(this)
-        .withSlot(ModEquipmentSlot.VEST)
-        .withCrouchingOrientation(true)
+    this.addLayer(EquipmentLayer.builder(this)
+        .slot(ModEquipmentSlot.VEST)
+        .useCrouchOrientation(true)
         .build());
-    this.addLayer(new EquipmentLayer.Builder<T, M>()
-        .withRenderer(this)
-        .withSlot(ModEquipmentSlot.HAT)
-        .withHeadOrientation(true)
-        .withArbitraryTransformation(
-            new Transformation(null, null, new Vector3f(-1F, -1F, 1F), null))
+    this.addLayer(EquipmentLayer.builder(this)
+        .slot(ModEquipmentSlot.HAT)
+        .useHeadOrientation(true)
+        .transformation(poseStack -> poseStack.scale(-1F, -1F, 1F))
         .build());
-    this.addLayer(new EquipmentLayer.Builder<T, M>()
-        .withRenderer(this)
-        .withSlot(ModEquipmentSlot.GUN)
-        .withCrouchingOrientation(true)
+    this.addLayer(EquipmentLayer.builder(this)
+        .slot(ModEquipmentSlot.GUN)
+        .useCrouchOrientation(true)
         .build());
   }
 

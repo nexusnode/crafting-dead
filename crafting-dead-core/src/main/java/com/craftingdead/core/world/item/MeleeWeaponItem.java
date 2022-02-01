@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item;
 
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.google.common.collect.ImmutableMultimap;
@@ -33,7 +33,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class MeleeWeaponItem extends ToolItem {
 
@@ -64,8 +63,6 @@ public class MeleeWeaponItem extends ToolItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> CombatSlot.MELEE),
-        () -> CombatSlotProvider.CAPABILITY);
+    return CapabilityUtil.provider(() -> CombatSlot.MELEE, CombatSlotProvider.CAPABILITY);
   }
 }

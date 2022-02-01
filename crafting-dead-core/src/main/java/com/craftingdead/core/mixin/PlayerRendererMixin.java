@@ -24,10 +24,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.client.ClientDist;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.model.geom.ModelPart;
 
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin {
@@ -36,12 +36,11 @@ public abstract class PlayerRendererMixin {
    * Renders first person arm with custom clothing.
    */
   @Inject(at = @At("RETURN"), method = "renderHand")
-  private void renderHand(PoseStack matrixStack, MultiBufferSource renderTypeBuffer,
-      int packedLight, AbstractClientPlayer playerEntity, ModelPart armRenderer,
-      ModelPart armwearRenderer,
-      CallbackInfo callbackInfo) {
-    final PlayerRenderer playerRenderer = (PlayerRenderer) (Object) this;
-    ClientDist.renderArmWithClothing(playerRenderer, matrixStack, renderTypeBuffer, packedLight,
-        playerEntity, armRenderer, armwearRenderer);
+  private void renderHand(PoseStack poseStack, MultiBufferSource bufferSource,
+      int packedLight, AbstractClientPlayer playerEntity, ModelPart arm,
+      ModelPart sleeve, CallbackInfo callbackInfo) {
+    final var playerRenderer = (PlayerRenderer) (Object) this;
+    ClientDist.renderArmWithClothing(playerRenderer, poseStack, bufferSource, packedLight,
+        playerEntity, arm, sleeve);
   }
 }

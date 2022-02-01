@@ -18,10 +18,11 @@
 
 package com.craftingdead.core.world.entity.extension;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public interface PlayerExtension<E extends Player>
     extends LivingExtension<E, PlayerHandler>, PlayerHandler {
@@ -30,10 +31,15 @@ public interface PlayerExtension<E extends Player>
     return new PlayerExtensionImpl<>(entity);
   }
 
-  @Nonnull
   @SuppressWarnings("unchecked")
-  static <E extends Player> PlayerExtension<E> getOrThrow(E player) {
+  static <P extends Player> PlayerExtension<P> getOrThrow(P player) {
     return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, player, PlayerExtension.class);
+  }
+
+  @Nullable
+  @SuppressWarnings("unchecked")
+  static <P extends Player> PlayerExtension<P> get(P player) {
+    return CapabilityUtil.get(LivingExtension.CAPABILITY, player, PlayerExtension.class);
   }
 
   boolean isCombatModeEnabled();
@@ -42,5 +48,24 @@ public interface PlayerExtension<E extends Player>
 
   void openEquipmentMenu();
 
-  void openStorage(ModEquipmentSlot slotType);
+  void openStorage(ModEquipmentSlot slot);
+
+  ItemStack getHandcuffs();
+
+  default boolean isHandcuffed() {
+    return !this.getHandcuffs().isEmpty();
+  }
+
+  void setHandcuffs(ItemStack itemStack);
+
+  default boolean damageHandcuffs(int damage) {
+    final var handcuffs = this.getHandcuffs().copy();
+    handcuffs.hurtAndBreak(damage, this.getEntity(), __ -> this.breakItem(handcuffs));
+    if (handcuffs.isEmpty()) {
+      this.setHandcuffs(ItemStack.EMPTY);
+      return true;
+    }
+    this.setHandcuffs(handcuffs);
+    return false;
+  }
 }

@@ -15,7 +15,8 @@
         "PlayerInventoryMixin",
         "GameRendererMixin",
         "ModelBakeryMixin",
-        "MouseHandlerMixin"
+        "MouseHandlerMixin",
+        "HumanoidModelMixin"
     ],
     "injectors": {
         "defaultRequire": 1

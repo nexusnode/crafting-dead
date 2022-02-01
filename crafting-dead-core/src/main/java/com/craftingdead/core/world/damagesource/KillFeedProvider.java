@@ -22,5 +22,5 @@ import net.minecraft.world.entity.player.Player;
 
 public interface KillFeedProvider {
 
-  KillFeedEntry createKillFeedEntry(Player killedEntity);
+  KillFeedEntry createKillFeedEntry(Player player);
 }

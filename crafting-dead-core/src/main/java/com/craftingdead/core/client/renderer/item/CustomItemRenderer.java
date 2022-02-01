@@ -21,6 +21,7 @@ package com.craftingdead.core.client.renderer.item;
 import java.util.Collection;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -54,7 +55,7 @@ public interface CustomItemRenderer {
    * @param itemStack - {@link ItemStack} being rendered
    */
   void renderItem(ItemStack itemStack, ItemTransforms.TransformType transformType,
-      @Nullable LivingEntity livingEntity, PoseStack poseStack,
+      @Nullable LivingExtension<?, ?> living, PoseStack poseStack,
       MultiBufferSource bufferSource, int packedLight, int packedOverlay);
 
   void rotateCamera(ItemStack itemStack, LivingEntity livingEntity, float partialTicks,

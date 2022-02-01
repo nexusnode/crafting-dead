@@ -395,7 +395,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   protected boolean canShoot(LivingExtension<?, ?> living) {
     return !living.getProgressMonitor().isPresent() && !living.getEntity().isSprinting()
-        && !living.getEntity().isSpectator();
+        && !living.getEntity().isSpectator()
+        && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
 
   protected abstract int getRoundsPerShot();
@@ -673,11 +674,16 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     return this.performingSecondaryAction;
   }
 
+  protected boolean canPerformSecondaryAction(LivingExtension<?, ?> living) {
+    return !living.getEntity().isSprinting()
+        && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
+  }
+
   @Override
   public void setPerformingSecondaryAction(LivingExtension<?, ?> living,
       boolean performingAction, boolean sendUpdate) {
     if (performingAction == this.performingSecondaryAction
-        || (performingAction && living.getEntity().isSprinting())) {
+        || (performingAction && !this.canPerformSecondaryAction(living))) {
       return;
     }
 
@@ -688,7 +694,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
 
     if (sendUpdate) {
-      PacketTarget target = living.getLevel().isClientSide()
+      var target = living.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,

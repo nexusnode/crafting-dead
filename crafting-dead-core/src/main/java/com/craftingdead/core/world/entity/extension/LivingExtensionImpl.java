@@ -155,7 +155,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
       return false;
     }
 
-    final ProgressMonitor targetProgressMonitor = action.getTarget()
+    final var targetProgressMonitor = action.getTarget()
         .flatMap(LivingExtension::getProgressMonitor)
         .orElse(null);
 
@@ -375,7 +375,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    return this.handlers.values().stream().map(e -> e.handleDeath(cause)).anyMatch(v -> v == true);
+    return this.handlers.values().stream().anyMatch(e -> e.handleDeath(cause));
   }
 
   @Override

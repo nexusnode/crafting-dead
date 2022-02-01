@@ -34,10 +34,10 @@ public class PistolShootAnimation extends TimedAnimation {
   }
 
   @Override
-  public void apply(float partialTicks, PoseStack matrixStack) {
+  public void apply(float partialTicks, PoseStack poseStack) {
     float lerpProgress = this.lerpProgress(partialTicks);
-    matrixStack.translate(0, 0, getPushbackTranslation(lerpProgress));
-    matrixStack.mulPose(getBounceRotation(lerpProgress));
+    poseStack.translate(0, 0, getPushbackTranslation(lerpProgress));
+    poseStack.mulPose(getBounceRotation(lerpProgress));
   }
 
   private static Quaternion getBounceRotation(float lerpProgress) {
@@ -54,16 +54,16 @@ public class PistolShootAnimation extends TimedAnimation {
   }
 
   @Override
-  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks,
-      PoseStack matrixStack) {
+  public void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks,
+      PoseStack poseStack) {
     float lerpProgress = this.lerpProgress(partialTicks);
     float translation = getPushbackTranslation(lerpProgress);
-    switch (handSide) {
+    switch (arm) {
       case LEFT:
-        matrixStack.translate(0, -translation * 0.5F, translation);
+        poseStack.translate(0, -translation * 0.5F, translation);
         break;
       case RIGHT:
-        matrixStack.translate(0, 0, translation);
+        poseStack.translate(0, 0, translation);
         break;
     }
   }

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
 import com.craftingdead.core.world.item.gun.skin.Skins;
@@ -37,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class PaintItem extends Item {
@@ -59,19 +58,18 @@ public class PaintItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> Paint.of(this.skin, this.multipaint
-            ? OptionalInt.of(
-                DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]
-                    .getTextColor())
-            : OptionalInt.empty())),
-        () -> Paint.CAPABILITY);
+    return CapabilityUtil.provider(() -> Paint.of(this.skin, this.multipaint
+        ? OptionalInt.of(
+            DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]
+                .getTextColor())
+        : OptionalInt.empty()),
+        Paint.CAPABILITY);
   }
 
   @Override
   public void appendHoverText(ItemStack itemStack, @Nullable Level level,
       List<Component> lines, TooltipFlag flag) {
-    lines.add(new TranslatableComponent("item_lore.paint.accepted_guns")
+    lines.add(new TranslatableComponent("paint.accepted_guns")
         .withStyle(ChatFormatting.GRAY));
     Skins.REGISTRY.get(this.skin).getAcceptedGuns().stream()
         .map(ForgeRegistries.ITEMS::getValue)

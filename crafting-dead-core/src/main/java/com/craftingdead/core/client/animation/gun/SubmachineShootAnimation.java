@@ -18,7 +18,7 @@ public class SubmachineShootAnimation extends TimedAnimation {
   }
 
   @Override
-  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack) {
+  public void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks, PoseStack poseStack) {
 
   }
 

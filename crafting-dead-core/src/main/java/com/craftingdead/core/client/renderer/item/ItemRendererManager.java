@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -47,7 +48,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.StartupMessageManager;
@@ -79,11 +79,11 @@ public class ItemRendererManager implements ResourceManagerReloadListener {
   }
 
   public boolean renderItem(ItemStack itemStack, ItemTransforms.TransformType transformType,
-      @Nullable LivingEntity livingEntity, PoseStack poseStack, MultiBufferSource bufferSource,
+      @Nullable LivingExtension<?, ?> living, PoseStack poseStack, MultiBufferSource bufferSource,
       int packedLight, int packedOverlay) {
     var renderer = this.renderers.get(itemStack.getItem().delegate);
     if (renderer != null && renderer.handlePerspective(itemStack, transformType)) {
-      renderer.renderItem(itemStack, transformType, livingEntity, poseStack, bufferSource,
+      renderer.renderItem(itemStack, transformType, living, poseStack, bufferSource,
           packedLight, packedOverlay);
       return true;
     }

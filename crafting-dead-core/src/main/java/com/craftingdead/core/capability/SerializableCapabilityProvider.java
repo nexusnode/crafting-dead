@@ -20,7 +20,6 @@ package com.craftingdead.core.capability;
 
 import java.util.Set;
 import java.util.function.Supplier;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -28,37 +27,26 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullFunction;
 
-public class SerializableCapabilityProvider<C extends INBTSerializable<S>, S extends Tag>
-    extends SimpleCapabilityProvider<C> implements INBTSerializable<S> {
+class SerializableCapabilityProvider<C extends INBTSerializable<T>, T extends Tag>
+    extends SimpleCapabilityProvider<C> implements INBTSerializable<T> {
 
-  private final Supplier<S> emptyNbt;
+  private final Supplier<T> emptyTag;
 
-  public SerializableCapabilityProvider(LazyOptional<C> capability,
-      Supplier<Capability<? super C>> capabilityHolder, Supplier<S> emptyNbt) {
-    super(capability, ImmutableSet.of(capabilityHolder));
-    this.emptyNbt = emptyNbt;
-  }
-
-  public SerializableCapabilityProvider(LazyOptional<C> capability,
-      Set<Supplier<Capability<? super C>>> capabilityHolder, Supplier<S> emptyNbt) {
-    super(capability, capabilityHolder, null);
-    this.emptyNbt = emptyNbt;
-  }
-
-  public SerializableCapabilityProvider(LazyOptional<C> instance,
-      Set<Supplier<Capability<? super C>>> capabilities,
-      NonNullFunction<C, ICapabilityProvider> instanceMapper, Supplier<S> emptyNbt) {
+  public SerializableCapabilityProvider(
+      Supplier<T> emptyTag, LazyOptional<C> instance,
+      Set<Capability<? super C>> capabilities,
+      NonNullFunction<C, ICapabilityProvider> instanceMapper) {
     super(instance, capabilities, instanceMapper);
-    this.emptyNbt = emptyNbt;
+    this.emptyTag = emptyTag;
   }
 
   @Override
-  public S serializeNBT() {
-    return this.instance.map(C::serializeNBT).orElseGet(this.emptyNbt);
+  public T serializeNBT() {
+    return this.instance.map(C::serializeNBT).orElseGet(this.emptyTag);
   }
 
   @Override
-  public void deserializeNBT(S nbt) {
-    this.instance.ifPresent(i -> i.deserializeNBT(nbt));
+  public void deserializeNBT(T tag) {
+    this.instance.ifPresent(i -> i.deserializeNBT(tag));
   }
 }

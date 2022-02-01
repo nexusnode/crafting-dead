@@ -337,13 +337,13 @@ public abstract class GunItem extends ProjectileWeaponItem {
           new TextComponent(this.getRange() + " blocks")
               .withStyle(ChatFormatting.RED);
 
-      lines.add(new TranslatableComponent("item_lore.gun_item.ammo_amount")
+      lines.add(new TranslatableComponent("gun.ammo_amount")
           .withStyle(ChatFormatting.GRAY)
           .append(ammoCount));
-      lines.add(new TranslatableComponent("item_lore.gun_item.damage")
+      lines.add(new TranslatableComponent("gun.damage")
           .withStyle(ChatFormatting.GRAY)
           .append(damageText));
-      lines.add(new TranslatableComponent("item_lore.gun_item.headshot_damage")
+      lines.add(new TranslatableComponent("gun.headshot_damage")
           .withStyle(ChatFormatting.GRAY)
           .append(headshotDamageText));
 
@@ -352,7 +352,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
             new TextComponent(String.valueOf(this.getRoundsPerShot()))
                 .withStyle(ChatFormatting.RED);
 
-        lines.add(new TranslatableComponent("item_lore.gun_item.pellets_shot")
+        lines.add(new TranslatableComponent("gun.pellets_shot")
             .withStyle(ChatFormatting.GRAY)
             .append(pelletsText));
       }
@@ -361,18 +361,18 @@ public abstract class GunItem extends ProjectileWeaponItem {
         Component attachmentName = attachment.getDescription()
             .plainCopy()
             .withStyle(ChatFormatting.RED);
-        lines.add(new TranslatableComponent("item_lore.gun_item.attachment")
+        lines.add(new TranslatableComponent("gun.attachment")
             .withStyle(ChatFormatting.GRAY)
             .append(attachmentName));
       }
 
-      lines.add(new TranslatableComponent("item_lore.gun_item.rpm")
+      lines.add(new TranslatableComponent("gun.rpm")
           .withStyle(ChatFormatting.GRAY)
           .append(rpmText));
-      lines.add(new TranslatableComponent("item_lore.gun_item.accuracy")
+      lines.add(new TranslatableComponent("gun.accuracy")
           .withStyle(ChatFormatting.GRAY)
           .append(accuracyText));
-      lines.add(new TranslatableComponent("item_lore.gun_item.range")
+      lines.add(new TranslatableComponent("gun.range")
           .withStyle(ChatFormatting.GRAY)
           .append(rangeText));
     });

@@ -16,7 +16,7 @@ public class InspectAnimation extends TimedAnimation {
   public void apply(float partialTicks, PoseStack poseStack) {}
 
   @Override
-  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack) {}
+  public void applyArm(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack) {}
 
   @Override
   public void applyCamera(float partialTicks, Vector3f rotations) {}

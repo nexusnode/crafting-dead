@@ -18,8 +18,7 @@
 
 package com.craftingdead.core.world.item.gun.aimable;
 
-import java.util.Set;
-import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
@@ -27,7 +26,6 @@ import com.craftingdead.core.world.item.scope.Scope;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class AimableGunItem extends GunItem {
 
@@ -43,10 +41,9 @@ public class AimableGunItem extends GunItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundTag nbt) {
-    return new SerializableCapabilityProvider<>(
-        LazyOptional.of(() -> AimableGun.create(AimableGunClient::new, itemStack, this)),
-        Set.of(() -> Gun.CAPABILITY, () -> CombatSlotProvider.CAPABILITY, () -> Scope.CAPABILITY),
-        CompoundTag::new);
+    return CapabilityUtil.serializableProvider(
+        () -> AimableGun.create(AimableGunClient::new, itemStack, this),
+        Gun.CAPABILITY, CombatSlotProvider.CAPABILITY, Scope.CAPABILITY);
   }
 
   public boolean hasBoltAction() {

@@ -21,12 +21,11 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.inventory.GenericMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
 import com.craftingdead.core.world.inventory.storage.Storage;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -38,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.items.CapabilityItemHandler;
 
@@ -74,11 +72,8 @@ public class StorageItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SerializableCapabilityProvider<>(LazyOptional.of(this.storageContainer),
-        ImmutableSet.of(
-            () -> Storage.CAPABILITY,
-            () -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
-        CompoundTag::new);
+    return CapabilityUtil.serializableProvider(this.storageContainer,
+        Storage.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
   }
 
   @Override

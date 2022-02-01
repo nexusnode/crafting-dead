@@ -25,11 +25,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -60,10 +62,16 @@ public abstract class ItemRendererMixin {
       cancellable = true)
   private void renderStatic(@Nullable LivingEntity livingEntity, ItemStack itemStack,
       ItemTransforms.TransformType transformType, boolean leftHanded, PoseStack matrixStack,
-      MultiBufferSource renderTypeBuffer, @Nullable Level world, int packedLight, int packedOverlay, int value,
+      MultiBufferSource renderTypeBuffer, @Nullable Level world, int packedLight, int packedOverlay,
+      int value,
       CallbackInfo callbackInfo) {
-    if (CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
-        transformType, livingEntity, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
+
+    final var living = livingEntity == null ? null
+        : livingEntity.getCapability(LivingExtension.CAPABILITY).orElse(null);
+
+    if (living instanceof PlayerExtension<?> player && player.isHandcuffed()
+        || CraftingDead.getInstance().getClientDist().getItemRendererManager().renderItem(itemStack,
+            transformType, living, matrixStack, renderTypeBuffer, packedLight, packedOverlay)) {
       callbackInfo.cancel();
     }
   }

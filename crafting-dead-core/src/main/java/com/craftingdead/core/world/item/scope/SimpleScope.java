@@ -19,10 +19,10 @@
 package com.craftingdead.core.world.item.scope;
 
 import java.util.Optional;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class SimpleScope implements Scope {
 
@@ -46,18 +46,18 @@ public class SimpleScope implements Scope {
   }
 
   @Override
-  public boolean isScoping(Entity entity) {
-    return entity instanceof LivingEntity livingEntity
-        && livingEntity.getUseItem() == this.itemStack;
+  public boolean isScoping(LivingExtension<?, ?> living) {
+    return living.getEntity().getUseItem() == this.itemStack
+        && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
 
   @Override
-  public float getZoomMultiplier(Entity entity) {
+  public float getZoomMultiplier(LivingExtension<?, ?> living) {
     return this.zoomMultiplier;
   }
 
   @Override
-  public Optional<ResourceLocation> getOverlayTexture(Entity entity) {
+  public Optional<ResourceLocation> getOverlayTexture(LivingExtension<?, ?> living) {
     return this.overlayTexture;
   }
 

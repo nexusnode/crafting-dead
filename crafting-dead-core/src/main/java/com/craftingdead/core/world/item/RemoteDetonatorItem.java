@@ -43,38 +43,35 @@ public class RemoteDetonatorItem extends Item {
   }
 
   @Override
-  public InteractionResultHolder<ItemStack> use(Level world, Player playerEntity,
-      InteractionHand hand) {
-    ItemStack itemstack = playerEntity.getItemInHand(hand);
-    playerEntity.startUsingItem(hand);
+  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    var item = player.getItemInHand(hand);
+    player.startUsingItem(hand);
 
-    if (world instanceof ServerLevel) {
-      ServerLevel serverWorld = (ServerLevel) world;
-
-      serverWorld.playSound(null, playerEntity, SoundEvents.UI_BUTTON_CLICK,
+    if (level instanceof ServerLevel serverLevel) {
+      serverLevel.playSound(null, player, SoundEvents.UI_BUTTON_CLICK,
           SoundSource.PLAYERS, 0.8F, 1.2F);
 
-      serverWorld.getEntities(playerEntity,
-          playerEntity.getBoundingBox().inflate(RANGE), (entity) -> {
+      serverLevel.getEntities(player,
+          player.getBoundingBox().inflate(RANGE), (entity) -> {
             if (!(entity instanceof Grenade)) {
               return false;
             }
             Grenade grenadeEntity = (Grenade) entity;
 
             boolean isOwner =
-                grenadeEntity.getThrower().map(thrower -> thrower == playerEntity).orElse(false);
+                grenadeEntity.getThrower().map(thrower -> thrower == player).orElse(false);
 
             return isOwner && grenadeEntity.canBeRemotelyActivated();
           }).forEach(entity -> ((Grenade) entity).setActivated(true));
     }
-    return InteractionResultHolder.consume(itemstack);
+    return InteractionResultHolder.consume(item);
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, Level world,
+  public void appendHoverText(ItemStack stack, Level level,
       List<Component> lines, TooltipFlag tooltipFlag) {
-    super.appendHoverText(stack, world, lines, tooltipFlag);
-    lines.add(new TranslatableComponent("item_lore." + this.getRegistryName().getPath(), RANGE)
+    super.appendHoverText(stack, level, lines, tooltipFlag);
+    lines.add(new TranslatableComponent("remote_detonator.information", RANGE)
         .withStyle(ChatFormatting.GRAY));
   }
 }

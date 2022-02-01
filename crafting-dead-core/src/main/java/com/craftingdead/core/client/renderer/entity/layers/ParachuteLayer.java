@@ -61,8 +61,7 @@ public class ParachuteLayer<T extends LivingEntity, M extends EntityModel<T>>
         poseStack.translate(0.0D, 0.0D, 0.125D);
         var vertexConsumer = ItemRenderer.getArmorFoilBuffer(renderTypeBuffer,
             RenderType.armorCutoutNoCull(TEXTURE), false, false);
-        this.model.render(poseStack, vertexConsumer, packedLight,
-            OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
       }
       poseStack.popPose();
     }

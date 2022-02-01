@@ -1508,7 +1508,7 @@ public class ModItems {
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> BOLT_CUTTERS = ITEMS.register("bolt_cutters",
-      () -> new MeleeWeaponItem(9, -2.4F, new Item.Properties()
+      () -> new BoltCuttersItem(40, 9, -2.4F, new Item.Properties()
           .durability(50)
           .tab(COMBAT_TAB)));
 
@@ -2305,6 +2305,18 @@ public class ModItems {
   public static final RegistryObject<Item> PARACHUTE =
       ITEMS.register("parachute",
           () -> new ParachuteItem(new Item.Properties()
+              .stacksTo(1)
+              .tab(COMBAT_TAB)));
+
+  public static final RegistryObject<Item> HANDCUFFS =
+      ITEMS.register("handcuffs",
+          () -> new HandcuffsItem(new Item.Properties()
+              .durability(200)
+              .tab(COMBAT_TAB)));
+
+  public static final RegistryObject<Item> HANDCUFFS_KEY =
+      ITEMS.register("handcuffs_key",
+          () -> new HandcuffsKeyItem(new Item.Properties()
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 

@@ -17,24 +17,24 @@ public class ReloadAnimation extends TimedAnimation {
   }
 
   @Override
-  public void apply(float partialTicks, PoseStack matrixStack) {
-    this.applyTranslations(partialTicks, matrixStack);
+  public void apply(float partialTicks, PoseStack poseStack) {
+    this.applyTranslations(partialTicks, poseStack);
   }
 
   @Override
-  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack matrixStack) {
-    this.applyTranslations(partialTicks, matrixStack);
+  public void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks, PoseStack poseStack) {
+    this.applyTranslations(partialTicks, poseStack);
   }
 
-  private void applyTranslations(float partialTicks, PoseStack matrixStack) {
+  private void applyTranslations(float partialTicks, PoseStack poseStack) {
     float sineProgress = Mth.sin(this.lerpProgress(partialTicks) * (float) Math.PI);
-    matrixStack.mulPose(Vector3f.YP.rotationDegrees(sineProgress * 30.0F));
-    matrixStack.mulPose(Vector3f.XP.rotationDegrees(sineProgress * -30.0F));
-    matrixStack.translate(0.0D, 0.0D, sineProgress / 4.0D);
+    poseStack.mulPose(Vector3f.YP.rotationDegrees(sineProgress * 30.0F));
+    poseStack.mulPose(Vector3f.XP.rotationDegrees(sineProgress * -30.0F));
+    poseStack.translate(0.0D, 0.0D, sineProgress / 4.0D);
 
     applyRandomMovements(MUTABLE_VEC, partialTicks);
-    matrixStack.mulPose(Vector3f.XP.rotationDegrees(MUTABLE_VEC.x()));
-    matrixStack.mulPose(Vector3f.ZP.rotationDegrees(MUTABLE_VEC.z()));
+    poseStack.mulPose(Vector3f.XP.rotationDegrees(MUTABLE_VEC.x()));
+    poseStack.mulPose(Vector3f.ZP.rotationDegrees(MUTABLE_VEC.z()));
   }
 
   @Override

@@ -35,13 +35,11 @@ public class ClothingLayer<T extends LivingEntity, M extends HumanoidModel<T>>
 
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
-    // Resolve optionals to nullable for better performance.
-    var livingExtension = livingEntity.getCapability(LivingExtension.CAPABILITY).orElse(null);
-    if (livingExtension != null) {
-      var clothing =
-          livingExtension.getItemHandler().getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex())
-              .getCapability(Clothing.CAPABILITY)
-              .orElse(null);
+    final var living = LivingExtension.get(livingEntity);
+    if (living != null) {
+      var clothing = living.getItemHandler().getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex())
+          .getCapability(Clothing.CAPABILITY)
+          .orElse(null);
       if (clothing != null) {
         return clothing.getTexture(skinType);
       }

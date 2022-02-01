@@ -41,7 +41,7 @@ public class CylinderGrenadeRenderer extends EntityRenderer<Grenade> {
 
   @Override
   public void render(Grenade entity, float entityYaw, float partialTicks,
-      PoseStack poseStack, MultiBufferSource renderTypeBuffer, int packedLight) {
+      PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 
     float totalTicks = entity.getTotalTicksInAir();
     if (!entity.isStoppedInGround()) {
@@ -51,7 +51,7 @@ public class CylinderGrenadeRenderer extends EntityRenderer<Grenade> {
     poseStack.mulPose(Vector3f.XP.rotation(totalTicks / 3.25F));
 
     var vertexConsumer =
-        renderTypeBuffer.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(entity)));
+        bufferSource.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(entity)));
     this.model.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY,
         1.0F, 1.0F, 1.0F, 0.15F);
   }

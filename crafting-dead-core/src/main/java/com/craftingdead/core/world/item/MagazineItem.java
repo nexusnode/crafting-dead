@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SerializableCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.magazine.MagazineImpl;
 import net.minecraft.ChatFormatting;
@@ -36,7 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class MagazineItem extends Item {
 
@@ -59,8 +58,7 @@ public class MagazineItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SerializableCapabilityProvider<>(LazyOptional.of(() -> new MagazineImpl(this)),
-        () -> Magazine.CAPABILITY, CompoundTag::new);
+    return CapabilityUtil.serializableProvider(() -> new MagazineImpl(this), Magazine.CAPABILITY);
   }
 
   @Override
@@ -95,9 +93,9 @@ public class MagazineItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, Level world, List<Component> lines,
+  public void appendHoverText(ItemStack stack, Level level, List<Component> lines,
       TooltipFlag tooltipFlag) {
-    super.appendHoverText(stack, world, lines, tooltipFlag);
+    super.appendHoverText(stack, level, lines, tooltipFlag);
 
     // Shows the current amount if the maximum size is higher than 1
     if (this.getSize() > 1) {
@@ -107,13 +105,13 @@ public class MagazineItem extends Item {
       Component amountText = new TextComponent(currentAmount + "/" + this.getSize())
           .withStyle(ChatFormatting.RED);
 
-      lines.add(new TranslatableComponent("item_lore.magazine_item.amount")
+      lines.add(new TranslatableComponent("magazine.amount")
           .withStyle(ChatFormatting.GRAY)
           .append(amountText));
     }
 
     if (this.armorPenetration > 0) {
-      lines.add(new TranslatableComponent("item_lore.magazine_item.armor_penetration")
+      lines.add(new TranslatableComponent("magazine.armor_penetration")
           .withStyle(ChatFormatting.GRAY)
           .append(new TextComponent(String.format("%.0f%%", this.armorPenetration))
               .withStyle(ChatFormatting.RED)));

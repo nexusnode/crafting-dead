@@ -22,7 +22,8 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.Grenade;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
@@ -42,7 +43,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class GrenadeItem extends Item {
 
@@ -56,19 +56,25 @@ public class GrenadeItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable Level world,
-      List<Component> texts, TooltipFlag tooltipFlag) {
-    texts.add(new TranslatableComponent("item_lore.grenade").withStyle(ChatFormatting.GRAY));
+  public void appendHoverText(ItemStack item, @Nullable Level level,
+      List<Component> lines, TooltipFlag tooltipFlag) {
+    lines.add(new TranslatableComponent("grenade.information").withStyle(ChatFormatting.GRAY));
   }
 
   @Override
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-    var itemStack = player.getItemInHand(hand);
+    final var itemStack = player.getItemInHand(hand);
+
+    final var extension = PlayerExtension.getOrThrow(player);
+    if (extension.isHandcuffed()) {
+      return InteractionResultHolder.fail(itemStack);
+    }
+
     level.playSound(null, player.getX(), player.getY(), player.getZ(),
         SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F,
         0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
-    if (!level.isClientSide) {
-      Grenade grenadeEntity = this.grenadeEntitySupplier.apply(player, level);
+    if (!level.isClientSide()) {
+      var grenadeEntity = this.grenadeEntitySupplier.apply(player, level);
 
       float force = player.isShiftKeyDown() ? 0.4F : this.throwSpeed;
       grenadeEntity.teleportTo(player.getX(),
@@ -90,9 +96,7 @@ public class GrenadeItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> () -> CombatSlot.GRENADE),
-        () -> CombatSlotProvider.CAPABILITY);
+    return CapabilityUtil.provider(() -> CombatSlot.GRENADE, CombatSlotProvider.CAPABILITY);
   }
 
   public static class Properties extends Item.Properties {

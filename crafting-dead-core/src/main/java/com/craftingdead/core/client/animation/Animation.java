@@ -10,7 +10,7 @@ public interface Animation {
 
   void apply(float partialTicks, PoseStack poseStack);
 
-  void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks, PoseStack poseStack);
+  void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks, PoseStack poseStack);
 
   void applyCamera(float partialTicks, Vector3f rotations);
 

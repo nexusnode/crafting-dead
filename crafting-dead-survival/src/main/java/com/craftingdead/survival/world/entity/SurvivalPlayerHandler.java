@@ -104,15 +104,15 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   public void infect(float chance) {
-    var playerEntity = this.player.getEntity();
-    if (!playerEntity.isCreative()
-        && playerEntity.level.getDifficulty() != Difficulty.PEACEFUL
-        && playerEntity.getRandom().nextFloat() < chance
-        && !playerEntity.hasEffect(SurvivalMobEffects.INFECTION.get())
+    final var entity = this.player.getEntity();
+    if (!entity.isCreative()
+        && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
+        && entity.getRandom().nextFloat() < chance
+        && !entity.hasEffect(SurvivalMobEffects.INFECTION.get())
         && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
-      playerEntity.displayClientMessage(new TranslatableComponent("message.infected")
+      entity.displayClientMessage(new TranslatableComponent("message.infected")
           .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-      playerEntity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
+      entity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
     }
   }
 

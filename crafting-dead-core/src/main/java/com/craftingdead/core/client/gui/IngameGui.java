@@ -45,10 +45,10 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
 public class IngameGui {
@@ -128,8 +128,9 @@ public class IngameGui {
     }
   }
 
-  private static void renderScopeOverlay(Entity entity, Scope scope, int width, int height) {
-    scope.getOverlayTexture(entity).ifPresent(overlayTexture -> {
+  private static void renderScopeOverlay(PlayerExtension<AbstractClientPlayer> player,
+      Scope scope, int width, int height) {
+    scope.getOverlayTexture(player).ifPresent(overlayTexture -> {
       RenderSystem.setShaderTexture(0, overlayTexture);
       var overlayTextureWidth = scope.getOverlayTextureWidth();
       var overlayTextureHeight = scope.getOverlayTextureHeight();
@@ -158,11 +159,9 @@ public class IngameGui {
 
     this.renderKillFeed(poseStack, partialTicks);
 
-    final AbstractClientPlayer playerEntity = player.getEntity();
-
     heldStack.getCapability(Scope.CAPABILITY)
-        .filter(scope -> scope.isScoping(playerEntity))
-        .ifPresent(scope -> renderScopeOverlay(playerEntity, scope, width, height));
+        .filter(scope -> scope.isScoping(player))
+        .ifPresent(scope -> renderScopeOverlay(player, scope, width, height));
 
     // Draws Flashbang effect
     MobEffectInstance flashEffect =
@@ -192,9 +191,34 @@ public class IngameGui {
     if (player.isCombatModeEnabled()) {
       this.renderCombatMode(player, poseStack, width, height);
     }
+
+    this.renderHandcuffsDamage(poseStack, player.getHandcuffs(), width, height);
   }
 
-  private void renderKillFeed(PoseStack matrixStack, float partialTicks) {
+  private void renderHandcuffsDamage(PoseStack poseStack, ItemStack handcuffs,
+      int width, int height) {
+    if (!handcuffs.isEmpty()) {
+      final var mWidth = width / 2;
+      final var mHeight = height / 2;
+      final var damage = handcuffs.getMaxDamage() - handcuffs.getDamageValue();
+      GuiComponent.drawCenteredString(poseStack, this.minecraft.font,
+          new TextComponent(damage + "/" + handcuffs.getMaxDamage()), mWidth + 1, mHeight + 10,
+          0xFFFFFFFF);
+
+      final var modelViewStack = RenderSystem.getModelViewStack();
+      modelViewStack.pushPose();
+      {
+        modelViewStack.translate(mWidth - 20.0F, mHeight - 30.0F, 0.0F);
+        final var scale = 2.5F;
+        modelViewStack.scale(scale, scale, scale);
+        this.minecraft.getItemRenderer().renderGuiItem(handcuffs, 0, 0);
+      }
+      modelViewStack.popPose();
+      RenderSystem.applyModelViewMatrix();
+    }
+  }
+
+  private void renderKillFeed(PoseStack poseStack, float partialTicks) {
     if (this.killFeedVisibleTimeMs == 0L) {
       this.killFeedVisibleTimeMs = Util.getMillis();
       this.killFeedAnimationTimeMs = 0L;
@@ -223,7 +247,7 @@ public class IngameGui {
     for (int i = 0; i < this.killFeedMessages.size(); i++) {
       final KillFeedEntry killFeedMessage = this.killFeedMessages.get(i);
       float killFeedMessageY = 5.0F + ((i - (1.0F * animationPct)) * 12.0F);
-      this.renderKillFeedEntry(killFeedMessage, matrixStack, killFeedMessageX, killFeedMessageY,
+      this.renderKillFeedEntry(killFeedMessage, poseStack, killFeedMessageX, killFeedMessageY,
           i == 0 ? 1.0F - animationPct : 1.0F);
     }
   }

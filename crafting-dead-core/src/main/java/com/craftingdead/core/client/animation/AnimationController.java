@@ -34,11 +34,11 @@ public class AnimationController {
     }
   }
 
-  public void applyHand(InteractionHand hand, HumanoidArm handSide, float partialTicks,
+  public void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks,
       PoseStack poseStack) {
     for (var animation : this.animations) {
       if (animation.isAlive()) {
-        animation.applyHand(hand, handSide, partialTicks, poseStack);
+        animation.applyArm(hand, arm, partialTicks, poseStack);
       }
     }
   }

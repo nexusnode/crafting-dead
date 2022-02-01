@@ -18,7 +18,35 @@
 
 package com.craftingdead.core.world.entity.extension;
 
+import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.eventbus.api.Event;
+
 public interface PlayerHandler extends LivingHandler {
+
+  default boolean handleAttack(Entity target) {
+    return false;
+  }
+
+  default boolean handleInteract(InteractionHand hand, Entity target) {
+    return false;
+  }
+
+  default boolean handleLeftClickBlock(BlockPos pos, Direction face,
+      Consumer<Event.Result> attackResult, Consumer<Event.Result> mineResult) {
+    return false;
+  }
+
+  default boolean handleRightClickBlock(InteractionHand hand, BlockPos pos, Direction face) {
+    return false;
+  }
+
+  default boolean handleRightClickItem(InteractionHand hand) {
+    return false;
+  }
 
   default boolean isCombatModeEnabled() {
     return false;

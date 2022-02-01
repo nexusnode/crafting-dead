@@ -18,40 +18,60 @@
 
 package com.craftingdead.core.world.entity.extension;
 
+import java.util.Collection;
+import java.util.function.Consumer;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
+import com.craftingdead.core.network.message.play.EnableCombatModeMessage;
+import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.Storage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.network.PacketDistributor;
 
 class PlayerExtensionImpl<E extends Player>
     extends LivingExtensionImpl<E, PlayerHandler> implements PlayerExtension<E> {
 
-  private final SynchedData dataManager = new SynchedData();
+  private static final float HANDCUFFS_DAMAGE_CHANCE = 0.1F;
+
+  private final SynchedData data = new SynchedData();
 
   private static final EntityDataAccessor<Boolean> COMBAT_MODE_ENABLED =
-      new EntityDataAccessor<>(0x02, EntityDataSerializers.BOOLEAN);
+      new EntityDataAccessor<>(0x00, EntityDataSerializers.BOOLEAN);
+
+  private static final EntityDataAccessor<ItemStack> HANDCUFFS =
+      new EntityDataAccessor<>(0x01, EntityDataSerializers.ITEM_STACK);
 
   private boolean cachedCombatModeEnabled;
 
   PlayerExtensionImpl(E entity) {
     super(entity);
-    this.dataManager.register(COMBAT_MODE_ENABLED, false);
+    this.data.register(COMBAT_MODE_ENABLED, false);
+    this.data.register(HANDCUFFS, ItemStack.EMPTY);
   }
 
   @Override
@@ -66,6 +86,11 @@ class PlayerExtensionImpl<E extends Player>
     if (extension.isCombatModeEnabled()) {
       this.cachedCombatModeEnabled = true;
     }
+  }
+
+  @Override
+  public boolean performAction(Action action, boolean force, boolean sendUpdate) {
+    return !this.isHandcuffed() && super.performAction(action, force, sendUpdate);
   }
 
   @Override
@@ -84,14 +109,113 @@ class PlayerExtensionImpl<E extends Player>
   }
 
   @Override
+  public boolean handleAttack(Entity target) {
+    if (this.handlers.values().stream().anyMatch(e -> e.handleAttack(target))) {
+      return true;
+    }
+
+    if (this.isHandcuffed()) {
+      if (!this.getLevel().isClientSide()) {
+        this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean handleInteract(InteractionHand hand, Entity target) {
+    if (this.handlers.values().stream().anyMatch(e -> e.handleInteract(hand, target))) {
+      return true;
+    }
+
+    if (this.isHandcuffed()) {
+      if (!this.getLevel().isClientSide()) {
+        this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean handleLeftClickBlock(BlockPos pos, Direction face,
+      Consumer<Event.Result> attackResult, Consumer<Event.Result> mineResult) {
+    if (this.handlers.values().stream()
+        .anyMatch(e -> e.handleLeftClickBlock(pos, face, attackResult, mineResult))) {
+      return true;
+    }
+
+    if (this.isHandcuffed()) {
+      if (this.getLevel().isClientSide()) {
+        mineResult.accept(Event.Result.DENY);
+      } else {
+        this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean handleRightClickBlock(InteractionHand hand, BlockPos pos, Direction face) {
+    if (this.handlers.values().stream().anyMatch(e -> e.handleRightClickBlock(hand, pos, face))) {
+      return true;
+    }
+
+    if (this.isHandcuffed()) {
+      if (!this.getLevel().isClientSide()) {
+        this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean handleRightClickItem(InteractionHand hand) {
+    if (this.handlers.values().stream().anyMatch(e -> e.handleRightClickItem(hand))) {
+      return true;
+    }
+
+    if (this.isHandcuffed()) {
+      if (!this.getLevel().isClientSide()) {
+        this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  private void handcuffInteract(float chance) {
+    if (this.getRandom().nextFloat() < chance
+        && !this.damageHandcuffs(1)
+        && !this.getEntity().isSilent()) {
+      this.getLevel().playSound(null, this.getEntity().getX(), this.getEntity().getY(),
+          this.getEntity().getZ(), SoundEvents.ITEM_BREAK, this.getEntity().getSoundSource(), 0.8F,
+          0.8F + this.getLevel().getRandom().nextFloat() * 0.4F);
+    }
+  }
+
+  @Override
   public boolean isCombatModeEnabled() {
     return !this.getEntity().isSpectator()
-        && (this.cachedCombatModeEnabled || this.dataManager.get(COMBAT_MODE_ENABLED));
+        && (this.cachedCombatModeEnabled || this.data.get(COMBAT_MODE_ENABLED));
   }
 
   @Override
   public void setCombatModeEnabled(boolean combatModeEnabled) {
-    this.dataManager.set(COMBAT_MODE_ENABLED, combatModeEnabled);
+    if (this.getLevel().isClientSide() && combatModeEnabled != this.isCombatModeEnabled()) {
+      NetworkChannel.PLAY.getSimpleChannel().sendToServer(
+          new EnableCombatModeMessage(combatModeEnabled));
+    } else {
+      this.data.set(COMBAT_MODE_ENABLED, combatModeEnabled);
+    }
   }
 
   @Override
@@ -125,6 +249,23 @@ class PlayerExtensionImpl<E extends Player>
   }
 
   @Override
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
+    if (super.handleDeathLoot(cause, drops)) {
+      return true;
+    }
+
+    var handcuffs = this.getHandcuffs();
+    if (!handcuffs.isEmpty()) {
+      var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
+          this.getEntity().getY(), this.getEntity().getZ(), handcuffs);
+      itemEntity.setDefaultPickUpDelay();
+      drops.add(itemEntity);
+    }
+
+    return false;
+  }
+
+  @Override
   protected boolean keepInventory() {
     return this.getLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
   }
@@ -140,27 +281,55 @@ class PlayerExtensionImpl<E extends Player>
     for (var extension : this.handlers.values()) {
       extension.copyFrom(that, wasDeath);
     }
+
+    this.setCombatModeEnabled(that.isCombatModeEnabled());
+
+    if (!wasDeath) {
+      this.setHandcuffs(that.getHandcuffs());
+    }
   }
 
-  public SynchedData getDataManager() {
-    return this.dataManager;
+  @Override
+  public CompoundTag serializeNBT() {
+    var tag = super.serializeNBT();
+    tag.put("handcuffs", this.getHandcuffs().serializeNBT());
+    return tag;
+  }
+
+  @Override
+  public void deserializeNBT(CompoundTag tag) {
+    super.deserializeNBT(tag);
+    if (tag.contains("handcuffs", Tag.TAG_COMPOUND)) {
+      this.setHandcuffs(ItemStack.of(tag.getCompound("handcuffs")));
+    }
   }
 
   @Override
   public void encode(FriendlyByteBuf out, boolean writeAll) {
     super.encode(out, writeAll);
     SynchedData.pack(
-        writeAll ? this.dataManager.getAll() : this.dataManager.packDirty(), out);
+        writeAll ? this.data.getAll() : this.data.packDirty(), out);
+
   }
 
   @Override
   public void decode(FriendlyByteBuf in) {
     super.decode(in);
-    this.dataManager.assignValues(SynchedData.unpack(in));
+    this.data.assignValues(SynchedData.unpack(in));
   }
 
   @Override
   public boolean requiresSync() {
-    return super.requiresSync() || this.dataManager.isDirty();
+    return super.requiresSync() || this.data.isDirty();
+  }
+
+  @Override
+  public ItemStack getHandcuffs() {
+    return this.data.get(HANDCUFFS);
+  }
+
+  @Override
+  public void setHandcuffs(ItemStack itemStack) {
+    this.data.set(HANDCUFFS, itemStack);
   }
 }

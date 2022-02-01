@@ -25,10 +25,9 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.scope.Scope;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public final class AimableGun extends TypedGun<AimableGunItem> implements Scope {
 
@@ -74,19 +73,19 @@ public final class AimableGun extends TypedGun<AimableGunItem> implements Scope 
   }
 
   @Override
-  public boolean isScoping(Entity entity) {
+  public boolean isScoping(LivingExtension<?, ?> living) {
     return this.isPerformingSecondaryAction();
   }
 
   @Override
-  public float getZoomMultiplier(Entity entity) {
+  public float getZoomMultiplier(LivingExtension<?, ?> living) {
     return this.hasIronSight()
         ? 2.0F
         : this.getAttachmentMultiplier(Attachment.MultiplierType.ZOOM);
   }
 
   @Override
-  public Optional<ResourceLocation> getOverlayTexture(Entity entity) {
+  public Optional<ResourceLocation> getOverlayTexture(LivingExtension<?, ?> living) {
     for (Attachment attachment : this.getAttachments()) {
       if (attachment.isScope()) {
         return Optional.of(new ResourceLocation(attachment.getRegistryName().getNamespace(),

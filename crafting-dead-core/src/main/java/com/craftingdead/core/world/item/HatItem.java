@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.craftingdead.core.capability.SimpleCapabilityProvider;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.hat.DefaultHat;
 import com.craftingdead.core.world.item.hat.Hat;
 import net.minecraft.ChatFormatting;
@@ -33,7 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class HatItem extends Item {
 
@@ -61,30 +60,30 @@ public class HatItem extends Item {
           new TextComponent(String.format("%.1f", this.headshotReductionPercentage) + "%")
               .withStyle(ChatFormatting.RED);
 
-      lore.add(new TranslatableComponent("item_lore.hat_item.headshot_reduction")
+      lore.add(new TranslatableComponent("hat.headshot_reduction")
           .withStyle(ChatFormatting.GRAY)
           .append(percentageText));
     }
     if (this.immuneToFlashes) {
-      lore.add(new TranslatableComponent("item_lore.hat_item.immune_to_flashes")
+      lore.add(new TranslatableComponent("hat.immune_to_flashes")
           .withStyle(ChatFormatting.GRAY));
     }
     if (this.immuneToGas) {
-      lore.add(new TranslatableComponent("item_lore.hat_item.immune_to_gas")
+      lore.add(new TranslatableComponent("hat.immune_to_gas")
           .withStyle(ChatFormatting.GRAY));
     }
     if (this.nightVision) {
-      lore.add(new TranslatableComponent("item_lore.hat_item.has_night_vision")
+      lore.add(new TranslatableComponent("hat.has_night_vision")
           .withStyle(ChatFormatting.GRAY));
     }
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return new SimpleCapabilityProvider<>(
-        LazyOptional.of(() -> new DefaultHat(this.nightVision,
-            this.headshotReductionPercentage, this.immuneToFlashes)),
-        () -> Hat.CAPABILITY);
+    return CapabilityUtil.provider(
+        () -> new DefaultHat(this.nightVision, this.headshotReductionPercentage,
+            this.immuneToFlashes),
+        Hat.CAPABILITY);
   }
 
   public static class Properties extends Item.Properties {

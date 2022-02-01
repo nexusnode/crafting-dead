@@ -28,16 +28,16 @@ public class KillFeedDamageSource extends EntityDamageSource implements KillFeed
   private final ItemStack itemStack;
   private final KillFeedEntry.Type killFeedType;
 
-  public KillFeedDamageSource(String damageTypeIn, LivingEntity source,
+  public KillFeedDamageSource(String msgId, LivingEntity source,
       ItemStack itemStack, KillFeedEntry.Type killFeedType) {
-    super(damageTypeIn, source);
+    super(msgId, source);
     this.itemStack = itemStack;
     this.killFeedType = killFeedType;
   }
 
   @Override
-  public KillFeedEntry createKillFeedEntry(Player killedEntity) {
+  public KillFeedEntry createKillFeedEntry(Player player) {
     return new KillFeedEntry(this.entity.getId(), this.entity.getDisplayName(),
-        killedEntity.getDisplayName(), this.itemStack, this.killFeedType);
+        player.getDisplayName(), this.itemStack, this.killFeedType);
   }
 }

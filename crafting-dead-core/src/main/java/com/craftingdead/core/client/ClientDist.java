@@ -43,8 +43,8 @@ import com.craftingdead.core.client.renderer.entity.grenade.FragGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
+import com.craftingdead.core.client.renderer.entity.layers.HandcuffsLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
-import com.craftingdead.core.client.renderer.item.CustomItemRenderer;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
 import com.craftingdead.core.client.renderer.item.ItemRendererManager;
 import com.craftingdead.core.client.sounds.EffectsManager;
@@ -75,7 +75,6 @@ import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.scope.Scope;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -85,7 +84,6 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -109,7 +107,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.ClientRegistry;
@@ -121,6 +118,7 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -261,10 +259,9 @@ public class ClientDist implements ModDist {
   }
 
   public Optional<PlayerExtension<LocalPlayer>> getPlayerExtension() {
-    return Optional.ofNullable(this.minecraft.player)
-        .flatMap(player -> player.getCapability(LivingExtension.CAPABILITY).resolve())
-        .filter(PlayerExtension.class::isInstance)
-        .map(PlayerExtension.class::cast);
+    return this.minecraft.player == null
+        ? Optional.empty()
+        : Optional.ofNullable(PlayerExtension.get(this.minecraft.player));
   }
 
   public boolean isRightMouseDown() {
@@ -290,10 +287,8 @@ public class ClientDist implements ModDist {
 
   @Nullable
   public PlayerExtension<AbstractClientPlayer> getCameraPlayer() {
-    return this.minecraft.getCameraEntity() instanceof AbstractClientPlayer
-        ? this.minecraft.getCameraEntity().getCapability(LivingExtension.CAPABILITY)
-            .<PlayerExtension<AbstractClientPlayer>>cast()
-            .orElse(null)
+    return this.minecraft.getCameraEntity() instanceof AbstractClientPlayer player
+        ? PlayerExtension.get(player)
         : null;
   }
 
@@ -369,38 +364,32 @@ public class ClientDist implements ModDist {
         SlimGrenadeRenderer::new);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {
     for (var skin : event.getSkins()) {
-      var renderer = event.getSkin(skin);
-      renderer.addLayer(new ParachuteLayer(renderer, event.getEntityModels()));
-      renderer.addLayer(new ClothingLayer(renderer));
-      renderer.addLayer(new EquipmentLayer.Builder()
-          .withRenderer(renderer)
-          .withSlot(ModEquipmentSlot.MELEE)
-          .withCrouchingOrientation(true)
+      var renderer = (PlayerRenderer) event.getSkin(skin);
+      renderer.addLayer(new ParachuteLayer<>(renderer, event.getEntityModels()));
+      renderer.addLayer(new HandcuffsLayer<>(renderer, event.getEntityModels()));
+      renderer.addLayer(new ClothingLayer<>(renderer));
+      renderer.addLayer(EquipmentLayer.builder(renderer)
+          .slot(ModEquipmentSlot.MELEE)
+          .useCrouchOrientation(true)
           .build());
-      renderer.addLayer(new EquipmentLayer.Builder()
-          .withRenderer(renderer)
-          .withSlot(ModEquipmentSlot.VEST)
-          .withCrouchingOrientation(true)
+      renderer.addLayer(EquipmentLayer.builder(renderer)
+          .slot(ModEquipmentSlot.VEST)
+          .useCrouchOrientation(true)
           .build());
-      renderer.addLayer(new EquipmentLayer.Builder()
-          .withRenderer(renderer)
-          .withSlot(ModEquipmentSlot.HAT)
-          .withHeadOrientation(true)
-          .withArbitraryTransformation(
-              new Transformation(null, null, new Vector3f(-1F, -1F, 1F), null))
+      renderer.addLayer(EquipmentLayer.builder(renderer)
+          .slot(ModEquipmentSlot.HAT)
+          .useHeadOrientation(true)
+          .transformation(poseStack -> poseStack.scale(-1F, -1F, 1F))
           .build());
-      renderer.addLayer(new EquipmentLayer.Builder()
-          .withRenderer(renderer)
-          .withSlot(ModEquipmentSlot.GUN)
-          .withCrouchingOrientation(true)
+      renderer.addLayer(EquipmentLayer.builder(renderer)
+          .slot(ModEquipmentSlot.GUN)
+          .useCrouchOrientation(true)
           .build());
-      renderer.addLayer(new EquipmentLayer.Builder()
-          .withRenderer(renderer)
-          .withSlot(ModEquipmentSlot.BACKPACK)
-          .withCrouchingOrientation(true)
+      renderer.addLayer(EquipmentLayer.builder(renderer)
+          .slot(ModEquipmentSlot.BACKPACK)
+          .useCrouchOrientation(true)
           .build());
     }
   }
@@ -411,6 +400,8 @@ public class ClientDist implements ModDist {
         GunRenderer::createMuzzleFlashBodyLayer);
     event.registerLayerDefinition(ModModelLayers.PARACHUTE,
         ParachuteLayer::createParachuteBodyLayer);
+    event.registerLayerDefinition(ModModelLayers.HANDCUFFS,
+        HandcuffsLayer::createHandcuffsBodyLayer);
     event.registerLayerDefinition(ModModelLayers.C4_EXPLOSIVE,
         C4ExplosiveModel::createBodyLayer);
     event.registerLayerDefinition(ModModelLayers.CYLINDER_GRENADE,
@@ -477,17 +468,17 @@ public class ClientDist implements ModDist {
     switch (event.phase) {
       case START:
         this.lastTime = (float) Math.ceil(this.lastTime);
-        PlayerExtension<LocalPlayer> player = this.getPlayerExtension().orElse(null);
+        var player = this.getPlayerExtension().orElse(null);
         if (player != null) {
-          Gun gun = player.getMainHandGun().orElse(null);
+          var gun = player.getMainHandGun().orElse(null);
 
-          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
+          var levelFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           this.cameraManager.tick();
 
-          if (!worldFocused || player.getEntity().isSpectator()) {
-            // Stop gun actions if world not focused.
+          if (!levelFocused || player.getEntity().isSpectator()) {
+            // Stop gun actions if level not focused.
             if (gun != null) {
               if (gun.isTriggerPressed()) {
                 gun.setTriggerPressed(player, false, true);
@@ -564,10 +555,10 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
-    PlayerExtension<LocalPlayer> player = this.getPlayerExtension().orElse(null);
+    var player = this.getPlayerExtension().orElse(null);
     if (player != null && this.minecraft.getOverlay() == null
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
-      Gun gun = player.getMainHandGun().orElse(null);
+      var gun = player.getMainHandGun().orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
@@ -595,12 +586,11 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleRenderLiving(RenderLivingEvent.Pre<?, HumanoidModel<?>> event) {
-    ItemStack heldStack = event.getEntity().getMainHandItem();
+  public void handleRenderLiving(RenderLivingEvent.Pre<?, ?> event) {
+    final var heldStack = event.getEntity().getMainHandItem();
     // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
-    if (event.getRenderer().getModel() instanceof HumanoidModel
+    if (event.getRenderer().getModel() instanceof HumanoidModel<?> model
         && heldStack.getItem() instanceof GunItem) {
-      HumanoidModel<?> model = event.getRenderer().getModel();
       switch (event.getEntity().getMainArm()) {
         case LEFT:
           model.leftArmPose = ArmPose.BOW_AND_ARROW;
@@ -632,14 +622,14 @@ public class ClientDist implements ModDist {
       event.setCanceled(player.isCombatModeEnabled());
     } else if (overlay == ForgeIngameGui.CROSSHAIR_ELEMENT) {
       var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
-          .map(scope -> scope.isScoping(player.getEntity()))
+          .map(scope -> scope.isScoping(player))
           .orElse(false);
-      if (player.hasProgressMonitor() || aiming) {
+      if (player.hasProgressMonitor() || aiming || player.isHandcuffed()) {
         event.setCanceled(true);
         return;
       }
 
-      player.getMainHandItem().getCapability(Gun.CAPABILITY).ifPresent(gun -> {
+      player.getMainHandGun().ifPresent(gun -> {
         event.setCanceled(true);
         if (gun.getClient().hasCrosshair()) {
           this.ingameGui.renderCrosshairs(event.getMatrixStack(),
@@ -675,11 +665,9 @@ public class ClientDist implements ModDist {
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
     this.cameraManager.getCameraRotations((float) event.getPartialTicks(),
         MUTABLE_CAMERA_ROTATIONS);
-    if (this.minecraft.cameraEntity instanceof LivingEntity) {
-      LivingEntity livingEntity = (LivingEntity) this.minecraft.cameraEntity;
-      ItemStack itemStack = livingEntity.getMainHandItem();
-      CustomItemRenderer itemRenderer =
-          this.itemRendererManager.getItemRenderer(itemStack.getItem());
+    if (this.minecraft.cameraEntity instanceof LivingEntity livingEntity) {
+      var itemStack = livingEntity.getMainHandItem();
+      var itemRenderer = this.itemRendererManager.getItemRenderer(itemStack.getItem());
       if (itemRenderer != null) {
         itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getPartialTicks(),
             MUTABLE_CAMERA_ROTATIONS);
@@ -697,10 +685,12 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handeFOVModifier(FOVModifierEvent event) {
-    if (this.minecraft.getCameraEntity() instanceof LivingEntity livingEntity) {
-      final var scope = livingEntity.getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
-      if (scope != null && scope.isScoping(livingEntity)) {
-        event.setNewfov(1.0F / scope.getZoomMultiplier(livingEntity));
+    var player = this.getCameraPlayer();
+    if (player != null) {
+      final var scope =
+          player.getEntity().getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
+      if (scope != null && scope.isScoping(player)) {
+        event.setNewfov(1.0F / scope.getZoomMultiplier(player));
       }
     }
     event.setNewfov(
@@ -762,6 +752,22 @@ public class ClientDist implements ModDist {
     }
   }
 
+  @SubscribeEvent
+  public void handleRenderHand(RenderHandEvent event) {
+    final var player = this.getCameraPlayer();
+    if (player != null) {
+      event.setCanceled(player.isHandcuffed());
+    }
+  }
+
+  @SubscribeEvent
+  public void handleClickInput(InputEvent.ClickInputEvent event) {
+    final var player = this.getCameraPlayer();
+    if (player != null && player.isHandcuffed()) {
+      event.setSwingHand(false);
+    }
+  }
+
   // ================================================================================
   // Client-only helper methods
   // ================================================================================
@@ -785,10 +791,9 @@ public class ClientDist implements ModDist {
   /**
    * @see com.craftingdead.core.mixin.PlayerRendererMixin
    */
-  public static void renderArmWithClothing(PlayerRenderer renderer, PoseStack matrixStack,
-      MultiBufferSource renderTypeBuffer,
-      int packedLight, AbstractClientPlayer playerEntity, ModelPart armRenderer,
-      ModelPart armwearRenderer) {
+  public static void renderArmWithClothing(PlayerRenderer renderer, PoseStack poseStack,
+      MultiBufferSource bufferSource, int packedLight, AbstractClientPlayer playerEntity,
+      ModelPart arm, ModelPart sleeve) {
 
     var clothingTexture = playerEntity.getCapability(LivingExtension.CAPABILITY)
         .map(LivingExtension::getItemHandler)
@@ -802,22 +807,22 @@ public class ClientDist implements ModDist {
     clothingTexture = event.getClothingTexture();
 
     if (clothingTexture != null) {
-      PlayerModel<AbstractClientPlayer> playerModel = renderer.getModel();
-      playerModel.attackTime = 0.0F;
-      playerModel.crouching = false;
-      playerModel.swimAmount = 0.0F;
-      playerModel.setupAnim(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+      final var model = renderer.getModel();
+      model.attackTime = 0.0F;
+      model.crouching = false;
+      model.swimAmount = 0.0F;
+      model.setupAnim(playerEntity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 
-      armRenderer.visible = true;
-      armwearRenderer.visible = true;
+      arm.visible = true;
+      sleeve.visible = true;
 
-      armRenderer.xRot = 0.0F;
-      armRenderer.render(matrixStack,
-          renderTypeBuffer.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
+      arm.xRot = 0.0F;
+      arm.render(poseStack,
+          bufferSource.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
-      armwearRenderer.xRot = 0.0F;
-      armwearRenderer.render(matrixStack,
-          renderTypeBuffer.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
+      sleeve.xRot = 0.0F;
+      sleeve.render(poseStack,
+          bufferSource.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
     }
   }
