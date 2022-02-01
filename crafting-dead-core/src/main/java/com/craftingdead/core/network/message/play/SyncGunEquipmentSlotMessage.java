@@ -27,22 +27,12 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SyncGunEquipmentSlotMessage {
-
-  private final int entityId;
-  private final EquipmentSlot slot;
-  private final FriendlyByteBuf data;
+public record SyncGunEquipmentSlotMessage(int entityId, EquipmentSlot slot, FriendlyByteBuf data) {
 
   public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlot slot, Gun gun,
       boolean writeAll) {
     this(entityId, slot, new FriendlyByteBuf(Unpooled.buffer()));
     gun.encode(this.data, writeAll);
-  }
-
-  public SyncGunEquipmentSlotMessage(int entityId, EquipmentSlot slot, FriendlyByteBuf data) {
-    this.entityId = entityId;
-    this.slot = slot;
-    this.data = data;
   }
 
   public void encode(FriendlyByteBuf out) {

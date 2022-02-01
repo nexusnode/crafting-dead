@@ -25,15 +25,7 @@ import com.craftingdead.core.world.item.gun.FireMode;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SetFireModeMessage {
-
-  private final int entityId;
-  private final FireMode fireMode;
-
-  public SetFireModeMessage(int entityId, FireMode fireMode) {
-    this.entityId = entityId;
-    this.fireMode = fireMode;
-  }
+public record SetFireModeMessage(int entityId, FireMode fireMode) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);

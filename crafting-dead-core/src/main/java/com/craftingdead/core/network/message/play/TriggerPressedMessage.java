@@ -24,15 +24,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class TriggerPressedMessage {
-
-  private final int entityId;
-  private final boolean triggerPressed;
-
-  public TriggerPressedMessage(int entityId, boolean triggerPressed) {
-    this.entityId = entityId;
-    this.triggerPressed = triggerPressed;
-  }
+public record TriggerPressedMessage(int entityId, boolean triggerPressed) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);

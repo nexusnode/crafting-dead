@@ -24,13 +24,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class CancelActionMessage {
-
-  private final int entityId;
-
-  public CancelActionMessage(int entityId) {
-    this.entityId = entityId;
-  }
+public record CancelActionMessage(int entityId) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);

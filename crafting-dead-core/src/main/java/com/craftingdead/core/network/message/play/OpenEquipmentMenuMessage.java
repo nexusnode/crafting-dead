@@ -23,7 +23,7 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class OpenEquipmentMenuMessage {
+public record OpenEquipmentMenuMessage() {
 
   public void encode(FriendlyByteBuf out) {}
 

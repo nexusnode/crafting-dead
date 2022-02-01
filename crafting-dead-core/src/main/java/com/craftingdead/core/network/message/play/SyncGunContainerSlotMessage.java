@@ -26,21 +26,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SyncGunContainerSlotMessage {
-
-  private final int entityId;
-  private final int slot;
-  private final FriendlyByteBuf data;
+public record SyncGunContainerSlotMessage(int entityId, int slot, FriendlyByteBuf data) {
 
   public SyncGunContainerSlotMessage(int entityId, int slot, Gun gun, boolean writeAll) {
     this(entityId, slot, new FriendlyByteBuf(Unpooled.buffer()));
     gun.encode(this.data, writeAll);
-  }
-
-  public SyncGunContainerSlotMessage(int entityId, int slot, FriendlyByteBuf data) {
-    this.entityId = entityId;
-    this.slot = slot;
-    this.data = data;
   }
 
   public void encode(FriendlyByteBuf out) {

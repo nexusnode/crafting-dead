@@ -29,20 +29,13 @@ import com.craftingdead.core.world.item.gun.PendingHit;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
-public class ValidatePendingHitMessage {
-
-  private final Map<Integer, Collection<PendingHit>> hits;
-
-  public ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hits) {
-    this.hits = hits;
-  }
+public record ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hits) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.hits.size());
-    for (Map.Entry<Integer, Collection<PendingHit>> hit : this.hits.entrySet()) {
+    for (var hit : this.hits.entrySet()) {
       out.writeVarInt(hit.getKey());
       out.writeVarInt(hit.getValue().size());
       for (PendingHit value : hit.getValue()) {
@@ -56,11 +49,11 @@ public class ValidatePendingHitMessage {
 
   public static ValidatePendingHitMessage decode(FriendlyByteBuf in) {
     final int hitsSize = in.readVarInt();
-    Map<Integer, Collection<PendingHit>> hits = new Int2ObjectLinkedOpenHashMap<>();
+    var hits = new Int2ObjectLinkedOpenHashMap<Collection<PendingHit>>();
     for (int i = 0; i < hitsSize; i++) {
       int key = in.readVarInt();
       int valueSize = in.readVarInt();
-      Collection<PendingHit> value = new ObjectArrayList<PendingHit>();
+      var value = new ObjectArrayList<PendingHit>();
       for (int j = 0; j < valueSize; j++) {
         value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in),
             in.readVarLong()));
@@ -72,15 +65,14 @@ public class ValidatePendingHitMessage {
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
-      PlayerExtension<ServerPlayer> extension = PlayerExtension.getOrThrow(player);
-      extension.getMainHandGun().ifPresent(gun -> {
-        for (Map.Entry<Integer, Collection<PendingHit>> hit : this.hits.entrySet()) {
-          Optional.ofNullable(player.level.getEntity(hit.getKey()))
+      var player = PlayerExtension.getOrThrow(ctx.get().getSender());
+      player.getMainHandGun().ifPresent(gun -> {
+        for (var hit : this.hits.entrySet()) {
+          Optional.ofNullable(player.getLevel().getEntity(hit.getKey()))
               .flatMap(entity -> entity.getCapability(LivingExtension.CAPABILITY).resolve())
               .ifPresent(hitLiving -> {
-                for (PendingHit value : hit.getValue()) {
-                  gun.validatePendingHit(extension, hitLiving, value);
+                for (var value : hit.getValue()) {
+                  gun.validatePendingHit(player, hitLiving, value);
                 }
               });
         }

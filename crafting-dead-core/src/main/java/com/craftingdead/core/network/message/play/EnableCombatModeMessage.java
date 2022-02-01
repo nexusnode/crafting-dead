@@ -23,13 +23,7 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class EnableCombatModeMessage {
-
-  private final boolean enabled;
-
-  public EnableCombatModeMessage(boolean enabled) {
-    this.enabled = enabled;
-  }
+public record EnableCombatModeMessage(boolean enabled) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeBoolean(this.enabled);

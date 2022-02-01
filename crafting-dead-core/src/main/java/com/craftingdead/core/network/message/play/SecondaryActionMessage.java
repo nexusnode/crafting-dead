@@ -24,15 +24,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SecondaryActionMessage {
-
-  private final int entityId;
-  private final boolean performing;
-
-  public SecondaryActionMessage(int entityId, boolean performing) {
-    this.entityId = entityId;
-    this.performing = performing;
-  }
+public record SecondaryActionMessage(int entityId, boolean performing) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);

@@ -26,21 +26,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
 
-public class PerformActionMessage {
-
-  private final ActionType actionType;
-  /**
-   * Ignored on server reception - assumed to be the player who sent the message.
-   */
-  private final int performerEntityId;
-  private final int targetEntityId;
-
-  public PerformActionMessage(ActionType actionType, int performerEntityId,
-      int targetEntityId) {
-    this.actionType = actionType;
-    this.performerEntityId = performerEntityId;
-    this.targetEntityId = targetEntityId;
-  }
+public record PerformActionMessage(ActionType actionType, int performerEntityId,
+    int targetEntityId) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeRegistryId(this.actionType);
@@ -54,14 +41,14 @@ public class PerformActionMessage {
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      LivingEntity performerEntity =
+      final var performerEntity =
           NetworkUtil.getEntityOrSender(ctx.get(), this.performerEntityId, LivingEntity.class);
-      LivingExtension<?, ?> performer = LivingExtension.getOrThrow(performerEntity);
-      LivingExtension<?, ?> target = this.targetEntityId == -1 ? null
+      final var performer = LivingExtension.getOrThrow(performerEntity);
+      final var target = this.targetEntityId == -1 ? null
           : performerEntity.level.getEntity(this.targetEntityId)
               .getCapability(LivingExtension.CAPABILITY)
               .orElse(null);
-      final boolean serverSide = ctx.get().getDirection().getReceptionSide().isServer();
+      final var serverSide = ctx.get().getDirection().getReceptionSide().isServer();
       if (!serverSide || this.actionType.isTriggeredByClient()) {
         performer.performAction(this.actionType.createAction(performer, target), serverSide);
       }

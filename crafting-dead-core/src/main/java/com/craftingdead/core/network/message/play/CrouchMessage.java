@@ -24,15 +24,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class CrouchMessage {
-
-  private final int entityId;
-  private final boolean crouching;
-
-  public CrouchMessage(int entityId, boolean crouching) {
-    this.entityId = entityId;
-    this.crouching = crouching;
-  }
+public record CrouchMessage(int entityId, boolean crouching) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);

@@ -24,13 +24,7 @@ import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class AddKillFeedEntryMessage {
-
-  private final KillFeedEntry entry;
-
-  public AddKillFeedEntryMessage(KillFeedEntry entry) {
-    this.entry = entry;
-  }
+public record AddKillFeedEntryMessage(KillFeedEntry entry) {
 
   public void encode(FriendlyByteBuf out) {
     this.entry.encode(out);

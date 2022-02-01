@@ -24,10 +24,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
-public class HitMessage {
-
-  private final Vec3 hitPos;
-  private final boolean dead;
+public record HitMessage(Vec3 hitPos, boolean dead) {
 
   public HitMessage(Vec3 hitPos, boolean dead) {
     this.hitPos = hitPos;

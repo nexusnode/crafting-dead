@@ -25,15 +25,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SyncLivingMessage {
-
-  private final int entityId;
-  private final FriendlyByteBuf data;
-
-  public SyncLivingMessage(int entityId, FriendlyByteBuf data) {
-    this.entityId = entityId;
-    this.data = data;
-  }
+public record SyncLivingMessage(int entityId, FriendlyByteBuf data) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.entityId);
@@ -42,12 +34,8 @@ public class SyncLivingMessage {
   }
 
   public static SyncLivingMessage decode(FriendlyByteBuf in) {
-    int entityId = in.readVarInt();
-    byte[] data = new byte[in.readVarInt()];
-    in.readBytes(data);
-    SyncLivingMessage msg = new SyncLivingMessage(entityId,
-        new FriendlyByteBuf(Unpooled.wrappedBuffer(data)));
-    return msg;
+    return new SyncLivingMessage(in.readVarInt(),
+        new FriendlyByteBuf(Unpooled.wrappedBuffer(in.readBytes(in.readVarInt()))));
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {

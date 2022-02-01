@@ -24,9 +24,7 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class OpenStorageMessage {
-
-  private final ModEquipmentSlot slot;
+public record OpenStorageMessage(ModEquipmentSlot slot) {
 
   public OpenStorageMessage(ModEquipmentSlot slot) {
     this.slot = slot;
