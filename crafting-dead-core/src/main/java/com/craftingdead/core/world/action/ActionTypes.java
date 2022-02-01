@@ -20,18 +20,19 @@ package com.craftingdead.core.world.action;
 
 import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.action.delegated.DelegatedEntityActionType;
+import com.craftingdead.core.world.action.delegate.DelegateEntityActionType;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.action.reload.MagazineReloadAction;
 import com.craftingdead.core.world.action.reload.RefillableReloadAction;
 import com.craftingdead.core.world.effect.ModMobEffects;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
+import com.google.common.base.Predicates;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.Lazy;
@@ -63,23 +64,23 @@ public class ActionTypes {
   public static final RegistryObject<ActionType> USE_SYRINGE =
       ACTION_TYPES.register("use_syringe",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.SYRINGE.get())
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector((performer, target) -> {
+              .forItem(ModItems.SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder((performer, target) -> {
                     if (target == null
                         || performer == target
                         || target.getEntity() instanceof Skeleton) {
                       return Optional.empty();
                     }
 
-                    LivingEntity targetEntity = target.getEntity();
+                    var targetEntity = target.getEntity();
                     if (targetEntity.getHealth() > 4) {
                       return Optional.ofNullable(target);
                     }
 
-                    if (performer.getEntity() instanceof Player) {
-                      ((Player) performer.getEntity()).displayClientMessage(
+                    if (performer.getEntity() instanceof Player player) {
+                      player.displayClientMessage(
                           new TranslatableComponent("message.low_health",
                               targetEntity.getDisplayName()).withStyle(ChatFormatting.RED),
                           true);
@@ -87,61 +88,76 @@ public class ActionTypes {
 
                     return Optional.empty();
                   })
-                  .setCustomAction(extension -> extension.getEntity().hurt(
-                      DamageSource.mobAttack(extension.getEntity()), 2.0F), 1.0F)
-                  .setReturnItem(ModItems.BLOOD_SYRINGE)
+                  .customAction((performer, target) -> target.getEntity().hurt(
+                      DamageSource.mobAttack(target.getEntity()), 2.0F), 1.0F)
+                  .returnItem(ModItems.BLOOD_SYRINGE)
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_FIRST_AID_KIT =
       ACTION_TYPES.register("use_first_aid_kit",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(
-                  itemStack -> itemStack.getItem() == ModItems.FIRST_AID_KIT.get())
+              .forItem(ModItems.FIRST_AID_KIT)
               .setFreezeMovement(true)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 1), 1.0F)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS)
+                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 1))
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_ADRENALINE_SYRINGE =
       ACTION_TYPES.register("use_adrenaline_syringe",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(
-                  itemStack -> itemStack.getItem() == ModItems.ADRENALINE_SYRINGE.get())
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .setReturnItem(ModItems.SYRINGE)
-                  .setReturnItemInCreative(false)
-                  .addEffect(
-                      () -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1), 1.0F)
+              .forItem(ModItems.ADRENALINE_SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS)
+                  .returnItem(ModItems.SYRINGE)
+                  .useResultItemInCreative(false)
+                  .effect(() -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1))
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_BLOOD_SYRINGE =
       ACTION_TYPES.register("use_blood_syringe",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(
-                  itemStack -> itemStack.getItem() == ModItems.BLOOD_SYRINGE.get())
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .setReturnItem(ModItems.SYRINGE)
-                  .setReturnItemInCreative(false)
-                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0), 1.0F)
+              .forItem(ModItems.BLOOD_SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS)
+                  .returnItem(ModItems.SYRINGE)
+                  .useResultItemInCreative(false)
+                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_BANDAGE =
       ACTION_TYPES.register("use_bandage",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.getItem() == ModItems.BANDAGE.get())
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .addEffect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0), 1.0F)
+              .forItem(ModItems.BANDAGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS)
+                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
+                  .build())
+              .build());
+
+  public static final RegistryObject<ActionType> APPLY_HANDCUFFS =
+      ACTION_TYPES.register("apply_handcuffs",
+          () -> ItemActionType.builder()
+              .forItem(ModItems.HANDCUFFS)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.OTHERS_ONLY
+                      .players()
+                      .filter(Predicates.not(PlayerExtension::isHandcuffed)))
+                  .customAction((performer, target) -> {
+                    target.setHandcuffs(performer.getMainHandItem().copy());
+                    target.getEntity().displayClientMessage(
+                        new TranslatableComponent("handcuffs.handcuffed",
+                            performer.getEntity().getDisplayName())
+                                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
+                        true);
+                  }, 1.0F)
                   .build())
               .build());
 }

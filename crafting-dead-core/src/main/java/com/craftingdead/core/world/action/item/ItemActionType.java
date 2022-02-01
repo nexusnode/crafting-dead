@@ -23,28 +23,30 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import com.craftingdead.core.world.action.ActionType;
-import com.craftingdead.core.world.action.delegated.DelegatedActionType;
+import com.craftingdead.core.world.action.delegate.DelegateActionType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemActionType extends ActionType {
 
-  private final List<DelegatedActionType> delegatedActions;
+  private final List<DelegateActionType> delegateActions;
   private final boolean freezeMovement;
   private final int totalDurationTicks;
   private final Predicate<ItemStack> heldItemPredicate;
 
-  private ItemActionType(boolean triggeredByClient, List<DelegatedActionType> delegatedActions,
+  private ItemActionType(boolean triggeredByClient, List<DelegateActionType> delegateActions,
       boolean freezeMovement, int totalDurationTicks, Predicate<ItemStack> heldItemPredicate) {
     super(triggeredByClient, ItemAction::new);
-    this.delegatedActions = delegatedActions;
+    this.delegateActions = delegateActions;
     this.freezeMovement = freezeMovement;
     this.totalDurationTicks = totalDurationTicks;
     this.heldItemPredicate = heldItemPredicate;
   }
 
-  public List<DelegatedActionType> getDelegatedActionTypes() {
-    return Collections.unmodifiableList(this.delegatedActions);
+  public List<DelegateActionType> getDelegateActions() {
+    return Collections.unmodifiableList(this.delegateActions);
   }
 
   public boolean isFreezeMovement() {
@@ -66,7 +68,7 @@ public class ItemActionType extends ActionType {
   public static class Builder {
 
     private boolean triggeredByClient;
-    private final List<DelegatedActionType> delegatedActions = new ArrayList<>();
+    private final List<DelegateActionType> delegateActions = new ArrayList<>();
     private boolean freezeMovement;
     private int totalDurationTicks = 32;
     private Predicate<ItemStack> heldItemPredicate;
@@ -76,13 +78,13 @@ public class ItemActionType extends ActionType {
       return this;
     }
 
-    public Builder addDelegatedAction(DelegatedActionType entry) {
+    public Builder delegate(DelegateActionType entry) {
       return this.addDelegatedAction(() -> true, entry);
     }
 
-    public Builder addDelegatedAction(BooleanSupplier condition, DelegatedActionType entry) {
-      if (condition.getAsBoolean() && !this.delegatedActions.contains(entry)) {
-        this.delegatedActions.add(entry);
+    public Builder addDelegatedAction(BooleanSupplier condition, DelegateActionType entry) {
+      if (condition.getAsBoolean() && !this.delegateActions.contains(entry)) {
+        this.delegateActions.add(entry);
       }
       return this;
     }
@@ -92,18 +94,22 @@ public class ItemActionType extends ActionType {
       return this;
     }
 
-    public Builder setTotalDurationTicks(int totalDurationTicks) {
+    public Builder duration(int totalDurationTicks) {
       this.totalDurationTicks = totalDurationTicks;
       return this;
     }
 
-    public Builder setHeldItemPredicate(Predicate<ItemStack> heldItemPredicate) {
+    public Builder forItem(Supplier<Item> item) {
+      return this.forItem(itemStack -> itemStack.is(item.get()));
+    }
+
+    public Builder forItem(Predicate<ItemStack> heldItemPredicate) {
       this.heldItemPredicate = heldItemPredicate;
       return this;
     }
 
     public ItemActionType build() {
-      return new ItemActionType(this.triggeredByClient, this.delegatedActions, this.freezeMovement,
+      return new ItemActionType(this.triggeredByClient, this.delegateActions, this.freezeMovement,
           this.totalDurationTicks, this.heldItemPredicate);
     }
   }

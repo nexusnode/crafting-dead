@@ -18,13 +18,11 @@
 
 package com.craftingdead.survival.world.action;
 
-import java.util.Optional;
-import java.util.Random;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TargetSelector;
-import com.craftingdead.core.world.action.delegated.DelegatedBlockActionType;
-import com.craftingdead.core.world.action.delegated.DelegatedEntityActionType;
+import com.craftingdead.core.world.action.delegate.DelegateBlockActionType;
+import com.craftingdead.core.world.action.delegate.DelegateEntityActionType;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
@@ -48,18 +46,18 @@ public class SurvivalActionTypes {
   public static final RegistryObject<ActionType> SHRED_CLOTHING =
       ACTION_TYPES.register("shred_clothing",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(CapabilityUtil.capabilityPresent(Clothing.CAPABILITY))
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setCustomAction(extension -> {
-                    Random random = extension.getEntity().getRandom();
+              .forItem(CapabilityUtil.capabilityPresent(Clothing.CAPABILITY))
+              .delegate(DelegateEntityActionType.builder(TargetSelector.SELF_ONLY)
+                  .customAction((performer, target) -> {
+                    var random = target.getRandom();
                     int randomRagAmount = random.nextInt(3) + 3;
 
                     for (int i = 0; i < randomRagAmount; i++) {
                       if (random.nextBoolean()) {
-                        extension.getEntity().spawnAtLocation(
+                        target.getEntity().spawnAtLocation(
                             new ItemStack(SurvivalItems.CLEAN_RAG::get));
                       } else {
-                        extension.getEntity().spawnAtLocation(
+                        target.getEntity().spawnAtLocation(
                             new ItemStack(SurvivalItems.DIRTY_RAG::get));
                       }
                     }
@@ -70,78 +68,66 @@ public class SurvivalActionTypes {
   public static final RegistryObject<ActionType> USE_SPLINT =
       ACTION_TYPES.register("use_splint",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(SurvivalItems.SPLINT.get()))
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS
-                      .andThen(extension -> (extension == null
-                          || !extension.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get()))
-                              ? Optional.empty()
-                              : Optional.of(extension)))
+              .forItem(SurvivalItems.SPLINT)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS.hasEffect(SurvivalMobEffects.BROKEN_LEG))
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_CLEAN_RAG =
       ACTION_TYPES.register("use_clean_rag",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(SurvivalItems.CLEAN_RAG.get()))
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS
-                      .andThen(extension -> (extension == null
-                          || !extension.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get()))
-                              ? Optional.empty()
-                              : Optional.of(extension)))
-                  .setReturnItem(SurvivalItems.BLOODY_RAG)
+              .forItem(SurvivalItems.CLEAN_RAG)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.SELF_OR_OTHERS.hasEffect(SurvivalMobEffects.BLEEDING))
+                  .returnItem(SurvivalItems.BLOODY_RAG)
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> WASH_RAG =
       ACTION_TYPES.register("wash_rag",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(SurvivalItems.DIRTY_RAG.get())
+              .forItem(itemStack -> itemStack.is(SurvivalItems.DIRTY_RAG.get())
                   || itemStack.is(SurvivalItems.BLOODY_RAG.get()))
-              .addDelegatedAction(DelegatedBlockActionType.builder()
-                  .setReturnItem(SurvivalItems.CLEAN_RAG)
-                  .setFinishSound(SoundEvents.BUCKET_FILL)
-                  .setPredicate(blockState -> blockState.getFluidState().is(Fluids.WATER))
+              .delegate(DelegateBlockActionType.builder()
+                  .returnItem(SurvivalItems.CLEAN_RAG)
+                  .finishSound(SoundEvents.BUCKET_FILL)
+                  .forBlock(blockState -> blockState.getFluidState().is(Fluids.WATER))
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_SYRINGE_ON_ZOMBIE =
       ACTION_TYPES.register("use_syringe_on_zombie",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(ModItems.SYRINGE.get()))
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.OTHERS_ONLY.ofType(Zombie.class))
-                  .setCustomAction(extension -> extension.getEntity().hurt(
-                      DamageSource.mobAttack(extension.getEntity()), 2.0F), 0.25F)
-                  .setReturnItem(SurvivalItems.RBI_SYRINGE)
+              .forItem(ModItems.SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType
+                  .builder(TargetSelector.OTHERS_ONLY.ofEntityType(Zombie.class))
+                  .customAction((performer, target) -> target.getEntity().hurt(
+                      DamageSource.mobAttack(target.getEntity()), 2.0F), 0.25F)
+                  .returnItem(SurvivalItems.RBI_SYRINGE)
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_CURE_SYRINGE =
       ACTION_TYPES.register("use_cure_syringe",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(SurvivalItems.CURE_SYRINGE.get()))
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .setReturnItem(ModItems.SYRINGE)
+              .forItem(SurvivalItems.CURE_SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType.builder(TargetSelector.SELF_OR_OTHERS)
+                  .returnItem(ModItems.SYRINGE)
                   .build())
               .build());
 
   public static final RegistryObject<ActionType> USE_RBI_SYRINGE =
       ACTION_TYPES.register("use_rbi_syringe",
           () -> ItemActionType.builder()
-              .setHeldItemPredicate(itemStack -> itemStack.is(SurvivalItems.RBI_SYRINGE.get()))
-              .setTotalDurationTicks(16)
-              .addDelegatedAction(DelegatedEntityActionType.builder()
-                  .setTargetSelector(TargetSelector.SELF_OR_OTHERS)
-                  .addEffect(
-                      () -> new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999),
-                      1.0F)
-                  .setReturnItem(ModItems.SYRINGE)
+              .forItem(SurvivalItems.RBI_SYRINGE)
+              .duration(16)
+              .delegate(DelegateEntityActionType.builder(TargetSelector.SELF_OR_OTHERS)
+                  .effect(() -> new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999))
+                  .returnItem(ModItems.SYRINGE)
                   .build())
               .build());
 }

@@ -18,21 +18,19 @@
 
 package com.craftingdead.core.world.action.item;
 
-import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.world.action.TimedAction;
-import com.craftingdead.core.world.action.delegated.DelegatedAction;
-import com.craftingdead.core.world.action.delegated.DelegatedActionType;
+import com.craftingdead.core.world.action.delegate.DelegateAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionHand;
 
 public class ItemAction extends TimedAction<ItemActionType> {
 
-  private DelegatedAction delegatedAction;
+  private DelegateAction delegatedAction;
 
   ItemAction(ItemActionType type, LivingExtension<?, ?> performer, LivingExtension<?, ?> target) {
     super(type, performer, target);
@@ -40,10 +38,10 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
   @Override
   public boolean start() {
-    final ItemStack heldStack = this.getPerformer().getMainHandItem();
+    final var heldStack = this.getPerformer().getMainHandItem();
     if (this.getType().getHeldItemPredicate().test(heldStack)) {
-      for (DelegatedActionType delegatedActionType : this.getType().getDelegatedActionTypes()) {
-        DelegatedAction action = delegatedActionType.create(this).orElse(null);
+      for (var delegatedActionType : this.getType().getDelegateActions()) {
+        var action = delegatedActionType.create(this).orElse(null);
         if (action != null) {
           this.delegatedAction = action;
           return super.start();
@@ -55,27 +53,24 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
   @Override
   protected final void finish() {
-    final ItemStack heldStack = this.getPerformer().getMainHandItem();
+    final var heldStack = this.getPerformer().getMainHandItem();
     if (this.delegatedAction.finish(
         this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
-      final boolean shrinkStack = this.delegatedAction.shouldShrinkStack(this.getPerformer());
-      final ItemStack resultStack = this.delegatedAction.getReturnItem(this.getPerformer())
+      final var consumeItem = this.delegatedAction.shouldConsumeItem(this.getPerformer());
+      final var resultStack = this.delegatedAction.getResultItem(this.getPerformer())
           .map(Item::getDefaultInstance)
           .orElse(ItemStack.EMPTY);
 
-      @Nullable
-      final Player playerEntity = this.getPerformer().getEntity() instanceof Player
-          ? (Player) this.getPerformer().getEntity()
-          : null;
-      if (shrinkStack && !(playerEntity != null && playerEntity.isCreative())) {
+      if (consumeItem
+          && !(this.getPerformer().getEntity() instanceof Player player && player.isCreative())) {
         heldStack.shrink(1);
       }
 
       if (!resultStack.isEmpty()) {
         if (heldStack.isEmpty()) {
           this.getPerformer().getEntity().setItemInHand(InteractionHand.MAIN_HAND, resultStack);
-        } else if (playerEntity != null
-            && playerEntity.getInventory().add(resultStack)) {
+        } else if (this.getPerformer().getEntity() instanceof Player player
+            && player.getInventory().add(resultStack)) {
           this.getPerformer().getEntity().spawnAtLocation(resultStack);
         }
       }
@@ -87,7 +82,7 @@ public class ItemAction extends TimedAction<ItemActionType> {
 
   @Override
   public boolean tick() {
-    boolean finished = super.tick();
+    final var finished = super.tick();
     final ItemStack heldStack = this.getPerformer().getMainHandItem();
 
     boolean usingItem = true;
@@ -115,6 +110,4 @@ public class ItemAction extends TimedAction<ItemActionType> {
   protected int getTotalDurationTicks() {
     return this.getType().getTotalDurationTicks();
   }
-
-
 }

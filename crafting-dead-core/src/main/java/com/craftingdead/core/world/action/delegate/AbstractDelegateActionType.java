@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.action.delegated;
+package com.craftingdead.core.world.action.delegate;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -25,28 +25,28 @@ import javax.annotation.Nullable;
 import net.minecraft.world.item.Item;
 import net.minecraft.sounds.SoundEvent;
 
-public abstract class AbstractDelegatedActionType implements DelegatedActionType {
+public abstract class AbstractDelegateActionType implements DelegateActionType {
 
-  private final boolean shrinkStack;
+  private final boolean consumeItem;
   @Nullable
   private final Supplier<Item> returnItem;
   @Nullable
   private final Supplier<SoundEvent> finishSound;
 
-  private final boolean shrinkStackInCreative;
+  private final boolean consumeItemInCreative;
 
-  private final boolean returnItemInCreative;
+  private final boolean useResultItemInCreative;
 
-  protected AbstractDelegatedActionType(Builder<?> builder) {
-    this.shrinkStack = builder.shrinkStack;
+  protected AbstractDelegateActionType(Builder<?> builder) {
+    this.consumeItem = builder.consumeItem;
     this.returnItem = builder.returnItem;
     this.finishSound = builder.finishSound;
-    this.shrinkStackInCreative = builder.shrinkStackInCreative;
-    this.returnItemInCreative = builder.returnItemInCreative;
+    this.consumeItemInCreative = builder.consumeItemInCreative;
+    this.useResultItemInCreative = builder.useResultItemInCreative;
   }
 
-  public boolean isShrinkStack() {
-    return this.shrinkStack;
+  public boolean shouldConsumeItem() {
+    return this.consumeItem;
   }
 
   public Optional<Item> getReturnItem() {
@@ -57,62 +57,62 @@ public abstract class AbstractDelegatedActionType implements DelegatedActionType
     return Optional.ofNullable(this.finishSound).map(Supplier::get);
   }
 
-  public boolean isShrinkStackInCreative() {
-    return this.shrinkStackInCreative;
+  public boolean shouldConsumeItemInCreative() {
+    return this.consumeItemInCreative;
   }
 
-  public boolean isReturnItemInCreative() {
-    return this.returnItemInCreative;
+  public boolean useResultItemInCreative() {
+    return this.useResultItemInCreative;
   }
 
   protected static abstract class Builder<SELF extends Builder<SELF>> {
 
-    private final Function<SELF, AbstractDelegatedActionType> factory;
+    private final Function<SELF, AbstractDelegateActionType> factory;
 
-    protected boolean shrinkStack = true;
+    protected boolean consumeItem = true;
     @Nullable
     protected Supplier<Item> returnItem;
     @Nullable
     protected Supplier<SoundEvent> finishSound;
 
-    protected boolean shrinkStackInCreative;
+    protected boolean consumeItemInCreative;
 
-    protected boolean returnItemInCreative = true;
+    protected boolean useResultItemInCreative = true;
 
-    protected Builder(Function<SELF, AbstractDelegatedActionType> factory) {
+    protected Builder(Function<SELF, AbstractDelegateActionType> factory) {
       this.factory = factory;
     }
 
-    public SELF setShrinkStack(boolean shrinkStack) {
-      this.shrinkStack = shrinkStack;
+    public SELF consumeItem(boolean consumeItem) {
+      this.consumeItem = consumeItem;
       return this.self();
     }
 
-    public SELF setReturnItem(Supplier<Item> returnItem) {
+    public SELF returnItem(Supplier<Item> returnItem) {
       this.returnItem = returnItem;
       return this.self();
     }
 
-    public SELF setFinishSound(SoundEvent finishSound) {
-      return this.setFinishSound(() -> finishSound);
+    public SELF finishSound(SoundEvent finishSound) {
+      return this.finishSound(() -> finishSound);
     }
 
-    public SELF setFinishSound(Supplier<SoundEvent> finishSound) {
+    public SELF finishSound(Supplier<SoundEvent> finishSound) {
       this.finishSound = finishSound;
       return this.self();
     }
 
-    public SELF setShrinkStackInCreative(boolean shrinkStackInCreative) {
-      this.shrinkStackInCreative = shrinkStackInCreative;
+    public SELF consumeItemInCreative(boolean consumeItemInCreative) {
+      this.consumeItemInCreative = consumeItemInCreative;
       return this.self();
     }
 
-    public SELF setReturnItemInCreative(boolean returnItemInCreative) {
-      this.returnItemInCreative = returnItemInCreative;
+    public SELF useResultItemInCreative(boolean useResultItemInCreative) {
+      this.useResultItemInCreative = useResultItemInCreative;
       return this.self();
     }
 
-    public AbstractDelegatedActionType build() {
+    public AbstractDelegateActionType build() {
       return this.factory.apply(this.self());
     }
 

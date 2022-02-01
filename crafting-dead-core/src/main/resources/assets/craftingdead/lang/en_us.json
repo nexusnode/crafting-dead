@@ -46,13 +46,14 @@
 
   "action.craftingdead.magazine_reload.message":"Reloading",
   "action.craftingdead.refillable_reload.message":"Reloading",
-  "action.craftingdead.remove_magazine.message":"Removing magazine",
+  "action.craftingdead.remove_magazine.message":"Removing Magazine",
 
-  "action.craftingdead.use_syringe.message":"Withdrawing fluid",
+  "action.craftingdead.use_syringe.message":"Withdrawing Fluid",
   "action.craftingdead.use_first_aid_kit.message":"Healing",
   "action.craftingdead.use_adrenaline_syringe.message":"Injecting Adrenaline",
   "action.craftingdead.use_blood_syringe.message":"Injecting Blood",
-  "action.craftingdead.use_bandage.message":"Applying bandage",
+  "action.craftingdead.use_bandage.message":"Applying Bandage",
+  "action.craftingdead.apply_handcuffs.message":"Applying Handcuffs",
 
   "itemGroup.craftingdead.cosmetics": "Crafting Dead Clothing",
   "itemGroup.craftingdead.medical": "Crafting Dead Medical",

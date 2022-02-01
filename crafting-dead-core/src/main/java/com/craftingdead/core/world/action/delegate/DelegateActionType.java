@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.action.delegated;
+package com.craftingdead.core.world.action.delegate;
 
 import java.util.Optional;
 import com.craftingdead.core.world.action.Action;
 
-public interface DelegatedActionType {
+public interface DelegateActionType {
 
-  Optional<? extends DelegatedAction> create(Action action);
+  Optional<? extends DelegateAction> create(Action action);
 }

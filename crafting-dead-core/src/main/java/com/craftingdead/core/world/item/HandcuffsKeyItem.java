@@ -32,7 +32,7 @@ public class HandcuffsKeyItem extends Item {
         extension.setHandcuffs(ItemStack.EMPTY);
 
         playerHit.displayClientMessage(
-            new TranslatableComponent("handcuffs_key.removed").withStyle(ChatFormatting.RED),
+            new TranslatableComponent("handcuffs_key.removed").withStyle(ChatFormatting.GREEN),
             true);
 
         if (!player.addItem(handcuffs)) {

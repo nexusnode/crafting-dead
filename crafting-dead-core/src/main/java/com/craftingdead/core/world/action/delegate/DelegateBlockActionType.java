@@ -16,24 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.core.world.action.delegated;
+package com.craftingdead.core.world.action.delegate;
 
 import java.util.Optional;
 import java.util.function.Predicate;
 import com.craftingdead.core.world.action.Action;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class DelegatedBlockActionType extends AbstractDelegatedActionType {
+public final class DelegateBlockActionType extends AbstractDelegateActionType {
 
   private final Predicate<BlockState> predicate;
 
-  private DelegatedBlockActionType(Builder builder) {
+  private DelegateBlockActionType(Builder builder) {
     super(builder);
     this.predicate = builder.predicate;
   }
 
   @Override
-  public Optional<? extends DelegatedAction> create(Action action) {
+  public Optional<? extends DelegateAction> create(Action action) {
     return Optional.of(new DelegatedBlockAction(this));
   }
 
@@ -45,15 +45,15 @@ public final class DelegatedBlockActionType extends AbstractDelegatedActionType 
     return new Builder();
   }
 
-  public static final class Builder extends AbstractDelegatedActionType.Builder<Builder> {
+  public static final class Builder extends AbstractDelegateActionType.Builder<Builder> {
 
     private Predicate<BlockState> predicate;
 
     private Builder() {
-      super(DelegatedBlockActionType::new);
+      super(DelegateBlockActionType::new);
     }
 
-    public Builder setPredicate(Predicate<BlockState> predicate) {
+    public Builder forBlock(Predicate<BlockState> predicate) {
       this.predicate = predicate;
       return this;
     }

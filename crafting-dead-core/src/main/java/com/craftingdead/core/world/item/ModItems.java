@@ -2310,7 +2310,8 @@ public class ModItems {
 
   public static final RegistryObject<Item> HANDCUFFS =
       ITEMS.register("handcuffs",
-          () -> new HandcuffsItem(new Item.Properties()
+          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
+              .action(ActionTypes.APPLY_HANDCUFFS)
               .durability(200)
               .tab(COMBAT_TAB)));
 
@@ -2327,35 +2328,35 @@ public class ModItems {
   public static final RegistryObject<Item> FIRST_AID_KIT =
       ITEMS.register("first_aid_kit",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setAction(ActionTypes.USE_FIRST_AID_KIT)
+              .action(ActionTypes.USE_FIRST_AID_KIT)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<Item> ADRENALINE_SYRINGE =
       ITEMS.register("adrenaline_syringe",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setAction(ActionTypes.USE_ADRENALINE_SYRINGE)
+              .action(ActionTypes.USE_ADRENALINE_SYRINGE)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<Item> SYRINGE =
       ITEMS.register("syringe",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setAction(ActionTypes.USE_SYRINGE)
+              .action(ActionTypes.USE_SYRINGE)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<Item> BLOOD_SYRINGE =
       ITEMS.register("blood_syringe",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setAction(ActionTypes.USE_BLOOD_SYRINGE)
+              .action(ActionTypes.USE_BLOOD_SYRINGE)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<Item> BANDAGE =
       ITEMS.register("bandage",
           () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .setAction(ActionTypes.USE_BANDAGE)
+              .action(ActionTypes.USE_BANDAGE)
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 

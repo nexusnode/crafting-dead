@@ -1,6 +1,7 @@
 package com.craftingdead.core.world.item;
 
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -29,7 +30,9 @@ public class BoltCuttersItem extends MeleeWeaponItem {
       if (extension.isHandcuffed()) {
         if (extension.damageHandcuffs(this.damageToHandcuffs)) {
           playerHit.displayClientMessage(
-              new TranslatableComponent("bolt_cutters.free", player.getDisplayName()), true);
+              new TranslatableComponent("bolt_cutters.free", player.getDisplayName())
+                  .withStyle(ChatFormatting.GREEN),
+              true);
         } else {
           playerHit.getLevel().playLocalSound(playerHit.getX(), playerHit.getY(),
               playerHit.getZ(), SoundEvents.ITEM_BREAK,
