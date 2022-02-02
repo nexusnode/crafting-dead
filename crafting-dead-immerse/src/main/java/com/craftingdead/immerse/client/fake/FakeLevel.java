@@ -32,7 +32,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,7 +47,7 @@ public class FakeLevel extends ClientLevel {
 
   private FakeLevel(Minecraft mc) {
     super(mc.getConnection(), new ClientLevel.ClientLevelData(Difficulty.NORMAL, false, false),
-        Level.OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 3, 3, mc::getProfiler, mc.levelRenderer,
+        OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 0, 0, mc::getProfiler, mc.levelRenderer,
         false, 0L);
   }
 

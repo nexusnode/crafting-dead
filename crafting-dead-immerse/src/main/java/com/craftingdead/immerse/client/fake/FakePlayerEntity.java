@@ -103,7 +103,7 @@ public class FakePlayerEntity extends AbstractClientPlayer {
 
   @Override
   public Vec3 position() {
-    return new Vec3(0.0D, 0.0D, 0.0D);
+    return new Vec3(99.0D, 99.0D, 99.0D);
   }
 
   @Override

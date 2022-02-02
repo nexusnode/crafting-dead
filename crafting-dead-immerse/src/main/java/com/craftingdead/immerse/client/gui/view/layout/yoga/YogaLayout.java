@@ -362,6 +362,12 @@ public class YogaLayout implements Layout {
     return this;
   }
 
+  public YogaLayout setMaxWidthPercent(float maxWidthPercent) {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetMaxWidthPercent(this.node, maxWidthPercent);
+    return this;
+  }
+
   public final YogaLayout setHeight(float height) {
     this.checkClosed();
     Yoga.YGNodeStyleSetHeight(this.node, height);
@@ -383,6 +389,12 @@ public class YogaLayout implements Layout {
   public YogaLayout setMaxHeight(float maxHeight) {
     this.checkClosed();
     Yoga.YGNodeStyleSetMaxHeight(this.node, maxHeight);
+    return this;
+  }
+
+  public YogaLayout setMaxHeightPercent(float maxHeightPercent) {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetMaxHeightPercent(this.node, maxHeightPercent);
     return this;
   }
 

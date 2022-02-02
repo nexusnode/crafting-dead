@@ -21,12 +21,11 @@ package com.craftingdead.immerse.client.gui.view;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.immerse.client.fake.FakeLevel;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.world.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
+import net.minecraft.world.entity.LivingEntity;
 
 public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
 
@@ -37,58 +36,59 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
     this.livingEntity = entity;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTicks);
     this.minecraft.getEntityRenderDispatcher().prepare(FakeLevel.getInstance(),
         this.minecraft.gameRenderer.getMainCamera(), null);
-    matrixStack.pushPose();
+
+    final var x = this.getScaledContentX() + this.getScaledContentWidth() / 2.0F;
+    final var y = this.getScaledContentY() + this.getScaledContentHeight();
+
+    final var yaw = (float) Math.atan((x - mouseX) / 40.0F);
+    final var pitch = (float) Math.atan((y / (2.0F * this.getYScale()) + 4 - mouseY) / 40.0F);
+
+    final var modelViewStack = RenderSystem.getModelViewStack();
+    modelViewStack.pushPose();
     {
-      matrixStack.translate(0, 0, 1050.0F);
-      matrixStack.scale(1.0F, 1.0F, -1.0F);
-      matrixStack.translate(
-          this.getScaledContentX() + this.getScaledContentWidth() / 2.0F,
-          this.getScaledContentY() + this.getScaledContentHeight(), 1000.0D);
-      matrixStack.scale(this.getXScale(), this.getYScale(), 1.0F);
-      matrixStack.scale(this.getContentWidth() / 2.0F, this.getContentHeight() / 2.0F,
-          1.0F);
-      matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
+      modelViewStack.translate(x, y, 1050.0D);
+      modelViewStack.scale(1.0F, 1.0F, -1.0F);
+      RenderSystem.applyModelViewMatrix();
 
-      final float oldYawOffset = this.livingEntity.yBodyRot;
-      final float oldYaw = this.livingEntity.getYRot();
-      final float oldPitch = this.livingEntity.getXRot();
-      final float oldPrevHeadYaw = this.livingEntity.yHeadRotO;
-      final float oldHeadYaw = this.livingEntity.yHeadRot;
-
-      float headYaw = (float) Math
-          .atan((this.getScaledContentX() + this.getScaledContentWidth() / 2.0F - mouseX) / 40.0F);
-      float headPitch = (float) Math
-          .atan((this.getScaledContentY() + this.getScaledContentHeight() / 4.0F - mouseY) / 40.0F);
-      this.livingEntity.yBodyRot = 180.0F + headYaw * 20.0F;
-      this.livingEntity.setYRot(180.0F + headYaw * 40.0F);
-      this.livingEntity.setXRot(-headPitch * 20.0F);
-      this.livingEntity.yHeadRot = this.livingEntity.getYRot();
-      this.livingEntity.yHeadRotO = this.livingEntity.getYRot();
-      final EntityRenderDispatcher entityRendererManager =
-          this.minecraft.getEntityRenderDispatcher();
-
-      entityRendererManager.setRenderShadow(false);
-      MultiBufferSource.BufferSource renderTypeBufferImpl =
-          this.minecraft.renderBuffers().bufferSource();
-
-      RenderSystem.runAsFancy(() -> entityRendererManager.render(this.livingEntity, 0.0D, 0.0D,
-          0.0D, 0.0F, 1.0F, matrixStack, renderTypeBufferImpl, RenderUtil.FULL_LIGHT));
-
-      renderTypeBufferImpl.endBatch();
-      entityRendererManager.setRenderShadow(false);
-
-      this.livingEntity.yBodyRot = oldYawOffset;
-      this.livingEntity.setYRot(oldYaw);
-      this.livingEntity.setXRot(oldPitch);
-      this.livingEntity.yHeadRotO = oldPrevHeadYaw;
-      this.livingEntity.yHeadRot = oldHeadYaw;
+      poseStack.pushPose();
+      {
+        poseStack.translate(0.0D, 0.0D, 1000.0D);
+        poseStack.scale(this.getXScale(), this.getYScale(), 1.0F);
+        poseStack.scale(this.getContentWidth() / 2.0F, this.getContentHeight() / 2.0F, 1.0F);
+        poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
+        final var lastYBodyRot = this.livingEntity.yBodyRot;
+        final var lastYRot = this.livingEntity.getYRot();
+        final var lastXRot = this.livingEntity.getXRot();
+        final var lastYHeadRotO = this.livingEntity.yHeadRotO;
+        final var lastYHeadRot = this.livingEntity.yHeadRot;
+        this.livingEntity.yBodyRot = 180.0F + yaw * 20.0F;
+        this.livingEntity.setYRot(180.0F + yaw * 40.0F);
+        this.livingEntity.setXRot(-pitch * 20.0F);
+        this.livingEntity.yHeadRot = this.livingEntity.getYRot();
+        this.livingEntity.yHeadRotO = this.livingEntity.getYRot();
+        Lighting.setupForEntityInInventory();
+        final var entityRenderDispatcher = this.minecraft.getEntityRenderDispatcher();
+        entityRenderDispatcher.setRenderShadow(false);
+        final var bufferSource = this.minecraft.renderBuffers().bufferSource();
+        entityRenderDispatcher.render(this.livingEntity, 0.0D, 0.0D, 0.0D,
+            0.0F, 1.0F, poseStack, bufferSource, RenderUtil.FULL_LIGHT);
+        bufferSource.endBatch();
+        entityRenderDispatcher.setRenderShadow(true);
+        this.livingEntity.yBodyRot = lastYBodyRot;
+        this.livingEntity.setYRot(lastYRot);
+        this.livingEntity.setXRot(lastXRot);
+        this.livingEntity.yHeadRotO = lastYHeadRotO;
+        this.livingEntity.yHeadRot = lastYHeadRot;
+        Lighting.setupFor3DItems();
+      }
+      poseStack.popPose();
     }
-    matrixStack.popPose();
+    modelViewStack.popPose();
+    RenderSystem.applyModelViewMatrix();
   }
 }

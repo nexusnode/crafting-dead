@@ -202,9 +202,9 @@ public class MainMenuView extends ParentView<MainMenuView, Layout, YogaLayout> {
         .stream()
         .filter(item -> item instanceof HatItem)
         .collect(Collectors.toList());
-    Item randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
+    var randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
 
-    LivingExtension<?, ?> livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
+    var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
     livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);
 
@@ -214,7 +214,8 @@ public class MainMenuView extends ParentView<MainMenuView, Layout, YogaLayout> {
         .setBottomPercent(15)
         .setLeftPercent(75)
         .setPositionType(PositionType.ABSOLUTE), new YogaLayoutParent().setAlignItems(Align.CENTER))
-            .addChild(new EntityView<>(new YogaLayout().setAspectRatio(1), fakePlayerEntity)));
+            .addChild(
+                new EntityView<>(new YogaLayout().setFlex(1).setAspectRatio(1), fakePlayerEntity)));
 
     this.addChild(this.contentContainer);
 
