@@ -103,6 +103,22 @@ public class Color {
     this.valueHex = RenderUtil.getColour(this.value4i);
   }
 
+  public int getRed() {
+    return this.value4i[0];
+  }
+
+  public int getGreen() {
+    return this.value4i[1];
+  }
+
+  public int getBlue() {
+    return this.value4i[2];
+  }
+
+  public int getAlpha() {
+    return this.value4i[3];
+  }
+
   public float[] getValue4f() {
     float[] result = new float[4];
     System.arraycopy(this.value4f, 0, result, 0, 4);
@@ -122,6 +138,18 @@ public class Color {
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Color && ((Color) obj).valueHex == this.valueHex;
+  }
+
+  public static Color fromHex(String hex) {
+    return Color.fromHex(hex, 1);
+  }
+
+  public static Color fromHex(String hex, float alpha) {
+    int padding = hex.startsWith("#") ? 1 : 0;
+    var red = Integer.parseInt(hex.substring(padding, 2 + padding), 16) / 255.0F;
+    var green = Integer.parseInt(hex.substring(2 + padding, 4 + padding), 16) / 255.0F;
+    var blue = Integer.parseInt(hex.substring(4 + padding, 6 + padding), 16) / 255.0F;
+    return new Color(red, green, blue, alpha);
   }
 
   @Nullable

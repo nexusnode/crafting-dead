@@ -40,7 +40,11 @@ public abstract class StyleProperty<T> {
 
   public abstract StyleProperty<T> setTransition(Transition<T> transition);
 
-  public abstract StyleProperty<T> defineState(T value, State... states);
+  public final StyleProperty<T> defineState(T value, int... states) {
+    return this.defineState(value, States.combine(states));
+  }
+
+  public abstract StyleProperty<T> defineState(T value, int state);
 
   public abstract StyleProperty<T> set(@Nonnull T value);
 

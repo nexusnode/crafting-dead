@@ -18,14 +18,11 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ValueStyleProperty<T> extends StyleProperty<T> {
 
@@ -35,7 +32,7 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
 
   private T baseValue;
 
-  private final Map<Set<State>, T> stateValues = new HashMap<>();
+  private final Int2ObjectMap<T> stateValues = new Int2ObjectOpenHashMap<>();
 
   private T value;
 
@@ -58,7 +55,7 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     Objects.nonNull(baseValue);
     this.baseValue = baseValue;
     this.defined = defined;
-    this.stateValues.put(Collections.emptySet(), this.baseValue);
+    this.stateValues.put(0, this.baseValue);
     this.value = this.baseValue;
     return this;
   }
@@ -70,11 +67,11 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
   }
 
   @Override
-  public StyleProperty<T> defineState(T value, State... states) {
-    if (states.length == 0) {
+  public StyleProperty<T> defineState(T value, int state) {
+    if (state == 0) {
       return this;
     }
-    this.stateValues.put(Sets.newHashSet(states), value);
+    this.stateValues.put(state, value);
     return this;
   }
 
@@ -96,8 +93,8 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     return this.overrideValue != null ? this.overrideValue : this.value;
   }
 
-  public boolean transition(Set<State> states, boolean animate) {
-    T newValue = this.stateValues.get(states);
+  public boolean transition(int state, boolean animate) {
+    T newValue = this.stateValues.get(state);
     if (newValue == null) {
       return false;
     }

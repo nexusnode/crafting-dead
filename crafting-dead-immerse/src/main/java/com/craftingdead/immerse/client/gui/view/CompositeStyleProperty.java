@@ -45,8 +45,8 @@ public class CompositeStyleProperty<T> extends StyleProperty<T> {
   }
 
   @Override
-  public StyleProperty<T> defineState(T value, State... states) {
-    this.properties.forEach(property -> property.defineState(value, states));
+  public StyleProperty<T> defineState(T value, int state) {
+    this.properties.forEach(property -> property.defineState(value, state));
     return this;
   }
 

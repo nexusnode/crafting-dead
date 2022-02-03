@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
@@ -30,6 +31,7 @@ import net.minecraft.network.chat.Component;
 public final class ViewScreen extends Screen {
 
   private final ParentView<?, Layout, ?> root;
+  private final List<? extends GuiEventListener> children;
 
   private View<?, ?> lastHovered;
 
@@ -54,6 +56,7 @@ public final class ViewScreen extends Screen {
     });
     this.root.screen = this;
     this.root.added();
+    this.children = Collections.singletonList(this.root);
   }
 
   public void keepOpenAndSetScreen(Screen screen) {
@@ -152,6 +155,6 @@ public final class ViewScreen extends Screen {
 
   @Override
   public List<? extends GuiEventListener> children() {
-    return List.of(this.root);
+    return this.children;
   }
 }

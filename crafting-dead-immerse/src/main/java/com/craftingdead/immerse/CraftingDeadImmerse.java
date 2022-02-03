@@ -58,6 +58,8 @@ import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {
 
+  private static final boolean ENABLE_SENTRY = false;
+
   public static final String ID = "craftingdeadimmerse";
 
   public static final String VERSION;
@@ -126,14 +128,16 @@ public class CraftingDeadImmerse {
 
     MinecraftForge.EVENT_BUS.register(this);
 
-    Sentry.init(options -> {
-      options.setDsn(SENTRY_DSN);
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-      // We recommend adjusting this value in production.
-      options.setTracesSampleRate(1.0);
-      // When first trying Sentry it's good to see what the SDK is doing:
-      options.setDebug(true);
-    });
+    if (ENABLE_SENTRY) {
+      Sentry.init(options -> {
+        options.setDsn(SENTRY_DSN);
+        // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+        // We recommend adjusting this value in production.
+        options.setTracesSampleRate(1.0);
+        // When first trying Sentry it's good to see what the SDK is doing:
+        options.setDebug(true);
+      });
+    }
   }
 
   @Nullable

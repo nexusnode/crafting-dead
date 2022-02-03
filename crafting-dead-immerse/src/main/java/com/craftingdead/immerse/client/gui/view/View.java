@@ -21,9 +21,7 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -88,7 +86,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
 
   protected final L layout;
 
-  private final Set<State> states = new HashSet<>();
+  private int state;
 
   private final Map<String, ValueStyleProperty<?>> valueProperties = new HashMap<>();
 
@@ -181,7 +179,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     this.layout = layout;
     this.eventBus.start();
 
-    this.states.add(States.ENABLED);
+    this.addState(States.ENABLED);
 
     this.outlineWidth
         .defineState(1.0F, States.FOCUSED)
@@ -189,24 +187,25 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
     this.outlineColor.defineState(Color.BLUE_C, States.FOCUSED);
   }
 
-  protected boolean hasState(State state) {
-    return this.states.contains(state);
+  protected void addState(int state) {
+    this.state |= state;
   }
 
-  protected boolean toggleState(State state) {
-    if (!this.addState(state)) {
+  protected void removeState(int state) {
+    this.state &= ~state;
+  }
+
+  protected boolean hasState(int state) {
+    return (this.state & state) == state;
+  }
+
+  protected boolean toggleState(int state) {
+    if (this.hasState(state)) {
       this.removeState(state);
       return false;
     }
+    this.addState(state);
     return true;
-  }
-
-  protected boolean addState(State state) {
-    return this.states.add(state);
-  }
-
-  protected boolean removeState(State state) {
-    return this.states.remove(state);
   }
 
   protected void registerValueProperty(ValueStyleProperty<?> property) {
@@ -214,11 +213,11 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
   }
 
   protected void updateProperties(boolean animate) {
-    var powerSet = new ArrayList<>(Sets.powerSet(this.states));
+    var powerSet = new ArrayList<>(Sets.powerSet(States.split(this.state)));
     Collections.reverse(powerSet);
     for (var property : this.valueProperties.values()) {
       for (var subset : powerSet) {
-        if (property.transition(subset, animate)) {
+        if (property.transition(States.combine(subset), animate)) {
           break;
         }
       }
@@ -630,7 +629,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
           .start();
     }
 
-    this.states.add(States.HOVERED);
+    this.addState(States.HOVERED);
     this.updateProperties(true);
 
     this.post(new MouseEnterEvent());
@@ -651,7 +650,7 @@ public class View<SELF extends View<SELF, L>, L extends Layout> extends GuiCompo
           .start();
     }
 
-    this.states.remove(States.HOVERED);
+    this.removeState(States.HOVERED);
     this.updateProperties(true);
 
     this.post(new MouseLeaveEvent());
