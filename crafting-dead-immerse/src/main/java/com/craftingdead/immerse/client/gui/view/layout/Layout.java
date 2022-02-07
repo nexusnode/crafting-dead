@@ -18,8 +18,11 @@
 
 package com.craftingdead.immerse.client.gui.view.layout;
 
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.Overflow;
+import com.craftingdead.immerse.client.gui.view.StateListener;
+import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import net.minecraft.world.phys.Vec2;
 
 public interface Layout {
@@ -85,6 +88,10 @@ public interface Layout {
   default void markDirty() {}
 
   default void close() {}
+
+  default void gatherDispatchers(Consumer<PropertyDispatcher<?>> consumer) {}
+
+  default void gatherListeners(Consumer<StateListener> consumer) {}
 
   interface MeasureFunction {
 

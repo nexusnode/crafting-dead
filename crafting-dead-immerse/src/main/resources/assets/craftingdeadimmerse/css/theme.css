@@ -1,0 +1,75 @@
+.seperator {
+    height: 1;
+    width: 100%;
+    background-color: rgba(181, 181, 181, 0.5);
+}
+
+.background {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    scale: 1.25;
+}
+
+.button {
+    width: 30;
+    height: 20;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.button > #label {
+    height: 8;
+}
+
+.red-button {
+    background-color: rgba(255, 117, 131, 0.4);
+}
+
+.red-button:hover:enabled {
+    background-color: rgba(255, 140, 152, 0.4);
+}
+
+.red-button:disabled {
+    background-color: rgba(148, 67, 75, 0.2);
+}
+
+.green-button {
+    background-color: rgba(82, 242, 183, 0.4);
+}
+
+.green-button:hover:enabled {
+    background-color: rgba(146, 240, 206, 0.4);
+}
+
+.green-button:disabled {
+    background-color: rgba(48, 145, 110, 0.2);
+}
+
+.blue-button {
+    background-color: rgba(116, 185, 247, 0.4);
+}
+
+.blue-button:hover:enabled {
+    background-color: rgba(145, 203, 255, 0.4);
+}
+
+.blue-button:disabled {
+    background-color: rgba(7, 97, 176, 0.2);
+}
+
+.item {
+    background-color: rgba(44, 44, 44, 0.4);
+}
+
+.item:hover {
+    outline-width: 1;
+    outline-color: rgb(170, 170, 170);
+}
+
+.item:focus {
+    outline-width: 1;
+    outline-color: white;
+}

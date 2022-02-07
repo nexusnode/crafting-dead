@@ -23,48 +23,25 @@ import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewUtil;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 
-public class HomeView extends ParentView<HomeView, YogaLayout, YogaLayout> {
+public class HomeView extends ParentView {
 
-  private final View<?, YogaLayout> newsComponent;
+  private final ParentView newsComponent;
 
   public HomeView() {
-    super(
-        new YogaLayout()
-            .setWidthPercent(100)
-            .setHeightPercent(100)
-            .setPositionType(PositionType.ABSOLUTE),
-        new YogaLayoutParent()
-            .setJustifyContent(Justify.SPACE_AROUND));
+    super(new Properties<>());
 
-    this.newsComponent = new ParentView<>(
-        new YogaLayout()
-            .setWidthPercent(45.0F)
-            .setHeightPercent(75.0F)
-            .setPadding(10)
-            .setLeftMarginPercent(10.0F)
-            .setOverflow(Overflow.SCROLL),
-        new YogaLayoutParent())
-            .configure(
-                view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x70777777)))
-            .setBackgroundBlur(50.0F)
-            .configure(view -> ViewUtil.addAll(view, new File("news.xml")));
-
+    this.newsComponent = new ParentView(new Properties<>().id("news").backgroundBlur(50.0F));
+    ViewUtil.addAll(this.newsComponent, new File("news.xml"));
 
     this.addChild(this.newsComponent);
   }
 
   @Override
   protected void added() {
+    super.added();
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
             .to(0.3F, 1.0F)

@@ -34,249 +34,113 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import org.jdesktop.core.animation.timing.Animator;
-import org.jdesktop.core.animation.timing.Animator.RepeatBehavior;
-import org.jdesktop.core.animation.timing.KeyFrames;
-import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
+import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
-import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.Tooltip;
 import com.craftingdead.immerse.client.gui.view.Transition;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
-import com.craftingdead.immerse.client.util.FitType;
-import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.Item;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class MainMenuView extends ParentView<MainMenuView, Layout, YogaLayout> {
+public class MainMenuView extends ParentView {
 
   private static final Component TITLE = new TranslatableComponent("menu.home.title");
 
-  private final ParentView<?, YogaLayout, YogaLayout> contentContainer =
-      new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
+  private final ParentView contentContainer = new ParentView(new Properties<>().id("content"));
 
-  public MainMenuView(Layout layout) {
-    super(layout,
-        new YogaLayoutParent().setFlexDirection(FlexDirection.ROW_REVERSE));
+  public MainMenuView() {
+    super(new Properties<>());
 
-    var homeView = new HomeView()
-        .setZOffset(-2)
-        .configure(view -> view.getLayout()
-            .setWidthPercent(100)
-            .setHeightPercent(100)
-            .setPositionType(PositionType.ABSOLUTE));
-
+    var homeView = new HomeView();
     var playView = new PlayView();
 
-    this.addChild(createBackgroundView());
+    this.addChild(Theme.createBackground());
 
-    this.addChild(new FogView<>(new YogaLayout()
-        .setPositionType(PositionType.ABSOLUTE)
-        .setHeightPercent(100)
-        .setWidthPercent(100)));
+    this.addChild(new FogView(new Properties<>()));
 
-    var sideBar = new ParentView<>(new YogaLayout()
-        .setRightBorderWidth(1)
-        .setHeightPercent(100.0F)
-        .setWidth(30.0F), new YogaLayoutParent().setAlignItems(Align.CENTER))
-            .configure(
-                view -> view.getBackgroundColorProperty().setBaseValue(new Color(0x70777777)))
-            .setBackgroundBlur(50.0F)
-            .configure(
-                view -> view.getRightBorderColorProperty().setBaseValue(new Color(0X80B5B5B5)));
+    var sideBar = new ParentView(new Properties<>().id("side-bar").backgroundBlur(50.0F));
 
-    sideBar.addChild(new ImageView<>(new YogaLayout()
-        .setMargin(5)
-        .setWidth(20)
-        .setAspectRatio(1))
-            .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"))
-            .configure(view -> view.getColorProperty()
-                .setTransition(Transition.linear(150L))
-                .defineState(new Color(0xFF666666), States.HOVERED))
-            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-            .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
-            .addListener(ActionEvent.class, (c, e) -> this.setContentView(homeView))
-            .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
+    var homeButton = Theme.createImageButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"),
+        () -> this.contentContainer.replace(homeView),
+        new Properties<>()
+            .id("home")
+            .tooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
+    sideBar.addChild(homeButton);
 
-    sideBar.addChild(new View<>(new YogaLayout()
-        .setHeight(1)
-        .setWidthPercent(100.0F))
-            .setUnscaleHeight(true)
-            .configure(
-                view -> view.getBackgroundColorProperty().setBaseValue(new Color(0X80B5B5B5))));
+    sideBar.addChild(Theme.newSeparator());
 
-    sideBar.addChild(new ImageView<>(new YogaLayout()
-        .setMargin(5)
-        .setWidth(14)
-        .setAspectRatio(1))
-            .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"))
-            .setBilinearFiltering(true)
-            .configure(view -> {
-              view.getColorProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(new Color(0xFF181818), States.HOVERED);
-              view.getScaleProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(1.15F, States.HOVERED);
-            })
-            .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
-            .addListener(ActionEvent.class, (c, e) -> this.setContentView(playView))
-            .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
+    var playButton = Theme.createImageButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"),
+        () -> this.contentContainer.replace(playView),
+        new Properties<>()
+            .id("play")
+            .tooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
+    playButton.getXScaleProperty().setTransition(Transition.linear(150L));
+    playButton.getYScaleProperty().setTransition(Transition.linear(150L));
+    playButton.setBilinearFiltering(true);
+    sideBar.addChild(playButton);
 
-    sideBar.addChild(new ImageView<>(new YogaLayout()
-        .setMargin(5)
-        .setWidth(12)
-        .setAspectRatio(1))
-            .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"))
-            .setBilinearFiltering(true)
-            .configure(view -> {
-              view.getColorProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(new Color(0xFF181818), States.HOVERED);
+    var settingsButton = Theme.createImageButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"),
+        () -> this.getScreen().keepOpenAndSetScreen(
+            new OptionsScreen(this.getScreen(), this.minecraft.options)),
+        new Properties<>()
+            .id("settings")
+            .tooltip(new Tooltip(new TranslatableComponent("menu.options"))));
+    settingsButton.getXScaleProperty().setTransition(Transition.linear(150L));
+    settingsButton.getYScaleProperty().setTransition(Transition.linear(150L));
+    settingsButton.setBilinearFiltering(true);
+    sideBar.addChild(settingsButton);
 
-              view.getScaleProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(1.15F, States.HOVERED);
-            })
-            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-            .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
-            .addListener(ActionEvent.class,
-                (c, e) -> this.getScreen().keepOpenAndSetScreen(
-                    new OptionsScreen(this.getScreen(), this.minecraft.options)))
-            .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslatableComponent("menu.options"))));
+    var quitButton = Theme.createImageButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"),
+        this.minecraft::stop,
+        new Properties<>().id("quit"));
+    quitButton.getXScaleProperty().setTransition(Transition.linear(150L));
+    quitButton.getYScaleProperty().setTransition(Transition.linear(150L));
+    quitButton.setBilinearFiltering(true);
+    sideBar.addChild(quitButton);
 
-    sideBar.addChild(new ImageView<>(new YogaLayout()
-        .setMargin(5)
-        .setTopMarginAuto()
-        .setWidth(12)
-        .setAspectRatio(1))
-            .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"))
-            .setBilinearFiltering(true)
-            .configure(view -> {
-              view.getColorProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(new Color(0xFF181818), States.HOVERED);
-              view.getScaleProperty()
-                  .setTransition(Transition.linear(150L))
-                  .defineState(1.15F, States.HOVERED);
-            })
-            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-            .addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get())
-            .addListener(ActionEvent.class, (c, e) -> this.minecraft.stop())
-            .setFocusable(true)
-            .setTooltip(new Tooltip(new TranslatableComponent("menu.quit"))));
+    var fakePlayerEntity = new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
 
-    final FakePlayerEntity fakePlayerEntity =
-        new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
-
-    List<Item> hatItems = ForgeRegistries.ITEMS.getValues()
+    var hatItems = ForgeRegistries.ITEMS.getValues()
         .stream()
         .filter(item -> item instanceof HatItem)
-        .collect(Collectors.toList());
+        .toList();
     var randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
 
     var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
     livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(),
         randomHatItem.getDefaultInstance(), false);
 
-    this.addChild(new ParentView<>(new YogaLayout()
-        .setWidthPercent(10)
-        .setHeightPercent(50)
-        .setBottomPercent(15)
-        .setLeftPercent(75)
-        .setPositionType(PositionType.ABSOLUTE), new YogaLayoutParent().setAlignItems(Align.CENTER))
-            .addChild(
-                new EntityView<>(new YogaLayout().setFlex(1).setAspectRatio(1), fakePlayerEntity)));
+    var entityContainer = new ParentView(new Properties<>().id("entity-container"));
+    entityContainer.addChild(new EntityView(new Properties<>(), fakePlayerEntity));
+    this.addChild(entityContainer);
 
     this.addChild(this.contentContainer);
 
     this.addChild(sideBar);
 
-    this.setContentView(homeView);
-  }
-
-  private void setContentView(View<?, YogaLayout> view) {
-    // Already added
-    if (view.getParent() == this.contentContainer) {
-      return;
-    }
-    this.contentContainer
-        .queueAllForRemoval()
-        .addChild(view)
-        .layout();
+    this.contentContainer.replace(homeView);
   }
 
   public static Screen createScreen() {
-    return new ViewScreen(TITLE, MainMenuView::new);
-  }
-
-  public static View<?, YogaLayout> createBackgroundView() {
-    var view = new ImageView<>(new YogaLayout()
-        .setPositionType(PositionType.ABSOLUTE)
-        .setHeightPercent(100)
-        .setWidthPercent(100))
-            .setImage(
-                new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
-            .setFitType(FitType.COVER)
-            .setBilinearFiltering(true)
-            .configure(v -> v.getScaleProperty().setBaseValue(1.25F));
-
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(view.getXTranslationProperty())
-            .keyFrames(new KeyFrames.Builder<Float>()
-                .addFrames(1.0F, -3.0F, 5.0F, 15.0F)
-                .build())
-            .build())
-        .addTarget(Animation.forProperty(view.getYTranslationProperty())
-            .keyFrames(new KeyFrames.Builder<Float>()
-                .addFrames(10.0F, 5.0F, 1.0F, 3.0F, 5.0F, 1.0F, -10.0F, -7.0F, -5.0F)
-                .build())
-            .build())
-        .addTarget(Animation.forProperty(view.getXScaleProperty())
-            .keyFrames(new KeyFrames.Builder<Float>()
-                .addFrames(1.3F, 1.2F, 1.25F, 1.15F)
-                .build())
-            .build())
-        .addTarget(Animation.forProperty(view.getYScaleProperty())
-            .keyFrames(new KeyFrames.Builder<Float>()
-                .addFrames(1.3F, 1.2F, 1.25F, 1.15F)
-                .build())
-            .build())
-        .setInterpolator(new SplineInterpolator(0.25, 0.1, 0.25, 1))
-        .setDuration(20L, TimeUnit.SECONDS)
-        .setRepeatCount(Animator.INFINITE)
-        .setRepeatBehavior(RepeatBehavior.REVERSE)
-        .build()
-        .start();
-    return view;
+    var screen = new ViewScreen(TITLE, new MainMenuView());
+    screen.setStylesheets(
+        List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/main-menu.css")));
+    return screen;
   }
 }

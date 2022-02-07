@@ -40,7 +40,7 @@ public class Color {
     });
   }
 
-  public static final Color INVISIBLE = new Color(0, 0, 0, 0);
+  public static final Color TRANSPARENT = new Color(0, 0, 0, 0);
 
   public static final Color BLACK = new Color(0, 0, 0);
   public static final Color DARK_BLUE = new Color(0, 0, 170);
@@ -133,6 +133,10 @@ public class Color {
 
   public int getHex() {
     return this.valueHex;
+  }
+
+  public boolean isTransparent() {
+    return this.getAlpha() == 0;
   }
 
   @Override

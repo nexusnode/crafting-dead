@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
@@ -29,49 +30,57 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 
-public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
+public class ImageView extends View {
 
-  private ResourceLocation image;
-  private FitType fitType = FitType.FILL;
   private boolean depthTest = false;
   private boolean bilinearFiltering = false;
 
-  private final ValueStyleProperty<Color> color =
-      Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
+  private final StyleableProperty<Color> color =
+      Util.make(StyleableProperty.create("color", Color.class, Color.WHITE),
           this::registerValueProperty);
+
+  private final StyleableProperty<FitType> objectFit =
+      Util.make(StyleableProperty.create("object-fit", FitType.class, FitType.FILL),
+          this::registerValueProperty);
+
+  private ResourceLocation image = TextureManager.INTENTIONAL_MISSING_TEXTURE;
 
   private Vec2 fittedImageSize;
 
-  public ImageView(L layout) {
-    super(layout);
-    this.layout.setMeasureFunction(this::measure);
+  public ImageView(Properties<?> properties) {
+    super(properties);
   }
 
-  public ValueStyleProperty<Color> getColorProperty() {
+  @Override
+  protected void setLayout(@Nullable Layout layout) {
+    super.setLayout(layout);
+    if (layout != null) {
+      layout.setMeasureFunction(this::measure);
+    }
+  }
+
+  public StyleableProperty<Color> getColorProperty() {
     return this.color;
   }
 
-  public final ImageView<L> setImage(ResourceLocation image) {
+  public final ImageView setImage(ResourceLocation image) {
     this.image = image;
-    this.layout.markDirty();
+    if (this.hasLayout()) {
+      this.getLayout().markDirty();
+    }
     return this;
   }
 
-  public final ImageView<L> setFitType(FitType fitType) {
-    this.fitType = fitType;
-    this.layout.markDirty();
-    return this;
-  }
-
-  public final ImageView<L> setDepthTest(boolean depthTest) {
+  public final ImageView setDepthTest(boolean depthTest) {
     this.depthTest = depthTest;
     return this;
   }
 
-  public final ImageView<L> setBilinearFiltering(boolean bilinearFiltering) {
+  public final ImageView setBilinearFiltering(boolean bilinearFiltering) {
     this.bilinearFiltering = bilinearFiltering;
     return this;
   }
@@ -91,8 +100,8 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
   }
 
   private Optional<Vec2> getFittedImageSize(float containerWidth, float containerHeight) {
-    return this.getImageSize().map(imageSize -> this.fitType.getSize(imageSize.x,
-        imageSize.y, containerWidth, containerHeight));
+    return this.getImageSize().map(imageSize -> this.objectFit.get()
+        .getSize(imageSize.x, imageSize.y, containerWidth, containerHeight));
   }
 
   @Override
@@ -116,7 +125,7 @@ public class ImageView<L extends Layout> extends View<ImageView<L>, L> {
       RenderSystem.enableDepthTest();
     }
     final var colour = this.color.get().getValue4f();
-    RenderSystem.setShaderColor(colour[0], colour[1], colour[2], colour[3]);
+    RenderSystem.setShaderColor(colour[0], colour[1], colour[2], colour[3] * this.getAlpha());
     if (this.image != null) {
       if (this.bilinearFiltering) {
         this.minecraft.getTextureManager().getTexture(this.image).setFilter(true, true);

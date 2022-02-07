@@ -29,129 +29,82 @@ import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
 
-public class WorldListView<L extends Layout>
-    extends ParentView<WorldListView<L>, L, YogaLayout> {
+public class WorldListView extends ParentView {
 
   private static final Logger logger = LogManager.getLogger();
 
-  private final ParentView<?, YogaLayout, YogaLayout> listView;
+  private final ParentView listView;
 
   @Nullable
   private WorldItemView selectedItem;
 
-  private final View<?, YogaLayout> playButton;
-  private final View<?, YogaLayout> editButton;
-  private final View<?, YogaLayout> deleteButton;
-  private final View<?, YogaLayout> recreateButton;
+  private final View playButton;
+  private final View editButton;
+  private final View deleteButton;
+  private final View recreateButton;
 
-  public WorldListView(L layout) {
-    super(layout, new YogaLayoutParent().setFlexDirection(FlexDirection.COLUMN));
+  public WorldListView() {
+    super(new Properties<>());
 
-    this.listView = new ParentView<>(
-        new YogaLayout()
-            .setFlexBasis(1)
-            .setFlexGrow(1)
-            .setTopPadding(4F)
-            .setBottomPadding(10F)
-            .setOverflow(Overflow.SCROLL),
-        new YogaLayoutParent()
-            .setFlexDirection(FlexDirection.COLUMN)
-            .setAlignItems(Align.CENTER));
+    this.listView = new ParentView(new Properties<>().id("content"));
     this.loadWorlds();
 
-    this.playButton =
-        Theme.createGreenButton(
-            new TranslatableComponent("view.world_list.button.play"),
-            () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld))
-            .configure(view -> view.getBackgroundColorProperty()
-                .defineState(Theme.GREEN_DISABLED, States.DISABLED))
-            .configure(view -> view.getLayout().setMargin(3F))
-            .setEnabled(false);
+    this.playButton = Theme.createGreenButton(
+        new TranslatableComponent("view.world_list.button.play"),
+        () -> this.getSelectedItem().ifPresent(WorldItemView::joinWorld));
+    this.playButton.setEnabled(false);
 
-    var createButton =
-        Theme.createBlueButton(
-            new TranslatableComponent("view.world_list.button.create"),
-            () -> this.getScreen()
-                .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())))
-            .configure(view -> view.getLayout().setMargin(3F));
+    var createButton = Theme.createBlueButton(
+        new TranslatableComponent("view.world_list.button.create"),
+        () -> this.getScreen()
+            .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())));
 
-    this.editButton =
-        Theme.createBlueButton(
-            new TranslatableComponent("view.world_list.button.edit"),
-            () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld))
-            .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
-            .configure(view -> view.getLayout().setMargin(3))
-            .setEnabled(false);
+    this.editButton = Theme.createBlueButton(
+        new TranslatableComponent("view.world_list.button.edit"),
+        () -> this.getSelectedItem().ifPresent(WorldItemView::editWorld));
+    this.editButton.setEnabled(false);
 
-    this.deleteButton =
-        Theme.createRedButton(
-            new TranslatableComponent("view.world_list.button.delete"),
-            () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld))
-            .setDisabledBackgroundColor(Theme.RED_DISABLED)
-            .configure(view -> view.getLayout().setMargin(3))
-            .setEnabled(false);
+    this.deleteButton = Theme.createRedButton(
+        new TranslatableComponent("view.world_list.button.delete"),
+        () -> this.getSelectedItem().ifPresent(WorldItemView::deleteWorld));
+    this.deleteButton.setEnabled(false);
 
-    this.recreateButton =
-        Theme.createBlueButton(
-            new TranslatableComponent("view.world_list.button.recreate"),
-            () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld))
-            .setDisabledBackgroundColor(Theme.BLUE_DISABLED)
-            .configure(view -> view.getLayout().setMargin(3))
-            .setEnabled(false);
+    this.recreateButton = Theme.createBlueButton(
+        new TranslatableComponent("view.world_list.button.recreate"),
+        () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld));
+    this.recreateButton.setEnabled(false);
 
-    var controlsContainer = new ParentView<>(
-        new YogaLayout().setHeight(56),
-        new YogaLayoutParent()
-            .setJustifyContent(Justify.CENTER)
-            .setAlignItems(Align.CENTER)
-            .setFlexDirection(FlexDirection.COLUMN))
-                .configure(view -> view.getBackgroundColorProperty()
-                    .setBaseValue(new Color(0x40121212)))
-                .addChild(new ParentView<>(
-                    new YogaLayout()
-                        .setFlex(1)
-                        .setWidth(220F),
-                    new YogaLayoutParent()
-                        .setFlexDirection(FlexDirection.ROW)
-                        .setAlignItems(Align.CENTER))
-                            .addChild(this.playButton)
-                            .addChild(createButton))
-                .addChild(new ParentView<>(
-                    new YogaLayout()
-                        .setFlex(1)
-                        .setWidth(220F),
-                    new YogaLayoutParent()
-                        .setFlexDirection(FlexDirection.ROW)
-                        .setAlignItems(Align.CENTER))
-                            .addChild(this.deleteButton)
-                            .addChild(this.editButton)
-                            .addChild(this.recreateButton));
+    var controls = new ParentView(new Properties<>().id("controls"));
+
+    var firstRow = new ParentView(new Properties<>());
+    firstRow.addChild(this.playButton);
+    firstRow.addChild(createButton);
+
+    var secondRow = new ParentView(new Properties<>());
+    secondRow.addChild(this.deleteButton);
+    secondRow.addChild(this.editButton);
+    secondRow.addChild(this.recreateButton);
+
+    controls.addChild(firstRow);
+    controls.addChild(secondRow);
 
     this.addChild(this.listView);
-    this.addChild(controlsContainer);
+    this.addChild(controls);
 
   }
 
   @Override
   protected void added() {
+    super.added();
     int delay = 0;
-    for (View<?, ?> view : this.listView.getChildViews()) {
+    for (var view : this.listView.getChildViews()) {
       new Animator.Builder()
           .addTarget(Animation.forProperty(view.getAlphaProperty())
               .keyFrames(new KeyFrames.Builder<>(0.0F)
@@ -177,7 +130,7 @@ public class WorldListView<L extends Layout>
     this.selectedItem = this.listView.getChildViews().stream()
         .filter(child -> child instanceof WorldItemView)
         .map(child -> (WorldItemView) child)
-        .filter(WorldItemView::isSelected)
+        .filter(WorldItemView::isFocused)
         .findAny()
         .orElse(null);
 

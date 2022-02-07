@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,7 +22,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 
-public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
+public class TextFieldView extends View {
 
   private final Font font;
 
@@ -36,12 +35,12 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   private int cursorIndex;
   private int highlightIndex;
 
-  private final ValueStyleProperty<Color> textColor = Util.make(
-      ValueStyleProperty.create("text_color", Color.class, new Color(0xFFE0E0E0)),
+  private final StyleableProperty<Color> textColor = Util.make(
+      StyleableProperty.create("text_color", Color.class, new Color(0xFFE0E0E0)),
       this::registerValueProperty);
 
-  private final ValueStyleProperty<Color> textColorUneditable = Util.make(
-      ValueStyleProperty.create("text_color_uneditable", Color.class, new Color(0xFF707070)),
+  private final StyleableProperty<Color> textColorUneditable = Util.make(
+      StyleableProperty.create("text_color_uneditable", Color.class, new Color(0xFF707070)),
       this::registerValueProperty);
 
   private String suggestion;
@@ -50,18 +49,22 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
   private BiFunction<String, Integer, FormattedCharSequence> formatter =
       (value, p_195610_1_) -> FormattedCharSequence.forward(value, Style.EMPTY);
 
-  public TextFieldView(L layout) {
-    super(layout);
-    this.setFocusable(true);
+  public TextFieldView(Properties<?> properties) {
+    super(properties);
     this.font = this.minecraft.font;
   }
 
-  public TextFieldView<L> setResponder(Consumer<String> responder) {
+  @Override
+  protected boolean isFocusable() {
+    return true;
+  }
+
+  public TextFieldView setResponder(Consumer<String> responder) {
     this.responder = responder;
     return this;
   }
 
-  public TextFieldView<L> setFormatter(
+  public TextFieldView setFormatter(
       BiFunction<String, Integer, FormattedCharSequence> formatter) {
     this.formatter = formatter;
     return this;
@@ -99,7 +102,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     return this.value.substring(startIndex, endIndex);
   }
 
-  public TextFieldView<L> setFilter(Predicate<String> filter) {
+  public TextFieldView setFilter(Predicate<String> filter) {
     this.filter = filter;
     return this;
   }
@@ -449,7 +452,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     RenderSystem.enableTexture();
   }
 
-  public TextFieldView<L> setMaxLength(int maxLength) {
+  public TextFieldView setMaxLength(int maxLength) {
     this.maxLength = maxLength;
     if (this.value.length() > maxLength) {
       this.value = this.value.substring(0, maxLength);
@@ -466,11 +469,11 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     return this.cursorIndex;
   }
 
-  public ValueStyleProperty<Color> getTextColorProperty() {
+  public ValueProperty<Color> getTextColorProperty() {
     return this.textColor;
   }
 
-  public ValueStyleProperty<Color> getTextColorUneditableProperty() {
+  public ValueProperty<Color> getTextColorUneditableProperty() {
     return this.textColorUneditable;
   }
 
@@ -490,7 +493,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     return this.editable;
   }
 
-  public TextFieldView<L> setEditable(boolean editable) {
+  public TextFieldView setEditable(boolean editable) {
     this.editable = editable;
     return this;
   }
@@ -520,7 +523,7 @@ public class TextFieldView<L extends Layout> extends View<TextFieldView<L>, L> {
     }
   }
 
-  public TextFieldView<L> setSuggestion(@Nullable String suggestion) {
+  public TextFieldView setSuggestion(@Nullable String suggestion) {
     this.suggestion = suggestion;
     return this;
   }

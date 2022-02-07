@@ -35,6 +35,7 @@ import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
+import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
@@ -60,6 +61,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderNameplateEvent;
@@ -114,6 +116,7 @@ public class ClientDist implements ModDist {
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleEntityRenderersAddLayers);
     modBus.addListener(this::handleRegisterShaders);
+    modBus.addListener(this::handleRegisterClientReloadListeners);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
     this.spectatorRenderer = new SpectatorRenderer();
@@ -174,6 +177,10 @@ public class ClientDist implements ModDist {
   // ================================================================================
   // Mod Events
   // ================================================================================
+
+  private void handleRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+    event.registerReloadListener(StylesheetManager.getInstance());
+  }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {

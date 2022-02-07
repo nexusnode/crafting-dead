@@ -26,12 +26,12 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 
 public class Animation<T> extends TimingTargetAdapter {
 
-  private final ValueStyleProperty<T> property;
+  private final ValueProperty<T> property;
   private KeyFrames<T> keyFrames;
 
   private final boolean fromCurrent;
 
-  private Animation(ValueStyleProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
+  private Animation(ValueProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
     this.property = property;
     this.keyFrames = keyFrames;
     this.fromCurrent = fromCurrent;
@@ -64,17 +64,17 @@ public class Animation<T> extends TimingTargetAdapter {
     this.timingEvent(source, fraction);
   }
 
-  public static <T> Builder<T> forProperty(ValueStyleProperty<T> property) {
+  public static <T> Builder<T> forProperty(ValueProperty<T> property) {
     return new Builder<>(property);
   }
 
   public static class Builder<T> {
 
-    private final ValueStyleProperty<T> property;
+    private final ValueProperty<T> property;
     private KeyFrames<T> keyFrames;
     private boolean fromCurrent;
 
-    private Builder(ValueStyleProperty<T> property) {
+    private Builder(ValueProperty<T> property) {
       this.property = property;
     }
 

@@ -18,13 +18,21 @@
 
 package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.Overflow;
+import com.craftingdead.immerse.client.gui.view.Point;
+import com.craftingdead.immerse.client.gui.view.StateListener;
+import com.craftingdead.immerse.client.gui.view.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.ValueAccessor;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
+import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
+import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandArgMapper;
+import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandDispatcher;
 
 public class YogaLayout implements Layout {
 
@@ -40,6 +48,49 @@ public class YogaLayout implements Layout {
   private static final Overflow[] overflows =
       new Overflow[] {Overflow.VISIBLE, Overflow.HIDDEN, Overflow.SCROLL};
 
+  private final StyleableProperty<Float> borderTopWidth;
+  private final StyleableProperty<Float> borderRightWidth;
+  private final StyleableProperty<Float> borderBottomWidth;
+  private final StyleableProperty<Float> borderLeftWidth;
+  private final PropertyDispatcher<Float> borderWidth;
+
+  private final StyleableProperty<Point> top;
+  private final StyleableProperty<Point> right;
+  private final StyleableProperty<Point> bottom;
+  private final StyleableProperty<Point> left;
+  private final PropertyDispatcher<Point> inset;
+
+  private final StyleableProperty<Point> paddingTop;
+  private final StyleableProperty<Point> paddingRight;
+  private final StyleableProperty<Point> paddingBottom;
+  private final StyleableProperty<Point> paddingLeft;
+  private final PropertyDispatcher<Point> padding;
+  private final StyleableProperty<Point> marginTop;
+  private final StyleableProperty<Point> marginRight;
+  private final StyleableProperty<Point> marginBottom;
+  private final StyleableProperty<Point> marginLeft;
+  private final PropertyDispatcher<Point> margin;
+  private final StyleableProperty<YogaPositionType> position;
+
+  private final StyleableProperty<Float> flexGrow;
+  private final StyleableProperty<Float> flexShrink;
+  private final StyleableProperty<Point> flexBasis;
+  private final StyleableProperty<Float> flex;
+
+  private final StyleableProperty<Float> aspectRatio;
+
+  private final StyleableProperty<YogaAlign> alignSelf;
+
+  private final StyleableProperty<Point> width;
+
+  private final StyleableProperty<Point> height;
+
+  private final StyleableProperty<Point> minWidth;
+
+  private final StyleableProperty<Point> minHeight;
+
+  private final StyleableProperty<Overflow> overflow;
+
   final long node;
 
   private boolean measureFunctionPresent;
@@ -47,6 +98,90 @@ public class YogaLayout implements Layout {
 
   public YogaLayout() {
     this.node = Yoga.YGNodeNew();
+
+    this.borderTopWidth = StyleableProperty.create("border-top-width", Float.class,
+        0.0F, this::setTopBorderWidth);
+    this.borderRightWidth = StyleableProperty.create("border-right-width", Float.class,
+        0.0F, this::setRightBorderWidth);
+    this.borderBottomWidth = StyleableProperty.create("border-bottom-width", Float.class,
+        0.0F, this::setBottomBorderWidth);
+    this.borderLeftWidth = StyleableProperty.create("border-left-width", Float.class,
+        0.0F, this::setLeftBorderWidth);
+    this.borderWidth =
+        ShorthandDispatcher.create("border-width", Float.class, ShorthandArgMapper.BOX_MAPPER,
+            this.borderTopWidth, this.borderRightWidth, this.borderBottomWidth,
+            this.borderLeftWidth);
+
+    this.top = StyleableProperty.create("top", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setTop, this::setTopPercent, null));
+    this.right = StyleableProperty.create("right", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setRight, this::setRightPercent, null));
+    this.bottom = StyleableProperty.create("bottom", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setBottom, this::setBottomPercent, null));
+    this.left = StyleableProperty.create("left", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setLeft, this::setLeftPercent, null));
+    this.inset = ShorthandDispatcher.create("inset", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        this.top, this.right, this.bottom, this.left);
+
+    this.paddingTop = StyleableProperty.create("padding-top", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setTopPadding, this::setTopPaddingPercent, null));
+    this.paddingRight = StyleableProperty.create("padding-right", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setRightPadding, this::setRightPaddingPercent, null));
+    this.paddingBottom = StyleableProperty.create("padding-bottom", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setBottomPadding, this::setBottomPaddingPercent, null));
+    this.paddingLeft = StyleableProperty.create("padding-left", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setLeftPadding, this::setLeftPaddingPercent, null));
+    this.padding = ShorthandDispatcher.create("padding", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        this.paddingTop, this.paddingRight, this.paddingBottom, this.paddingLeft);
+
+    this.marginTop = StyleableProperty.create("margin-top", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setTopMargin, this::setTopMarginPercent,
+            this::setTopMarginAuto));
+    this.marginRight = StyleableProperty.create("margin-right", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setRightMargin, this::setRightMarginPercent,
+            this::setRightMarginAuto));
+    this.marginBottom = StyleableProperty.create("margin-bottom", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setBottomMargin, this::setBottomMarginPercent,
+            this::setBottomMarginAuto));
+    this.marginLeft = StyleableProperty.create("margin-left", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setLeftMargin, this::setLeftMarginPercent,
+            this::setLeftMarginAuto));
+    this.margin = ShorthandDispatcher.create("margin", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        this.marginTop, this.marginRight, this.marginBottom, this.marginLeft);
+
+    this.position = StyleableProperty.create("position", YogaPositionType.class,
+        YogaPositionType.RELATIVE, this::setPositionType);
+
+    this.flexGrow = StyleableProperty.create("flex-grow", Float.class,
+        0.0F, this::setFlexGrow);
+    this.flexShrink = StyleableProperty.create("flex-shrink", Float.class,
+        1.0F, this::setFlexShrink);
+    this.flexBasis = StyleableProperty.create("flex-basis", Point.class,
+        Point.AUTO, value -> value.dispatch(this::setFlexBasis, this::setFlexBasisPercent,
+            this::setFlexBasisAuto));
+    this.flex = new StyleableProperty<>("flex", Float.class,
+        ValueAccessor.getterSetter(this::getFlex, this::setFlex, null));
+
+    this.aspectRatio = new StyleableProperty<>("aspect-ratio", Float.class,
+        ValueAccessor.getterSetter(this::getAspectRatio, this::setAspectRatio, null));
+
+    this.alignSelf = StyleableProperty.create("align-self", YogaAlign.class, YogaAlign.AUTO,
+        this::setAlignSelf);
+
+    this.width = StyleableProperty.create("width", Point.class, Point.AUTO,
+        value -> value.dispatch(this::setWidth, this::setWidthPercent, this::setWidthAuto));
+
+    this.height = StyleableProperty.create("height", Point.class, Point.AUTO,
+        value -> value.dispatch(this::setHeight, this::setHeightPercent, this::setHeightAuto));
+
+    this.minWidth = StyleableProperty.create("min-width", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setMinWidth, this::setMinWidthPercent, null));
+
+    this.minHeight = StyleableProperty.create("min-height", Point.class, Point.ZERO,
+        value -> value.dispatch(this::setMinHeight, this::setMinHeightPercent, null));
+
+    this.overflow = StyleableProperty.create("overflow", Overflow.class,
+        Overflow.VISIBLE, this::setOverflow);
   }
 
   public final YogaLayout setOverflow(Overflow overflow) {
@@ -288,9 +423,9 @@ public class YogaLayout implements Layout {
     return this;
   }
 
-  public final YogaLayout setPositionType(PositionType positionType) {
+  public final YogaLayout setPositionType(YogaPositionType positionType) {
     this.checkClosed();
-    Yoga.YGNodeStyleSetPositionType(this.node, positionType == PositionType.ABSOLUTE
+    Yoga.YGNodeStyleSetPositionType(this.node, positionType == YogaPositionType.ABSOLUTE
         ? Yoga.YGPositionTypeAbsolute
         : Yoga.YGPositionTypeRelative);
     return this;
@@ -314,10 +449,32 @@ public class YogaLayout implements Layout {
     return this;
   }
 
+  public final YogaLayout setFlexBasisPercent(float flexBasisPercent) {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetFlexBasisPercent(this.node, flexBasisPercent);
+    return this;
+  }
+
+  public final YogaLayout setFlexBasisAuto() {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetFlexBasisAuto(this.node);
+    return this;
+  }
+
+  public final float getFlex() {
+    this.checkClosed();
+    return Yoga.YGNodeStyleGetFlex(this.node);
+  }
+
   public final YogaLayout setFlex(float flex) {
     this.checkClosed();
     Yoga.YGNodeStyleSetFlex(this.node, flex);
     return this;
+  }
+
+  public final float getAspectRatio() {
+    this.checkClosed();
+    return Yoga.YGNodeStyleGetAspectRatio(this.node);
   }
 
   public final YogaLayout setAspectRatio(float aspectRatio) {
@@ -326,15 +483,9 @@ public class YogaLayout implements Layout {
     return this;
   }
 
-  public final YogaLayout setAlignSelf(Align align) {
+  public final YogaLayout setAlignSelf(YogaAlign align) {
     this.checkClosed();
     Yoga.YGNodeStyleSetAlignSelf(this.node, align.getYogaType());
-    return this;
-  }
-
-  public final YogaLayout setDisplay(Display display) {
-    this.checkClosed();
-    Yoga.nYGNodeStyleSetDisplay(this.node, display.getYogaType());
     return this;
   }
 
@@ -404,9 +555,21 @@ public class YogaLayout implements Layout {
     return this;
   }
 
+  public YogaLayout setMinWidthPercent(float minWidthPercent) {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetMinWidthPercent(this.node, minWidthPercent);
+    return this;
+  }
+
   public YogaLayout setMinHeight(float minHeight) {
     this.checkClosed();
     Yoga.YGNodeStyleSetMinHeight(this.node, minHeight);
+    return this;
+  }
+
+  public YogaLayout setMinHeightPercent(float minHeightPercent) {
+    this.checkClosed();
+    Yoga.YGNodeStyleSetMinHeightPercent(this.node, minHeightPercent);
     return this;
   }
 
@@ -521,6 +684,51 @@ public class YogaLayout implements Layout {
     if (this.closed) {
       throw new IllegalStateException("Layout has been closed.");
     }
+  }
+
+  @Override
+  public void gatherDispatchers(Consumer<PropertyDispatcher<?>> consumer) {
+    consumer.accept(this.borderWidth);
+    consumer.accept(this.inset);
+    consumer.accept(this.padding);
+    consumer.accept(this.margin);
+    this.gatherStyleProperties(consumer);
+  }
+
+  @Override
+  public void gatherListeners(Consumer<StateListener> consumer) {
+    this.gatherStyleProperties(consumer);
+  }
+
+  private void gatherStyleProperties(Consumer<? super StyleableProperty<?>> consumer) {
+    consumer.accept(this.overflow);
+    consumer.accept(this.borderTopWidth);
+    consumer.accept(this.borderRightWidth);
+    consumer.accept(this.borderBottomWidth);
+    consumer.accept(this.borderLeftWidth);
+    consumer.accept(this.top);
+    consumer.accept(this.right);
+    consumer.accept(this.bottom);
+    consumer.accept(this.left);
+    consumer.accept(this.paddingTop);
+    consumer.accept(this.paddingRight);
+    consumer.accept(this.paddingBottom);
+    consumer.accept(this.paddingLeft);
+    consumer.accept(this.marginTop);
+    consumer.accept(this.marginRight);
+    consumer.accept(this.marginBottom);
+    consumer.accept(this.marginLeft);
+    consumer.accept(this.position);
+    consumer.accept(this.flexGrow);
+    consumer.accept(this.flexShrink);
+    consumer.accept(this.flexBasis);
+    consumer.accept(this.flex);
+    consumer.accept(this.aspectRatio);
+    consumer.accept(this.alignSelf);
+    consumer.accept(this.width);
+    consumer.accept(this.height);
+    consumer.accept(this.minWidth);
+    consumer.accept(this.minHeight);
   }
 
   @Override

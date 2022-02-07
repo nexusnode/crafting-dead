@@ -19,8 +19,8 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -28,43 +28,38 @@ import net.minecraft.network.chat.Component;
 public class Tooltip {
 
   private final Component text;
-  private final ValueStyleProperty<Integer> opacityProperty =
-      ValueStyleProperty.create("alpha", Integer.class, 0);
-  private final ValueStyleProperty<Integer> textOpacityProperty =
-      ValueStyleProperty.create("text-alpha", Integer.class, 0);
+  private final ValueProperty<Integer> opacity =
+      StyleableProperty.create("alpha", Integer.class, 0);
+  private final ValueProperty<Integer> textOpacity =
+      StyleableProperty.create("text-alpha", Integer.class, 0);
 
   public Tooltip(Component text) {
     this.text = text;
   }
 
-  public void render(Font fontRenderer, PoseStack matrixStack, float x, float y) {
-    final float width = 10.0F + fontRenderer.width(this.text);
+  public void render(Font font, PoseStack poseStack, float x, float y) {
+    final float width = 10.0F + font.width(this.text);
     final float height = 14;
 
     RenderSystem.enableBlend();
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fill(matrixStack,
-        x, y, x + width, y + height, 0x222222 | (this.opacityProperty.get() << 24));
+    RenderUtil.fill(poseStack, x, y, x + width, y + height, 0x222222 | (this.opacity.get() << 24));
 
-    int shiftedOpacity = this.textOpacityProperty.get() << 24;
+    int shiftedOpacity = this.textOpacity.get() << 24;
     if ((shiftedOpacity & 0xFC000000) != 0) {
-      matrixStack.pushPose();
-      {
-        matrixStack.translate(0.0D, 0.0D, 400.0D);
-        fontRenderer.draw(matrixStack, this.text,
-            (x + (width - fontRenderer.width(this.text)) / 2.0F), y + 3.5F,
-            0xFFFFFF | shiftedOpacity);
-      }
-      matrixStack.popPose();
+      font.draw(poseStack, this.text,
+          (x + (width - font.width(this.text)) / 2.0F), y + 3.5F,
+          0xFFFFFF | shiftedOpacity);
     }
     RenderSystem.disableBlend();
+
   }
 
-  public ValueStyleProperty<Integer> getOpacityProperty() {
-    return this.opacityProperty;
+  public ValueProperty<Integer> getOpacityProperty() {
+    return this.opacity;
   }
 
-  public ValueStyleProperty<Integer> getTextOpacityProperty() {
-    return this.textOpacityProperty;
+  public ValueProperty<Integer> getTextOpacityProperty() {
+    return this.textOpacity;
   }
 }

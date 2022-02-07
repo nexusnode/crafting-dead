@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 
-public enum PositionType {
+public enum YogaPositionType {
   /**
    * The component is positioned relative to its normal position.
    */
@@ -32,7 +32,7 @@ public enum PositionType {
 
   private final int yogaType;
 
-  private PositionType(int yogaType) {
+  private YogaPositionType(int yogaType) {
     this.yogaType = yogaType;
   }
 

@@ -20,29 +20,34 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
+import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
+import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public final class ViewScreen extends Screen {
 
-  private final ParentView<?, Layout, ?> root;
+  private final ParentView root;
   private final List<? extends GuiEventListener> children;
 
-  private View<?, ?> lastHovered;
+  private StyleList styleList;
+
+  private View lastHovered;
 
   private boolean keepOpen;
 
-  public ViewScreen(Component title, Function<Layout, ParentView<?, Layout, ?>> rootFactory) {
+  public ViewScreen(Component title, ParentView root) {
     super(title);
     this.minecraft = Minecraft.getInstance();
     this.width = this.minecraft.getWindow().getGuiScaledWidth();
     this.height = this.minecraft.getWindow().getGuiScaledHeight();
-    this.root = rootFactory.apply(new Layout() {
+    this.root = root;
+    this.root.setLayout(new Layout() {
 
       @Override
       public float getWidth() {
@@ -55,7 +60,7 @@ public final class ViewScreen extends Screen {
       }
     });
     this.root.screen = this;
-    this.root.added();
+    // Don't use List::of as it does not permit null values.
     this.children = Collections.singletonList(this.root);
   }
 
@@ -70,37 +75,38 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void init() {
+    if (!this.root.isAdded()) {
+      this.root.added();
+    }
+
     this.root.layout();
+
     // Reset mouse pos
-    double scaledMouseX =
+    var scaledMouseX =
         this.minecraft.mouseHandler.xpos() / this.minecraft.getWindow().getGuiScale();
-    double scaledMouseY =
+    var scaledMouseY =
         this.minecraft.mouseHandler.ypos() / this.minecraft.getWindow().getGuiScale();
     this.mouseMoved(scaledMouseX, scaledMouseY);
-    this.root.setVisible(true);
-
   }
 
   @Override
   public void removed() {
-    this.root.setVisible(false);
     if (this.keepOpen) {
       this.keepOpen = false;
       return;
     }
+    this.root.removed();
     this.root.close();
   }
 
   private void updateHovered(double mouseX, double mouseY) {
-    // Update hovered views
-
-    boolean keepLastHovered = false;
-    View<?, ?> hovered = this.root.isMouseOver(mouseX, mouseY) ? this.root : null;
-    while (hovered instanceof ParentView) {
-      View<?, ?> nextHovered = ((ParentView<?, ?, ?>) hovered)
+    var keepLastHovered = false;
+    View hovered = this.root.isMouseOver(mouseX, mouseY) ? this.root : null;
+    while (hovered instanceof ParentView parent) {
+      var nextHovered = parent
           .getChildAt(mouseX, mouseY)
           .filter(listener -> listener instanceof View)
-          .map(listener -> (View<?, ?>) listener)
+          .map(listener -> (View) listener)
           .orElse(null);
 
       if (nextHovered == null) {
@@ -120,7 +126,8 @@ public final class ViewScreen extends Screen {
 
     if (!keepLastHovered) {
       while (this.lastHovered != null
-          && (!this.lastHovered.isMouseOver(mouseX, mouseY)
+          && (!this.lastHovered.isAdded()
+              || !this.lastHovered.isMouseOver(mouseX, mouseY)
               || (hovered != null && hovered.compareTo(this.lastHovered) > 0))) {
         this.lastHovered.mouseLeft(mouseX, mouseY);
         this.lastHovered = this.lastHovered.getParent();
@@ -138,7 +145,7 @@ public final class ViewScreen extends Screen {
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    boolean result = this.root.mouseScrolled(mouseX, mouseY, scrollDelta);
+    var result = this.root.mouseScrolled(mouseX, mouseY, scrollDelta);
     this.updateHovered(mouseX, mouseY);
     return result;
   }
@@ -156,5 +163,14 @@ public final class ViewScreen extends Screen {
   @Override
   public List<? extends GuiEventListener> children() {
     return this.children;
+  }
+
+  public void setStylesheets(List<ResourceLocation> stylesheets) {
+    this.styleList = StylesheetManager.getInstance().refreshStylesheets(stylesheets);
+    this.root.refreshStyle();
+  }
+
+  public StyleList getStyleList() {
+    return this.styleList;
   }
 }

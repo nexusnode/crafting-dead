@@ -35,7 +35,7 @@ public interface Transition<T> {
     };
   };
 
-  Runnable transition(ValueStyleProperty<T> property, T newValue);
+  Runnable transition(ValueProperty<T> property, T newValue);
 
   @SuppressWarnings("unchecked")
   static <T> Transition<T> instant() {
@@ -56,30 +56,27 @@ public interface Transition<T> {
   static <T> Transition<T> create(@Nullable Evaluator<T> evaluatorIn,
       Consumer<Animator.Builder> configurer) {
     return (property, newValue) -> {
-      AtomicBoolean stopped = new AtomicBoolean();
-      Animator.Builder builder = new Animator.Builder()
+      var stopped = new AtomicBoolean();
+      var builder = new Animator.Builder()
           .addTarget(new TimingTargetAdapter() {
 
             private final T startValue = property.get();
 
             private final Evaluator<T> evaluator = evaluatorIn == null
-                ? KnownEvaluators.getInstance().getEvaluatorFor(property.getValueType())
+                ? KnownEvaluators.getInstance().getEvaluatorFor(property.getType())
                 : evaluatorIn;
 
             @Override
             public void timingEvent(Animator source, double fraction) {
-              if (stopped.get())
-                System.out.println("test2");
               property.set(this.evaluator.evaluate(this.startValue, newValue, fraction));
             }
           });
       configurer.accept(builder);
-      Animator animator = builder.build();
+      var animator = builder.build();
       animator.start();
       return () -> {
         stopped.set(true);
         animator.stop();
-       
       };
     };
   }

@@ -19,37 +19,33 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Collection;
-import java.util.OptionalInt;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.Util;
 
 public class States {
 
-  private static final int NILL = -1;
+  private static final Map<String, State> states = new HashMap<>();
 
-  private static final Object2IntMap<String> states =
-      Util.make(new Object2IntOpenHashMap<>(), map -> map.defaultReturnValue(NILL));
-
-  public static final int ENABLED = register("enabled");
-  public static final int DISABLED = register("disabled");
-  public static final int HOVERED = register("hovered");
-  public static final int SELECTED = register("selected");
-  public static final int FOCUSED = register("focused");
+  public static final State ENABLED = register("enabled");
+  public static final State DISABLED = register("disabled");
+  public static final State HOVER = register("hover");
+  public static final State FOCUS = register("focus");
+  public static final State FOCUS_VISIBLE = register("focus-visible");
 
   private static int n = 0;
 
-  private static int register(String name) {
+  private static State register(String name) {
     var value = 1 << n++;
-    states.put(name, value);
-    return value;
+    var state = new State(name, value);
+    states.put(name, state);
+    return state;
   }
 
-  public static OptionalInt getValue(String name) {
-    var value = states.getInt(name);
-    return value == NILL ? OptionalInt.empty() : OptionalInt.of(value);
+  public static Optional<State> get(String name) {
+    return Optional.ofNullable(states.get(name));
   }
 
   public static int combine(int... states) {
@@ -71,8 +67,8 @@ public class States {
   public static IntSet split(int state) {
     var states = new IntOpenHashSet();
     States.states.values().forEach(s -> {
-      if ((state & s) == s) {
-        states.add(s);
+      if ((state & s.value()) == s.value()) {
+        states.add(s.value());
       }
     });
     return states;
