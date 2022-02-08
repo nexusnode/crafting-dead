@@ -47,9 +47,14 @@ public class Tooltip {
 
     int shiftedOpacity = this.textOpacity.get() << 24;
     if ((shiftedOpacity & 0xFC000000) != 0) {
-      font.draw(poseStack, this.text,
-          (x + (width - font.width(this.text)) / 2.0F), y + 3.5F,
-          0xFFFFFF | shiftedOpacity);
+      poseStack.pushPose();
+      {
+        poseStack.translate(0.0D, 0.0D, 400.0D);
+        font.draw(poseStack, this.text,
+            (x + (width - font.width(this.text)) / 2.0F), y + 3.5F,
+            0xFFFFFF | shiftedOpacity);
+      }
+      poseStack.popPose();
     }
     RenderSystem.disableBlend();
 

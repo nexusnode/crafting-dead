@@ -45,7 +45,6 @@ import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.Tooltip;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -87,9 +86,8 @@ public class MainMenuView extends ParentView {
         () -> this.contentContainer.replace(playView),
         new Properties<>()
             .id("play")
+            .styleClasses("grow-button")
             .tooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
-    playButton.getXScaleProperty().setTransition(Transition.linear(150L));
-    playButton.getYScaleProperty().setTransition(Transition.linear(150L));
     playButton.setBilinearFiltering(true);
     sideBar.addChild(playButton);
 
@@ -99,18 +97,17 @@ public class MainMenuView extends ParentView {
             new OptionsScreen(this.getScreen(), this.minecraft.options)),
         new Properties<>()
             .id("settings")
+            .styleClasses("grow-button")
             .tooltip(new Tooltip(new TranslatableComponent("menu.options"))));
-    settingsButton.getXScaleProperty().setTransition(Transition.linear(150L));
-    settingsButton.getYScaleProperty().setTransition(Transition.linear(150L));
     settingsButton.setBilinearFiltering(true);
     sideBar.addChild(settingsButton);
 
     var quitButton = Theme.createImageButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"),
         this.minecraft::stop,
-        new Properties<>().id("quit"));
-    quitButton.getXScaleProperty().setTransition(Transition.linear(150L));
-    quitButton.getYScaleProperty().setTransition(Transition.linear(150L));
+        new Properties<>()
+            .id("quit")
+            .styleClasses("grow-button"));
     quitButton.setBilinearFiltering(true);
     sideBar.addChild(quitButton);
 

@@ -2,6 +2,7 @@ package com.craftingdead.immerse.client.gui.view.style.shorthand;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
 import com.craftingdead.immerse.client.gui.view.style.adapter.StyleTranslatorRegistry;
@@ -12,15 +13,15 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   private final String name;
   private final StyleValidator<T> validator;
   private final ShorthandArgMapper argMapper;
-  private final PropertyDispatcher<T>[] properties;
+  private final PropertyDispatcher<T>[] dispatchers;
 
   @SafeVarargs
   public ShorthandDispatcher(String name, StyleValidator<T> validator, ShorthandArgMapper argMapper,
-      PropertyDispatcher<T>... properties) {
+      PropertyDispatcher<T>... dispatchers) {
     this.name = name;
     this.validator = validator;
     this.argMapper = argMapper;
-    this.properties = properties;
+    this.dispatchers = dispatchers;
   }
 
   @Override
@@ -39,7 +40,7 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
 
     for (int i = 0; i < values.size(); i++) {
       for (int childIndex : this.argMapper.map(i, values.size())) {
-        this.properties[childIndex].defineState(source, values.get(i), state);
+        this.dispatchers[childIndex].defineState(source, values.get(i), state);
       }
     }
 
@@ -52,6 +53,13 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   @Override
   public String getName() {
     return this.name;
+  }
+  
+  @Override
+  public void setTransition(Transition transition) {
+    for (var dispatcher : this.dispatchers) {
+      dispatcher.setTransition(transition);
+    }
   }
 
   @SafeVarargs

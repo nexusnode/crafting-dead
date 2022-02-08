@@ -16,11 +16,6 @@
     aspect-ratio: 1;
 }
 
-#play:hover, #settings:hover, #quit:hover {
-    color: #181818;
-    scale: 1.15;
-}
-
 #settings {
     margin: 5;
     width: 12;
@@ -123,8 +118,8 @@ PlayView > #title {
     width: 25;
     height: 30;
     padding-top: 12;
-    margin-left: 17;
-    scale: 1.5;
+    margin-left: 20;
+    scale: 2;
 }
 
 PlayView > DropdownView {

@@ -187,19 +187,35 @@ public class TextView extends View {
 
     poseStack.pushPose();
     {
-      poseStack.translate(this.getScaledContentX(),
-          Mth.ceil(this.getScaledContentY() + (this.centered
-              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D
-              : 0.0D)),
-          51.0D);
-      poseStack.scale(this.getXScale(), this.getYScale(), 1.0F);
+
+      final var xScale = this.getXScale();
+      final var yScale = this.getYScale();
+
+      // Ceil x and y pos because text renders weirdly with decimal values.
+      // Don't ceil x and y pos if they are being animated because it will look choppy.
+
+      var yTranslation = this.getScaledContentY() + (this.centered
+          ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D
+          : 0.0D);
+      if (!this.getYTranslationProperty().isBeingAnimated() && yScale == Mth.ceil(yScale)) {
+        yTranslation = Mth.ceil(yTranslation);
+      }
+
+      var xTranslation = this.getScaledContentX();
+      if (!this.getXTranslationProperty().isBeingAnimated() && xScale == Mth.ceil(xScale)) {
+        xTranslation = Mth.ceil(xTranslation);
+      }
+
+      poseStack.translate(xTranslation, yTranslation, 51.0D);
+
+      poseStack.scale(xScale, yScale, 1.0F);
       var bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
         var line = this.lines.get(i);
         poseStack.pushPose();
         {
           poseStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
-          float x = this.centered
+          var x = this.centered
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
           this.font.drawInBatch(line, x, 0.0F, color, this.shadow, poseStack.last().pose(),

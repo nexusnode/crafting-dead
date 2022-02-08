@@ -2,17 +2,18 @@ package com.craftingdead.immerse.client.gui.view.style.shorthand;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
+import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
 
 public class GenericShorthandProperty implements PropertyDispatcher<String> {
 
   private final String name;
-  private final PropertyDispatcher<?>[] properties;
+  private final PropertyDispatcher<?>[] dispatchers;
 
-  public GenericShorthandProperty(String name, PropertyDispatcher<?>... properties) {
+  public GenericShorthandProperty(String name, PropertyDispatcher<?>... dispatchers) {
     this.name = name;
-    this.properties = properties;
+    this.dispatchers = dispatchers;
   }
 
   @Override
@@ -22,7 +23,7 @@ public class GenericShorthandProperty implements PropertyDispatcher<String> {
 
     while (!current.isEmpty()) {
       var anySet = false;
-      for (var child : this.properties) {
+      for (var child : this.dispatchers) {
         if (alreadySet.contains(child)) {
           continue;
         }
@@ -52,5 +53,12 @@ public class GenericShorthandProperty implements PropertyDispatcher<String> {
   @Override
   public String getName() {
     return this.name;
+  }
+
+  @Override
+  public void setTransition(Transition transition) {
+    for (var dispatcher : this.dispatchers) {
+      dispatcher.setTransition(transition);
+    }
   }
 }

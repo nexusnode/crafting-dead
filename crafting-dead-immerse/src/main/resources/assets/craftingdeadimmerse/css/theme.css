@@ -18,6 +18,7 @@
     flex-grow: 1;
     justify-content: center;
     align-items: center;
+    transition: background-color 100ms;
 }
 
 .button > #label {
@@ -58,6 +59,22 @@
 
 .blue-button:disabled {
     background-color: rgba(7, 97, 176, 0.2);
+}
+
+.image-button {
+    transition: color 150ms;
+}
+
+.image-button:hover {
+    color: #181818;
+}
+
+.grow-button {
+    transition: scale 150ms;
+}
+
+.grow-button:hover {
+    scale: 1.15;
 }
 
 .item {

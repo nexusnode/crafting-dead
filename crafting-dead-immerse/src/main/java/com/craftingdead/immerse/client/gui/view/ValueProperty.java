@@ -33,7 +33,7 @@ public class ValueProperty<T> implements StateListener {
 
   private final Int2ObjectMap<T> stateValues = new Int2ObjectOpenHashMap<>();
 
-  private Transition<T> transition = Transition.instant();
+  private Transition transition = Transition.INSTANT;
 
   @Nullable
   private Runnable transitionStopListener;
@@ -56,7 +56,7 @@ public class ValueProperty<T> implements StateListener {
     return this.type;
   }
 
-  public void setTransition(Transition<T> transition) {
+  public void setTransition(Transition transition) {
     this.transition = transition;
   }
 
@@ -82,6 +82,10 @@ public class ValueProperty<T> implements StateListener {
 
   public void set(T value) {
     this.accessor.set(value);
+  }
+
+  public boolean isBeingAnimated() {
+    return this.overrideValue != null;
   }
 
   public void setOverrideValue(@Nullable T overrideValue) {

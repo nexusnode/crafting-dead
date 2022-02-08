@@ -30,7 +30,6 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
@@ -105,7 +104,6 @@ public class ConnectView extends ParentView {
       }
       this.minecraft.setScreen(this.lastScreen);
     }, true);
-    cancelButton.getBackgroundColorProperty().setTransition(Transition.linear(150L));
     dialog.addChild(cancelButton);
 
     this.minecraft.clearLevel();

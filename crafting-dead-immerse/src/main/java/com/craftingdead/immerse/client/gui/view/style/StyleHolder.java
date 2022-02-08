@@ -1,5 +1,6 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -77,10 +78,14 @@ public class StyleHolder {
 
     var rules = styleList.getRulesMatching(this);
 
+    var transitionBuilders = new ArrayList<TransitionBuilder>();
+
     this.resetToDefault();
     for (var rule : rules) {
       var source = new StyleSource(StyleSource.Type.AUTHOR, rule.selector().getSpecificity());
-      rule.properties().forEach(property -> {
+      TransitionBuilder transitionBuilder = null;
+      for (var property : rule.properties()) {
+
         var dispatcher = this.dispatchers.get(property.name());
         if (dispatcher != null) {
           var state = rule.selector().getPseudoClasses().stream()
@@ -89,8 +94,27 @@ public class StyleHolder {
               .reduce((a, b) -> a | b)
               .orElse(0);
           dispatcher.defineState(source, property.value(), state);
+          continue;
         }
-      });
+
+
+        if (TransitionBuilder.isTransitionProperty(property.name())) {
+          if (transitionBuilder == null) {
+            transitionBuilder = new TransitionBuilder();
+          }
+
+          transitionBuilder.tryParse(property.name(), property.value());
+        }
+      }
+
+      if (transitionBuilder != null) {
+        transitionBuilder.build();
+        transitionBuilders.add(transitionBuilder);
+      }
+    }
+
+    for (var transitionBuilder : transitionBuilders) {
+      transitionBuilder.apply(this.dispatchers);
     }
   }
 

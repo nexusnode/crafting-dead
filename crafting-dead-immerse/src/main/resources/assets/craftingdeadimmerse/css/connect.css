@@ -18,6 +18,7 @@ ConnectView > #dialog > #cancel-button {
     height: 20;
     margin-top: 50;
     background-color: rgba(255, 85, 85, 0.4);
+    transition: background-color 150ms;
 }
 
 ConnectView > #dialog > #cancel-button:hover:enabled {

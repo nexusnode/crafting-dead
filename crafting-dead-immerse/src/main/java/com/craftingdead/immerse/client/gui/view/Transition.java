@@ -20,64 +20,63 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Evaluator;
+import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.evaluators.KnownEvaluators;
 
-public interface Transition<T> {
+public interface Transition {
 
-  Transition<?> INSTANT = (property, newValue) -> {
-    property.set(newValue);
-    return () -> {
-    };
+  Transition INSTANT = new Transition() {
+
+    @Override
+    public <T> Runnable transition(ValueProperty<T> property, T newValue) {
+      property.set(newValue);
+      return () -> {
+      };
+    }
   };
 
-  Runnable transition(ValueProperty<T> property, T newValue);
+  <T> Runnable transition(ValueProperty<T> property, T newValue);
 
-  @SuppressWarnings("unchecked")
-  static <T> Transition<T> instant() {
-    return (Transition<T>) INSTANT;
+  static Transition linear(long durationMs) {
+    return linear(0L, durationMs);
   }
 
-  static <T> Transition<T> linear(long durationMs) {
-    return linear(0L, durationMs, null);
+  static Transition linear(long delayMs, long durationMs) {
+    return create(delayMs, durationMs, null);
   }
 
-  static <T> Transition<T> linear(long delayMs, long durationMs,
-      @Nullable Evaluator<T> evaluator) {
-    return create(evaluator, builder -> builder
-        .setStartDelay(delayMs, TimeUnit.MILLISECONDS)
-        .setDuration(durationMs, TimeUnit.MILLISECONDS));
-  }
+  static Transition create(long delayMs, long durationMs, @Nullable Interpolator interpolator) {
+    return new Transition() {
 
-  static <T> Transition<T> create(@Nullable Evaluator<T> evaluatorIn,
-      Consumer<Animator.Builder> configurer) {
-    return (property, newValue) -> {
-      var stopped = new AtomicBoolean();
-      var builder = new Animator.Builder()
-          .addTarget(new TimingTargetAdapter() {
+      @Override
+      public <T> Runnable transition(ValueProperty<T> property, T newValue) {
+        var stopped = new AtomicBoolean();
+        var animator = new Animator.Builder()
+            .setStartDelay(delayMs, TimeUnit.MILLISECONDS)
+            .setDuration(durationMs, TimeUnit.MILLISECONDS)
+            .setInterpolator(interpolator)
+            .addTarget(new TimingTargetAdapter() {
 
-            private final T startValue = property.get();
+              private final T startValue = property.get();
+              private final Evaluator<T> evaluator =
+                  KnownEvaluators.getInstance().getEvaluatorFor(property.getType());
 
-            private final Evaluator<T> evaluator = evaluatorIn == null
-                ? KnownEvaluators.getInstance().getEvaluatorFor(property.getType())
-                : evaluatorIn;
-
-            @Override
-            public void timingEvent(Animator source, double fraction) {
-              property.set(this.evaluator.evaluate(this.startValue, newValue, fraction));
-            }
-          });
-      configurer.accept(builder);
-      var animator = builder.build();
-      animator.start();
-      return () -> {
-        stopped.set(true);
-        animator.stop();
-      };
+              @Override
+              public void timingEvent(Animator source, double fraction) {
+                property.set(this.evaluator.evaluate(this.startValue, newValue, fraction));
+              }
+            })
+            .build();
+        animator.start();
+        return () -> {
+          stopped.set(true);
+          animator.stop();
+        };
+      }
     };
   }
 }

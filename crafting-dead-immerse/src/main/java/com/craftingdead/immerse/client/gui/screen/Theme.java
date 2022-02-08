@@ -30,7 +30,6 @@ import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.View.Properties;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
@@ -94,8 +93,6 @@ public class Theme {
         .setShadow(false)
         .setCentered(true));
 
-    view.getBackgroundColorProperty().setTransition(Transition.linear(100L));
-
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addListener(ActionEvent.class, event -> actionListener.run());
 
@@ -104,7 +101,7 @@ public class Theme {
 
   public static ImageView createImageButton(ResourceLocation image, Runnable actionListener,
       ParentView.Properties<?> properties) {
-    var view = new ImageView(properties) {
+    var view = new ImageView(properties.styleClasses("image-button")) {
       @Override
       protected boolean isFocusable() {
         return true;
@@ -114,7 +111,6 @@ public class Theme {
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());
     view.addListener(ActionEvent.class, event -> actionListener.run());
-    view.getColorProperty().setTransition(Transition.linear(150L));
     return view;
   }
 
