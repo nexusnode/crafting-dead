@@ -18,11 +18,9 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -60,10 +58,10 @@ import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
 import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.hat.Hat;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -94,10 +92,8 @@ import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.BellBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -167,6 +163,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
    */
   private final AtomicInteger shotCount = new AtomicInteger();
 
+  /**
+   * Immutable set of attachments.
+   */
   private Set<Attachment> attachments;
   private boolean attachmentsDirty;
 
@@ -223,7 +222,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     MinecraftForge.EVENT_BUS.post(event);
 
     this.setAmmoProvider(event.getAmmoProvider());
-    this.attachments = new HashSet<>(event.getAttachments());
+    this.attachments = Set.copyOf(event.getAttachments());
 
     this.dataManager.register(PAINT_STACK, ItemStack.EMPTY);
   }
@@ -277,7 +276,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
 
     if (sendUpdate) {
-      PacketTarget target = living.getLevel().isClientSide()
+      var target = living.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
@@ -330,7 +329,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
 
     if (!hitLiving.getEntity().isDeadOrDying()) {
-      Random random = new Random(pendingHit.getRandomSeed());
+      var random = player.getRandom();
+      random.setSeed(pendingHit.getRandomSeed());
       hitSnapshot
           .rayTrace(player.getLevel(),
               playerSnapshot,
@@ -346,8 +346,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   protected abstract long getFireDelayMs();
 
+  /*
+   * Warning: this is not called on the main thread.
+   */
   private void shoot(LivingExtension<?, ?> living) {
-    final Random random = new Random();
     long time = Util.getMillis();
 
     if (!this.isTriggerPressed()
@@ -384,7 +386,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       return;
     }
 
-    executor.execute(() -> this.processShot(living, random));
+    executor.execute(() -> this.processShot(living));
 
     if (side.isClient()) {
       this.getClient().handleShoot(living);
@@ -401,9 +403,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   protected abstract int getRoundsPerShot();
 
-  protected void processShot(LivingExtension<?, ?> living, Random random) {
-    Entity entity = living.getEntity();
-    Level level = living.getLevel();
+  protected void processShot(LivingExtension<?, ?> living) {
+    var entity = living.getEntity();
+    var level = living.getLevel();
+    var random = entity.getRandom();
 
     MinecraftForge.EVENT_BUS.post(new GunEvent.Shoot(this, this.itemStack, living));
 
@@ -478,27 +481,24 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   private void hitEntity(LivingExtension<?, ?> living, Entity hitEntity, Vec3 hitPos,
       boolean playSound) {
-    final LivingEntity entity = living.getEntity();
-    float damage = this.getDamage();
+    final var entity = living.getEntity();
+    var damage = this.getDamage();
 
-    float armorPenetration = Math.min((1.0F
+    var armorPenetration = Math.min((1.0F
         + (EnchantmentHelper.getItemEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
             this.itemStack) / 255.0F))
         * this.ammoProvider.getExpectedMagazine().getArmorPenetration(), 1.0F);
-    if (armorPenetration > 0 && hitEntity instanceof LivingEntity) {
-      LivingEntity livingEntityHit = (LivingEntity) hitEntity;
-      float reducedDamage = damage - CombatRules
-          .getDamageAfterAbsorb(damage, livingEntityHit.getArmorValue(),
-              (float) livingEntityHit
-                  .getAttribute(Attributes.ARMOR_TOUGHNESS)
-                  .getValue());
+    if (armorPenetration > 0 && hitEntity instanceof LivingEntity livingEntityHit) {
+      var reducedDamage =
+          damage - CombatRules.getDamageAfterAbsorb(damage, livingEntityHit.getArmorValue(),
+              (float) livingEntityHit.getAttribute(Attributes.ARMOR_TOUGHNESS).getValue());
       // Apply armor penetration by adding to the damage lost by armor absorption
       damage += reducedDamage * armorPenetration;
     }
 
     boolean headshot = false;
     if (hitEntity instanceof LivingEntity) {
-      LivingExtension<?, ?> hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
+      var hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
       headshot = (hitEntity instanceof Player || hitEntity instanceof Zombie
           || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
@@ -506,18 +506,22 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
           || hitEntity instanceof Villager || hitEntity instanceof Vindicator
           || hitEntity instanceof WanderingTrader) && hitPos.y >= chinHeight;
       if (headshot) {
-        damage *= HEADSHOT_MULTIPLIER * (1.0F - hitLiving.getItemHandler()
+        var damagePercentage = 1.0F - hitLiving.getItemHandler()
             .getStackInSlot(ModEquipmentSlot.HAT.getIndex())
             .getCapability(Hat.CAPABILITY)
             .map(Hat::getHeadshotReductionPercentage)
-            .orElse(0.0F));
+            .orElse(0.0F);
+        if (damagePercentage < 1.0F) {
+          damage *= damagePercentage;
+        } else {
+          damage *= HEADSHOT_MULTIPLIER;
+        }
       }
     }
 
     // Post gun hit entity event
-    GunEvent.HitEntity event =
+    var event =
         new GunEvent.HitEntity(this, itemStack, living, hitEntity, damage, hitPos, headshot);
-
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
@@ -528,47 +532,43 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     // Simulated client-side effects
     if (living.getLevel().isClientSide()) {
       this.getClient().handleHitEntityPost(living, hitEntity, hitPos, playSound, headshot);
-    } else {
-      // Resets the temporary invincibility before causing the damage, preventing
-      // previous damages from blocking the gun damage.
-      // Also, allows multiple bullets to hit the same target at the same time.
-      hitEntity.invulnerableTime = 0;
+      return;
+    }
 
-      ModDamageSource.causeDamageWithoutKnockback(hitEntity,
-          ModDamageSource.causeGunDamage(entity, this.itemStack, headshot), damage);
+    // Resets the temporary invincibility before causing the damage, preventing
+    // previous damages from blocking the gun damage.
+    // Also, allows multiple bullets to hit the same target at the same time.
+    hitEntity.invulnerableTime = 0;
 
-      checkCreateExplosion(this.itemStack, entity, hitPos);
+    ModDamageSource.causeDamageWithoutKnockback(hitEntity,
+        ModDamageSource.causeGunDamage(entity, this.itemStack, headshot), damage);
 
-      if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
-          this.itemStack) > 0) {
-        hitEntity.setSecondsOnFire(100);
-      }
+    checkCreateExplosion(this.itemStack, entity, hitPos);
 
-      if (hitEntity instanceof LivingEntity) {
-        final LivingEntity hitLivingEntity = (LivingEntity) hitEntity;
+    if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
+        this.itemStack) > 0) {
+      hitEntity.setSecondsOnFire(100);
+    }
 
-        // Alert client of hit (real hit as opposed to client prediction)
-        if (entity instanceof ServerPlayer) {
-          boolean dead = hitLivingEntity.isDeadOrDying();
-          NetworkChannel.PLAY.getSimpleChannel().send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
-              new HitMessage(hitPos, dead));
-        }
-      }
+    if (hitEntity instanceof LivingEntity hitLivingEntity
+        && entity instanceof ServerPlayer player) {
+      // Alert client of hit (real hit as opposed to client prediction)
+      NetworkChannel.PLAY.getSimpleChannel().send(
+          PacketDistributor.PLAYER.with(() -> player),
+          new HitMessage(hitPos, hitLivingEntity.isDeadOrDying()));
     }
   }
 
   private void hitBlock(LivingExtension<?, ?> living, BlockHitResult result,
       BlockState blockState, boolean playSound) {
-    final LivingEntity entity = living.getEntity();
-    Block block = blockState.getBlock();
-    Level level = entity.level;
-    BlockPos blockPos = result.getBlockPos();
+    final var entity = living.getEntity();
+    final var block = blockState.getBlock();
+    final var level = entity.getLevel();
+    final var blockPos = result.getBlockPos();
 
     // Post gun hit block event
-    GunEvent.HitBlock event =
+    var event =
         new GunEvent.HitBlock(this, itemStack, result, blockState, living, level);
-
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
@@ -576,31 +576,29 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     // Client-side effects
     if (level.isClientSide()) {
       this.getClient().handleHitBlock(living, result, blockState, playSound);
-    } else {
-      if (block instanceof BellBlock) {
-        ((BellBlock) block).onHit(level, blockState, result,
-            entity instanceof Player ? (Player) entity : null, playSound);
-      }
+      return;
+    }
 
-      if (block instanceof TntBlock) {
-        block.onCaughtFire(blockState, entity.level, blockPos, null,
-            entity instanceof LivingEntity ? (LivingEntity) entity : null);
-        entity.level.removeBlock(blockPos, false);
-      }
+    if (block instanceof BellBlock bell) {
+      bell.onHit(level, blockState, result, entity instanceof Player player ? player : null,
+          playSound);
+    }
 
-      checkCreateExplosion(this.itemStack, entity, result.getLocation());
+    if (block instanceof TntBlock tnt) {
+      tnt.onCaughtFire(blockState, level, blockPos, null, entity);
+      level.removeBlock(blockPos, false);
+    }
 
-      if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
-          this.itemStack) > 0) {
-        if (CampfireBlock.canLight(blockState)) {
-          level.setBlock(blockPos,
-              blockState.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
-        } else {
-          BlockPos faceBlockPos = blockPos.relative(result.getDirection());
-          if (BaseFireBlock.canBePlacedAt(level, faceBlockPos, entity.getDirection())) {
-            BlockState blockstate1 = BaseFireBlock.getState(level, faceBlockPos);
-            level.setBlock(faceBlockPos, blockstate1, 11);
-          }
+    checkCreateExplosion(this.itemStack, entity, result.getLocation());
+
+    if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS,
+        this.itemStack) > 0) {
+      if (CampfireBlock.canLight(blockState)) {
+        level.setBlockAndUpdate(blockPos, blockState.setValue(BlockStateProperties.LIT, true));
+      } else {
+        var directedPos = blockPos.relative(result.getDirection());
+        if (BaseFireBlock.canBePlacedAt(level, directedPos, entity.getDirection())) {
+          level.setBlockAndUpdate(directedPos, BaseFireBlock.getState(level, directedPos));
         }
       }
     }
@@ -608,12 +606,12 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   @Override
   public Set<Attachment> getAttachments() {
-    return Collections.unmodifiableSet(this.attachments);
+    return this.attachments;
   }
 
   @Override
   public void setAttachments(Set<Attachment> attachments) {
-    this.attachments = attachments;
+    this.attachments = Set.copyOf(attachments);
   }
 
   @Override
@@ -814,10 +812,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     int size = in.readVarInt();
     if (size > -1) {
-      this.attachments.clear();
+      var builder = ImmutableSet.<Attachment>builderWithExpectedSize(size);
       for (int i = 0; i < size; i++) {
-        this.attachments.add(in.readRegistryIdSafe(Attachment.class));
+        builder.add(in.readRegistryIdSafe(Attachment.class));
       }
+      this.attachments = builder.build();
     }
 
     if (in.readBoolean()) {
