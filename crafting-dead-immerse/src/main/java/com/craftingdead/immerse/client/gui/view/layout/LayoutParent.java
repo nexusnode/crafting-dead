@@ -18,13 +18,21 @@
 
 package com.craftingdead.immerse.client.gui.view.layout;
 
-public interface LayoutParent<L extends Layout> {
+import java.util.function.Consumer;
+import com.craftingdead.immerse.client.gui.view.StateListener;
+import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 
-  void addChild(L layout, int index);
+public interface LayoutParent {
 
-  void removeChild(L layout);
+  Layout addChild(int index);
+
+  void removeChild(Layout layout);
 
   void layout(float width, float height);
 
   void close();
+
+  default void gatherDispatchers(Consumer<PropertyDispatcher<?>> consumer) {}
+
+  default void gatherListeners(Consumer<StateListener> consumer) {}
 }

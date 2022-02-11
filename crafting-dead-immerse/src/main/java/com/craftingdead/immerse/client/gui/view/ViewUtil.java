@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,12 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import com.craftingdead.immerse.client.util.DownloadUtil;
-import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
-import com.google.common.base.Strings;
-import com.mojang.datafixers.util.Either;
 import net.minecraft.Util;
 import net.minecraftforge.common.ForgeHooks;
 
@@ -52,8 +47,8 @@ public class ViewUtil {
    * @param file - the {@link File} to read {@link View}s from
    * @return ourself
    */
-  public static <T extends ParentView<?, ?, YogaLayout>> T addAll(T parentView, File file) {
-    return addAll(parentView, file, c -> c.getLayout().setFlex(1.0F));
+  public static void addAll(ParentView parentView, File file) {
+    addAll(parentView, file, view -> view.setStyle("flex: 1;"));
   }
 
   /**
@@ -63,8 +58,7 @@ public class ViewUtil {
    * @param configurer - a {@link Consumer} used to configure {@link View}s before they're added
    * @return ourself
    */
-  public static <T extends ParentView<?, ?, YogaLayout>> T addAll(T parentView, File file,
-      Consumer<View<?, YogaLayout>> configurer) {
+  public static void addAll(ParentView parentView, File file, Consumer<View> configurer) {
     DocumentBuilder builder;
     CompletableFuture<Document> documentFuture;
     try {
@@ -82,33 +76,27 @@ public class ViewUtil {
       }, Util.backgroundExecutor());
     } catch (ParserConfigurationException e) {
       logger.warn("Failed to create document builder", e);
-      return parentView;
+      return;
     }
 
     documentFuture.thenAcceptAsync(
         document -> parseDocument(document, file, parentView, configurer), parentView.minecraft);
-
-    return parentView;
   }
 
-  private static <T extends ParentView<?, ?, YogaLayout>> void parseDocument(Document document,
-      File file, T parentView, Consumer<View<?, YogaLayout>> configurer) {
+  private static void parseDocument(Document document, File file, ParentView parentView,
+      Consumer<View> configurer) {
     NodeList nodes = document.getDocumentElement().getChildNodes();
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       switch (node.getNodeName()) {
         case "text":
-          final String text = node.getTextContent();
+          final var text = node.getTextContent();
 
-          boolean shadow = true;
-          float scale = 1.0F;
-          Node scaleNode = node.getAttributes().getNamedItem("scale");
+          var shadow = true;
+          String scale = null;
+          Node scaleNode = node.getAttributes().getNamedItem("style");
           if (scaleNode != null && scaleNode.getNodeValue() != null) {
-            try {
-              scale = Float.valueOf(scaleNode.getNodeValue());
-            } catch (NumberFormatException | NullPointerException e) {
-              logger.warn("Float expected for property 'scale' in {}", file.getAbsolutePath());
-            }
+            scale = "scale: " + scaleNode.getNodeValue() + ";";
           }
 
           Node shadowNode = node.getAttributes().getNamedItem("shadow");
@@ -121,25 +109,22 @@ public class ViewUtil {
           }
 
           if (text != null) {
-            final boolean finalShadow = shadow;
-            final float finalScale = scale;
-            parentView.minecraft.executeBlocking(() -> {
-              View<?, YogaLayout> view = new TextView<>(
-                  new YogaLayout().setWidthPercent(100.0F))
-                      .setText(ForgeHooks.newChatWithLinks(text))
-                      .setShadow(finalShadow);
-
-              view.getScaleProperty().setBaseValue(finalScale);
-
-              parentView.addChild(view);
-            });
+            var view = new TextView(new TextView.Properties<>())
+                .setText(ForgeHooks.newChatWithLinks(text))
+                .setShadow(shadow);
+            var style = "width: 100%;";
+            if (scale != null) {
+              style += scale;
+            }
+            view.setStyle(style);
+            parentView.addChild(view);
           }
           break;
         case "image":
-          final Either<Integer, Float> width;
-          final Either<Integer, Float> height;
+          final String width;
+          final String height;
           String url = null;
-          FitType fitType = FitType.FILL;
+          String fitType = null;
 
           Node urlNode = node.getAttributes().getNamedItem("url");
           if (urlNode != null && urlNode.getNodeValue() != null) {
@@ -151,24 +136,14 @@ public class ViewUtil {
 
           Node widthNode = node.getAttributes().getNamedItem("width");
           if (widthNode != null && widthNode.getNodeValue() != null) {
-            String widthString = widthNode.getNodeValue();
-            width = extractSize(widthString);
-            if (width == null) {
-              logger.warn("Invalid width '{}' for image in {}", widthString,
-                  file.getAbsolutePath());
-            }
+            width = widthNode.getNodeValue();
           } else {
             width = null;
           }
 
           Node heightNode = node.getAttributes().getNamedItem("height");
           if (heightNode != null && heightNode.getNodeValue() != null) {
-            String heightString = heightNode.getNodeValue();
-            height = extractSize(heightString);
-            if (height == null) {
-              logger.warn("Invalid height '{}' for image in {}", heightString,
-                  file.getAbsolutePath());
-            }
+            height = heightNode.getNodeValue();
           } else {
             height = null;
           }
@@ -181,21 +156,10 @@ public class ViewUtil {
 
           Node fitNode = node.getAttributes().getNamedItem("fit");
           if (fitNode != null && fitNode.getNodeValue() != null) {
-            try {
-              fitType = FitType.valueOf(fitNode.getNodeValue());
-            } catch (IllegalArgumentException e) {
-              logger.warn("Invalid fit type {} in {}", heightNode.getNodeValue(),
-                  file.getAbsolutePath());
-            }
+            fitType = fitNode.getNodeValue();
           }
-          YogaLayout layout = new YogaLayout();
-          if (width != null) {
-            width.ifLeft(layout::setWidth).ifRight(layout::setWidthPercent);
-          }
-          if (height != null) {
-            height.ifLeft(layout::setHeight).ifRight(layout::setHeightPercent);
-          }
-          ImageView<YogaLayout> view = new ImageView<>(layout).setFitType(fitType);
+          var view = new ImageView(new ImageView.Properties<>());
+          view.setStyle("width: %s;height: %s;object-fit: %s;".formatted(width, height, fitType));
           parentView.addChild(view);
           DownloadUtil.downloadImageAsTexture(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {
@@ -212,30 +176,6 @@ public class ViewUtil {
 
     if (parentView.isAdded()) {
       parentView.layout();
-    }
-  }
-
-  @Nullable
-  private static Either<Integer, Float> extractSize(String size) {
-    if (Strings.isNullOrEmpty(size)) {
-      return null;
-    }
-    if (size.contains("%")) {
-      String pctString = size.split("%")[0];
-      try {
-        return Either.right(Float.valueOf(pctString));
-      } catch (NumberFormatException e) {
-        return null;
-      }
-    } else if (size.contains("px")) {
-      String pxString = size.split("px")[0];
-      try {
-        return Either.left(Integer.valueOf(pxString));
-      } catch (NumberFormatException e) {
-        return null;
-      }
-    } else {
-      return null;
     }
   }
 }

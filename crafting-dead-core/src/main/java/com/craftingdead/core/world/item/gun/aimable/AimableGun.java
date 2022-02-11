@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.item.gun.aimable;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.TypedGun;
@@ -64,8 +63,8 @@ public final class AimableGun extends TypedGun<AimableGunItem> implements Scope 
   }
 
   @Override
-  protected void processShot(LivingExtension<?, ?> living, Random random) {
-    super.processShot(living, random);
+  protected void processShot(LivingExtension<?, ?> living) {
+    super.processShot(living);
     if (this.isPerformingSecondaryAction() && this.getType().hasBoltAction()) {
       this.setPerformingSecondaryAction(living, false, false);
       this.waitingForBoltAction = true;

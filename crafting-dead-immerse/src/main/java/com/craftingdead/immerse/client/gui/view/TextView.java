@@ -38,12 +38,12 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
-public class TextView<L extends Layout> extends View<TextView<L>, L> {
+public class TextView extends View {
 
   private static final Component ELLIPSIS = new TextComponent("...");
 
-  private final ValueStyleProperty<Color> colorProperty =
-      Util.make(ValueStyleProperty.create("color", Color.class, Color.WHITE),
+  private final StyleableProperty<Color> colorProperty =
+      Util.make(StyleableProperty.create("color", Color.class, Color.WHITE),
           this::registerValueProperty);
 
   private Component text = TextComponent.EMPTY;
@@ -54,55 +54,61 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
 
   private List<FormattedCharSequence> lines = new ArrayList<>();
 
-  public TextView(L layout) {
-    super(layout);
+  public TextView(Properties<?> properties) {
+    super(properties);
     this.font = this.minecraft.font;
     this.shadow = true;
     this.centered = false;
-
-    this.layout.setMeasureFunction(this::measure);
   }
 
-  public ValueStyleProperty<Color> getColorProperty() {
+  @Override
+  protected void setLayout(@Nullable Layout layout) {
+    super.setLayout(layout);
+    if (layout != null) {
+      layout.setMeasureFunction(this::measure);
+    }
+  }
+
+  public StyleableProperty<Color> getColorProperty() {
     return this.colorProperty;
   }
 
-  public TextView<L> setWrap(boolean wrap) {
+  public TextView setWrap(boolean wrap) {
     this.wrap = wrap;
     if (this.isAdded()) {
-      this.layout.markDirty();
+      this.getLayout().markDirty();
       this.parent.layout();
     }
     return this;
   }
 
-  public TextView<L> setFontRenderer(Font fontRenderer) {
+  public TextView setFontRenderer(Font fontRenderer) {
     this.font = fontRenderer;
     if (this.isAdded()) {
-      this.layout.markDirty();
+      this.getLayout().markDirty();
       this.parent.layout();
     }
     return this;
   }
 
-  public TextView<L> setShadow(boolean shadow) {
+  public TextView setShadow(boolean shadow) {
     this.shadow = shadow;
     return this;
   }
 
-  public TextView<L> setCentered(boolean centered) {
+  public TextView setCentered(boolean centered) {
     this.centered = centered;
     return this;
   }
 
-  public TextView<L> setText(@Nullable String text) {
+  public TextView setText(@Nullable String text) {
     return this.setText(Component.nullToEmpty(text));
   }
 
-  public TextView<L> setText(Component text) {
+  public TextView setText(Component text) {
     this.text = text;
     if (this.isAdded()) {
-      this.layout.markDirty();
+      this.getLayout().markDirty();
       this.parent.layout();
     }
     return this;
@@ -179,22 +185,37 @@ public class TextView<L extends Layout> extends View<TextView<L>, L> {
         | ((color4i[1] & 0xFF) << 8)
         | ((color4i[2] & 0xFF) << 0);
 
-
     poseStack.pushPose();
     {
-      poseStack.translate(this.getScaledContentX(),
-          this.getScaledContentY() + (this.centered
-              ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D + 0.5D
-              : 0.0D),
-          51.0D);
-      poseStack.scale(this.getXScale(), this.getYScale(), 1.0F);
+
+      final var xScale = this.getXScale();
+      final var yScale = this.getYScale();
+
+      // Ceil x and y pos because text renders weirdly with decimal values.
+      // Don't ceil x and y pos if they are being animated because it will look choppy.
+
+      var yTranslation = this.getScaledContentY() + (this.centered
+          ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D
+          : 0.0D);
+      if (!this.getYTranslationProperty().isBeingAnimated() && yScale == Mth.ceil(yScale)) {
+        yTranslation = Mth.ceil(yTranslation);
+      }
+
+      var xTranslation = this.getScaledContentX();
+      if (!this.getXTranslationProperty().isBeingAnimated() && xScale == Mth.ceil(xScale)) {
+        xTranslation = Mth.ceil(xTranslation);
+      }
+
+      poseStack.translate(xTranslation, yTranslation, 51.0D);
+
+      poseStack.scale(xScale, yScale, 1.0F);
       var bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
       for (int i = 0; i < this.lines.size(); i++) {
         var line = this.lines.get(i);
         poseStack.pushPose();
         {
           poseStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
-          float x = this.centered
+          var x = this.centered
               ? (this.getContentWidth() - this.font.width(line)) / 2.0F
               : 0;
           this.font.drawInBatch(line, x, 0.0F, color, this.shadow, poseStack.last().pose(),

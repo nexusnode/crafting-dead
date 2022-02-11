@@ -68,17 +68,18 @@ public class ServerPinger {
   private ServerPinger() {}
 
   public void ping(ServerAddress serveraddress, Consumer<PingData> callback) {
-    Optional<InetSocketAddress> optional = ServerNameResolver.DEFAULT.resolveAddress(serveraddress)
-        .map(ResolvedServerAddress::asInetSocketAddress);
-    var pingData = new PingData();
-
-    if (!optional.isPresent()) {
-      pingFailed(serveraddress, ConnectScreen.UNKNOWN_HOST_MESSAGE, pingData);
-      return;
-    }
-    final var inetsocketaddress = optional.get();
-
     executor.execute(() -> {
+      Optional<InetSocketAddress> optional =
+          ServerNameResolver.DEFAULT.resolveAddress(serveraddress)
+              .map(ResolvedServerAddress::asInetSocketAddress);
+      var pingData = new PingData();
+
+      if (!optional.isPresent()) {
+        pingFailed(serveraddress, ConnectScreen.UNKNOWN_HOST_MESSAGE, pingData);
+        return;
+      }
+      final var inetsocketaddress = optional.get();
+
       Connection connection;
       try {
         connection = Connection.connectToServer(inetsocketaddress, false);

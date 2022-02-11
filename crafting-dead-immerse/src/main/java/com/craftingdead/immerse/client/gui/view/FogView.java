@@ -19,7 +19,6 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -28,15 +27,15 @@ import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-public class FogView<L extends Layout> extends View<FogView<L>, L> {
+public class FogView extends View {
 
   private static final ResourceLocation SMOKE_TEXTURE =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/smoke.png");
 
   private static long fogStartTime = Util.getMillis();
 
-  public FogView(L layout) {
-    super(layout);
+  public FogView(Properties<?> properties) {
+    super(properties);
   }
 
   @Override
@@ -51,7 +50,6 @@ public class FogView<L extends Layout> extends View<FogView<L>, L> {
     if (pct == 1.0F) {
       fogStartTime = Util.getMillis();
     }
-
 
     poseStack.pushPose();
     {

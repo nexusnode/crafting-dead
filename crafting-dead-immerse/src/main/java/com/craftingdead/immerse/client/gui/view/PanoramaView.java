@@ -19,20 +19,19 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Objects;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public class PanoramaView<L extends Layout> extends View<PanoramaView<L>, L> {
+public class PanoramaView extends View {
 
   private final PanoramaRenderer panorama;
 
   private final ResourceLocation panoramaTexture;
 
-  public PanoramaView(L layout, ResourceLocation panoramaTexture) {
-    super(layout);
+  public PanoramaView(Properties<?> properties, ResourceLocation panoramaTexture) {
+    super(properties);
     Objects.requireNonNull(panoramaTexture, "Panorama texture cannot be null");
     this.panoramaTexture = panoramaTexture;
     this.panorama = new PanoramaRenderer(new CubeMap(this.panoramaTexture));

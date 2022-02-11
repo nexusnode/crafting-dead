@@ -26,58 +26,82 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
+import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
+import com.craftingdead.immerse.client.gui.view.style.StyleParent;
 import com.craftingdead.immerse.util.ThreadSafe;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
-public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C extends Layout>
-    extends View<SELF, L> implements ContainerEventHandler {
+public class ParentView extends View implements ContainerEventHandler, StyleParent {
 
-  private final List<View<?, C>> children = new ArrayList<>();
+  private final List<View> children = new ArrayList<>();
   // Bottom to top order
-  @SuppressWarnings("unchecked")
-  private View<?, C>[] sortedChildren = new View[0];
+  private View[] sortedChildren = new View[0];
 
-  private final Deque<Pair<View<?, C>, Runnable>> pendingRemoval = new ArrayDeque<>();
+  private final Deque<Pair<View, Runnable>> pendingRemoval = new ArrayDeque<>();
 
-  private final LayoutParent<C> layoutParent;
+  private LayoutParent layoutParent;
 
   @Nullable
   private GuiEventListener focusedListener;
   private boolean dragging;
 
-  public ParentView(L layout, LayoutParent<C> layoutParent) {
-    super(layout);
-    this.layoutParent = layoutParent;
+  public ParentView(Properties<?> properties) {
+    super(properties);
+    this.registerValueProperty(
+        StyleableProperty.create("display", Display.class, Display.FLEX, this::setDisplay));
   }
 
-  public final List<? extends View<?, C>> getChildViews() {
+  private void setDisplay(Display display) {
+    if (this.layoutParent != null) {
+      this.layoutParent.gatherDispatchers(this.getStyle()::removeDispatcher);
+      this.layoutParent.gatherListeners(this.stateManager::addListener);
+      this.children.forEach(this::clearLayout);
+      this.layoutParent.close();
+    }
+    this.layoutParent = display.createLayoutParent();
+    this.layoutParent.gatherDispatchers(this.getStyle()::registerDispatcher);
+    this.layoutParent.gatherListeners(this.stateManager::removeListener);
+    this.children.forEach(this::setupLayout);
+  }
+
+  public final List<? extends View> getChildViews() {
     return this.children;
   }
 
-  public final LayoutParent<C> getLayoutParent() {
+  public final LayoutParent getLayoutParent() {
     return this.layoutParent;
   }
 
-  @Override
-  public SELF setVisible(boolean visible) {
-    super.setVisible(visible);
-    this.children.forEach(child -> child.setVisible(visible));
-    return this.self();
+  @ThreadSafe
+  public final void replace(View view) {
+    if (!this.minecraft.isSameThread()) {
+      this.minecraft.submit(() -> this.replace(view)).join();
+      return;
+    }
+
+    if (view.isAdded()) {
+      return;
+    }
+
+    this.queueAllForRemoval();
+    this.addChild(view);
+    if (this.isAdded()) {
+      this.layout();
+    }
   }
 
   @ThreadSafe
-  @SuppressWarnings("unchecked")
-  public final SELF addChild(View<?, C> view) {
+  public final void addChild(View view) {
     if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(() -> this.addChild(view)).join();
+      this.minecraft.submit(() -> this.addChild(view)).join();
+      return;
     }
 
     if (view.parent != null) {
-      return this.self();
+      return;
     }
 
     this.updatePendingRemoval();
@@ -86,14 +110,37 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
     this.children.add(view);
     this.sortedChildren = this.children.toArray(new View[0]);
     this.sortChildren();
-
-    this.layoutParent.addChild(view.getLayout(), view.index);
+    view.getStyle().setParent(this);
     view.parent = this;
-    view.setVisible(this.visible);
-    view.layout();
-    view.added();
 
-    return this.self();
+    if (this.layoutParent != null) {
+      this.setupLayout(view);
+    }
+
+    if (this.isAdded()) {
+      view.added();
+    }
+  }
+
+  private void setupLayout(View view) {
+    view.setLayout(this.layoutParent.addChild(view.index));
+  }
+
+  private void clearLayout(View view) {
+    this.layoutParent.removeChild(view.getLayout());
+    view.setLayout(null);
+  }
+
+  @Override
+  protected void added() {
+    super.added();
+    this.children.forEach(View::added);
+  }
+
+  @Override
+  protected void removed() {
+    super.removed();
+    this.children.forEach(View::removed);
   }
 
   /**
@@ -104,15 +151,15 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @return ourself
    */
   @ThreadSafe
-  public final SELF removeChild(View<?, C> view) {
+  public final void removeChild(View view) {
     if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(() -> this.removeChild(view)).join();
+      this.minecraft.submit(() -> this.removeChild(view)).join();
+      return;
     }
     this.assertChildPresent(view);
     this.removed(view);
     this.children.remove(view);
     this.indexAndSortChildren();
-    return this.self();
   }
 
   /**
@@ -121,15 +168,14 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @return ourself
    */
   @ThreadSafe
-  @SuppressWarnings("unchecked")
-  public final SELF clearChildren() {
+  public final void clearChildren() {
     if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(this::clearChildren).join();
+      this.minecraft.submit(this::clearChildren).join();
+      return;
     }
     this.children.forEach(this::removed);
     this.children.clear();
     this.sortedChildren = new View[0];
-    return this.self();
   }
 
   /**
@@ -138,8 +184,8 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @param view - child to remove
    */
   @ThreadSafe
-  public final SELF queueChildForRemoval(View<?, C> view) {
-    return this.queueChildForRemoval(view, null);
+  public final void queueChildForRemoval(View view) {
+    this.queueChildForRemoval(view, null);
   }
 
   /**
@@ -151,9 +197,10 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @param callback - executed upon removal
    */
   @ThreadSafe
-  public final SELF queueChildForRemoval(View<?, C> view, Runnable callback) {
+  public final void queueChildForRemoval(View view, Runnable callback) {
     if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(() -> this.queueChildForRemoval(view, callback)).join();
+      this.minecraft.submit(() -> this.queueChildForRemoval(view, callback)).join();
+      return;
     }
     this.assertChildPresent(view);
     view.queueRemoval(new Runnable() {
@@ -171,7 +218,6 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
         }
       }
     });
-    return this.self();
   }
 
   /**
@@ -182,12 +228,12 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * @return ourself
    */
   @ThreadSafe
-  public final SELF queueAllForRemoval() {
+  public final void queueAllForRemoval() {
     if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(this::queueAllForRemoval).join();
+      this.minecraft.submit(this::queueAllForRemoval).join();
+      return;
     }
     this.children.forEach(this::queueChildForRemoval);
-    return this.self();
   }
 
   /**
@@ -196,20 +242,23 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
    * 
    * @param view - child to remove
    */
-  private void removed(View<?, C> view) {
+  private void removed(View view) {
     view.removed();
+    if (this.layoutParent != null) {
+      this.clearLayout(view);
+    }
+    view.getStyle().setParent(null);
     view.parent = null;
-    this.layoutParent.removeChild(view.getLayout());
+    view.getStyle().setStyleSupplier(null);
     view.pendingRemoval = false;
   }
 
-  private final void assertChildPresent(View<?, C> view) {
+  private final void assertChildPresent(View view) {
     if (this.children.size() <= view.index || this.children.get(view.index) != view) {
       throw new IllegalArgumentException("View not added");
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void indexAndSortChildren() {
     for (int i = 0; i < this.children.size(); i++) {
       this.children.get(i).index = i;
@@ -222,10 +271,10 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   private void updatePendingRemoval() {
     if (!this.pendingRemoval.isEmpty()) {
       this.pendingRemoval.forEach(pair -> {
-        View<?, C> view = pair.getLeft();
+        var view = pair.getLeft();
         this.removed(view);
         this.children.remove(view);
-        Runnable callback = pair.getRight();
+        var callback = pair.getRight();
         if (callback != null) {
           callback.run();
         }
@@ -233,7 +282,9 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
       this.pendingRemoval.clear();
 
       this.indexAndSortChildren();
-      this.layout();
+      if (this.isAdded()) {
+        this.layout();
+      }
     }
   }
 
@@ -241,7 +292,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   public float computeFullHeight() {
     float minY = 0.0F;
     float maxY = 0.0F;
-    for (View<?, ?> child : this.children) {
+    for (var child : this.children) {
       float y = child.getY() - this.getScaledContentY();
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y + child.getHeight());
@@ -281,7 +332,7 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    for (View<?, ?> view : this.sortedChildren) {
+    for (var view : this.sortedChildren) {
       if (!view.pendingRemoval) {
         view.render(matrixStack, mouseX, mouseY, partialTicks);
       }
@@ -398,5 +449,21 @@ public class ParentView<SELF extends ParentView<SELF, L, C>, L extends Layout, C
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     this.setDragging(false);
     return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
+  }
+
+  @Override
+  public List<StyleHolder> getChildStyles() {
+    return this.children.stream().map(View::getStyle).toList();
+  }
+
+  @Override
+  public int getChildCount() {
+    return this.children.size();
+  }
+
+  @Override
+  public void refreshStyle() {
+    super.refreshStyle();
+    this.children.forEach(View::refreshStyle);
   }
 }

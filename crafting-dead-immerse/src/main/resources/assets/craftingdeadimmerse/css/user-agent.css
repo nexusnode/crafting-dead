@@ -1,0 +1,21 @@
+*:focus-visible {
+    outline-width: 3;
+    outline-color: rgb(170, 220, 240);
+}
+
+TabsView {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+TabsView > * {
+    width: 60;
+    padding-top: 5.5;
+    padding-bottom: 5.5
+}
+
+FogView {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}

@@ -19,101 +19,63 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Iterator;
-import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.screen.ConnectView;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 
-class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> {
+class ServerItemView extends ParentView {
 
   private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
 
   private final ServerEntry serverEntry;
 
-  private final TextView<YogaLayout> motdComponent;
-  private final TextView<YogaLayout> pingComponent;
-  private final TextView<YogaLayout> playersAmountComponent;
+  private final TextView motdComponent;
+  private final TextView pingComponent;
+  private final TextView playersAmountComponent;
 
   private long lastAnimationUpdateMs;
 
   ServerItemView(ServerEntry serverEntry) {
-    super(
-        new YogaLayout()
-            .setWidthPercent(90)
-            .setTopMargin(3F)
-            .setLeftMargin(7F)
-            .setRightMargin(7F)
-            .setLeftPadding(10F)
-            .setRightPadding(20F)
-            .setHeight(22F)
-            .setMaxWidth(520F),
-        new YogaLayoutParent()
-            .setFlexDirection(FlexDirection.ROW)
-            .setAlignItems(Align.CENTER));
+    super(new Properties<>().styleClasses("item").doubleClick(true));
     this.serverEntry = serverEntry;
 
-    this.getOutlineWidthProperty()
-        .defineState(1.0F, States.SELECTED)
-        .defineState(1.0F, States.HOVERED);
-    this.getOutlineColorProperty()
-        .defineState(Color.WHITE, States.SELECTED)
-        .defineState(Color.GRAY, States.HOVERED);
+    this.motdComponent = new TextView(new Properties<>().id("motd"))
+        .setText("...")
+        .setShadow(false)
+        .setCentered(true)
+        .setWrap(false);
 
-    this.motdComponent = new TextView<>(new YogaLayout()
-        .setMinHeight(8)
-        .setFlex(2)
-        .setWidthPercent(100)
-        .setHeight(8))
-            .setText("...")
-            .setShadow(false)
-            .setCentered(true)
-            .setWrap(false);
+    this.pingComponent = new TextView(new Properties<>().id("ping"))
+        .setText("...")
+        .setShadow(false)
+        .setCentered(true);
+    this.playersAmountComponent = new TextView(new Properties<>().id("players"))
+        .setText("...")
+        .setShadow(false)
+        .setCentered(true);
 
-    this.pingComponent = new TextView<>(new YogaLayout()
-        .setWidth(60F)
-        .setLeftMargin(10F)
-        .setHeight(8))
-            .setText("...")
-            .setShadow(false)
-            .setCentered(true);
-    this.playersAmountComponent = new TextView<>(new YogaLayout()
-        .setWidth(60F)
-        .setLeftMargin(10F)
-        .setHeight(8))
-            .setText("...")
-            .setShadow(false)
-            .setCentered(true);
-
-    this.getBackgroundColorProperty().setBaseValue(new Color(0X882C2C2C));
-
-    this
-        .setFocusable(true)
-        .setDoubleClick(true)
-        .addListener(ActionEvent.class, (c, e) -> this.connect())
-        .addChild(this.motdComponent)
-        .addChild(new TextView<>(
-            new YogaLayout().setOverflow(Overflow.HIDDEN).setFlex(1).setHeight(8))
-                .setText(new TextComponent(this.serverEntry.getMap().orElse("-"))
-                    .withStyle(ChatFormatting.GRAY))
-                .setShadow(false)
-                .setCentered(true))
-        .addChild(this.pingComponent)
-        .addChild(this.playersAmountComponent);
+    this.addListener(ActionEvent.class, event -> this.connect());
+    this.addChild(this.motdComponent);
+    this.addChild(new TextView(new Properties<>().id("map"))
+        .setText(new TextComponent(this.serverEntry.getMap().orElse("-"))
+            .withStyle(ChatFormatting.GRAY))
+        .setShadow(false)
+        .setCentered(true));
+    this.addChild(this.pingComponent);
+    this.addChild(this.playersAmountComponent);
 
     this.ping();
+  }
+
+  @Override
+  protected boolean isFocusable() {
+    return true;
   }
 
   @Override
@@ -167,22 +129,5 @@ class ServerItemView extends ParentView<ServerItemView, YogaLayout, YogaLayout> 
     }
     this.playersAmountComponent.setText(pingData.getPlayersAmount());
     this.lastAnimationUpdateMs = -1L;
-  }
-
-  @Override
-  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
-      this.toggleState(States.SELECTED);
-      this.updateProperties(true);
-      return true;
-    }
-    return super.keyPressed(keyCode, scanCode, modifiers);
-  }
-
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean consume = super.mouseClicked(mouseX, mouseY, button);
-    this.setSelected(this.isHovered());
-    return consume;
   }
 }

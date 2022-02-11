@@ -18,7 +18,6 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -27,12 +26,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 
-public class AvatarView<L extends Layout> extends View<AvatarView<L>, L> {
+public class AvatarView extends View {
 
   private ResourceLocation textureLocation;
 
-  public AvatarView(L layout, GameProfile gameProfile) {
-    super(layout);
+  public AvatarView(Properties<?> properties, GameProfile gameProfile) {
+    super(properties);
     this.textureLocation = DefaultPlayerSkin.getDefaultSkin(gameProfile.getId());
     this.minecraft.getSkinManager().registerSkins(gameProfile,
         (type, textureLocation, texture) -> {

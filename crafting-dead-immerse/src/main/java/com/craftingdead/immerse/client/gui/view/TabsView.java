@@ -18,79 +18,42 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexWrap;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.GameRenderer;
 
-public class TabsView<L extends Layout>
-    extends ParentView<TabsView<L>, L, YogaLayout> {
+public class TabsView extends ParentView {
 
-  private final List<TabView> tabList = new ArrayList<>();
   private TabView selectedTab = null;
-  private float tabWidth = 60f;
-  private float tabHeight = 20f;
-  private boolean init = false;
 
-  public TabsView(L layout) {
-    super(layout, new YogaLayoutParent()
-        .setFlexDirection(FlexDirection.ROW)
-        .setFlexWrap(FlexWrap.WRAP));
+  public TabsView(Properties<?> properties) {
+    super(properties);
   }
 
-  /**
-   * If called after adding this component as a child,
-   */
-  public TabsView<L> addTab(TabView tab) {
-    this.tabList.add(tab);
+  public TabsView addTab(TabView tab) {
+    this.addChild(tab);
+    tab.addListener(ActionEvent.class, event -> this.changeTab(tab));
     return this;
   }
 
   @Override
-  public void layout() {
-    this.init();
-    super.layout();
+  public boolean changeFocus(boolean forward) {
+    return super.changeFocus(forward);
   }
 
-  public void init() {
-    if (this.init) {
-      return;
-    }
-    this.init = true;
-    TabView newSelectedTab = null;
-    for (TabView tab : this.tabList) {
-      tab.getLayout().setWidth(this.tabWidth);
-      float y = (this.tabHeight - this.minecraft.font.lineHeight) / 2F;
-      tab.getLayout().setTopPadding(y);
-      tab.getLayout().setBottomPadding(y);
-      this.addChild(tab);
-      if (tab.isSelected() && this.selectedTab == null) {
-        newSelectedTab = tab;
-      } else if (tab.isSelected()) {
-        tab.setSelected(false);
-      }
-      tab.layout();
-      tab.addListener(ActionEvent.class, (c, e) -> this.changeTab((TabView) c));
-    }
-
-    if (newSelectedTab != null) {
-      this.changeTab(newSelectedTab);
-    } else if (this.tabList.size() > 0) {
-      this.changeTab(this.tabList.get(0));
+  @Override
+  protected void added() {
+    super.added();
+    if (this.getChildViews().size() > 0) {
+      this.changeTab((TabView) this.getChildViews().get(0));
     }
   }
 
   private void changeTab(TabView newTab) {
-    TabView previousTab = this.selectedTab;
+    var previousTab = this.selectedTab;
     this.selectedTab = newTab;
     if (previousTab != newTab) {
       if (previousTab != null) {
@@ -100,7 +63,7 @@ public class TabsView<L extends Layout>
     }
   }
 
-  public static class TabView extends TextView<YogaLayout> {
+  public static class TabView extends TextView {
 
     public static final Color DEFAULT_UNDERSCORE_COLOR = Color.WHITE;
     public static final float DEFAULT_UNDERSCORE_HEIGHT = 2.5F;
@@ -117,8 +80,10 @@ public class TabsView<L extends Layout>
     @Nullable
     private Runnable selectedListener;
 
+    private boolean selected;
+
     public TabView() {
-      super(new YogaLayout());
+      super(new Properties<>());
       this.underscoreColor = DEFAULT_UNDERSCORE_COLOR;
       this.underscoreHeight = DEFAULT_UNDERSCORE_HEIGHT;
       this.underscoreYOffset = DEFAULT_UNDERSCORE_OFFSET;
@@ -132,7 +97,7 @@ public class TabsView<L extends Layout>
       super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
       RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      if (this.isSelected()) {
+      if (this.selected) {
         RenderUtil.fill(matrixStack, this.getScaledX(),
             this.getScaledY() + this.getScaledHeight() - this.underscoreHeight
                 + this.underscoreYOffset,
@@ -149,13 +114,11 @@ public class TabsView<L extends Layout>
       }
     }
 
-    @Override
-    public TabView setSelected(boolean selected) {
+    private void setSelected(boolean selected) {
+      this.selected = selected;
       if (selected && this.selectedListener != null) {
         this.selectedListener.run();
       }
-      super.setSelected(selected);
-      return this;
     }
 
     public TabView setSelectedListener(Runnable selectedListener) {

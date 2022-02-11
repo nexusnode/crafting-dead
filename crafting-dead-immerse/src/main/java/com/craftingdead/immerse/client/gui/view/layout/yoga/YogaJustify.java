@@ -20,19 +20,18 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 
-public enum Justify {
-  // @formatter:off
+public enum YogaJustify {
+
   FLEX_START(Yoga.YGJustifyFlexStart),
   CENTER(Yoga.YGJustifyCenter),
   FLEX_END(Yoga.YGJustifyFlexEnd),
   SPACE_BETWEEN(Yoga.YGJustifySpaceBetween),
   SPACE_AROUND(Yoga.YGJustifySpaceAround),
   SPACE_EVENLY(Yoga.YGJustifySpaceEvenly);
-  // @formatter:on
 
   private final int yogaType;
 
-  private Justify(int yogaType) {
+  private YogaJustify(int yogaType) {
     this.yogaType = yogaType;
   }
 

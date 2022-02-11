@@ -19,24 +19,21 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class ValueStyleProperty<T> extends StyleProperty<T> {
+public class ValueProperty<T> implements StateListener {
+
+  private final String name;
 
   private final Class<T> type;
 
-  private boolean defined;
-
-  private T baseValue;
+  private final ValueAccessor<T> accessor;
 
   private final Int2ObjectMap<T> stateValues = new Int2ObjectOpenHashMap<>();
 
-  private T value;
-
-  private Transition<T> transition = Transition.instant();
+  private Transition transition = Transition.INSTANT;
 
   @Nullable
   private Runnable transitionStopListener;
@@ -44,55 +41,58 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
   @Nullable
   private T overrideValue;
 
-  protected ValueStyleProperty(String name, Class<T> type, @Nonnull T baseValue) {
-    super(name);
+  protected ValueProperty(String name, Class<T> type, ValueAccessor<T> accessor) {
+    this.name = name;
     this.type = type;
-    this.setBaseValue(baseValue, false);
+    this.accessor = accessor;
+    this.resetState(0);
   }
 
-  @Override
-  protected StyleProperty<T> setBaseValue(@Nonnull T baseValue, boolean defined) {
-    Objects.nonNull(baseValue);
-    this.baseValue = baseValue;
-    this.defined = defined;
-    this.stateValues.put(0, this.baseValue);
-    this.value = this.baseValue;
-    return this;
+  public String getName() {
+    return this.name;
   }
 
-  @Override
-  public StyleProperty<T> setTransition(Transition<T> transition) {
+  public Class<T> getType() {
+    return this.type;
+  }
+
+  public void setTransition(Transition transition) {
     this.transition = transition;
-    return this;
   }
 
-  @Override
-  public StyleProperty<T> defineState(T value, int state) {
-    if (state == 0) {
-      return this;
-    }
+  public void defineState(T value, int state) {
     this.stateValues.put(state, value);
-    return this;
+    if (state == 0) {
+      this.set(value);
+    }
   }
 
-  @Override
-  public StyleProperty<T> set(@Nonnull T value) {
-    this.value = value;
-    return this;
+  public void resetState(int state) {
+    if (state == 0) {
+      this.accessor.reset();
+      this.defineState(this.accessor.get(), 0);
+    } else {
+      this.stateValues.remove(state);
+    }
   }
 
-  public boolean isDefined() {
-    return this.defined;
+  public T get() {
+    return this.overrideValue != null ? this.overrideValue : this.accessor.get();
+  }
+
+  public void set(T value) {
+    this.accessor.set(value);
+  }
+
+  public boolean isBeingAnimated() {
+    return this.overrideValue != null;
   }
 
   public void setOverrideValue(@Nullable T overrideValue) {
     this.overrideValue = overrideValue;
   }
 
-  public T get() {
-    return this.overrideValue != null ? this.overrideValue : this.value;
-  }
-
+  @Override
   public boolean transition(int state, boolean animate) {
     T newValue = this.stateValues.get(state);
     if (newValue == null) {
@@ -103,7 +103,7 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
       this.transitionStopListener.run();
     }
 
-    if (!Objects.equals(newValue, this.value)) {
+    if (!Objects.equals(newValue, this.accessor.get())) {
       if (animate) {
         this.transitionStopListener = this.transition.transition(this, newValue);
       } else {
@@ -114,11 +114,18 @@ public class ValueStyleProperty<T> extends StyleProperty<T> {
     return true;
   }
 
-  public Class<T> getValueType() {
-    return this.type;
+  @Override
+  public String toString() {
+    return this.getName();
   }
 
-  public static <T> ValueStyleProperty<T> create(String name, Class<T> type, @Nonnull T baseValue) {
-    return new ValueStyleProperty<>(name, type, baseValue);
+  @Override
+  public int hashCode() {
+    return this.getName().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof ValueProperty<?> that && that.getName().equals(this.getName());
   }
 }

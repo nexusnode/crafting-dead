@@ -25,129 +25,93 @@ import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
 import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.DropDownView;
+import com.craftingdead.immerse.client.gui.view.DropdownView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TabsView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TranslatableComponent;
 
-public class PlayView extends ParentView<PlayView, YogaLayout, YogaLayout> {
+public class PlayView extends ParentView {
 
-  private final ParentView<?, YogaLayout, YogaLayout> dropdownContent =
-      new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
+  private final ParentView content = new ParentView(new Properties<>().id("content"));
+  private final ParentView officialContent =
+      new ParentView(new Properties<>().id("official-content"));
 
   public PlayView() {
-    super(new YogaLayout().setFlex(1), new YogaLayoutParent());
+    super(new Properties<>().backgroundBlur(50));
 
-    var officialView =
-        new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
+    var officialView = new ParentView(new Properties<>().id("official"));
 
-    var officialServerListView =
-        new ParentView<>(new YogaLayout().setFlex(1), new YogaLayoutParent());
+    var survivalServerListView = new ServerListView(new JsonServerList(
+        Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
 
-    var survivalServerListView = new ServerListView<>(
-        new YogaLayout().setFlex(1).setTopMargin(1F),
-        new JsonServerList(
-            Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
+    var deathmatchServerListView = new ServerListView(new JsonServerList(
+        Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
 
-    var deathmatchServerListView = new ServerListView<>(
-        new YogaLayout().setFlex(1).setTopMargin(1F),
-        new JsonServerList(
-            Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
+    var survivalTab = (TabsView.TabView) new TabsView.TabView()
+        .setSelectedListener(() -> this.officialContent.replace(survivalServerListView))
+        .setText(new TranslatableComponent("menu.play.tab.survival"));
+    survivalTab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
+    survivalTab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
 
-    officialView
-        .addChild(new TabsView<>(new YogaLayout().setHeight(20))
-            .setZOffset(5)
-            .addTab((TabsView.TabView) new TabsView.TabView()
-                .setSelectedListener(() -> officialServerListView.queueAllForRemoval()
-                    .addChild(survivalServerListView)
-                    .layout())
-                .setText(new TranslatableComponent("menu.play.tab.survival"))
-                .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
-                .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get()))
-            .addTab((TabsView.TabView) new TabsView.TabView()
-                .setSelectedListener(() -> officialServerListView.queueAllForRemoval()
-                    .addChild(deathmatchServerListView)
-                    .layout())
-                .setText(new TranslatableComponent("menu.play.tab.tdm"))
-                .addActionSound(ImmerseSoundEvents.TAB_SELECT.get())
-                .addHoverSound(ImmerseSoundEvents.TAB_HOVER.get())))
-        .addChild(officialServerListView);
+    var deathmatchTab = (TabsView.TabView) new TabsView.TabView()
+        .setSelectedListener(() -> this.officialContent.replace(deathmatchServerListView))
+        .setText(new TranslatableComponent("menu.play.tab.tdm"));
+    deathmatchTab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
+    deathmatchTab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
 
-    var singleplayerView = new WorldListView<>(new YogaLayout().setFlex(1));
-    singleplayerView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
+    officialView.addChild(new TabsView(new Properties<>())
+        .addTab(survivalTab)
+        .addTab(deathmatchTab));
+    officialView.addChild(this.officialContent);
 
-    var customServerListView = new MutableServerListView<>(
-        new YogaLayout().setFlex(1),
-        new NbtServerList(
-            CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
-    customServerListView.getBackgroundColorProperty().setBaseValue(new Color(0, 0, 0, 0.25F));
+    var singleplayerView = new WorldListView();
 
-    this.getBackgroundColorProperty().setBaseValue(new Color(0x50777777));
+    var customServerListView = new MutableServerListView(new NbtServerList(
+        CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
 
-    this
-        .setBackgroundBlur(50.0F)
-        .addChild(new TextView<>(
-            new YogaLayout()
-                .setWidth(25)
-                .setHeight(30)
-                .setTopPadding(12)
-                .setLeftMargin(17))
-                    .setShadow(true)
-                    .setText(new TranslatableComponent("menu.play.title"))
-                    .configure(view -> view.getXScaleProperty().setBaseValue(1.5F))
-                    .configure(view -> view.getYScaleProperty().setBaseValue(1.5F)))
-        .addChild(this.newSeparator())
-        .addChild(new DropDownView<>(new YogaLayout()
-            .setWidth(100F)
-            .setHeight(21F)
-            .setMargin(2)
-            .setLeftMargin(10F))
-                .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
-                .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
-                .addItem(new TranslatableComponent("menu.play.dropdown.official"),
-                    () -> this.dropDownSelect(officialView))
-                .addItem(new TranslatableComponent("menu.play.dropdown.singleplayer"),
-                    () -> this.dropDownSelect(singleplayerView))
-                .addItem(new TranslatableComponent("menu.play.dropdown.custom"),
-                    () -> this.dropDownSelect(customServerListView)))
-        .addChild(this.newSeparator())
-        .addChild(this.dropdownContent);
+    this.addChild(new TextView(new Properties<>().id("title"))
+        .setShadow(true)
+        .setText(new TranslatableComponent("menu.play.title")));
+    this.addChild(Theme.newSeparator());
+    this.addChild(new DropdownView(new Properties<>())
+        .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
+        .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
+        .addItem(new TranslatableComponent("menu.play.dropdown.official"),
+            () -> this.dropDownSelect(officialView))
+        .addItem(new TranslatableComponent("menu.play.dropdown.singleplayer"),
+            () -> this.dropDownSelect(singleplayerView))
+        .addItem(new TranslatableComponent("menu.play.dropdown.custom"),
+            () -> this.dropDownSelect(customServerListView)));
+    this.addChild(Theme.newSeparator());
+    this.addChild(this.content);
   }
 
-  private void dropDownSelect(View<?, YogaLayout> content) {
+  private void dropDownSelect(View content) {
     this.minecraft.getSoundManager().play(
         SimpleSoundInstance.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
-    this.displayContent(content);
+    this.setContent(content);
   }
 
-  private View<?, YogaLayout> newSeparator() {
-    return new View<>(new YogaLayout().setHeight(1F))
-        .setUnscaleHeight(true)
-        .configure(view -> view.getBackgroundColorProperty().setBaseValue(new Color(0X80B5B5B5)));
-  }
-
-  private void displayContent(View<?, YogaLayout> content) {
-    this.dropdownContent
-        .queueAllForRemoval()
-        .addChild(content)
-        .layout();
+  private void setContent(View content) {
+    this.content.queueAllForRemoval();
+    this.content.addChild(content);
+    this.content.layout();
   }
 
   @Override
   protected void added() {
+    super.added();
     this.minecraft.getSoundManager().play(
         SimpleSoundInstance.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
 

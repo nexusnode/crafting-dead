@@ -57,7 +57,7 @@ public class EntitySnapshot {
     this.complete = true;
   }
 
-  public Optional<Vec3> rayTrace(Level world, EntitySnapshot fromSnapshot, double distance,
+  public Optional<Vec3> rayTrace(Level level, EntitySnapshot fromSnapshot, double distance,
       float accuracy, int shotCount, Random random) {
     if (!fromSnapshot.complete || !this.complete) {
       return Optional.empty();
@@ -69,7 +69,7 @@ public class EntitySnapshot {
         fromSnapshot.getPitchYaw().y + RayTraceUtil.getAccuracyOffset(accuracy, shotCount, random));
 
     Optional<BlockHitResult> blockRayTraceResult =
-        RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, world);
+        RayTraceUtil.rayTraceBlocksPiercing(start, distance, look, level);
 
     Vec3 scaledLook = look.scale(distance);
 

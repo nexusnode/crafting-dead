@@ -20,11 +20,8 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.DirectJoinServerScreen;
 import net.minecraft.client.gui.screens.EditServerScreen;
@@ -33,62 +30,64 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
 
-public class MutableServerListView<L extends Layout> extends ServerListView<L> {
+public class MutableServerListView extends ServerListView {
 
-  private View<?, YogaLayout> removeButton;
+  private View removeButton;
 
-  public MutableServerListView(L layout, MutableServerList serverProvider) {
-    super(layout, serverProvider);
+  public MutableServerListView(MutableServerList serverProvider) {
+    super(serverProvider);
   }
 
   @Override
-  protected ParentView<?, YogaLayout, YogaLayout> createTopRowControls() {
-    return super.createTopRowControls()
-        .configure(view -> view.getLayout().setWidth(300))
-        .addChild(Theme.createBlueButton(
-            new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
-              ServerData tempServerData =
-                  new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = this.getScreen();
-              screen.keepOpenAndSetScreen(new DirectJoinServerScreen(screen,
-                  connect -> {
-                    if (connect) {
-                      ConnectScreen.startConnecting(screen, this.minecraft,
-                          ServerAddress.parseString(tempServerData.ip), tempServerData);
-                    } else {
-                      this.minecraft.setScreen(screen);
-                    }
-                  },
-                  tempServerData));
-            }).configure(view -> view.getLayout().setMargin(3)))
-        .addChild(Theme.createGreenButton(
-            new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
-              ServerData tempServerData =
-                  new ServerData(I18n.get("selectServer.defaultName"), "", false);
-              ViewScreen screen = this.getScreen();
-              screen.keepOpenAndSetScreen(new EditServerScreen(screen,
-                  success -> {
-                    if (success) {
-                      this.addServer(tempServerData.ip);
-                    }
-                    this.minecraft.setScreen(screen);
-                  },
-                  tempServerData));
-            }).configure(view -> view.getLayout().setMargin(3)));
+  protected ParentView createTopRowControls() {
+    var directConnectButton = Theme.createBlueButton(
+        new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
+          ServerData tempServerData =
+              new ServerData(I18n.get("selectServer.defaultName"), "", false);
+          ViewScreen screen = this.getScreen();
+          screen.keepOpenAndSetScreen(new DirectJoinServerScreen(screen,
+              connect -> {
+                if (connect) {
+                  ConnectScreen.startConnecting(screen, this.minecraft,
+                      ServerAddress.parseString(tempServerData.ip), tempServerData);
+                } else {
+                  this.minecraft.setScreen(screen);
+                }
+              },
+              tempServerData));
+        });
+
+    var addServerButton = Theme.createGreenButton(
+        new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
+          ServerData tempServerData =
+              new ServerData(I18n.get("selectServer.defaultName"), "", false);
+          ViewScreen screen = this.getScreen();
+          screen.keepOpenAndSetScreen(new EditServerScreen(screen,
+              success -> {
+                if (success) {
+                  this.addServer(tempServerData.ip);
+                }
+                this.minecraft.setScreen(screen);
+              },
+              tempServerData));
+        });
+
+    var view = super.createTopRowControls();
+    view.addChild(directConnectButton);
+    view.addChild(addServerButton);
+    return view;
   }
 
   @Override
-  protected ParentView<?, YogaLayout, YogaLayout> createBottomRowControls() {
+  protected ParentView createBottomRowControls() {
     this.removeButton = Theme.createRedButton(
         new TranslatableComponent("view.mutable_server_list.button.remove"),
-        () -> this.getSelectedItem().ifPresent(this::removeServer))
-        .configure(view -> view.getBackgroundColorProperty()
-            .defineState(Theme.RED_DISABLED, States.DISABLED))
-        .setEnabled(false)
-        .configure(view -> view.getLayout().setMargin(3));
-    return super.createBottomRowControls()
-        .configure(view -> view.getLayout().setWidth(300))
-        .addChild(this.removeButton);
+        () -> this.getSelectedItem().ifPresent(this::removeServer));
+    this.removeButton.setEnabled(false);
+
+    var view = super.createBottomRowControls();
+    view.addChild(this.removeButton);
+    return view;
   }
 
   @Override
@@ -98,8 +97,8 @@ public class MutableServerListView<L extends Layout> extends ServerListView<L> {
   }
 
   private void addServer(String host) {
-    ServerAddress address = ServerAddress.parseString(host);
-    ServerEntry entry = new ServerEntry(null, address.getHost(), address.getPort());
+    var address = ServerAddress.parseString(host);
+    var entry = new ServerEntry(null, address.getHost(), address.getPort());
     this.addServer(entry);
     this.saveServerList();
   }

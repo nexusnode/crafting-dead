@@ -20,22 +20,18 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 
-public enum Align {
-  // @formatter:off
-  AUTO(Yoga.YGAlignAuto),
-  FLEX_START(Yoga.YGAlignFlexStart),
-  CENTER(Yoga.YGAlignCenter),
-  FLEX_END(Yoga.YGAlignFlexEnd),
-  STRETCH(Yoga.YGAlignStretch),
-  BASELINE(Yoga.YGAlignBaseline),
-  SPACE_BETWEEN(Yoga.YGAlignSpaceBetween),
-  SPACE_AROUND(Yoga.YGAlignSpaceAround);
-  // @formatter:on
+public enum YogaFlexDirection {
+
+  COLUMN(Yoga.YGFlexDirectionColumn),
+  COLUMN_REVERSE(Yoga.YGFlexDirectionColumnReverse),
+  ROW(Yoga.YGFlexDirectionRow),
+  ROW_REVERSE(Yoga.YGFlexDirectionRowReverse);
 
   private final int yogaType;
 
-  private Align(int yogaType) {
+  private YogaFlexDirection(int yogaType) {
     this.yogaType = yogaType;
+
   }
 
   public int getYogaType() {

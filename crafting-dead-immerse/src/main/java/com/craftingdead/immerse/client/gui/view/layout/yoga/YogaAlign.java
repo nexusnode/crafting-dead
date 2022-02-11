@@ -20,15 +20,21 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 
-public enum FlexWrap {
+public enum YogaAlign {
 
-  NO_WRAP(Yoga.YGWrapNoWrap), WRAP_REVERSE(Yoga.YGWrapReverse), WRAP(Yoga.YGWrapWrap);
+  AUTO(Yoga.YGAlignAuto),
+  FLEX_START(Yoga.YGAlignFlexStart),
+  CENTER(Yoga.YGAlignCenter),
+  FLEX_END(Yoga.YGAlignFlexEnd),
+  STRETCH(Yoga.YGAlignStretch),
+  BASELINE(Yoga.YGAlignBaseline),
+  SPACE_BETWEEN(Yoga.YGAlignSpaceBetween),
+  SPACE_AROUND(Yoga.YGAlignSpaceAround);
 
   private final int yogaType;
 
-  private FlexWrap(int yogaType) {
+  private YogaAlign(int yogaType) {
     this.yogaType = yogaType;
-
   }
 
   public int getYogaType() {

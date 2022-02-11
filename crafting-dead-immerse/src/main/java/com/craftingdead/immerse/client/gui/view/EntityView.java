@@ -20,19 +20,18 @@ package com.craftingdead.immerse.client.gui.view;
 
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.immerse.client.fake.FakeLevel;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.world.entity.LivingEntity;
 
-public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
+public class EntityView extends View {
 
   private final LivingEntity livingEntity;
 
-  public EntityView(L layout, LivingEntity entity) {
-    super(layout);
+  public EntityView(Properties<?> properties, LivingEntity entity) {
+    super(properties);
     this.livingEntity = entity;
   }
 
@@ -45,8 +44,10 @@ public class EntityView<L extends Layout> extends View<EntityView<L>, L> {
     final var x = this.getScaledContentX() + this.getScaledContentWidth() / 2.0F;
     final var y = this.getScaledContentY() + this.getScaledContentHeight();
 
+    final var eyeYOffset = 35 * this.getYScale() - this.getScaledContentHeight();
+
     final var yaw = (float) Math.atan((x - mouseX) / 40.0F);
-    final var pitch = (float) Math.atan((y / (2.0F * this.getYScale()) + 4 - mouseY) / 40.0F);
+    final var pitch = (float) Math.atan(((y + eyeYOffset - mouseY) / this.getYScale()) / 40.0F);
 
     final var modelViewStack = RenderSystem.getModelViewStack();
     modelViewStack.pushPose();

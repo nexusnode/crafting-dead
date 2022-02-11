@@ -30,18 +30,11 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.FlexDirection;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
@@ -70,8 +63,7 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 
-class WorldItemView
-    extends ParentView<WorldItemView, YogaLayout, YogaLayout> {
+class WorldItemView extends ParentView {
 
   private static final Logger logger = LogManager.getLogger();
   private static final DateFormat dateFormat = new SimpleDateFormat();
@@ -80,27 +72,19 @@ class WorldItemView
       new ResourceLocation("textures/misc/unknown_server.png");
 
   private final LevelSummary worldSummary;
-  private final WorldListView<?> parentWorldList;
+  private final WorldListView parentWorldList;
 
-  WorldItemView(LevelSummary worldSummary, WorldListView<?> parentWorldList) {
-    super(
-        new YogaLayout()
-            .setWidthPercent(100)
-            .setHeight(46F)
-            .setTopMargin(6F)
-            .setMaxWidth(300F)
-            .setPadding(4F),
-        new YogaLayoutParent()
-            .setFlexDirection(FlexDirection.ROW));
+  WorldItemView(LevelSummary worldSummary, WorldListView parentWorldList) {
+    super(new Properties<>().styleClasses("item").doubleClick(true));
     this.worldSummary = worldSummary;
     this.parentWorldList = parentWorldList;
-    String displayName = worldSummary.getLevelName();
-    String info = worldSummary.getLevelId() + " (" + dateFormat.format(
+    var displayName = worldSummary.getLevelName();
+    var info = worldSummary.getLevelId() + " (" + dateFormat.format(
         new Date(worldSummary.getLastPlayed())) + ")";
-    String description = worldSummary.getInfo().getString();
-    String levelId = worldSummary.getLevelId();
+    var description = worldSummary.getInfo().getString();
+    var levelId = worldSummary.getLevelId();
     @SuppressWarnings("deprecation")
-    ResourceLocation dynamicWorldIcon =
+    var dynamicWorldIcon =
         new ResourceLocation("worlds/" + Util.sanitizeName(levelId,
             ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(levelId)
             + "/icon");
@@ -111,44 +95,27 @@ class WorldItemView
       worldIcon = UNKOWN_SERVER_ICON;
     }
 
-    this.getOutlineWidthProperty()
-        .defineState(1.0F, States.SELECTED)
-        .defineState(1.0F, States.HOVERED)
-        .defineState(1.0F, States.FOCUSED);
-    this.getOutlineColorProperty()
-        .defineState(Color.WHITE, States.SELECTED)
-        .defineState(Color.GRAY, States.HOVERED)
-        .defineState(Color.GRAY, States.FOCUSED);
+    this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
+    this.addChild(new ImageView(new Properties<>().id("icon")).setImage(worldIcon));
 
-    this.getBackgroundColorProperty().setBaseValue(new Color(0X882C2C2C));
+    var texts = new ParentView(new Properties<>().id("texts"));
+    texts.addChild(new TextView(new Properties<>())
+        .setText(displayName)
+        .setShadow(false));
+    texts.addChild(new TextView(new Properties<>().id("info"))
+        .setText(new TextComponent(info)
+            .withStyle(ChatFormatting.GRAY))
+        .setShadow(false));
+    texts.addChild(new TextView(new Properties<>())
+        .setText(new TextComponent(description)
+            .withStyle(ChatFormatting.GRAY))
+        .setShadow(false));
+    this.addChild(texts);
+  }
 
-    this
-        .setFocusable(true)
-        .setDoubleClick(true)
-        .addListener(ActionEvent.class, (c, e) -> this.joinWorld(), true)
-        .addChild(new ImageView<>(new YogaLayout().setHeight(38F)
-            .setWidth(38F)
-            .setRightMargin(5F))
-                .setImage(worldIcon))
-        .addChild(new ParentView<>(
-            new YogaLayout()
-                .setWidth(120F)
-                .setFlexGrow(1F)
-                .setBottomPadding(1F),
-            new YogaLayoutParent()
-                .setFlexDirection(FlexDirection.COLUMN)
-                .setJustifyContent(Justify.CENTER))
-                    .addChild(new TextView<>(new YogaLayout())
-                        .setText(displayName)
-                        .setShadow(false))
-                    .addChild(new TextView<>(new YogaLayout().setTopMargin(2F))
-                        .setText(new TextComponent(info)
-                            .withStyle(ChatFormatting.GRAY))
-                        .setShadow(false))
-                    .addChild(new TextView<>(new YogaLayout())
-                        .setText(new TextComponent(description)
-                            .withStyle(ChatFormatting.GRAY))
-                        .setShadow(false)));
+  @Override
+  protected boolean isFocusable() {
+    return true;
   }
 
   @Nullable
@@ -171,23 +138,6 @@ class WorldItemView
       this.minecraft.getTextureManager().release(textureLocation);
       return null;
     }
-  }
-
-  @Override
-  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
-      this.toggleState(States.SELECTED);
-      this.updateProperties(true);
-      return true;
-    }
-    return super.keyPressed(keyCode, scanCode, modifiers);
-  }
-
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean consume = super.mouseClicked(mouseX, mouseY, button);
-    this.setSelected(this.isHovered());
-    return consume;
   }
 
   /**

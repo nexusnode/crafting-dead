@@ -186,10 +186,8 @@ public class RayTraceUtil {
   /**
    * Perform a ray trace looking for blocks, ignoring blocks that are {@link #isBlockPierceable}
    */
-  public static Optional<BlockHitResult> rayTraceBlocksPiercing(Vec3 start,
-      double distance,
-      Vec3 look,
-      Level world) {
+  public static Optional<BlockHitResult> rayTraceBlocksPiercing(Vec3 start, double distance,
+      Vec3 look, Level world) {
     return rayTraceBlocksPiercing(start, distance, look, ClipContext.Block.COLLIDER,
         ClipContext.Fluid.NONE, world);
   }

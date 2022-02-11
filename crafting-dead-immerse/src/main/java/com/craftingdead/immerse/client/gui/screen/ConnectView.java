@@ -20,26 +20,18 @@ package com.craftingdead.immerse.client.gui.screen;
 
 import java.net.InetSocketAddress;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
-import com.craftingdead.immerse.client.gui.view.Color;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Align;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.Justify;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.PositionType;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayout;
-import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -62,8 +54,9 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
+import net.minecraft.resources.ResourceLocation;
 
-public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
+public class ConnectView extends ParentView {
 
   private static final Logger logger = LogManager.getLogger();
   private static final ExecutorService executorService = Executors.newSingleThreadExecutor(
@@ -78,57 +71,40 @@ public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
   private Connection connection;
   private boolean aborted;
   private final Screen lastScreen;
-  private final TextView<YogaLayout> statusView;
-  private final TextView<YogaLayout> animationView;
+  private final TextView statusView;
+  private final TextView animationView;
 
-  public ConnectView(Layout layout, Screen lastScreen, ServerAddress address) {
-    super(layout,
-        new YogaLayoutParent().setAlignItems(Align.CENTER).setJustifyContent(Justify.CENTER));
+  public ConnectView(Screen lastScreen, ServerAddress address) {
+    super(new Properties<>());
     this.lastScreen = lastScreen;
 
-    this.addChild(MainMenuView.createBackgroundView());
-    this.addChild(new FogView<>(new YogaLayout()
-        .setPositionType(PositionType.ABSOLUTE)
-        .setHeightPercent(100)
-        .setWidthPercent(100)));
+    this.addChild(Theme.createBackground());
+    this.addChild(new FogView(new Properties<>()));
 
-    this.addChild(
-        new ParentView<>(new YogaLayout().setWidthPercent(60).setHeightPercent(60),
-            new YogaLayoutParent()
-                .setAlignItems(Align.CENTER)
-                .setJustifyContent(Justify.CENTER))
-                    .setBackgroundBlur(50.0F)
-                    .configure(
-                        view -> view.getBackgroundColorProperty()
-                            .setBaseValue(new Color(0x40111111)))
-                    .addChild(this.statusView =
-                        new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
-                            .setText(new TranslatableComponent("connect.connecting"))
-                            .setCentered(true))
-                    .addChild(this.animationView =
-                        new TextView<>(new YogaLayout().setWidthPercent(100).setHeight(15))
-                            .setText(this.nextAnimation())
-                            .setCentered(true))
-                    .addChild(new TextView<>(
-                        new YogaLayout().setWidth(150).setHeight(20).setTopMargin(50))
-                            .setText(CommonComponents.GUI_CANCEL)
-                            .setCentered(true)
-                            .configure(view -> view.getBackgroundColorProperty()
-                                .setBaseValue(
-                                    new Color(ChatFormatting.RED.getColor() + (100 << 24)))
-                                .defineState(
-                                    new Color(ChatFormatting.DARK_RED.getColor() + (100 << 24)),
-                                    States.HOVERED, States.ENABLED)
-                                .setTransition(Transition.linear(150L)))
-                            .addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get())
-                            .addListener(ActionEvent.class, (c, e) -> {
-                              this.aborted = true;
-                              if (this.connection != null) {
-                                this.connection.disconnect(
-                                    new TranslatableComponent("connect.aborted"));
-                              }
-                              this.minecraft.setScreen(this.lastScreen);
-                            }, true)));
+    var dialog = new ParentView(new Properties<>().id("dialog").backgroundBlur(50.0F));
+    this.addChild(dialog);
+    dialog.addChild(this.statusView =
+        new TextView(new Properties<>().id("status"))
+            .setText(new TranslatableComponent("connect.connecting"))
+            .setCentered(true));
+    dialog.addChild(this.animationView =
+        new TextView(new Properties<>().id("animation"))
+            .setText(this.nextAnimation())
+            .setCentered(true));
+
+    var cancelButton = new TextView(new Properties<>().id("cancel-button"))
+        .setText(CommonComponents.GUI_CANCEL)
+        .setCentered(true);
+    cancelButton.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
+    cancelButton.addListener(ActionEvent.class, event -> {
+      this.aborted = true;
+      if (this.connection != null) {
+        this.connection.disconnect(
+            new TranslatableComponent("connect.aborted"));
+      }
+      this.minecraft.setScreen(this.lastScreen);
+    }, true);
+    dialog.addChild(cancelButton);
 
     this.minecraft.clearLevel();
     this.connect(address);
@@ -208,7 +184,9 @@ public class ConnectView extends ParentView<ConnectView, Layout, YogaLayout> {
   }
 
   public static Screen createScreen(Screen lastScreen, ServerAddress address) {
-    return new ViewScreen(NarratorChatListener.NO_TITLE,
-        layout -> new ConnectView(layout, lastScreen, address));
+    var screen =
+        new ViewScreen(NarratorChatListener.NO_TITLE, new ConnectView(lastScreen, address));
+    screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/connect.css")));
+    return screen;
   }
 }

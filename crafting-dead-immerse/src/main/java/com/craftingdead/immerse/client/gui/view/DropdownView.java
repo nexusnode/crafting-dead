@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.view.layout.Layout;
+import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -43,15 +43,14 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
-public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
-    implements ContainerEventHandler {
+public class DropdownView extends View implements ContainerEventHandler {
 
   public static final int DEFAULT_HEIGHT = 14;
   public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0x444444;
   public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR = 0x222222;
   public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR = 0x333333;
 
-  public static final int DEFAULT_Z_LEVEL = 5;
+  public static final int Z_OFFSET = 5;
   public static final float DEFAULT_ARROW_WIDTH = 12.0F;
   public static final float DEFAULT_ARROW_HEIGHT = 5.0F;
   public static final float DEFAULT_ARROW_LINE_WIDTH = 1.6F;
@@ -64,8 +63,8 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   private int hoveredItemBackgroundColour;
 
   private boolean expanded = false;
-  private int selectedItemIndex = -1;
-  private boolean init = false;
+  private int focusedItemIndex;
+  private Item selectedItem;
 
   private float arrowWidth;
   private float arrowHeight;
@@ -74,8 +73,6 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   private float arrowLineWidthY;
   private float xArrowOffset;
 
-  @Nullable
-  private GuiEventListener focusedListener;
   private boolean dragging;
 
   private long fadeStartTimeMs;
@@ -88,12 +85,18 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   @Nullable
   private GuiEventListener lastHoveredListener;
 
-  public DropDownView(L layout) {
-    super(layout);
+  public DropdownView(Properties<?> properties) {
+    super(properties);
+    this.addListener(ActionEvent.class, event -> {
+      if (this.expanded) {
+        this.getFocusedItem().select();
+      }
+      this.toggleExpanded();
+    });
+
     this.itemBackgroundColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
     this.selectedItemBackgroundColour = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR;
     this.hoveredItemBackgroundColour = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR;
-    this.setZOffset(DEFAULT_Z_LEVEL);
     this.arrowWidth = DEFAULT_ARROW_WIDTH;
     this.arrowHeight = DEFAULT_ARROW_HEIGHT;
     this.arrowLineWidth = DEFAULT_ARROW_LINE_WIDTH;
@@ -101,24 +104,34 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     this.xArrowOffset = DEFAULT_X_ARROW_OFFSET;
   }
 
+  @Override
+  public float getZOffset() {
+    return super.getZOffset() + Z_OFFSET;
+  }
+
+  @Override
+  protected boolean isFocusable() {
+    return true;
+  }
+
   protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     return new Vec2(width, DEFAULT_HEIGHT);
   }
 
-  public DropDownView<L> setArrowWidth(float arrowWidth) {
+  public DropdownView setArrowWidth(float arrowWidth) {
     this.arrowWidth = arrowWidth;
     this.calculateArrowLineWidthProjections();
     return this;
   }
 
-  public DropDownView<L> setArrowHeight(float arrowHeight) {
+  public DropdownView setArrowHeight(float arrowHeight) {
     this.arrowHeight = arrowHeight;
     this.calculateArrowLineWidthProjections();
     return this;
   }
 
-  public DropDownView<L> setArrowLineWidth(float arrowLineWidth) {
+  public DropdownView setArrowLineWidth(float arrowLineWidth) {
     this.arrowLineWidth = arrowLineWidth;
     this.calculateArrowLineWidthProjections();
     return this;
@@ -127,55 +140,55 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   /**
    * @param xArrowOffset RTL offset from 0.0F to 1.0F (something like percent margin right)
    */
-  public DropDownView<L> setXArrowOffset(float xArrowOffset) {
+  public DropdownView setXArrowOffset(float xArrowOffset) {
     this.xArrowOffset = xArrowOffset;
     return this;
   }
 
-  public DropDownView<L> setItemBackgroundColour(int itemBackgroundColour) {
+  public DropdownView setItemBackgroundColour(int itemBackgroundColour) {
     this.itemBackgroundColour = itemBackgroundColour;
     return this;
   }
 
-  public DropDownView<L> setSelectedItemBackgroundColour(int selectedItemBackgroundColour) {
+  public DropdownView setSelectedItemBackgroundColour(int selectedItemBackgroundColour) {
     this.selectedItemBackgroundColour = selectedItemBackgroundColour;
     return this;
   }
 
-  public DropDownView<L> setHoveredItemBackgroundColour(int hoveredItemBackgroundColour) {
+  public DropdownView setHoveredItemBackgroundColour(int hoveredItemBackgroundColour) {
     this.hoveredItemBackgroundColour = hoveredItemBackgroundColour;
     return this;
   }
 
-  public DropDownView<L> addItem(Component text, Runnable actionListener) {
+  public DropdownView addItem(Component text, Runnable actionListener) {
     this.items.add(new Item(this.items.size(), text, actionListener));
     return this;
   }
 
-  public DropDownView<L> setDisabled(int itemId, boolean disabled) {
+  public DropdownView setDisabled(int itemId, boolean disabled) {
     this.items.get(itemId).setDisabled(disabled);
     return this;
   }
 
-  public DropDownView<L> setExpandSound(@Nullable SoundEvent expandSound) {
+  public DropdownView setExpandSound(@Nullable SoundEvent expandSound) {
     this.expandSound = expandSound;
     return this;
   }
 
-  public DropDownView<L> setItemHoverSound(@Nullable SoundEvent itemHoverSound) {
+  public DropdownView setItemHoverSound(@Nullable SoundEvent itemHoverSound) {
     this.itemHoverSound = itemHoverSound;
     return this;
   }
 
-  public Item getSelectedItem() {
-    return this.items.get(this.selectedItemIndex);
+  private Item getFocusedItem() {
+    return this.items.get(this.focusedItemIndex);
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     super.mouseMoved(mouseX, mouseY);
-    GuiEventListener hoveredListener = this.getChildAt(mouseX, mouseY).orElse(null);
-    if (hoveredListener instanceof DropDownView.Item
+    var hoveredListener = this.getChildAt(mouseX, mouseY).orElse(null);
+    if (hoveredListener instanceof DropdownView.Item
         && hoveredListener != this.lastHoveredListener
         && this.itemHoverSound != null) {
       this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(this.itemHoverSound, 1.0F));
@@ -185,54 +198,40 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
-    }
-
-    if (this.expanded || this.isMouseOver(mouseX, mouseY)) {
-      if (this.expanded) {
-        ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button);
+    if (this.expanded) {
+      if (!ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button) && !this.isHovered()) {
+        this.toggleExpanded();
       }
-      this.toggleExpanded();
-      return true;
     }
-
-    return false;
+    return super.mouseClicked(mouseX, mouseY, button);
   }
 
   @Override
   protected void layout() {
     super.layout();
-    this.init();
-  }
-
-  private void init() {
-    if (this.init) {
-      return;
-    }
-    this.init = true;
-    if (this.selectedItemIndex == -1 && this.items.size() > 0) {
-      this.selectedItemIndex = 0;
-      this.items.get(0).actionListener.run();
-    }
   }
 
   @Override
-  public boolean changeFocus(boolean forward) {
-    if (this.expanded) {
-      if (!ContainerEventHandler.super.changeFocus(forward)) {
-        this.toggleExpanded();
-      }
-    } else {
-      this.toggleExpanded();
+  protected void added() {
+    super.added();
+    if (this.items.size() > 0) {
+      this.items.get(0).select();
     }
-    return this.expanded;
   }
 
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return ContainerEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
-        || super.keyPressed(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_DOWN) {
+      this.focusedItemIndex = Math.min(this.focusedItemIndex + 1, this.items.size() - 1);
+    } else if (keyCode == GLFW.GLFW_KEY_UP) {
+      this.focusedItemIndex = Math.max(this.focusedItemIndex - 1, 0);
+    }
+
+    if (!this.expanded) {
+      this.getFocusedItem().select();
+    }
+
+    return super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
@@ -263,7 +262,7 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
-    this.items.get(this.selectedItemIndex).render(poseStack, Type.SELECTED, 255 << 24);
+    this.selectedItem.render(poseStack, Type.SELECTED, 255 << 24);
     this.renderArrow(poseStack);
 
     float alpha = Mth.clamp((Util.getMillis() - this.fadeStartTimeMs) / 100.0F, 0.0F, 1.0F);
@@ -272,13 +271,13 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     }
     int opacity = Mth.ceil(alpha * 255.0F) << 24;
     if ((opacity & 0xFC000000) != 0) {
-      for (Item item : this.items) {
+      for (var item : this.items) {
         Type type;
         if (item.disabled) {
           type = Type.DISABLED;
-        } else if (item.index == this.selectedItemIndex) {
+        } else if (item == this.selectedItem) {
           type = Type.HIGHLIGHTED;
-        } else if (item.isMouseOver(mouseX, mouseY) || this.focusedListener == item) {
+        } else if (item.isMouseOver(mouseX, mouseY) || this.focusedItemIndex == item.index) {
           type = Type.HOVERED;
         } else {
           type = Type.NONE;
@@ -351,31 +350,31 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     private void render(PoseStack poseStack, Type type, int opacity) {
       float y = this.getY();
 
-      int backgroundColour = DropDownView.this.itemBackgroundColour;
+      int backgroundColour = DropdownView.this.itemBackgroundColour;
       int textColour = ChatFormatting.GRAY.getColor();
 
       switch (type) {
         case SELECTED:
-          y = DropDownView.this.getScaledContentY();
+          y = DropdownView.this.getScaledContentY();
           backgroundColour ^= 0x000000;
           backgroundColour += 128 << 24;
           textColour = ChatFormatting.WHITE.getColor();
           break;
         case HIGHLIGHTED:
-          backgroundColour = DropDownView.this.selectedItemBackgroundColour;
+          backgroundColour = DropdownView.this.selectedItemBackgroundColour;
           break;
         case DISABLED:
           textColour = ChatFormatting.DARK_GRAY.getColor();
           break;
         case HOVERED:
-          backgroundColour = DropDownView.this.hoveredItemBackgroundColour;
+          backgroundColour = DropdownView.this.hoveredItemBackgroundColour;
           break;
         default:
           break;
       }
 
-      this.render(poseStack, DropDownView.this.getScaledContentX(), y,
-          DropDownView.this.getScaledContentWidth(), DropDownView.this.getItemHeight(),
+      this.render(poseStack, DropdownView.this.getScaledContentX(), y,
+          DropdownView.this.getScaledContentWidth(), DropdownView.this.getItemHeight(),
           backgroundColour | opacity, textColour | opacity);
     }
 
@@ -384,48 +383,34 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
       RenderSystem.setShader(GameRenderer::getPositionColorShader);
       RenderUtil.fillWidthHeight(poseStack, x, y, width, height, backgroundColour);
 
-      var font = DropDownView.this.minecraft.font;
+      var font = DropdownView.this.minecraft.font;
 
       poseStack.pushPose();
       {
         poseStack.translate(0.0D, 0.0D, 400.0D);
-        float textY = y + (height - DropDownView.this.minecraft.font.lineHeight) / 2 + 1;
+        float textY = y + (height - DropdownView.this.minecraft.font.lineHeight) / 2 + 1;
         for (FormattedCharSequence line : font.split(this.text, (int) width)) {
           font.draw(poseStack, line, x + 3, textY, textColour);
-          textY += DropDownView.this.minecraft.font.lineHeight;
+          textY += DropdownView.this.minecraft.font.lineHeight;
         }
       }
       poseStack.popPose();
     }
 
-    private void click() {
-      DropDownView.this.selectedItemIndex = this.index;
-      this.actionListener.run();
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-      if (keyCode == GLFW.GLFW_KEY_ENTER) {
-        this.click();
-        return true;
+    private void select() {
+      if (DropdownView.this.selectedItem != this) {
+        this.actionListener.run();
+        DropdownView.this.selectedItem = this;
       }
-      return false;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-      if (!this.disabled && this.index != DropDownView.this.selectedItemIndex
-          && this.isMouseOver(mouseX, mouseY)) {
-        this.click();
+      if (!this.disabled && this.isMouseOver(mouseX, mouseY)) {
+        DropdownView.this.focusedItemIndex = this.index;
         return true;
       }
       return false;
-    }
-
-    @Override
-    public boolean changeFocus(boolean forward) {
-      return !this.disabled && DropDownView.this.selectedItemIndex != this.index
-          && DropDownView.this.focusedListener != this;
     }
 
     public void setDisabled(boolean disabled) {
@@ -433,16 +418,16 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
     }
 
     private float getY() {
-      return DropDownView.this.getScaledContentY()
-          + DropDownView.this.getScaledContentHeight()
-          + DropDownView.this.getItemHeight() * this.index;
+      return DropdownView.this.getScaledContentY()
+          + DropdownView.this.getScaledContentHeight()
+          + DropdownView.this.getItemHeight() * this.index;
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
       final float y = this.getY();
-      return DropDownView.this.isMouseOver(mouseX, mouseY) && mouseY >= y
-          && mouseY <= y + DropDownView.this.getItemHeight();
+      return DropdownView.this.isMouseOver(mouseX, mouseY) && mouseY >= y
+          && mouseY <= y + DropdownView.this.getItemHeight();
     }
   }
 
@@ -459,11 +444,9 @@ public class DropDownView<L extends Layout> extends View<DropDownView<L>, L>
   @Nullable
   @Override
   public GuiEventListener getFocused() {
-    return this.focusedListener;
+    return null;
   }
 
   @Override
-  public void setFocused(@Nullable GuiEventListener focusedListener) {
-    this.focusedListener = focusedListener;
-  }
+  public void setFocused(@Nullable GuiEventListener focusedListener) {}
 }

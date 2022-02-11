@@ -1,0 +1,235 @@
+@import url("craftingdeadimmerse:css/theme.css");
+
+#home {
+    margin: 5;
+    width: 20;
+    aspect-ratio: 1;
+}
+
+#home:hover {
+    color: #666666;
+}
+
+#play {
+    margin: 5;
+    width: 14;
+    aspect-ratio: 1;
+}
+
+#settings {
+    margin: 5;
+    width: 12;
+    aspect-ratio: 1;
+}
+
+#quit {
+    margin: 5;
+    margin-top: auto;
+    width: 12;
+    aspect-ratio: 1;
+}
+
+MainMenuView {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+MainMenuView > #content {
+    flex-grow: 1;
+}
+
+MainMenuView > #content > * {
+    flex-grow: 1;
+    position: absolute;
+}
+
+MainMenuView > #side-bar {
+    border-right-width: 1;
+    height: 100%;
+    width: 30;
+    align-items: center;
+    background-color: rgba(119, 119, 119, 0.35);
+    border-right-color: rgba(181, 181, 181, 0.5);
+}
+
+MainMenuView > #entity-container {
+    width: 25%;
+    height: 50%;
+    top: 30%;
+    right: 10%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+}
+
+MainMenuView > #entity-container > EntityView {
+    aspect-ratio: 1;
+    width: 100%;
+    height: 100%;
+}
+
+ConnectView {
+    align-items: center;
+    justify-content: center;
+}
+
+HomeView {
+    justify-content: space-around;
+    z-index: -2;
+}
+
+HomeView > #news {
+    width: 45%;
+    height: 75%;
+    padding: 10;
+    margin-left: 10%;
+    overflow: scroll;
+    background-color: rgba(119, 119, 119, 0.35);
+}
+
+/* Don't shrink the text so it can scroll */
+HomeView > #news > TextView {
+    flex-shrink: 0;
+}
+
+PlayView {
+    background-color: rgba(119, 119, 119, 0.35);
+}
+
+PlayView > #content {
+    flex-grow: 1;
+}
+
+PlayView > #content > * {
+    flex-grow: 1;
+}
+
+PlayView > #content > #official > TabsView {
+    height: 20;
+    z-index: 5;
+    flex-shrink: 0;
+}
+
+PlayView > #content > #official > #official-content {
+    flex-grow: 1;
+}
+
+PlayView > #title {
+    width: 25;
+    height: 30;
+    padding-top: 12;
+    margin-left: 20;
+    scale: 2;
+}
+
+PlayView > DropdownView {
+    width: 100;
+    height: 21;
+    margin: 2;
+    margin-left: 10;
+}
+
+ServerListView, MutableServerListView, WorldListView {
+    flex-grow: 1;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Button section */
+ServerListView > #controls, MutableServerListView > #controls, WorldListView > #controls {
+    height: 56;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(18, 18, 18, 0.25);
+}
+
+/* Button rows */
+ServerListView > #controls > *, MutableServerListView > #controls > *, WorldListView > #controls > * {
+    flex-grow: 1;
+    flex-shrink: 0;
+    width: 220;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Buttons */
+ServerListView > #controls > ParentView > *, MutableServerListView > #controls > ParentView > *, WorldListView > #controls > ParentView > * {
+    margin: 3;
+}
+
+ServerListView > #content, MutableServerListView > #content {
+    flex-grow: 1;
+    padding-bottom: 7;
+    overflow: scroll;
+    align-items: center;
+}
+
+PlayView ServerListView, PlayView MutableServerListView {
+    margin-top: 1;
+}
+
+ServerItemView {
+    width: 90%;
+    margin-top: 3;
+    margin-left: 7;
+    margin-right: 7;
+    padding-left: 10;
+    padding-right: 20;
+    height: 22;
+    max-width: 520;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+ServerItemView > #motd {
+    flex-grow: 1;
+}
+
+ServerItemView > #ping, ServerItemView > #players {
+    flex-basis: 60;
+    margin-left: 10;
+}
+
+ServerItemView > #map {
+    flex-basis: 90;
+}
+
+MutableServerListView > #controls > * {
+    width: 300;
+}
+
+WorldListView > #content {
+    flex-grow: 1;
+    padding-top: 4;
+    padding-bottom: 10;
+    overflow: scroll;
+    align-items: center;
+}
+
+WorldItemView {
+    width: 300;
+    height: 46;
+    margin-top: 6;
+    padding: 4;
+    flex-direction: row;
+    flex-shrink: 0;
+}
+
+WorldItemView > #icon {
+    height: 38;
+    width: 38;
+    margin-right: 5;
+}
+
+WorldItemView > #texts {
+    width: 120;
+    flex-grow: 1;
+    padding-bottom: 1;
+    justify-content: center;
+}
+
+WorldItemView > #texts > #info {
+    margin-top: 2;
+}
