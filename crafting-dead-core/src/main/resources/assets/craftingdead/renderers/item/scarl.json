@@ -16,12 +16,7 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            -0.25,
-            -3.25
-        ],
-        "rotation": [
-            -3.5,
-            0,
+            -1,
             0
         ]
     },
@@ -36,9 +31,9 @@
             },
             "left_hand": {
                 "translation": [
-                    2,
+                    3.25,
                     -7,
-                    -11
+                    -13
                 ],
                 "rotation": [
                     0,

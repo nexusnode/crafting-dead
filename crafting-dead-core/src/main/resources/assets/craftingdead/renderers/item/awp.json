@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/awp",
     "muzzle_flash_transform": {
         "translation": [
-            1.6,
-            -1,
-            -28.8
+            3,
+            0,
+            -40
         ],
         "scale": [
             1.2,
@@ -16,8 +16,13 @@
     "aiming_transform": {
         "translation": [
             -8.5,
-            6.25,
-            -4.75
+            6.5,
+            -5
+        ],
+        "rotation": [
+            -1.5,
+            0,
+            0
         ]
     },
     "attachement_transforms": {
@@ -38,28 +43,21 @@
     },
     "hand_transforms": {
         "held_right_handed": {
-            "right_hand": {
-                "translation": [
-                    -3.2,
-                    1.6,
-                    3.2
-                ]
-            },
             "left_hand": {
                 "translation": [
-                    0,
-                    -3.2,
-                    -4.8
+                    4,
+                    -7,
+                    -15
                 ],
                 "rotation": [
                     0,
-                    7,
+                    25,
                     0
                 ],
                 "scale": [
-                    1.5,
-                    1.5,
-                    1.5
+                    1.75,
+                    1.75,
+                    1.75
                 ]
             }
         },

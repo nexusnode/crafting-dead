@@ -3,8 +3,8 @@
     "model": "craftingdead:gun/magnum",
     "muzzle_flash_transform": {
         "translation": [
-            2,
-            0,
+            4,
+            1.5,
             -20
         ],
         "scale": [
@@ -16,11 +16,11 @@
     "aiming_transform": {
         "translation": [
             -9,
-            6.65,
-            1.25
+            4,
+            2.75
         ],
         "rotation": [
-            -1,
+            -1.5,
             0,
             0
         ]
@@ -29,16 +29,16 @@
         "held_right_handed": {
             "right_hand": {
                 "translation": [
-                    -3,
-                    2,
-                    -1
+                    -2.5,
+                    2.15,
+                    1.75
                 ]
             },
             "left_hand": {
                 "translation": [
-                    -2,
-                    2,
-                    3
+                    -1,
+                    2.25,
+                    2
                 ],
                 "rotation": [
                     0,
@@ -51,30 +51,30 @@
             "right_hand": {
                 "translation": [
                     -14,
-                    8,
-                    10
+                    7,
+                    7.25
                 ],
                 "rotation": [
                     0,
-                    10,
+                    15,
                     0
                 ]
             },
             "left_hand": {
                 "translation": [
-                    -14,
-                    6.75,
-                    13
+                    -15.25,
+                    6.4,
+                    11.25
                 ],
                 "rotation": [
                     0,
-                    20,
+                    32.5,
                     0
                 ]
             }
         }
     },
     "iron_sights": {
-        "craftingdead:attachment/p250_iron_sight": {}
+        "craftingdead:attachment/g18_iron_sight": {}
     }
 }

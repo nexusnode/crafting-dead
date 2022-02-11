@@ -1,0 +1,72 @@
+{
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/vector",
+  "muzzle_flash_transform": {
+    "translation": [
+      6.5,
+      0,
+      -28.8
+    ],
+    "scale": [
+      1.2,
+      1.2,
+      1.2
+    ]
+  },
+  "aiming_transform": {
+    "translation": [
+      -9.5,
+      3.25,
+      0
+    ]
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
+        "translation": [
+          -1.5,
+          1,
+          4.5
+        ]
+      },
+      "left_hand": {
+        "translation": [
+          2.5,
+          -2,
+          6
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1.25,
+          1.25,
+          1.25
+        ]
+      }
+    },
+    "aiming_right_handed": {
+      "left_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ],
+        "rotation": [
+          0,
+          22,
+          0
+        ]
+      },
+      "right_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ]
+      }
+    }
+  }
+}

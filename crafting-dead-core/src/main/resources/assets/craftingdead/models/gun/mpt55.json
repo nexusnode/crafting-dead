@@ -46,8 +46,8 @@
 			}
 		},
 		{
-			"from": [6.5, 10, -10.5],
-			"to": [10.5, 12, -4.5],
+			"from": [6.5, 10, -10],
+			"to": [10.5, 12, -4],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 9.59945, 8.91649]},
 			"faces": {
 				"north": {"uv": [4.5, 3.875, 5, 4.125], "texture": "#gun"},
@@ -239,6 +239,32 @@
 				"up": {"uv": [0.875, 8.625, 0.625, 8], "texture": "#gun"},
 				"down": {"uv": [1.125, 8, 0.875, 8.625], "texture": "#gun"}
 			}
+		},
+		{
+			"from": [7.5, 5, 2.5],
+			"to": [9.5, 8, 6.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 4.74686, 4.0021]},
+			"faces": {
+				"north": {"uv": [2, 0.5, 2.25, 0.875], "texture": "#gun"},
+				"east": {"uv": [1.5, 0.5, 2, 0.875], "texture": "#gun"},
+				"south": {"uv": [2.75, 0.5, 3, 0.875], "texture": "#gun"},
+				"west": {"uv": [2.25, 0.5, 2.75, 0.875], "texture": "#gun"},
+				"up": {"uv": [2.25, 0.5, 2, 0], "texture": "#gun"},
+				"down": {"uv": [2.5, 0, 2.25, 0.5], "texture": "#gun"}
+			}
+		},
+		{
+			"from": [7.5, -0.06336, 2.21299],
+			"to": [9.5, 5.93664, 6.21299],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8.5, 4.74686, 4.0021]},
+			"faces": {
+				"north": {"uv": [0.5, 0.5, 0.75, 1.25], "texture": "#gun"},
+				"east": {"uv": [0, 0.5, 0.5, 1.25], "texture": "#gun"},
+				"south": {"uv": [1.25, 0.5, 1.5, 1.25], "texture": "#gun"},
+				"west": {"uv": [0.75, 0.5, 1.25, 1.25], "texture": "#gun"},
+				"up": {"uv": [0.75, 0.5, 0.5, 0], "texture": "#gun"},
+				"down": {"uv": [1, 0, 0.75, 0.5], "texture": "#gun"}
+			}
 		}
 	],
 	"display": {
@@ -251,8 +277,8 @@
 			"scale": [0.6, 0.6, 0.6]
 		},
 		"firstperson_righthand": {
-			"rotation": [6.5, 1.5, 0],
-			"translation": [4.5, -1.75, -6]
+			"rotation": [6.5, 4, 1],
+			"translation": [1.25, -1.75, -6.5]
 		},
 		"firstperson_lefthand": {
 			"translation": [-8.5, 0.5, -0.5]
@@ -287,6 +313,12 @@
 					"origin": [8, 8, 8],
 					"color": 0,
 					"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+				},
+				{
+					"name": "Magazine",
+					"origin": [8, 8, 8],
+					"color": 0,
+					"children": [18, 19]
 				}
 			]
 		}

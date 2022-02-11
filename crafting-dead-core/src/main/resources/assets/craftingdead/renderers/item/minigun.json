@@ -1,0 +1,72 @@
+{
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/minigun",
+  "muzzle_flash_transform": {
+    "translation": [
+      6,
+      -1,
+      -40
+    ],
+    "scale": [
+      1.2,
+      1.2,
+      1.2
+    ]
+  },
+  "aiming_transform": {
+    "translation": [
+      -9.5,
+      1.5,
+      3
+    ]
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
+        "translation": [
+          0,
+          0,
+          2
+        ]
+      },
+      "left_hand": {
+        "translation": [
+          2.5,
+          -4,
+          -9.5
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ],
+        "scale": [
+          1.5,
+          1.5,
+          1.5
+        ]
+      }
+    },
+    "aiming_right_handed": {
+      "left_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ]
+      },
+      "right_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ]
+      }
+    }
+  }
+}
