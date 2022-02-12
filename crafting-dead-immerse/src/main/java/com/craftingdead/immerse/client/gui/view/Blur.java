@@ -85,8 +85,6 @@ public class Blur implements AutoCloseable {
   public void process(float partialTicks) {
     if (this.blurShader != null) {
       this.blurShader.process(partialTicks);
-      // TODO Fixes Minecraft bug when using post-processing shaders.
-      RenderSystem.enableTexture();
       this.minecraft.getMainRenderTarget().bindWrite(false);
     }
   }

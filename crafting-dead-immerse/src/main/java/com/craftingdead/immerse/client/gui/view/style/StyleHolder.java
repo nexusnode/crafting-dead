@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.State;
 import com.craftingdead.immerse.client.gui.view.States;
 import com.craftingdead.immerse.client.gui.view.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.style.parser.TransitionParser;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 
 public class StyleHolder {
@@ -78,12 +79,12 @@ public class StyleHolder {
 
     var rules = styleList.getRulesMatching(this);
 
-    var transitionBuilders = new ArrayList<TransitionBuilder>();
+    var transitions = new ArrayList<StyleTransition>();
 
     this.resetToDefault();
     for (var rule : rules) {
       var source = new StyleSource(StyleSource.Type.AUTHOR, rule.selector().getSpecificity());
-      TransitionBuilder transitionBuilder = null;
+      TransitionParser transitionParser = null;
       for (var property : rule.properties()) {
 
         var dispatcher = this.dispatchers.get(property.name());
@@ -97,24 +98,22 @@ public class StyleHolder {
           continue;
         }
 
-
-        if (TransitionBuilder.isTransitionProperty(property.name())) {
-          if (transitionBuilder == null) {
-            transitionBuilder = new TransitionBuilder();
+        if (TransitionParser.isTransitionProperty(property.name())) {
+          if (transitionParser == null) {
+            transitionParser = new TransitionParser();
           }
 
-          transitionBuilder.tryParse(property.name(), property.value());
+          transitionParser.tryParse(property.name(), property.value());
         }
       }
 
-      if (transitionBuilder != null) {
-        transitionBuilder.build();
-        transitionBuilders.add(transitionBuilder);
+      if (transitionParser != null) {
+        transitionParser.build().ifPresent(transitions::add);
       }
     }
 
-    for (var transitionBuilder : transitionBuilders) {
-      transitionBuilder.apply(this.dispatchers);
+    for (var transition : transitions) {
+      transition.apply(this.dispatchers);
     }
   }
 

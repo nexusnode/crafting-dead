@@ -121,9 +121,11 @@ public class WorldListView extends ParentView {
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+    if (super.mouseClicked(mouseX, mouseY, button)) {
+      return true;
+    }
     this.updateSelected();
-    return result;
+    return false;
   }
 
   protected void updateSelected() {

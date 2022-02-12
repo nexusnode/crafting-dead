@@ -1,5 +1,10 @@
 @import url("craftingdeadimmerse:css/theme.css");
 
+ConnectView {
+    align-items: center;
+    justify-content: center;
+}
+
 ConnectView > #dialog {
     width: 60%;
     height: 60%;

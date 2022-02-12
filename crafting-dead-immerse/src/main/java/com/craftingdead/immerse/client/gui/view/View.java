@@ -826,7 +826,7 @@ public class View extends GuiComponent
   }
 
   public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer) {
-    this.addListener(eventType, consumer, false);
+    this.addListener(eventType, consumer, true);
   }
 
   public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer,

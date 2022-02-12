@@ -6,12 +6,12 @@ import com.craftingdead.immerse.client.gui.view.Transition;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
 
-public class GenericShorthandProperty implements PropertyDispatcher<String> {
+public class GenericShorthandDispatcher implements PropertyDispatcher<String> {
 
   private final String name;
   private final PropertyDispatcher<?>[] dispatchers;
 
-  public GenericShorthandProperty(String name, PropertyDispatcher<?>... dispatchers) {
+  public GenericShorthandDispatcher(String name, PropertyDispatcher<?>... dispatchers) {
     this.name = name;
     this.dispatchers = dispatchers;
   }
