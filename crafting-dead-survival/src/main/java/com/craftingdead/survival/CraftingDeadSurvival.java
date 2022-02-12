@@ -22,9 +22,8 @@ import java.util.ListIterator;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
-import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionTypes;
-import com.craftingdead.core.world.action.item.ItemAction;
+import com.craftingdead.core.world.action.item.EntityItemAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
@@ -54,7 +53,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -199,17 +197,17 @@ public class CraftingDeadSurvival {
   // ================================================================================
 
   @SubscribeEvent
-  public void handlePerformAction(LivingExtensionEvent.PerformAction<ItemAction> event) {
-    Action action = event.getAction();
-    LivingExtension<?, ?> target = action.getTarget().orElse(null);
-    if (action.getType() == ActionTypes.USE_SYRINGE.get()
-        && target != null
-        && target.getEntity() instanceof Zombie) {
-      event.setCanceled(true);
-      event.getLiving().performAction(
-          SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get().createAction(action.getPerformer(),
-              target),
-          true);
+  public void handlePerformAction(LivingExtensionEvent.PerformAction<EntityItemAction<?>> event) {
+    var action = event.getAction();
+    LivingExtension<?, ?> target = action.getSelectedTarget();
+    if (!event.getLiving().getLevel().isClientSide()
+        && action.getType() == ActionTypes.USE_SYRINGE.get()) {
+      SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get()
+          .createEntityAction(event.getLiving(), target, action.getHand())
+          .ifPresent(newAction -> {
+            event.setCanceled(true);
+            event.getLiving().performAction(newAction, true);
+          });
     }
   }
 
@@ -248,7 +246,7 @@ public class CraftingDeadSurvival {
         && event.getItemStack().getCapability(Clothing.CAPABILITY).isPresent()) {
       var extension = PlayerExtension.getOrThrow(event.getPlayer());
       extension.performAction(
-          SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, null), true);
+          SurvivalActionTypes.SHRED_CLOTHING.get().decode(extension, null), true);
     }
   }
 

@@ -36,6 +36,9 @@ import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.util.DependencyLoader;
+import com.craftingdead.immerse.world.action.ImmerseActionTypes;
+import com.craftingdead.immerse.world.item.ImmerseItems;
+import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
 import io.sentry.Sentry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -125,6 +128,9 @@ public class CraftingDeadImmerse {
     ImmerseSoundEvents.SOUND_EVENTS.register(modEventBus);
     GameTypes.GAME_TYPES.register(modEventBus);
     ModuleTypes.MODULE_TYPES.register(modEventBus);
+    ImmerseActionTypes.ACTION_TYPES.register(modEventBus);
+    ImmerseBlocks.BLOCKS.register(modEventBus);
+    ImmerseItems.ITEMS.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
 

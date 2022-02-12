@@ -20,12 +20,11 @@ package com.craftingdead.core.world.action.reload;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.common.collect.ImmutableList;
@@ -43,10 +42,9 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   private MagazineLocation magazineLocation;
 
-  public MagazineReloadAction(ActionType type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
-    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
+  public MagazineReloadAction(LivingExtension<?, ?> performer) {
+    super(performer);
+    var ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
     }
@@ -54,8 +52,13 @@ public class MagazineReloadAction extends AbstractReloadAction {
   }
 
   @Override
+  public ActionType<?> getType() {
+    return ActionTypes.MAGAZINE_RELOAD.get();
+  }
+
+  @Override
   public boolean start() {
-    Optional<MagazineLocation> result = this.findMagazine(this.getPerformer());
+    var result = this.findMagazine(this.getPerformer());
     if (!result.isPresent()) {
       return false;
     }
@@ -80,15 +83,15 @@ public class MagazineReloadAction extends AbstractReloadAction {
   @Override
   protected void revert() {
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);
-    ItemStack remainingStack = this.magazineLocation.itemHandler.insertItem(
-        this.magazineLocation.slot, this.newMagazineStack, false);
+    var remainingStack = this.magazineLocation.itemHandler().insertItem(
+        this.magazineLocation.slot(), this.newMagazineStack, false);
     this.getPerformer().getEntity().spawnAtLocation(remainingStack);
   }
 
   private List<IItemHandler> collectItemHandlers(LivingExtension<?, ?> living) {
-    ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
+    var builder = ImmutableList.<IItemHandler>builder();
 
-    CollectMagazineItemHandlers event = new CollectMagazineItemHandlers(living);
+    var event = new CollectMagazineItemHandlers(living);
     MinecraftForge.EVENT_BUS.post(event);
     builder.addAll(event.getItemHandlers());
 
@@ -96,18 +99,21 @@ public class MagazineReloadAction extends AbstractReloadAction {
     living.getItemHandler().getStackInSlot(ModEquipmentSlot.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
-    // TODO Backpack - second
+    // Backpack - second
+    living.getItemHandler().getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
+        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
     // Inventory - third
     living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
         .ifPresent(builder::add);
+
     return builder.build();
   }
 
   private Optional<MagazineLocation> findMagazine(LivingExtension<?, ?> living) {
-    for (IItemHandler itemHandler : this.collectItemHandlers(living)) {
+    for (var itemHandler : this.collectItemHandlers(living)) {
       for (int i = 0; i < itemHandler.getSlots(); ++i) {
-        ItemStack itemStack = itemHandler.getStackInSlot(i);
+        var itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
             && !itemStack.getCapability(Magazine.CAPABILITY)
                 .map(Magazine::isEmpty)
@@ -119,14 +125,5 @@ public class MagazineReloadAction extends AbstractReloadAction {
     return Optional.empty();
   }
 
-  private static class MagazineLocation {
-
-    private final IItemHandler itemHandler;
-    private final int slot;
-
-    public MagazineLocation(IItemHandler itemHandler, int slot) {
-      this.itemHandler = itemHandler;
-      this.slot = slot;
-    }
-  }
+  private record MagazineLocation(IItemHandler itemHandler, int slot) {}
 }

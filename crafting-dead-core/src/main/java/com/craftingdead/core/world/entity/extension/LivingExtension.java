@@ -25,10 +25,10 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.item.gun.Gun;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -121,7 +121,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param sendUpdate - alert the other side (client/server) of this change
    * @return whether the {@link Action} is being performed
    */
-  boolean performAction(Action action, boolean force, boolean sendUpdate);
+  <T extends Action> boolean performAction(T action, boolean force, boolean sendUpdate);
 
   /**
    * Cancel the current {@link Action} being performed.
@@ -131,28 +131,27 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   void cancelAction(boolean sendUpdate);
 
   /**
-   * Attach a progress monitor to this {@link LivingExtension} (will show a progress bar on the
-   * client).
+   * Set the action observer.
    * 
-   * @param progressMonitor - the {@link ProgressMonitor} to attach
+   * @param actionObserver - the {@link ActionObserver} to attach
    */
-  void setProgressMonitor(ProgressMonitor progressMonitor);
+  void setActionObserver(@Nullable ActionObserver actionObserver);
 
   /**
-   * Get the currently attached {@link ProgressMonitor} monitor.
+   * Get the action observer.
    * 
-   * @return an {@link Optional} progress monitor
-   * @see #setProgressMonitor(ProgressMonitor)
+   * @return an optional {@link ActionObserver}
+   * @see #setActionObserver(ActionObserver)
    */
-  Optional<ProgressMonitor> getProgressMonitor();
+  Optional<ActionObserver> getActionObserver();
 
   /**
    * Whether this {@link LivingExtension} is currently monitoring an action.
    * 
    * @return true if it is monitoring an action.
    */
-  default boolean hasProgressMonitor() {
-    return this.getProgressMonitor().isPresent();
+  default boolean isObservingAction() {
+    return this.getActionObserver().isPresent();
   }
 
   /**
@@ -303,39 +302,5 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
             pos.y, pos.z, velocity.x, velocity.y + 0.05D, velocity.z);
       }
     }
-  }
-
-  /**
-   * Progress monitor used to track the progress of actions.
-   */
-  public static interface ProgressMonitor {
-
-    /**
-     * The message to display to a {@link LivingExtension} that is monitoring the action.
-     * 
-     * @return a {@link ITextComponent} instance
-     */
-    Component getMessage();
-
-    /**
-     * Get an optional sub-message.
-     * 
-     * @return an {@link Optional} sub-message.
-     * @see #getMessage()
-     */
-    Optional<Component> getSubMessage();
-
-    /**
-     * Get the progress percentage (0 - 1) of the action.
-     * 
-     * @param partialTicks
-     * @return
-     */
-    float getProgress(float partialTicks);
-
-    /**
-     * Stop the underlying action being performed.
-     */
-    void stop();
   }
 }

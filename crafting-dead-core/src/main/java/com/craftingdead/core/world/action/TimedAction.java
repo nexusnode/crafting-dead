@@ -18,47 +18,27 @@
 
 package com.craftingdead.core.world.action;
 
-import javax.annotation.Nullable;
-import com.craftingdead.core.world.entity.extension.LivingExtension;
-
-public abstract class TimedAction<T extends ActionType> extends AbstractAction<T> {
+public abstract class TimedAction implements Action {
 
   private int durationTicks;
-
-  public TimedAction(T type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
-  }
 
   protected abstract int getTotalDurationTicks();
 
   @Override
   public boolean start() {
-    if (this.getTotalDurationTicks() <= 0) {
-      this.finish();
-      return false;
-    } else {
-      return true;
-    }
+    return true;
   }
 
   @Override
   public boolean tick() {
-    if (++this.durationTicks >= this.getTotalDurationTicks()) {
-      this.finish();
-      return true;
-    }
-    return false;
+    return ++this.durationTicks >= this.getTotalDurationTicks();
   }
 
-  protected abstract void finish();
-
   @Override
-  public void cancel() {
+  public void stop(StopReason reason) {
     this.durationTicks = 0;
   }
 
-  @Override
   public float getProgress(float partialTicks) {
     return (float) (this.durationTicks + partialTicks) / this.getTotalDurationTicks();
   }

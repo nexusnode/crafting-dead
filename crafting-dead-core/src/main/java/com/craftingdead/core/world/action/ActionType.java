@@ -18,33 +18,20 @@
 
 package com.craftingdead.core.world.action;
 
-import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.Util;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public class ActionType extends ForgeRegistryEntry<ActionType> {
+public interface ActionType<T extends Action> extends IForgeRegistryEntry<ActionType<?>> {
 
-  private final boolean triggeredByClient;
-  private final Factory<ActionType> factory;
+  void encode(T action, FriendlyByteBuf out);
 
-  @SuppressWarnings("unchecked")
-  public <SELF extends ActionType> ActionType(boolean triggeredByClient,
-      Factory<? super SELF> factory) {
-    this.triggeredByClient = triggeredByClient;
-    this.factory = (Factory<ActionType>) factory;
-  }
+  T decode(LivingExtension<?, ?> performer, FriendlyByteBuf in);
 
-  public Action createAction(LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    return this.factory.create(this, performer, target);
-  }
+  boolean isTriggeredByClient();
 
-  public boolean isTriggeredByClient() {
-    return this.triggeredByClient;
-  }
-
-  public interface Factory<T extends ActionType> {
-    Action create(T actionType, LivingExtension<?, ?> performer,
-        @Nullable LivingExtension<?, ?> target);
+  default String makeDescriptionId() {
+    return Util.makeDescriptionId("action", this.getRegistryName());
   }
 }

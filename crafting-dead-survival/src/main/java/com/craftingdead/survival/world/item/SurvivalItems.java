@@ -140,35 +140,26 @@ public class SurvivalItems {
           .tab(TAB)));
 
   public static final RegistryObject<Item> DIRTY_RAG = ITEMS.register("dirty_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.WASH_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS.register("bloody_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.WASH_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS.register("clean_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_CLEAN_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.USE_CLEAN_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS.register("splint",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_SPLINT)
+      () -> new ActionItem(SurvivalActionTypes.USE_SPLINT, new Item.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS.register("rbi_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_RBI_SYRINGE)
+      () -> new ActionItem(SurvivalActionTypes.USE_RBI_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS.register("cure_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_CURE_SYRINGE)
+      () -> new ActionItem(SurvivalActionTypes.USE_CURE_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
 

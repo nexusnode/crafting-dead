@@ -18,96 +18,117 @@
 
 package com.craftingdead.core.world.action.item;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.world.action.TimedAction;
-import com.craftingdead.core.world.action.delegate.DelegateAction;
+import java.util.Optional;
+import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class ItemAction extends TimedAction<ItemActionType> {
+public abstract class ItemAction implements Action {
 
-  private DelegateAction delegatedAction;
+  private final InteractionHand hand;
 
-  ItemAction(ItemActionType type, LivingExtension<?, ?> performer, LivingExtension<?, ?> target) {
-    super(type, performer, target);
+  public ItemAction(InteractionHand hand) {
+    this.hand = hand;
+  }
+
+  public InteractionHand getHand() {
+    return this.hand;
+  }
+
+  public ItemStack getItemStack() {
+    return this.getPerformer().getEntity().getItemInHand(this.hand);
+  }
+  
+  public int getTicksUsingItem() {
+    return this.getPerformer().getEntity().getTicksUsingItem();
+  }
+
+  private boolean checkHeldItem() {
+    return this.getType().getHeldItemPredicate().test(this.getItemStack());
   }
 
   @Override
   public boolean start() {
-    final var heldStack = this.getPerformer().getMainHandItem();
-    if (this.getType().getHeldItemPredicate().test(heldStack)) {
-      for (var delegatedActionType : this.getType().getDelegateActions()) {
-        var action = delegatedActionType.create(this).orElse(null);
-        if (action != null) {
-          this.delegatedAction = action;
-          return super.start();
-        }
+    if (this.checkHeldItem()) {
+      if (!this.getPerformer().getLevel().isClientSide()) {
+        this.getPerformer().getEntity().startUsingItem(this.hand);
       }
+      return true;
     }
     return false;
   }
 
   @Override
-  protected final void finish() {
-    final var heldStack = this.getPerformer().getMainHandItem();
-    if (this.delegatedAction.finish(
-        this.getPerformer(), this.getTarget().orElse(null), heldStack)) {
-      final var consumeItem = this.delegatedAction.shouldConsumeItem(this.getPerformer());
-      final var resultStack = this.delegatedAction.getResultItem(this.getPerformer())
-          .map(Item::getDefaultInstance)
-          .orElse(ItemStack.EMPTY);
-
-      if (consumeItem
-          && !(this.getPerformer().getEntity() instanceof Player player && player.isCreative())) {
-        heldStack.shrink(1);
-      }
-
-      if (!resultStack.isEmpty()) {
-        if (heldStack.isEmpty()) {
-          this.getPerformer().getEntity().setItemInHand(InteractionHand.MAIN_HAND, resultStack);
-        } else if (this.getPerformer().getEntity() instanceof Player player
-            && player.getInventory().add(resultStack)) {
-          this.getPerformer().getEntity().spawnAtLocation(resultStack);
-        }
-      }
-
-      this.delegatedAction.getFinishSound().ifPresent(
-          sound -> this.getPerformer().getEntity().playSound(sound, 1.0F, 1.0F));
+  public void stop(StopReason reason) {
+    this.getPerformer().getEntity().stopUsingItem();
+    if (!reason.isCompleted()) {
+      return;
     }
+
+    final var heldStack = this.getItemStack();
+
+    final var consumeItem = this.shouldConsumeItem(this.getPerformer());
+    final var resultStack = this.getResultItem(this.getPerformer())
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
+
+    if (consumeItem
+        && !(this.getPerformer().getEntity() instanceof Player player && player.isCreative())) {
+      heldStack.shrink(1);
+    }
+
+    if (!resultStack.isEmpty()) {
+      if (heldStack.isEmpty()) {
+        this.getPerformer().getEntity().setItemInHand(this.hand, resultStack);
+      } else if (this.getPerformer().getEntity() instanceof Player player
+          && player.getInventory().add(resultStack)) {
+        this.getPerformer().getEntity().spawnAtLocation(resultStack);
+      }
+    }
+
+    this.getType().getFinishSound().ifPresent(
+        sound -> this.getPerformer().getEntity().playSound(sound, 1.0F, 1.0F));
+  }
+
+  protected boolean shouldConsumeItem(LivingExtension<?, ?> performer) {
+    return this.getType().shouldConsumeItemInCreative()
+        && !(performer.getEntity() instanceof Player player && player.isCreative())
+        && this.getType().shouldConsumeItem();
+  }
+
+  protected Optional<Item> getResultItem(LivingExtension<?, ?> performer) {
+    return (!this.getType().useResultItemInCreative()
+        && performer.getEntity() instanceof Player player
+        && player.isCreative()) ? Optional.empty() : this.getType().getReturnItem();
   }
 
   @Override
   public boolean tick() {
-    final var finished = super.tick();
-    final ItemStack heldStack = this.getPerformer().getMainHandItem();
-
-    boolean usingItem = true;
-    if (this.getPerformer().getLevel().isClientSide()) {
-      ClientDist clientDist = CraftingDead.getInstance().getClientDist();
-      usingItem =
-          !clientDist.isLocalPlayer(this.getPerformer().getEntity())
-              || clientDist.isRightMouseDown();
-    }
-
-    if (!this.delegatedAction.canPerform(
-        this.getPerformer(), this.getTarget().orElse(null), heldStack) || !usingItem) {
+    if (!this.getPerformer().getLevel().isClientSide()
+        && !this.getPerformer().getEntity().isUsingItem()) {
       this.getPerformer().cancelAction(true);
+      return false;
     }
 
     if (this.getType().isFreezeMovement()) {
-      this.getTarget().ifPresent(target -> target.setMovementBlocked(true));
       this.getPerformer().setMovementBlocked(true);
     }
 
-    return finished;
+    return this.getPerformer().getEntity().getUseItemRemainingTicks() == 1;
+  }
+
+  public float getProgress(float partialTicks) {
+    if (!this.getPerformer().getEntity().isUsingItem()) {
+      return 0.0F;
+    } else {
+      return (float) (this.getPerformer().getEntity().getTicksUsingItem() + partialTicks)
+          / this.getType().getTotalDurationTicks();
+    }
   }
 
   @Override
-  protected int getTotalDurationTicks() {
-    return this.getType().getTotalDurationTicks();
-  }
+  public abstract ItemActionType<?> getType();
 }

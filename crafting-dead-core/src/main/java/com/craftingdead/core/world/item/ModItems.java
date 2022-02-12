@@ -2308,10 +2308,9 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> HANDCUFFS =
+  public static final RegistryObject<ActionItem> HANDCUFFS =
       ITEMS.register("handcuffs",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.APPLY_HANDCUFFS)
+          () -> new ActionItem(ActionTypes.APPLY_HANDCUFFS, new Item.Properties()
               .durability(200)
               .tab(COMBAT_TAB)));
 
@@ -2325,38 +2324,33 @@ public class ModItems {
   // Medical
   // ================================================================================
 
-  public static final RegistryObject<Item> FIRST_AID_KIT =
+  public static final RegistryObject<ActionItem> FIRST_AID_KIT =
       ITEMS.register("first_aid_kit",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_FIRST_AID_KIT)
+          () -> new ActionItem(ActionTypes.USE_FIRST_AID_KIT, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> ADRENALINE_SYRINGE =
+  public static final RegistryObject<ActionItem> ADRENALINE_SYRINGE =
       ITEMS.register("adrenaline_syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_ADRENALINE_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_ADRENALINE_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> SYRINGE =
+  public static final RegistryObject<ActionItem> SYRINGE =
       ITEMS.register("syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> BLOOD_SYRINGE =
+  public static final RegistryObject<ActionItem> BLOOD_SYRINGE =
       ITEMS.register("blood_syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_BLOOD_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_BLOOD_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> BANDAGE =
+  public static final RegistryObject<ActionItem> BANDAGE =
       ITEMS.register("bandage",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_BANDAGE)
+          () -> new ActionItem(ActionTypes.USE_BANDAGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 

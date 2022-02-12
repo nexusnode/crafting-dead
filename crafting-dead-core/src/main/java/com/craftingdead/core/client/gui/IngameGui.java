@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -147,10 +148,6 @@ public class IngameGui {
 
   public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, ItemStack heldStack,
       @Nullable Gun gun, PoseStack poseStack, int width, int height, float partialTicks) {
-
-    // TODO Fixes Minecraft bug when using post-processing shaders.
-    RenderSystem.enableTexture();
-
     if (this.hitMarker != null) {
       if (this.hitMarker.render(poseStack, width, height, partialTicks)) {
         this.hitMarker = null;
@@ -174,7 +171,8 @@ public class IngameGui {
       RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
     }
 
-    player.getProgressMonitor()
+    player.getActionObserver()
+        .flatMap(ActionObserver::getProgressBar)
         .ifPresent(observer -> renderProgress(poseStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
@@ -395,6 +393,11 @@ public class IngameGui {
 
   private static void renderProgress(PoseStack poseStack, Font font,
       int width, int height, Component message, @Nullable Component subMessage, float percent) {
+
+    if (percent == 1.0F)
+      System.out.println(percent);
+
+
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;

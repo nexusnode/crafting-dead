@@ -18,10 +18,9 @@
 
 package com.craftingdead.core.world.action.reload;
 
-import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.RefillableAmmoProvider;
 
 public class RefillableReloadAction extends AbstractReloadAction {
@@ -30,14 +29,18 @@ public class RefillableReloadAction extends AbstractReloadAction {
 
   private int oldAmmoCount;
 
-  public RefillableReloadAction(ActionType type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
-    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
+  public RefillableReloadAction(LivingExtension<?, ?> performer) {
+    super(performer);
+    var ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof RefillableAmmoProvider)) {
       throw new IllegalStateException("No RefillableAmmoProvider present");
     }
     this.ammoProvider = (RefillableAmmoProvider) ammoProvider;
+  }
+
+  @Override
+  public ActionType<?> getType() {
+    return ActionTypes.REFILLABLE_RELOAD.get();
   }
 
   @Override

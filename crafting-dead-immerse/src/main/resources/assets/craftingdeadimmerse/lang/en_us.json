@@ -1,4 +1,8 @@
 {
+    "item.craftingdeadimmerse.campfire_blueprint": "Campfire Blueprint",
+    "item.craftingdeadimmerse.base_center_blueprint": "Base Center Blueprint",
+    "item.craftingdeadimmerse.oak_planks_wall_blueprint": "Oak Planks Wall Blueprint",
+
     "commands.game.restart":"Restarting game",
     "commands.game.reload_rotation":"Reloading game rotation",
 

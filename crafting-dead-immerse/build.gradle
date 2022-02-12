@@ -80,6 +80,8 @@ dependencies {
 	library ('io.sentry:sentry:5.6.0') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
+    
+    library group: 'net.rocketpowered', name: 'rocket-connector', version: '1.18.1-0.0.1'
 }
 
 jar {

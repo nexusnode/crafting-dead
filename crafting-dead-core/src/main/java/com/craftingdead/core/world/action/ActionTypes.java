@@ -20,8 +20,7 @@ package com.craftingdead.core.world.action;
 
 import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.action.delegate.DelegateEntityActionType;
-import com.craftingdead.core.world.action.item.ItemActionType;
+import com.craftingdead.core.world.action.item.EntityItemActionType;
 import com.craftingdead.core.world.action.reload.MagazineReloadAction;
 import com.craftingdead.core.world.action.reload.RefillableReloadAction;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -43,121 +42,105 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ActionTypes {
 
-  public static final DeferredRegister<ActionType> ACTION_TYPES =
-      DeferredRegister.create(ActionType.class, CraftingDead.ID);
+  @SuppressWarnings("unchecked")
+  public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
+      DeferredRegister.create((Class<ActionType<?>>) (Object) ActionType.class, CraftingDead.ID);
 
-  public static final Lazy<IForgeRegistry<ActionType>> REGISTRY =
+  public static final Lazy<IForgeRegistry<ActionType<?>>> REGISTRY =
       Lazy.of(ACTION_TYPES.makeRegistry("action_type", RegistryBuilder::new));
 
-  public static final RegistryObject<ActionType> MAGAZINE_RELOAD =
+  public static final RegistryObject<ActionType<?>> MAGAZINE_RELOAD =
       ACTION_TYPES.register("magazine_reload",
-          () -> new ActionType(true, MagazineReloadAction::new));
+          () -> new SimpleActionType<>(MagazineReloadAction::new, true));
 
-  public static final RegistryObject<ActionType> REFILLABLE_RELOAD =
+  public static final RegistryObject<ActionType<?>> REFILLABLE_RELOAD =
       ACTION_TYPES.register("refillable_reload",
-          () -> new ActionType(true, RefillableReloadAction::new));
+          () -> new SimpleActionType<>(RefillableReloadAction::new, true));
 
-  public static final RegistryObject<ActionType> REMOVE_MAGAZINE =
+  public static final RegistryObject<ActionType<?>> REMOVE_MAGAZINE =
       ACTION_TYPES.register("remove_magazine",
-          () -> new ActionType(true, RemoveMagazineAction::new));
+          () -> new SimpleActionType<>(RemoveMagazineAction::new, true));
 
-  public static final RegistryObject<ActionType> USE_SYRINGE =
+  public static final RegistryObject<EntityItemActionType<?>> USE_SYRINGE =
       ACTION_TYPES.register("use_syringe",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType
+              .builder((performer, target) -> {
+                if (target == null
+                    || performer == target
+                    || target.getEntity() instanceof Skeleton) {
+                  return Optional.empty();
+                }
+
+                var targetEntity = target.getEntity();
+                if (targetEntity.getHealth() > 4) {
+                  return Optional.ofNullable(target);
+                }
+
+                if (performer.getEntity() instanceof Player player) {
+                  player.displayClientMessage(
+                      new TranslatableComponent("message.low_health",
+                          targetEntity.getDisplayName()).withStyle(ChatFormatting.RED),
+                      true);
+                }
+
+                return Optional.empty();
+              })
               .forItem(ModItems.SYRINGE)
               .duration(16)
-              .delegate(DelegateEntityActionType
-                  .builder((performer, target) -> {
-                    if (target == null
-                        || performer == target
-                        || target.getEntity() instanceof Skeleton) {
-                      return Optional.empty();
-                    }
-
-                    var targetEntity = target.getEntity();
-                    if (targetEntity.getHealth() > 4) {
-                      return Optional.ofNullable(target);
-                    }
-
-                    if (performer.getEntity() instanceof Player player) {
-                      player.displayClientMessage(
-                          new TranslatableComponent("message.low_health",
-                              targetEntity.getDisplayName()).withStyle(ChatFormatting.RED),
-                          true);
-                    }
-
-                    return Optional.empty();
-                  })
-                  .customAction((performer, target) -> target.getEntity().hurt(
-                      DamageSource.mobAttack(target.getEntity()), 2.0F), 1.0F)
-                  .returnItem(ModItems.BLOOD_SYRINGE)
-                  .build())
+              .customAction((performer, target) -> target.getEntity().hurt(
+                  DamageSource.mobAttack(target.getEntity()), 2.0F), 1.0F)
+              .returnItem(ModItems.BLOOD_SYRINGE)
               .build());
 
-  public static final RegistryObject<ActionType> USE_FIRST_AID_KIT =
+  public static final RegistryObject<EntityItemActionType<?>> USE_FIRST_AID_KIT =
       ACTION_TYPES.register("use_first_aid_kit",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.FIRST_AID_KIT)
               .setFreezeMovement(true)
-              .delegate(DelegateEntityActionType
-                  .builder(TargetSelector.SELF_OR_OTHERS)
-                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 1))
-                  .build())
+              .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 1))
               .build());
 
-  public static final RegistryObject<ActionType> USE_ADRENALINE_SYRINGE =
+  public static final RegistryObject<EntityItemActionType<?>> USE_ADRENALINE_SYRINGE =
       ACTION_TYPES.register("use_adrenaline_syringe",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.ADRENALINE_SYRINGE)
               .duration(16)
-              .delegate(DelegateEntityActionType
-                  .builder(TargetSelector.SELF_OR_OTHERS)
-                  .returnItem(ModItems.SYRINGE)
-                  .useResultItemInCreative(false)
-                  .effect(() -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1))
-                  .build())
+              .returnItem(ModItems.SYRINGE)
+              .useResultItemInCreative(false)
+              .effect(() -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1))
               .build());
 
-  public static final RegistryObject<ActionType> USE_BLOOD_SYRINGE =
+  public static final RegistryObject<EntityItemActionType<?>> USE_BLOOD_SYRINGE =
       ACTION_TYPES.register("use_blood_syringe",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.BLOOD_SYRINGE)
               .duration(16)
-              .delegate(DelegateEntityActionType
-                  .builder(TargetSelector.SELF_OR_OTHERS)
-                  .returnItem(ModItems.SYRINGE)
-                  .useResultItemInCreative(false)
-                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
-                  .build())
+              .returnItem(ModItems.SYRINGE)
+              .useResultItemInCreative(false)
+              .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
               .build());
 
-  public static final RegistryObject<ActionType> USE_BANDAGE =
+  public static final RegistryObject<EntityItemActionType<?>> USE_BANDAGE =
       ACTION_TYPES.register("use_bandage",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.BANDAGE)
               .duration(16)
-              .delegate(DelegateEntityActionType
-                  .builder(TargetSelector.SELF_OR_OTHERS)
-                  .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
-                  .build())
+              .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
               .build());
 
-  public static final RegistryObject<ActionType> APPLY_HANDCUFFS =
+  public static final RegistryObject<EntityItemActionType<?>> APPLY_HANDCUFFS =
       ACTION_TYPES.register("apply_handcuffs",
-          () -> ItemActionType.builder()
+          () -> EntityItemActionType.builder(TargetSelector.OTHERS_ONLY
+              .players()
+              .filter(Predicates.not(PlayerExtension::isHandcuffed)))
               .forItem(ModItems.HANDCUFFS)
-              .delegate(DelegateEntityActionType
-                  .builder(TargetSelector.OTHERS_ONLY
-                      .players()
-                      .filter(Predicates.not(PlayerExtension::isHandcuffed)))
-                  .customAction((performer, target) -> {
-                    target.setHandcuffs(performer.getMainHandItem().copy());
-                    target.getEntity().displayClientMessage(
-                        new TranslatableComponent("handcuffs.handcuffed",
-                            performer.getEntity().getDisplayName())
-                                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
-                        true);
-                  }, 1.0F)
-                  .build())
+              .customAction((performer, target) -> {
+                target.setHandcuffs(performer.getMainHandItem().copy());
+                target.getEntity().displayClientMessage(
+                    new TranslatableComponent("handcuffs.handcuffed",
+                        performer.getEntity().getDisplayName())
+                            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
+                    true);
+              }, 1.0F)
               .build());
 }
