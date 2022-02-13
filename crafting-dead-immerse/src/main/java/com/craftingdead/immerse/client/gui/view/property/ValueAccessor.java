@@ -1,4 +1,4 @@
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

@@ -16,14 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import com.craftingdead.immerse.client.gui.view.state.StateListener;
+import com.craftingdead.immerse.client.gui.view.state.States;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class ValueProperty<T> implements StateListener {
+public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
 
   private final String name;
 
@@ -39,57 +41,89 @@ public class ValueProperty<T> implements StateListener {
   private Runnable transitionStopListener;
 
   @Nullable
-  private T overrideValue;
+  private T animatedValue;
 
-  protected ValueProperty(String name, Class<T> type, ValueAccessor<T> accessor) {
+  protected StatefulProperty(String name, Class<T> type, ValueAccessor<T> accessor) {
     this.name = name;
     this.type = type;
     this.accessor = accessor;
     this.resetState(0);
   }
 
-  public String getName() {
+  public final String getName() {
     return this.name;
   }
 
-  public Class<T> getType() {
+  public final Class<T> getType() {
     return this.type;
   }
 
-  public void setTransition(Transition transition) {
+  public final void setTransition(Transition transition) {
     this.transition = transition;
   }
 
+  /**
+   * Varargs version of {@link #defineState(Object, int)}.
+   */
+  public final void defineState(T value, int... states) {
+    this.defineState(value, States.combine(states));
+  }
+
+  /**
+   * User-facing method to define a state.
+   * 
+   * @param value - the value to associate the state with
+   * @param state - the state
+   */
   public void defineState(T value, int state) {
+    this.setState(state, value);
+  }
+
+  /**
+   * Internal method used to associate a value with a given state.
+   * 
+   * @param state - the state
+   * @param value - the value to associate the state with
+   */
+  protected final void setState(int state, T value) {
     this.stateValues.put(state, value);
     if (state == 0) {
       this.set(value);
     }
   }
 
-  public void resetState(int state) {
+  /**
+   * Internal method used to reset a specific state.
+   * 
+   * @param state - the state to reset
+   */
+  protected final void resetState(int state) {
     if (state == 0) {
       this.accessor.reset();
-      this.defineState(this.accessor.get(), 0);
+      this.setState(0, this.accessor.get());
     } else {
       this.stateValues.remove(state);
     }
   }
 
-  public T get() {
-    return this.overrideValue != null ? this.overrideValue : this.accessor.get();
+  @Override
+  public final T get() {
+    return this.animatedValue != null ? this.animatedValue : this.accessor.get();
   }
 
-  public void set(T value) {
+  @Override
+  public final void set(T value) {
     this.accessor.set(value);
   }
 
-  public boolean isBeingAnimated() {
-    return this.overrideValue != null;
+  @Override
+  public final boolean isBeingAnimated() {
+    return this.animatedValue != null;
   }
 
-  public void setOverrideValue(@Nullable T overrideValue) {
-    this.overrideValue = overrideValue;
+  @Override
+  public final void setAnimatedValue(@Nullable T animatedValue) {
+    this.animatedValue = animatedValue;
   }
 
   @Override
@@ -126,6 +160,6 @@ public class ValueProperty<T> implements StateListener {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof ValueProperty<?> that && that.getName().equals(this.getName());
+    return obj instanceof StatefulProperty<?> that && that.getName().equals(this.getName());
   }
 }

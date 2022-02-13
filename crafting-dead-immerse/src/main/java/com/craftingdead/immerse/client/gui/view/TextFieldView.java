@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -37,11 +39,11 @@ public class TextFieldView extends View {
 
   private final StyleableProperty<Color> textColor = Util.make(
       StyleableProperty.create("text_color", Color.class, new Color(0xFFE0E0E0)),
-      this::registerValueProperty);
+      this::registerProperty);
 
   private final StyleableProperty<Color> textColorUneditable = Util.make(
       StyleableProperty.create("text_color_uneditable", Color.class, new Color(0xFF707070)),
-      this::registerValueProperty);
+      this::registerProperty);
 
   private String suggestion;
   private Consumer<String> responder;
@@ -64,8 +66,7 @@ public class TextFieldView extends View {
     return this;
   }
 
-  public TextFieldView setFormatter(
-      BiFunction<String, Integer, FormattedCharSequence> formatter) {
+  public TextFieldView setFormatter(BiFunction<String, Integer, FormattedCharSequence> formatter) {
     this.formatter = formatter;
     return this;
   }
@@ -354,6 +355,7 @@ public class TextFieldView extends View {
 
   @Override
   protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTicks);
     int textColor =
         this.editable ? this.textColor.get().getHex() : this.textColorUneditable.get().getHex();
     int cursorIndex = this.cursorIndex - this.displayIndex;
@@ -400,6 +402,7 @@ public class TextFieldView extends View {
 
     if (cursorBlink) {
       if (pipeCursor) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderUtil.fill(poseStack, highlightX, y - 1, highlightX + 1, y + 1 + 9, 0xFFD0D0D0);
       } else {
         this.font.drawShadow(poseStack, "_", (float) highlightX, (float) y, textColor);
@@ -469,11 +472,11 @@ public class TextFieldView extends View {
     return this.cursorIndex;
   }
 
-  public ValueProperty<Color> getTextColorProperty() {
+  public StatefulProperty<Color> getTextColorProperty() {
     return this.textColor;
   }
 
-  public ValueProperty<Color> getTextColorUneditableProperty() {
+  public StatefulProperty<Color> getTextColorUneditableProperty() {
     return this.textColorUneditable;
   }
 

@@ -1,4 +1,4 @@
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.state;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +15,19 @@ public class StateManager {
     return this.state;
   }
 
-  public void addState(State state) {
-    this.state |= state.value();
+  public void addState(int state) {
+    this.state |= state;
   }
 
-  public void removeState(State state) {
-    this.state &= ~state.value();
+  public void removeState(int state) {
+    this.state &= ~state;
   }
 
-  public boolean hasState(State state) {
-    return (this.state & state.value()) == state.value();
+  public boolean hasState(int state) {
+    return (this.state & state) == state;
   }
 
-  public boolean toggleState(State state) {
+  public boolean toggleState(int state) {
     if (this.hasState(state)) {
       this.removeState(state);
       return false;

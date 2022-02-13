@@ -24,6 +24,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.Util;
@@ -44,7 +45,7 @@ public class TextView extends View {
 
   private final StyleableProperty<Color> colorProperty =
       Util.make(StyleableProperty.create("color", Color.class, Color.WHITE),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private Component text = TextComponent.EMPTY;
   private Font font;

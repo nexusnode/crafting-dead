@@ -6,7 +6,6 @@ import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Display;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.Point;
-import com.craftingdead.immerse.client.gui.view.PointTranslator;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaAlign;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaFlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaJustify;

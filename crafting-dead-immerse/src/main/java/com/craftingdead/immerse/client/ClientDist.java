@@ -35,6 +35,7 @@ import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
@@ -226,7 +227,7 @@ public class ClientDist implements ModDist {
           shader -> roundedRectShader = new RoundedRectShader(shader));
       event.registerShader(new ShaderInstance(event.getResourceManager(),
           new ResourceLocation(CraftingDeadImmerse.ID, "rounded_tex"),
-          DefaultVertexFormat.POSITION_COLOR_TEX),
+          DefaultVertexFormat.POSITION_TEX),
           shader -> roundedTexShader = new RoundedTexShader(shader));
     } catch (IOException e) {
       throw new UncheckedIOException(e);
@@ -293,6 +294,11 @@ public class ClientDist implements ModDist {
   public void handleGuiOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
+      if (this.minecraft.screen instanceof ViewScreen screen
+          && screen.getRoot() instanceof MainMenuView) {
+        event.setCanceled(true);
+        return;
+      }
       event.setScreen(MainMenuView.createScreen());
     }
   }

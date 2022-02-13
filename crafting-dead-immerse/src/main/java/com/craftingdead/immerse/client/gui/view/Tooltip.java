@@ -18,6 +18,8 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -28,9 +30,9 @@ import net.minecraft.network.chat.Component;
 public class Tooltip {
 
   private final Component text;
-  private final ValueProperty<Integer> opacity =
+  private final StatefulProperty<Integer> opacity =
       StyleableProperty.create("alpha", Integer.class, 0);
-  private final ValueProperty<Integer> textOpacity =
+  private final StatefulProperty<Integer> textOpacity =
       StyleableProperty.create("text-alpha", Integer.class, 0);
 
   public Tooltip(Component text) {
@@ -60,11 +62,11 @@ public class Tooltip {
 
   }
 
-  public ValueProperty<Integer> getOpacityProperty() {
+  public StatefulProperty<Integer> getOpacityProperty() {
     return this.opacity;
   }
 
-  public ValueProperty<Integer> getTextOpacityProperty() {
+  public StatefulProperty<Integer> getTextOpacityProperty() {
     return this.textOpacity;
   }
 }

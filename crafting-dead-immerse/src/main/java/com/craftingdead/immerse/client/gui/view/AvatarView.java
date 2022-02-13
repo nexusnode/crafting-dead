@@ -42,9 +42,8 @@ public class AvatarView extends View {
   }
 
   @Override
-  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTick) {
+    super.renderContent(matrixStack, mouseX, mouseY, partialTick);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
     RenderUtil.blitAvatar(this.textureLocation, matrixStack,
         this.getScaledContentX(), this.getScaledContentY(),

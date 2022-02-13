@@ -1,4 +1,4 @@
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class StyleableProperty<T> extends ValueProperty<T> implements PropertyDispatcher<T> {
+public class StyleableProperty<T> extends StatefulProperty<T> implements PropertyDispatcher<T> {
 
   private final Int2ObjectMap<StyleSource> sources = new Int2ObjectOpenHashMap<>();
 
@@ -29,12 +29,18 @@ public class StyleableProperty<T> extends ValueProperty<T> implements PropertyDi
   }
 
   @Override
+  public void defineState(T value, int state) {
+    super.defineState(value, state);
+    this.sources.put(state, StyleSource.CODE);
+  }
+
+  @Override
   public boolean defineState(StyleSource source, String style, int state) {
     var current = this.sources.get(state);
     if (current == null || source.compareTo(current) > -1) {
       this.sources.put(state, source);
       var value = this.styleCache.computeIfAbsent(style, this.decoder::decode);
-      this.defineState(value, state);
+      this.setState(state, value);
       return true;
     }
     return false;

@@ -1,4 +1,4 @@
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.state;
 
 public interface StateListener {
 

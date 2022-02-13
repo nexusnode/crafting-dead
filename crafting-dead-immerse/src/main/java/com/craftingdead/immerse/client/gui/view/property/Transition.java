@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,14 +32,13 @@ public interface Transition {
   Transition INSTANT = new Transition() {
 
     @Override
-    public <T> Runnable transition(ValueProperty<T> property, T newValue) {
+    public <T> Runnable transition(StatefulProperty<T> property, T newValue) {
       property.set(newValue);
-      return () -> {
-      };
+      return () -> {};
     }
   };
 
-  <T> Runnable transition(ValueProperty<T> property, T newValue);
+  <T> Runnable transition(StatefulProperty<T> property, T newValue);
 
   static Transition linear(long durationMs) {
     return linear(0L, durationMs);
@@ -53,7 +52,7 @@ public interface Transition {
     return new Transition() {
 
       @Override
-      public <T> Runnable transition(ValueProperty<T> property, T newValue) {
+      public <T> Runnable transition(StatefulProperty<T> property, T newValue) {
         var stopped = new AtomicBoolean();
         var animator = new Animator.Builder()
             .setStartDelay(delayMs, TimeUnit.MILLISECONDS)
