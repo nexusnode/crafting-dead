@@ -2,7 +2,7 @@ package com.craftingdead.immerse.client.gui.view.style.shorthand;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
-import com.craftingdead.immerse.client.gui.view.Transition;
+import com.craftingdead.immerse.client.gui.view.property.Transition;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
 import com.craftingdead.immerse.client.gui.view.style.adapter.StyleTranslatorRegistry;

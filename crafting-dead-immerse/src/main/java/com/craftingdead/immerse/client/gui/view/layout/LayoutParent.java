@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.layout;
 
 import java.util.function.Consumer;
-import com.craftingdead.immerse.client.gui.view.StateListener;
+import com.craftingdead.immerse.client.gui.view.state.StateListener;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 
 public interface LayoutParent {

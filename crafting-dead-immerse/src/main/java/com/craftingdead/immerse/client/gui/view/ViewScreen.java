@@ -64,6 +64,10 @@ public final class ViewScreen extends Screen {
     this.children = Collections.singletonList(this.root);
   }
 
+  public ParentView getRoot() {
+    return this.root;
+  }
+
   public void keepOpenAndSetScreen(Screen screen) {
     this.keepOpen();
     this.minecraft.setScreen(screen);
@@ -162,7 +166,7 @@ public final class ViewScreen extends Screen {
 
   @Override
   public List<? extends GuiEventListener> children() {
-    return this.children;
+    return this.root.isAdded() ? this.children : Collections.emptyList();
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {

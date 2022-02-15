@@ -1,5 +1,6 @@
 #version 430 compatibility
 
+uniform vec4 ColorModulator;
 
 uniform vec4 u_Radius;
 uniform vec2 u_Position;
@@ -34,7 +35,7 @@ void main() {
     // Smooth the result (free antialiasing).
     float smoothedAlpha =  1.0f - smoothstep(0.0f, edgeSoftness, distance);
 
-    fragColor = mix(f_VertexColor, u_OutlineColor, borderAlpha) * vec4(1.0f, 1.0f, 1.0f, smoothedAlpha);
+    fragColor = mix(f_VertexColor, u_OutlineColor, borderAlpha) * ColorModulator * vec4(1.0f, 1.0f, 1.0f, smoothedAlpha);
     if (fragColor.w <= 0.0f) {
         discard;
     }

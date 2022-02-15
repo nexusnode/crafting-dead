@@ -16,36 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.state;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.OptionalInt;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.Util;
 
 public class States {
 
-  private static final Map<String, State> states = new HashMap<>();
+  private static final int NILL = -1;
 
-  public static final State ENABLED = register("enabled");
-  public static final State DISABLED = register("disabled");
-  public static final State HOVER = register("hover");
-  public static final State FOCUS = register("focus");
-  public static final State FOCUS_VISIBLE = register("focus-visible");
+  private static final Object2IntMap<String> states =
+      Util.make(new Object2IntOpenHashMap<>(), map -> map.defaultReturnValue(NILL));
+
+  public static final int ENABLED = register("enabled");
+  public static final int DISABLED = register("disabled");
+  public static final int HOVER = register("hover");
+  public static final int FOCUS = register("focus");
+  public static final int FOCUS_VISIBLE = register("focus-visible");
 
   private static int n = 0;
 
-  private static State register(String name) {
+  private static int register(String name) {
     var value = 1 << n++;
-    var state = new State(name, value);
-    states.put(name, state);
-    return state;
+    states.put(name, value);
+    return value;
   }
 
-  public static Optional<State> get(String name) {
-    return Optional.ofNullable(states.get(name));
+  public static OptionalInt get(String name) {
+    var value = states.getInt(name);
+    return value == NILL ? OptionalInt.empty() : OptionalInt.of(value);
   }
 
   public static int combine(int... states) {
@@ -56,21 +59,13 @@ public class States {
     return combined;
   }
 
-  public static int combine(Collection<Integer> collection) {
-    var combined = 0;
-    for (var state : collection) {
-      combined |= state;
-    }
-    return combined;
-  }
-
   public static IntSet split(int state) {
-    var states = new IntOpenHashSet();
-    States.states.values().forEach(s -> {
-      if ((state & s.value()) == s.value()) {
-        states.add(s.value());
+    var splitStates = new IntOpenHashSet();
+    states.values().forEach(value -> {
+      if ((state & value) == value) {
+        splitStates.add(value);
       }
     });
-    return states;
+    return splitStates;
   }
 }

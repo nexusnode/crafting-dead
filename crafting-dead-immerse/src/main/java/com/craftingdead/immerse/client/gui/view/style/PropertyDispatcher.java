@@ -1,7 +1,7 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.function.Predicate;
-import com.craftingdead.immerse.client.gui.view.Transition;
+import com.craftingdead.immerse.client.gui.view.property.Transition;
 
 public interface PropertyDispatcher<T> {
 

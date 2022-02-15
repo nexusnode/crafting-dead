@@ -21,17 +21,19 @@ package com.craftingdead.immerse.client.gui.view;
 import javax.annotation.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Animator.Direction;
+import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;
+import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 
 public class Animation<T> extends TimingTargetAdapter {
 
-  private final ValueProperty<T> property;
+  private final AnimatedProperty<T> property;
   private KeyFrames<T> keyFrames;
 
   private final boolean fromCurrent;
 
-  private Animation(ValueProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
+  private Animation(AnimatedProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
     this.property = property;
     this.keyFrames = keyFrames;
     this.fromCurrent = fromCurrent;
@@ -39,7 +41,7 @@ public class Animation<T> extends TimingTargetAdapter {
 
   @Override
   public void timingEvent(Animator source, double fraction) {
-    this.property.setOverrideValue(source.isRunning()
+    this.property.setAnimatedValue(source.isRunning()
         ? this.keyFrames.getInterpolatedValueAt(fraction)
         : null);
   }
@@ -47,10 +49,10 @@ public class Animation<T> extends TimingTargetAdapter {
   @Override
   public void begin(Animator source) {
     if (this.fromCurrent) {
-      final T startValue = this.property.get();
-      final KeyFrames.Builder<T> builder = new KeyFrames.Builder<>(startValue);
-      boolean first = true;
-      for (KeyFrames.Frame<T> frame : this.keyFrames) {
+      final var startValue = this.property.get();
+      final var builder = new KeyFrames.Builder<T>(startValue);
+      var first = true;
+      for (var frame : this.keyFrames) {
         if (first) {
           first = false;
         } else {
@@ -64,17 +66,17 @@ public class Animation<T> extends TimingTargetAdapter {
     this.timingEvent(source, fraction);
   }
 
-  public static <T> Builder<T> forProperty(ValueProperty<T> property) {
+  public static <T> Builder<T> forProperty(StatefulProperty<T> property) {
     return new Builder<>(property);
   }
 
   public static class Builder<T> {
 
-    private final ValueProperty<T> property;
+    private final StatefulProperty<T> property;
     private KeyFrames<T> keyFrames;
     private boolean fromCurrent;
 
-    private Builder(ValueProperty<T> property) {
+    private Builder(StatefulProperty<T> property) {
       this.property = property;
     }
 

@@ -3,7 +3,7 @@ package com.craftingdead.immerse.client.gui.view.style;
 import java.util.Collections;
 import java.util.Map;
 import org.jdesktop.core.animation.timing.Interpolator;
-import com.craftingdead.immerse.client.gui.view.Transition;
+import com.craftingdead.immerse.client.gui.view.property.Transition;
 
 public record StyleTransition(TargetSelector[] selectors, long[] delays, long[] durations,
     Interpolator[] interpolators) {

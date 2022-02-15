@@ -5,9 +5,6 @@ plugins {
 repositories {
     mavenCentral()
     google()
-    maven {
-   	    url 'https://packages.jetbrains.team/maven/p/skija/maven'   	
-    }
     flatDir {
         dir 'libs'
     }

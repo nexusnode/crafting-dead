@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -41,11 +42,11 @@ public class ImageView extends View {
 
   private final StyleableProperty<Color> color =
       Util.make(StyleableProperty.create("color", Color.class, Color.WHITE),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private final StyleableProperty<FitType> objectFit =
       Util.make(StyleableProperty.create("object-fit", FitType.class, FitType.FILL),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private ResourceLocation image = TextureManager.INTENTIONAL_MISSING_TEXTURE;
 

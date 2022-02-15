@@ -27,6 +27,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
 import com.craftingdead.immerse.client.gui.view.style.StyleParent;
 import com.craftingdead.immerse.util.ThreadSafe;
@@ -50,7 +51,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   public ParentView(Properties<?> properties) {
     super(properties);
-    this.registerValueProperty(
+    this.registerProperty(
         StyleableProperty.create("display", Display.class, Display.FLEX, this::setDisplay));
   }
 

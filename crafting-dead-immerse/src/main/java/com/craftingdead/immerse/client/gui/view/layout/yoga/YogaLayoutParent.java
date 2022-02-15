@@ -20,10 +20,10 @@ package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import java.util.function.Consumer;
 import org.lwjgl.util.yoga.Yoga;
-import com.craftingdead.immerse.client.gui.view.StateListener;
-import com.craftingdead.immerse.client.gui.view.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.state.StateListener;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 
 public class YogaLayoutParent implements LayoutParent {

@@ -1,8 +1,6 @@
-package com.craftingdead.immerse.client.gui.view;
+package com.craftingdead.immerse.client.gui.view.style.adapter;
 
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleDecoder;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleEncoder;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
+import com.craftingdead.immerse.client.gui.view.Point;
 import com.craftingdead.immerse.util.StringCountUtil;
 
 public class PointTranslator

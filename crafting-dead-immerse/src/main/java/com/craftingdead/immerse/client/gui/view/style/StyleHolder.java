@@ -3,11 +3,11 @@ package com.craftingdead.immerse.client.gui.view.style;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.immerse.client.gui.view.State;
-import com.craftingdead.immerse.client.gui.view.States;
-import com.craftingdead.immerse.client.gui.view.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.state.States;
 import com.craftingdead.immerse.client.gui.view.style.parser.TransitionParser;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 
@@ -90,9 +90,9 @@ public class StyleHolder {
         var dispatcher = this.dispatchers.get(property.name());
         if (dispatcher != null) {
           var state = rule.selector().getPseudoClasses().stream()
-              .flatMap(name -> States.get(name).stream())
-              .mapToInt(State::value)
-              .reduce((a, b) -> a | b)
+              .map(States::get)
+              .flatMapToInt(OptionalInt::stream)
+              .reduce(States::combine)
               .orElse(0);
           dispatcher.defineState(source, property.value(), state);
           continue;
