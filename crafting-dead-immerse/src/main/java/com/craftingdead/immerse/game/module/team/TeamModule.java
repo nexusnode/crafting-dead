@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import com.craftingdead.core.network.Synched;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 
-public class TeamModule<T extends Enum<T> & Team> implements Module, Synched {
+public class TeamModule<T extends Enum<T> & Team> implements GameModule, Synched {
 
   private final Class<T> teamType;
   private final Map<T, TeamInstance<T>> teams;

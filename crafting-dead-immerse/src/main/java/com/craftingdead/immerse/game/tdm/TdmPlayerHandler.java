@@ -50,13 +50,13 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
 
   protected final SynchedData dataManager = new SynchedData();
 
-  private final TdmGame<?> game;
+  private final TdmGame game;
 
-  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<P> player) {
+  public TdmPlayerHandler(TdmGame game, PlayerExtension<P> player) {
     this(game, player, 0, 0, 0);
   }
 
-  public TdmPlayerHandler(TdmGame<?> game, PlayerExtension<P> player, int buyTimeSeconds,
+  public TdmPlayerHandler(TdmGame game, PlayerExtension<P> player, int buyTimeSeconds,
       int spawnProtectionSeconds, int ghostTimeSeconds) {
     this.game = game;
     this.player = player;

@@ -21,14 +21,14 @@ package com.craftingdead.immerse.game.module.team;
 import java.util.function.Supplier;
 import com.craftingdead.core.event.RenderArmClothingEvent;
 import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientTeamModule<T extends Enum<T> & Team> extends TeamModule<T>
-    implements Module.Tickable {
+    implements GameModule.Tickable {
 
   private final Minecraft minecraft = Minecraft.getInstance();
 

@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.module;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.server.level.ServerPlayer;
 
-public interface ServerModule extends Module {
+public interface ServerModule extends GameModule {
 
   default void addPlayer(PlayerExtension<ServerPlayer> player) {}
 

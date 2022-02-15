@@ -22,7 +22,7 @@ import java.util.UUID;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.client.gui.screen.game.shop.ShopScreen;
 import com.craftingdead.immerse.game.GameUtil;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
 import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
@@ -31,7 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.network.NetworkEvent;
 
-public class ClientShopModule extends ShopModule implements Module.Tickable {
+public class ClientShopModule extends ShopModule implements GameModule.Tickable {
 
   private static final MessageHandlerRegistry<ClientShopModule> messageHandlers =
       new MessageHandlerRegistry<>();

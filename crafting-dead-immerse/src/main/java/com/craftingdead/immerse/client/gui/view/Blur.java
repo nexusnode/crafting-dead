@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.immerse.client.gui.view;
@@ -39,10 +36,10 @@ public class Blur implements AutoCloseable {
 
   private final Minecraft minecraft = Minecraft.getInstance();
 
-  private PostChain blurShader;
+  private PostChain postChain;
 
-  private float lastFramebufferWidth;
-  private float lastFramebufferHeight;
+  private float lastWidth;
+  private float lastHeight;
 
   public Blur() {
     this(-1);
@@ -50,55 +47,54 @@ public class Blur implements AutoCloseable {
 
   public Blur(float radius) {
     try {
-      this.blurShader = new PostChain(this.minecraft.getTextureManager(),
+      this.postChain = new PostChain(this.minecraft.getTextureManager(),
           this.minecraft.getResourceManager(), this.minecraft.getMainRenderTarget(), BLUR_SHADER);
       this.setRadius(radius);
-      this.blurShader.resize(this.minecraft.getWindow().getWidth(),
+      this.postChain.resize(this.minecraft.getWindow().getWidth(),
           this.minecraft.getWindow().getHeight());
     } catch (JsonSyntaxException | IOException ioexception) {
       logger.warn("Failed to load shader: {}", BLUR_SHADER, ioexception);
-      this.blurShader = null;
+      this.postChain = null;
     }
   }
 
   public void setRadius(float radius) {
-    if (radius > -1 && this.blurShader != null) {
-      com.craftingdead.core.client.util.RenderUtil.updateUniform("Radius", radius, this.blurShader);
+    if (radius > -1 && this.postChain != null) {
+      com.craftingdead.core.client.util.RenderUtil.updateUniform("Radius", radius, this.postChain);
     }
   }
 
   public void tick() {
-    float framebufferWidth = this.minecraft.getMainRenderTarget().width;
-    float framebufferHeight = this.minecraft.getMainRenderTarget().height;
+    var width = this.minecraft.getMainRenderTarget().width;
+    var height = this.minecraft.getMainRenderTarget().height;
     // Can't use #resized as it's called before the framebuffer is resized.
-    if (framebufferWidth != this.lastFramebufferWidth
-        || framebufferHeight != this.lastFramebufferHeight) {
-      if (this.blurShader != null) {
-        this.blurShader.resize(this.minecraft.getWindow().getWidth(),
+    if (width != this.lastWidth || height != this.lastHeight) {
+      if (this.postChain != null) {
+        this.postChain.resize(this.minecraft.getWindow().getWidth(),
             this.minecraft.getWindow().getHeight());
       }
-      this.lastFramebufferWidth = framebufferWidth;
-      this.lastFramebufferHeight = framebufferHeight;
+      this.lastWidth = width;
+      this.lastHeight = height;
     }
   }
 
-  public void process(float partialTicks) {
-    if (this.blurShader != null) {
-      this.blurShader.process(partialTicks);
+  public void process(float partialTick) {
+    if (this.postChain != null) {
+      this.postChain.process(partialTick);
       this.minecraft.getMainRenderTarget().bindWrite(false);
     }
   }
 
   public void render(PoseStack poseStack, float x, float y, float width, float height) {
-    if (this.blurShader != null) {
-      var renderTarget = this.blurShader.getTempTarget("output");
+    if (this.postChain != null) {
+      var renderTarget = this.postChain.getTempTarget("output");
       RenderSystem.setShaderTexture(0, renderTarget.getColorTextureId());
-      float textureWidth = (float) (renderTarget.width
+      var textureWidth = (float) (renderTarget.width
           / this.minecraft.getWindow().getGuiScale());
-      float textureHeight = (float) (renderTarget.height
+      var textureHeight = (float) (renderTarget.height
           / this.minecraft.getWindow().getGuiScale());
-      float textureX = x;
-      float textureY = (textureHeight - height) - y;
+      var textureX = x;
+      var textureY = (textureHeight - height) - y;
       RenderUtil.blit(poseStack, x, y, x + width, y + height, textureX, textureY,
           textureX + width, textureY + height, textureWidth, textureHeight);
     }
@@ -106,8 +102,8 @@ public class Blur implements AutoCloseable {
 
   @Override
   public void close() {
-    if (this.blurShader != null) {
-      this.blurShader.close();
+    if (this.postChain != null) {
+      this.postChain.close();
     }
   }
 }
