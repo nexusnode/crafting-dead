@@ -1,9 +1,4 @@
 {
-  "options.craftingdeadsurvival.server.broken_legs_enabled":"骨折已启用",
-  "options.craftingdeadsurvival.server.bleeding_enabled":"流血已启用",
-  "options.craftingdeadsurvival.server.disable_zombies":"关闭丧尸",
-  "options.craftingdeadsurvival.server.infection_enabled":"尸毒已启用",
-
   "options.craftingdeadsurvival.client.display_blood": "显示血液",
 
   "enchantment.craftingdeadsurvival.infection": "尸毒",

@@ -2,27 +2,23 @@
  * Crafting Dead
  * Copyright (C) 2021  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.survival.world.entity;
 
-import java.util.Random;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
+import java.util.Random;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -79,17 +75,17 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     boolean invulnerable = this.player.getEntity().getAbilities().invulnerable
         || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.bleedingEnabled.get())
+    if ((invulnerable || !CraftingDeadSurvival.serverConfig.abilitiesBleedEffect.get())
         && this.player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
       this.player.getEntity().removeEffect(SurvivalMobEffects.BLEEDING.get());
     }
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get())
+    if ((invulnerable || !CraftingDeadSurvival.serverConfig.abilitiesBrokenLegs.get())
         && this.player.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())) {
       this.player.getEntity().removeEffect(SurvivalMobEffects.BROKEN_LEG.get());
     }
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.infectionEnabled.get())
+    if ((invulnerable || !CraftingDeadSurvival.serverConfig.abilitiesInfectionEffect.get())
         && this.player.getEntity().hasEffect(SurvivalMobEffects.INFECTION.get())) {
       this.player.getEntity().removeEffect(SurvivalMobEffects.INFECTION.get());
     }
@@ -109,7 +105,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
         && entity.getRandom().nextFloat() < chance
         && !entity.hasEffect(SurvivalMobEffects.INFECTION.get())
-        && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
+        && CraftingDeadSurvival.serverConfig.abilitiesInfectionEffect.get()) {
       entity.displayClientMessage(new TranslatableComponent("message.infected")
           .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
       entity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
@@ -122,7 +118,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         || this.player.getLevel().getDifficulty() == Difficulty.PEACEFUL;
 
     if (!invulnerable
-        && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()
+        && CraftingDeadSurvival.serverConfig.abilitiesBleedEffect.get()
         && (source.getDirectEntity() != null || source.isExplosion())) {
       float bleedChance = 0.1F * amount;
       if (random.nextFloat() < bleedChance
@@ -136,7 +132,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     }
 
     if (!invulnerable
-        && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
+        && CraftingDeadSurvival.serverConfig.abilitiesBrokenLegs.get()
         && !this.player.getEntity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
         && source == DamageSource.FALL
         && ((amount > 0.0F && random.nextInt(3) == 0) || amount > 4.0F)) {

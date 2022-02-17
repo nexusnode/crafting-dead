@@ -2,37 +2,19 @@
  * Crafting Dead
  * Copyright (C) 2021  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
@@ -61,6 +43,19 @@ import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -110,6 +105,8 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.PacketDistributor.PacketTarget;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
@@ -119,8 +116,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
    * The constant difference between server and client entity positions.
    */
   private static final int BASE_SNAPSHOT_TICK_OFFSET = 3;
-
-  public static final float HEADSHOT_MULTIPLIER = 4;
 
   public static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
@@ -192,12 +187,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   private Skin skin;
   private boolean skinDirty;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "StaticPseudoFunctionalStyleMethod"})
   public <SELF extends AbstractGun> AbstractGun(
       Function<SELF, ? extends AbstractGunClient<? super SELF>> clientFactory,
       ItemStack itemStack, Set<FireMode> fireModes) {
     this.itemStack = itemStack;
-    this.fireModeInfiniteIterator = Iterables.cycle(fireModes).iterator();
+    this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(fireModes,
+        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get())).iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.client = FMLEnvironment.dist.isClient()
         ? Lazy.concurrentOf(() -> clientFactory.apply((SELF) this))
@@ -483,6 +479,12 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       boolean playSound) {
     final var entity = living.getEntity();
     var damage = this.getDamage();
+    if (CraftingDead.serverConfig.damageDropOffEnable.get()) {
+      var distance = hitEntity.distanceTo(living.getEntity());
+      // Ensure minimum damage
+      var minDamage = Math.min(damage, CraftingDead.serverConfig.damageDropOffMinimumDamage.get().floatValue());
+      damage = Math.max(minDamage, damage - (float)(((CraftingDead.serverConfig.damageDropOffLoss.get() / 100) * this.getRange()) * distance));
+    }
 
     var armorPenetration = Math.min((1.0F
         + (EnchantmentHelper.getItemEnchantmentLevel(ModEnchantments.ARMOR_PENETRATION.get(),
@@ -500,7 +502,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     if (hitEntity instanceof LivingEntity) {
       var hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
-      headshot = (hitEntity instanceof Player || hitEntity instanceof Zombie
+      headshot = CraftingDead.serverConfig.headshotEnabled.get() &&
+          (hitEntity instanceof Player || hitEntity instanceof Zombie
           || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
           || hitEntity instanceof EnderMan || hitEntity instanceof Witch
           || hitEntity instanceof Villager || hitEntity instanceof Vindicator
@@ -514,7 +517,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         if (damagePercentage < 1.0F) {
           damage *= damagePercentage;
         } else {
-          damage *= HEADSHOT_MULTIPLIER;
+          damage *= CraftingDead.serverConfig.headshotBonusDamage.get();
         }
       }
     }
