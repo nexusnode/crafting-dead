@@ -62,23 +62,37 @@ minecraft {
 
 def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
 
+configurations {
+    lwjgl_native_library
+    library.extendsFrom lwjgl_native_library
+}
+
 dependencies {
     implementation project(':crafting-dead-core')
-    library (group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
+    shaded_library (group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
     lwjgl_natives.each {
-        library ("org.lwjgl:lwjgl-yoga::${it}") {
+        lwjgl_native_library ("org.lwjgl:lwjgl-yoga:${lwjgl_version}:${it}") {
             exclude group: 'org.lwjgl', module: 'lwjgl'
         }
     }
 
-	library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
-	library ('io.sentry:sentry:5.6.0') {
+	shaded_library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+	shaded_library ('io.sentry:sentry:5.6.0') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
     
     library group: 'net.rocketpowered', name: 'rocket-connector', version: '1.18.1-0.0.1'
+}
+
+shadowJar {
+    into 'lwjgl-natives', {
+        exclude 'META-INF/'
+        from {   
+            project.configurations.lwjgl_native_library.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
 }
 
 jar {

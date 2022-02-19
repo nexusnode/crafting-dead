@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.immerse.game.tdm;
@@ -27,7 +24,7 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.game.SelectTeamScreen;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.game.GameClient;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.craftingdead.immerse.game.module.team.ClientTeamModule;
 import com.craftingdead.immerse.game.module.team.TeamModule;
@@ -49,7 +46,7 @@ import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TdmClient extends TdmGame<Module> implements GameClient {
+public class TdmClient extends TdmGame implements GameClient {
 
   private static final ResourceLocation STOPWATCH =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/stopwatch.png");
@@ -103,13 +100,12 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   }
 
   @Override
-  public void registerModules(Consumer<Module> registrar) {
+  public void registerClientModules(Consumer<GameModule> registrar) {
     this.shopModule = new ClientShopModule();
     registrar.accept(this.shopModule);
 
     this.teamModule = new ClientTeamModule<>(TdmTeam.class, SelectTeamScreen::new);
     registrar.accept(this.teamModule);
-    super.registerModules(registrar);
   }
 
   @Override

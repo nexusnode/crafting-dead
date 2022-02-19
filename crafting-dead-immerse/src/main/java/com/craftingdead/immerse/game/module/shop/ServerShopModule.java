@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.immerse.Permissions;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
 import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
@@ -39,7 +39,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.server.permission.PermissionAPI;
 
-public class ServerShopModule extends ShopModule implements ServerModule, Module.Tickable {
+public class ServerShopModule extends ShopModule implements ServerModule, GameModule.Tickable {
 
   public static final BiConsumer<PlayerExtension<?>, ItemStack> COMBAT_PURCHASE_HANDLER =
       (player, item) -> CombatSlot.getSlotType(item)

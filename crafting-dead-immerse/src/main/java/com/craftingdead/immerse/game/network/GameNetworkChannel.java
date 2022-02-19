@@ -24,7 +24,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameWrapper;
 import com.craftingdead.immerse.game.module.ModuleType;
 import io.netty.buffer.Unpooled;
@@ -109,9 +108,9 @@ public class GameNetworkChannel {
 
   public static <MSG> Packet<?> toVanillaPacket(@Nullable ModuleType moduleType, MSG message,
       NetworkDirection direction) {
-    Game<?> game = CraftingDeadImmerse.getInstance().getGame(direction.getOriginationSide());
+    var game = CraftingDeadImmerse.getInstance().getGame(direction.getOriginationSide());
     try {
-      FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+      var buf = new FriendlyByteBuf(Unpooled.buffer());
       if (moduleType == null) {
         buf.writeBoolean(false);
         game.getType().getNetworkProtocol().encode(buf, message);

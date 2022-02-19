@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.immerse.game.survival;
@@ -22,14 +19,13 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameClient;
-import com.craftingdead.immerse.game.module.Module;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 
-public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
+public class SurvivalClient extends SurvivalGame implements GameClient {
 
   private static final ResourceLocation DAYS_SURVIVED =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/days_survived.png");
@@ -42,8 +38,8 @@ public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
 
   @Override
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
-      PoseStack matrixStack, int width, int height, float partialTicks) {
-    SurvivalPlayerHandler survivalPlayer =
+      PoseStack poseStack, int width, int height, float partialTick) {
+    var survivalPlayer =
         (SurvivalPlayerHandler) player.getHandlerOrThrow(SurvivalPlayerHandler.EXTENSION_ID);
     int y = height / 2;
     int x = 4;
@@ -52,17 +48,17 @@ public class SurvivalClient extends SurvivalGame<Module> implements GameClient {
 
     RenderSystem.setShaderTexture(0, DAYS_SURVIVED);
     RenderUtil.blit(x, y - 20, 16, 16);
-    this.minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(poseStack,
         String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
     RenderSystem.setShaderTexture(0, ZOMBIES_KILLED);
     RenderUtil.blit(x, y, 16, 16);
-    this.minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(poseStack,
         String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
     RenderSystem.setShaderTexture(0, PLAYERS_KILLED);
     RenderUtil.blit(x, y + 20, 16, 16);
-    this.minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(poseStack,
         String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 
     RenderSystem.disableBlend();
