@@ -2,26 +2,19 @@
  * Crafting Dead
  * Copyright (C) 2021  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity.extension;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import javax.annotation.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
@@ -29,7 +22,9 @@ import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.entity.EntityUtil;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -38,6 +33,10 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -48,6 +47,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -359,8 +359,25 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public float handleDamaged(DamageSource source, float amount) {
-    return this.handlers.values().stream().reduce(amount,
+    var damage = this.handlers.values().stream().reduce(amount,
         (result, extension) -> extension.handleDamaged(source, result), (u, t) -> t);
+    if (source.getEntity() instanceof Player player) {
+      if (CraftingDead.serverConfig.backstabEnabled.get()) {
+        var usedMeleeWeapon = player.getItemInHand(player.getUsedItemHand())
+            .getItem() instanceof MeleeWeaponItem;
+        if (usedMeleeWeapon && !EntityUtil.canSee(this.getEntity(), player, 90F)) {
+          damage *= CraftingDead.serverConfig.backstabBonusDamage.get().floatValue();
+        }
+      }
+
+      if (CraftingDead.serverConfig.criticalHitEnable.get()) {
+        if (CraftingDead.serverConfig.criticalHitChance.get() > player.getRandom().nextFloat()) {
+          damage *= CraftingDead.serverConfig.criticalHitBonusDamage.get().floatValue();
+        }
+      }
+    }
+
+    return damage;
   }
 
   @Override
