@@ -47,6 +47,7 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
+import com.craftingdead.immerse.util.LwjglNativeUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.KeyMapping;
@@ -75,6 +76,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 
 public class ClientDist implements ModDist {
@@ -113,6 +115,10 @@ public class ClientDist implements ModDist {
   private static RoundedTexShader roundedTexShader;
 
   public ClientDist() {
+    if (FMLLoader.isProduction()) {
+      LwjglNativeUtil.load("lwjgl_yoga");
+    }
+
     final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleEntityRenderersAddLayers);

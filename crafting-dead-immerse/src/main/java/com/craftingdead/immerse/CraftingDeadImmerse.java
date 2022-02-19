@@ -35,7 +35,6 @@ import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import com.craftingdead.immerse.util.DependencyLoader;
 import io.sentry.Sentry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -103,8 +102,6 @@ public class CraftingDeadImmerse {
 
   public CraftingDeadImmerse() {
     instance = this;
-
-    DependencyLoader.loadDependencies();
 
     this.modDir = FMLPaths.CONFIGDIR.get().resolve(ID);
     if (!Files.exists(this.modDir)) {

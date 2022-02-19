@@ -18,4 +18,5 @@ dependencies {
     implementation group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     implementation group: 'gradle.plugin.org.cadixdev.gradle', name: 'licenser', version: '0.6.1'
     implementation group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    implementation group: 'gradle.plugin.com.github.johnrengelman', name: 'shadow', version: '7.1.2'
 }
