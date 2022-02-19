@@ -67,7 +67,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent;
 
-public class TdmServer extends TdmGame<ServerModule> implements GameServer, TeamHandler<TdmTeam> {
+public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTeam> {
 
   public static final Codec<TdmServer> CODEC = RecordCodecBuilder.create(instance -> instance
       .group(
@@ -244,7 +244,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public void load() {
+  public void started() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
     GameRules.BooleanValue daylightCycle = gameRules.getRule(GameRules.RULE_DAYLIGHT);
@@ -276,11 +276,11 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
     this.oldDifficulty = this.getMinecraftServer().getWorldData().getDifficulty();
     this.getMinecraftServer().setDifficulty(Difficulty.PEACEFUL, true);
 
-    super.load();
+    super.started();
   }
 
   @Override
-  public void unload() {
+  public void ended() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
     gameRules.getRule(GameRules.RULE_DAYLIGHT).set(this.daylightCycleOld,
@@ -301,7 +301,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
           .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
     }
 
-    super.unload();
+    super.ended();
   }
 
   @Override
@@ -336,12 +336,12 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public boolean save() {
+  public boolean persistGameData() {
     return false;
   }
 
   @Override
-  public void registerModules(Consumer<ServerModule> registrar) {
+  public void registerServerModules(Consumer<ServerModule> registrar) {
     this.shopModule = new ServerShopModule(ServerShopModule.COMBAT_PURCHASE_HANDLER,
         (int) this.buyDuration.getSeconds());
 
@@ -402,8 +402,6 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
     this.teamModule = new ServerTeamModule<>(TdmTeam.class, this);
     registrar.accept(this.teamModule);
-
-    super.registerModules(registrar);
   }
 
   @Override

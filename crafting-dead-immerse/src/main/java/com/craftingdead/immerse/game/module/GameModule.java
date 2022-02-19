@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game.module;
 
 import net.minecraftforge.network.NetworkEvent;
 
-public interface Module {
+public interface GameModule {
 
   default void load() {}
 

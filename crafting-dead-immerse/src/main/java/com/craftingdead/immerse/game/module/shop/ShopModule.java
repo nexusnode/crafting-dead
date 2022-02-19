@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.craftingdead.core.network.Synched;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
-class ShopModule implements Module, Synched {
+class ShopModule implements GameModule, Synched {
 
   protected final Map<UUID, ShopItem> items = new HashMap<>();
   private final List<ShopCategory> categories = new ArrayList<>();

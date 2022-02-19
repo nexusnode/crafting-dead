@@ -1,19 +1,16 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.craftingdead.immerse.game.tdm;
@@ -22,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 import com.craftingdead.core.event.CombatPickupEvent;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
@@ -33,7 +29,6 @@ import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
-import com.craftingdead.immerse.game.module.Module;
 import com.craftingdead.immerse.game.module.team.TeamModule;
 import com.craftingdead.immerse.game.tdm.state.TdmState;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -44,7 +39,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public abstract class TdmGame<M extends Module> implements Game<M> {
+public abstract class TdmGame implements Game {
 
   private static final EntityDataAccessor<Boolean> MOVEMENT_BLOCKED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.BOOLEAN);
@@ -55,28 +50,24 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   private static final EntityDataAccessor<String> DISPLAY_NAME =
       new EntityDataAccessor<>(0x03, EntityDataSerializers.STRING);
 
-  private final SynchedData dataManager = new SynchedData();
+  private final SynchedData data = new SynchedData();
 
   private final Map<UUID, TdmPlayerData> playerData = new Object2ObjectOpenHashMap<>();
   private final Map<UUID, TdmPlayerData> dirtyPlayerData = new Object2ObjectOpenHashMap<>();
 
   public TdmGame(String displayName) {
-    this.dataManager.register(MOVEMENT_BLOCKED, false);
-    this.dataManager.register(TIMER_VALUE_SECONDS, 0);
-    this.dataManager.register(GAME_STATE_ORDINAL, 0);
-    this.dataManager.register(DISPLAY_NAME, displayName);
+    this.data.register(MOVEMENT_BLOCKED, false);
+    this.data.register(TIMER_VALUE_SECONDS, 0);
+    this.data.register(GAME_STATE_ORDINAL, 0);
+    this.data.register(DISPLAY_NAME, displayName);
   }
 
   public abstract TeamModule<TdmTeam> getTeamModule();
 
   @Override
-  public void registerModules(Consumer<M> registrar) {
+  public void load() {
     this.getTeamModule().registerTeam(TdmTeam.RED);
     this.getTeamModule().registerTeam(TdmTeam.BLUE);
-  }
-
-  @Override
-  public void load() {
     MinecraftForge.EVENT_BUS.register(this);
   }
 
@@ -93,8 +84,8 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   @Override
   public void encode(FriendlyByteBuf out, boolean writeAll) {
     SynchedData.pack(writeAll
-        ? this.dataManager.getAll()
-        : this.dataManager.packDirty(), out);
+        ? this.data.getAll()
+        : this.data.packDirty(), out);
     Set<Map.Entry<UUID, TdmPlayerData>> playerDataCollection = writeAll
         ? this.playerData.entrySet()
         : this.dirtyPlayerData.entrySet();
@@ -117,7 +108,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
 
   @Override
   public void decode(FriendlyByteBuf in) {
-    this.dataManager.assignValues(SynchedData.unpack(in));
+    this.data.assignValues(SynchedData.unpack(in));
     int playerDataSize = in.readVarInt();
     for (int i = 0; i < playerDataSize; i++) {
       UUID playerId = in.readUUID();
@@ -131,7 +122,7 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
 
   @Override
   public boolean requiresSync() {
-    return this.dataManager.isDirty() || !this.dirtyPlayerData.isEmpty();
+    return this.data.isDirty() || !this.dirtyPlayerData.isEmpty();
   }
 
   @SubscribeEvent
@@ -169,35 +160,35 @@ public abstract class TdmGame<M extends Module> implements Game<M> {
   }
 
   public boolean isMovementBlocked() {
-    return this.dataManager.get(MOVEMENT_BLOCKED);
+    return this.data.get(MOVEMENT_BLOCKED);
   }
 
   public void setMovementBlocked(boolean movementBlocked) {
-    this.dataManager.set(MOVEMENT_BLOCKED, movementBlocked);
+    this.data.set(MOVEMENT_BLOCKED, movementBlocked);
   }
 
   public int getTimerValueSeconds() {
-    return this.dataManager.get(TIMER_VALUE_SECONDS);
+    return this.data.get(TIMER_VALUE_SECONDS);
   }
 
   public void setTimerValueSeconds(int timerValueSeconds) {
-    this.dataManager.set(TIMER_VALUE_SECONDS, timerValueSeconds);
+    this.data.set(TIMER_VALUE_SECONDS, timerValueSeconds);
   }
 
   public TdmState getGameState() {
-    return TdmState.values()[this.dataManager.get(GAME_STATE_ORDINAL)];
+    return TdmState.values()[this.data.get(GAME_STATE_ORDINAL)];
   }
 
   public void setGameState(TdmState gameState) {
-    this.dataManager.set(GAME_STATE_ORDINAL, gameState.ordinal());
+    this.data.set(GAME_STATE_ORDINAL, gameState.ordinal());
   }
 
   public String getDisplayName() {
-    return this.dataManager.get(DISPLAY_NAME);
+    return this.data.get(DISPLAY_NAME);
   }
 
   protected void setDisplayName(String displayName) {
-    this.dataManager.set(DISPLAY_NAME, displayName);
+    this.data.set(DISPLAY_NAME, displayName);
   }
 
   public TdmPlayerData getPlayerData(UUID playerId) {
