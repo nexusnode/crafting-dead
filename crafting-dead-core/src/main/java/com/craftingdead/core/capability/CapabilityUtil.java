@@ -35,10 +35,7 @@ public class CapabilityUtil {
   public static <T, R extends T> R get(Capability<T> capability,
       ICapabilityProvider provider, Class<R> clazz) {
     final var value = provider.getCapability(capability).orElse(null);
-    if (clazz.isInstance(value)) {
-      return clazz.cast(value);
-    }
-    return null;
+    return clazz.isInstance(value) ? clazz.cast(value) : null;
   }
 
   @SafeVarargs

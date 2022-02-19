@@ -44,9 +44,9 @@ public class RefillableReloadAction extends AbstractReloadAction {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     return (this.ammoProvider.hasInfiniteAmmo() || this.ammoProvider.getReserveSize() > 0)
-        && super.start();
+        && super.start(simulate);
   }
 
   @Override

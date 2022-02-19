@@ -21,7 +21,6 @@ package com.craftingdead.core.client;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.ModDist;
@@ -157,8 +156,7 @@ public class ClientDist implements ModDist {
   public static final ForgeConfigSpec clientConfigSpec;
 
   static {
-    final Pair<ClientConfig, ForgeConfigSpec> clientConfigPair =
-        new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+    var clientConfigPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
     clientConfigSpec = clientConfigPair.getRight();
     clientConfig = clientConfigPair.getLeft();
   }
@@ -624,7 +622,9 @@ public class ClientDist implements ModDist {
       var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
           .map(scope -> scope.isScoping(player))
           .orElse(false);
-      if (player.isObservingAction() || aiming || player.isHandcuffed()) {
+      if (player.getActionObserver()
+          .map(observer -> observer.getProgressBar().isPresent())
+          .orElse(false) || aiming || player.isHandcuffed()) {
         event.setCanceled(true);
         return;
       }

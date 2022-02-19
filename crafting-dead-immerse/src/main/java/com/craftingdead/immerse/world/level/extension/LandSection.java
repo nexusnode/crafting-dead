@@ -1,0 +1,55 @@
+package com.craftingdead.immerse.world.level.extension;
+
+import java.util.List;
+import javax.annotation.Nullable;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.BlockPos;
+
+public class LandSection {
+
+  public static final Codec<LandSection> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(LandClaim.CODEC
+              .listOf()
+              .fieldOf("landClaims")
+              .forGetter(LandSection::getLandClaims))
+          .apply(instance, LandSection::new));
+
+  private final List<LandClaim> landClaims = new ObjectArrayList<>();
+
+  public LandSection() {}
+
+  public LandSection(List<LandClaim> landClaims) {
+    this.landClaims.addAll(landClaims);
+  }
+
+  private List<LandClaim> getLandClaims() {
+    return this.landClaims;
+  }
+
+  @Nullable
+  public LandClaim getLandClaim(BlockPos blockPos) {
+    for (var claim : this.landClaims) {
+      if (claim.boundingBox().isInside(blockPos)) {
+        return claim;
+      }
+    }
+    return null;
+  }
+
+  public boolean registerLandClaim(LandClaim landClaim) {
+    for (var otherRegion : this.landClaims) {
+      if (otherRegion.boundingBox().intersects(landClaim.boundingBox())) {
+        return false;
+      }
+    }
+    this.landClaims.add(landClaim);
+    return true;
+  }
+
+  public boolean removeLandClaim(LandClaim landClaim) {
+    return this.landClaims.remove(landClaim);
+  }
+}

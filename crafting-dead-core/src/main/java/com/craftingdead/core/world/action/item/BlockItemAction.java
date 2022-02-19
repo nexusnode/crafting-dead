@@ -61,9 +61,9 @@ public class BlockItemAction extends ItemAction {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     this.blockState = this.performer.getLevel().getBlockState(this.context.getClickedPos());
-    return super.start() && this.type.getPredicate().test(this.blockState);
+    return super.start(simulate) && this.type.getPredicate().test(this.blockState);
   }
 
   @Override

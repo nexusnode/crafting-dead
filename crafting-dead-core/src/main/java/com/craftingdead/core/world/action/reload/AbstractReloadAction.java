@@ -57,9 +57,13 @@ public abstract class AbstractReloadAction extends TimedAction {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     if (this.getPerformer().getEntity().isSprinting()) {
       return false;
+    }
+
+    if (simulate) {
+      return true;
     }
 
     if (this.gun.isPerformingSecondaryAction()) {

@@ -31,16 +31,16 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class GameTypes {
 
-  public static final DeferredRegister<GameType> GAME_TYPES =
+  public static final DeferredRegister<GameType> gameTypes =
       DeferredRegister.create(GameType.class, CraftingDeadImmerse.ID);
 
-  public static final Lazy<IForgeRegistry<GameType>> REGISTRY =
-      Lazy.of(GAME_TYPES.makeRegistry("game_type", RegistryBuilder::new));
+  public static final Lazy<IForgeRegistry<GameType>> registry =
+      Lazy.of(gameTypes.makeRegistry("game_type", RegistryBuilder::new));
 
-  public static final RegistryObject<GameType> SURVIVAL = GAME_TYPES.register("survival",
+  public static final RegistryObject<GameType> SURVIVAL = gameTypes.register("survival",
       () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new,
           NetworkProtocol.EMPTY));
 
-  public static final RegistryObject<GameType> TEAM_DEATHMATCH = GAME_TYPES.register("tdm",
+  public static final RegistryObject<GameType> TEAM_DEATHMATCH = gameTypes.register("tdm",
       () -> new GameType(TdmServer.CODEC, () -> TdmClient::new, TdmNetworkProtocol.INSTANCE));
 }

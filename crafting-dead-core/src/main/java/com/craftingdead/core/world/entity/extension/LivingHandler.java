@@ -111,5 +111,5 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
   }
 
   @Override
-  default void deserializeNBT(CompoundTag nbt) {}
+  default void deserializeNBT(CompoundTag tag) {}
 }

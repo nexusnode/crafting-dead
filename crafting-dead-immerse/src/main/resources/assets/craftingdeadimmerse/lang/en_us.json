@@ -1,7 +1,35 @@
 {
-    "item.craftingdeadimmerse.campfire_blueprint": "Campfire Blueprint",
+    "block.craftingdeadimmerse.base_center": "Base Center",
+
+    "action.craftingdeadimmerse.build_base_center.message": "Building base center",
+    "action.craftingdeadimmerse.build_campfire.message": "Building campfire",
+    "action.craftingdeadimmerse.build_oak_plank_wall.message": "Building oak plank wall",
+    "action.craftingdeadimmerse.build_spruce_plank_wall.message": "Building spruce plank wall",
+    "action.craftingdeadimmerse.build_birch_plank_wall.message": "Building birch plank wall",
+    "action.craftingdeadimmerse.build_jungle_plank_wall.message": "Building jungle plank wall",
+    "action.craftingdeadimmerse.build_acacia_plank_wall.message": "Building acacia plank wall",
+    "action.craftingdeadimmerse.build_dark_oak_plank_wall.message": "Building dark oak plank wall",
+    "action.craftingdeadimmerse.build_oak_door.message": "Building oak door",
+    "action.craftingdeadimmerse.build_spruce_door.message": "Building spruce door",
+    "action.craftingdeadimmerse.build_birch_door.message": "Building birch door",
+    "action.craftingdeadimmerse.build_jungle_door.message": "Building jungle door",
+    "action.craftingdeadimmerse.build_acacia_door.message": "Building acacia door",
+    "action.craftingdeadimmerse.build_dark_oak_door.message": "Building dark oak door",
+
     "item.craftingdeadimmerse.base_center_blueprint": "Base Center Blueprint",
-    "item.craftingdeadimmerse.oak_planks_wall_blueprint": "Oak Planks Wall Blueprint",
+    "item.craftingdeadimmerse.campfire_blueprint": "Campfire Blueprint",
+    "item.craftingdeadimmerse.oak_plank_wall_blueprint": "Oak Plank Wall Blueprint",
+    "item.craftingdeadimmerse.spruce_plank_wall_blueprint": "Building spruce plank wall",
+    "item.craftingdeadimmerse.birch_plank_wall_blueprint": "Building birch plank wall",
+    "item.craftingdeadimmerse.jungle_plank_wall_blueprint": "Building jungle plank wall",
+    "item.craftingdeadimmerse.acacia_plank_wall_blueprint": "Building acacia plank wall",
+    "item.craftingdeadimmerse.dark_oak_plank_wall_blueprint": "Building dark oak plank wall",
+    "item.craftingdeadimmerse.oak_door_blueprint": "Building oak door",
+    "item.craftingdeadimmerse.spruce_door_blueprint": "Building spruce door",
+    "item.craftingdeadimmerse.birch_door_blueprint": "Building birch door",
+    "item.craftingdeadimmerse.jungle_door_blueprint": "Building jungle door",
+    "item.craftingdeadimmerse.acacia_door_blueprint": "Building acacia door",
+    "item.craftingdeadimmerse.dark_oak_door_blueprint": "Building dark oak door",
 
     "commands.game.restart":"Restarting game",
     "commands.game.reload_rotation":"Reloading game rotation",
@@ -9,6 +37,10 @@
     "message.first_blood_drawn": "%s drew first blood",
     "message.joined": "%s has joined the game",
     "message.left": "%s has left the game",
+
+    "message.creating_base": "Creating base...",
+    "message.base_creation_succeeded": "Base successfully created",
+    "message.base_creation_failed": "Someone has already claimed land near your base!",
 
     "title.warm_up": "Warm Up",
     "title.game_start": "Let's roll!",
@@ -18,6 +50,7 @@
     "message.no_switch_team": "You can't switch teams right now",
     "message.joined_team": "%s joined %s",
     "message.buy_time_expired": "Your buy time has expired",
+    "message.already_own_base": "You already own a base at: %s",
 
     "key.switch_teams": "Switch Teams",
 

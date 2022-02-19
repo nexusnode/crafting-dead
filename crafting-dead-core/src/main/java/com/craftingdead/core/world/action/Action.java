@@ -28,7 +28,7 @@ public interface Action {
    * 
    * @return if the action can start
    */
-  boolean start();
+  boolean start(boolean simulate);
 
   /**
    * Ticks the {@link Action} and determines if it should continue running.

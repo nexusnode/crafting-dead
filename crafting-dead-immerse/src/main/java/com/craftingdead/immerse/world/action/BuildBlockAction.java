@@ -2,6 +2,7 @@ package com.craftingdead.immerse.world.action;
 
 import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -20,23 +21,24 @@ public class BuildBlockAction extends BlueprintAction {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     return this.blockState != null
-        && super.start()
-        && this.canPlace(this.getContext().getClickedPos(), this.blockState);
+        && super.start(simulate)
+        && this.canPlace(this.getContext().getClickedPos());
   }
 
   @Override
   public boolean tick() {
-    if (!super.tick()) {
-      return false;
+    if (super.tick()) {
+      return true;
     }
 
     if (this.getTicksUsingItem() % 10 == 0) {
+      this.getPerformer().getEntity().playSound(SoundEvents.WOOD_BREAK, 1.0F, 1.0F);
       this.addBuildEffects(this.getContext().getClickedPos(), this.blockState);
     }
 
-    return true;
+    return false;
   }
 
   @Override
@@ -49,7 +51,7 @@ public class BuildBlockAction extends BlueprintAction {
   }
 
   @Override
-  public BlueprintActionType getType() {
+  public BuildBlockActionType getType() {
     return this.type;
   }
 }

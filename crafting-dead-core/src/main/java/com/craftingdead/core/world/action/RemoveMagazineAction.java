@@ -64,18 +64,25 @@ public class RemoveMagazineAction extends TimedAction {
   }
 
   @Override
-  public boolean start() {
-    if (!this.getPerformer().getEntity().isSprinting() && !this.oldMagazineStack.isEmpty()) {
-      if (this.gun.isPerformingSecondaryAction()) {
-        this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
-      }
-      if (this.getPerformer().getLevel().isClientSide()) {
-        this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
-        this.gun.getClient().getAnimationController().addAnimation(this.animation);
-      }
+  public boolean start(boolean simulate) {
+    if (this.getPerformer().getEntity().isSprinting() || this.oldMagazineStack.isEmpty()) {
+      return false;
+    }
+
+    if (simulate) {
       return true;
     }
-    return false;
+
+    if (this.gun.isPerformingSecondaryAction()) {
+      this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
+    }
+
+    if (this.getPerformer().getLevel().isClientSide()) {
+      this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
+      this.gun.getClient().getAnimationController().addAnimation(this.animation);
+    }
+
+    return true;
   }
 
   @Override

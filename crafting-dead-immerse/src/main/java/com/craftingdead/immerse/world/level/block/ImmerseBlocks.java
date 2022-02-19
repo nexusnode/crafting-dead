@@ -10,9 +10,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ImmerseBlocks {
 
-  public static final DeferredRegister<Block> BLOCKS =
+  public static final DeferredRegister<Block> blocks =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadImmerse.ID);
 
   public static final RegistryObject<Block> BASE_CENTER =
-      BLOCKS.register("base_center", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+      blocks.register("base_center",
+          () -> new BaseCenterBlock(BlockBehaviour.Properties.copy(Blocks.BEDROCK).noOcclusion()));
 }

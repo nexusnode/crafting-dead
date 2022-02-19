@@ -233,10 +233,9 @@ public class CraftingDeadSurvival {
 
   @SubscribeEvent
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension
-        && !event.getLiving().getHandler(SurvivalPlayerHandler.ID).isPresent()) {
-      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
-      player.registerHandler(SurvivalPlayerHandler.ID, new SurvivalPlayerHandler(player));
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && !player.getHandler(SurvivalPlayerHandler.TYPE).isPresent()) {
+      player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
     }
   }
 
@@ -254,8 +253,7 @@ public class CraftingDeadSurvival {
   public void handleGunHitEntity(GunEvent.HitEntity event) {
     event.getTarget().getCapability(LivingExtension.CAPABILITY)
         .resolve()
-        .flatMap(living -> living.getHandler(SurvivalPlayerHandler.ID))
-        .map(living -> (SurvivalPlayerHandler) living)
+        .flatMap(living -> living.getHandler(SurvivalPlayerHandler.TYPE))
         .ifPresent(playerHandler -> {
           float enchantmentPct =
               EnchantmentHelper.getItemEnchantmentLevel(SurvivalEnchantments.INFECTION.get(),

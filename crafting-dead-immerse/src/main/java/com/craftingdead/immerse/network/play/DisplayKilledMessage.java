@@ -27,15 +27,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
-public class DisplayKilledMessage {
-
-  private final int killerEntityId;
-  private final ItemStack itemStack;
-
-  public DisplayKilledMessage(int killerEntityId, ItemStack itemStack) {
-    this.killerEntityId = killerEntityId;
-    this.itemStack = itemStack;
-  }
+public record DisplayKilledMessage(int killerEntityId, ItemStack itemStack) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.killerEntityId);

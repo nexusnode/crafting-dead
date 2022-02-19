@@ -25,11 +25,6 @@ public abstract class TimedAction implements Action {
   protected abstract int getTotalDurationTicks();
 
   @Override
-  public boolean start() {
-    return true;
-  }
-
-  @Override
   public boolean tick() {
     return ++this.durationTicks >= this.getTotalDurationTicks();
   }

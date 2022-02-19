@@ -62,7 +62,6 @@ import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.DrawSelectionEvent;
@@ -70,7 +69,6 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -362,9 +360,12 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleDrawHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
-    var heldStack = this.minecraft.player.getMainHandItem();
+    var cameraPlayer = CraftingDead.getInstance().getClientDist().getCameraPlayer();
+    var heldStack = cameraPlayer.getMainHandItem();
     if (heldStack.getItem() instanceof BlueprintItem blueprint) {
-      BlueprintRenderer.render(blueprint, event.getTarget().getBlockPos().above());
+      event.setCanceled(true);
+      BlueprintRenderer.render(cameraPlayer, blueprint, event.getTarget(),
+          event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
     }
   }
 }

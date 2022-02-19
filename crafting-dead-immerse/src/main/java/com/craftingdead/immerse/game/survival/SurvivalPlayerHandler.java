@@ -18,23 +18,30 @@
 
 package com.craftingdead.immerse.game.survival;
 
+import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.network.SynchedData;
+import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
-import com.craftingdead.immerse.game.GameTypes;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.server.level.ServerPlayer;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.stats.Stats;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Zombie;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
-  public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
+  public static final LivingHandlerType<SurvivalPlayerHandler> TYPE =
+      new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "survival_player"));
 
   private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
@@ -47,11 +54,22 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private final SynchedData dataManager = new SynchedData();
 
+  @Nullable
+  private BlockPos basePos;
+
   public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);
     this.dataManager.register(PLAYERS_KILLED, 0);
+  }
+
+  public Optional<BlockPos> getBasePos() {
+    return Optional.ofNullable(this.basePos);
+  }
+
+  public void setBasePos(@Nullable BlockPos basePos) {
+    this.basePos = basePos;
   }
 
   @Override
@@ -103,30 +121,32 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
+  public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
     if (!wasDeath) {
-      that.getHandler(GameTypes.SURVIVAL.getId())
-          .map(extension -> (SurvivalPlayerHandler) extension)
-          .ifPresent(extension -> {
-            this.setDaysSurvived(extension.getDaysSurvived());
-            this.setZombiesKilled(extension.getZombiesKilled());
-            this.setPlayersKilled(extension.getPlayersKilled());
-          });
+      that.getHandler(TYPE).ifPresent(extension -> {
+        this.setDaysSurvived(extension.getDaysSurvived());
+        this.setZombiesKilled(extension.getZombiesKilled());
+        this.setPlayersKilled(extension.getPlayersKilled());
+      });
     }
   }
 
   @Override
   public CompoundTag serializeNBT() {
-    CompoundTag nbt = new CompoundTag();
-    nbt.putInt("zombiesKilled", this.getZombiesKilled());
-    nbt.putInt("playersKilled", this.getPlayersKilled());
-    return nbt;
+    var tag = new CompoundTag();
+    tag.putInt("zombiesKilled", this.getZombiesKilled());
+    tag.putInt("playersKilled", this.getPlayersKilled());
+    this.getBasePos().ifPresent(pos -> tag.put("basePos", NbtUtils.writeBlockPos(pos)));
+    return tag;
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    this.setZombiesKilled(nbt.getInt("zombiesKilled"));
-    this.setPlayersKilled(nbt.getInt("playersKilled"));
+  public void deserializeNBT(CompoundTag tag) {
+    this.setZombiesKilled(tag.getInt("zombiesKilled"));
+    this.setPlayersKilled(tag.getInt("playersKilled"));
+    if (tag.contains("basePos", Tag.TAG_COMPOUND)) {
+      this.setBasePos(NbtUtils.readBlockPos(tag.getCompound("basePos")));
+    }
   }
 
   @Override

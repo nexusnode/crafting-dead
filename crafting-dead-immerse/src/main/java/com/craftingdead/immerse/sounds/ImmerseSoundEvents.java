@@ -27,7 +27,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ImmerseSoundEvents {
 
-  public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+  public static final DeferredRegister<SoundEvent> soundEvents =
       DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDeadImmerse.ID);
 
   public static final RegistryObject<SoundEvent> BUTTON_CLICK = register("button_click");
@@ -53,6 +53,6 @@ public class ImmerseSoundEvents {
 
   private static RegistryObject<SoundEvent> register(String name) {
     ResourceLocation registryName = new ResourceLocation(CraftingDeadImmerse.ID, name);
-    return SOUND_EVENTS.register(name, () -> new SoundEvent(registryName));
+    return soundEvents.register(name, () -> new SoundEvent(registryName));
   }
 }

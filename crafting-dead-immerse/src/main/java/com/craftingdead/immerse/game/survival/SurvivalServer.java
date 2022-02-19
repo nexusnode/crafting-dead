@@ -15,9 +15,15 @@
 
 package com.craftingdead.immerse.game.survival;
 
+import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.GameServer;
+import com.craftingdead.immerse.world.action.BuildBlockAction;
+import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SurvivalServer extends SurvivalGame implements GameServer {
 
@@ -41,4 +47,20 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
 
   @Override
   public void removePlayer(PlayerExtension<ServerPlayer> player) {}
+
+  @SubscribeEvent
+  public void handlePerformAction(LivingExtensionEvent.PerformAction<BuildBlockAction> event) {
+    if (!event.getLiving().getLevel().isClientSide()
+        && event.getAction().getType().getBlock() == ImmerseBlocks.BASE_CENTER.get()
+        && event.getLiving() instanceof PlayerExtension<?> player) {
+      var handler = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
+      handler.getBasePos().ifPresent(pos -> {
+        event.setCanceled(true);
+        player.getEntity().displayClientMessage(
+            new TranslatableComponent("message.already_own_base", pos.toShortString())
+                .withStyle(ChatFormatting.RED),
+            true);
+      });
+    }
+  }
 }

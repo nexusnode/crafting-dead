@@ -39,8 +39,7 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
   @Override
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
       PoseStack poseStack, int width, int height, float partialTick) {
-    var survivalPlayer =
-        (SurvivalPlayerHandler) player.getHandlerOrThrow(SurvivalPlayerHandler.EXTENSION_ID);
+    var survivalPlayer = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
     int y = height / 2;
     int x = 4;
 

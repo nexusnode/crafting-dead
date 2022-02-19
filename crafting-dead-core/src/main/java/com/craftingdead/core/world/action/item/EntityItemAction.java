@@ -22,6 +22,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.craftingdead.core.world.action.ActionObserver;
+import com.craftingdead.core.world.action.ProgressBar;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
@@ -48,23 +49,25 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
   }
 
   @Override
-  public boolean start() {
-    return this.selectedTarget != null && super.start();
+  public boolean start(boolean simulate) {
+    return this.selectedTarget != null && super.start(simulate);
   }
 
   @Override
   public ActionObserver createPerformerObserver() {
-    return ActionObserver.create(this,
+    return ActionObserver.create(this, ProgressBar.create(this.getType(),
         this.performer == this.selectedTarget ? null
             : new TranslatableComponent("action.target",
                 this.selectedTarget.getEntity().getDisplayName().getString()),
-        this::getProgress);
+        this::getProgress));
   }
 
   @Override
   public ActionObserver createTargetObserver() {
-    return ActionObserver.create(this, new TranslatableComponent("action.performer",
-        this.performer.getEntity().getDisplayName().getString()), this::getProgress);
+    return ActionObserver.create(this, ProgressBar.create(this.getType(),
+        new TranslatableComponent("action.performer",
+            this.performer.getEntity().getDisplayName().getString()),
+        this::getProgress));
   }
 
   @Override

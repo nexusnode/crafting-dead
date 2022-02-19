@@ -57,17 +57,19 @@ public class MagazineReloadAction extends AbstractReloadAction {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     var result = this.findMagazine(this.getPerformer());
     if (!result.isPresent()) {
       return false;
     }
 
-    this.magazineLocation = result.get();
-    this.newMagazineStack =
-        this.magazineLocation.itemHandler.extractItem(this.magazineLocation.slot, 1, false);
+    if (!simulate) {
+      this.magazineLocation = result.get();
+      this.newMagazineStack =
+          this.magazineLocation.itemHandler.extractItem(this.magazineLocation.slot, 1, false);
+    }
 
-    return super.start();
+    return true;
   }
 
   @Override

@@ -113,8 +113,8 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
 
       if (playerEntity.getCapability(LivingExtension.CAPABILITY)
           .resolve()
-          .flatMap(e -> e.getHandler(ID))
-          .map(extension -> ((TdmPlayerHandler<?>) extension).getTeam().orElse(null) == this
+          .flatMap(e -> e.getHandler(TYPE))
+          .map(extension -> extension.getTeam().orElse(null) == this
               .getTeam()
               .orElse(null))
           .orElse(false)) {
@@ -167,9 +167,8 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
   }
 
   @Override
-  public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
-    TdmServerPlayerHandler extension =
-        (TdmServerPlayerHandler) that.getHandlerOrThrow(ID);
+  public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
+    var extension = (TdmServerPlayerHandler) that.getHandlerOrThrow(TYPE);
     if (extension.valid) {
       this.wasGhost = extension.wasGhost;
       this.ghost = extension.ghost;

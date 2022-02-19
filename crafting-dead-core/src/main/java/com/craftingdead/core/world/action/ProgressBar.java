@@ -1,8 +1,11 @@
 package com.craftingdead.core.world.action;
 
 import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import it.unimi.dsi.fastutil.floats.FloatUnaryOperator;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public interface ProgressBar {
 
@@ -28,4 +31,24 @@ public interface ProgressBar {
    * @return
    */
   float getProgress(float partialTick);
+
+  static ProgressBar create(ActionType<?> actionType, @Nullable Component subMessage,
+      FloatUnaryOperator progress) {
+    return new ProgressBar() {
+      @Override
+      public Component getMessage() {
+        return new TranslatableComponent(actionType.makeDescriptionId() + ".message");
+      }
+
+      @Override
+      public Optional<Component> getSubMessage() {
+        return Optional.ofNullable(subMessage);
+      }
+
+      @Override
+      public float getProgress(float partialTick) {
+        return progress.apply(partialTick);
+      }
+    };
+  }
 }

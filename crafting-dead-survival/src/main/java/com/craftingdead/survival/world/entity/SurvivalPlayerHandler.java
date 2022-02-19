@@ -19,6 +19,7 @@
 package com.craftingdead.survival.world.entity;
 
 import java.util.Random;
+import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
@@ -35,8 +36,8 @@ import net.minecraft.world.entity.monster.Zombie;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
-  public static final ResourceLocation ID =
-      new ResourceLocation(CraftingDeadSurvival.ID, "player_handler");
+  public static final LivingHandlerType<SurvivalPlayerHandler> TYPE = new LivingHandlerType<>(
+      new ResourceLocation(CraftingDeadSurvival.ID, "survival_player"));
 
   /**
    * The % chance of getting infected by a zombie.

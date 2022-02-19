@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.craftingdead.core.Util;
+import com.craftingdead.core.FunctionalUtil;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.RegisterGunColour;
@@ -278,7 +278,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
   }
 
   public Optional<SoundEvent> getSecondaryActionSound() {
-    return Util.optional(this.secondaryActionSound);
+    return FunctionalUtil.optional(this.secondaryActionSound);
   }
 
   public long getSecondaryActionSoundRepeatDelayMs() {

@@ -301,8 +301,8 @@ public class CraftingDead {
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
     event.getOriginal().reviveCaps();
-    PlayerExtension.getOrThrow(event.getPlayer())
-        .copyFrom(PlayerExtension.getOrThrow(event.getOriginal()), event.isWasDeath());
+    PlayerExtension.getOrThrow(event.getPlayer()).copyFrom(
+        PlayerExtension.getOrThrow((ServerPlayer) event.getOriginal()), event.isWasDeath());
   }
 
   @SubscribeEvent

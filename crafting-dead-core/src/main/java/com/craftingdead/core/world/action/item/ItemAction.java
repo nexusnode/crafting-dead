@@ -41,7 +41,7 @@ public abstract class ItemAction implements Action {
   public ItemStack getItemStack() {
     return this.getPerformer().getEntity().getItemInHand(this.hand);
   }
-  
+
   public int getTicksUsingItem() {
     return this.getPerformer().getEntity().getTicksUsingItem();
   }
@@ -51,9 +51,9 @@ public abstract class ItemAction implements Action {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     if (this.checkHeldItem()) {
-      if (!this.getPerformer().getLevel().isClientSide()) {
+      if (!this.getPerformer().getLevel().isClientSide() && !simulate) {
         this.getPerformer().getEntity().startUsingItem(this.hand);
       }
       return true;

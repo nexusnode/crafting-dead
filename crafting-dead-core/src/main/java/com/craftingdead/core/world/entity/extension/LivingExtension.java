@@ -44,29 +44,29 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
-    extends LivingHandler {
+public sealed interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
+    extends LivingHandler permits BaseLivingExtension<?, ?>,PlayerExtension<?> {
 
   Capability<LivingExtension<?, ?>> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
   /**
    * @see {@link net.minecraftforge.event.AttachCapabilitiesEvent}
    */
-  static final ResourceLocation CAPABILITY_KEY = new ResourceLocation(CraftingDead.ID, "living");
+  ResourceLocation CAPABILITY_KEY = new ResourceLocation(CraftingDead.ID, "living_extension");
 
-  static <E extends LivingEntity> LivingExtension<E, ?> create(E entity) {
-    return new LivingExtensionImpl<>(entity);
+  static SimpleLivingExtension create(LivingEntity entity) {
+    return new SimpleLivingExtension(entity);
   }
 
   @SuppressWarnings("unchecked")
   static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E entity) {
-    return CapabilityUtil.getOrThrow(LivingExtension.CAPABILITY, entity, LivingExtension.class);
+    return CapabilityUtil.getOrThrow(CAPABILITY, entity, LivingExtension.class);
   }
 
   @Nullable
   @SuppressWarnings("unchecked")
   static <E extends LivingEntity> LivingExtension<E, ?> get(E entity) {
-    return CapabilityUtil.get(LivingExtension.CAPABILITY, entity, LivingExtension.class);
+    return CapabilityUtil.get(CAPABILITY, entity, LivingExtension.class);
   }
 
   /**
@@ -80,7 +80,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param id - the handler's ID
    * @return an {@link Optional} handler
    */
-  Optional<H> getHandler(ResourceLocation id);
+  <T extends LivingHandler> Optional<T> getHandler(LivingHandlerType<T> type);
 
   /**
    * Get a handler or throw an exception if not present.
@@ -90,7 +90,8 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @return the handler
    */
   @Nonnull
-  H getHandlerOrThrow(ResourceLocation id) throws IllegalStateException;
+  <T extends LivingHandler> T getHandlerOrThrow(LivingHandlerType<T> type)
+      throws IllegalStateException;
 
   /**
    * Register a handler.
@@ -98,7 +99,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param id - the handler's ID
    * @param handler - the handler to attach
    */
-  void registerHandler(ResourceLocation id, H handler);
+  <T extends H> void registerHandler(LivingHandlerType<T> type, T handler);
 
   Optional<Action> getAction();
 

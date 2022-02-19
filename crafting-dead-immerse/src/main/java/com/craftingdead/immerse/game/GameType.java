@@ -35,7 +35,7 @@ public class GameType extends ForgeRegistryEntry<GameType> {
 
   public static final Codec<GameType> CODEC =
       ResourceLocation.CODEC.flatXmap(registryName -> {
-        GameType gameType = GameTypes.REGISTRY.get().getValue(registryName);
+        var gameType = GameTypes.registry.get().getValue(registryName);
         return gameType == null
             ? DataResult.error("Unknown registry key: " + registryName.toString())
             : DataResult.success(gameType);

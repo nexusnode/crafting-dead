@@ -11,111 +11,125 @@ import net.minecraftforge.registries.RegistryObject;
 public class ImmerseActionTypes {
 
   @SuppressWarnings("unchecked")
-  public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
+  public static final DeferredRegister<ActionType<?>> actionTypes =
       DeferredRegister.create((Class<ActionType<?>>) (Object) ActionType.class,
           CraftingDeadImmerse.ID);
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BASE_CENTER =
-      ACTION_TYPES.register("build_base_center",
+      actionTypes.register("build_base_center",
           () -> BuildBlockActionType.builder()
               .duration(100)
               .block(ImmerseBlocks.BASE_CENTER)
+              .notClaimed()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_CAMPFIRE =
-      ACTION_TYPES.register("build_campfire",
+      actionTypes.register("build_campfire",
           () -> BuildBlockActionType.builder()
               .duration(100)
               .block(Blocks.CAMPFIRE)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_OAK_PLANKS_WALL =
-      ACTION_TYPES.register("build_oak_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_OAK_PLANK_WALL =
+      actionTypes.register("build_oak_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.OAK_PLANKS)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_PLANKS_WALL =
-      ACTION_TYPES.register("build_spruce_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_PLANK_WALL =
+      actionTypes.register("build_spruce_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.SPRUCE_PLANKS)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_PLANKS_WALL =
-      ACTION_TYPES.register("build_birch_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_PLANK_WALL =
+      actionTypes.register("build_birch_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.BIRCH_PLANKS)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_PLANKS_WALL =
-      ACTION_TYPES.register("build_jungle_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_PLANK_WALL =
+      actionTypes.register("build_jungle_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.JUNGLE_PLANKS)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_PLANKS_WALL =
-      ACTION_TYPES.register("build_acacia_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_PLANK_WALL =
+      actionTypes.register("build_acacia_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.ACACIA_PLANKS)
+              .withinBase()
               .build());
 
-  public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_PLANKS_WALL =
-      ACTION_TYPES.register("build_dark_oak_planks_wall",
+  public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_PLANK_WALL =
+      actionTypes.register("build_dark_oak_plank_wall",
           () -> BuildWallActionType.builder()
               .duration(100)
               .block(Blocks.DARK_OAK_PLANKS)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_OAK_DOOR =
-      ACTION_TYPES.register("build_oak_door",
+      actionTypes.register("build_oak_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.OAK_PLANKS)
               .doorBlock(Blocks.OAK_DOOR)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_DOOR =
-      ACTION_TYPES.register("build_spruce_door",
+      actionTypes.register("build_spruce_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.SPRUCE_PLANKS)
               .doorBlock(Blocks.SPRUCE_DOOR)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_DOOR =
-      ACTION_TYPES.register("build_birch_door",
+      actionTypes.register("build_birch_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.BIRCH_PLANKS)
               .doorBlock(Blocks.BIRCH_DOOR)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_DOOR =
-      ACTION_TYPES.register("build_jungle_door",
+      actionTypes.register("build_jungle_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.JUNGLE_PLANKS)
               .doorBlock(Blocks.JUNGLE_DOOR)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_DOOR =
-      ACTION_TYPES.register("build_acacia_door",
+      actionTypes.register("build_acacia_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.ACACIA_PLANKS)
               .doorBlock(Blocks.ACACIA_DOOR)
+              .withinBase()
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_DOOR =
-      ACTION_TYPES.register("build_dark_oak_door",
+      actionTypes.register("build_dark_oak_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.DARK_OAK_PLANKS)
               .doorBlock(Blocks.DARK_OAK_DOOR)
+              .withinBase()
               .build());
 }

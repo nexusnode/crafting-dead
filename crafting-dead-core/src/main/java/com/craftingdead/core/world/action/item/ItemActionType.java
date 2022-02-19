@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.google.common.base.Predicates;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -115,7 +116,7 @@ public abstract class ItemActionType<T extends ItemAction>
     private boolean triggeredByClient;
     private boolean freezeMovement;
     private int totalDurationTicks = 32;
-    private Predicate<ItemStack> heldItemPredicate;
+    private Predicate<ItemStack> heldItemPredicate = Predicates.alwaysTrue();
 
     private boolean consumeItem = true;
     @Nullable
