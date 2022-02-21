@@ -74,11 +74,9 @@ jar {
 
 license {
     include '**/*.java'
-
     header = rootProject.file('HEADER.txt')
-
     ext {
         organization = 'NexusNode LTD'
-        year = 2021
+        year = 2022
     }
 }    

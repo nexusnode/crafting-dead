@@ -1,6 +1,6 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
  * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
  * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
@@ -11,6 +11,7 @@
  *
  * https://craftingdead.net/terms.php
  */
+
 package com.craftingdead.core.client.renderer.item;
 
 import java.io.BufferedReader;
