@@ -15,7 +15,7 @@
 package com.craftingdead.survival.world.entity;
 
 import com.craftingdead.survival.CraftingDeadSurvival;
-import com.craftingdead.survival.world.entity.grenade.PipeGrenade;
+import com.craftingdead.survival.world.entity.grenade.PipeBomb;
 import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
 import com.craftingdead.survival.world.entity.monster.DoctorZombieEntity;
 import com.craftingdead.survival.world.entity.monster.FastZombie;
@@ -37,10 +37,10 @@ public class SurvivalEntityTypes {
   public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
       DeferredRegister.create(ForgeRegistries.ENTITIES, CraftingDeadSurvival.ID);
 
-  public static final RegistryObject<EntityType<PipeGrenade>> PIPE_GRENADE =
-      ENTITY_TYPES.register("pipe_grenade", () -> create("pipe_grenade",
+  public static final RegistryObject<EntityType<PipeBomb>> PIPE_BOMB =
+      ENTITY_TYPES.register("pipe_bomb", () -> create("pipe_bomb",
           EntityType.Builder
-              .<PipeGrenade>of(PipeGrenade::new, MobCategory.MISC)
+              .<PipeBomb>of(PipeBomb::new, MobCategory.MISC)
               .setTrackingRange(64)
               .setUpdateInterval(4)
               .sized(0.25F, 0.5F)

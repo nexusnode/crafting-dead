@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "craftingdeadsurvival:pipe_grenade"
+      "craftingdeadsurvival:pipe_bomb"
     ]
   },
   "criteria": {
@@ -11,7 +11,9 @@
       "conditions": {
         "items": [
           {
-            "item": "craftingdeadsurvival:bloody_rag"
+            "items": [
+              "craftingdeadsurvival:bloody_rag"
+            ]
           }
         ]
       }
@@ -19,7 +21,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "craftingdeadsurvival:pipe_grenade"
+        "recipe": "craftingdeadsurvival:pipe_bomb"
       }
     }
   },

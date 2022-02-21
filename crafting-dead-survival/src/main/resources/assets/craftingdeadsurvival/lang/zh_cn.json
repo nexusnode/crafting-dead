@@ -19,7 +19,7 @@
   "effect.craftingdeadsurvival.bleeding":"流血",
 
   "entity.craftingdeadsurvival.supply_drop": "空投物品",
-  "entity.craftingdeadsurvival.pipe_grenade": "黏土炸弹",
+  "entity.craftingdeadsurvival.pipe_bomb": "黏土炸弹",
   "entity.craftingdeadsurvival.advanced_zombie": "超级丧尸",
   "entity.craftingdeadsurvival.fast_zombie": "奔跑者",
   "entity.craftingdeadsurvival.tank_zombie": "强壮的丧尸",
@@ -52,7 +52,7 @@
   "item.craftingdeadsurvival.bloody_rag": "带血的破布",
   "item.craftingdeadsurvival.clean_rag": "干净的破布",
 
-  "item.craftingdeadsurvival.pipe_grenade": "粘土炸弹",
+  "item.craftingdeadsurvival.pipe_bomb": "粘土炸弹",
   "item.craftingdeadsurvival.military_drop_radio": "军用空投召唤器",
   "item.craftingdeadsurvival.medical_drop_radio": "医用空投召唤器",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "生成 高级丧尸",

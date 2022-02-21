@@ -39,7 +39,7 @@ public class SurvivalRecipeProvider extends RecipeProvider {
         .unlockedBy("has_clean_rag", has(SurvivalItems.CLEAN_RAG.get()))
         .unlockedBy("has_dirty_rag", has(SurvivalItems.DIRTY_RAG.get()))
         .save(consumer);
-    ShapedRecipeBuilder.shaped(SurvivalItems.PIPE_GRENADE.get())
+    ShapedRecipeBuilder.shaped(SurvivalItems.PIPE_BOMB.get())
         .pattern("bib")
         .pattern("igi")
         .pattern("bib")

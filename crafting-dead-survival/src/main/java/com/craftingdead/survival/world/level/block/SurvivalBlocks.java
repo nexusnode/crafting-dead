@@ -65,33 +65,33 @@ public class SurvivalBlocks {
   public static final RegistryObject<Block> MILITARY_LOOT_GENERATOR =
       BLOCKS.register("military_loot_gen",
           () -> lootGenerator(MILITARY_LOOT, SurvivalParticleTypes.MILITARY_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.lootMilitaryRespawnTick::get,
-              CraftingDeadSurvival.serverConfig.lootMilitaryLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.militaryLootRefreshDelayTicks::get,
+              CraftingDeadSurvival.serverConfig.militaryLootEnabled::get));
 
   public static final RegistryObject<Block> MEDICAL_LOOT_GENERATOR =
       BLOCKS.register("medic_loot_gen",
           () -> lootGenerator(MEDICAL_LOOT, SurvivalParticleTypes.MEDIC_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.lootMedicalRespawnTick::get,
-              CraftingDeadSurvival.serverConfig.lootMedicalLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.medicalLootRefreshDelayTicks::get,
+              CraftingDeadSurvival.serverConfig.medicalLootEnabled::get));
 
   public static final RegistryObject<Block> CIVILIAN_LOOT_GENERATOR =
       BLOCKS.register("civilian_loot_gen",
           () -> lootGenerator(CIVILIAN_LOOT, SurvivalParticleTypes.CIVILIAN_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.lootCivilianRespawnTick::get,
-              CraftingDeadSurvival.serverConfig.lootCivilianLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.civilianLootRefreshDelayTicks::get,
+              CraftingDeadSurvival.serverConfig.civilianLootEnabled::get));
 
   public static final RegistryObject<Block> RARE_CIVILIAN_LOOT_GENERATOR =
       BLOCKS.register("civilian_rare_loot_gen",
           () -> lootGenerator(RARE_CIVILIAN_LOOT,
               SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.lootCivilianRareRespawnTick::get,
-              CraftingDeadSurvival.serverConfig.lootCivilianRareLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.rareCivilianLootRefreshDelayTicks::get,
+              CraftingDeadSurvival.serverConfig.rareCivilianLootEnabled::get));
 
   public static final RegistryObject<Block> POLICE_LOOT_GENERATOR =
       BLOCKS.register("police_loot_gen",
           () -> lootGenerator(POLICE_LOOT, SurvivalParticleTypes.POLICE_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.lootPoliceRespawnTick::get,
-              CraftingDeadSurvival.serverConfig.lootPoliceLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks::get,
+              CraftingDeadSurvival.serverConfig.policeLootEnabled::get));
 
   private static LootGeneratorBlock lootGenerator(Supplier<Block> lootBlock,
       Supplier<? extends ParticleOptions> particleOptions, IntSupplier refreshDelayTicks,

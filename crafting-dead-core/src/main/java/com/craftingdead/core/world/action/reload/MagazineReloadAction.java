@@ -14,9 +14,9 @@
 
 package com.craftingdead.core.world.action.reload;
 
-import com.craftingdead.core.CraftingDead;
 import java.util.List;
 import java.util.Optional;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.ActionTypes;
@@ -25,9 +25,6 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nullable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -78,8 +75,9 @@ public class MagazineReloadAction extends AbstractReloadAction {
     if (!displayOnly
         && !this.oldMagazineStack.isEmpty()
         && this.getPerformer().getEntity() instanceof Player
-        && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty).orElse(true)
-        && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
+        && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
+            .orElse(true)
+            && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
       ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
     }
   }

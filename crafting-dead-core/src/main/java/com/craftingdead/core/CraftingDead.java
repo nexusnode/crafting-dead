@@ -14,6 +14,9 @@
 
 package com.craftingdead.core;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
@@ -27,6 +30,7 @@ import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.ModEntityTypes;
+import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
@@ -86,9 +90,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.PacketDistributor;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -349,7 +350,7 @@ public class CraftingDead {
     if (event.getObject() instanceof LivingEntity entity) {
       var living = entity instanceof Player player
           ? PlayerExtension.create(player)
-          : LivingExtension.create(entity);
+          : BasicLivingExtension.create(entity);
       event.addCapability(LivingExtension.CAPABILITY_KEY, CapabilityUtil.serializableProvider(
           () -> living, LivingExtension.CAPABILITY));
       living.load();

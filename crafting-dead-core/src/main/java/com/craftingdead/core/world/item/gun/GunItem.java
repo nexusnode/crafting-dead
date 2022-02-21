@@ -14,16 +14,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.client.animation.Animation;
-import com.craftingdead.core.util.FunctionalUtil;
-import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
-import com.craftingdead.core.world.item.combatslot.CombatSlot;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
-import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -38,10 +28,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.craftingdead.core.FunctionalUtil;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
@@ -63,7 +54,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-@RegisterGunColour
+@RegisterGunColor
 public abstract class GunItem extends ProjectileWeaponItem {
 
   /**

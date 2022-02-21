@@ -14,6 +14,12 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -26,11 +32,6 @@ import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Predicate;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -38,6 +39,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,8 +61,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
@@ -126,7 +126,7 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
   @Override
   public void setBaby(boolean baby) {
-    if (!CraftingDeadSurvival.serverConfig.zombiesBabyZombies.get()) {
+    if (!CraftingDeadSurvival.serverConfig.babyZombiesEnabled.get()) {
       return;
     }
     super.setBaby(baby);
@@ -264,29 +264,36 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   }
 
 
-  public static AttributeSupplier.@NotNull Builder attributeTemplate() {
+  public static AttributeSupplier.Builder attributeTemplate() {
     return Zombie.createAttributes()
         .add(Attributes.ATTACK_KNOCKBACK, 0);
   }
 
-  public static AttributeSupplier.@NotNull Builder createAttributes() {
+  public static AttributeSupplier.Builder createAttributes() {
     return AdvancedZombie.attributeTemplate()
         .add(Attributes.MAX_HEALTH, 20.0D)
         .add(Attributes.ATTACK_DAMAGE, 3.0D);
   }
 
+  @Override
+  protected void dropAllDeathLoot(DamageSource damageSource) {
+    if (CraftingDeadSurvival.serverConfig.zombieDeathLootEnabled.get()) {
+      super.dropAllDeathLoot(damageSource);
+    }
+  }
+
   @Nullable
   @Override
-  public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor world, @NotNull DifficultyInstance difficulty,
-      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
-    groupData = super.finalizeSpawn(world, difficulty, spawnType, groupData, tag);
-    if (!world.isClientSide()) {
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+    groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_KNOCKBACK))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesAttackKnockback.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.zombieAttackKnockback.get());
       Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesAdvancedZombieHealth.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieMaxHealth.get());
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesAdvancedZombieDamage.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieAttackDamage.get());
     }
     return groupData;
   }

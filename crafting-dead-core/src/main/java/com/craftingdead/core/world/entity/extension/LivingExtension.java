@@ -41,7 +41,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 public sealed interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
-    extends LivingHandler permits BaseLivingExtension<?, ?>,PlayerExtension<?> {
+    extends LivingHandler permits BaseLivingExtension<?, ?>, BasicLivingExtension, PlayerExtension<?> {
 
   Capability<LivingExtension<?, ?>> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
@@ -49,10 +49,6 @@ public sealed interface LivingExtension<E extends LivingEntity, H extends Living
    * @see {@link net.minecraftforge.event.AttachCapabilitiesEvent}
    */
   ResourceLocation CAPABILITY_KEY = new ResourceLocation(CraftingDead.ID, "living_extension");
-
-  static SimpleLivingExtension create(LivingEntity entity) {
-    return new SimpleLivingExtension(entity);
-  }
 
   @SuppressWarnings("unchecked")
   static <E extends LivingEntity> LivingExtension<E, ?> getOrThrow(E entity) {

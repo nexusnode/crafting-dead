@@ -14,12 +14,14 @@
 
 package com.craftingdead.survival;
 
+import java.util.ListIterator;
+import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.item.EntityItemAction;
+import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.entity.extension.LivingHandler;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
@@ -44,7 +46,6 @@ import com.craftingdead.survival.world.entity.monster.WeakZombie;
 import com.craftingdead.survival.world.item.SurvivalItems;
 import com.craftingdead.survival.world.item.enchantment.SurvivalEnchantments;
 import com.craftingdead.survival.world.level.block.SurvivalBlocks;
-import java.util.ListIterator;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -74,7 +75,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.apache.commons.lang3.tuple.Pair;
 
 @Mod(CraftingDeadSurvival.ID)
 public class CraftingDeadSurvival {
@@ -231,15 +231,11 @@ public class CraftingDeadSurvival {
 
   @SubscribeEvent
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension
-        && !event.getLiving().getHandler(SurvivalPlayerHandler.TYPE).isPresent()) {
-      PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
+    if (event.getLiving() instanceof PlayerExtension<?> player) {
       player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
     } else if (event.getLiving().getEntity() instanceof AdvancedZombie
-        && event.getLiving().getHandler(SurvivalPlayerHandler.TYPE).isEmpty()) {
-      @SuppressWarnings("unchecked") // heap pollution should not happen here since we are specifically targeting advanced zombies
-      var zombie = (LivingExtension<? extends AdvancedZombie, LivingHandler>) event.getLiving();
-      zombie.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalZombieHandler(zombie));
+        && event.getLiving() instanceof BasicLivingExtension living) {
+      living.registerHandler(SurvivalZombieHandler.TYPE, new SurvivalZombieHandler());
     }
   }
 
@@ -278,33 +274,33 @@ public class CraftingDeadSurvival {
     while (iterator.hasNext()) {
       MobSpawnSettings.SpawnerData spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
-        if (serverConfig.zombiesAdvancedZombie.get()) {
+        if (serverConfig.advancedZombiesEnabled.get()) {
           iterator.add(new MobSpawnSettings.SpawnerData(
               SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
-              serverConfig.zombiesSpawnAdvancedZombieSpawnWeight.get(),
-              serverConfig.zombiesSpawnAdvancedZombieMinSpawn.get(),
-              serverConfig.zombiesSpawnAdvancedZombieMaxSpawn.get()));
+              serverConfig.advancedZombieSpawnWeight.get(),
+              serverConfig.advancedZombieMinSpawn.get(),
+              serverConfig.advancedZombieMaxSpawn.get()));
         }
-        if (serverConfig.zombiesFastZombie.get()) {
+        if (serverConfig.fastZombiesEnabled.get()) {
           iterator.add(new MobSpawnSettings.SpawnerData(
               SurvivalEntityTypes.FAST_ZOMBIE.get(),
-              serverConfig.zombiesSpawnFastZombieSpawnWeight.get(),
-              serverConfig.zombiesSpawnFastZombieMinSpawn.get(),
-              serverConfig.zombiesSpawnFastZombieMaxSpawn.get()));
+              serverConfig.fastZombieSpawnWeight.get(),
+              serverConfig.fastZombieMinSpawn.get(),
+              serverConfig.fastZombieMaxSpawn.get()));
         }
-        if (serverConfig.zombiesTankZombie.get()) {
+        if (serverConfig.tankZombiesEnabled.get()) {
           iterator.add(new MobSpawnSettings.SpawnerData(
               SurvivalEntityTypes.TANK_ZOMBIE.get(),
-              serverConfig.zombiesSpawnTankZombieSpawnWeight.get(),
-              serverConfig.zombiesSpawnTankZombieMinSpawn.get(),
-              serverConfig.zombiesSpawnTankZombieMaxSpawn.get()));
+              serverConfig.tankZombieSpawnWeight.get(),
+              serverConfig.tankZombieMinSpawn.get(),
+              serverConfig.tankZombieMaxSpawn.get()));
         }
-        if (serverConfig.zombiesWeakZombie.get()) {
+        if (serverConfig.weakZombiesEnabled.get()) {
           iterator.add(new MobSpawnSettings.SpawnerData(
               SurvivalEntityTypes.WEAK_ZOMBIE.get(),
-              serverConfig.zombiesSpawnWeakZombieSpawnWeight.get(),
-              serverConfig.zombiesSpawnWeakZombieMinSpawn.get(),
-              serverConfig.zombiesSpawnWeakZombieMaxSpawn.get()));
+              serverConfig.weakZombieSpawnWeight.get(),
+              serverConfig.weakZombieMinSpawn.get(),
+              serverConfig.weakZombieMaxSpawn.get()));
         }
       }
     }

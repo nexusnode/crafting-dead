@@ -84,7 +84,7 @@ public class LootGeneratorBlock extends AirBlock {
   @Override
   public void tick(BlockState blockState, ServerLevel level, BlockPos pos, Random random) {
     super.tick(blockState, level, pos, random);
-    if (!enabled.getAsBoolean()) {
+    if (!this.enabled.getAsBoolean()) {
       return;
     }
 

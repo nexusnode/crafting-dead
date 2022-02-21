@@ -57,7 +57,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 sealed class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
-    implements LivingExtension<E, H> permits PlayerExtensionImpl<?>, SimpleLivingExtension {
+    implements LivingExtension<E, H> permits PlayerExtensionImpl<?>, BasicLivingExtensionImpl {
 
   /**
    * The vanilla entity.

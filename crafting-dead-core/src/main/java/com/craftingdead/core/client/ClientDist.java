@@ -29,13 +29,11 @@ import com.craftingdead.core.client.model.CylinderGrenadeModel;
 import com.craftingdead.core.client.model.FragGrenadeModel;
 import com.craftingdead.core.client.model.SlimGrenadeModel;
 import com.craftingdead.core.client.model.geom.ModModelLayers;
+import com.craftingdead.core.client.particle.FlashParticle;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
-import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
 import com.craftingdead.core.client.renderer.entity.grenade.C4ExplosiveRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.FragGrenadeRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
+import com.craftingdead.core.client.renderer.entity.grenade.GrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.HandcuffsLayer;
@@ -61,7 +59,7 @@ import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
@@ -347,15 +345,15 @@ public class ClientDist implements ModDist {
     event.registerEntityRenderer(ModEntityTypes.C4_EXPLOSIVE.get(),
         C4ExplosiveRenderer::new);
     event.registerEntityRenderer(ModEntityTypes.FIRE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
+        GrenadeRenderer.cylinder());
     event.registerEntityRenderer(ModEntityTypes.FRAG_GRENADE.get(),
-        FragGrenadeRenderer::new);
+        GrenadeRenderer.frag());
     event.registerEntityRenderer(ModEntityTypes.DECOY_GRENADE.get(),
-        SlimGrenadeRenderer::new);
+        GrenadeRenderer.slim());
     event.registerEntityRenderer(ModEntityTypes.SMOKE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
+        GrenadeRenderer.cylinder());
     event.registerEntityRenderer(ModEntityTypes.FLASH_GRENADE.get(),
-        SlimGrenadeRenderer::new);
+        GrenadeRenderer.slim());
   }
 
   private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {
@@ -410,7 +408,7 @@ public class ClientDist implements ModDist {
     ParticleEngine particleEngine = this.minecraft.particleEngine;
     particleEngine.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
-    particleEngine.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
+    particleEngine.register(ModParticleTypes.RGB_FLASH.get(), FlashParticle.Factory::new);
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
@@ -423,7 +421,7 @@ public class ClientDist implements ModDist {
             .findAny()
             .orElse(0xFFFFFFFF);
     ForgeRegistries.ITEMS.getValues().stream()
-        .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColour.class))
+        .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColor.class))
         .forEach(item -> event.getItemColors().register(gunColour, item));
   }
 

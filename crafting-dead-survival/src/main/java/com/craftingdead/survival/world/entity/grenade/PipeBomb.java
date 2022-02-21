@@ -14,7 +14,8 @@
 
 package com.craftingdead.survival.world.entity.grenade;
 
-import com.craftingdead.core.particle.RGBFlashParticleData;
+import java.util.OptionalInt;
+import com.craftingdead.core.particle.FlashParticleOptions;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.grenade.Grenade;
 import com.craftingdead.core.world.item.GrenadeItem;
@@ -29,20 +30,21 @@ import net.minecraft.world.level.Level;
 
 public class PipeBomb extends Grenade implements ExplosionSource {
 
-  private static final RGBFlashParticleData RED_FLASH =
-      new RGBFlashParticleData(1F, 0.35F, 0.35F, 1F);
+  private static final FlashParticleOptions RED_FLASH =
+      new FlashParticleOptions(1F, 0.35F, 0.35F, 1F);
 
   public PipeBomb(EntityType<? extends Grenade> type, Level level) {
     super(type, level);
   }
 
   public PipeBomb(LivingEntity thrower, Level level) {
-    super(SurvivalEntityTypes.PIPE_GRENADE.get(), thrower, level);
+    super(SurvivalEntityTypes.PIPE_BOMB.get(), thrower, level);
   }
 
   @Override
-  public Integer getMinimumTicksUntilAutoActivation() {
-    return CraftingDeadSurvival.serverConfig.explosivesPipeBombTicksBeforeActivation.get();
+  public OptionalInt getMinimumTicksUntilAutoActivation() {
+    return OptionalInt.of(
+        CraftingDeadSurvival.serverConfig.pipeBombTicksBeforeActivation.get());
   }
 
   @Override
@@ -52,8 +54,8 @@ public class PipeBomb extends Grenade implements ExplosionSource {
         this.kill();
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(),
-            CraftingDeadSurvival.serverConfig.explosivesPipeBombRadius.get().floatValue(), false,
-            CraftingDeadSurvival.serverConfig.explosivesPipeBombMode.get());
+            CraftingDeadSurvival.serverConfig.pipeBombRadius.get().floatValue(), false,
+            CraftingDeadSurvival.serverConfig.pipeBombBlockInteraction.get());
       }
     }
   }
@@ -65,10 +67,11 @@ public class PipeBomb extends Grenade implements ExplosionSource {
         this.level.addParticle(RED_FLASH, true,
             this.getX(), this.getY(), this.getZ(), 0D, 0D, 0D);
       } else {
-        float pitchProgress =
-            this.tickCount / (float) (this.getMinimumTicksUntilAutoActivation());
-        float gradualPitch = Mth.lerp(pitchProgress, 1.0F, 2F);
-        this.playSound(SoundEvents.NOTE_BLOCK_BELL, 1.7F, gradualPitch);
+        this.getMinimumTicksUntilAutoActivation().ifPresent(ticks -> {
+          var pitchProgress = this.tickCount / (float) ticks;
+          var gradualPitch = Mth.lerp(pitchProgress, 1.0F, 2F);
+          this.playSound(SoundEvents.NOTE_BLOCK_BELL, 1.7F, gradualPitch);
+        });
       }
     }
   }
@@ -80,19 +83,19 @@ public class PipeBomb extends Grenade implements ExplosionSource {
 
   @Override
   public GrenadeItem asItem() {
-    return SurvivalItems.PIPE_GRENADE.get();
+    return SurvivalItems.PIPE_BOMB.get();
   }
 
   @Override
   public void onMotionStop(int stopsCount) {}
 
   @Override
-  public double getDamageMultiplier() {
-    return CraftingDeadSurvival.serverConfig.explosivesPipeBombDamageMultiplier.get();
+  public float getDamageMultiplier() {
+    return CraftingDeadSurvival.serverConfig.pipeBombDamageMultiplier.get().floatValue();
   }
 
   @Override
   public double getKnockbackMultiplier() {
-    return CraftingDeadSurvival.serverConfig.explosivesPipeBombKnockbackMultiplier.get();
+    return CraftingDeadSurvival.serverConfig.pipeBombKnockbackMultiplier.get();
   }
 }

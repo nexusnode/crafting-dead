@@ -35,7 +35,7 @@ public class CylinderGrenadeModel<T extends Grenade> extends HierarchicalModel<T
     var root = mesh.getRoot();
 
     var anchor = root.addOrReplaceChild("anchor", CubeListBuilder.create(),
-        PartPose.offset(0.5F, -2.0F, 0.0F));
+        PartPose.offset(0.0F, 4.0F, 0.0F));
 
     anchor.addOrReplaceChild("body",
         CubeListBuilder.create()

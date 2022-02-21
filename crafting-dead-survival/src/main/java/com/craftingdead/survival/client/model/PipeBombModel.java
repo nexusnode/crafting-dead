@@ -35,7 +35,7 @@ public class PipeBombModel extends HierarchicalModel<PipeBomb> {
     var root = mesh.getRoot();
 
     var anchor = root.addOrReplaceChild("anchor", CubeListBuilder.create(),
-        PartPose.offset(0.0F, 20.0F, 0.0F));
+        PartPose.offset(0.0F, 4.0F, 0.0F));
 
     var body = anchor.addOrReplaceChild("body",
         CubeListBuilder.create()

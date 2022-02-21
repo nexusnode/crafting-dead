@@ -72,7 +72,7 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   @Override
   public boolean canBePickedUp(Player playerFrom) {
-    return this.isStoppedInGround();
+    return this.hasStoppedMoving();
   }
 
   @Override

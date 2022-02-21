@@ -23,21 +23,23 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 
-public class RGBFlashParticleData implements ParticleOptions {
+public record FlashParticleOptions(float red, float green, float blue, float scale)
+    implements ParticleOptions {
 
-  public static final Codec<RGBFlashParticleData> CODEC =
+  public static final Codec<FlashParticleOptions> CODEC =
       RecordCodecBuilder.create(instance -> instance
-          .group(Codec.FLOAT.fieldOf("red").forGetter(RGBFlashParticleData::getRed),
-              Codec.FLOAT.fieldOf("green").forGetter(RGBFlashParticleData::getGreen),
-              Codec.FLOAT.fieldOf("blue").forGetter(RGBFlashParticleData::getBlue),
-              Codec.FLOAT.fieldOf("scale").forGetter(RGBFlashParticleData::getScale))
-          .apply(instance, RGBFlashParticleData::new));
+          .group(
+              Codec.FLOAT.fieldOf("red").forGetter(FlashParticleOptions::red),
+              Codec.FLOAT.fieldOf("green").forGetter(FlashParticleOptions::green),
+              Codec.FLOAT.fieldOf("blue").forGetter(FlashParticleOptions::blue),
+              Codec.FLOAT.fieldOf("scale").forGetter(FlashParticleOptions::scale))
+          .apply(instance, FlashParticleOptions::new));
 
   @SuppressWarnings("deprecation")
-  public static final ParticleOptions.Deserializer<RGBFlashParticleData> DESERIALIZER =
-      new ParticleOptions.Deserializer<RGBFlashParticleData>() {
+  public static final ParticleOptions.Deserializer<FlashParticleOptions> DESERIALIZER =
+      new ParticleOptions.Deserializer<FlashParticleOptions>() {
         @Override
-        public RGBFlashParticleData fromCommand(ParticleType<RGBFlashParticleData> particleType,
+        public FlashParticleOptions fromCommand(ParticleType<FlashParticleOptions> particleType,
             StringReader stringReader) throws CommandSyntaxException {
           stringReader.expect(' ');
           float red = stringReader.readFloat();
@@ -47,28 +49,16 @@ public class RGBFlashParticleData implements ParticleOptions {
           float blue = stringReader.readFloat();
           stringReader.expect(' ');
           float scale = stringReader.readFloat();
-          return new RGBFlashParticleData(red, green, blue, scale);
+          return new FlashParticleOptions(red, green, blue, scale);
         }
 
         @Override
-        public RGBFlashParticleData fromNetwork(ParticleType<RGBFlashParticleData> particleType,
+        public FlashParticleOptions fromNetwork(ParticleType<FlashParticleOptions> particleType,
             FriendlyByteBuf packetBuffer) {
-          return new RGBFlashParticleData(packetBuffer.readFloat(), packetBuffer.readFloat(),
+          return new FlashParticleOptions(packetBuffer.readFloat(), packetBuffer.readFloat(),
               packetBuffer.readFloat(), packetBuffer.readFloat());
         }
       };
-
-  private final float red;
-  private final float green;
-  private final float blue;
-  private final float scale;
-
-  public RGBFlashParticleData(float red, float green, float blue, float scale) {
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
-    this.scale = scale;
-  }
 
   @Override
   public void writeToNetwork(FriendlyByteBuf packetBuffer) {
@@ -85,23 +75,7 @@ public class RGBFlashParticleData implements ParticleOptions {
   }
 
   @Override
-  public ParticleType<RGBFlashParticleData> getType() {
+  public ParticleType<FlashParticleOptions> getType() {
     return ModParticleTypes.RGB_FLASH.get();
-  }
-
-  public float getRed() {
-    return this.red;
-  }
-
-  public float getGreen() {
-    return this.green;
-  }
-
-  public float getBlue() {
-    return this.blue;
-  }
-
-  public float getScale() {
-    return this.scale;
   }
 }

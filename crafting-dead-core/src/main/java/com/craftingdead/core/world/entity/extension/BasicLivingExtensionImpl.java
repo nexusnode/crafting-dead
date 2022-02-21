@@ -2,9 +2,10 @@ package com.craftingdead.core.world.entity.extension;
 
 import net.minecraft.world.entity.LivingEntity;
 
-final class SimpleLivingExtension extends BaseLivingExtension<LivingEntity, LivingHandler> {
+final class BasicLivingExtensionImpl extends BaseLivingExtension<LivingEntity, LivingHandler>
+    implements BasicLivingExtension {
 
-  SimpleLivingExtension(LivingEntity entity) {
+  BasicLivingExtensionImpl(LivingEntity entity) {
     super(entity);
   }
 }

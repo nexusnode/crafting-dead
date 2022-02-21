@@ -25,80 +25,74 @@ public class ServerConfig {
   // ================================================================================
 
   public final ForgeConfigSpec.BooleanValue lootEnabled;
-  public final ForgeConfigSpec.BooleanValue lootCivilianLootEnabled;
-  public final ForgeConfigSpec.BooleanValue lootCivilianRareLootEnabled;
-  public final ForgeConfigSpec.BooleanValue lootMedicalLootEnabled;
-  public final ForgeConfigSpec.BooleanValue lootPoliceLootEnabled;
-  public final ForgeConfigSpec.BooleanValue lootMilitaryLootEnabled;
-  public final ForgeConfigSpec.IntValue lootCivilianRespawnTick;
-  public final ForgeConfigSpec.IntValue lootCivilianRareRespawnTick;
-  public final ForgeConfigSpec.IntValue lootMedicalRespawnTick;
-  public final ForgeConfigSpec.IntValue lootPoliceRespawnTick;
-  public final ForgeConfigSpec.IntValue lootMilitaryRespawnTick;
+  public final ForgeConfigSpec.BooleanValue civilianLootEnabled;
+  public final ForgeConfigSpec.BooleanValue rareCivilianLootEnabled;
+  public final ForgeConfigSpec.BooleanValue medicalLootEnabled;
+  public final ForgeConfigSpec.BooleanValue policeLootEnabled;
+  public final ForgeConfigSpec.BooleanValue militaryLootEnabled;
+  public final ForgeConfigSpec.IntValue civilianLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue rareCivilianLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue medicalLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue policeLootRefreshDelayTicks;
+  public final ForgeConfigSpec.IntValue militaryLootRefreshDelayTicks;
 
   // ================================================================================
   // Zombies Values
   // ================================================================================
 
   public final ForgeConfigSpec.BooleanValue zombiesEnabled;
-  public final ForgeConfigSpec.BooleanValue zombiesBabyZombies;
-  public final ForgeConfigSpec.BooleanValue zombiesAdvancedZombie;
-  public final ForgeConfigSpec.BooleanValue zombiesTankZombie;
-  public final ForgeConfigSpec.BooleanValue zombiesFastZombie;
-  public final ForgeConfigSpec.BooleanValue zombiesWeakZombie;
-  public final ForgeConfigSpec.DoubleValue zombiesAdvancedZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesTankZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesFastZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesWeakZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesPoliceZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesDoctorZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesGiantZombieHealth;
-  public final ForgeConfigSpec.DoubleValue zombiesAdvancedZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesTankZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesFastZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesWeakZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesPoliceZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesDoctorZombieDamage;
-  public final ForgeConfigSpec.DoubleValue zombiesGiantZombieDamage;
-  public final ForgeConfigSpec.IntValue zombiesSpawnAdvancedZombieSpawnWeight;
-  public final ForgeConfigSpec.IntValue zombiesSpawnTankZombieSpawnWeight;
-  public final ForgeConfigSpec.IntValue zombiesSpawnFastZombieSpawnWeight;
-  public final ForgeConfigSpec.IntValue zombiesSpawnWeakZombieSpawnWeight;
-  public final ForgeConfigSpec.IntValue zombiesSpawnAdvancedZombieMinSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnTankZombieMinSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnFastZombieMinSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnWeakZombieMinSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnAdvancedZombieMaxSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnTankZombieMaxSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnFastZombieMaxSpawn;
-  public final ForgeConfigSpec.IntValue zombiesSpawnWeakZombieMaxSpawn;
-  public final ForgeConfigSpec.DoubleValue zombiesAttackKnockback;
-  public final ForgeConfigSpec.BooleanValue zombiesDeathDrops;
+  public final ForgeConfigSpec.BooleanValue babyZombiesEnabled;
+  public final ForgeConfigSpec.BooleanValue advancedZombiesEnabled;
+  public final ForgeConfigSpec.BooleanValue tankZombiesEnabled;
+  public final ForgeConfigSpec.BooleanValue fastZombiesEnabled;
+  public final ForgeConfigSpec.BooleanValue weakZombiesEnabled;
+  public final ForgeConfigSpec.DoubleValue advancedZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue tankZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue fastZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue weakZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue policeZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue doctorZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue giantZombieMaxHealth;
+  public final ForgeConfigSpec.DoubleValue advancedZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue tankZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue fastZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue weakZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue policeZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue doctorZombieAttackDamage;
+  public final ForgeConfigSpec.DoubleValue giantZombieAttackDamage;
+  public final ForgeConfigSpec.IntValue advancedZombieSpawnWeight;
+  public final ForgeConfigSpec.IntValue tankZombieSpawnWeight;
+  public final ForgeConfigSpec.IntValue fastZombieSpawnWeight;
+  public final ForgeConfigSpec.IntValue weakZombieSpawnWeight;
+  public final ForgeConfigSpec.IntValue advancedZombieMinSpawn;
+  public final ForgeConfigSpec.IntValue tankZombieMinSpawn;
+  public final ForgeConfigSpec.IntValue fastZombieMinSpawn;
+  public final ForgeConfigSpec.IntValue weakZombieMinSpawn;
+  public final ForgeConfigSpec.IntValue advancedZombieMaxSpawn;
+  public final ForgeConfigSpec.IntValue tankZombieMaxSpawn;
+  public final ForgeConfigSpec.IntValue fastZombieMaxSpawn;
+  public final ForgeConfigSpec.IntValue weakZombieMaxSpawn;
+  public final ForgeConfigSpec.DoubleValue zombieAttackKnockback;
+  public final ForgeConfigSpec.BooleanValue zombieDeathLootEnabled;
 
   // ================================================================================
   // Abilities Values
   // ================================================================================
 
-  public final ForgeConfigSpec.BooleanValue abilitiesBrokenLegs;
-  public final ForgeConfigSpec.BooleanValue abilitiesBleedEffect;
-  public final ForgeConfigSpec.BooleanValue abilitiesInfectionEffect;
+  public final ForgeConfigSpec.BooleanValue brokenLegsEnabled;
+  public final ForgeConfigSpec.BooleanValue bleedingEnabled;
+  public final ForgeConfigSpec.BooleanValue infectionEnabled;
 
   // ================================================================================
   // Explosives Values
   // ================================================================================
 
-  public final ForgeConfigSpec.BooleanValue explosivesPipeBombEnabled;
-  public final ForgeConfigSpec.BooleanValue explosivesPipeGrenadeEnabled;
-  public final ForgeConfigSpec.EnumValue<Explosion.BlockInteraction> explosivesPipeBombMode;
-  public final ForgeConfigSpec.EnumValue<Explosion.BlockInteraction> explosivesPipeGrenadeMode;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeBombRadius;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeGrenadeRadius;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeBombKnockbackMultiplier;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeGrenadeKnockbackMultiplier;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeBombDamageMultiplier;
-  public final ForgeConfigSpec.DoubleValue explosivesPipeGrenadeDamageMultiplier;
-  public final ForgeConfigSpec.IntValue explosivesPipeBombTicksBeforeActivation;
-  public final ForgeConfigSpec.IntValue explosivesPipeGrenadeTicksBeforeActivation;
+  public final ForgeConfigSpec.BooleanValue pipeBombEnabled;
+  public final ForgeConfigSpec.EnumValue<Explosion.BlockInteraction> pipeBombBlockInteraction;
+  public final ForgeConfigSpec.DoubleValue pipeBombRadius;
+  public final ForgeConfigSpec.DoubleValue pipeBombKnockbackMultiplier;
+  public final ForgeConfigSpec.DoubleValue pipeBombDamageMultiplier;
+  public final ForgeConfigSpec.IntValue pipeBombTicksBeforeActivation;
 
   public ServerConfig(ForgeConfigSpec.Builder builder) {
     // Loot configuration
@@ -109,42 +103,42 @@ public class ServerConfig {
       this.lootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.enable")
           .comment("Defines if loot can be respawned (applies to all loots)")
-          .define("enabled", true);
-      this.lootCivilianLootEnabled = builder
+          .define("lootEnabled", true);
+      this.civilianLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.civilian_loot")
           .comment("Defines if Civilian Loot can be respawned")
           .define("civilianLootEnabled", true);
-      this.lootCivilianRareLootEnabled = builder
+      this.rareCivilianLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.civilian_rare_loot")
           .comment("Defines if Civilian Rare Loot can be respawned")
-          .define("civilianRareLootEnabled", true);
-      this.lootMedicalLootEnabled = builder
+          .define("rareCivilianLootEnabled", true);
+      this.medicalLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.medical_loot")
           .comment("Defines if Medical Loot can be respawned")
           .define("medicalLootEnabled", true);
-      this.lootPoliceLootEnabled = builder
+      this.policeLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.police_loot")
           .comment("Defines if Police Loot can be respawned")
           .define("policeLootEnabled", true);
-      this.lootMilitaryLootEnabled = builder
+      this.militaryLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.loot.military_loot")
           .comment("Defines if Military Loot can be respawned")
           .define("militaryLootEnabled", true);
-      this.lootCivilianRespawnTick = builder
+      this.civilianLootRefreshDelayTicks = builder
           .translation("options.craftingdeadsurvival.server.loot.civilian_loot_respawn_tick")
-          .defineInRange("civilianRespawnTick", 1000, 0, Integer.MAX_VALUE);
-      this.lootCivilianRareRespawnTick = builder
+          .defineInRange("civilianLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+      this.rareCivilianLootRefreshDelayTicks = builder
           .translation("options.craftingdeadsurvival.server.loot.civilian_rare_loot_respawn_tick")
-          .defineInRange("civilianRareRespawnTick", 1000, 0, Integer.MAX_VALUE);
-      this.lootMedicalRespawnTick = builder
+          .defineInRange("rareCivilianLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+      this.medicalLootRefreshDelayTicks = builder
           .translation("options.craftingdeadsurvival.server.loot.medical_loot_respawn_tick")
-          .defineInRange("medicalRespawnTick", 1000, 0, Integer.MAX_VALUE);
-      this.lootPoliceRespawnTick = builder
+          .defineInRange("medicalLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+      this.policeLootRefreshDelayTicks = builder
           .translation("options.craftingdeadsurvival.server.loot.police_loot_respawn_tick")
-          .defineInRange("policeRespawnTick", 1000, 0, Integer.MAX_VALUE);
-      this.lootMilitaryRespawnTick = builder
+          .defineInRange("policeLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
+      this.militaryLootRefreshDelayTicks = builder
           .translation("options.craftingdeadsurvival.server.loot.military_loot_respawn_tick")
-          .defineInRange("militaryRespawnTick", 1000, 0, Integer.MAX_VALUE);
+          .defineInRange("militaryLootRefreshDelayTicks", 1000, 0, Integer.MAX_VALUE);
     }
     builder.pop();
 
@@ -154,62 +148,62 @@ public class ServerConfig {
             "WARNING: Most changes only affects newly spawned zombies. Previously spawned zombies will retain their old settings.")
         .push("zombies");
     {
-      this.zombiesAdvancedZombieHealth = builder
+      this.advancedZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.advanced_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("advancedZombieHealth", 20.0D, 1.0D, 1024.0D);
-      this.zombiesTankZombieHealth = builder
+          .defineInRange("advancedZombieMaxHealth", 20.0D, 1.0D, 1024.0D);
+      this.tankZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.tank_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("tankZombieHealth", 100.0D, 1.0D, 1024.0D);
-      this.zombiesFastZombieHealth = builder
+          .defineInRange("tankZombieMaxHealth", 100.0D, 1.0D, 1024.0D);
+      this.fastZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.fast_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("fastZombieHealth", 10.0D, 1.0D, 1024.0D);
-      this.zombiesWeakZombieHealth = builder
+          .defineInRange("fastZombieMaxHealth", 10.0D, 1.0D, 1024.0D);
+      this.weakZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.weak_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("weakZombieHealth", 5.0D, 1.0D, 1024.0D);
-      this.zombiesPoliceZombieHealth = builder
+          .defineInRange("weakZombieMaxHealth", 5.0D, 1.0D, 1024.0D);
+      this.policeZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.police_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("policeZombieHealth", 20.0D, 1.0D, 1024.0D);
-      this.zombiesDoctorZombieHealth = builder
+          .defineInRange("policeZombieMaxHealth", 20.0D, 1.0D, 1024.0D);
+      this.doctorZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.doctor_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("doctorZombieHealth", 20.0D, 1.0D, 1024.0D);
-      this.zombiesGiantZombieHealth = builder
+          .defineInRange("doctorZombieMaxHealth", 20.0D, 1.0D, 1024.0D);
+      this.giantZombieMaxHealth = builder
           .translation("options.craftingdeadsurvival.server.zombies.giant_zombie.health")
           .comment("Defines how much health the zombie has (2 health points = 1 heart)")
-          .defineInRange("giantZombieHealth", 100.0D, 1.0D, 1024.0D);
-      this.zombiesAdvancedZombieDamage = builder
+          .defineInRange("giantZombieMaxHealth", 100.0D, 1.0D, 1024.0D);
+      this.advancedZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.advanced_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("advancedZombieDamage", 3.0D, 0.0D, 2048.0D);
-      this.zombiesTankZombieDamage = builder
+          .defineInRange("advancedZombieAttackDamage", 3.0D, 0.0D, 2048.0D);
+      this.tankZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.tank_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("tankZombieDamage", 15.0D, 0.0D, 2048.0D);
-      this.zombiesFastZombieDamage = builder
+          .defineInRange("tankZombieAttackDamage", 15.0D, 0.0D, 2048.0D);
+      this.fastZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.fast_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("fastZombieDamage", 1.0D, 0.0D, 2048.0D);
-      this.zombiesWeakZombieDamage = builder
+          .defineInRange("fastZombieAttackDamage", 1.0D, 0.0D, 2048.0D);
+      this.weakZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.weak_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("weakZombieDamage", 2.0D, 0.0D, 2048.0D);
-      this.zombiesPoliceZombieDamage = builder
+          .defineInRange("weakZombieAttackDamage", 2.0D, 0.0D, 2048.0D);
+      this.policeZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.police_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("policeZombieDamage", 3.0D, 0.0D, 2048.0D);
-      this.zombiesDoctorZombieDamage = builder
+          .defineInRange("policeZombieAttackDamage", 3.0D, 0.0D, 2048.0D);
+      this.doctorZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.doctor_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("doctorZombieDamage", 3.0D, 0.0D, 2048.0D);
-      this.zombiesGiantZombieDamage = builder
+          .defineInRange("doctorZombieAttackDamage", 3.0D, 0.0D, 2048.0D);
+      this.giantZombieAttackDamage = builder
           .translation("options.craftingdeadsurvival.server.zombies.giant_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
-          .defineInRange("giantZombieDamage", 50.0D, 0.0D, 2048.0D);
+          .defineInRange("giantZombieAttackDamage", 50.0D, 0.0D, 2048.0D);
 
       builder
           .comment("Configure how zombies should spawn",
@@ -220,69 +214,73 @@ public class ServerConfig {
           .push("spawning");
       this.zombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.enable")
-          .define("enabled", true);
-      this.zombiesBabyZombies = builder
+          .define("zombiesEnabled", true);
+      this.babyZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.baby_zombies.enable")
-          .define("babyZombies", true);
-      this.zombiesAdvancedZombie = builder
-          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable")
-          .define("advancedZombie", true);
-      this.zombiesTankZombie = builder
+          .define("babyZombiesEnabled", true);
+      this.advancedZombiesEnabled = builder
+          .translation(
+              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable")
+          .define("advancedZombiesEnabled", true);
+      this.tankZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.enable")
-          .define("tankZombie", true);
-      this.zombiesFastZombie = builder
+          .define("tankZombiesEnabled", true);
+      this.fastZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.fast_zombie.enable")
-          .define("fastZombie", true);
-      this.zombiesWeakZombie = builder
+          .define("fastZombiesEnabled", true);
+      this.weakZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.enable")
-          .define("weakZombie", true);
-      this.zombiesSpawnAdvancedZombieSpawnWeight = builder
-          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.weight")
+          .define("weakZombiesEnabled", true);
+      this.advancedZombieSpawnWeight = builder
+          .translation(
+              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.weight")
           .defineInRange("advancedZombieSpawnWeight", 40, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnTankZombieSpawnWeight = builder
+      this.tankZombieSpawnWeight = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.weight")
           .defineInRange("tankZombieSpawnWeight", 5, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnFastZombieSpawnWeight = builder
+      this.fastZombieSpawnWeight = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.fast_zombie.weight")
           .defineInRange("fastZombieSpawnWeight", 15, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnWeakZombieSpawnWeight = builder
+      this.weakZombieSpawnWeight = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.weight")
           .defineInRange("weakZombieSpawnWeight", 30, 1, Integer.MAX_VALUE);
-      zombiesSpawnAdvancedZombieMinSpawn = builder
-          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.min_spawn")
+      this.advancedZombieMinSpawn = builder
+          .translation(
+              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.min_spawn")
           .defineInRange("advancedZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnTankZombieMinSpawn = builder
+      this.tankZombieMinSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.min_spawn")
           .defineInRange("tankZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnFastZombieMinSpawn = builder
+      this.fastZombieMinSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.fast_zombie.min_spawn")
           .defineInRange("fastZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnWeakZombieMinSpawn = builder
+      this.weakZombieMinSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.min_spawn")
           .defineInRange("weakZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnAdvancedZombieMaxSpawn = builder
-          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.max_spawn")
+      this.advancedZombieMaxSpawn = builder
+          .translation(
+              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.max_spawn")
           .defineInRange("advancedZombieMaxSpawn", 8, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnTankZombieMaxSpawn = builder
+      this.tankZombieMaxSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.max_spawn")
           .defineInRange("tankZombieMaxSpawn", 4, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnFastZombieMaxSpawn = builder
+      this.fastZombieMaxSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.fast_zombie.max_spawn")
           .defineInRange("fastZombieMaxSpawn", 4, 1, Integer.MAX_VALUE);
-      this.zombiesSpawnWeakZombieMaxSpawn = builder
+      this.weakZombieMaxSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.max_spawn")
           .defineInRange("weakZombieMaxSpawn", 12, 1, Integer.MAX_VALUE);
       builder.pop();
 
       builder.push("misc");
-      this.zombiesAttackKnockback = builder
+      this.zombieAttackKnockback = builder
           .translation("options.craftingdeadsurvival.server.zombies.misc.attack_knockback")
           .comment("Additional knockback given to all zombies")
-          .defineInRange("attackKnockback", 0D, 0D, 5.0D);
-      this.zombiesDeathDrops = builder
+          .defineInRange("zombieAttackKnockback", 0D, 0D, 5.0D);
+      this.zombieDeathLootEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.misc.death_drops")
           .comment("If disabled, all zombies will not drop any loot")
-          .define("deathDrops", true);
+          .define("zombieDeathLootEnabled", true);
       builder.pop();
     }
     builder.pop();
@@ -292,80 +290,52 @@ public class ServerConfig {
         .comment("Allows toggling some gameplay aspects")
         .push("abilities");
     {
-      this.abilitiesBrokenLegs = builder
+      this.brokenLegsEnabled = builder
           .translation("options.craftingdeadsurvival.server.abilities.broken_leg")
           .comment("Defines if players can break their legs")
-          .define("brokenLegs", true);
-      this.abilitiesBleedEffect = builder
+          .define("brokenLegsEnabled", true);
+      this.bleedingEnabled = builder
           .translation("options.craftingdeadsurvival.server.abilities.bleed_effect")
           .comment("Defines if players can bleed")
-          .define("bleedEffect", true);
-      this.abilitiesInfectionEffect = builder
+          .define("bleedingEnabled", true);
+      this.infectionEnabled = builder
           .translation("options.craftingdeadsurvival.server.abilities.infection_effect")
           .comment("Defines if players can be infected")
-          .define("infectionEffect", true);
+          .define("infectionEnabled", true);
     }
     builder.pop();
 
     // Explosives configuration
     builder.push("explosives");
     {
-      this.explosivesPipeBombEnabled = builder
+      this.pipeBombEnabled = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.enable")
           .comment("Enables the usage of Pipe Bomb",
               "It wont prevent the ability to get Pipe Bombs, only the ability to use it")
           .define("pipeBombEnabled", true);
-      this.explosivesPipeGrenadeEnabled = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.enable")
-          .comment("Enables the usage of Pipe Grenade",
-              "It wont prevent the ability to get Pipe Grenades, only the ability to use it")
-          .define("pipeGrenadeEnabled", true);
-      this.explosivesPipeBombMode = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.mode")
-          .comment("Defines how the explosion should interact with blocks",
-              "NONE: No block interaction, blocks will remain unchanged",
-              "BREAK: Blocks are broken, they will be dropped when exploded",
-              "DESTROY: Blocks are destroyed, nothing will be dropped and only a crater will be left")
-          .defineEnum("pipeBombExplosionMode", BlockInteraction.NONE);
-      this.explosivesPipeGrenadeMode = builder
+      this.pipeBombBlockInteraction = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.mode")
           .comment("Defines how the explosion should interact with blocks",
               "NONE: No block interaction, blocks will remain unchanged",
               "BREAK: Blocks are broken, they will be dropped when exploded",
               "DESTROY: Blocks are destroyed, nothing will be dropped and only a crater will be left")
-          .defineEnum("pipeGrenadeExplosionMode", BlockInteraction.NONE);
-      this.explosivesPipeBombRadius = builder
+          .defineEnum("pipeBombBlockInteraction", BlockInteraction.NONE);
+      this.pipeBombRadius = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.radius")
           .comment("The explosion radius (in blocks), it tells how big the explosion should be")
           .defineInRange("pipeBombRadius", 4D, 0.1D, 50D);
-      this.explosivesPipeGrenadeRadius = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.radius")
-          .comment("The explosion radius (in blocks), it tells how big the explosion should be")
-          .defineInRange("pipeGrenadeRadius", 4D, 0.1D, 50D);
-      this.explosivesPipeBombKnockbackMultiplier = builder
+      this.pipeBombKnockbackMultiplier = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.knockback")
           .comment("Defines how strong the explosion knockback should be (Multiplier)")
           .defineInRange("pipeBombKnockbackMultiplier", 1D, 0D, 30D);
-      this.explosivesPipeGrenadeKnockbackMultiplier = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.knockback")
-          .comment("Defines how strong the explosion knockback should be (Multiplier)")
-          .defineInRange("pipeGrenadeKnockbackMultiplier", 1D, 0D, 30D);
-      this.explosivesPipeBombDamageMultiplier = builder
+      this.pipeBombDamageMultiplier = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.damage")
           .comment("Multiplies the base damage given by the explosion (Multiplier)")
           .defineInRange("pipeBombDamageMultiplier", 1D, 0D, 30D);
-      this.explosivesPipeGrenadeDamageMultiplier = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.damage")
-          .comment("Multiplies the base damage given by the explosion (Multiplier)")
-          .defineInRange("pipeGrenadeDamageMultiplier", 1D, 0D, 30D);
-      this.explosivesPipeBombTicksBeforeActivation = builder
+      this.pipeBombTicksBeforeActivation = builder
           .translation("options.craftingdeadsurvival.server.explosives.pipe_bomb.activation_tick")
           .comment("How long before the bomb activates automatically (Ticks)")
           .defineInRange("pipeBombTicksBeforeActivation", 100, 0, 18000);
-      this.explosivesPipeGrenadeTicksBeforeActivation = builder
-          .translation("options.craftingdeadsurvival.server.explosives.pipe_grenade.activation_tick")
-          .comment("How long before the grenade activates automatically (Ticks)")
-          .defineInRange("pipeGrenadeTicksBeforeActivation", 100, 0, 18000);
     }
     builder.pop();
   }

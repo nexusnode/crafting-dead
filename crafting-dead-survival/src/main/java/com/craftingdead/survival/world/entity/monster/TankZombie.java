@@ -14,8 +14,9 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import com.craftingdead.survival.CraftingDeadSurvival;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import com.craftingdead.survival.CraftingDeadSurvival;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
@@ -25,8 +26,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class TankZombie extends AdvancedZombie {
 
@@ -45,14 +44,14 @@ public class TankZombie extends AdvancedZombie {
 
   @Nullable
   @Override
-  public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor world, @NotNull DifficultyInstance difficulty,
-      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
-    groupData = super.finalizeSpawn(world, difficulty, spawnType, groupData, tag);
-    if (!world.isClientSide()) {
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+    groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesTankZombieHealth.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.tankZombieMaxHealth.get());
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesTankZombieDamage.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.tankZombieAttackDamage.get());
     }
     return groupData;
   }

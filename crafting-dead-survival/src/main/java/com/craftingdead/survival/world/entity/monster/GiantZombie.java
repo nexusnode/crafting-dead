@@ -19,6 +19,7 @@ import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.RefillableAmmoProvider;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityDimensions;
@@ -31,8 +32,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class GiantZombie extends AdvancedZombie {
 
@@ -58,7 +57,7 @@ public class GiantZombie extends AdvancedZombie {
     return ModItems.ARMY_HELMET.get().getDefaultInstance();
   }
 
-  public static AttributeSupplier.@NotNull Builder createAttributes() {
+  public static AttributeSupplier.Builder createAttributes() {
     return AdvancedZombie.attributeTemplate()
         .add(Attributes.MAX_HEALTH, 100.0D)
         .add(Attributes.ATTACK_DAMAGE, 50.0D)
@@ -72,14 +71,14 @@ public class GiantZombie extends AdvancedZombie {
 
   @Nullable
   @Override
-  public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor world, @NotNull DifficultyInstance difficulty,
-      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
-    groupData = super.finalizeSpawn(world, difficulty, spawnType, groupData, tag);
-    if (!world.isClientSide()) {
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+    groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesGiantZombieHealth.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.giantZombieMaxHealth.get());
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesGiantZombieDamage.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.giantZombieAttackDamage.get());
     }
     return groupData;
   }

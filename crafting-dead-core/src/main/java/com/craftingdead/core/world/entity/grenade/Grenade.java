@@ -77,7 +77,7 @@ public abstract class Grenade extends BounceableProjectileEntity {
   public void tick() {
     super.tick();
 
-    boolean activated = this.getEntityData().get(ACTIVATED);
+    var activated = this.isActivated();
     if (this.lastActivated != activated) {
       this.lastActivated = activated;
 

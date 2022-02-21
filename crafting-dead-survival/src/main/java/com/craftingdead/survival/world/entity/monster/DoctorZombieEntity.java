@@ -14,11 +14,12 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
+import java.util.Objects;
+import javax.annotation.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.ai.goal.ActionItemGoal;
-import java.util.Objects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
@@ -31,8 +32,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class DoctorZombieEntity extends AdvancedZombie {
 
@@ -75,7 +74,7 @@ public class DoctorZombieEntity extends AdvancedZombie {
     }
   }
 
-  public static AttributeSupplier.@NotNull Builder createAttributes() {
+  public static AttributeSupplier.Builder createAttributes() {
     return AdvancedZombie.attributeTemplate()
         .add(Attributes.MAX_HEALTH, 20.0D)
         .add(Attributes.ATTACK_DAMAGE, 3.0D);
@@ -83,14 +82,14 @@ public class DoctorZombieEntity extends AdvancedZombie {
 
   @Nullable
   @Override
-  public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor world, @NotNull DifficultyInstance difficulty,
-      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
-    groupData = super.finalizeSpawn(world, difficulty, spawnType, groupData, tag);
-    if (!world.isClientSide()) {
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+    groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesDoctorZombieHealth.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.doctorZombieMaxHealth.get());
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.zombiesDoctorZombieDamage.get());
+          .setBaseValue(CraftingDeadSurvival.serverConfig.doctorZombieAttackDamage.get());
     }
     return groupData;
   }

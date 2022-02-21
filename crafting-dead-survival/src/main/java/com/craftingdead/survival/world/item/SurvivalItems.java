@@ -19,7 +19,7 @@ import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
-import com.craftingdead.survival.world.entity.grenade.PipeGrenade;
+import com.craftingdead.survival.world.entity.grenade.PipeBomb;
 import com.craftingdead.survival.world.level.block.SurvivalBlocks;
 import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.item.BlockItem;
@@ -129,10 +129,10 @@ public class SurvivalItems {
   // Virus
   // ================================================================================
 
-  public static final RegistryObject<GrenadeItem> PIPE_GRENADE = ITEMS.register("pipe_grenade",
+  public static final RegistryObject<GrenadeItem> PIPE_BOMB = ITEMS.register("pipe_bomb",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(PipeGrenade::new)
-          .setEnabledSupplier(CraftingDeadSurvival.serverConfig.explosivesPipeGrenadeEnabled::get)
+          .setGrenadeEntitySupplier(PipeBomb::new)
+          .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled::get)
           .stacksTo(3)
           .tab(TAB)));
 

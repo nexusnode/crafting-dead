@@ -31,8 +31,8 @@ public class GrenadeSmokeParticle extends TextureSheetParticle {
   private final SpriteSet animatedSprite;
 
   private GrenadeSmokeParticle(GrenadeSmokeParticleData data, SpriteSet animatedSprite,
-      ClientLevel world, double x, double y, double z) {
-    super(world, x, y, z);
+      ClientLevel level, double x, double y, double z) {
+    super(level, x, y, z);
     this.animatedSprite = animatedSprite;
     float colorScale = 1.0F - (float) (Math.random() * (double) 0.3F);
     this.rCol = colorScale * data.getRed();

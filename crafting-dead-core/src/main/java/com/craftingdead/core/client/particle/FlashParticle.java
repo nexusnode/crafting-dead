@@ -14,7 +14,7 @@
 
 package com.craftingdead.core.client.particle;
 
-import com.craftingdead.core.particle.RGBFlashParticleData;
+import com.craftingdead.core.particle.FlashParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.ParticleProvider;
@@ -25,16 +25,16 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 
-public class RGBFlashParticle extends TextureSheetParticle {
+public class FlashParticle extends TextureSheetParticle {
 
-  private RGBFlashParticle(RGBFlashParticleData data, ClientLevel world, double x, double y,
-      double z) {
-    super(world, x, y, z);
+  private FlashParticle(FlashParticleOptions options, ClientLevel level,
+      double x, double y, double z) {
+    super(level, x, y, z);
     this.lifetime = 4;
-    this.rCol = data.getRed();
-    this.gCol = data.getGreen();
-    this.bCol = data.getBlue();
-    this.quadSize = data.getScale();
+    this.rCol = options.red();
+    this.gCol = options.green();
+    this.bCol = options.blue();
+    this.quadSize = options.scale();
   }
 
   @Override
@@ -55,7 +55,7 @@ public class RGBFlashParticle extends TextureSheetParticle {
         * this.quadSize;
   }
 
-  public static class Factory implements ParticleProvider<RGBFlashParticleData> {
+  public static class Factory implements ParticleProvider<FlashParticleOptions> {
 
     private final SpriteSet animatedSprite;
 
@@ -64,9 +64,9 @@ public class RGBFlashParticle extends TextureSheetParticle {
     }
 
     @Override
-    public Particle createParticle(RGBFlashParticleData data, ClientLevel world, double xPos,
+    public Particle createParticle(FlashParticleOptions data, ClientLevel world, double xPos,
         double yPos, double zPos, double xVelocity, double yVelocity, double zVelocity) {
-      RGBFlashParticle flashParticle = new RGBFlashParticle(data, world, xPos, yPos, zPos);
+      FlashParticle flashParticle = new FlashParticle(data, world, xPos, yPos, zPos);
       flashParticle.pickSprite(this.animatedSprite);
       return flashParticle;
     }

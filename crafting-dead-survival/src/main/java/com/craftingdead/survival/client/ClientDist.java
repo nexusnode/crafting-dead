@@ -14,13 +14,13 @@
 
 package com.craftingdead.survival.client;
 
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientConfig;
-import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
+import com.craftingdead.core.client.renderer.entity.grenade.GrenadeRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.ModDist;
+import com.craftingdead.survival.client.model.PipeBombModel;
 import com.craftingdead.survival.client.model.SupplyDropModel;
 import com.craftingdead.survival.client.model.geom.SurvivalModelLayers;
 import com.craftingdead.survival.client.renderer.entity.AdvancedZombieRenderer;
@@ -50,8 +50,7 @@ public class ClientDist implements ModDist {
   public static final ForgeConfigSpec clientConfigSpec;
 
   static {
-    final Pair<ClientConfig, ForgeConfigSpec> clientConfigPair =
-        new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+    var clientConfigPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
     clientConfigSpec = clientConfigPair.getRight();
     clientConfig = clientConfigPair.getLeft();
   }
@@ -76,8 +75,9 @@ public class ClientDist implements ModDist {
   }
 
   private void handleEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    event.registerEntityRenderer(SurvivalEntityTypes.PIPE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
+    event.registerEntityRenderer(SurvivalEntityTypes.PIPE_BOMB.get(),
+        context -> new GrenadeRenderer(context,
+            context.bakeLayer(SurvivalModelLayers.PIPE_BOMB)));
     event.registerEntityRenderer(SurvivalEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
     event.registerEntityRenderer(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
@@ -100,6 +100,8 @@ public class ClientDist implements ModDist {
       EntityRenderersEvent.RegisterLayerDefinitions event) {
     event.registerLayerDefinition(SurvivalModelLayers.SUPPLY_DROP,
         SupplyDropModel::createBodyLayer);
+    event.registerLayerDefinition(SurvivalModelLayers.PIPE_BOMB,
+        PipeBombModel::createBodyLayer);
   }
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {

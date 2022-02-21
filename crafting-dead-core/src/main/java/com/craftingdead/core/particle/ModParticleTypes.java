@@ -32,9 +32,9 @@ public class ModParticleTypes {
           () -> create(true, GrenadeSmokeParticleData.DESERIALIZER,
               GrenadeSmokeParticleData.CODEC));
 
-  public static final RegistryObject<ParticleType<RGBFlashParticleData>> RGB_FLASH =
+  public static final RegistryObject<ParticleType<FlashParticleOptions>> RGB_FLASH =
       PARTICLE_TYPES.register("rgb_flash",
-          () -> create(true, RGBFlashParticleData.DESERIALIZER, RGBFlashParticleData.CODEC));
+          () -> create(true, FlashParticleOptions.DESERIALIZER, FlashParticleOptions.CODEC));
 
   private static <T extends ParticleOptions> ParticleType<T> create(boolean alwaysShow,
       @SuppressWarnings("deprecation") ParticleOptions.Deserializer<T> deserializer,

@@ -27,6 +27,7 @@ public class SurvivalModelLayers {
   private static final Set<ModelLayerLocation> allModels = Sets.newHashSet();
 
   public static final ModelLayerLocation SUPPLY_DROP = register("supply_drop");
+  public static final ModelLayerLocation PIPE_BOMB = register("pipe_bomb");
 
   private static ModelLayerLocation register(String model) {
     return register(model, DEFAULT_LAYER);

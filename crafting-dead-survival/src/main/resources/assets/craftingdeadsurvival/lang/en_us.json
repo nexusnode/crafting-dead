@@ -50,17 +50,11 @@
   "options.craftingdeadsurvival.server.abilities.bleed_effect":"Bleeding Enabled",
   "options.craftingdeadsurvival.server.abilities.infection_effect":"Infection Enabled",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.enable":"Pipe Bomb Enabled",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.enable":"Pipe Grenade Enabled",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.mode":"Pipe Bomb Explosion Mode",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.mode":"Pipe Grenade Explosion Mode",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.radius":"Pipe Bomb Radius",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.radius":"Pipe Grenade Radius",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.knockback":"Pipe Bomb Knockback (Multiplier)",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.knockback":"Pipe Grenade Knockback (Multiplier)",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.damage":"Pipe Bomb Damage (Multiplier)",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.damage":"Pipe Grenade Damage (Multiplier)",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.activation_tick":"Pipe Bomb Activation Delay (Ticks)",
-  "options.craftingdeadsurvival.server.explosives.pipe_grenade.activation_tick":"Pipe Grenade Activation Delay (Ticks)",
 
   "enchantment.craftingdeadsurvival.infection": "Infection",
 
@@ -80,7 +74,7 @@
   "effect.craftingdeadsurvival.bleeding":"Bleeding",
 
   "entity.craftingdeadsurvival.supply_drop": "Supply Drop",
-  "entity.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
+  "entity.craftingdeadsurvival.pipe_bomb": "Pipe Bomb",
   "entity.craftingdeadsurvival.advanced_zombie": "Advanced Zombie",
   "entity.craftingdeadsurvival.fast_zombie": "Fast Zombie",
   "entity.craftingdeadsurvival.tank_zombie": "Tank Zombie",
@@ -113,7 +107,7 @@
   "item.craftingdeadsurvival.bloody_rag": "Bloody Rag",
   "item.craftingdeadsurvival.clean_rag": "Clean Rag",
 
-  "item.craftingdeadsurvival.pipe_grenade": "Pipe Grenade",
+  "item.craftingdeadsurvival.pipe_bomb": "Pipe Bomb",
   "item.craftingdeadsurvival.military_drop_radio": "Military Supply Drop Radio",
   "item.craftingdeadsurvival.medical_drop_radio": "Medical Supply Drop Radio",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",

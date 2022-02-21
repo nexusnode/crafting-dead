@@ -2,7 +2,8 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 10,
+      "rolls": 10.0,
+      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
@@ -10,10 +11,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:bandage"
@@ -24,10 +26,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.7,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.7
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:bolt_cutters"
@@ -38,10 +41,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 6,
-                "p": 0.2,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 6.0,
+                "p": 0.2
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:c4_explosive"
@@ -52,10 +56,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.9,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.9
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:remote_detonator"
@@ -66,10 +71,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:stanag_30_round_magazine"
@@ -80,10 +86,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 6,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 6.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m107_magazine"
@@ -94,10 +101,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m9_magazine"
@@ -108,10 +116,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:g18_magazine"
@@ -122,10 +131,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m240b_magazine"
@@ -136,10 +146,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:rpk_drum_magazine"
@@ -150,10 +161,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.6,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.6
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:minigun_magazine"
@@ -164,10 +176,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:mpt55_magazine"
@@ -178,10 +191,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:frag_grenade"
@@ -192,10 +206,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:fire_grenade"
@@ -206,10 +221,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:flash_grenade"
@@ -220,10 +236,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:acog_sight"
@@ -234,10 +251,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:suppressor"
@@ -248,10 +266,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.2,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.2
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:hp_scope"
@@ -262,10 +281,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:army_clothing"
@@ -276,10 +296,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:tac_ghillie_clothing"
@@ -290,10 +311,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.2,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.2
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:space_suit_clothing"
@@ -304,10 +326,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.8,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.8
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:juggernaut_clothing"
@@ -318,10 +341,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.8,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.8
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:combat_bdu_clothing"
@@ -332,10 +356,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.6,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.6
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:clone_clothing"
@@ -346,10 +371,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:contractor_clothing"
@@ -360,10 +386,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.45,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.45
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:ak47"
@@ -374,10 +401,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m4a1"
@@ -388,10 +416,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.2,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.2
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m107"
@@ -402,10 +431,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 6,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 6.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m1911"
@@ -416,10 +446,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:g18"
@@ -430,10 +461,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m9"
@@ -444,10 +476,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 5,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 5.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:p250"
@@ -458,10 +491,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.7,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.7
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:as50"
@@ -472,10 +506,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.9,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.9
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m240b"
@@ -486,10 +521,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.2,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.2
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:minigun"
@@ -500,10 +536,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:mp5a5"
@@ -514,10 +551,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:mpt55"
@@ -528,10 +566,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:fury_paint"
@@ -542,10 +581,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:scorched_paint"
@@ -556,10 +596,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:inferno_paint"
@@ -570,10 +611,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.45,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.45
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:ak47_30_round_magazine"
@@ -584,10 +626,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 1,
-                "p": 0.45,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 1.0,
+                "p": 0.45
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:mossberg"

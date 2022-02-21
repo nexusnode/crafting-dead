@@ -40,7 +40,7 @@ public class C4ExplosiveRenderer extends EntityRenderer<Grenade> {
   public void render(Grenade entity, float entityYaw, float partialTicks,
       PoseStack poseStack, MultiBufferSource renderTypeBuffer, int packedLight) {
 
-    if (!entity.isStoppedInGround()) {
+    if (!entity.hasStoppedMoving()) {
       float rotation = (entity.tickCount + partialTicks) * 15F;
       poseStack.mulPose(Vector3f.XP.rotationDegrees(rotation));
       poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotation));

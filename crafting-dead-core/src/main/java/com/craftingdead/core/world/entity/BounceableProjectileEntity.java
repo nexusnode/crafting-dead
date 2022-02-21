@@ -42,7 +42,7 @@ public abstract class BounceableProjectileEntity extends Entity
   @Nullable
   private UUID sourceId;
   private BlockState blockStanding;
-  private boolean stoppedInGround;
+  private boolean stoppedMoving;
   private int totalTicksInAir;
   private int motionStopCount;
 
@@ -78,7 +78,7 @@ public abstract class BounceableProjectileEntity extends Entity
     BlockPos currentBlockPos = this.blockPosition();
     BlockState currentBlockState = this.level.getBlockState(currentBlockPos);
 
-    if (this.stoppedInGround) {
+    if (this.stoppedMoving) {
       // Places the current inBlockState if it is not present
       if (this.blockStanding == null) {
         this.blockStanding = currentBlockState;
@@ -89,12 +89,12 @@ public abstract class BounceableProjectileEntity extends Entity
       boolean shouldMove = !this.getDeltaMovement().equals(Vec3.ZERO) || notCollided;
 
       if (shouldMove) {
-        this.stoppedInGround = false;
+        this.stoppedMoving = false;
         this.blockStanding = null;
       }
     }
 
-    if (!this.stoppedInGround) {
+    if (!this.stoppedMoving) {
       // Natural loss of speed
       this.setDeltaMovement(this.getDeltaMovement().scale(0.98D));
 
@@ -162,7 +162,7 @@ public abstract class BounceableProjectileEntity extends Entity
             // Stops if the next bounce is too slow
             if (nextBounceMotion.length() < 0.1D) {
               nextBounceMotion = Vec3.ZERO;
-              this.stoppedInGround = true;
+              this.stoppedMoving = true;
               this.blockStanding = blockHitState;
               this.onMotionStop(++this.motionStopCount);
             }
@@ -238,8 +238,8 @@ public abstract class BounceableProjectileEntity extends Entity
   /**
    * Whether this projectile is in the ground, without any movements.
    */
-  public boolean isStoppedInGround() {
-    return this.stoppedInGround;
+  public boolean hasStoppedMoving() {
+    return this.stoppedMoving;
   }
 
   public int getMotionStopCount() {
@@ -266,7 +266,7 @@ public abstract class BounceableProjectileEntity extends Entity
       compound.putUUID("sourceId", this.sourceId);
     }
 
-    compound.putBoolean("inGround", this.stoppedInGround);
+    compound.putBoolean("stoppedMoving", this.stoppedMoving);
     compound.putInt("motionStopCount", this.motionStopCount);
   }
 
@@ -275,20 +275,20 @@ public abstract class BounceableProjectileEntity extends Entity
     if (compound.hasUUID("sourceId")) {
       this.sourceId = compound.getUUID("sourceId");
     }
-    this.stoppedInGround = compound.getBoolean("inGround");
+    this.stoppedMoving = compound.getBoolean("stoppedMoving");
     this.motionStopCount = compound.getInt("motionStopCount");
   }
 
   @Override
   public void writeSpawnData(FriendlyByteBuf buffer) {
-    buffer.writeBoolean(this.stoppedInGround);
+    buffer.writeBoolean(this.stoppedMoving);
     buffer.writeInt(this.totalTicksInAir);
     buffer.writeInt(this.motionStopCount);
   }
 
   @Override
   public void readSpawnData(FriendlyByteBuf buffer) {
-    this.stoppedInGround = buffer.readBoolean();
+    this.stoppedMoving = buffer.readBoolean();
     this.totalTicksInAir = buffer.readInt();
     this.motionStopCount = buffer.readInt();
   }

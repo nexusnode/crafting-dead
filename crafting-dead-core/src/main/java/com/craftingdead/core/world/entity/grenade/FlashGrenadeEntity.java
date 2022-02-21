@@ -18,7 +18,7 @@ package com.craftingdead.core.world.entity.grenade;
 
 import java.util.OptionalInt;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.particle.RGBFlashParticleData;
+import com.craftingdead.core.particle.FlashParticleOptions;
 import com.craftingdead.core.world.effect.FlashBlindnessMobEffect;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.EntityUtil;
@@ -81,7 +81,7 @@ public class FlashGrenadeEntity extends Grenade {
 
   private void flash() {
     if (this.level.isClientSide()) {
-      this.level.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(),
+      this.level.addParticle(new FlashParticleOptions(1F, 1F, 1F, 2F), this.getX(),
           this.getY(), this.getZ(), 0D, 0D, 0D);
       CraftingDead.getInstance().getClientDist().checkApplyFlashEffects(this);
     } else {

@@ -35,7 +35,7 @@ public class FragGrenadeModel extends HierarchicalModel<FragGrenade> {
     var root = mesh.getRoot();
 
     var anchor = root.addOrReplaceChild("anchor", CubeListBuilder.create(),
-        PartPose.offset(0.0F, 21.0F, 0.0F));
+        PartPose.offset(0.0F, 2.0F, 0.0F));
 
     anchor.addOrReplaceChild("body",
         CubeListBuilder.create()
