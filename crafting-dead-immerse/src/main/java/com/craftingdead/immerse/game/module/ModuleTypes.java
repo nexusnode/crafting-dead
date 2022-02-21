@@ -25,15 +25,15 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModuleTypes {
 
-  public static final DeferredRegister<ModuleType> MODULE_TYPES =
+  public static final DeferredRegister<ModuleType> moduleTypes =
       DeferredRegister.create(ModuleType.class, CraftingDeadImmerse.ID);
 
   public static final Lazy<IForgeRegistry<ModuleType>> REGISTRY =
-      Lazy.of(MODULE_TYPES.makeRegistry("module_types", RegistryBuilder::new));
+      Lazy.of(moduleTypes.makeRegistry("module_types", RegistryBuilder::new));
 
   public static final RegistryObject<ModuleType> TEAM =
-      MODULE_TYPES.register("team", () -> new ModuleType(NetworkProtocol.EMPTY));
+      moduleTypes.register("team", () -> new ModuleType(NetworkProtocol.EMPTY));
 
   public static final RegistryObject<ModuleType> SHOP =
-      MODULE_TYPES.register("shop", () -> new ModuleType(ShopNetworkProtocol.INSTANCE));
+      moduleTypes.register("shop", () -> new ModuleType(ShopNetworkProtocol.INSTANCE));
 }

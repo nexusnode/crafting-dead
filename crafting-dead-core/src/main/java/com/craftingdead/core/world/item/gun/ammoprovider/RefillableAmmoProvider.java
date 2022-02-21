@@ -86,7 +86,7 @@ public class RefillableAmmoProvider implements AmmoProvider {
 
   @Override
   public void reload(LivingExtension<?, ?> living) {
-    living.performAction(ActionTypes.REFILLABLE_RELOAD.get().createAction(living, null), true);
+    living.performAction(ActionTypes.REFILLABLE_RELOAD.get().decode(living, null), true);
   }
 
   @Override

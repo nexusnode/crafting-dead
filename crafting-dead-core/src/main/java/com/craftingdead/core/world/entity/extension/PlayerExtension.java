@@ -20,8 +20,8 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public interface PlayerExtension<E extends Player>
-    extends LivingExtension<E, PlayerHandler>, PlayerHandler {
+public sealed interface PlayerExtension<E extends Player>
+    extends LivingExtension<E, PlayerHandler>, PlayerHandler permits PlayerExtensionImpl<E> {
 
   static <E extends Player> PlayerExtension<E> create(E entity) {
     return new PlayerExtensionImpl<>(entity);

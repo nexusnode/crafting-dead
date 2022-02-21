@@ -16,9 +16,8 @@ package com.craftingdead.survival;
 
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
-import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionTypes;
-import com.craftingdead.core.world.action.item.ItemAction;
+import com.craftingdead.core.world.action.item.EntityItemAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingHandler;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -51,7 +50,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -197,17 +195,17 @@ public class CraftingDeadSurvival {
   // ================================================================================
 
   @SubscribeEvent
-  public void handlePerformAction(LivingExtensionEvent.PerformAction<ItemAction> event) {
-    Action action = event.getAction();
-    LivingExtension<?, ?> target = action.getTarget().orElse(null);
-    if (action.getType() == ActionTypes.USE_SYRINGE.get()
-        && target != null
-        && target.getEntity() instanceof Zombie) {
-      event.setCanceled(true);
-      event.getLiving().performAction(
-          SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get().createAction(action.getPerformer(),
-              target),
-          true);
+  public void handlePerformAction(LivingExtensionEvent.PerformAction<EntityItemAction<?>> event) {
+    var action = event.getAction();
+    LivingExtension<?, ?> target = action.getSelectedTarget();
+    if (!event.getLiving().getLevel().isClientSide()
+        && action.getType() == ActionTypes.USE_SYRINGE.get()) {
+      SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get()
+          .createEntityAction(event.getLiving(), target, action.getHand())
+          .ifPresent(newAction -> {
+            event.setCanceled(true);
+            event.getLiving().performAction(newAction, true);
+          });
     }
   }
 
@@ -234,14 +232,14 @@ public class CraftingDeadSurvival {
   @SubscribeEvent
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension
-        && !event.getLiving().getHandler(SurvivalPlayerHandler.ID).isPresent()) {
+        && !event.getLiving().getHandler(SurvivalPlayerHandler.TYPE).isPresent()) {
       PlayerExtension<?> player = (PlayerExtension<?>) event.getLiving();
-      player.registerHandler(SurvivalPlayerHandler.ID, new SurvivalPlayerHandler(player));
+      player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
     } else if (event.getLiving().getEntity() instanceof AdvancedZombie
-        && event.getLiving().getHandler(SurvivalZombieHandler.ID).isEmpty()) {
+        && event.getLiving().getHandler(SurvivalPlayerHandler.TYPE).isEmpty()) {
       @SuppressWarnings("unchecked") // heap pollution should not happen here since we are specifically targeting advanced zombies
       var zombie = (LivingExtension<? extends AdvancedZombie, LivingHandler>) event.getLiving();
-      zombie.registerHandler(SurvivalZombieHandler.ID, new SurvivalZombieHandler(zombie));
+      zombie.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalZombieHandler(zombie));
     }
   }
 
@@ -251,7 +249,7 @@ public class CraftingDeadSurvival {
         && event.getItemStack().getCapability(Clothing.CAPABILITY).isPresent()) {
       var extension = PlayerExtension.getOrThrow(event.getPlayer());
       extension.performAction(
-          SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, null), true);
+          SurvivalActionTypes.SHRED_CLOTHING.get().decode(extension, null), true);
     }
   }
 
@@ -259,8 +257,7 @@ public class CraftingDeadSurvival {
   public void handleGunHitEntity(GunEvent.HitEntity event) {
     event.getTarget().getCapability(LivingExtension.CAPABILITY)
         .resolve()
-        .flatMap(living -> living.getHandler(SurvivalPlayerHandler.ID))
-        .map(living -> (SurvivalPlayerHandler) living)
+        .flatMap(living -> living.getHandler(SurvivalPlayerHandler.TYPE))
         .ifPresent(playerHandler -> {
           float enchantmentPct =
               EnchantmentHelper.getItemEnchantmentLevel(SurvivalEnchantments.INFECTION.get(),

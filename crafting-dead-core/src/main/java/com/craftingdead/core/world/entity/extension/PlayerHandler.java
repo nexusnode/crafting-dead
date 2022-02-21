@@ -17,6 +17,7 @@ package com.craftingdead.core.world.entity.extension;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.eventbus.api.Event;
@@ -57,5 +58,5 @@ public interface PlayerHandler extends LivingHandler {
    * @param that - the old player
    * @param wasDeath if they died or not
    */
-  default void copyFrom(PlayerExtension<?> that, boolean wasDeath) {}
+  default void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {}
 }

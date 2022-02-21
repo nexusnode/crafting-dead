@@ -20,7 +20,12 @@ import com.craftingdead.immerse.network.login.LoginIndexedMessage;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
 import com.craftingdead.immerse.network.play.ChangeGameMessage;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
+import com.craftingdead.immerse.network.play.RegisterLandOwnerMessage;
+import com.craftingdead.immerse.network.play.RemoveLandOwnerMessage;
 import com.craftingdead.immerse.network.play.SyncGameMessage;
+import com.craftingdead.immerse.network.play.SyncLandChunkMessage;
+import com.craftingdead.immerse.network.play.SyncLandManagerMessage;
+import com.craftingdead.immerse.network.play.SyncLandOwnerMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.HandshakeHandler;
 import net.minecraftforge.network.NetworkDirection;
@@ -70,6 +75,36 @@ public enum NetworkChannel {
           .encoder(SyncGameMessage::encode)
           .decoder(SyncGameMessage::decode)
           .consumer(SyncGameMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(RegisterLandOwnerMessage.class, 0x03, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(RegisterLandOwnerMessage::encode)
+          .decoder(RegisterLandOwnerMessage::decode)
+          .consumer(RegisterLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(RemoveLandOwnerMessage.class, 0x04, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(RemoveLandOwnerMessage::encode)
+          .decoder(RemoveLandOwnerMessage::decode)
+          .consumer(RemoveLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandChunkMessage.class, 0x05, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandChunkMessage::encode)
+          .decoder(SyncLandChunkMessage::decode)
+          .consumer(SyncLandChunkMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandOwnerMessage.class, 0x06, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandOwnerMessage::encode)
+          .decoder(SyncLandOwnerMessage::decode)
+          .consumer(SyncLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandManagerMessage.class, 0x07, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandManagerMessage::encode)
+          .decoder(SyncLandManagerMessage::decode)
+          .consumer(SyncLandManagerMessage::handle)
           .add();
     }
   };

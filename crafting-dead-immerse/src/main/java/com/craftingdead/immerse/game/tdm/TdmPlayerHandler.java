@@ -17,10 +17,11 @@ package com.craftingdead.immerse.game.tdm;
 import java.util.Collection;
 import java.util.Optional;
 import com.craftingdead.core.network.SynchedData;
+import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.core.world.entity.extension.Visibility;
-import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -31,7 +32,8 @@ import net.minecraft.world.entity.player.Player;
 
 public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
 
-  public static final ResourceLocation ID = GameTypes.TEAM_DEATHMATCH.getId();
+  public static final LivingHandlerType<TdmPlayerHandler<?>> TYPE =
+      new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "tdm_player"));
 
   protected static final EntityDataAccessor<Integer> REMAINING_BUY_TIME_SECONDS =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);

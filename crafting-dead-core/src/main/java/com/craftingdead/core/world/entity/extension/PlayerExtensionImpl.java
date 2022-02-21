@@ -34,7 +34,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleMenuProvider;
@@ -49,8 +49,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.network.PacketDistributor;
 
-class PlayerExtensionImpl<E extends Player>
-    extends LivingExtensionImpl<E, PlayerHandler> implements PlayerExtension<E> {
+final class PlayerExtensionImpl<E extends Player>
+    extends BaseLivingExtension<E, PlayerHandler> implements PlayerExtension<E> {
 
   private static final float HANDCUFFS_DAMAGE_CHANCE = 0.1F;
 
@@ -77,8 +77,9 @@ class PlayerExtensionImpl<E extends Player>
   }
 
   @Override
-  protected void tickHandler(ResourceLocation extensionId, PlayerHandler extension) {
-    super.tickHandler(extensionId, extension);
+  protected void tickHandler(LivingHandlerType<? extends PlayerHandler> type,
+      PlayerHandler extension) {
+    super.tickHandler(type, extension);
     if (extension.isCombatModeEnabled()) {
       this.cachedCombatModeEnabled = true;
     }
@@ -267,7 +268,7 @@ class PlayerExtensionImpl<E extends Player>
   }
 
   @Override
-  public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
+  public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
     // Copies the inventory. Doesn't actually matter if it was death or not.
     // Death drops from 'that' should be cleared on death drops to prevent item duplication.
     for (int i = 0; i < that.getItemHandler().getSlots(); i++) {

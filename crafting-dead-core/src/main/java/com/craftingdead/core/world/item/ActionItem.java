@@ -14,13 +14,10 @@
 
 package com.craftingdead.core.world.item;
 
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import com.craftingdead.core.world.action.Action;
-import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import net.minecraft.core.BlockPos;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -28,73 +25,66 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 public class ActionItem extends Item {
 
-  @Nullable
-  private final BiFunction<LivingExtension<?, ?>, BlockPos, Action> blockActionFactory;
-  @Nullable
-  private final BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, Action> entityActionFactory;
+  private final Supplier<? extends ItemActionType<?>> itemActionType;
 
-  public ActionItem(Properties properties) {
+  public ActionItem(Supplier<? extends ItemActionType<?>> itemActionType, Properties properties) {
     super(properties);
-    this.blockActionFactory = properties.blockActionFactory;
-    this.entityActionFactory = properties.entityActionFactory;
+    this.itemActionType = itemActionType;
+  }
+
+  public ItemActionType<?> getActionType() {
+    return this.itemActionType.get();
   }
 
   @Override
-  public InteractionResult interactLivingEntity(ItemStack itemStack, Player playerEntity,
-      LivingEntity targetEntity, InteractionHand hand) {
-    if (!playerEntity.getCommandSenderWorld().isClientSide()) {
-      this.performAction(playerEntity, targetEntity);
+  public InteractionResult useOn(UseOnContext context) {
+    if (!context.getLevel().isClientSide()) {
+      var performer = PlayerExtension.getOrThrow(context.getPlayer());
+      if (this.getActionType().createBlockAction(performer, context)
+          .map(action -> performer.performAction(action, true))
+          .orElse(false)) {
+        return InteractionResult.CONSUME;
+      }
     }
     return InteractionResult.PASS;
   }
 
   @Override
-  public InteractionResultHolder<ItemStack> use(Level world, Player playerEntity, InteractionHand hand) {
-    if (!playerEntity.level.isClientSide()) {
-      this.performAction(playerEntity, null);
+  public InteractionResult interactLivingEntity(ItemStack itemStack, Player player,
+      LivingEntity targetEntity, InteractionHand hand) {
+    if (!player.getLevel().isClientSide()) {
+      var performer = PlayerExtension.getOrThrow(player);
+      var target = LivingExtension.getOrThrow(targetEntity);
+      if (this.getActionType().createEntityAction(performer, target, hand)
+          .map(action -> performer.performAction(action, true))
+          .orElse(false)) {
+        return InteractionResult.CONSUME;
+      }
     }
-    return new InteractionResultHolder<>(InteractionResult.PASS, playerEntity.getItemInHand(hand));
+    return InteractionResult.PASS;
   }
 
-  public void performAction(LivingEntity performerEntity, LivingEntity targetEntity) {
-    if (this.entityActionFactory != null) {
-      performerEntity.getCapability(LivingExtension.CAPABILITY)
-          .ifPresent(performer -> performer.performAction(
-              this.entityActionFactory.apply(performer, targetEntity == null
-                  ? null
-                  : targetEntity.getCapability(LivingExtension.CAPABILITY).orElse(null)),
-              false, true));
+  @Override
+  public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    if (!player.getLevel().isClientSide()) {
+      var performer = PlayerExtension.getOrThrow(player);
+      if (this.getActionType().createAction(performer, hand)
+          .map(action -> performer.performAction(action, true))
+          .orElse(false)) {
+        return InteractionResultHolder.consume(player.getItemInHand(hand));
+      }
     }
+
+    return InteractionResultHolder.pass(player.getItemInHand(hand));
   }
 
-  public static class Properties extends Item.Properties {
-
-    @Nullable
-    private BiFunction<LivingExtension<?, ?>, BlockPos, Action> blockActionFactory;
-    @Nullable
-    private BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, Action> entityActionFactory;
-
-    public Properties action(Supplier<? extends ActionType> actionType) {
-      // Can't use method reference because don't want to resolve the supplier too early.
-      this.entityActionFactory =
-          (performer, target) -> actionType.get().createAction(performer, target);
-      return this;
-    }
-
-    public Properties setBlockFactory(
-        BiFunction<LivingExtension<?, ?>, BlockPos, Action> blockFactory) {
-      this.blockActionFactory = blockFactory;
-      return this;
-    }
-
-    public Properties setEntityFactory(
-        BiFunction<LivingExtension<?, ?>, LivingExtension<?, ?>, Action> entityFactory) {
-      this.entityActionFactory = entityFactory;
-      return this;
-    }
+  @Override
+  public int getUseDuration(ItemStack itemStack) {
+    return this.getActionType().getTotalDurationTicks();
   }
 }

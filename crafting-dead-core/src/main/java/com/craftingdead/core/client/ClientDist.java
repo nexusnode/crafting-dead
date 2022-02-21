@@ -17,7 +17,6 @@ package com.craftingdead.core.client;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.ModDist;
@@ -42,7 +41,7 @@ import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.HandcuffsLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
-import com.craftingdead.core.client.renderer.item.ItemRendererManager;
+import com.craftingdead.core.client.renderer.item.ItemRenderDispatcher;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
@@ -153,8 +152,7 @@ public class ClientDist implements ModDist {
   public static final ForgeConfigSpec clientConfigSpec;
 
   static {
-    final Pair<ClientConfig, ForgeConfigSpec> clientConfigPair =
-        new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+    var clientConfigPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
     clientConfigSpec = clientConfigPair.getRight();
     clientConfig = clientConfigPair.getLeft();
   }
@@ -173,7 +171,7 @@ public class ClientDist implements ModDist {
 
   private final IngameGui ingameGui;
 
-  private final ItemRendererManager itemRendererManager;
+  private final ItemRenderDispatcher itemRenderDispatcher;
 
   private final CameraManager cameraManager;
 
@@ -212,7 +210,7 @@ public class ClientDist implements ModDist {
 
     this.minecraft = Minecraft.getInstance();
     this.crosshairManager = new CrosshairManager();
-    this.itemRendererManager = new ItemRendererManager();
+    this.itemRenderDispatcher = new ItemRenderDispatcher();
 
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
@@ -238,8 +236,8 @@ public class ClientDist implements ModDist {
     return this.cameraManager;
   }
 
-  public ItemRendererManager getItemRendererManager() {
-    return this.itemRendererManager;
+  public ItemRenderDispatcher getItemRendererManager() {
+    return this.itemRenderDispatcher;
   }
 
   /**
@@ -294,7 +292,7 @@ public class ClientDist implements ModDist {
 
   private void handleRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
     event.registerReloadListener(this.crosshairManager);
-    event.registerReloadListener(this.itemRendererManager);
+    event.registerReloadListener(this.itemRenderDispatcher);
   }
 
   /**
@@ -430,7 +428,7 @@ public class ClientDist implements ModDist {
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
-    this.itemRendererManager.getTextures(event.getAtlas().location()).forEach(event::addSprite);
+    this.itemRenderDispatcher.getTextures(event.getAtlas().location()).forEach(event::addSprite);
     if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
       Skins.REGISTRY.stream()
           .flatMap(skin -> skin.getAcceptedGuns().stream().map(skin::getTextureLocation))
@@ -620,7 +618,9 @@ public class ClientDist implements ModDist {
       var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
           .map(scope -> scope.isScoping(player))
           .orElse(false);
-      if (player.hasProgressMonitor() || aiming || player.isHandcuffed()) {
+      if (player.getActionObserver()
+          .map(observer -> observer.getProgressBar().isPresent())
+          .orElse(false) || aiming || player.isHandcuffed()) {
         event.setCanceled(true);
         return;
       }
@@ -663,7 +663,7 @@ public class ClientDist implements ModDist {
         MUTABLE_CAMERA_ROTATIONS);
     if (this.minecraft.cameraEntity instanceof LivingEntity livingEntity) {
       var itemStack = livingEntity.getMainHandItem();
-      var itemRenderer = this.itemRendererManager.getItemRenderer(itemStack.getItem());
+      var itemRenderer = this.itemRenderDispatcher.getItemRenderer(itemStack.getItem());
       if (itemRenderer != null) {
         itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getPartialTicks(),
             MUTABLE_CAMERA_ROTATIONS);

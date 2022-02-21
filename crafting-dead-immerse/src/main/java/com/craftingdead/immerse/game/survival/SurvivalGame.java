@@ -66,8 +66,8 @@ public abstract class SurvivalGame implements Game {
   @SubscribeEvent
   public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player
-        && !event.getLiving().getHandler(SurvivalPlayerHandler.EXTENSION_ID).isPresent()) {
-      player.registerHandler(SurvivalPlayerHandler.EXTENSION_ID, new SurvivalPlayerHandler(player));
+        && !player.getHandler(SurvivalPlayerHandler.TYPE).isPresent()) {
+      player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
     }
   }
 

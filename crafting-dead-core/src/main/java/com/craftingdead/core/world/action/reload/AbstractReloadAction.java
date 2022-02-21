@@ -16,7 +16,6 @@ package com.craftingdead.core.world.action.reload;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
-import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -26,9 +25,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class AbstractReloadAction extends TimedAction<ActionType> {
+public abstract class AbstractReloadAction extends TimedAction {
 
-  protected final ItemStack gunStack;
+  protected final LivingExtension<?, ?> performer;
 
   protected final Gun gun;
 
@@ -37,13 +36,16 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
   @Nullable
   private Animation animation;
 
-  public AbstractReloadAction(ActionType type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
-    this.gunStack = performer.getMainHandItem();
-    this.gun = this.gunStack.getCapability(Gun.CAPABILITY)
+  public AbstractReloadAction(LivingExtension<?, ?> performer) {
+    this.performer = performer;
+    this.gun = performer.getMainHandItem().getCapability(Gun.CAPABILITY)
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     this.oldMagazineStack = this.gun.getAmmoProvider().getMagazineStack();
+  }
+
+  @Override
+  public LivingExtension<?, ?> getPerformer() {
+    return this.performer;
   }
 
   @Override
@@ -52,9 +54,13 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
   }
 
   @Override
-  public boolean start() {
+  public boolean start(boolean simulate) {
     if (this.getPerformer().getEntity().isSprinting()) {
       return false;
+    }
+
+    if (simulate) {
+      return true;
     }
 
     if (this.gun.isPerformingSecondaryAction()) {
@@ -78,7 +84,8 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
   @Override
   public boolean tick() {
     if (!this.getPerformer().getLevel().isClientSide()
-        && this.getPerformer().getEntity().isSprinting()) {
+        && !this.performer.getMainHandItem().is(this.gun.getItemStack().getItem())
+        || this.getPerformer().getEntity().isSprinting()) {
       this.getPerformer().cancelAction(true);
       return false;
     }
@@ -86,17 +93,18 @@ public abstract class AbstractReloadAction extends TimedAction<ActionType> {
   }
 
   @Override
-  protected void finish() {
-    if (this.getPerformer().getLevel().isClientSide()) {
+  public void stop(StopReason reason) {
+    super.stop(reason);
+
+    if (reason.isCompleted()) {
+      if (this.getPerformer().getLevel().isClientSide()) {
+        return;
+      }
+      // This will be synced to the client by the gun.
+      this.loadNewMagazineStack(false);
       return;
     }
-    // This will be synced to the client by the gun.
-    this.loadNewMagazineStack(false);
-  }
 
-  @Override
-  public void cancel() {
-    super.cancel();
     if (this.getPerformer().getLevel().isClientSide()) {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound

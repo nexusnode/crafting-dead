@@ -24,7 +24,7 @@ public interface Action {
    * 
    * @return if the action can start
    */
-  boolean start();
+  boolean start(boolean simulate);
 
   /**
    * Ticks the {@link Action} and determines if it should continue running.
@@ -33,15 +33,31 @@ public interface Action {
    */
   boolean tick();
 
-  void cancel();
+  void stop(StopReason reason);
+
+  default ActionObserver createPerformerObserver() {
+    return () -> this;
+  }
 
   LivingExtension<?, ?> getPerformer();
 
-  LivingExtension.ProgressMonitor getPerformerProgress();
+  default Optional<LivingExtension<?, ?>> getTarget() {
+    return Optional.empty();
+  }
 
-  Optional<LivingExtension<?, ?>> getTarget();
+  default ActionObserver createTargetObserver() {
+    return () -> this;
+  }
 
-  LivingExtension.ProgressMonitor getTargetProgress();
+  ActionType<?> getType();
 
-  ActionType getType();
+  enum StopReason {
+
+    CANCELLED,
+    COMPLETED;
+
+    public boolean isCompleted() {
+      return this == COMPLETED;
+    }
+  }
 }

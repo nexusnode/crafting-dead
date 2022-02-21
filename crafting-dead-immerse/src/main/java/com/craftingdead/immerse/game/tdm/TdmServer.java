@@ -190,9 +190,8 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   public void resetBuyTimes() {
     this.getMinecraftServer().getPlayerList().getPlayers()
         .stream()
-        .<PlayerExtension<?>>map(PlayerExtension::getOrThrow)
-        .map(player -> (TdmServerPlayerHandler) player
-            .getHandlerOrThrow(TdmPlayerHandler.ID))
+        .map(PlayerExtension::getOrThrow)
+        .map(player -> (TdmServerPlayerHandler) player.getHandlerOrThrow(TdmPlayerHandler.TYPE))
         .forEach(TdmServerPlayerHandler::resetBuyTime);
   }
 
@@ -294,7 +293,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
     for (ServerPlayer playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((TdmServerPlayerHandler) PlayerExtension.getOrThrow(playerEntity)
-          .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
+          .getHandlerOrThrow(TdmPlayerHandler.TYPE)).invalidate();
     }
 
     super.ended();
@@ -449,10 +448,10 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   @SuppressWarnings("unchecked")
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension<?> extension
-        && !event.getLiving().getLevel().isClientSide()) {
-      extension.registerHandler(TdmPlayerHandler.ID,
-          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) extension));
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && !player.getLevel().isClientSide()) {
+      player.registerHandler(TdmPlayerHandler.TYPE,
+          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) player));
     }
   }
 
@@ -471,9 +470,8 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
-    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.ID);
-    var player = (TdmPlayerHandler<?>) handler;
-    player.setRemainingSpawnProtectionSeconds(0);
+    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.TYPE);
+    handler.setRemainingSpawnProtectionSeconds(0);
   }
 
   @SubscribeEvent

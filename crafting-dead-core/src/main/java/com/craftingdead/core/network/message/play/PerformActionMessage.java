@@ -22,17 +22,20 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
 
-public record PerformActionMessage(ActionType actionType, int performerEntityId,
-    int targetEntityId) {
+public record PerformActionMessage(ActionType<?> actionType, int performerEntityId,
+    FriendlyByteBuf buf) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeRegistryId(this.actionType);
     out.writeVarInt(this.performerEntityId);
-    out.writeVarInt(this.targetEntityId);
+    out.writeVarInt(this.buf.readableBytes());
+    out.writeBytes(this.buf);
+    this.buf.release();
   }
 
   public static PerformActionMessage decode(FriendlyByteBuf in) {
-    return new PerformActionMessage(in.readRegistryId(), in.readVarInt(), in.readVarInt());
+    return new PerformActionMessage(in.readRegistryId(), in.readVarInt(),
+        new FriendlyByteBuf(in.readBytes(in.readVarInt())));
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
@@ -40,14 +43,11 @@ public record PerformActionMessage(ActionType actionType, int performerEntityId,
       final var performerEntity =
           NetworkUtil.getEntityOrSender(ctx.get(), this.performerEntityId, LivingEntity.class);
       final var performer = LivingExtension.getOrThrow(performerEntity);
-      final var target = this.targetEntityId == -1 ? null
-          : performerEntity.level.getEntity(this.targetEntityId)
-              .getCapability(LivingExtension.CAPABILITY)
-              .orElse(null);
       final var serverSide = ctx.get().getDirection().getReceptionSide().isServer();
       if (!serverSide || this.actionType.isTriggeredByClient()) {
-        performer.performAction(this.actionType.createAction(performer, target), serverSide);
+        performer.performAction(this.actionType.decode(performer, this.buf), serverSide);
       }
+      this.buf.release();
     });
     return true;
   }

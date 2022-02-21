@@ -23,6 +23,8 @@ import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.entity.EntityUtil;
+import com.craftingdead.core.world.action.ActionObserver;
+import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -39,7 +41,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -54,19 +55,19 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
 
-class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
-    implements LivingExtension<E, H> {
+sealed class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
+    implements LivingExtension<E, H> permits PlayerExtensionImpl<?>, SimpleLivingExtension {
 
   /**
    * The vanilla entity.
    */
   private final E entity;
 
-  protected final Map<ResourceLocation, H> handlers = new Object2ObjectArrayMap<>();
+  protected final Map<LivingHandlerType<? extends H>, H> handlers = new Object2ObjectArrayMap<>();
 
-  protected final Map<ResourceLocation, H> dirtyHandlers = new Object2ObjectArrayMap<>();
+  protected final Map<LivingHandlerType<? extends H>, H> dirtyHandlers =
+      new Object2ObjectArrayMap<>();
 
   private final IntSet dirtySlots = new IntOpenHashSet();
 
@@ -83,8 +84,8 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
         @Override
         public void onContentsChanged(int slot) {
-          if (!LivingExtensionImpl.this.entity.getCommandSenderWorld().isClientSide()) {
-            LivingExtensionImpl.this.dirtySlots.add(slot);
+          if (!BaseLivingExtension.this.getLevel().isClientSide()) {
+            BaseLivingExtension.this.dirtySlots.add(slot);
           }
         }
       };
@@ -98,7 +99,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   private Action action;
 
   @Nullable
-  private ProgressMonitor progressMonitor;
+  private ActionObserver actionObserver;
 
   private boolean movementBlocked;
 
@@ -112,7 +113,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   private ItemStack lastClothingStack = ItemStack.EMPTY;
 
-  LivingExtensionImpl(E entity) {
+  BaseLivingExtension(E entity) {
     this.entity = entity;
   }
 
@@ -122,24 +123,24 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void registerHandler(ResourceLocation id, H extension) {
-    if (this.handlers.containsKey(id)) {
-      throw new IllegalArgumentException(
-          "Handler with id " + id.toString() + " already registered");
+  public <T extends H> void registerHandler(LivingHandlerType<T> type, T handler) {
+    if (this.handlers.put(type, handler) != null) {
+      throw new IllegalArgumentException("Duplicate handler: " + type);
     }
-    this.handlers.put(id, extension);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends LivingHandler> Optional<T> getHandler(LivingHandlerType<T> type) {
+    return Optional.ofNullable((T) this.handlers.get(type));
   }
 
   @Override
-  public Optional<H> getHandler(ResourceLocation id) {
-    return Optional.ofNullable(this.handlers.get(id));
-  }
-
-  @Override
-  public H getHandlerOrThrow(ResourceLocation id) {
-    H handler = this.handlers.get(id);
+  public <T extends LivingHandler> T getHandlerOrThrow(LivingHandlerType<T> type) {
+    @SuppressWarnings("unchecked")
+    T handler = (T) this.handlers.get(type);
     if (handler == null) {
-      throw new IllegalStateException("Missing handler with ID: " + id.toString());
+      throw new IllegalStateException("Missing handler: " + type);
     }
     return handler;
   }
@@ -149,44 +150,36 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     return Optional.ofNullable(this.action);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public boolean performAction(Action action, boolean force, boolean sendUpdate) {
+  public <T extends Action> boolean performAction(T action, boolean force, boolean sendUpdate) {
     if (MinecraftForge.EVENT_BUS.post(new LivingExtensionEvent.PerformAction<>(this, action))) {
       return false;
     }
 
-    final var targetProgressMonitor = action.getTarget()
-        .flatMap(LivingExtension::getProgressMonitor)
-        .orElse(null);
-
-    if (this.progressMonitor != null || targetProgressMonitor != null) {
-      if (!force) {
-        return false;
-      }
-      this.progressMonitor.stop();
-      if (targetProgressMonitor != this.progressMonitor) {
-        targetProgressMonitor.stop();
-      }
+    if (this.isObservingAction()
+        || action.getTarget().map(LivingExtension::isObservingAction).orElse(false)) {
+      return false;
     }
 
-    if ((this.action != null && !force) || !action.start()) {
+    if (!action.start(false)) {
       return false;
     }
 
     this.cancelAction(true);
     this.action = action;
-    this.progressMonitor = action.getPerformerProgress();
-    action.getTarget().ifPresent(target -> target.setProgressMonitor(action.getTargetProgress()));
+    this.setActionObserver(action.createPerformerObserver());
+
+    action.getTarget().ifPresent(target -> target.setActionObserver(action.createTargetObserver()));
+
     if (sendUpdate) {
       var target = this.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
-      int targetId = action.getTarget()
-          .map(LivingExtension::getEntity)
-          .map(Entity::getId)
-          .orElse(-1);
+      var buf = new FriendlyByteBuf(Unpooled.buffer());
+      ((ActionType<T>) action.getType()).encode(action, buf);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new PerformActionMessage(action.getType(), this.getEntity().getId(), targetId));
+          new PerformActionMessage(action.getType(), this.getEntity().getId(), buf));
     }
     return true;
   }
@@ -196,10 +189,9 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     if (this.action == null) {
       return;
     }
-    this.action.cancel();
-    this.removeAction();
+    this.stopAction(Action.StopReason.CANCELLED);
     if (sendUpdate) {
-      PacketTarget target = this.getLevel().isClientSide()
+      var target = this.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
@@ -208,19 +200,20 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public void setProgressMonitor(ProgressMonitor actionProgress) {
-    this.progressMonitor = actionProgress;
+  public void setActionObserver(ActionObserver actionObserver) {
+    this.actionObserver = actionObserver;
   }
 
   @Override
-  public Optional<ProgressMonitor> getProgressMonitor() {
-    return Optional.ofNullable(this.progressMonitor);
+  public Optional<ActionObserver> getActionObserver() {
+    return Optional.ofNullable(this.actionObserver);
   }
 
-  private void removeAction() {
+  private void stopAction(Action.StopReason reason) {
     if (this.action != null) {
-      this.progressMonitor = null;
-      this.action.getTarget().ifPresent(target -> target.setProgressMonitor(null));
+      this.action.stop(reason);
+      this.action.getTarget().ifPresent(target -> target.setActionObserver(null));
+      this.setActionObserver(null);
       this.action = null;
     }
   }
@@ -242,9 +235,8 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public void tick() {
-    ItemStack heldStack = this.getMainHandItem();
+    var heldStack = this.getMainHandItem();
     if (heldStack != this.lastHeldStack) {
-      this.getProgressMonitor().ifPresent(ProgressMonitor::stop);
       if (this.lastHeldStack != null) {
         this.lastHeldStack.getCapability(Gun.CAPABILITY)
             .ifPresent(gun -> gun.reset(this));
@@ -259,7 +251,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     this.movementBlocked = false;
 
     if (this.action != null && this.action.tick()) {
-      this.removeAction();
+      this.stopAction(Action.StopReason.COMPLETED);
     }
 
     heldStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.tick(this));
@@ -276,12 +268,10 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     this.moving = !this.entity.position().equals(this.lastPos);
     this.lastPos = this.entity.position();
 
-    for (var entry : this.handlers.entrySet()) {
-      this.tickHandler(entry.getKey(), entry.getValue());
-    }
+    this.handlers.forEach(this::tickHandler);
   }
 
-  protected void tickHandler(ResourceLocation handlerId, H handler) {
+  protected void tickHandler(LivingHandlerType<? extends H> type, H handler) {
     handler.tick();
 
     // Precedence = (1) INVISIBLE (2) PARTIALLY_VISIBLE (3) VISIBLE
@@ -303,7 +293,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     }
 
     if (handler.requiresSync()) {
-      this.dirtyHandlers.put(handlerId, handler);
+      this.dirtyHandlers.put(type, handler);
     }
   }
 
@@ -531,7 +521,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     var handlersToSend = writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
     out.writeVarInt(handlersToSend.size());
     for (var entry : handlersToSend) {
-      out.writeResourceLocation(entry.getKey());
+      out.writeResourceLocation(entry.getKey().id());
       var handlerData = new FriendlyByteBuf(Unpooled.buffer());
       entry.getValue().encode(handlerData, writeAll);
       out.writeVarInt(handlerData.readableBytes());
@@ -553,7 +543,7 @@ class LivingExtensionImpl<E extends LivingEntity, H extends LivingHandler>
     for (int x = 0; x < handlersSize; x++) {
       var id = in.readResourceLocation();
       int dataSize = in.readVarInt();
-      H handler = this.handlers.get(id);
+      var handler = this.handlers.get(new LivingHandlerType<>(id));
       if (handler == null) {
         in.readerIndex(in.readerIndex() + dataSize);
         continue;

@@ -392,7 +392,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   protected boolean canShoot(LivingExtension<?, ?> living) {
-    return !living.getProgressMonitor().isPresent() && !living.getEntity().isSprinting()
+    return !living.getActionObserver().isPresent() && !living.getEntity().isSprinting()
         && !living.getEntity().isSpectator()
         && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }

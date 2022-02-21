@@ -12,7 +12,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.action.delegate;
+package com.craftingdead.core.world.action.item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +23,20 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 
-public final class DelegateEntityActionType<T extends LivingExtension<?, ?>>
-    extends AbstractDelegateActionType {
+public final class EntityItemActionType<T extends LivingExtension<?, ?>>
+    extends ItemActionType<EntityItemAction<T>> {
 
   private final TargetSelector<T> targetSelector;
   private final List<EffectAction> effects;
   @Nullable
   private final CustomAction<T> customAction;
 
-  private DelegateEntityActionType(Builder<T> builder) {
+  private EntityItemActionType(Builder<T> builder) {
     super(builder);
     this.targetSelector = builder.targetSelector;
     this.effects = builder.effects;
@@ -54,9 +57,36 @@ public final class DelegateEntityActionType<T extends LivingExtension<?, ?>>
   }
 
   @Override
-  public Optional<? extends DelegateAction> create(Action action) {
-    return this.targetSelector.select(action.getPerformer(), action.getTarget().orElse(null))
-        .map(target -> new DelegateEntityAction<>(this, target));
+  public void encode(EntityItemAction<T> action, FriendlyByteBuf out) {
+    out.writeEnum(action.getHand());
+    out.writeVarInt(action.getSelectedTarget().getEntity().getId());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public EntityItemAction<T> decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
+    var hand = in.readEnum(InteractionHand.class);
+    var targetId = in.readVarInt();
+    var target = performer.getLevel().getEntity(targetId);
+    if (target instanceof LivingEntity livingTarget) {
+      return new EntityItemAction<>(hand, this, performer,
+          (T) LivingExtension.getOrThrow(livingTarget));
+    } else {
+      throw new IllegalStateException("Invalid target: " + target);
+    }
+  }
+
+  @Override
+  public Optional<Action> createEntityAction(LivingExtension<?, ?> performer,
+      LivingExtension<?, ?> target, InteractionHand hand) {
+    var selectedTarget = this.getTargetSelector().select(performer, target).orElse(null);
+    return Optional.of(new EntityItemAction<>(hand, this, performer, selectedTarget));
+  }
+
+  @Override
+  public Optional<Action> createAction(LivingExtension<?, ?> performer, InteractionHand hand) {
+    var selectedTarget = this.getTargetSelector().select(performer, null).orElse(null);
+    return Optional.of(new EntityItemAction<>(hand, this, performer, selectedTarget));
   }
 
   public static <T extends LivingExtension<?, ?>> Builder<T> builder(
@@ -64,16 +94,14 @@ public final class DelegateEntityActionType<T extends LivingExtension<?, ?>>
     return new Builder<>(targetSelector);
   }
 
-  public record EffectAction(Supplier<MobEffectInstance> effect, float chance) {
-  }
+  public record EffectAction(Supplier<MobEffectInstance> effect, float chance) {}
 
   public record CustomAction<T extends LivingExtension<?, ?>> (
       BiConsumer<LivingExtension<?, ?>, T> consumer,
-      float chance) {
-  }
+      float chance) {}
 
   public static final class Builder<T extends LivingExtension<?, ?>>
-      extends AbstractDelegateActionType.Builder<Builder<T>> {
+      extends ItemActionType.Builder<Builder<T>> {
 
     private final TargetSelector<T> targetSelector;
     private final List<EffectAction> effects = new ArrayList<>();
@@ -81,7 +109,6 @@ public final class DelegateEntityActionType<T extends LivingExtension<?, ?>>
     private CustomAction<T> customAction;
 
     private Builder(TargetSelector<T> targetSelector) {
-      super(DelegateEntityActionType::new);
       this.targetSelector = targetSelector;
     }
 
@@ -102,6 +129,11 @@ public final class DelegateEntityActionType<T extends LivingExtension<?, ?>>
         float chance) {
       this.customAction = new CustomAction<>(customAction, chance);
       return this;
+    }
+
+    @Override
+    public EntityItemActionType<?> build() {
+      return new EntityItemActionType<>(this);
     }
   }
 }

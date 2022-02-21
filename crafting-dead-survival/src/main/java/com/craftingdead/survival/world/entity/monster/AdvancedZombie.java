@@ -114,8 +114,7 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
         new NearestAttackableTargetGoal<>(this, Player.class, 5, false, false,
             targetEntity -> targetEntity.getCapability(LivingExtension.CAPABILITY)
                 .resolve()
-                .flatMap(extension -> extension.getHandler(SurvivalPlayerHandler.ID))
-                .map(SurvivalPlayerHandler.class::cast)
+                .flatMap(extension -> extension.getHandler(SurvivalPlayerHandler.TYPE))
                 .map(handler -> handler.getSoundLevel() >= targetEntity.distanceTo(this))
                 .orElse(false)) {
           @Override

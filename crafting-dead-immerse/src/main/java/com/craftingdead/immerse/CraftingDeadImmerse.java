@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
 import com.craftingdead.immerse.game.Game;
@@ -27,17 +28,33 @@ import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.network.NetworkChannel;
+import com.craftingdead.immerse.network.play.SyncLandChunkMessage;
+import com.craftingdead.immerse.network.play.SyncLandManagerMessage;
 import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
+import com.craftingdead.immerse.world.action.ImmerseActionTypes;
+import com.craftingdead.immerse.world.item.ImmerseItems;
+import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
+import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
+import com.craftingdead.immerse.world.level.extension.LandOwnerTypes;
+import com.craftingdead.immerse.world.level.extension.LevelExtension;
+import io.netty.buffer.Unpooled;
 import io.sentry.Sentry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.LogicalSide;
@@ -48,6 +65,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 
 @Mod(CraftingDeadImmerse.ID)
@@ -115,9 +133,14 @@ public class CraftingDeadImmerse {
     final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     modEventBus.addListener(this::handleCommonSetup);
 
-    ImmerseSoundEvents.SOUND_EVENTS.register(modEventBus);
-    GameTypes.GAME_TYPES.register(modEventBus);
-    ModuleTypes.MODULE_TYPES.register(modEventBus);
+    ImmerseSoundEvents.soundEvents.register(modEventBus);
+    GameTypes.gameTypes.register(modEventBus);
+    ModuleTypes.moduleTypes.register(modEventBus);
+    ImmerseActionTypes.actionTypes.register(modEventBus);
+    ImmerseBlocks.blocks.register(modEventBus);
+    ImmerseItems.items.register(modEventBus);
+    ImmerseBlockEntityTypes.blockEntityTypes.register(modEventBus);
+    LandOwnerTypes.landOwnerTypes.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
 
@@ -207,5 +230,45 @@ public class CraftingDeadImmerse {
       MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
       this.logicalServer = null;
     }
+  }
+
+  @SubscribeEvent
+  public void handleAttachCapabilities(AttachCapabilitiesEvent<Level> event) {
+    event.addCapability(LevelExtension.CAPABILITY_KEY,
+        CapabilityUtil.serializableProvider(() -> LevelExtension.create(event.getObject()),
+            LevelExtension.CAPABILITY));
+  }
+
+  @SubscribeEvent
+  public void handleChunkWatch(ChunkWatchEvent.Watch event) {
+    var landManager = LevelExtension.getOrThrow(event.getWorld()).getLandManager();
+    var buf = new FriendlyByteBuf(Unpooled.buffer());
+    landManager.writeChunkToBuf(event.getPos(), buf);
+    NetworkChannel.PLAY.getSimpleChannel().send(
+        PacketDistributor.PLAYER.with(event::getPlayer),
+        new SyncLandChunkMessage(event.getPos(), buf));
+  }
+
+  @SubscribeEvent
+  public void handleLevelTick(TickEvent.WorldTickEvent event) {
+    LevelExtension.getOrThrow(event.world).tick();
+  }
+
+  @SubscribeEvent
+  public void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    sendLandManager((ServerPlayer) event.getPlayer());
+  }
+
+  @SubscribeEvent
+  public void handlePlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+    sendLandManager((ServerPlayer) event.getPlayer());
+  }
+
+  private static void sendLandManager(ServerPlayer player) {
+    var landManager = LevelExtension.getOrThrow(player.getLevel()).getLandManager();
+    var buf = new FriendlyByteBuf(Unpooled.buffer());
+    landManager.writeToBuf(buf);
+    NetworkChannel.PLAY.getSimpleChannel()
+        .send(PacketDistributor.PLAYER.with(() -> player), new SyncLandManagerMessage(buf));
   }
 }

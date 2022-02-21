@@ -77,12 +77,12 @@ public class MagazineAmmoProvider implements AmmoProvider {
 
   @Override
   public void reload(LivingExtension<?, ?> living) {
-    living.performAction(ActionTypes.MAGAZINE_RELOAD.get().createAction(living, null), true);
+    living.performAction(ActionTypes.MAGAZINE_RELOAD.get().decode(living, null), true);
   }
 
   @Override
   public void unload(LivingExtension<?, ?> living) {
-    living.performAction(ActionTypes.REMOVE_MAGAZINE.get().createAction(living, null), true);
+    living.performAction(ActionTypes.REMOVE_MAGAZINE.get().decode(living, null), true);
   }
 
   @Override

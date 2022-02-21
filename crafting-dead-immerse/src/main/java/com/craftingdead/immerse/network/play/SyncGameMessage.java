@@ -16,20 +16,14 @@ package com.craftingdead.immerse.network.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.game.ClientGameWrapper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SyncGameMessage {
-
-  private final FriendlyByteBuf data;
-
-  public SyncGameMessage(FriendlyByteBuf data) {
-    this.data = data;
-  }
+public record SyncGameMessage(FriendlyByteBuf buf) {
 
   public void encode(FriendlyByteBuf out) {
-    out.writeBytes(this.data);
+    out.writeBytes(this.buf);
+    this.buf.release();
   }
 
   public static SyncGameMessage decode(FriendlyByteBuf in) {
@@ -37,13 +31,14 @@ public class SyncGameMessage {
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ClientGameWrapper gameWrapper =
-          CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
-      if (gameWrapper != null) {
-        gameWrapper.decode(this.data);
-      }
-    });
+    ctx.get()
+        .enqueueWork(() -> {
+          var gameWrapper = CraftingDeadImmerse.getInstance().getClientDist().getGameWrapper();
+          if (gameWrapper != null) {
+            gameWrapper.decode(this.buf);
+          }
+        })
+        .thenRun(this.buf::release);
     return true;
   }
 }

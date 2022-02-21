@@ -12,46 +12,63 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.action.delegate;
+package com.craftingdead.core.world.action.item;
 
 import java.util.Optional;
 import java.util.function.Predicate;
 import com.craftingdead.core.world.action.Action;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class DelegateBlockActionType extends AbstractDelegateActionType {
+public class BlockItemActionType extends ItemActionType<BlockItemAction> {
 
   private final Predicate<BlockState> predicate;
 
-  private DelegateBlockActionType(Builder builder) {
+  protected BlockItemActionType(Builder builder) {
     super(builder);
     this.predicate = builder.predicate;
-  }
-
-  @Override
-  public Optional<? extends DelegateAction> create(Action action) {
-    return Optional.of(new DelegatedBlockAction(this));
   }
 
   public Predicate<BlockState> getPredicate() {
     return this.predicate;
   }
 
+  @Override
+  public void encode(BlockItemAction action, FriendlyByteBuf out) {
+    out.writeEnum(action.getHand());
+    out.writeBlockHitResult(action.getContext().getHitResult());
+  }
+
+  @Override
+  public BlockItemAction decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
+    return new BlockItemAction(in.readEnum(InteractionHand.class), this, performer,
+        in.readBlockHitResult());
+  }
+
+  @Override
+  public Optional<Action> createBlockAction(LivingExtension<?, ?> performer, UseOnContext context) {
+    return Optional.of(new BlockItemAction(this, performer, context));
+  }
+
   public static Builder builder() {
     return new Builder();
   }
 
-  public static final class Builder extends AbstractDelegateActionType.Builder<Builder> {
+  public static final class Builder extends ItemActionType.Builder<Builder> {
 
     private Predicate<BlockState> predicate;
-
-    private Builder() {
-      super(DelegateBlockActionType::new);
-    }
 
     public Builder forBlock(Predicate<BlockState> predicate) {
       this.predicate = predicate;
       return this;
+    }
+
+    @Override
+    public BlockItemActionType build() {
+      return new BlockItemActionType(this);
     }
   }
 }

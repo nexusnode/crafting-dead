@@ -20,13 +20,7 @@ import com.craftingdead.immerse.game.GameType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class ChangeGameMessage {
-
-  private final GameType gameType;
-
-  public ChangeGameMessage(GameType gameType) {
-    this.gameType = gameType;
-  }
+public record ChangeGameMessage(GameType gameType) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeRegistryId(this.gameType);
