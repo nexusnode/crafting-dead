@@ -1,11 +1,13 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the
+ * "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor"). By installing or otherwise using
+ * Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this
+ * Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy,
+ * reproduce or otherwise use any of the source code available online at any time.
  *
  * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
  *
@@ -14,16 +16,17 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.OptionalInt;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
-import com.craftingdead.core.world.explosion.ExplosionHook;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
-public class FragGrenade extends Grenade implements ExplosionHook {
+public class FragGrenade extends Grenade implements ExplosionSource {
 
   public FragGrenade(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
@@ -34,8 +37,9 @@ public class FragGrenade extends Grenade implements ExplosionHook {
   }
 
   @Override
-  public Integer getMinimumTicksUntilAutoActivation() {
-    return CraftingDead.serverConfig.explosivesFragGrenadeTicksBeforeActivation.get();
+  public OptionalInt getMinimumTicksUntilAutoActivation() {
+    return OptionalInt.of(
+        CraftingDead.serverConfig.explosivesFragGrenadeTicksBeforeActivation.get());
   }
 
   @Override
@@ -63,8 +67,8 @@ public class FragGrenade extends Grenade implements ExplosionHook {
   }
 
   @Override
-  public double getDamageMultiplier() {
-    return CraftingDead.serverConfig.explosivesFragGrenadeDamageMultiplier.get();
+  public float getDamageMultiplier() {
+    return CraftingDead.serverConfig.explosivesFragGrenadeDamageMultiplier.get().floatValue();
   }
 
   @Override

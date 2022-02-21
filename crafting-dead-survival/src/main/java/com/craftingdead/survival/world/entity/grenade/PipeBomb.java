@@ -15,8 +15,8 @@
 package com.craftingdead.survival.world.entity.grenade;
 
 import com.craftingdead.core.particle.RGBFlashParticleData;
+import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.grenade.Grenade;
-import com.craftingdead.core.world.explosion.ExplosionHook;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
@@ -27,7 +27,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
-public class PipeBomb extends Grenade implements ExplosionHook {
+public class PipeBomb extends Grenade implements ExplosionSource {
 
   private static final RGBFlashParticleData RED_FLASH =
       new RGBFlashParticleData(1F, 0.35F, 0.35F, 1F);

@@ -57,7 +57,7 @@ public class RemoteDetonatorItem extends Item {
             Grenade grenadeEntity = (Grenade) entity;
 
             boolean isOwner =
-                grenadeEntity.getThrower().map(thrower -> thrower == player).orElse(false);
+                grenadeEntity.getSource().map(thrower -> thrower == player).orElse(false);
 
             return isOwner && grenadeEntity.canBeRemotelyActivated();
           }).forEach(entity -> ((Grenade) entity).setActivated(true));

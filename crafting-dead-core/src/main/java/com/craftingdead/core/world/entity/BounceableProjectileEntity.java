@@ -1,11 +1,13 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the
+ * "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor"). By installing or otherwise using
+ * Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this
+ * Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy,
+ * reproduce or otherwise use any of the source code available online at any time.
  *
  * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
  *
@@ -16,6 +18,7 @@ package com.craftingdead.core.world.entity;
 
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,7 +39,8 @@ import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 public abstract class BounceableProjectileEntity extends Entity
     implements IEntityAdditionalSpawnData {
 
-  private UUID ownerId;
+  @Nullable
+  private UUID sourceId;
   private BlockState blockStanding;
   private boolean stoppedInGround;
   private int totalTicksInAir;
@@ -55,9 +59,16 @@ public abstract class BounceableProjectileEntity extends Entity
 
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
       LivingEntity throwerEntity, Level level) {
-    this(type, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
-        level);
-    this.ownerId = throwerEntity.getUUID();
+    this(type, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(), level);
+    this.setSource(throwerEntity);
+  }
+
+  public void setSource(Entity source) {
+    this.setSourceId(source.getUUID());
+  }
+
+  public void setSourceId(UUID sourceId) {
+    this.sourceId = sourceId;
   }
 
   @Override
@@ -251,8 +262,8 @@ public abstract class BounceableProjectileEntity extends Entity
 
   @Override
   protected void addAdditionalSaveData(CompoundTag compound) {
-    if (this.ownerId != null) {
-      compound.putUUID("owner", this.ownerId);
+    if (this.sourceId != null) {
+      compound.putUUID("sourceId", this.sourceId);
     }
 
     compound.putBoolean("inGround", this.stoppedInGround);
@@ -261,8 +272,8 @@ public abstract class BounceableProjectileEntity extends Entity
 
   @Override
   protected void readAdditionalSaveData(CompoundTag compound) {
-    if (compound.contains("owner", 10)) {
-      this.ownerId = compound.getUUID("owner");
+    if (compound.hasUUID("sourceId")) {
+      this.sourceId = compound.getUUID("sourceId");
     }
     this.stoppedInGround = compound.getBoolean("inGround");
     this.motionStopCount = compound.getInt("motionStopCount");
@@ -282,9 +293,9 @@ public abstract class BounceableProjectileEntity extends Entity
     this.motionStopCount = buffer.readInt();
   }
 
-  public Optional<Entity> getThrower() {
-    return this.level instanceof ServerLevel
-        ? Optional.ofNullable(((ServerLevel) this.level).getEntity(this.ownerId))
+  public Optional<Entity> getSource() {
+    return this.level instanceof ServerLevel level
+        ? Optional.ofNullable(level.getEntity(this.sourceId))
         : Optional.empty();
   }
 }

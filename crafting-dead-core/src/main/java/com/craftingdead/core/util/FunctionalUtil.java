@@ -12,12 +12,15 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.explosion;
+package com.craftingdead.core.util;
 
-import net.minecraft.world.level.Explosion;
+import java.util.Optional;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
-public interface ExplosionHook {
-  double getDamageMultiplier();
+public class FunctionalUtil {
 
-  double getKnockbackMultiplier();
+  public static <T> Optional<T> optional(@Nullable Supplier<T> supplier) {
+    return Optional.ofNullable(supplier).map(Supplier::get);
+  }
 }

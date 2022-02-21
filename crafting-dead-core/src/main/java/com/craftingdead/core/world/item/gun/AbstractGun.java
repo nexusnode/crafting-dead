@@ -187,7 +187,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   private Skin skin;
   private boolean skinDirty;
 
-  @SuppressWarnings({"unchecked", "StaticPseudoFunctionalStyleMethod"})
+  @SuppressWarnings("unchecked")
   public <SELF extends AbstractGun> AbstractGun(
       Function<SELF, ? extends AbstractGunClient<? super SELF>> clientFactory,
       ItemStack itemStack, Set<FireMode> fireModes) {

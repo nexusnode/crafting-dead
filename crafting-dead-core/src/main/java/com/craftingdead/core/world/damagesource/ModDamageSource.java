@@ -1,11 +1,13 @@
 /*
- * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Crafting Dead Copyright (C) 2021 NexusNode LTD
  *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the
+ * "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor"). By installing or otherwise using
+ * Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this
+ * Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy,
+ * reproduce or otherwise use any of the source code available online at any time.
  *
  * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
  *
@@ -15,13 +17,15 @@
 package com.craftingdead.core.world.damagesource;
 
 import javax.annotation.Nullable;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.item.ItemStack;
+import com.craftingdead.core.world.entity.grenade.Grenade;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.damagesource.IndirectEntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
 
 public class ModDamageSource {
 
@@ -36,6 +40,10 @@ public class ModDamageSource {
             .bypassArmor()
             .setProjectile()
             .setExplosion();
+  }
+
+  public static DamageSource grenade(Grenade grenade, @Nullable Entity thrower) {
+    return new IndirectEntityDamageSource("grenade", grenade, thrower).setExplosion();
   }
 
   /**
