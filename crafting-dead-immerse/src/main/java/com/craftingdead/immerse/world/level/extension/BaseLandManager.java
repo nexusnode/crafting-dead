@@ -17,12 +17,14 @@ package com.craftingdead.immerse.world.level.extension;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +37,6 @@ import com.craftingdead.immerse.util.SplittingExecutor;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.longs.Long2BooleanFunction;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -149,14 +150,14 @@ public class BaseLandManager implements LandManager {
   }
 
   @Override
-  public CompletionStage<Boolean> registerLandClaim(LandClaim landClaim) {
+  public CompletionStage<ClaimResult> registerLandClaim(LandClaim landClaim) {
     if (!this.landsOwners.containsKey(landClaim.ownerId())) {
       throw new IllegalStateException("Land owner must be registered before claiming land");
     }
 
     return this.forRegion(landClaim.boundingBox(), sectionPos -> {
       if (this.isSectionOutOfBounds(sectionPos)) {
-        return false;
+        return Optional.of(ClaimResult.OUT_OF_BOUNDS);
       }
 
       var section = this.getOrLoadSection(sectionPos);
@@ -166,17 +167,17 @@ public class BaseLandManager implements LandManager {
       }
 
       if (!section.registerLandClaim(landClaim)) {
-        return false;
+        return Optional.of(ClaimResult.ALREADY_CLAIMED);
       }
 
       this.sectionChanged(sectionPos);
-      return true;
-    }).thenCompose(success -> {
-      if (success) {
+      return Optional.empty();
+    }, ClaimResult.SUCCESS).thenCompose(result -> {
+      if (result == ClaimResult.SUCCESS) {
         this.landClaims.put(landClaim.ownerId(), landClaim);
-        return CompletableFuture.completedStage(true);
+        return CompletableFuture.completedStage(ClaimResult.SUCCESS);
       } else {
-        return this.removeLandClaim(landClaim);
+        return this.removeLandClaim(landClaim).thenApply(__ -> result);
       }
     });
   }
@@ -186,15 +187,16 @@ public class BaseLandManager implements LandManager {
     return this.forRegion(landClaim.boundingBox(), sectionPos -> {
       var section = this.getOrLoadSection(sectionPos);
       if (section == null) {
-        return false;
+        return Optional.of(false);
       }
 
       section.removeLandClaim(landClaim);
 
       this.sectionChanged(sectionPos);
 
-      return true;
-    }).whenComplete((result, exception) -> this.landClaims.remove(landClaim.ownerId(), landClaim));
+      return Optional.empty();
+    }, true).whenComplete(
+        (result, exception) -> this.landClaims.remove(landClaim.ownerId(), landClaim));
   }
 
   @Override
@@ -308,7 +310,8 @@ public class BaseLandManager implements LandManager {
   @Override
   public void close() throws IOException {}
 
-  private CompletionStage<Boolean> forRegion(BoundingBox boundingBox, Long2BooleanFunction action) {
+  private <T> CompletionStage<T> forRegion(BoundingBox boundingBox,
+      LongFunction<Optional<T>> action, T successResult) {
     return this.forRegion(
         SectionPos.blockToSectionCoord(boundingBox.minX()),
         SectionPos.blockToSectionCoord(boundingBox.minY()),
@@ -316,11 +319,11 @@ public class BaseLandManager implements LandManager {
         SectionPos.blockToSectionCoord(boundingBox.maxX()),
         SectionPos.blockToSectionCoord(boundingBox.maxY()),
         SectionPos.blockToSectionCoord(boundingBox.maxZ()),
-        action);
+        action, successResult);
   }
 
-  private CompletionStage<Boolean> forRegion(int minX, int minY, int minZ,
-      int maxX, int maxY, int maxZ, Long2BooleanFunction action) {
+  private <T> CompletionStage<T> forRegion(int minX, int minY, int minZ,
+      int maxX, int maxY, int maxZ, LongFunction<Optional<T>> action, T successResult) {
     int area = 0;
     for (int x = minX; x < maxX; x++) {
       for (int y = minY; y < maxY; y++) {
@@ -330,16 +333,18 @@ public class BaseLandManager implements LandManager {
             var nextY = y;
             var nextZ = z;
             return this.executor
-                .submit(() -> this.forRegion(nextX, nextY, nextZ, maxX, maxY, maxZ, action))
+                .submit(() -> this.forRegion(nextX, nextY, nextZ, maxX, maxY, maxZ, action,
+                    successResult))
                 .thenCompose(Function.identity());
           }
 
-          if (!action.apply(SectionPos.asLong(x, y, z))) {
-            return CompletableFuture.completedStage(false);
+          var result = action.apply(SectionPos.asLong(x, y, z));
+          if (result.isPresent()) {
+            return CompletableFuture.completedStage(result.get());
           }
         }
       }
     }
-    return CompletableFuture.completedStage(true);
+    return CompletableFuture.completedStage(successResult);
   }
 }

@@ -15,55 +15,45 @@
 package com.craftingdead.immerse.world.action;
 
 import java.util.List;
-import java.util.Set;
+import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.immerse.util.BlockUtil;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;
 
-public class BuildDoorWallAction extends BuildAction {
+public class BuildCuboidAction extends BuildAction {
 
-  public static final Set<BlockPos> WALL_OFFSETS = Set.of(
-      new BlockPos(1, 0, 0),
-      new BlockPos(-1, 0, 0),
-      new BlockPos(1, 1, 0),
-      new BlockPos(-1, 1, 0),
-      new BlockPos(0, 2, 0),
-      new BlockPos(1, 2, 0),
-      new BlockPos(-1, 2, 0));
+  private final BuildCuboidActionType type;
 
-  private final BuildDoorWallActionType type;
-
-  protected BuildDoorWallAction(LivingExtension<?, ?> performer, BlockPlaceContext context,
-      BuildDoorWallActionType type) {
+  public BuildCuboidAction(LivingExtension<?, ?> performer, BlockPlaceContext context,
+      BuildCuboidActionType type) {
     super(performer, context);
     this.type = type;
   }
 
+
+  @Nullable
   @Override
   protected List<Placement> createPlacements() {
     var rotation = BlockUtil.getRotation(this.getPerformer().getEntity().getDirection());
     var clickedPos = this.getContext().getClickedPos();
 
-    var placements = ImmutableList.<Placement>builder();
+    var minPos = this.type.getMinOffset()
+        .rotate(rotation)
+        .offset(clickedPos);
+    var maxPos = this.type.getMaxOffset()
+        .rotate(rotation)
+        .offset(clickedPos);
 
-    for (var offset : WALL_OFFSETS) {
-      var pos = offset.rotate(rotation).offset(clickedPos);
-      var placement = this.createPlacement(pos, this.type.getWallBlock());
+    var placements = ImmutableList.<Placement>builder();
+    for (var pos : BlockPos.betweenClosed(minPos, maxPos)) {
+      var placement = this.createPlacement(pos, this.type.getBlock());
       if (placement == null) {
         return null;
       }
       placements.add(placement);
     }
-
-    var doorPlacement =
-        this.createPlacement(this.getContext().getClickedPos(), this.type.getDoorBlock());
-    if (doorPlacement == null) {
-      return null;
-    }
-    placements.add(doorPlacement);
-
     return placements.build();
   }
 

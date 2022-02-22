@@ -36,6 +36,10 @@ public class ImmerseItems {
       items.register("base_center_blueprint",
           () -> new BlueprintItem(ImmerseActionTypes.BUILD_BASE_CENTER, new Item.Properties()));
 
+  public static final RegistryObject<BlueprintItem> CHEST_BLUEPRINT =
+      items.register("chest_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_CHEST, new Item.Properties()));
+
   public static final RegistryObject<BlueprintItem> CAMPFIRE_BLUEPRINT =
       items.register("campfire_blueprint",
           () -> new BlueprintItem(ImmerseActionTypes.BUILD_CAMPFIRE, new Item.Properties()));
@@ -97,5 +101,35 @@ public class ImmerseItems {
   public static final RegistryObject<BlueprintItem> DARK_OAK_DOOR_BLUEPRINT =
       items.register("dark_oak_door_blueprint",
           () -> new BlueprintItem(ImmerseActionTypes.BUILD_DARK_OAK_DOOR,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> OAK_PLANK_PLATFORM_BLUEPRINT =
+      items.register("oak_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_OAK_PLANK_PLATFORM,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> SPRUCE_PLANK_PLATFORM_BLUEPRINT =
+      items.register("spruce_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_SPRUCE_PLANK_PLATFORM,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> BIRCH_PLANK_PLATFORM_BLUEPRINT =
+      items.register("birch_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_BIRCH_PLANK_PLATFORM,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> JUNGLE_PLANK_PLATFORM_BLUEPRINT =
+      items.register("jungle_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_JUNGLE_PLANK_PLATFORM,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> ACACIA_PLANK_PLATFORM_BLUEPRINT =
+      items.register("acacia_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_ACACIA_PLANK_PLATFORM,
+              new Item.Properties()));
+
+  public static final RegistryObject<BlueprintItem> DARK_OAK_PLANK_PLATFORM_BLUEPRINT =
+      items.register("dark_oak_plank_platform_blueprint",
+          () -> new BlueprintItem(ImmerseActionTypes.BUILD_DARK_OAK_PLANK_PLATFORM,
               new Item.Properties()));
 }

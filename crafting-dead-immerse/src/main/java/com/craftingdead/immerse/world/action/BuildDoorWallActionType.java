@@ -20,7 +20,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 
-public class BuildDoorWallActionType extends BlueprintActionType {
+public class BuildDoorWallActionType extends BuildActionType {
 
   private final Supplier<Block> wallBlock;
   private final Supplier<Block> doorBlock;
@@ -40,7 +40,7 @@ public class BuildDoorWallActionType extends BlueprintActionType {
   }
 
   @Override
-  protected BlueprintAction create(LivingExtension<?, ?> performer, BlockPlaceContext context) {
+  protected BuildAction create(LivingExtension<?, ?> performer, BlockPlaceContext context) {
     return new BuildDoorWallAction(performer, context, this);
   }
 
@@ -48,7 +48,7 @@ public class BuildDoorWallActionType extends BlueprintActionType {
     return new Builder();
   }
 
-  public static class Builder extends BlueprintActionType.Builder<Builder> {
+  public static class Builder extends BuildActionType.Builder<Builder> {
 
     private Supplier<Block> wallBlock;
     private Supplier<Block> doorBlock;

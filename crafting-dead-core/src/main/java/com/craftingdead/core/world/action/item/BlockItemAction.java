@@ -15,6 +15,8 @@
 package com.craftingdead.core.world.action.item;
 
 import com.craftingdead.core.util.RayTraceUtil;
+import com.craftingdead.core.world.action.ActionObserver;
+import com.craftingdead.core.world.action.ProgressBar;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -54,6 +56,11 @@ public class BlockItemAction extends ItemAction {
 
   public BlockState getBlockState() {
     return this.blockState;
+  }
+
+  @Override
+  public ActionObserver createPerformerObserver() {
+    return ActionObserver.create(this, ProgressBar.create(this.getType(), null, this::getProgress));
   }
 
   @Override

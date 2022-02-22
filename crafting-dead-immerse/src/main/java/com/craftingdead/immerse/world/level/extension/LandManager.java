@@ -54,7 +54,7 @@ public interface LandManager extends AutoCloseable {
    * @param landClaim
    * @return
    */
-  CompletionStage<Boolean> registerLandClaim(LandClaim landClaim);
+  CompletionStage<ClaimResult> registerLandClaim(LandClaim landClaim);
 
   /**
    * Removes the specified {@link LandClaim}.
@@ -68,7 +68,7 @@ public interface LandManager extends AutoCloseable {
   LandClaim getLandClaimAt(BlockPos blockPos);
 
   default boolean isLandClaimed(BlockPos blockPos) {
-    return this.getLandClaimAt(blockPos) == null;
+    return this.getLandClaimAt(blockPos) != null;
   }
 
   default Optional<LandOwner> getLandOwnerAt(BlockPos blockPos) {
@@ -93,4 +93,11 @@ public interface LandManager extends AutoCloseable {
 
   @Override
   void close() throws IOException;
+
+  enum ClaimResult {
+
+    OUT_OF_BOUNDS,
+    ALREADY_CLAIMED,
+    SUCCESS;
+  }
 }

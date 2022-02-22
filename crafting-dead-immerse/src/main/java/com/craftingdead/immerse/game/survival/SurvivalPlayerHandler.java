@@ -15,16 +15,16 @@
 package com.craftingdead.immerse.game.survival;
 
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import net.minecraft.core.BlockPos;
+import com.craftingdead.immerse.world.level.extension.LegacyBase;
+import com.craftingdead.immerse.world.level.extension.LevelExtension;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -45,34 +45,40 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       new EntityDataAccessor<>(0x01, EntityDataSerializers.INT);
   private static final EntityDataAccessor<Integer> PLAYERS_KILLED =
       new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Optional<UUID>> BASE_ID =
+      new EntityDataAccessor<>(0x03, EntityDataSerializers.OPTIONAL_UUID);
 
   private final PlayerExtension<?> player;
 
   private final SynchedData dataManager = new SynchedData();
-
-  @Nullable
-  private BlockPos basePos;
 
   public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);
     this.dataManager.register(PLAYERS_KILLED, 0);
+    this.dataManager.register(BASE_ID, Optional.empty());
   }
 
-  public Optional<BlockPos> getBasePos() {
-    return Optional.ofNullable(this.basePos);
+  public Optional<LegacyBase> getBase() {
+    return this.getBaseId()
+        .map(baseId -> LevelExtension.getOrThrow(this.player.getLevel())
+            .getLandManager().getLandOwner(baseId))
+        .map(LegacyBase.class::cast);
   }
 
-  public void setBasePos(@Nullable BlockPos basePos) {
-    this.basePos = basePos;
+  public Optional<UUID> getBaseId() {
+    return this.dataManager.get(BASE_ID);
+  }
+
+  public void setBaseId(@Nullable UUID baseId) {
+    this.dataManager.set(BASE_ID, Optional.ofNullable(baseId));
   }
 
   @Override
   public void tick() {
-    if (this.player.getEntity() instanceof ServerPlayer) {
-      int aliveTicks = ((ServerPlayer) this.player.getEntity()).getStats()
-          .getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
+    if (this.player.getEntity() instanceof ServerPlayer player) {
+      int aliveTicks = player.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
       this.setDaysSurvived(aliveTicks / 20 / 60 / 20);
     }
   }
@@ -132,7 +138,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     var tag = new CompoundTag();
     tag.putInt("zombiesKilled", this.getZombiesKilled());
     tag.putInt("playersKilled", this.getPlayersKilled());
-    this.getBasePos().ifPresent(pos -> tag.put("basePos", NbtUtils.writeBlockPos(pos)));
+    this.getBaseId().ifPresent(baseId -> tag.putUUID("baseId", baseId));
     return tag;
   }
 
@@ -140,8 +146,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public void deserializeNBT(CompoundTag tag) {
     this.setZombiesKilled(tag.getInt("zombiesKilled"));
     this.setPlayersKilled(tag.getInt("playersKilled"));
-    if (tag.contains("basePos", Tag.TAG_COMPOUND)) {
-      this.setBasePos(NbtUtils.readBlockPos(tag.getCompound("basePos")));
+    if (tag.hasUUID("baseId")) {
+      this.setBaseId(tag.getUUID("baseId"));
     }
   }
 

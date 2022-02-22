@@ -24,5 +24,4 @@ public class BlueprintItem extends ActionItem {
       Properties properties) {
     super(itemActionType, properties);
   }
-
 }

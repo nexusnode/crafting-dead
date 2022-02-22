@@ -47,6 +47,9 @@ public class LegacyBase implements LandOwner {
                   .<Set<UUID>>xmap(HashSet::new, List::copyOf)
                   .fieldOf("members")
                   .forGetter(LegacyBase::getMembers),
+              BlockPos.CODEC
+                  .fieldOf("blockPos")
+                  .forGetter(LegacyBase::getBlockPos),
               BoundingBox.CODEC
                   .fieldOf("buildRegion")
                   .forGetter(LegacyBase::getBuildRegion))
@@ -60,22 +63,30 @@ public class LegacyBase implements LandOwner {
 
   private final Set<UUID> members;
 
+  private final BlockPos blockPos;
+
   private BoundingBox buildRegion;
 
-  public LegacyBase(UUID ownerId, BlockPos centerPos, int buildRadius) {
-    this(UUID.randomUUID(), ownerId, new HashSet<>(),
-        new BoundingBox(centerPos).inflatedBy(buildRadius));
+  public LegacyBase(UUID ownerId, BlockPos blockPos, int buildRadius) {
+    this(UUID.randomUUID(), ownerId, new HashSet<>(), blockPos,
+        new BoundingBox(blockPos).inflatedBy(buildRadius));
   }
 
-  public LegacyBase(UUID id, UUID ownerId, Set<UUID> members, BoundingBox buildRegion) {
+  public LegacyBase(UUID id, UUID ownerId, Set<UUID> members, BlockPos blockPos,
+      BoundingBox buildRegion) {
     this.id = id;
     this.ownerId = ownerId;
     this.members = members;
+    this.blockPos = blockPos;
     this.buildRegion = buildRegion;
   }
 
   public UUID getOwnerId() {
     return this.ownerId;
+  }
+
+  public BlockPos getBlockPos() {
+    return this.blockPos;
   }
 
   public BoundingBox getBuildRegion() {
