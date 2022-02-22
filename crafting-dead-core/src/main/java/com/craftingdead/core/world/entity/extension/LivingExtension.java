@@ -40,8 +40,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public sealed interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
-    extends LivingHandler permits BaseLivingExtension<?, ?>, BasicLivingExtension, PlayerExtension<?> {
+public interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
+    extends LivingHandler {
 
   Capability<LivingExtension<?, ?>> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
