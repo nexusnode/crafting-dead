@@ -2,13 +2,14 @@
 
 precision highp float;
 
+uniform vec4 ColorModulator;
+uniform sampler2D Sampler0;
+
 uniform vec4 u_Radius;
 uniform vec2 u_Position;
 uniform vec2 u_Size;
-uniform sampler2D u_Sampler;
 
 in vec2 f_VertexPosition;
-in vec4 f_VertexColor;
 in vec2 f_TexCoord;
 
 out vec4 fragColor;
@@ -33,5 +34,5 @@ void main() {
     // Smooth the result (free antialiasing).
     float smoothedAlpha =  1.0f - smoothstep(0.0f, edgeSoftness, distance);
 
-    fragColor = texture(u_Sampler, f_TexCoord) * vec4(f_VertexColor.xyz, smoothedAlpha * f_VertexColor.w);
+    fragColor = texture(Sampler0, f_TexCoord) * ColorModulator * vec4(1.0, 1.0, 1.0, smoothedAlpha);
 }

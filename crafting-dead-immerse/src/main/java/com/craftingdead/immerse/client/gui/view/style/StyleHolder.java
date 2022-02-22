@@ -1,13 +1,28 @@
+/*
+ * Crafting Dead
+ * Copyright (C) 2022  NexusNode LTD
+ *
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
+ *
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
+ *
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
+ */
+
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.craftingdead.immerse.client.gui.view.State;
-import com.craftingdead.immerse.client.gui.view.States;
-import com.craftingdead.immerse.client.gui.view.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.state.States;
+import com.craftingdead.immerse.client.gui.view.style.parser.TransitionParser;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 
 public class StyleHolder {
@@ -78,43 +93,41 @@ public class StyleHolder {
 
     var rules = styleList.getRulesMatching(this);
 
-    var transitionBuilders = new ArrayList<TransitionBuilder>();
+    var transitions = new ArrayList<StyleTransition>();
 
     this.resetToDefault();
     for (var rule : rules) {
       var source = new StyleSource(StyleSource.Type.AUTHOR, rule.selector().getSpecificity());
-      TransitionBuilder transitionBuilder = null;
+      TransitionParser transitionParser = null;
       for (var property : rule.properties()) {
 
         var dispatcher = this.dispatchers.get(property.name());
         if (dispatcher != null) {
           var state = rule.selector().getPseudoClasses().stream()
-              .flatMap(name -> States.get(name).stream())
-              .mapToInt(State::value)
-              .reduce((a, b) -> a | b)
+              .map(States::get)
+              .flatMapToInt(OptionalInt::stream)
+              .reduce(States::combine)
               .orElse(0);
           dispatcher.defineState(source, property.value(), state);
           continue;
         }
 
-
-        if (TransitionBuilder.isTransitionProperty(property.name())) {
-          if (transitionBuilder == null) {
-            transitionBuilder = new TransitionBuilder();
+        if (TransitionParser.isTransitionProperty(property.name())) {
+          if (transitionParser == null) {
+            transitionParser = new TransitionParser();
           }
 
-          transitionBuilder.tryParse(property.name(), property.value());
+          transitionParser.tryParse(property.name(), property.value());
         }
       }
 
-      if (transitionBuilder != null) {
-        transitionBuilder.build();
-        transitionBuilders.add(transitionBuilder);
+      if (transitionParser != null) {
+        transitionParser.build().ifPresent(transitions::add);
       }
     }
 
-    for (var transitionBuilder : transitionBuilders) {
-      transitionBuilder.apply(this.dispatchers);
+    for (var transition : transitions) {
+      transition.apply(this.dispatchers);
     }
   }
 

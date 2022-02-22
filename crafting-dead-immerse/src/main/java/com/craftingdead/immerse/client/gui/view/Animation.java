@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.client.gui.view;
@@ -21,17 +17,19 @@ package com.craftingdead.immerse.client.gui.view;
 import javax.annotation.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Animator.Direction;
+import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;
+import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 
 public class Animation<T> extends TimingTargetAdapter {
 
-  private final ValueProperty<T> property;
+  private final AnimatedProperty<T> property;
   private KeyFrames<T> keyFrames;
 
   private final boolean fromCurrent;
 
-  private Animation(ValueProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
+  private Animation(AnimatedProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
     this.property = property;
     this.keyFrames = keyFrames;
     this.fromCurrent = fromCurrent;
@@ -39,7 +37,7 @@ public class Animation<T> extends TimingTargetAdapter {
 
   @Override
   public void timingEvent(Animator source, double fraction) {
-    this.property.setOverrideValue(source.isRunning()
+    this.property.setAnimatedValue(source.isRunning()
         ? this.keyFrames.getInterpolatedValueAt(fraction)
         : null);
   }
@@ -47,10 +45,10 @@ public class Animation<T> extends TimingTargetAdapter {
   @Override
   public void begin(Animator source) {
     if (this.fromCurrent) {
-      final T startValue = this.property.get();
-      final KeyFrames.Builder<T> builder = new KeyFrames.Builder<>(startValue);
-      boolean first = true;
-      for (KeyFrames.Frame<T> frame : this.keyFrames) {
+      final var startValue = this.property.get();
+      final var builder = new KeyFrames.Builder<T>(startValue);
+      var first = true;
+      for (var frame : this.keyFrames) {
         if (first) {
           first = false;
         } else {
@@ -64,17 +62,17 @@ public class Animation<T> extends TimingTargetAdapter {
     this.timingEvent(source, fraction);
   }
 
-  public static <T> Builder<T> forProperty(ValueProperty<T> property) {
+  public static <T> Builder<T> forProperty(StatefulProperty<T> property) {
     return new Builder<>(property);
   }
 
   public static class Builder<T> {
 
-    private final ValueProperty<T> property;
+    private final StatefulProperty<T> property;
     private KeyFrames<T> keyFrames;
     private boolean fromCurrent;
 
-    private Builder(ValueProperty<T> property) {
+    private Builder(StatefulProperty<T> property) {
       this.property = property;
     }
 

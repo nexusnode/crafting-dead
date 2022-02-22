@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.client;
@@ -35,7 +31,9 @@ import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
+import com.craftingdead.immerse.client.renderer.BlueprintRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
@@ -46,6 +44,8 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
+import com.craftingdead.immerse.world.item.BlueprintItem;
+import com.craftingdead.immerse.util.LwjglNativeUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.KeyMapping;
@@ -60,6 +60,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
@@ -74,6 +75,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 
 public class ClientDist implements ModDist {
@@ -112,6 +114,10 @@ public class ClientDist implements ModDist {
   private static RoundedTexShader roundedTexShader;
 
   public ClientDist() {
+    if (FMLLoader.isProduction()) {
+      LwjglNativeUtil.load("lwjgl_yoga");
+    }
+
     final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleEntityRenderersAddLayers);
@@ -193,6 +199,8 @@ public class ClientDist implements ModDist {
   private void handleClientSetup(FMLClientSetupEvent event) {
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
 
+    BlueprintRenderer.register();
+
     // GLFW code needs to run on main thread
     this.minecraft.submit(() -> {
       StartupMessageManager.addModMessage("Applying branding");
@@ -226,7 +234,7 @@ public class ClientDist implements ModDist {
           shader -> roundedRectShader = new RoundedRectShader(shader));
       event.registerShader(new ShaderInstance(event.getResourceManager(),
           new ResourceLocation(CraftingDeadImmerse.ID, "rounded_tex"),
-          DefaultVertexFormat.POSITION_COLOR_TEX),
+          DefaultVertexFormat.POSITION_TEX),
           shader -> roundedTexShader = new RoundedTexShader(shader));
     } catch (IOException e) {
       throw new UncheckedIOException(e);
@@ -293,6 +301,11 @@ public class ClientDist implements ModDist {
   public void handleGuiOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
+      if (this.minecraft.screen instanceof ViewScreen screen
+          && screen.getRoot() instanceof MainMenuView) {
+        event.setCanceled(true);
+        return;
+      }
       event.setScreen(MainMenuView.createScreen());
     }
   }
@@ -338,6 +351,17 @@ public class ClientDist implements ModDist {
         break;
       default:
         break;
+    }
+  }
+
+  @SubscribeEvent
+  public void handleDrawHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
+    var cameraPlayer = CraftingDead.getInstance().getClientDist().getCameraPlayer();
+    var heldStack = cameraPlayer.getMainHandItem();
+    if (heldStack.getItem() instanceof BlueprintItem blueprint) {
+      event.setCanceled(true);
+      BlueprintRenderer.render(cameraPlayer, blueprint, event.getTarget(),
+          event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
     }
   }
 }

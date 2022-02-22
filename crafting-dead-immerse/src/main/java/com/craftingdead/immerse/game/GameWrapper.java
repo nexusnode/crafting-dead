@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.game;
@@ -22,7 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.craftingdead.core.network.Synched;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.SyncGameMessage;
@@ -34,33 +30,29 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.IRegistryDelegate;
 
-public class GameWrapper<T extends Game<M>, M extends Module> {
+public abstract sealed class GameWrapper<T extends Game, M extends GameModule> permits ClientGameWrapper,ServerGameWrapper {
 
   private final T game;
 
   protected final Map<IRegistryDelegate<ModuleType>, M> modules;
-  private final Collection<Module.Tickable> tickableModules;
-  private final Map<IRegistryDelegate<ModuleType>, Synched> networkModules;
+  private final Collection<GameModule.Tickable> tickableModules;
+  private final Map<IRegistryDelegate<ModuleType>, Synched> synched;
 
   public GameWrapper(T game) {
     this.game = game;
-    ImmutableMap.Builder<IRegistryDelegate<ModuleType>, M> builder = ImmutableMap.builder();
-    ImmutableList.Builder<Module.Tickable> tickableBuilder = ImmutableList.builder();
-    ImmutableMap.Builder<IRegistryDelegate<ModuleType>, Synched> networkBuilder =
-        ImmutableMap.builder();
-    this.game.registerModules(module -> {
-      builder.put(module.getType().delegate, module);
-      if (module instanceof Module.Tickable) {
-        tickableBuilder.add((Module.Tickable) module);
-      }
-      if (module instanceof Synched) {
-        networkBuilder.put(module.getType().delegate, (Synched) module);
-      }
-    });
-    this.modules = builder.build();
-    this.tickableModules = tickableBuilder.build();
-    this.networkModules = networkBuilder.build();
+
+    var moduleBuilder = new ModuleBuilder<M>();
+
+    this.buildModules(game, moduleBuilder);
+
+    this.modules = moduleBuilder.modules().buildOrThrow();
+    this.tickableModules = moduleBuilder.tickables().build();
+    this.synched = moduleBuilder.synched().buildOrThrow();
+
+    game.load();
   }
+
+  protected abstract void buildModules(T game, ModuleBuilder<M> builder);
 
   public T getGame() {
     return this.game;
@@ -72,19 +64,17 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
   }
 
   public void load() {
-    this.modules.values().forEach(Module::load);
-    this.game.load();
+    this.modules.values().forEach(GameModule::load);
+    this.game.started();
   }
 
   public void unload() {
-    this.game.unload();
-    this.modules.values().forEach(Module::unload);
+    this.game.ended();
+    this.modules.values().forEach(GameModule::unload);
   }
 
   public void tick() {
-    for (Module.Tickable module : this.tickableModules) {
-      module.tick();
-    }
+    this.tickableModules.forEach(GameModule.Tickable::tick);
     this.game.tick();
   }
 
@@ -99,8 +89,7 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
     this.game.encode(out, writeAll);
 
     out.writeVarInt(this.modules.size());
-    for (Map.Entry<IRegistryDelegate<ModuleType>, Synched> entry : this.networkModules
-        .entrySet()) {
+    for (var entry : this.synched.entrySet()) {
       out.writeRegistryId(entry.getKey().get());
       entry.getValue().encode(out, writeAll);
     }
@@ -111,8 +100,8 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
 
     int size = in.readVarInt();
     for (int i = 0; i < size; i++) {
-      ModuleType moduleType = in.readRegistryIdSafe(ModuleType.class);
-      Synched module = this.networkModules.get(moduleType.delegate);
+      var moduleType = in.readRegistryIdSafe(ModuleType.class);
+      var module = this.synched.get(moduleType.delegate);
       if (module == null) {
         throw new IllegalStateException(
             "Module not present with ID: " + moduleType.getRegistryName().toString());
@@ -123,6 +112,26 @@ public class GameWrapper<T extends Game<M>, M extends Module> {
 
   protected boolean requiresSync() {
     return this.game.requiresSync()
-        || this.networkModules.values().stream().anyMatch(Synched::requiresSync);
+        || this.synched.values().stream().anyMatch(Synched::requiresSync);
+  }
+
+  final record ModuleBuilder<M extends GameModule> (
+      ImmutableMap.Builder<IRegistryDelegate<ModuleType>, M> modules,
+      ImmutableList.Builder<GameModule.Tickable> tickables,
+      ImmutableMap.Builder<IRegistryDelegate<ModuleType>, Synched> synched) {
+
+    ModuleBuilder() {
+      this(ImmutableMap.builder(), ImmutableList.builder(), ImmutableMap.builder());
+    }
+
+    void registerModule(M module) {
+      this.modules.put(module.getType().delegate, module);
+      if (module instanceof GameModule.Tickable tickable) {
+        this.tickables.add(tickable);
+      }
+      if (module instanceof Synched synched) {
+        this.synched.put(module.getType().delegate, synched);
+      }
+    }
   }
 }

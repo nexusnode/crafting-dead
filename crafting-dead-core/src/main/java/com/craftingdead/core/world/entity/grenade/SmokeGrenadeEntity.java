@@ -1,36 +1,34 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.OptionalInt;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.particle.GrenadeSmokeParticleData;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SmokeGrenadeEntity extends Grenade {
 
@@ -48,8 +46,9 @@ public class SmokeGrenadeEntity extends Grenade {
   }
 
   @Override
-  public Integer getMinimumTicksUntilAutoDeactivation() {
-    return 500;
+  public OptionalInt getMinimumTicksUntilAutoDeactivation() {
+    return OptionalInt.of(
+        CraftingDead.serverConfig.explosivesSmokeGrenadeTicksBeforeDeactivation.get());
   }
 
   @Override
@@ -70,22 +69,20 @@ public class SmokeGrenadeEntity extends Grenade {
 
   @Override
   public void onGrenadeTick() {
-    if (!this.isActivated()) {
-      return;
-    }
-
     int activatedTicksCount = this.getActivatedTicksCount();
-    double radius = Mth.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D);
+    double radius = Mth.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D)
+        * CraftingDead.serverConfig.explosivesSmokeGrenadeRadius.get();
 
     if (this.level.isClientSide()) {
       if (activatedTicksCount % 10 == 0) {
-        int maximumDuration = this.getMinimumTicksUntilAutoDeactivation();
-        float progress =
-            Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
-                / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
-        float gradualPitch = Mth.lerp(1F - progress, 0.5F, 1.7F);
-        this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
-            SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 1.5F, gradualPitch, false);
+        this.getMinimumTicksUntilAutoDeactivation().ifPresent(maximumDuration -> {
+          float progress =
+              Math.max(activatedTicksCount - (maximumDuration * START_DECREASING_PITCH_AT), 0)
+                  / (float) (maximumDuration * (1F - START_DECREASING_PITCH_AT));
+          float gradualPitch = Mth.lerp(1F - progress, 0.5F, 1.7F);
+          this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
+              SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 1.5F, gradualPitch, false);
+        });
       }
 
       if (activatedTicksCount % 5 == 0) {

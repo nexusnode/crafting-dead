@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.client;
@@ -21,7 +17,6 @@ package com.craftingdead.core.client;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.ModDist;
@@ -34,19 +29,17 @@ import com.craftingdead.core.client.model.CylinderGrenadeModel;
 import com.craftingdead.core.client.model.FragGrenadeModel;
 import com.craftingdead.core.client.model.SlimGrenadeModel;
 import com.craftingdead.core.client.model.geom.ModModelLayers;
+import com.craftingdead.core.client.particle.FlashParticle;
 import com.craftingdead.core.client.particle.GrenadeSmokeParticle;
-import com.craftingdead.core.client.particle.RGBFlashParticle;
 import com.craftingdead.core.client.renderer.CameraManager;
 import com.craftingdead.core.client.renderer.entity.grenade.C4ExplosiveRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.CylinderGrenadeRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.FragGrenadeRenderer;
-import com.craftingdead.core.client.renderer.entity.grenade.SlimGrenadeRenderer;
+import com.craftingdead.core.client.renderer.entity.grenade.GrenadeRenderer;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.client.renderer.entity.layers.HandcuffsLayer;
 import com.craftingdead.core.client.renderer.entity.layers.ParachuteLayer;
 import com.craftingdead.core.client.renderer.item.GunRenderer;
-import com.craftingdead.core.client.renderer.item.ItemRendererManager;
+import com.craftingdead.core.client.renderer.item.ItemRenderDispatcher;
 import com.craftingdead.core.client.sounds.EffectsManager;
 import com.craftingdead.core.client.tutorial.ModTutorialStepInstance;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
@@ -66,7 +59,7 @@ import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunItem;
@@ -157,8 +150,7 @@ public class ClientDist implements ModDist {
   public static final ForgeConfigSpec clientConfigSpec;
 
   static {
-    final Pair<ClientConfig, ForgeConfigSpec> clientConfigPair =
-        new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+    var clientConfigPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
     clientConfigSpec = clientConfigPair.getRight();
     clientConfig = clientConfigPair.getLeft();
   }
@@ -177,7 +169,7 @@ public class ClientDist implements ModDist {
 
   private final IngameGui ingameGui;
 
-  private final ItemRendererManager itemRendererManager;
+  private final ItemRenderDispatcher itemRenderDispatcher;
 
   private final CameraManager cameraManager;
 
@@ -216,7 +208,7 @@ public class ClientDist implements ModDist {
 
     this.minecraft = Minecraft.getInstance();
     this.crosshairManager = new CrosshairManager();
-    this.itemRendererManager = new ItemRendererManager();
+    this.itemRenderDispatcher = new ItemRenderDispatcher();
 
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
@@ -242,8 +234,8 @@ public class ClientDist implements ModDist {
     return this.cameraManager;
   }
 
-  public ItemRendererManager getItemRendererManager() {
-    return this.itemRendererManager;
+  public ItemRenderDispatcher getItemRendererManager() {
+    return this.itemRenderDispatcher;
   }
 
   /**
@@ -298,7 +290,7 @@ public class ClientDist implements ModDist {
 
   private void handleRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
     event.registerReloadListener(this.crosshairManager);
-    event.registerReloadListener(this.itemRendererManager);
+    event.registerReloadListener(this.itemRenderDispatcher);
   }
 
   /**
@@ -353,15 +345,15 @@ public class ClientDist implements ModDist {
     event.registerEntityRenderer(ModEntityTypes.C4_EXPLOSIVE.get(),
         C4ExplosiveRenderer::new);
     event.registerEntityRenderer(ModEntityTypes.FIRE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
+        GrenadeRenderer.cylinder());
     event.registerEntityRenderer(ModEntityTypes.FRAG_GRENADE.get(),
-        FragGrenadeRenderer::new);
+        GrenadeRenderer.frag());
     event.registerEntityRenderer(ModEntityTypes.DECOY_GRENADE.get(),
-        SlimGrenadeRenderer::new);
+        GrenadeRenderer.slim());
     event.registerEntityRenderer(ModEntityTypes.SMOKE_GRENADE.get(),
-        CylinderGrenadeRenderer::new);
+        GrenadeRenderer.cylinder());
     event.registerEntityRenderer(ModEntityTypes.FLASH_GRENADE.get(),
-        SlimGrenadeRenderer::new);
+        GrenadeRenderer.slim());
   }
 
   private void handleEntityRenderersAddLayers(EntityRenderersEvent.AddLayers event) {
@@ -416,7 +408,7 @@ public class ClientDist implements ModDist {
     ParticleEngine particleEngine = this.minecraft.particleEngine;
     particleEngine.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
-    particleEngine.register(ModParticleTypes.RGB_FLASH.get(), RGBFlashParticle.Factory::new);
+    particleEngine.register(ModParticleTypes.RGB_FLASH.get(), FlashParticle.Factory::new);
   }
 
   private void handleItemColor(ColorHandlerEvent.Item event) {
@@ -429,12 +421,12 @@ public class ClientDist implements ModDist {
             .findAny()
             .orElse(0xFFFFFFFF);
     ForgeRegistries.ITEMS.getValues().stream()
-        .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColour.class))
+        .filter(item -> item.getClass().isAnnotationPresent(RegisterGunColor.class))
         .forEach(item -> event.getItemColors().register(gunColour, item));
   }
 
   private void handleTextureStitch(TextureStitchEvent.Pre event) {
-    this.itemRendererManager.getTextures(event.getAtlas().location()).forEach(event::addSprite);
+    this.itemRenderDispatcher.getTextures(event.getAtlas().location()).forEach(event::addSprite);
     if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
       Skins.REGISTRY.stream()
           .flatMap(skin -> skin.getAcceptedGuns().stream().map(skin::getTextureLocation))
@@ -624,7 +616,9 @@ public class ClientDist implements ModDist {
       var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
           .map(scope -> scope.isScoping(player))
           .orElse(false);
-      if (player.hasProgressMonitor() || aiming || player.isHandcuffed()) {
+      if (player.getActionObserver()
+          .map(observer -> observer.getProgressBar().isPresent())
+          .orElse(false) || aiming || player.isHandcuffed()) {
         event.setCanceled(true);
         return;
       }
@@ -667,7 +661,7 @@ public class ClientDist implements ModDist {
         MUTABLE_CAMERA_ROTATIONS);
     if (this.minecraft.cameraEntity instanceof LivingEntity livingEntity) {
       var itemStack = livingEntity.getMainHandItem();
-      var itemRenderer = this.itemRendererManager.getItemRenderer(itemStack.getItem());
+      var itemRenderer = this.itemRenderDispatcher.getItemRenderer(itemStack.getItem());
       if (itemRenderer != null) {
         itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getPartialTicks(),
             MUTABLE_CAMERA_ROTATIONS);

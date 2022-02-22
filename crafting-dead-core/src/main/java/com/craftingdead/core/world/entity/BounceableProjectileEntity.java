@@ -1,25 +1,22 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity;
 
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -40,9 +37,10 @@ import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 public abstract class BounceableProjectileEntity extends Entity
     implements IEntityAdditionalSpawnData {
 
-  private UUID ownerId;
+  @Nullable
+  private UUID sourceId;
   private BlockState blockStanding;
-  private boolean stoppedInGround;
+  private boolean stoppedMoving;
   private int totalTicksInAir;
   private int motionStopCount;
 
@@ -59,9 +57,16 @@ public abstract class BounceableProjectileEntity extends Entity
 
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
       LivingEntity throwerEntity, Level level) {
-    this(type, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(),
-        level);
-    this.ownerId = throwerEntity.getUUID();
+    this(type, throwerEntity.getX(), throwerEntity.getEyeY(), throwerEntity.getZ(), level);
+    this.setSource(throwerEntity);
+  }
+
+  public void setSource(Entity source) {
+    this.setSourceId(source.getUUID());
+  }
+
+  public void setSourceId(UUID sourceId) {
+    this.sourceId = sourceId;
   }
 
   @Override
@@ -71,7 +76,7 @@ public abstract class BounceableProjectileEntity extends Entity
     BlockPos currentBlockPos = this.blockPosition();
     BlockState currentBlockState = this.level.getBlockState(currentBlockPos);
 
-    if (this.stoppedInGround) {
+    if (this.stoppedMoving) {
       // Places the current inBlockState if it is not present
       if (this.blockStanding == null) {
         this.blockStanding = currentBlockState;
@@ -82,12 +87,12 @@ public abstract class BounceableProjectileEntity extends Entity
       boolean shouldMove = !this.getDeltaMovement().equals(Vec3.ZERO) || notCollided;
 
       if (shouldMove) {
-        this.stoppedInGround = false;
+        this.stoppedMoving = false;
         this.blockStanding = null;
       }
     }
 
-    if (!this.stoppedInGround) {
+    if (!this.stoppedMoving) {
       // Natural loss of speed
       this.setDeltaMovement(this.getDeltaMovement().scale(0.98D));
 
@@ -155,7 +160,7 @@ public abstract class BounceableProjectileEntity extends Entity
             // Stops if the next bounce is too slow
             if (nextBounceMotion.length() < 0.1D) {
               nextBounceMotion = Vec3.ZERO;
-              this.stoppedInGround = true;
+              this.stoppedMoving = true;
               this.blockStanding = blockHitState;
               this.onMotionStop(++this.motionStopCount);
             }
@@ -231,8 +236,8 @@ public abstract class BounceableProjectileEntity extends Entity
   /**
    * Whether this projectile is in the ground, without any movements.
    */
-  public boolean isStoppedInGround() {
-    return this.stoppedInGround;
+  public boolean hasStoppedMoving() {
+    return this.stoppedMoving;
   }
 
   public int getMotionStopCount() {
@@ -255,40 +260,40 @@ public abstract class BounceableProjectileEntity extends Entity
 
   @Override
   protected void addAdditionalSaveData(CompoundTag compound) {
-    if (this.ownerId != null) {
-      compound.putUUID("owner", this.ownerId);
+    if (this.sourceId != null) {
+      compound.putUUID("sourceId", this.sourceId);
     }
 
-    compound.putBoolean("inGround", this.stoppedInGround);
+    compound.putBoolean("stoppedMoving", this.stoppedMoving);
     compound.putInt("motionStopCount", this.motionStopCount);
   }
 
   @Override
   protected void readAdditionalSaveData(CompoundTag compound) {
-    if (compound.contains("owner", 10)) {
-      this.ownerId = compound.getUUID("owner");
+    if (compound.hasUUID("sourceId")) {
+      this.sourceId = compound.getUUID("sourceId");
     }
-    this.stoppedInGround = compound.getBoolean("inGround");
+    this.stoppedMoving = compound.getBoolean("stoppedMoving");
     this.motionStopCount = compound.getInt("motionStopCount");
   }
 
   @Override
   public void writeSpawnData(FriendlyByteBuf buffer) {
-    buffer.writeBoolean(this.stoppedInGround);
+    buffer.writeBoolean(this.stoppedMoving);
     buffer.writeInt(this.totalTicksInAir);
     buffer.writeInt(this.motionStopCount);
   }
 
   @Override
   public void readSpawnData(FriendlyByteBuf buffer) {
-    this.stoppedInGround = buffer.readBoolean();
+    this.stoppedMoving = buffer.readBoolean();
     this.totalTicksInAir = buffer.readInt();
     this.motionStopCount = buffer.readInt();
   }
 
-  public Optional<Entity> getThrower() {
-    return this.level instanceof ServerLevel
-        ? Optional.ofNullable(((ServerLevel) this.level).getEntity(this.ownerId))
+  public Optional<Entity> getSource() {
+    return this.level instanceof ServerLevel level
+        ? Optional.ofNullable(level.getEntity(this.sourceId))
         : Optional.empty();
   }
 }

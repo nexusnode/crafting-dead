@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.server;
@@ -46,7 +42,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -102,10 +97,9 @@ public class LogicalServer extends SavedData {
   }
 
   private void loadNextGame(boolean loadFirst) {
-    ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotationConfig =
-        CraftingDeadImmerse.serverConfig.gameRotation;
+    var gameRotationConfig = CraftingDeadImmerse.serverConfig.gameRotation;
 
-    List<? extends String> gameRotation = gameRotationConfig.get();
+    var gameRotation = gameRotationConfig.get();
 
     if (gameRotation.isEmpty()) {
       logger.info("Game rotation empty, defaulting to survival...");
@@ -228,7 +222,7 @@ public class LogicalServer extends SavedData {
 
   @Override
   public CompoundTag save(CompoundTag tag) {
-    if (this.getGame().save()) {
+    if (this.getGame().persistGameData()) {
       tag.put("game", GameServer.CODEC.encodeStart(NbtOps.INSTANCE, this.getGame())
           .getOrThrow(false, logger::error));
     }

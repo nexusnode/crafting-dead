@@ -1,40 +1,43 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.game.survival;
 
+import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.network.SynchedData;
+import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
-import com.craftingdead.immerse.game.GameTypes;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.server.level.ServerPlayer;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.stats.Stats;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Zombie;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
-  public static final ResourceLocation EXTENSION_ID = GameTypes.SURVIVAL.getId();
+  public static final LivingHandlerType<SurvivalPlayerHandler> TYPE =
+      new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "survival_player"));
 
   private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
@@ -47,11 +50,22 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private final SynchedData dataManager = new SynchedData();
 
+  @Nullable
+  private BlockPos basePos;
+
   public SurvivalPlayerHandler(PlayerExtension<?> player) {
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);
     this.dataManager.register(PLAYERS_KILLED, 0);
+  }
+
+  public Optional<BlockPos> getBasePos() {
+    return Optional.ofNullable(this.basePos);
+  }
+
+  public void setBasePos(@Nullable BlockPos basePos) {
+    this.basePos = basePos;
   }
 
   @Override
@@ -103,30 +117,32 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
-  public void copyFrom(PlayerExtension<?> that, boolean wasDeath) {
+  public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
     if (!wasDeath) {
-      that.getHandler(GameTypes.SURVIVAL.getId())
-          .map(extension -> (SurvivalPlayerHandler) extension)
-          .ifPresent(extension -> {
-            this.setDaysSurvived(extension.getDaysSurvived());
-            this.setZombiesKilled(extension.getZombiesKilled());
-            this.setPlayersKilled(extension.getPlayersKilled());
-          });
+      that.getHandler(TYPE).ifPresent(extension -> {
+        this.setDaysSurvived(extension.getDaysSurvived());
+        this.setZombiesKilled(extension.getZombiesKilled());
+        this.setPlayersKilled(extension.getPlayersKilled());
+      });
     }
   }
 
   @Override
   public CompoundTag serializeNBT() {
-    CompoundTag nbt = new CompoundTag();
-    nbt.putInt("zombiesKilled", this.getZombiesKilled());
-    nbt.putInt("playersKilled", this.getPlayersKilled());
-    return nbt;
+    var tag = new CompoundTag();
+    tag.putInt("zombiesKilled", this.getZombiesKilled());
+    tag.putInt("playersKilled", this.getPlayersKilled());
+    this.getBasePos().ifPresent(pos -> tag.put("basePos", NbtUtils.writeBlockPos(pos)));
+    return tag;
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    this.setZombiesKilled(nbt.getInt("zombiesKilled"));
-    this.setPlayersKilled(nbt.getInt("playersKilled"));
+  public void deserializeNBT(CompoundTag tag) {
+    this.setZombiesKilled(tag.getInt("zombiesKilled"));
+    this.setPlayersKilled(tag.getInt("playersKilled"));
+    if (tag.contains("basePos", Tag.TAG_COMPOUND)) {
+      this.setBasePos(NbtUtils.readBlockPos(tag.getCompound("basePos")));
+    }
   }
 
   @Override

@@ -1,25 +1,22 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.OptionalInt;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.particle.RGBFlashParticleData;
+import com.craftingdead.core.particle.FlashParticleOptions;
 import com.craftingdead.core.world.effect.FlashBlindnessMobEffect;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.EntityUtil;
@@ -41,7 +38,6 @@ import net.minecraft.world.level.Level;
 
 public class FlashGrenadeEntity extends Grenade {
 
-  public static final double FLASH_MAX_RANGE = 50D;
   public static final int EFFECT_MAX_DURATION = 110;
 
   public FlashGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
@@ -64,13 +60,15 @@ public class FlashGrenadeEntity extends Grenade {
   }
 
   @Override
-  public Integer getMinimumTicksUntilAutoActivation() {
-    return 30;
+  public OptionalInt getMinimumTicksUntilAutoActivation() {
+    return OptionalInt.of(
+        CraftingDead.serverConfig.explosivesFlashGrenadeTicksBeforeActivation.get());
   }
 
   @Override
-  public Integer getMinimumTicksUntilAutoDeactivation() {
-    return 5;
+  public OptionalInt getMinimumTicksUntilAutoDeactivation() {
+    return OptionalInt.of(
+        CraftingDead.serverConfig.explosivesFlashGrenadeTicksBeforeDeactivation.get());
   }
 
   @Override
@@ -81,13 +79,14 @@ public class FlashGrenadeEntity extends Grenade {
 
   private void flash() {
     if (this.level.isClientSide()) {
-      this.level.addParticle(new RGBFlashParticleData(1F, 1F, 1F, 2F), this.getX(),
+      this.level.addParticle(new FlashParticleOptions(1F, 1F, 1F, 2F), this.getX(),
           this.getY(), this.getZ(), 0D, 0D, 0D);
       CraftingDead.getInstance().getClientDist().checkApplyFlashEffects(this);
     } else {
       this.playSound(SoundEvents.GENERIC_EXPLODE, 3F, 1.2F);
 
-      this.level.getEntities(this, this.getBoundingBox().inflate(FLASH_MAX_RANGE),
+      var flashRange = CraftingDead.serverConfig.explosivesFlashRadius.get();
+      this.level.getEntities(this, this.getBoundingBox().inflate(flashRange),
           (entity) -> entity instanceof LivingEntity && !(entity instanceof Player))
           .stream()
           .map(entity -> (LivingEntity) entity)
@@ -128,9 +127,10 @@ public class FlashGrenadeEntity extends Grenade {
     final boolean isImmuneToFlashes =
         hatItemStack.getCapability(Hat.CAPABILITY).map(Hat::isImmuneToFlashes).orElse(false);
 
+    var flashRange = CraftingDead.serverConfig.explosivesFlashRadius.get();
     if (insideFOV && !isImmuneToFlashes) {
       double distanceProportion =
-          Mth.clamp(this.distanceTo(viewerEntity) / FLASH_MAX_RANGE, 0F, 1F);
+          Mth.clamp(this.distanceTo(viewerEntity) / flashRange, 0F, 1F);
       int calculatedDuration =
           (int) Mth.lerp(1F - distanceProportion, 0, EFFECT_MAX_DURATION);
 

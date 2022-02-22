@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.survival.world.item;
@@ -23,7 +19,7 @@ import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
-import com.craftingdead.survival.world.entity.grenade.PipeGrenade;
+import com.craftingdead.survival.world.entity.grenade.PipeBomb;
 import com.craftingdead.survival.world.level.block.SurvivalBlocks;
 import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.item.BlockItem;
@@ -133,42 +129,34 @@ public class SurvivalItems {
   // Virus
   // ================================================================================
 
-  public static final RegistryObject<GrenadeItem> PIPE_GRENADE = ITEMS.register("pipe_grenade",
+  public static final RegistryObject<GrenadeItem> PIPE_BOMB = ITEMS.register("pipe_bomb",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(PipeGrenade::new)
+          .setGrenadeEntitySupplier(PipeBomb::new)
+          .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled::get)
           .stacksTo(3)
           .tab(TAB)));
 
   public static final RegistryObject<Item> DIRTY_RAG = ITEMS.register("dirty_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.WASH_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> BLOODY_RAG = ITEMS.register("bloody_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.WASH_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> CLEAN_RAG = ITEMS.register("clean_rag",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_CLEAN_RAG)
-          .tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.USE_CLEAN_RAG, new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> SPLINT = ITEMS.register("splint",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_SPLINT)
+      () -> new ActionItem(SurvivalActionTypes.USE_SPLINT, new Item.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = ITEMS.register("rbi_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_RBI_SYRINGE)
+      () -> new ActionItem(SurvivalActionTypes.USE_RBI_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = ITEMS.register("cure_syringe",
-      () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-          .action(SurvivalActionTypes.USE_CURE_SYRINGE)
+      () -> new ActionItem(SurvivalActionTypes.USE_CURE_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
 

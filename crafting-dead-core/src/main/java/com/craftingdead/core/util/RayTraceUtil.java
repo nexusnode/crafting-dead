@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.util;
@@ -21,21 +17,22 @@ package com.craftingdead.core.util;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import net.minecraft.world.level.block.state.BlockState;
+import com.mojang.math.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
 
 public class RayTraceUtil {
@@ -117,9 +114,14 @@ public class RayTraceUtil {
       }
     }
 
-    return Optional
-        .ofNullable(
-            finalHitEntity != null ? new EntityHitResult(finalHitEntity, finalHitVec) : null);
+    return Optional.ofNullable(
+        finalHitEntity != null ? new EntityHitResult(finalHitEntity, finalHitVec) : null);
+  }
+
+  public static Optional<BlockHitResult> pick(LivingEntity entity) {
+    var reachDistance = entity.getAttribute(ForgeMod.REACH_DISTANCE.get());
+    return rayTraceBlocks(entity, ClipContext.Fluid.NONE,
+        reachDistance == null ? 4.0D : reachDistance.getValue(), 1.0F);
   }
 
   public static Optional<BlockHitResult> rayTraceBlocks(LivingEntity fromEntity,
@@ -128,7 +130,7 @@ public class RayTraceUtil {
     Vec3 look = fromEntity.getViewVector(partialTicks);
     Vec3 scaledLook = look.scale(distance);
     Vec3 end = start.add(scaledLook);
-    return Optional.ofNullable(fromEntity.level.clip(new ClipContext(start, end,
+    return Optional.ofNullable(fromEntity.getLevel().clip(new ClipContext(start, end,
         ClipContext.Block.COLLIDER, fluidMode, fromEntity)));
   }
 

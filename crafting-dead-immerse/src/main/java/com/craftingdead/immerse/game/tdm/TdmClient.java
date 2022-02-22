@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.game.tdm;
@@ -27,7 +23,7 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.game.SelectTeamScreen;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.game.GameClient;
-import com.craftingdead.immerse.game.module.Module;
+import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.craftingdead.immerse.game.module.team.ClientTeamModule;
 import com.craftingdead.immerse.game.module.team.TeamModule;
@@ -49,7 +45,7 @@ import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TdmClient extends TdmGame<Module> implements GameClient {
+public class TdmClient extends TdmGame implements GameClient {
 
   private static final ResourceLocation STOPWATCH =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/stopwatch.png");
@@ -103,13 +99,12 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
   }
 
   @Override
-  public void registerModules(Consumer<Module> registrar) {
+  public void registerClientModules(Consumer<GameModule> registrar) {
     this.shopModule = new ClientShopModule();
     registrar.accept(this.shopModule);
 
     this.teamModule = new ClientTeamModule<>(TdmTeam.class, SelectTeamScreen::new);
     registrar.accept(this.teamModule);
-    super.registerModules(registrar);
   }
 
   @Override
@@ -358,11 +353,9 @@ public class TdmClient extends TdmGame<Module> implements GameClient {
 
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension
-        && event.getLiving().getLevel().isClientSide()) {
-      var player = (PlayerExtension<?>) event.getLiving();
-      player.registerHandler(TdmPlayerHandler.ID,
-          new TdmPlayerHandler<>(this, player));
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && player.getLevel().isClientSide()) {
+      player.registerHandler(TdmPlayerHandler.TYPE, new TdmPlayerHandler<>(this, player));
     }
   }
 

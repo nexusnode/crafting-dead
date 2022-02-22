@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.client.gui.view;
@@ -22,24 +18,20 @@ import java.util.Objects;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.PanoramaRenderer;
-import net.minecraft.resources.ResourceLocation;
 
 public class PanoramaView extends View {
 
   private final PanoramaRenderer panorama;
 
-  private final ResourceLocation panoramaTexture;
-
-  public PanoramaView(Properties<?> properties, ResourceLocation panoramaTexture) {
+  public PanoramaView(Properties<?> properties, CubeMap cubeMap) {
     super(properties);
-    Objects.requireNonNull(panoramaTexture, "Panorama texture cannot be null");
-    this.panoramaTexture = panoramaTexture;
-    this.panorama = new PanoramaRenderer(new CubeMap(this.panoramaTexture));
+    Objects.requireNonNull(cubeMap, "cubeMap cannot be null");
+    this.panorama = new PanoramaRenderer(cubeMap);
   }
 
   @Override
-  public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
-    this.panorama.render(partialTicks, this.getAlpha());
+  public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTick);
+    this.panorama.render(partialTick, this.getAlpha());
   }
 }

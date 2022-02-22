@@ -1,31 +1,27 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.action.reload;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.common.collect.ImmutableList;
@@ -43,10 +39,9 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   private MagazineLocation magazineLocation;
 
-  public MagazineReloadAction(ActionType type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
-    AmmoProvider ammoProvider = this.gun.getAmmoProvider();
+  public MagazineReloadAction(LivingExtension<?, ?> performer) {
+    super(performer);
+    var ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
     }
@@ -54,17 +49,24 @@ public class MagazineReloadAction extends AbstractReloadAction {
   }
 
   @Override
-  public boolean start() {
-    Optional<MagazineLocation> result = this.findMagazine(this.getPerformer());
+  public ActionType<?> getType() {
+    return ActionTypes.MAGAZINE_RELOAD.get();
+  }
+
+  @Override
+  public boolean start(boolean simulate) {
+    var result = this.findMagazine(this.getPerformer());
     if (!result.isPresent()) {
       return false;
     }
 
-    this.magazineLocation = result.get();
-    this.newMagazineStack =
-        this.magazineLocation.itemHandler.extractItem(this.magazineLocation.slot, 1, false);
+    if (!simulate) {
+      this.magazineLocation = result.get();
+      this.newMagazineStack =
+          this.magazineLocation.itemHandler.extractItem(this.magazineLocation.slot, 1, false);
+    }
 
-    return super.start();
+    return true;
   }
 
   @Override
@@ -72,7 +74,10 @@ public class MagazineReloadAction extends AbstractReloadAction {
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
     if (!displayOnly
         && !this.oldMagazineStack.isEmpty()
-        && this.getPerformer().getEntity() instanceof Player) {
+        && this.getPerformer().getEntity() instanceof Player
+        && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
+            .orElse(true)
+            && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
       ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
     }
   }
@@ -80,15 +85,15 @@ public class MagazineReloadAction extends AbstractReloadAction {
   @Override
   protected void revert() {
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);
-    ItemStack remainingStack = this.magazineLocation.itemHandler.insertItem(
-        this.magazineLocation.slot, this.newMagazineStack, false);
+    var remainingStack = this.magazineLocation.itemHandler().insertItem(
+        this.magazineLocation.slot(), this.newMagazineStack, false);
     this.getPerformer().getEntity().spawnAtLocation(remainingStack);
   }
 
   private List<IItemHandler> collectItemHandlers(LivingExtension<?, ?> living) {
-    ImmutableList.Builder<IItemHandler> builder = ImmutableList.builder();
+    var builder = ImmutableList.<IItemHandler>builder();
 
-    CollectMagazineItemHandlers event = new CollectMagazineItemHandlers(living);
+    var event = new CollectMagazineItemHandlers(living);
     MinecraftForge.EVENT_BUS.post(event);
     builder.addAll(event.getItemHandlers());
 
@@ -96,18 +101,21 @@ public class MagazineReloadAction extends AbstractReloadAction {
     living.getItemHandler().getStackInSlot(ModEquipmentSlot.VEST.getIndex())
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
-    // TODO Backpack - second
+    // Backpack - second
+    living.getItemHandler().getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
+        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
     // Inventory - third
     living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
         .ifPresent(builder::add);
+
     return builder.build();
   }
 
   private Optional<MagazineLocation> findMagazine(LivingExtension<?, ?> living) {
-    for (IItemHandler itemHandler : this.collectItemHandlers(living)) {
+    for (var itemHandler : this.collectItemHandlers(living)) {
       for (int i = 0; i < itemHandler.getSlots(); ++i) {
-        ItemStack itemStack = itemHandler.getStackInSlot(i);
+        var itemStack = itemHandler.getStackInSlot(i);
         if (this.gun.getAcceptedMagazines().contains(itemStack.getItem())
             && !itemStack.getCapability(Magazine.CAPABILITY)
                 .map(Magazine::isEmpty)
@@ -119,14 +127,5 @@ public class MagazineReloadAction extends AbstractReloadAction {
     return Optional.empty();
   }
 
-  private static class MagazineLocation {
-
-    private final IItemHandler itemHandler;
-    private final int slot;
-
-    public MagazineLocation(IItemHandler itemHandler, int slot) {
-      this.itemHandler = itemHandler;
-      this.slot = slot;
-    }
-  }
+  private record MagazineLocation(IItemHandler itemHandler, int slot) {}
 }

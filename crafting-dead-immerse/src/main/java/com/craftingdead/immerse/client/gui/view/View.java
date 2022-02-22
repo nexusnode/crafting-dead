@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.client.gui.view;
@@ -39,6 +35,9 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
+import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
+import com.craftingdead.immerse.client.gui.view.state.StateManager;
+import com.craftingdead.immerse.client.gui.view.state.States;
 import com.craftingdead.immerse.client.gui.view.style.CascadeStyleable;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
 import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandArgMapper;
@@ -70,7 +69,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View extends GuiComponent
     implements GuiEventListener, Widget, Comparable<View>, CascadeStyleable {
 
-  public static final boolean DEBUG = false;
+  public static final boolean DEBUG = true;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -119,51 +118,51 @@ public class View extends GuiComponent
         if (this.parent != null) {
           this.parent.sortChildren();
         }
-      }), this::registerValueProperty);
+      }), this::registerProperty);
 
   private final StyleableProperty<Float> xScale =
       Util.make(StyleableProperty.create("x-scale", Float.class, 1.0F),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Float> yScale =
       Util.make(StyleableProperty.create("y-scale", Float.class, 1.0F),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private final StyleableProperty<Float> xTranslation =
       Util.make(StyleableProperty.create("x-translation", Float.class, 0.0F),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Float> yTranslation =
       Util.make(StyleableProperty.create("y-translation", Float.class, 0.0F),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private final StyleableProperty<Float> alpha =
-      Util.make(StyleableProperty.create("alpha", Float.class, 1.0F), this::registerValueProperty);
+      Util.make(StyleableProperty.create("alpha", Float.class, 1.0F), this::registerProperty);
 
   private final StyleableProperty<Color> backgroundColor =
       Util.make(StyleableProperty.create("background-color", Color.class, Color.TRANSPARENT),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private final StyleableProperty<Float> outlineWidth =
       Util.make(StyleableProperty.create("outline-width", Float.class, 0.0F),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Color> outlineColor =
       Util.make(StyleableProperty.create("outline-color", Color.class, Color.BLACK),
-          this::registerValueProperty);
+          this::registerProperty);
 
   private final StyleableProperty<Float> borderRadius =
       Util.make(StyleableProperty.create("border-radius", Float.class, 0.0F),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Color> leftBorderColor =
       Util.make(StyleableProperty.create("border-left-color", Color.class, Color.BLACK),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Color> rightBorderColor =
       Util.make(StyleableProperty.create("border-right-color", Color.class, Color.BLACK),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Color> topBorderColor =
       Util.make(StyleableProperty.create("border-top-color", Color.class, Color.BLACK),
-          this::registerValueProperty);
+          this::registerProperty);
   private final StyleableProperty<Color> bottomBorderColor =
       Util.make(StyleableProperty.create("border-bottom-color", Color.class, Color.BLACK),
-          this::registerValueProperty);
+          this::registerProperty);
 
   /*
    * ========== Properties ==========
@@ -205,12 +204,12 @@ public class View extends GuiComponent
     this.stateManager.addState(States.ENABLED);
   }
 
-  protected <T> void registerValueProperty(StyleableProperty<T> property) {
+  protected <T> void registerProperty(StyleableProperty<T> property) {
     this.stateManager.addListener(property);
     this.styleHolder.registerDispatcher(property);
   }
 
-  protected <T> void removeValueProperty(StyleableProperty<T> property) {
+  protected <T> void removeProperty(StyleableProperty<T> property) {
     this.stateManager.removeListener(property);
     this.styleHolder.removeProperty(property.getName());
   }
@@ -280,7 +279,7 @@ public class View extends GuiComponent
   }
 
   @Override
-  public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+  public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
     final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
     final var leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
@@ -289,7 +288,7 @@ public class View extends GuiComponent
     final var outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
 
     if (this.backgroundBlur != null) {
-      this.backgroundBlur.process(partialTicks);
+      this.backgroundBlur.process(partialTick);
       if (borderRadius > 0.0F) {
         final var shader = ClientDist.getRoundedTexShader();
         RenderSystem.setShader(shader::instance);
@@ -312,7 +311,6 @@ public class View extends GuiComponent
 
     final var roundedRectShader = ClientDist.getRoundedRectShader();
     RenderSystem.setShader(roundedRectShader::instance);
-
     roundedRectShader.radius()
         .set(borderRadius, borderRadius, borderRadius, borderRadius);
     roundedRectShader.position()
@@ -452,7 +450,7 @@ public class View extends GuiComponent
           (int) (this.getScaledHeight() * scale));
     }
 
-    this.renderContent(poseStack, mouseX, mouseY, partialTicks);
+    this.renderContent(poseStack, mouseX, mouseY, partialTick);
 
     if (scissor) {
       ScissorStack.pop();
@@ -492,13 +490,15 @@ public class View extends GuiComponent
   }
 
   protected final boolean isScrollbarEnabled() {
+    if(this.layout == null) {
+      System.out.println("test");
+    }
     return this.layout.getOverflow() == Overflow.SCROLL
         && this.fullHeight > this.getContentHeight();
   }
 
   @SuppressWarnings("unused")
-  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY,
-      float partialTicks) {
+  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     if (DEBUG && this.isHovered()) {
       RenderUtil.fillWidthHeight(poseStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledContentWidth(), this.getScaledContentHeight(), 0x333495eb);
@@ -826,18 +826,17 @@ public class View extends GuiComponent
   }
 
   public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer) {
-    this.addListener(eventType, consumer, false);
+    this.addListener(eventType, consumer, true);
   }
 
   public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer,
       boolean consumeEvent) {
-    this.eventBus.addListener(EventPriority.NORMAL, true, eventType,
-        event -> {
-          if (event.hasResult() && consumeEvent) {
-            event.setResult(Event.Result.ALLOW);
-          }
-          consumer.accept(event);
-        });
+    this.eventBus.addListener(EventPriority.NORMAL, true, eventType, event -> {
+      if (event.hasResult() && consumeEvent) {
+        event.setResult(Event.Result.ALLOW);
+      }
+      consumer.accept(event);
+    });
   }
 
   /**
@@ -958,14 +957,6 @@ public class View extends GuiComponent
     return this.unscale(this.layout.getHeight(), this.unscaleHeight);
   }
 
-  public final StyleableProperty<Float> getXTranslationProperty() {
-    return this.xTranslation;
-  }
-
-  public final StyleableProperty<Float> getYTranslationProperty() {
-    return this.yTranslation;
-  }
-
   public float getZOffset() {
     return this.index + this.zIndex.get();
   }
@@ -976,6 +967,18 @@ public class View extends GuiComponent
 
   public final float getYScale() {
     return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.yScale.get();
+  }
+
+  public final float getAlpha() {
+    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha.get();
+  }
+
+  public final StyleableProperty<Float> getXTranslationProperty() {
+    return this.xTranslation;
+  }
+
+  public final StyleableProperty<Float> getYTranslationProperty() {
+    return this.yTranslation;
   }
 
   public final StyleableProperty<Float> getXScaleProperty() {
@@ -1010,11 +1013,9 @@ public class View extends GuiComponent
     return this.outlineColor;
   }
 
-
   public final StyleableProperty<Color> getBackgroundColorProperty() {
     return this.backgroundColor;
   }
-
 
   public final StyleableProperty<Float> getBorderRadiusProperty() {
     return this.borderRadius;
@@ -1024,8 +1025,11 @@ public class View extends GuiComponent
     return this.alpha;
   }
 
-  public final float getAlpha() {
-    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha.get();
+  public final void defineBorderColorState(Color color, int... states) {
+    this.topBorderColor.defineState(color, states);
+    this.rightBorderColor.defineState(color, states);
+    this.bottomBorderColor.defineState(color, states);
+    this.leftBorderColor.defineState(color, states);
   }
 
   public final void setEnabled(boolean enabled) {
@@ -1050,10 +1054,6 @@ public class View extends GuiComponent
     return this.stateManager.hasState(States.FOCUS);
   }
 
-  public final Layout getLayout() {
-    return this.layout;
-  }
-
   public final ViewScreen getScreen() {
     if (this.screen == null) {
       if (this.parent == null) {
@@ -1068,8 +1068,8 @@ public class View extends GuiComponent
     return this.parent;
   }
 
-  public final boolean isAdded() {
-    return this.added;
+  public final Layout getLayout() {
+    return this.layout;
   }
 
   public final boolean hasLayout() {
@@ -1080,17 +1080,8 @@ public class View extends GuiComponent
     return this.closed;
   }
 
-  @Override
-  public int compareTo(View another) {
-    if (another == null) {
-      return 1;
-    }
-    if (this.getZOffset() < another.getZOffset()) {
-      return -1;
-    } else if (this.getZOffset() > another.getZOffset()) {
-      return 1;
-    }
-    return 0;
+  public final boolean isAdded() {
+    return this.added;
   }
 
   protected final float unscaleOffset(float value, boolean condition) {
@@ -1101,6 +1092,11 @@ public class View extends GuiComponent
 
   protected final float unscale(float value, boolean condition) {
     return condition ? value / (float) this.window.getGuiScale() : value;
+  }
+
+  @Override
+  public final int compareTo(View another) {
+    return Float.compare(this.getZOffset(), another.getZOffset());
   }
 
   @Override

@@ -1,43 +1,38 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity.grenade;
 
-import org.apache.commons.lang3.tuple.Triple;
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.level.Explosion;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class FireGrenadeEntity extends Grenade {
+public class FireGrenadeEntity extends Grenade implements ExplosionSource {
 
-  private static final double FIRE_RADIUS = 2D;
-  private static final Triple<SoundEvent, Float, Float> FIRE_GRENADE_BOUNCE_SOUND =
-      Triple.of(SoundEvents.GLASS_BREAK, 1.0F, 0.9F);
+  private static final BounceSound FIRE_GRENADE_BOUNCE_SOUND =
+      new BounceSound(SoundEvents.GLASS_BREAK, 1.0F, 0.9F);
 
   public FireGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
@@ -60,14 +55,14 @@ public class FireGrenadeEntity extends Grenade {
     if (activated) {
       if (!this.level.isClientSide()) {
         this.kill();
-        this.level.explode(this,
-            this.createDamageSource(), null,
-            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), 2F, true,
-            Explosion.BlockInteraction.NONE);
+        var fireRadius = CraftingDead.serverConfig.explosivesFireGrenadeRadius.get().floatValue();
+        this.level.explode(this, this.createDamageSource(), null,
+            this.getX(), this.getY() + this.getBbHeight(), this.getZ(), fireRadius, true,
+            CraftingDead.serverConfig.explosivesFireGrenadeExplosionMode.get());
 
-        BlockPos.betweenClosedStream(this.blockPosition().offset(-FIRE_RADIUS, 0, -FIRE_RADIUS),
-            this.blockPosition().offset(FIRE_RADIUS, 0, FIRE_RADIUS)).forEach(blockPos -> {
-              if (this.level.getBlockState(blockPos).getBlock() == Blocks.AIR) {
+        BlockPos.betweenClosedStream(this.blockPosition().offset(-fireRadius, 0, -fireRadius),
+            this.blockPosition().offset(fireRadius, 0, fireRadius)).forEach(blockPos -> {
+              if (this.level.getBlockState(blockPos).isAir()) {
                 if (Math.random() <= 0.8D) {
                   this.level.setBlockAndUpdate(blockPos, Blocks.FIRE.defaultBlockState());
                 }
@@ -86,7 +81,7 @@ public class FireGrenadeEntity extends Grenade {
   }
 
   @Override
-  public Triple<SoundEvent, Float, Float> getBounceSound(BlockHitResult blockRayTraceResult) {
+  public BounceSound getBounceSound(BlockHitResult blockRayTraceResult) {
     return blockRayTraceResult.getDirection() == Direction.UP
         ? FIRE_GRENADE_BOUNCE_SOUND
         : super.getBounceSound(blockRayTraceResult);
@@ -94,4 +89,17 @@ public class FireGrenadeEntity extends Grenade {
 
   @Override
   public void onMotionStop(int stopsCount) {}
+
+  @Override
+  public float getDamageMultiplier() {
+    return CraftingDead.serverConfig.explosivesFireGrenadeDamageMultiplier.get().floatValue();
+  }
+
+  @Override
+  public double getKnockbackMultiplier() {
+    return CraftingDead.serverConfig.explosivesFireGrenadeKnockbackMultiplier.get();
+  }
+
+  protected record BounceSound(SoundEvent soundEvent, float volume, float pitch) {
+  }
 }

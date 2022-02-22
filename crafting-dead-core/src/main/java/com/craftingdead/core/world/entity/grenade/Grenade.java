@@ -1,26 +1,23 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.entity.grenade;
 
-import org.apache.commons.lang3.tuple.Triple;
+import java.util.OptionalInt;
 import com.craftingdead.core.world.damagesource.ModDamageSource;
 import com.craftingdead.core.world.entity.BounceableProjectileEntity;
+import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity.BounceSound;
 import com.craftingdead.core.world.item.GrenadeItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,7 +25,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -45,8 +41,8 @@ import net.minecraftforge.network.NetworkHooks;
 
 public abstract class Grenade extends BounceableProjectileEntity {
 
-  private static final Triple<SoundEvent, Float, Float> DEFAULT_BOUNCE_SOUND =
-      Triple.of(SoundEvents.SCAFFOLDING_BREAK, 0.5F, 2F);
+  private static final BounceSound DEFAULT_BOUNCE_SOUND =
+      new BounceSound(SoundEvents.SCAFFOLDING_BREAK, 0.5F, 2F);
   private static final EntityDataAccessor<Boolean> ACTIVATED =
       SynchedEntityData.defineId(Grenade.class, EntityDataSerializers.BOOLEAN);
   private int activatedTicksCount = 0;
@@ -79,7 +75,7 @@ public abstract class Grenade extends BounceableProjectileEntity {
   public void tick() {
     super.tick();
 
-    boolean activated = this.getEntityData().get(ACTIVATED);
+    var activated = this.isActivated();
     if (this.lastActivated != activated) {
       this.lastActivated = activated;
 
@@ -105,23 +101,21 @@ public abstract class Grenade extends BounceableProjectileEntity {
     // Check again if it is alive.
     // Someone could kill the entity in a previous callback
     if (this.isAlive()) {
-      if (this.getMinimumTicksUntilAutoActivation() != null) {
-        if (!this.isActivated()
-            && this.deactivatedTicksCount >= this.getMinimumTicksUntilAutoActivation()) {
+      this.getMinimumTicksUntilAutoActivation().ifPresent(ticks -> {
+        if (!this.isActivated() && this.deactivatedTicksCount >= ticks) {
           this.setActivated(true);
         }
-      }
+      });
     }
 
     // Check again if it is alive.
     // Someone could kill the entity in a previous callback
     if (this.isAlive()) {
-      if (this.getMinimumTicksUntilAutoDeactivation() != null) {
-        if (this.isActivated()
-            && this.activatedTicksCount >= this.getMinimumTicksUntilAutoDeactivation()) {
+      this.getMinimumTicksUntilAutoDeactivation().ifPresent(ticks -> {
+        if (this.isActivated() && this.activatedTicksCount >= ticks) {
           this.setActivated(false);
         }
-      }
+      });
     }
   }
 
@@ -136,11 +130,11 @@ public abstract class Grenade extends BounceableProjectileEntity {
 
   @Override
   public void onSurfaceHit(BlockHitResult blockRayTraceResult) {
-    Triple<SoundEvent, Float, Float> bounceSound = this.getBounceSound(blockRayTraceResult);
+    var bounceSound = this.getBounceSound(blockRayTraceResult);
     if (this.level.isClientSide()) {
       this.level.playLocalSound(this.getX(), this.getY(), this.getZ(),
-          bounceSound.getLeft(), SoundSource.NEUTRAL, bounceSound.getMiddle(),
-          bounceSound.getRight(), false);
+          bounceSound.soundEvent(), SoundSource.NEUTRAL, bounceSound.volume(),
+          bounceSound.pitch(), false);
     }
   }
 
@@ -168,7 +162,7 @@ public abstract class Grenade extends BounceableProjectileEntity {
   /**
    * First decimal value is volume, second is pitch.
    */
-  public Triple<SoundEvent, Float, Float> getBounceSound(BlockHitResult blockRayTraceResult) {
+  public BounceSound getBounceSound(BlockHitResult blockRayTraceResult) {
     return DEFAULT_BOUNCE_SOUND;
   }
 
@@ -195,8 +189,8 @@ public abstract class Grenade extends BounceableProjectileEntity {
    *
    * @return {@link Integer} - An amount of ticks or <code>null</code>.
    */
-  public Integer getMinimumTicksUntilAutoActivation() {
-    return null;
+  public OptionalInt getMinimumTicksUntilAutoActivation() {
+    return OptionalInt.empty();
   }
 
   /**
@@ -204,8 +198,8 @@ public abstract class Grenade extends BounceableProjectileEntity {
    *
    * @return {@link Integer} - An amount of ticks or <code>null</code>.
    */
-  public Integer getMinimumTicksUntilAutoDeactivation() {
-    return null;
+  public OptionalInt getMinimumTicksUntilAutoDeactivation() {
+    return OptionalInt.empty();
   }
 
   public boolean isActivated() {
@@ -258,10 +252,6 @@ public abstract class Grenade extends BounceableProjectileEntity {
   }
 
   public DamageSource createDamageSource() {
-    return ModDamageSource.causeUnscaledExplosionDamage(
-        this.getThrower()
-            .filter(e -> e instanceof LivingEntity)
-            .map(e -> (LivingEntity) e)
-            .orElse(null));
+    return ModDamageSource.grenade(this, this.getSource().orElse(null));
   }
 }
