@@ -16,6 +16,8 @@ package com.craftingdead.immerse.world.level.block.entity;
 
 import java.util.UUID;
 import javax.annotation.Nullable;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.immerse.game.survival.SurvivalPlayerHandler;
 import com.craftingdead.immerse.world.level.extension.LandClaim;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
@@ -42,8 +44,23 @@ public class BaseCenterBlockEntity extends BlockEntity {
   }
 
   public void placed(LivingEntity livingEntity) {
+    final SurvivalPlayerHandler playerHandler;
     if (livingEntity instanceof Player player) {
       player.displayClientMessage(new TranslatableComponent("message.creating_base"), false);
+
+      playerHandler =
+          PlayerExtension.getOrThrow(player).getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
+      var existingBase = playerHandler.getBase().orElse(null);
+      if (existingBase != null) {
+        player.displayClientMessage(
+            new TranslatableComponent("message.already_own_base",
+                existingBase.getBlockPos().toShortString())
+                    .withStyle(ChatFormatting.RED),
+            true);
+        return;
+      }
+    } else {
+      playerHandler = null;
     }
 
     var landManager = LevelExtension.getOrThrow(this.level).getLandManager();
@@ -57,17 +74,19 @@ public class BaseCenterBlockEntity extends BlockEntity {
             new LandClaim(new BoundingBox(this.getBlockPos()).inflatedBy(RADIUS), this.baseId))
         .whenCompleteAsync((result, exception) -> {
           if (livingEntity instanceof Player player) {
-            if (result) {
-              player.displayClientMessage(
-                  new TranslatableComponent("message.base_creation_succeeded")
-                      .withStyle(ChatFormatting.GREEN),
-                  true);
-            } else {
-              player.displayClientMessage(
-                  new TranslatableComponent("message.base_creation_failed")
-                      .withStyle(ChatFormatting.RED),
-                  true);
-            }
+            player.displayClientMessage(switch (result) {
+              case ALREADY_CLAIMED -> new TranslatableComponent("message.land_already_claimed")
+                  .withStyle(ChatFormatting.RED);
+              case OUT_OF_BOUNDS -> new TranslatableComponent("message.land_out_of_bounds")
+                  .withStyle(ChatFormatting.RED);
+              case SUCCESS -> {
+                if (playerHandler != null) {
+                  playerHandler.setBaseId(this.baseId);
+                }
+                yield new TranslatableComponent("message.base_creation_succeeded")
+                    .withStyle(ChatFormatting.GREEN);
+              }
+            }, true);
           }
         }, this.level.getServer());
   }

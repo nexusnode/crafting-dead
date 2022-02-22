@@ -33,7 +33,7 @@ import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
-import com.craftingdead.immerse.client.renderer.BlueprintRenderer;
+import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
@@ -44,8 +44,8 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
-import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.craftingdead.immerse.util.LwjglNativeUtil;
+import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.KeyMapping;
@@ -104,6 +104,8 @@ public class ClientDist implements ModDist {
 
   private final SpectatorRenderer spectatorRenderer;
 
+  private final BlueprintOutlineRenderer blueprintOutlineRenderer;
+
   private final IngameGui ingameGui;
 
   @Nullable
@@ -126,6 +128,7 @@ public class ClientDist implements ModDist {
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
     this.spectatorRenderer = new SpectatorRenderer();
+    this.blueprintOutlineRenderer = new BlueprintOutlineRenderer();
     this.ingameGui = new IngameGui();
   }
 
@@ -199,7 +202,7 @@ public class ClientDist implements ModDist {
   private void handleClientSetup(FMLClientSetupEvent event) {
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
 
-    BlueprintRenderer.register();
+    this.blueprintOutlineRenderer.register();
 
     // GLFW code needs to run on main thread
     this.minecraft.submit(() -> {
@@ -360,7 +363,7 @@ public class ClientDist implements ModDist {
     var heldStack = cameraPlayer.getMainHandItem();
     if (heldStack.getItem() instanceof BlueprintItem blueprint) {
       event.setCanceled(true);
-      BlueprintRenderer.render(cameraPlayer, blueprint, event.getTarget(),
+      this.blueprintOutlineRenderer.render(cameraPlayer, blueprint, event.getTarget(),
           event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
     }
   }

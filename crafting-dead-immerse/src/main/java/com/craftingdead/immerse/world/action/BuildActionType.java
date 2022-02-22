@@ -15,9 +15,11 @@
 package com.craftingdead.immerse.world.action;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.immerse.game.survival.SurvivalPlayerHandler;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,30 +28,45 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 
-public abstract class BlueprintActionType extends ItemActionType<BlueprintAction> {
+public abstract class BuildActionType extends ItemActionType<BuildAction> {
 
-  private final PlacementPredicate predicate;
+  public static final BiPredicate<LivingExtension<?, ?>, BlockPos> WITHIN_BASE =
+      (performer, blockPos) -> LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+          .getLandOwnerAt(blockPos)
+          .map(owner -> owner.isAllowedToBuild(performer.getEntity(), blockPos))
+          .orElse(false);
 
-  protected BlueprintActionType(Builder<?> builder) {
+  public static final BiPredicate<LivingExtension<?, ?>, BlockPos> NOT_CLAIMED =
+      (performer, blockPos) -> !LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+          .isLandClaimed(blockPos);
+
+  public static final BiPredicate<LivingExtension<?, ?>, BlockPos> DONT_OWN_BASE =
+      (performer, blockPos) -> performer.getHandler(SurvivalPlayerHandler.TYPE)
+          .map(handler -> handler.getBase().isEmpty())
+          .orElse(true);
+
+  private final BiPredicate<LivingExtension<?, ?>, BlockPos> predicate;
+
+  protected BuildActionType(Builder<?> builder) {
     super(builder);
     this.predicate = builder.predicate;
   }
 
-  public PlacementPredicate getPlacementPredicate() {
+  public BiPredicate<LivingExtension<?, ?>, BlockPos> getPlacementPredicate() {
     return this.predicate;
   }
 
-  protected abstract BlueprintAction create(LivingExtension<?, ?> performer,
+  protected abstract BuildAction create(LivingExtension<?, ?> performer,
       BlockPlaceContext context);
 
   @Override
-  public void encode(BlueprintAction action, FriendlyByteBuf out) {
+  public void encode(BuildAction action, FriendlyByteBuf out) {
     out.writeEnum(action.getHand());
     out.writeBlockHitResult(action.getContext().getHitResult());
   }
 
   @Override
-  public BlueprintAction decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
+  public BuildAction decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
     var hand = in.readEnum(InteractionHand.class);
     var hitResult = in.readBlockHitResult();
     var context = new BlockPlaceContext(performer.getLevel(),
@@ -63,35 +80,23 @@ public abstract class BlueprintActionType extends ItemActionType<BlueprintAction
     return Optional.of(this.create(performer, new BlockPlaceContext(context)));
   }
 
-  public interface PlacementPredicate {
-
-    PlacementPredicate ALWAYS = (living, blockPos) -> true;
-
-    PlacementPredicate WITHIN_BASE =
-        (living, blockPos) -> LevelExtension.getOrThrow(living.getLevel()).getLandManager()
-            .getLandOwnerAt(blockPos)
-            .map(owner -> owner.isAllowedToBuild(living.getEntity(), blockPos))
-            .orElse(false);
-
-    PlacementPredicate NOT_CLAIMED =
-        (living, blockPos) -> LevelExtension.getOrThrow(living.getLevel()).getLandManager()
-            .isLandClaimed(blockPos);
-
-    boolean test(LivingExtension<?, ?> living, BlockPos blockPos);
-  }
-
   public static abstract class Builder<SELF extends Builder<SELF>>
       extends ItemActionType.Builder<SELF> {
 
-    private PlacementPredicate predicate = PlacementPredicate.ALWAYS;
+    private BiPredicate<LivingExtension<?, ?>, BlockPos> predicate = (performer, blockPos) -> true;
 
     public SELF withinBase() {
-      this.predicate = PlacementPredicate.WITHIN_BASE;
+      this.predicate = this.predicate.and(WITHIN_BASE);
       return this.self();
     }
 
     public SELF notClaimed() {
-      this.predicate = PlacementPredicate.NOT_CLAIMED;
+      this.predicate = this.predicate.and(NOT_CLAIMED);
+      return this.self();
+    }
+
+    public SELF dontOwnBase() {
+      this.predicate = this.predicate.and(DONT_OWN_BASE);
       return this.self();
     }
   }

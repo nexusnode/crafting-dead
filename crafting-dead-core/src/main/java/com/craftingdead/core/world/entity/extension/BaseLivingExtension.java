@@ -251,7 +251,10 @@ sealed class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler
     this.movementBlocked = false;
 
     if (this.action != null && this.action.tick()) {
-      this.stopAction(Action.StopReason.COMPLETED);
+      // Action may have cancelled itself
+      if (this.action != null) {
+        this.stopAction(Action.StopReason.COMPLETED);
+      }
     }
 
     heldStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.tick(this));
