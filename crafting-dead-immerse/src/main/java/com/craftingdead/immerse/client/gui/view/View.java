@@ -69,7 +69,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View extends GuiComponent
     implements GuiEventListener, Widget, Comparable<View>, CascadeStyleable {
 
-  public static final boolean DEBUG = true;
+  public static final boolean DEBUG = false;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
