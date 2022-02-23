@@ -2,7 +2,8 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
@@ -561,7 +562,7 @@
         {
           "type": "minecraft:item",
           "weight": 10,
-          "name": "craftingdeadsurvival:pipe_grenade"
+          "name": "craftingdeadsurvival:pipe_bomb"
         },
         {
           "type": "minecraft:item",

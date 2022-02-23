@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.item.gun;
@@ -32,10 +28,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.craftingdead.core.Util;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.RegisterGunColour;
+import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
@@ -57,7 +54,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-@RegisterGunColour
+@RegisterGunColor
 public abstract class GunItem extends ProjectileWeaponItem {
 
   /**
@@ -253,7 +250,9 @@ public abstract class GunItem extends ProjectileWeaponItem {
   public AmmoProvider createAmmoProvider() {
     AmmoProvider ammoProvider =
         new MagazineAmmoProvider(this.getDefaultMagazine().getDefaultInstance());
-    ammoProvider.getExpectedMagazine().setSize(0);
+    if (CraftingDead.serverConfig.reloadGunComeEmptyMag.get()) {
+      ammoProvider.getExpectedMagazine().setSize(0);
+    }
     return ammoProvider;
   }
 
@@ -278,7 +277,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
   }
 
   public Optional<SoundEvent> getSecondaryActionSound() {
-    return Util.optional(this.secondaryActionSound);
+    return FunctionalUtil.optional(this.secondaryActionSound);
   }
 
   public long getSecondaryActionSoundRepeatDelayMs() {
@@ -325,7 +324,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
           new TextComponent(String.valueOf(this.getDamage()))
               .withStyle(ChatFormatting.RED);
       Component headshotDamageText = new TextComponent(
-          String.valueOf((int) (this.getDamage() * AbstractGun.HEADSHOT_MULTIPLIER)))
+          String.valueOf((int) (this.getDamage() * CraftingDead.serverConfig.headshotBonusDamage.get())))
               .withStyle(ChatFormatting.RED);
       Component accuracyText =
           new TextComponent((int) (this.getAccuracyPct() * 100D) + "%")

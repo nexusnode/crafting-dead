@@ -1,9 +1,4 @@
 {
-  "options.craftingdeadsurvival.server.broken_legs_enabled":"Перелом ног включено",
-  "options.craftingdeadsurvival.server.bleeding_enabled":"Кровотечение включено",
-  "options.craftingdeadsurvival.server.disable_zombies":"Отключить зомби",
-  "options.craftingdeadsurvival.server.infection_enabled":"Включить заражение",
-
   "options.craftingdeadsurvival.client.display_blood": "Отображать кровь",
 
   "enchantment.craftingdeadsurvival.infection": "Заражение",
@@ -24,7 +19,7 @@
   "effect.craftingdeadsurvival.bleeding":"Кровотечение",
 
   "entity.craftingdeadsurvival.supply_drop": "Поставка сброса",
-  "entity.craftingdeadsurvival.pipe_grenade": "Трубковая граната",
+  "entity.craftingdeadsurvival.pipe_bomb": "Трубковая граната",
   "entity.craftingdeadsurvival.advanced_zombie": "Продвинутый зомби",
   "entity.craftingdeadsurvival.fast_zombie": "Быстрый зомби",
   "entity.craftingdeadsurvival.tank_zombie": "Зомби-танк",
@@ -57,7 +52,7 @@
   "item.craftingdeadsurvival.bloody_rag": "Окровавленная тряпка",
   "item.craftingdeadsurvival.clean_rag": "Чистая тряпка",
 
-  "item.craftingdeadsurvival.pipe_grenade": "Трубковая граната",
+  "item.craftingdeadsurvival.pipe_bomb": "Трубковая граната",
   "item.craftingdeadsurvival.military_drop_radio": "Радио: Гражданская поставка сброса",
   "item.craftingdeadsurvival.medical_drop_radio": "Радио: Медицинская поставка сброса",
   "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Яйцо продвинутого зомби",

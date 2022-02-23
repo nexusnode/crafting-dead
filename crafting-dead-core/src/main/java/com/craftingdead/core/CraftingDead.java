@@ -1,23 +1,20 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
@@ -33,6 +30,7 @@ import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.ModEntityTypes;
+import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
@@ -63,6 +61,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -83,7 +82,9 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
@@ -102,6 +103,16 @@ public class CraftingDead {
    * Logger.
    */
   private static final Logger logger = LogManager.getLogger();
+
+  public static final ServerConfig serverConfig;
+  public static final ForgeConfigSpec serverConfigSpec;
+
+  static {
+    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
+        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    serverConfigSpec = serverConfigPair.getRight();
+    serverConfig = serverConfigPair.getLeft();
+  }
 
   /**
    * Singleton.
@@ -122,6 +133,8 @@ public class CraftingDead {
     modEventBus.addListener(this::handleCommonSetup);
     modEventBus.addListener(this::handleGatherData);
     modEventBus.addListener(this::handleRegisterCapabilities);
+
+    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
 
     ModEntityTypes.ENTITY_TYPES.register(modEventBus);
     ModItems.ITEMS.register(modEventBus);
@@ -301,8 +314,8 @@ public class CraftingDead {
   @SubscribeEvent
   public void handlePlayerClone(PlayerEvent.Clone event) {
     event.getOriginal().reviveCaps();
-    PlayerExtension.getOrThrow(event.getPlayer())
-        .copyFrom(PlayerExtension.getOrThrow(event.getOriginal()), event.isWasDeath());
+    PlayerExtension.getOrThrow(event.getPlayer()).copyFrom(
+        PlayerExtension.getOrThrow((ServerPlayer) event.getOriginal()), event.isWasDeath());
   }
 
   @SubscribeEvent
@@ -337,7 +350,7 @@ public class CraftingDead {
     if (event.getObject() instanceof LivingEntity entity) {
       var living = entity instanceof Player player
           ? PlayerExtension.create(player)
-          : LivingExtension.create(entity);
+          : BasicLivingExtension.create(entity);
       event.addCapability(LivingExtension.CAPABILITY_KEY, CapabilityUtil.serializableProvider(
           () -> living, LivingExtension.CAPABILITY));
       living.load();

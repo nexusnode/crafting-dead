@@ -1,27 +1,25 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.survival.world.entity.monster;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -32,6 +30,7 @@ import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -40,12 +39,15 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -57,6 +59,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.registries.RegistryObject;
 
 public class AdvancedZombie extends Zombie implements RangedAttackMob {
@@ -108,11 +111,10 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   protected void addBehaviourGoals() {
     super.addBehaviourGoals();
     this.targetSelector.addGoal(2,
-        new NearestAttackableTargetGoal<Player>(this, Player.class, 5, false, false,
+        new NearestAttackableTargetGoal<>(this, Player.class, 5, false, false,
             targetEntity -> targetEntity.getCapability(LivingExtension.CAPABILITY)
                 .resolve()
-                .flatMap(extension -> extension.getHandler(SurvivalPlayerHandler.ID))
-                .map(SurvivalPlayerHandler.class::cast)
+                .flatMap(extension -> extension.getHandler(SurvivalPlayerHandler.TYPE))
                 .map(handler -> handler.getSoundLevel() >= targetEntity.distanceTo(this))
                 .orElse(false)) {
           @Override
@@ -124,8 +126,11 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
   @Override
   public void setBaby(boolean baby) {
+    if (!CraftingDeadSurvival.serverConfig.babyZombiesEnabled.get()) {
+      return;
+    }
     super.setBaby(baby);
-    if (this.level != null && !this.level.isClientSide) {
+    if (!this.level.isClientSide) {
       AttributeInstance damageAttribute = this.getAttribute(Attributes.ATTACK_DAMAGE);
       damageAttribute.removeModifier(DAMAGE_MODIFIER_BABY);
       damageAttribute.removeModifier(HEALTH_MODIFIER_BABY);
@@ -256,5 +261,40 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
             gun.setTriggerPressed(living, true, true);
           }));
     }
+  }
+
+
+  public static AttributeSupplier.Builder attributeTemplate() {
+    return Zombie.createAttributes()
+        .add(Attributes.ATTACK_KNOCKBACK, 0);
+  }
+
+  public static AttributeSupplier.Builder createAttributes() {
+    return AdvancedZombie.attributeTemplate()
+        .add(Attributes.MAX_HEALTH, 20.0D)
+        .add(Attributes.ATTACK_DAMAGE, 3.0D);
+  }
+
+  @Override
+  protected void dropAllDeathLoot(DamageSource damageSource) {
+    if (CraftingDeadSurvival.serverConfig.zombieDeathLootEnabled.get()) {
+      super.dropAllDeathLoot(damageSource);
+    }
+  }
+
+  @Nullable
+  @Override
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+    groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    if (!level.isClientSide()) {
+      Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_KNOCKBACK))
+          .setBaseValue(CraftingDeadSurvival.serverConfig.zombieAttackKnockback.get());
+      Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
+          .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieMaxHealth.get());
+      Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
+          .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieAttackDamage.get());
+    }
+    return groupData;
   }
 }

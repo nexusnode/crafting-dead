@@ -8,7 +8,7 @@
   "effect.craftingdead.bleeding":"Sangramento",
 
   "entity.craftingdeadsurvival.supply_drop": "Caixa de Suprimentos",
-  "entity.craftingdeadsurvival.pipe_grenade": "Granada Improvisada",
+  "entity.craftingdeadsurvival.pipe_bomb": "Granada Improvisada",
   "entity.craftingdeadsurvival.advanced_zombie": "Zumbi Avançado",
   "entity.craftingdeadsurvival.fast_zombie": "Zumbi Rápido",
   "entity.craftingdeadsurvival.tank_zombie": "Zumbi Tanque",
@@ -21,7 +21,7 @@
   "message.broken_leg": "Ai! Você quebrou sua perna.",
   "message.bleeding": "Você está sangrando!",
 
-  "item.craftingdeadsurvival.pipe_grenade": "Granada Improvisada",
+  "item.craftingdeadsurvival.pipe_bomb": "Granada Improvisada",
   "item.craftingdeadsurvival.rbi_syringe": "Seringa RBI",
   "item.craftingdeadsurvival.cure_syringe": "Seringa de Cura da RBI",
   "item.craftingdeadsurvival.splint": "Tala Improvisada",

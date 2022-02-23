@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.item;
@@ -211,7 +207,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(85)
               .setArmorPenetration(0.4F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_DRUM_MAGAZINE =
@@ -219,7 +214,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.4F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_30_ROUND_MAGAZINE =
@@ -227,7 +221,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_20_ROUND_MAGAZINE =
@@ -235,7 +228,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.4F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MPT55_MAGAZINE =
@@ -243,14 +235,12 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AK47_30_ROUND_MAGAZINE =
       ITEMS.register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> FNFAL_MAGAZINE =
@@ -258,7 +248,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.55F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> ACR_MAGAZINE =
@@ -266,7 +255,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.5F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> G36C_MAGAZINE =
@@ -274,7 +262,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.45F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> HK417_MAGAZINE =
@@ -282,7 +269,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.47F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M1911_MAGAZINE =
@@ -290,7 +276,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(7)
               .setArmorPenetration(0.08F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> G18_MAGAZINE =
@@ -298,7 +283,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.08F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M9_MAGAZINE =
@@ -306,7 +290,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(15)
               .setArmorPenetration(0.08F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> DESERT_EAGLE_MAGAZINE =
@@ -314,7 +297,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(13)
               .setArmorPenetration(0.35F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> P250_MAGAZINE =
@@ -322,7 +304,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(12)
               .setArmorPenetration(0.08F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAGNUM_MAGAZINE =
@@ -330,7 +311,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.65F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> FN57_MAGAZINE =
@@ -338,7 +318,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.09F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> P90_MAGAZINE =
@@ -346,7 +325,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(50)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> VECTOR_MAGAZINE =
@@ -354,7 +332,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MP5A5_35_ROUND_MAGAZINE =
@@ -362,7 +339,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(35)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MP5A5_21_ROUND_MAGAZINE =
@@ -370,7 +346,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(21)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAC10_EXTENDED_MAGAZINE =
@@ -378,7 +353,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAC10_MAGAZINE =
@@ -386,14 +360,12 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.15F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> SPORTER22_MAGAZINE =
       ITEMS.register("sporter22_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M107_MAGAZINE =
@@ -401,7 +373,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AS50_MAGAZINE =
@@ -409,7 +380,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M1GARAND_MAGAZINE =
@@ -417,7 +387,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.95F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AWP_MAGAZINE =
@@ -425,7 +394,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.95F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> TRENCH_GUN_SHELLS =
@@ -433,7 +401,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.35F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MOSSBERG_SHELLS =
@@ -441,7 +408,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.3F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> DMR_MAGAZINE =
@@ -449,14 +415,12 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(5)
               .setArmorPenetration(0.65F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> TASER_CARTRIDGE =
       ITEMS.register("taser_cartridge",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(3)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M240B_MAGAZINE =
@@ -464,7 +428,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.5F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
 
@@ -473,7 +436,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(100)
               .setArmorPenetration(0.5F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> RPK_MAGAZINE =
@@ -481,7 +443,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(60)
               .setArmorPenetration(0.5F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MINIGUN_MAGAZINE =
@@ -489,7 +450,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(350)
               .setArmorPenetration(0.3F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MK48MOD_MAGAZINE =
@@ -497,7 +457,6 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.52F)
-              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   // ================================================================================
@@ -1353,36 +1312,42 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> FIRE_GRENADE = ITEMS.register("fire_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(FireGrenadeEntity::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFireGrenadeEnabled::get)
           .stacksTo(3)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> SMOKE_GRENADE = ITEMS.register("smoke_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesSmokeGrenadeEnabled::get)
           .stacksTo(3)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> FLASH_GRENADE = ITEMS.register("flash_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFlashGrenadeEnabled::get)
           .stacksTo(3)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> DECOY_GRENADE = ITEMS.register("decoy_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesDecoyGrenadeEnabled::get)
           .stacksTo(3)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> FRAG_GRENADE = ITEMS.register("frag_grenade",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(FragGrenade::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFragGrenadeEnabled::get)
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> C4 = ITEMS.register("c4_explosive",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(C4Explosive::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
           .setThrowSpeed(0.75F)
           .stacksTo(1)
           .tab(COMBAT_TAB)));
@@ -2308,10 +2273,9 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> HANDCUFFS =
+  public static final RegistryObject<ActionItem> HANDCUFFS =
       ITEMS.register("handcuffs",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.APPLY_HANDCUFFS)
+          () -> new ActionItem(ActionTypes.APPLY_HANDCUFFS, new Item.Properties()
               .durability(200)
               .tab(COMBAT_TAB)));
 
@@ -2325,38 +2289,33 @@ public class ModItems {
   // Medical
   // ================================================================================
 
-  public static final RegistryObject<Item> FIRST_AID_KIT =
+  public static final RegistryObject<ActionItem> FIRST_AID_KIT =
       ITEMS.register("first_aid_kit",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_FIRST_AID_KIT)
+          () -> new ActionItem(ActionTypes.USE_FIRST_AID_KIT, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> ADRENALINE_SYRINGE =
+  public static final RegistryObject<ActionItem> ADRENALINE_SYRINGE =
       ITEMS.register("adrenaline_syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_ADRENALINE_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_ADRENALINE_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> SYRINGE =
+  public static final RegistryObject<ActionItem> SYRINGE =
       ITEMS.register("syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> BLOOD_SYRINGE =
+  public static final RegistryObject<ActionItem> BLOOD_SYRINGE =
       ITEMS.register("blood_syringe",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_BLOOD_SYRINGE)
+          () -> new ActionItem(ActionTypes.USE_BLOOD_SYRINGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 
-  public static final RegistryObject<Item> BANDAGE =
+  public static final RegistryObject<ActionItem> BANDAGE =
       ITEMS.register("bandage",
-          () -> new ActionItem((ActionItem.Properties) new ActionItem.Properties()
-              .action(ActionTypes.USE_BANDAGE)
+          () -> new ActionItem(ActionTypes.USE_BANDAGE, new Item.Properties()
               .stacksTo(1)
               .tab(MEDICAL_TAB)));
 

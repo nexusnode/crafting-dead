@@ -1,34 +1,34 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.world.action;
 
-import javax.annotation.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import javax.annotation.Nullable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class RemoveMagazineAction extends TimedAction<ActionType> {
+public class RemoveMagazineAction extends TimedAction {
+
+  private final LivingExtension<?, ?> performer;
 
   private final Gun gun;
 
@@ -39,9 +39,8 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   @Nullable
   private Animation animation;
 
-  public RemoveMagazineAction(ActionType type, LivingExtension<?, ?> performer,
-      @Nullable LivingExtension<?, ?> target) {
-    super(type, performer, target);
+  public RemoveMagazineAction(LivingExtension<?, ?> performer) {
+    this.performer = performer;
     this.gun = performer.getMainHandGun()
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
@@ -53,37 +52,66 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   }
 
   @Override
+  public ActionType<?> getType() {
+    return ActionTypes.REMOVE_MAGAZINE.get();
+  }
+
+  @Override
   protected int getTotalDurationTicks() {
     return this.gun.getReloadDurationTicks() / 2;
   }
 
   @Override
-  public boolean start() {
-    if (!this.getPerformer().getEntity().isSprinting() && !this.oldMagazineStack.isEmpty()) {
-      if (this.gun.isPerformingSecondaryAction()) {
-        this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
-      }
-      if (this.getPerformer().getLevel().isClientSide()) {
-        this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
-        this.gun.getClient().getAnimationController().addAnimation(this.animation);
-      }
+  public boolean start(boolean simulate) {
+    if (this.getPerformer().getEntity().isSprinting() || this.oldMagazineStack.isEmpty()) {
+      return false;
+    }
+
+    if (simulate) {
       return true;
     }
-    return false;
+
+    if (this.gun.isPerformingSecondaryAction()) {
+      this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
+    }
+
+    if (this.getPerformer().getLevel().isClientSide()) {
+      this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
+      this.gun.getClient().getAnimationController().addAnimation(this.animation);
+    }
+
+    return true;
   }
 
   @Override
   public boolean tick() {
-    if (this.getPerformer().getEntity().isSprinting()) {
-      this.getPerformer().cancelAction(false);
+    if (!this.performer.getLevel().isClientSide()
+        && !this.performer.getMainHandItem().is(this.gun.getItemStack().getItem())
+        || this.getPerformer().getEntity().isSprinting()) {
+      this.getPerformer().cancelAction(true);
       return false;
     }
     return super.tick();
   }
 
   @Override
-  public void cancel() {
-    super.cancel();
+  public void stop(StopReason reason) {
+    super.stop(reason);
+
+    if (reason.isCompleted()) {
+      if (!this.getPerformer().getLevel().isClientSide()) {
+        // This will be synced to the client by the gun.
+        this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
+        if (!this.oldMagazineStack.isEmpty()
+            && this.getPerformer().getEntity() instanceof Player
+            && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty).orElse(true)
+            && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
+          ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
+        }
+      }
+      return;
+    }
+
     if (this.animation != null) {
       this.animation.remove();
     }
@@ -92,15 +120,7 @@ public class RemoveMagazineAction extends TimedAction<ActionType> {
   }
 
   @Override
-  protected void finish() {
-    if (!this.getPerformer().getLevel().isClientSide()) {
-      // This will be synced to the client by the gun.
-      this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
-      if (!this.oldMagazineStack.isEmpty()
-          && this.getPerformer().getEntity() instanceof Player) {
-        ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
-      }
-    }
+  public LivingExtension<?, ?> getPerformer() {
+    return this.performer;
   }
 }
-

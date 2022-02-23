@@ -14,7 +14,8 @@
         "PlayerDataMixin",
         "FireBlockMixin",
         "ServerPlayerMixin",
-        "MinecraftServerMixin"
+        "MinecraftServerMixin",
+        "ChunkMapMixin"
     ],
     "injectors": {
         "defaultRequire": 1

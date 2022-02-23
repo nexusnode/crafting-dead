@@ -4,7 +4,10 @@ plugins {
     id 'eclipse'
     id 'org.cadixdev.licenser'
     id 'org.spongepowered.mixin'
+    id 'com.github.johnrengelman.shadow'
 }
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 group = 'com.craftingdead'
 version = "${mod_version}"
@@ -30,6 +33,10 @@ repositories {
 configurations {
     library
     implementation.extendsFrom library
+    
+    shaded_library
+    shaded.extendsFrom shaded_library
+    library.extendsFrom shaded_library
 }
 
 minecraft.runs.all {
@@ -47,6 +54,17 @@ dependencies {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+reobf {
+    shadowJar { }
+}
+
+shadowJar {
+    configurations = [project.configurations.shaded]
+    archiveVersion = "${minecraft_version}-${version}"
+    archiveClassifier = ''
+    finalizedBy 'reobfShadowJar'
+}
+
 jar {
     archiveBaseName = project.name
     archiveVersion = "${minecraft_version}-${version}"
@@ -56,11 +74,9 @@ jar {
 
 license {
     include '**/*.java'
-
     header = rootProject.file('HEADER.txt')
-
     ext {
         organization = 'NexusNode LTD'
-        year = 2021
+        year = 2022
     }
 }    

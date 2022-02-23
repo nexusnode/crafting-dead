@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.core.client.gui;
@@ -25,6 +21,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -147,10 +144,6 @@ public class IngameGui {
 
   public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, ItemStack heldStack,
       @Nullable Gun gun, PoseStack poseStack, int width, int height, float partialTicks) {
-
-    // TODO Fixes Minecraft bug when using post-processing shaders.
-    RenderSystem.enableTexture();
-
     if (this.hitMarker != null) {
       if (this.hitMarker.render(poseStack, width, height, partialTicks)) {
         this.hitMarker = null;
@@ -174,7 +167,8 @@ public class IngameGui {
       RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
     }
 
-    player.getProgressMonitor()
+    player.getActionObserver()
+        .flatMap(ActionObserver::getProgressBar)
         .ifPresent(observer -> renderProgress(poseStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
             observer.getProgress(partialTicks)));
@@ -395,6 +389,11 @@ public class IngameGui {
 
   private static void renderProgress(PoseStack poseStack, Font font,
       int width, int height, Component message, @Nullable Component subMessage, float percent) {
+
+    if (percent == 1.0F)
+      System.out.println(percent);
+
+
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;

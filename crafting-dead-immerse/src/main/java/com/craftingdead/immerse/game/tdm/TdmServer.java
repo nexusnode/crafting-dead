@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.game.tdm;
@@ -67,7 +63,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent;
 
-public class TdmServer extends TdmGame<ServerModule> implements GameServer, TeamHandler<TdmTeam> {
+public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTeam> {
 
   public static final Codec<TdmServer> CODEC = RecordCodecBuilder.create(instance -> instance
       .group(
@@ -194,9 +190,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   public void resetBuyTimes() {
     this.getMinecraftServer().getPlayerList().getPlayers()
         .stream()
-        .<PlayerExtension<?>>map(PlayerExtension::getOrThrow)
-        .map(player -> (TdmServerPlayerHandler) player
-            .getHandlerOrThrow(TdmPlayerHandler.ID))
+        .map(PlayerExtension::getOrThrow)
+        .map(player -> (TdmServerPlayerHandler) player.getHandlerOrThrow(TdmPlayerHandler.TYPE))
         .forEach(TdmServerPlayerHandler::resetBuyTime);
   }
 
@@ -244,7 +239,7 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public void load() {
+  public void started() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
     GameRules.BooleanValue daylightCycle = gameRules.getRule(GameRules.RULE_DAYLIGHT);
@@ -276,11 +271,11 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
     this.oldDifficulty = this.getMinecraftServer().getWorldData().getDifficulty();
     this.getMinecraftServer().setDifficulty(Difficulty.PEACEFUL, true);
 
-    super.load();
+    super.started();
   }
 
   @Override
-  public void unload() {
+  public void ended() {
     final GameRules gameRules = this.getMinecraftServer().getGameRules();
 
     gameRules.getRule(GameRules.RULE_DAYLIGHT).set(this.daylightCycleOld,
@@ -298,10 +293,10 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
     for (ServerPlayer playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((TdmServerPlayerHandler) PlayerExtension.getOrThrow(playerEntity)
-          .getHandlerOrThrow(TdmPlayerHandler.ID)).invalidate();
+          .getHandlerOrThrow(TdmPlayerHandler.TYPE)).invalidate();
     }
 
-    super.unload();
+    super.ended();
   }
 
   @Override
@@ -336,12 +331,12 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   }
 
   @Override
-  public boolean save() {
+  public boolean persistGameData() {
     return false;
   }
 
   @Override
-  public void registerModules(Consumer<ServerModule> registrar) {
+  public void registerServerModules(Consumer<ServerModule> registrar) {
     this.shopModule = new ServerShopModule(ServerShopModule.COMBAT_PURCHASE_HANDLER,
         (int) this.buyDuration.getSeconds());
 
@@ -402,8 +397,6 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
     this.teamModule = new ServerTeamModule<>(TdmTeam.class, this);
     registrar.accept(this.teamModule);
-
-    super.registerModules(registrar);
   }
 
   @Override
@@ -455,10 +448,10 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
   @SuppressWarnings("unchecked")
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension<?> extension
-        && !event.getLiving().getLevel().isClientSide()) {
-      extension.registerHandler(TdmPlayerHandler.ID,
-          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) extension));
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && !player.getLevel().isClientSide()) {
+      player.registerHandler(TdmPlayerHandler.TYPE,
+          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) player));
     }
   }
 
@@ -477,9 +470,8 @@ public class TdmServer extends TdmGame<ServerModule> implements GameServer, Team
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
-    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.ID);
-    var player = (TdmPlayerHandler<?>) handler;
-    player.setRemainingSpawnProtectionSeconds(0);
+    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.TYPE);
+    handler.setRemainingSpawnProtectionSeconds(0);
   }
 
   @SubscribeEvent

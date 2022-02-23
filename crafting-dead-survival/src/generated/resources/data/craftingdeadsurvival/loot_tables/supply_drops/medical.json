@@ -2,7 +2,8 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 10,
+      "rolls": 10.0,
+      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
@@ -10,10 +11,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:bandage"
@@ -24,10 +26,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 6,
-                "p": 0.12,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 6.0,
+                "p": 0.12
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:first_aid_kit"
@@ -38,10 +41,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:adrenaline_syringe"
@@ -52,10 +56,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:syringes",
@@ -67,10 +72,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:army_medic_clothing"
@@ -81,10 +87,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m9_magazine"
@@ -95,10 +102,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m1911_magazine"
@@ -109,10 +117,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:g18_magazine"
@@ -123,10 +132,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 3,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 3.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:smoke_grenade"
@@ -137,10 +147,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.5
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:adrenaline_syringe"
@@ -151,10 +162,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 4,
-                "p": 0.4,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 4.0,
+                "p": 0.4
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m1911"
@@ -165,10 +177,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:g18"
@@ -179,10 +192,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.3,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.3
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:m9"
@@ -193,10 +207,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
-                "n": 2,
-                "p": 0.45,
-                "type": "minecraft:binomial"
-              }
+                "type": "minecraft:binomial",
+                "n": 2.0,
+                "p": 0.45
+              },
+              "add": false
             }
           ],
           "name": "craftingdead:ak47_30_round_magazine"

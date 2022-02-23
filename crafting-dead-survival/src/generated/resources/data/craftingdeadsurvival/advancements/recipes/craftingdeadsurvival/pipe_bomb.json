@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdeadsurvival:pipe_bomb"
+    ]
+  },
+  "criteria": {
+    "has_bloody_rag": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "craftingdeadsurvival:bloody_rag"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdeadsurvival:pipe_bomb"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_bloody_rag",
+      "has_the_recipe"
+    ]
+  ]
+}

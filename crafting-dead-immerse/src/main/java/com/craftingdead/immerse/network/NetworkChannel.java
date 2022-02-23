@@ -1,19 +1,15 @@
 /*
  * Crafting Dead
- * Copyright (C) 2021  NexusNode LTD
+ * Copyright (C) 2022  NexusNode LTD
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
+ * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
+ *
+ * https://craftingdead.net/terms.php
  */
 
 package com.craftingdead.immerse.network;
@@ -24,7 +20,12 @@ import com.craftingdead.immerse.network.login.LoginIndexedMessage;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
 import com.craftingdead.immerse.network.play.ChangeGameMessage;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
+import com.craftingdead.immerse.network.play.RegisterLandOwnerMessage;
+import com.craftingdead.immerse.network.play.RemoveLandOwnerMessage;
 import com.craftingdead.immerse.network.play.SyncGameMessage;
+import com.craftingdead.immerse.network.play.SyncLandChunkMessage;
+import com.craftingdead.immerse.network.play.SyncLandManagerMessage;
+import com.craftingdead.immerse.network.play.SyncLandOwnerMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.HandshakeHandler;
 import net.minecraftforge.network.NetworkDirection;
@@ -74,6 +75,36 @@ public enum NetworkChannel {
           .encoder(SyncGameMessage::encode)
           .decoder(SyncGameMessage::decode)
           .consumer(SyncGameMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(RegisterLandOwnerMessage.class, 0x03, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(RegisterLandOwnerMessage::encode)
+          .decoder(RegisterLandOwnerMessage::decode)
+          .consumer(RegisterLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(RemoveLandOwnerMessage.class, 0x04, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(RemoveLandOwnerMessage::encode)
+          .decoder(RemoveLandOwnerMessage::decode)
+          .consumer(RemoveLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandChunkMessage.class, 0x05, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandChunkMessage::encode)
+          .decoder(SyncLandChunkMessage::decode)
+          .consumer(SyncLandChunkMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandOwnerMessage.class, 0x06, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandOwnerMessage::encode)
+          .decoder(SyncLandOwnerMessage::decode)
+          .consumer(SyncLandOwnerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(SyncLandManagerMessage.class, 0x07, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(SyncLandManagerMessage::encode)
+          .decoder(SyncLandManagerMessage::decode)
+          .consumer(SyncLandManagerMessage::handle)
           .add();
     }
   };
