@@ -23,7 +23,7 @@ import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 
 @Mixin(MultiPlayerGameMode.class)
-public class PlayerControllerMixin {
+public class MultiPlayerGameModeMixin {
 
   /**
    * Renders HUD for spectating player.
