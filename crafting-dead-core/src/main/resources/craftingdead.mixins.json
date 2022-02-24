@@ -4,11 +4,11 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "craftingdead.refmap.json",
   "mixins": [
-    "ContainerMixin",
+    "AbstractContainerMenuMixin",
     "EntityMixin",
     "ExplosionMixin",
     "LivingEntityMixin",
-    "PacketBufferMixin"
+    "FriendlyByteBufMixin"
   ],
   "client": [
     "GameRendererMixin",
@@ -16,7 +16,7 @@
     "ItemRendererMixin",
     "ModelBakeryMixin",
     "MouseHandlerMixin",
-    "PlayerInventoryMixin",
+    "InventoryMixin",
     "PlayerRendererMixin"
   ],
   "injectors": {

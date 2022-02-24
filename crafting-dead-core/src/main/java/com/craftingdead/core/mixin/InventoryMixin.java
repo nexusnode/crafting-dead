@@ -23,7 +23,7 @@ import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import net.minecraft.world.entity.player.Inventory;
 
 @Mixin(Inventory.class)
-public class PlayerInventoryMixin {
+public class InventoryMixin {
 
   /**
    * Scrolls over empty slots when in combat mode.

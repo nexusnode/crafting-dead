@@ -25,7 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
 @Mixin(PlayerDataStorage.class)
-public class PlayerDataMixin {
+public class PlayerDataStorageMixin {
 
   /**
    * Adds hook for {@link GameServer#persistPlayerData}.
