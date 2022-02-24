@@ -14,7 +14,7 @@
 
 package com.craftingdead.immerse.client.renderer;
 
-import com.craftingdead.immerse.mixin.ItemInHandRendererAccessor;
+import com.craftingdead.immerse.mixin.FirstPersonRendererAccessor;
 import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -80,8 +80,8 @@ public class SpectatorRenderer {
       }
     }
 
-    final ItemInHandRendererAccessor firstPersonRenderer =
-        (ItemInHandRendererAccessor) this.minecraft.getItemInHandRenderer();
+    final FirstPersonRendererAccessor firstPersonRenderer =
+        (FirstPersonRendererAccessor) this.minecraft.getItemInHandRenderer();
 
     if (renderRightHand) {
       float rightHandSwingProgress = hand == InteractionHand.MAIN_HAND ? swingProgress : 0.0F;
