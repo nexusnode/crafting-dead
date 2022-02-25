@@ -15,9 +15,14 @@
     },
     "aiming_transform": {
         "translation": [
-            -9.5,
-            5,
+            -9.45,
+            5.75,
             -5
+        ],
+        "rotation": [
+            0,
+            0,
+            0
         ]
     },
     "hand_transforms": {
@@ -25,13 +30,13 @@
             "left_hand": {
                 "translation": [
                     -0.8,
-                    -7,
+                    -2,
                     -12
                 ],
                 "rotation": [
-                    0,
-                    20,
-                    -7.5
+                    5,
+                    25,
+                    0
                 ],
                 "scale": [
                     1.5,
@@ -41,9 +46,9 @@
             },
             "right_hand": {
                 "translation": [
-                    -3,
-                    1,
-                    2
+                    -1.5,
+                    1.75,
+                    3
                 ]
             }
         },
@@ -67,6 +72,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:m107_magazine": {
+            "translation": [
+                0,
+                -1,
+                0
+            ]
         }
     }
 }

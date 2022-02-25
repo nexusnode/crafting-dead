@@ -1,6 +1,5 @@
 {
 	"credit": "Made with Blockbench",
-	"ambientocclusion": false,
 	"texture_size": [128, 128],
 	"textures": {
 		"gun": "craftingdead:gun/hk417",
@@ -240,32 +239,6 @@
 				"up": {"uv": [1.5, 6, 1.25, 4.75], "texture": "#gun"},
 				"down": {"uv": [1.75, 4.75, 1.5, 6], "texture": "#gun"}
 			}
-		},
-		{
-			"from": [7.5, 3, 5.5],
-			"to": [9.5, 6, 9.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 3.2088, 7.19344]},
-			"faces": {
-				"north": {"uv": [4, 6.625, 4.25, 7], "texture": "#gun"},
-				"east": {"uv": [3.5, 6.625, 4, 7], "texture": "#gun"},
-				"south": {"uv": [4.75, 6.625, 5, 7], "texture": "#gun"},
-				"west": {"uv": [4.25, 6.625, 4.75, 7], "texture": "#gun"},
-				"up": {"uv": [4.25, 6.625, 4, 6.125], "texture": "#gun"},
-				"down": {"uv": [4.5, 6.125, 4.25, 6.625], "texture": "#gun"}
-			}
-		},
-		{
-			"from": [7.5, -0.10142, 5.40433],
-			"to": [9.5, 3.89858, 9.40433],
-			"rotation": {"angle": 22.5, "axis": "x", "origin": [8.5, 3.2088, 7.19344]},
-			"faces": {
-				"north": {"uv": [2.75, 3.5, 3, 4], "texture": "#gun"},
-				"east": {"uv": [2.25, 3.5, 2.75, 4], "texture": "#gun"},
-				"south": {"uv": [3.5, 3.5, 3.75, 4], "texture": "#gun"},
-				"west": {"uv": [3, 3.5, 3.5, 4], "texture": "#gun"},
-				"up": {"uv": [3, 3.5, 2.75, 3], "texture": "#gun"},
-				"down": {"uv": [3.25, 3, 3, 3.5], "texture": "#gun"}
-			}
 		}
 	],
 	"display": {
@@ -314,12 +287,6 @@
 					"origin": [8, 8, 8],
 					"color": 0,
 					"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-				},
-				{
-					"name": "Magazine",
-					"origin": [8, 8, 8],
-					"color": 0,
-					"children": [18, 19]
 				}
 			]
 		}

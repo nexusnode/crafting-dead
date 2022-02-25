@@ -1,65 +1,77 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/mp5a5",
-  "muzzle_flash_transform": {
-    "translation": [
-      3,
-      0,
-      -20
-    ],
-    "scale": [
-      1.2,
-      1.2,
-      1.2
-    ]
-  },
-  "aiming_transform": {
-    "translation": [
-      -9.5,
-      1.5,
-      3
-    ]
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "left_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/mp5a5",
+    "muzzle_flash_transform": {
         "translation": [
-          7,
-          -6.5,
-          -10
-        ],
-        "rotation": [
-          0,
-          10,
-          0
+            3,
+            1,
+            -20
         ],
         "scale": [
-          1.75,
-          1.75,
-          1.75
+            1.2,
+            1.2,
+            1.2
         ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aiming_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
+            -9.5,
+            1.75,
+            3
         ],
         "rotation": [
-          0,
-          20,
-          0
+            2,
+            0,
+            0
         ]
-      },
-      "right_hand": {
-        "translation": [
-          -15,
-          2,
-          0.25
-        ]
-      }
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    1,
+                    0,
+                    0
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    4,
+                    -0.5,
+                    -7
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ],
+                "scale": [
+                    1.75,
+                    1.25,
+                    1.25
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
     }
-  }
 }

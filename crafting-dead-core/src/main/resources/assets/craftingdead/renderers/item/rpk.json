@@ -1,72 +1,81 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/rpk",
-  "muzzle_flash_transform": {
-    "translation": [
-      6,
-      -1,
-      -40
-    ],
-    "scale": [
-      1.2,
-      1.2,
-      1.2
-    ]
-  },
-  "aiming_transform": {
-    "translation": [
-      -9.5,
-      1.5,
-      3
-    ]
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "right_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/rpk",
+    "muzzle_flash_transform": {
         "translation": [
-          0,
-          0,
-          2
-        ]
-      },
-      "left_hand": {
-        "translation": [
-          2.5,
-          -4,
-          -9.5
-        ],
-        "rotation": [
-          0,
-          20,
-          0
+            6,
+            -2,
+            -40
         ],
         "scale": [
-          1.5,
-          1.5,
-          1.5
+            1.2,
+            1.2,
+            1.2
         ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aiming_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
-        ],
-        "rotation": [
-          0,
-          20,
-          0
+            -9.5,
+            2.25,
+            -1
         ]
-      },
-      "right_hand": {
-        "translation": [
-          -15,
-          2,
-          0.25
-        ]
-      }
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    0.5,
+                    1.5,
+                    2.5
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    3.75,
+                    -0.6,
+                    -9.5
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ],
+                "scale": [
+                    1.75,
+                    1.25,
+                    1.25
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:rpk_magazine": {
+            "translation": [
+                -0.5,
+                -0.5,
+                0
+            ]
+        }
     }
-  }
 }

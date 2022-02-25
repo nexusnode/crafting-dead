@@ -471,19 +471,6 @@
 				"up": {"uv": [8, 14.25, 7.5, 14], "texture": "#gun"},
 				"down": {"uv": [8.5, 14, 8, 14.25], "texture": "#gun"}
 			}
-		},
-		{
-			"from": [7.5, 0, 9],
-			"to": [9.5, 8, 11],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 4, 10]},
-			"faces": {
-				"north": {"uv": [3.5, 4.5, 4, 6.5], "texture": "#gun"},
-				"east": {"uv": [3, 4.5, 3.5, 6.5], "texture": "#gun"},
-				"south": {"uv": [4.5, 4.5, 5, 6.5], "texture": "#gun"},
-				"west": {"uv": [4, 4.5, 4.5, 6.5], "texture": "#gun"},
-				"up": {"uv": [4, 4.5, 3.5, 4], "texture": "#gun"},
-				"down": {"uv": [4.5, 4, 4, 4.5], "texture": "#gun"}
-			}
 		}
 	],
 	"display": {
@@ -538,12 +525,6 @@
 					"origin": [8, 8, 8],
 					"color": 0,
 					"children": [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
-				},
-				{
-					"name": "Magazine",
-					"origin": [8, 8, 8],
-					"color": 0,
-					"children": [34]
 				}
 			]
 		}

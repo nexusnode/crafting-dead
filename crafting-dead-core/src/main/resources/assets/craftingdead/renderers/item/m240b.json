@@ -1,72 +1,81 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/m240b",
-  "muzzle_flash_transform": {
-    "translation": [
-      0,
-      0,
-      -40
-    ],
-    "scale": [
-      1.5,
-      1.5,
-      1.5
-    ]
-  },
-  "aiming_transform": {
-    "translation": [
-      -9.5,
-      2,
-      3
-    ]
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "right_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/m240b",
+    "muzzle_flash_transform": {
         "translation": [
-          -2.2,
-          0,
-          -0.5
-        ]
-      },
-      "left_hand": {
-        "translation": [
-          3.5,
-          -8,
-          -12.5
-        ],
-        "rotation": [
-          0,
-          10,
-          0
+            1,
+            2,
+            -40
         ],
         "scale": [
-          1.75,
-          1.75,
-          1.75
+            1.5,
+            1.5,
+            1.5
         ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aiming_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
-        ],
-        "rotation": [
-          0,
-          20,
-          0
+            -9.5,
+            3.25,
+            3
         ]
-      },
-      "right_hand": {
-        "translation": [
-          -15,
-          2,
-          0.25
-        ]
-      }
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -3,
+                    1.75,
+                    5
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    3,
+                    -2.5,
+                    -14
+                ],
+                "rotation": [
+                    5,
+                    15,
+                    0
+                ],
+                "scale": [
+                    2,
+                    1.5,
+                    1.5
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:m240b_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
     }
-  }
 }

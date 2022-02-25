@@ -3,8 +3,8 @@
     "model": "craftingdead:gun/acr",
     "muzzle_flash_transform": {
         "translation": [
-            4,
-            -3,
+            3,
+            0,
             -40
         ],
         "scale": [
@@ -16,25 +16,32 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            -1.75,
-            2
+            -0.5,
+            0
         ]
     },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -2.25,
+                    1.85,
+                    2.25
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    2,
-                    -5,
-                    -8
+                    3,
+                    -2.5,
+                    -18
                 ],
                 "rotation": [
                     0,
-                    7,
+                    30,
                     0
                 ],
                 "scale": [
-                    1.5,
+                    2,
                     1.5,
                     1.5
                 ]
@@ -60,6 +67,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:acr_magazine": {
+            "translation": [
+                -0.5,
+                -1,
+                0
+            ]
         }
     }
 }

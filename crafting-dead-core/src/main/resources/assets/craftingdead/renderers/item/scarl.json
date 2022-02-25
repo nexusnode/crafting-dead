@@ -16,7 +16,7 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            -1,
+            0,
             0
         ]
     },
@@ -26,24 +26,24 @@
                 "translation": [
                     -2.2,
                     0,
-                    -2
+                    5
                 ]
             },
             "left_hand": {
                 "translation": [
-                    3.25,
-                    -7,
+                    0.5,
+                    -2,
                     -13
                 ],
                 "rotation": [
                     0,
-                    12,
+                    25,
                     0
                 ],
                 "scale": [
                     1.75,
-                    1.75,
-                    1.75
+                    1.5,
+                    1.5
                 ]
             }
         },
@@ -67,6 +67,36 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:stanag_30_round_magazine": {
+            "translation": [
+                -0.55,
+                -0.1,
+                -2
+            ]
+        },
+        "craftingdead:stanag_20_round_magazine": {
+            "translation": [
+                -0.65,
+                1,
+                -2.75
+            ]
+        },
+        "craftingdead:stanag_drum_magazine": {
+            "translation": [
+                0.5,
+                0.7,
+                -2
+            ]
+        },
+        "craftingdead:stanag_box_magazine": {
+            "translation": [
+                0.5,
+                1.2,
+                0.25
+            ]
         }
     }
 }

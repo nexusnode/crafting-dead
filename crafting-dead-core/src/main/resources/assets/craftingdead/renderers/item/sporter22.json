@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/sporter22",
     "muzzle_flash_transform": {
         "translation": [
-            6,
-            -1,
-            -50
+            8.5,
+            0,
+            -40
         ],
         "scale": [
             1.2,
@@ -16,21 +16,28 @@
     "aiming_transform": {
         "translation": [
             -8.5,
-            5.5,
-            1.75
+            5.75,
+            0
         ]
     },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    2.25,
+                    0.75,
+                    0.75
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    2.75,
-                    -3,
-                    -7
+                    3,
+                    -2,
+                    -5
                 ],
                 "rotation": [
                     0,
-                    10,
+                    15,
                     0
                 ],
                 "scale": [
@@ -60,6 +67,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:sporter22_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
         }
     }
 }

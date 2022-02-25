@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/g36c",
     "muzzle_flash_transform": {
         "translation": [
-            1.6,
-            -2,
-            -28.8
+            6,
+            -1,
+            -40
         ],
         "scale": [
             1.2,
@@ -16,27 +16,34 @@
     "aiming_transform": {
         "translation": [
             -8.5,
-            -0.25,
-            0
+            0.75,
+            1.5
         ]
     },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    0.5,
+                    2.5,
+                    1.5
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    3,
-                    -10,
-                    -10
+                    4,
+                    -2.5,
+                    -14.5
                 ],
                 "rotation": [
-                    0,
-                    11,
-                    -7.5
+                    5,
+                    20,
+                    0
                 ],
                 "scale": [
                     1.75,
-                    1.75,
-                    1.75
+                    1.5,
+                    1.5
                 ]
             }
         },
@@ -60,6 +67,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:g36c_magazine": {
+            "translation": [
+                -0.1,
+                -1.25,
+                0
+            ]
         }
     }
 }

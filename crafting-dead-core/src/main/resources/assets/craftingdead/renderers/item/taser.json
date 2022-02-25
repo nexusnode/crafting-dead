@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/taser",
     "muzzle_flash_transform": {
         "translation": [
-            2,
-            0,
-            -20
+            3,
+            1,
+            -12
         ],
         "scale": [
             0.75,
@@ -16,11 +16,11 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            7.25,
+            8.25,
             2
         ],
         "rotation": [
-            -1,
+            0.5,
             0,
             0
         ]
@@ -29,21 +29,31 @@
         "held_right_handed": {
             "right_hand": {
                 "translation": [
-                    -3,
-                    2,
-                    0.25
+                    -2.5,
+                    4.75,
+                    4
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
                 ]
             },
             "left_hand": {
                 "translation": [
                     -2,
-                    1.75,
-                    3
+                    4,
+                    6
                 ],
                 "rotation": [
-                    0,
+                    -5,
                     10,
                     0
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
                 ]
             }
         },
@@ -72,6 +82,15 @@
                     0
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:taser_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
         }
     }
 }
