@@ -14,12 +14,16 @@
 
 package com.craftingdead.immerse.world.action;
 
+import java.util.function.Supplier;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
 
-public class BuildCuboidActionType extends AbstractBuildBlockActionType {
+public class BuildCuboidActionType extends BuildActionType {
+
+  private final Supplier<Block> block;
 
   private final BlockPos minOffset;
   private final BlockPos maxOffset;
@@ -28,6 +32,11 @@ public class BuildCuboidActionType extends AbstractBuildBlockActionType {
     super(builder);
     this.minOffset = builder.minOffset;
     this.maxOffset = builder.maxOffset;
+    this.block = builder.block;
+  }
+
+  public Block getBlock() {
+    return this.block.get();
   }
 
   public BlockPos getMinOffset() {
@@ -59,14 +68,25 @@ public class BuildCuboidActionType extends AbstractBuildBlockActionType {
     return new Builder(minOffset, maxOffset);
   }
 
-  public static class Builder extends AbstractBuildBlockActionType.Builder<Builder> {
+  public static class Builder extends BuildActionType.Builder<Builder> {
 
     private final BlockPos minOffset;
     private final BlockPos maxOffset;
 
+    private Supplier<Block> block;
+
     private Builder(BlockPos minOffset, BlockPos maxOffset) {
       this.minOffset = minOffset;
       this.maxOffset = maxOffset;
+    }
+
+    public Builder block(Block block) {
+      return this.block(() -> block);
+    }
+
+    public Builder block(Supplier<Block> block) {
+      this.block = block;
+      return this;
     }
 
     @Override

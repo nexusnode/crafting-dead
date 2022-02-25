@@ -5,8 +5,8 @@ plugins {
 repositories {
     mavenCentral()
     google()
-    flatDir {
-        dir 'libs'
+    maven {
+        url 'https://maven.tarbits.co.uk/'
     }
 }
 
@@ -26,7 +26,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json', '--mixin', 'rocketconnector.mixins.json'
 
             mods {
                 craftingdeadimmerse {
@@ -46,7 +46,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json', '--mixin', 'rocketconnector.mixins.json'
 
             mods {
                 craftingdeadimmerse {
@@ -82,6 +82,10 @@ dependencies {
 	shaded_library ('io.sentry:sentry:5.6.0') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
+    
+    library group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.1'
+    
+    runtimeOnly fg.deobf('net.rocketpowered:rocket-connector:1.18.1-0.0.2')
 }
 
 shadowJar {

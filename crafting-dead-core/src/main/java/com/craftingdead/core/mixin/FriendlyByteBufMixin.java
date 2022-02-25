@@ -25,7 +25,7 @@ import net.minecraft.world.item.ItemStack;
 
 // TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
 @Mixin(FriendlyByteBuf.class)
-public class PacketBufferMixin {
+public class FriendlyByteBufMixin {
 
   @Inject(at = @At(value = "RETURN"),
       method = "Lnet/minecraft/network/FriendlyByteBuf;writeItemStack(Lnet/minecraft/world/item/ItemStack;Z)Lnet/minecraft/network/FriendlyByteBuf;",

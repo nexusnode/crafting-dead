@@ -45,6 +45,8 @@
     "item.craftingdeadimmerse.acacia_plank_platform_blueprint": "Acacia Plank Platform Blueprint",
     "item.craftingdeadimmerse.dark_oak_plank_platform_blueprint": "Dark Oak Plank Platform Blueprint",
 
+    "toasts.info": "Rocket",
+    "toasts.error": "Rocket Error",
     "commands.game.restart":"Restarting game",
     "commands.game.reload_rotation":"Reloading game rotation",
 
@@ -126,6 +128,11 @@
 
     "view.guild.manage_members": "Manage Members",
     "view.guild.invites": "Invites",
-    "view.guild.send_invite": "Send Invite",
-    "view.guild.your_guild": "Your Guild"
+    "view.guild.manage_members.send_invite.message": "Send Invite",
+    "view.guild.your_guild": "Your Guild",
+    "view.guild.create_guild": "Create Guild",
+
+    "view.guild.your_guild.delete.message": "Are you sure you want to delete %s?",
+    "view.guild.your_guild.transfer.message": "Transfer Ownership",
+    "view.guild.your_guild.leave.message": "Are you sure you want to leave %s?"
 }

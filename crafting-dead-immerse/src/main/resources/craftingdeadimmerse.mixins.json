@@ -6,11 +6,12 @@
     "client": [
         "MinecraftMixin",
         "GameRendererMixin",
-        "FirstPersonRendererAccessor",
-        "PlayerControllerMixin"
+        "ItemInHandRendererAccessor",
+        "MultiPlayerGameModeMixin",
+        "KeyboardHandlerMixin"
     ],
     "mixins": [
-        "PlayerDataMixin",
+        "PlayerDataStorageMixin",
         "FireBlockMixin",
         "ServerPlayerMixin",
         "MinecraftServerMixin",

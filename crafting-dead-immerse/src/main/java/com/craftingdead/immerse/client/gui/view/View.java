@@ -69,7 +69,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class View extends GuiComponent
     implements GuiEventListener, Widget, Comparable<View>, CascadeStyleable {
 
-  public static final boolean DEBUG = true;
+  public static final boolean DEBUG = false;
 
   private static final int SCROLLBAR_WIDTH = 4;
 
@@ -98,7 +98,6 @@ public class View extends GuiComponent
   @Nullable
   ParentView parent;
   int index;
-  boolean pendingRemoval;
   @Nullable
   private Layout layout;
   private float lastScrollOffset;
@@ -179,6 +178,7 @@ public class View extends GuiComponent
   private final boolean unscaleHeight;
   private final boolean unscaleBorder;
   private final boolean unscaleOutline;
+  private final boolean focusable;
 
   public View(Properties<?> properties) {
     this.id = properties.id;
@@ -190,6 +190,7 @@ public class View extends GuiComponent
     this.unscaleHeight = properties.unscaleHeight;
     this.unscaleBorder = properties.unscaleBorder;
     this.unscaleOutline = properties.unscaleOutline;
+    this.focusable = properties.focusable;
 
     this.styleHolder.registerDispatcher(
         ShorthandDispatcher.create("scale", Float.class, ShorthandArgMapper.TWO,
@@ -230,13 +231,7 @@ public class View extends GuiComponent
 
   protected void removed() {
     this.added = false;
-    this.post(new RemovedEvent.Post());
-  }
-
-  protected void queueRemoval(Runnable remove) {
-    if (this.post(new RemovedEvent.Pre(remove)) == Event.Result.DEFAULT) {
-      remove.run();
-    }
+    this.post(new RemovedEvent());
   }
 
   protected void setLayout(@Nullable Layout layout) {
@@ -490,9 +485,6 @@ public class View extends GuiComponent
   }
 
   protected final boolean isScrollbarEnabled() {
-    if(this.layout == null) {
-      System.out.println("test");
-    }
     return this.layout.getOverflow() == Overflow.SCROLL
         && this.fullHeight > this.getContentHeight();
   }
@@ -668,6 +660,34 @@ public class View extends GuiComponent
     this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
 
+  public boolean tryFocus(boolean visible) {
+    if (this.isFocused()) {
+      return true;
+    }
+
+    if (!this.focusable || this.stateManager.hasState(States.DISABLED)) {
+      return false;
+    }
+
+    if (visible) {
+      this.stateManager.addState(States.FOCUS_VISIBLE);
+    }
+    this.stateManager.addState(States.FOCUS);
+    this.stateManager.notifyListeners(true);
+    this.focusChanged();
+
+    return true;
+  }
+
+  public void removeFocus() {
+    if (this.isFocused()) {
+      this.stateManager.removeState(States.FOCUS);
+      this.stateManager.removeState(States.FOCUS_VISIBLE);
+      this.stateManager.notifyListeners(true);
+      this.focusChanged();
+    }
+  }
+
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
@@ -675,31 +695,15 @@ public class View extends GuiComponent
       return true;
     }
 
-    if (!this.isHovered()) {
-      if (this.isFocused()) {
-        this.stateManager.removeState(States.FOCUS);
-        this.stateManager.removeState(States.FOCUS_VISIBLE);
-        this.stateManager.notifyListeners(true);
-      }
-      return false;
-    }
-
-    if (!this.isFocused() && this.isFocusable() && this.stateManager.hasState(States.ENABLED)) {
-      this.stateManager.addState(States.FOCUS);
-      this.stateManager.notifyListeners(true);
-    }
-
     // Clicked on scrollbar region
     if (this.isScrollbarEnabled()
         && mouseX >= this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH
-        && mouseX <= this.getScaledX() + this.getScaledWidth() && mouseY >= this
-            .getScaledY()
+        && mouseX <= this.getScaledX() + this.getScaledWidth()
+        && mouseY >= this.getScaledY()
         && mouseY <= this.getScaledY() + this.getScaledHeight()) {
-      // Clicked on actual scrollbar
-      if (mouseX >= this.getScrollbarX() && mouseX <= this.getScrollbarX() + SCROLLBAR_WIDTH
-          && mouseY >= this.getScrollbarY()
-          && mouseY <= this.getScrollbarY() + this.getScrollbarHeight()) {
-      } else {
+      // Clicked outside of scrollbar
+      if (mouseY < this.getScrollbarY()
+          || mouseY > this.getScrollbarY() + this.getScrollbarHeight()) {
         this.scrollTo(this.scrollOffset
             + (mouseY > this.getScrollbarY() ? this.getScaledHeight() : -this.getScaledHeight()),
             200);
@@ -707,12 +711,18 @@ public class View extends GuiComponent
       return true;
     }
 
-    long currentTime = Util.getMillis();
-    long deltaTime = currentTime - this.lastClickTimeMs;
+    if (!this.isHovered() || !this.tryFocus(false)) {
+      return false;
+    }
+
+    var currentTime = Util.getMillis();
+    var deltaTime = currentTime - this.lastClickTimeMs;
     this.lastClickTimeMs = currentTime;
-    return this.stateManager.hasState(States.ENABLED)
-        && (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS)
-        && this.post(new ActionEvent()) == Event.Result.ALLOW;
+    if (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS) {
+      this.post(new ActionEvent());
+    }
+
+    return true;
   }
 
   @Override
@@ -770,7 +780,7 @@ public class View extends GuiComponent
 
   @Override
   public boolean changeFocus(boolean forward) {
-    if (this.isFocusable() && this.stateManager.hasState(States.ENABLED)) {
+    if (this.focusable && this.stateManager.hasState(States.ENABLED)) {
       var focused = this.stateManager.toggleState(States.FOCUS);
       if (focused) {
         this.stateManager.addState(States.FOCUS_VISIBLE);
@@ -786,10 +796,6 @@ public class View extends GuiComponent
 
   protected void focusChanged() {
     this.post(new FocusChangedEvent());
-  }
-
-  protected boolean isFocusable() {
-    return false;
   }
 
   /**
@@ -1064,16 +1070,20 @@ public class View extends GuiComponent
     return this.screen;
   }
 
+  public final boolean hasParent() {
+    return this.parent != null;
+  }
+
   public final ParentView getParent() {
     return this.parent;
   }
 
-  public final Layout getLayout() {
-    return this.layout;
-  }
-
   public final boolean hasLayout() {
     return this.layout != null;
+  }
+
+  public final Layout getLayout() {
+    return this.layout;
   }
 
   public final boolean isClosed() {
@@ -1140,6 +1150,7 @@ public class View extends GuiComponent
     private boolean unscaleHeight;
     private boolean unscaleBorder = true;
     private boolean unscaleOutline = true;
+    private boolean focusable;
 
     public SELF id(String id) {
       this.id = id;
@@ -1191,6 +1202,11 @@ public class View extends GuiComponent
 
     public final SELF unscaleOutline(boolean unscaleOutline) {
       this.unscaleOutline = unscaleOutline;
+      return this.self();
+    }
+
+    public final SELF focusable(boolean focusable) {
+      this.focusable = focusable;
       return this.self();
     }
 

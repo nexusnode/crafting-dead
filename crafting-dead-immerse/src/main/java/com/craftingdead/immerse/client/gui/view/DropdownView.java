@@ -82,7 +82,7 @@ public class DropdownView extends View implements ContainerEventHandler {
   private GuiEventListener lastHoveredListener;
 
   public DropdownView(Properties<?> properties) {
-    super(properties);
+    super(properties.focusable(true));
     this.addListener(ActionEvent.class, event -> {
       if (this.expanded) {
         this.getFocusedItem().select();
@@ -103,11 +103,6 @@ public class DropdownView extends View implements ContainerEventHandler {
   @Override
   public float getZOffset() {
     return super.getZOffset() + Z_OFFSET;
-  }
-
-  @Override
-  protected boolean isFocusable() {
-    return true;
   }
 
   protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
