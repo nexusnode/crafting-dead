@@ -14,14 +14,11 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
@@ -36,8 +33,6 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   private final List<View> children = new ArrayList<>();
   // Bottom to top order
   private View[] sortedChildren = new View[0];
-
-  private final Deque<Pair<View, Runnable>> pendingRemoval = new ArrayDeque<>();
 
   private LayoutParent layoutParent;
 
@@ -79,11 +74,11 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
       return;
     }
 
-    if (view.isAdded()) {
+    if (view.hasParent()) {
       return;
     }
 
-    this.queueAllForRemoval();
+    this.clearChildren();
     this.addChild(view);
     if (this.isAdded()) {
       this.layout();
@@ -92,16 +87,14 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   @ThreadSafe
   public final void addChild(View view) {
+    if (view.hasParent()) {
+      return;
+    }
+
     if (!this.minecraft.isSameThread()) {
       this.minecraft.submit(() -> this.addChild(view)).join();
       return;
     }
-
-    if (view.parent != null) {
-      return;
-    }
-
-    this.updatePendingRemoval();
 
     view.index = this.children.size();
     this.children.add(view);
@@ -141,22 +134,25 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   /**
-   * Forces a child to be removed.
+   * Remove a child view.
    * 
    * @param view - child to remove
-   * @throws IllegalStateException - if the child is not present
-   * @return ourself
+   * @return <code>true</code> if the child was present
    */
   @ThreadSafe
-  public final void removeChild(View view) {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(() -> this.removeChild(view)).join();
-      return;
+  public final boolean removeChild(View view) {
+    if (view.parent != this) {
+      return false;
     }
-    this.assertChildPresent(view);
+    if (!this.minecraft.isSameThread()) {
+      return this.minecraft.submit(() -> this.removeChild(view)).join();
+    }
     this.removed(view);
-    this.children.remove(view);
+    if (!this.children.remove(view)) {
+      throw new IllegalStateException("Expecting child view to be present");
+    }
     this.indexAndSortChildren();
+    return true;
   }
 
   /**
@@ -176,64 +172,6 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   /**
-   * No callback version of {@link #queueChildForRemoval(View, Runnable)}.
-   * 
-   * @param view - child to remove
-   */
-  @ThreadSafe
-  public final void queueChildForRemoval(View view) {
-    this.queueChildForRemoval(view, null);
-  }
-
-  /**
-   * Queues a child to be removed, this will notify the child and the child will be able to choose
-   * when it's actually removed via a callback in {@link View#queueRemoval(Runnable)}. If the child
-   * is not present an {@link IllegalArgumentException} will be thrown.
-   * 
-   * @param view - child to remove
-   * @param callback - executed upon removal
-   */
-  @ThreadSafe
-  public final void queueChildForRemoval(View view, Runnable callback) {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(() -> this.queueChildForRemoval(view, callback)).join();
-      return;
-    }
-    this.assertChildPresent(view);
-    view.queueRemoval(new Runnable() {
-
-      private boolean removed;
-
-      @Override
-      public void run() {
-        if (!this.removed) {
-          this.removed = true;
-          view.pendingRemoval = true;
-          ParentView.this.pendingRemoval.add(Pair.of(view, callback));
-        } else {
-          throw new UnsupportedOperationException("Cannot call remove twice.");
-        }
-      }
-    });
-  }
-
-  /**
-   * Queues all children for removal.
-   * 
-   * @see #queueChildForRemoval(View, Runnable)
-   * 
-   * @return ourself
-   */
-  @ThreadSafe
-  public final void queueAllForRemoval() {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(this::queueAllForRemoval).join();
-      return;
-    }
-    this.children.forEach(this::queueChildForRemoval);
-  }
-
-  /**
    * Performs appropriate logic to remove child but <b>does not actually remove the child from
    * {@link #children}</b>.
    * 
@@ -247,12 +185,8 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     view.getStyle().setParent(null);
     view.parent = null;
     view.getStyle().setStyleSupplier(null);
-    view.pendingRemoval = false;
-  }
-
-  private final void assertChildPresent(View view) {
-    if (this.children.size() <= view.index || this.children.get(view.index) != view) {
-      throw new IllegalArgumentException("View not added");
+    if (this.focusedListener == view) {
+      this.setFocused(null);
     }
   }
 
@@ -263,26 +197,6 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
     this.sortedChildren = this.children.toArray(new View[0]);
     this.sortChildren();
-  }
-
-  private void updatePendingRemoval() {
-    if (!this.pendingRemoval.isEmpty()) {
-      this.pendingRemoval.forEach(pair -> {
-        var view = pair.getLeft();
-        this.removed(view);
-        this.children.remove(view);
-        var callback = pair.getRight();
-        if (callback != null) {
-          callback.run();
-        }
-      });
-      this.pendingRemoval.clear();
-
-      this.indexAndSortChildren();
-      if (this.isAdded()) {
-        this.layout();
-      }
-    }
   }
 
   @Override
@@ -320,7 +234,6 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   @Override
   public void tick() {
-    this.updatePendingRemoval();
     super.tick();
     this.children.forEach(View::tick);
   }
@@ -330,9 +243,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
       float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
     for (var view : this.sortedChildren) {
-      if (!view.pendingRemoval) {
-        view.render(matrixStack, mouseX, mouseY, partialTicks);
-      }
+      view.render(matrixStack, mouseX, mouseY, partialTicks);
     }
   }
 
@@ -355,7 +266,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   @Override
   public Optional<GuiEventListener> getChildAt(double mouseX, double mouseY) {
     for (int i = this.sortedChildren.length; i-- > 0;) {
-      GuiEventListener eventListener = this.sortedChildren[i];
+      var eventListener = this.sortedChildren[i];
       if (eventListener.isMouseOver(mouseX, mouseY)) {
         return Optional.of(eventListener);
       }
@@ -381,8 +292,11 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button)
-        || super.mouseClicked(mouseX, mouseY, button);
+    if (ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button)) {
+      return true;
+    }
+    this.setFocused(null);
+    return super.mouseClicked(mouseX, mouseY, button);
   }
 
   @Override
@@ -438,7 +352,25 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   @Override
+  public void removeFocus() {
+    super.removeFocus();
+    this.setFocused(null);
+  }
+
+  @Override
   public void setFocused(@Nullable GuiEventListener focusedListener) {
+    if (this.focusedListener == focusedListener) {
+      return;
+    }
+
+    if (focusedListener instanceof View view && view.parent != this) {
+      return;
+    }
+
+    if (this.focusedListener instanceof View view && view.isAdded()) {
+      view.removeFocus();
+    }
+
     this.focusedListener = focusedListener;
   }
 

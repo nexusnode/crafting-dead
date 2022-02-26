@@ -164,7 +164,7 @@ public class IngameGui {
       int alpha = (int) (255F
           * (Mth.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
       int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
-      RenderUtil.drawGradientRectangle(0, 0, width, height, flashColour, flashColour);
+      RenderUtil.fillGradient(poseStack, 0, 0, width, height, flashColour, flashColour);
     }
 
     player.getActionObserver()
@@ -246,8 +246,8 @@ public class IngameGui {
     }
   }
 
-  private void renderKillFeedEntry(KillFeedEntry entry, PoseStack matrixStack, float x, float y,
-      float alpha) {
+  private void renderKillFeedEntry(KillFeedEntry entry, PoseStack poseStack,
+      float x, float y, float alpha) {
     final String killerName = entry.getKillerName().getString();
     final String deadName = entry.getDeadName().getString();
     final int killerNameWidth = this.minecraft.font.width(killerName);
@@ -273,12 +273,12 @@ public class IngameGui {
     }
 
     int colour = 0x000000 + (opacity << 24);
-    RenderUtil.drawGradientRectangle(x, y,
+    RenderUtil.fillGradient(poseStack, x, y,
         x + killerNameWidth + deadNameWidth + spacing, y + 11, colour, colour);
 
-    this.minecraft.font.drawShadow(matrixStack, killerName,
+    this.minecraft.font.drawShadow(poseStack, killerName,
         x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    this.minecraft.font.drawShadow(matrixStack, deadName,
+    this.minecraft.font.drawShadow(poseStack, deadName,
         x + killerNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
 
     switch (entry.getType()) {
@@ -314,13 +314,13 @@ public class IngameGui {
     }
 
     if (!entry.getWeaponStack().isEmpty()) {
-      matrixStack.pushPose();
+      poseStack.pushPose();
       {
-        matrixStack.translate(x + killerNameWidth + 4, y - 1, 0);
+        poseStack.translate(x + killerNameWidth + 4, y - 1, 0);
 
         if (entry.getWeaponStack().getItem() instanceof GunItem) {
           var scale = 0.75F;
-          matrixStack.scale(scale, scale, scale);
+          poseStack.scale(scale, scale, scale);
         }
 
         // if (this.itemStack.getItem() instanceof ItemKnife) {
@@ -332,32 +332,30 @@ public class IngameGui {
 
         if (entry.getWeaponStack().getItem() instanceof GrenadeItem) {
           var scale = 0.8F;
-          matrixStack.scale(scale, scale, scale);
-          matrixStack.translate(4, 1, 0);
+          poseStack.scale(scale, scale, scale);
+          poseStack.translate(4, 1, 0);
         }
 
         RenderUtil.renderGuiItem(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
       }
-      matrixStack.popPose();
+      poseStack.popPose();
     }
   }
 
-  private void renderAmmo(PoseStack matrixStack, int width,
-      int height, Gun gun) {
-
+  private void renderAmmo(PoseStack poseStack, int width, int height, Gun gun) {
     int x = width - 115;
     int boxHeight = 25;
 
-    RenderUtil.drawGradientRectangle(x - 10, height - boxHeight, x + 30, height, 0x00000000,
+    RenderUtil.fillGradient(poseStack, x - 10, height - boxHeight, x + 30, height, 0x00000000,
         0x55000000);
-    GuiComponent.fill(matrixStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
+    GuiComponent.fill(poseStack, x + 30, height - boxHeight, x + 30 + 90, height, 0x55000000);
 
     AmmoProvider ammoProvider = gun.getAmmoProvider();
     int ammoCount = ammoProvider.getMagazine().map(Magazine::getSize).orElse(0);
     int reserveSize = ammoProvider.getReserveSize();
-    boolean empty = ammoCount == 0 && reserveSize == 0;
+    var empty = ammoCount == 0 && reserveSize == 0;
 
-    String ammoText = empty ? I18n.get("hud.empty_magazine")
+    var ammoText = empty ? I18n.get("hud.empty_magazine")
         : String.valueOf(ammoCount);
     int ammoTextWidth = this.minecraft.font.width(ammoText);
 
@@ -366,34 +364,29 @@ public class IngameGui {
     int reserveTextWidth =
         (int) (this.minecraft.font.width(reserveText) * reserveTextScale);
 
-    this.minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(poseStack,
         ammoText,
         x + 55 - ammoTextWidth - (empty ? 0 : reserveTextWidth),
         height - (boxHeight / 2) - this.minecraft.font.lineHeight / 2,
         empty ? ChatFormatting.RED.getColor() : 0xFFFFFFFF);
 
     if (!empty) {
-      matrixStack.pushPose();
-      matrixStack.translate(x + 55 - reserveTextWidth,
+      poseStack.pushPose();
+      poseStack.translate(x + 55 - reserveTextWidth,
           height - (boxHeight / 2) - (reserveTextScale * 2), 0);
-      matrixStack.scale(reserveTextScale, reserveTextScale, reserveTextScale);
-      this.minecraft.font.drawShadow(matrixStack,
+      poseStack.scale(reserveTextScale, reserveTextScale, reserveTextScale);
+      this.minecraft.font.drawShadow(poseStack,
           reserveText, 0, 0, empty ? ChatFormatting.RED.getColor() : 0xFFFFFFFF);
-      matrixStack.popPose();
+      poseStack.popPose();
     }
 
     String fireMode = I18n.get(gun.getFireMode().getTranslationKey());
-    this.minecraft.font.drawShadow(matrixStack,
+    this.minecraft.font.drawShadow(poseStack,
         fireMode, x + 65, height - 16, 0xFFFFFFFF);
   }
 
   private static void renderProgress(PoseStack poseStack, Font font,
       int width, int height, Component message, @Nullable Component subMessage, float percent) {
-
-    if (percent == 1.0F)
-      System.out.println(percent);
-
-
     final int barWidth = 100;
     final int barHeight = 10;
     final int barColour = 0xC0FFFFFF;
@@ -401,7 +394,7 @@ public class IngameGui {
     final float y = height / 2;
     font.drawShadow(poseStack, message.getString(), x,
         y - barHeight - ((font.lineHeight / 2) + 0.5F), 0xFFFFFF);
-    RenderUtil.drawGradientRectangle(x, y, x + barWidth * percent, y + barHeight, barColour,
+    RenderUtil.fillGradient(poseStack, x, y, x + barWidth * percent, y + barHeight, barColour,
         barColour);
     if (subMessage != null) {
       font.drawShadow(poseStack, subMessage.getString(), x,
@@ -511,7 +504,7 @@ public class IngameGui {
 
     GuiComponent.fill(poseStack, 0, height - healthBoxHeight, healthWidth, height, 0x55000000);
 
-    RenderUtil.drawGradientRectangle(healthWidth, height - healthBoxHeight, healthWidth + 40,
+    RenderUtil.fillGradient(poseStack, healthWidth, height - healthBoxHeight, healthWidth + 40,
         height, 0x55000000, 0x00000000);
 
     RenderSystem.setShaderTexture(0, HEALTH);

@@ -86,6 +86,7 @@ public class StyleHolder {
       return;
     }
 
+
     var styleList = this.styleSupplier.get();
     if (styleList == null) {
       return;
@@ -100,7 +101,6 @@ public class StyleHolder {
       var source = new StyleSource(StyleSource.Type.AUTHOR, rule.selector().getSpecificity());
       TransitionParser transitionParser = null;
       for (var property : rule.properties()) {
-
         var dispatcher = this.dispatchers.get(property.name());
         if (dispatcher != null) {
           var state = rule.selector().getPseudoClasses().stream()

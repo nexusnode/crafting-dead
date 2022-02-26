@@ -34,6 +34,7 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -59,6 +60,8 @@ public class TextFieldView extends View {
       StyleableProperty.create("text_color_uneditable", Color.class, new Color(0xFF707070)),
       this::registerProperty);
 
+  @Nullable
+  private Component placeholder;
   private String suggestion;
   private Consumer<String> responder;
   private Predicate<String> filter = Objects::nonNull;
@@ -66,13 +69,8 @@ public class TextFieldView extends View {
       (value, p_195610_1_) -> FormattedCharSequence.forward(value, Style.EMPTY);
 
   public TextFieldView(Properties<?> properties) {
-    super(properties);
+    super(properties.focusable(true));
     this.font = this.minecraft.font;
-  }
-
-  @Override
-  protected boolean isFocusable() {
-    return true;
   }
 
   public TextFieldView setResponder(Consumer<String> responder) {
@@ -354,7 +352,9 @@ public class TextFieldView extends View {
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    super.mouseClicked(mouseX, mouseY, button);
+    if (super.mouseClicked(mouseX, mouseY, button)) {
+      return true;
+    }
 
     if (this.isFocused() && this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
       int i = Mth.ceil(mouseX) - Mth.ceil(this.getScaledContentX());
@@ -378,27 +378,28 @@ public class TextFieldView extends View {
         Mth.floor(this.getScaledContentX()));
     var cursorVisisble = cursorIndex >= 0 && cursorIndex <= text.length();
     var cursorBlink = this.isFocused() && this.frame / 6 % 2 == 0 && cursorVisisble;
-    var x = this.getScaledContentX() + 2;
-    var y = this.getScaledContentY()
+
+    var textX = this.getScaledContentX() + 2;
+    var textY = this.getScaledContentY()
         + this.getScaledContentHeight() / 2.0F
         - this.font.lineHeight / 2.0F;
-    var remainingX = x;
+    var remainingX = textX;
     if (highlightMaxIndex > text.length()) {
       highlightMaxIndex = text.length();
     }
 
     if (!text.isEmpty()) {
-      String highlightedText = cursorVisisble ? text.substring(0, cursorIndex) : text;
+      var highlightedText = cursorVisisble ? text.substring(0, cursorIndex) : text;
       remainingX = this.font.drawShadow(poseStack,
-          this.formatter.apply(highlightedText, this.displayIndex), x,
-          y, textColor);
+          this.formatter.apply(highlightedText, this.displayIndex), textX,
+          textY, textColor);
     }
 
     var pipeCursor =
         this.cursorIndex < this.value.length() || this.value.length() >= this.getMaxLength();
     var highlightX = remainingX;
     if (!cursorVisisble) {
-      highlightX = cursorIndex > 0 ? x + this.getScaledContentWidth() : x;
+      highlightX = cursorIndex > 0 ? textX + this.getScaledContentWidth() : textX;
     } else if (pipeCursor) {
       highlightX = remainingX - 1;
       --remainingX;
@@ -406,26 +407,31 @@ public class TextFieldView extends View {
 
     if (!text.isEmpty() && cursorVisisble && cursorIndex < text.length()) {
       this.font.drawShadow(poseStack,
-          this.formatter.apply(text.substring(cursorIndex), this.cursorIndex), remainingX, y,
+          this.formatter.apply(text.substring(cursorIndex), this.cursorIndex), remainingX, textY,
           textColor);
     }
 
     if (!pipeCursor && this.suggestion != null) {
-      this.font.drawShadow(poseStack, this.suggestion, highlightX - 1.0F, y, 0xFF808080);
+      this.font.drawShadow(poseStack, this.suggestion, highlightX - 1.0F, textY, 0xFF808080);
+    }
+
+    if (!pipeCursor && this.placeholder != null && this.value.isEmpty()) {
+      this.font.drawShadow(poseStack, this.placeholder, textX, textY, 0xFF808080);
     }
 
     if (cursorBlink) {
       if (pipeCursor) {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderUtil.fill(poseStack, highlightX, y - 1, highlightX + 1, y + 1 + 9, 0xFFD0D0D0);
+        RenderUtil.fill(poseStack, highlightX, textY - 1, highlightX + 1, textY + 1 + 9,
+            0xFFD0D0D0);
       } else {
-        this.font.drawShadow(poseStack, "_", (float) highlightX, (float) y, textColor);
+        this.font.drawShadow(poseStack, "_", (float) highlightX, (float) textY, textColor);
       }
     }
 
     if (highlightMaxIndex != cursorIndex) {
-      float highlightX2 = x + this.font.width(text.substring(0, highlightMaxIndex));
-      this.renderHighlight(highlightX, y - 1, highlightX2 - 1, y + 1 + 9);
+      float highlightX2 = textX + this.font.width(text.substring(0, highlightMaxIndex));
+      this.renderHighlight(highlightX, textY - 1, highlightX2 - 1, textY + 1 + 9);
     }
   }
 
@@ -538,6 +544,11 @@ public class TextFieldView extends View {
 
       this.displayIndex = Mth.clamp(this.displayIndex, 0, length);
     }
+  }
+
+  public TextFieldView setPlaceholder(@Nullable Component placeholder) {
+    this.placeholder = placeholder;
+    return this;
   }
 
   public TextFieldView setSuggestion(@Nullable String suggestion) {

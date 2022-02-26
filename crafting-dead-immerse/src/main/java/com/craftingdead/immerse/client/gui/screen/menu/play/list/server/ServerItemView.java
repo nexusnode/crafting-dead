@@ -38,7 +38,7 @@ class ServerItemView extends ParentView {
   private long lastAnimationUpdateMs;
 
   ServerItemView(ServerEntry serverEntry) {
-    super(new Properties<>().styleClasses("item").doubleClick(true));
+    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
     this.serverEntry = serverEntry;
 
     this.motdComponent = new TextView(new Properties<>().id("motd"))
@@ -67,11 +67,6 @@ class ServerItemView extends ParentView {
     this.addChild(this.playersAmountComponent);
 
     this.ping();
-  }
-
-  @Override
-  protected boolean isFocusable() {
-    return true;
   }
 
   @Override

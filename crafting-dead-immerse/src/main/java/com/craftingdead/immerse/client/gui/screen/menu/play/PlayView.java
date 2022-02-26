@@ -22,6 +22,7 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import com.craftingdead.immerse.client.gui.screen.menu.AnimatableView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServerList;
@@ -37,7 +38,7 @@ import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TranslatableComponent;
 
-public class PlayView extends ParentView {
+public class PlayView extends ParentView implements AnimatableView {
 
   private final ParentView content = new ParentView(new Properties<>().id("content"));
   private final ParentView officialContent =
@@ -100,9 +101,7 @@ public class PlayView extends ParentView {
   }
 
   private void setContent(View content) {
-    this.content.queueAllForRemoval();
-    this.content.addChild(content);
-    this.content.layout();
+    this.content.replace(content);
   }
 
   @Override
@@ -124,7 +123,7 @@ public class PlayView extends ParentView {
   }
 
   @Override
-  protected void queueRemoval(Runnable remove) {
+  public void animateRemoval(Runnable remove) {
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.getXTranslationProperty())
             .to((float) -this.window.getWidth())
