@@ -30,7 +30,7 @@ import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.rocketpowered.connector.RocketConnector;
+import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.guild.GuildView;
 
 @Mixin(KeyboardHandler.class)
@@ -42,7 +42,7 @@ public class KeyboardHandlerMixin {
     if (action == GLFW.GLFW_PRESS) {
       if (keyCode == GLFW.GLFW_KEY_TAB
           && (modifiers & GLFW.GLFW_MOD_SHIFT) == GLFW.GLFW_MOD_SHIFT
-          && RocketConnector.getInstance().getConnectionManager().getConnection().isPresent()) {
+          && Rocket.getGameClientGateway().isPresent()) {
         callbackInfo.cancel();
         var screen = new ViewScreen(TextComponent.EMPTY, new GuildView());
         screen.setStylesheets(

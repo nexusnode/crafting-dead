@@ -26,7 +26,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json', '--mixin', 'rocketconnector.mixins.json'
 
             mods {
                 craftingdeadimmerse {
@@ -46,7 +46,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdeadimmerse.mixins.json', '--mixin', 'craftingdead.mixins.json', '--mixin', 'rocketconnector.mixins.json'
 
             mods {
                 craftingdeadimmerse {
