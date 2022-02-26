@@ -85,7 +85,7 @@ dependencies {
     
     library group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.1'
     
-    runtimeOnly fg.deobf('net.rocketpowered:rocket-connector:1.18.1-0.0.1')
+    runtimeOnly fg.deobf('net.rocketpowered:rocket-connector:1.18.1-0.0.2')
 }
 
 shadowJar {

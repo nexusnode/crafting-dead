@@ -7,7 +7,8 @@
         "MinecraftMixin",
         "GameRendererMixin",
         "ItemInHandRendererAccessor",
-        "MultiPlayerGameModeMixin"
+        "MultiPlayerGameModeMixin",
+        "KeyboardHandlerMixin"
     ],
     "mixins": [
         "PlayerDataStorageMixin",
