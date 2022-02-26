@@ -308,8 +308,8 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
     this.getTeamModule().setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
-        new TranslatableComponent("message.joined",
-            player.getEntity().getDisplayName().getString()),
+        new TranslatableComponent("message.joined", player.getEntity().getDisplayName())
+            .withStyle(ChatFormatting.WHITE),
         this.getMinecraftServer());
   }
 
@@ -320,8 +320,8 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
     this.deletePlayerData(player.getEntity().getUUID());
 
     GameUtil.sendGameMessageToAll(
-        new TranslatableComponent("message.left",
-            player.getEntity().getDisplayName().getString()),
+        new TranslatableComponent("message.left", player.getEntity().getDisplayName())
+            .withStyle(ChatFormatting.WHITE),
         this.getMinecraftServer());
   }
 

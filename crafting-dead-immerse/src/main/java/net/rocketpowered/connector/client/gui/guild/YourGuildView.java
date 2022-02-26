@@ -20,29 +20,27 @@ package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.AvatarView;
-import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
-import com.mojang.authlib.GameProfile;
+import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.connector.RocketConnector;
-import net.rocketpowered.connector.api.GameClientApi;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.GuildRank;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberLeaveEvent;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberUpdateEvent;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.UserPresencePayload;
-import net.rocketpowered.connector.internal.shaded.org.bson.types.ObjectId;
-import net.rocketpowered.connector.internal.shaded.reactor.core.Disposable;
-import net.rocketpowered.connector.internal.shaded.reactor.core.publisher.Mono;
-import net.rocketpowered.connector.internal.shaded.reactor.core.scheduler.Schedulers;
+import net.rocketpowered.api.Rocket;
+import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.payload.GuildMemberPayload;
+import net.rocketpowered.common.payload.GuildMemberUpdateEvent;
+import net.rocketpowered.common.payload.GuildPayload;
+import net.rocketpowered.connector.client.gui.RocketToast;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class YourGuildView extends ParentView {
 
@@ -54,45 +52,47 @@ public class YourGuildView extends ParentView {
 
   private final Map<ObjectId, MemberView> memberViews = new HashMap<>();
 
+  private final Consumer<View> contentConsumer;
+
   @Nullable
   private GuildPayload guild;
 
   private Disposable listener;
 
-  public YourGuildView() {
-    super(new Properties<>());
+  public YourGuildView(Consumer<View> contentConsumer) {
+    super(new Properties<>().styleClasses("page").backgroundBlur(50));
 
-    var dialogView = new ParentView(new Properties<>().styleClasses("dialog").backgroundBlur(50));
-    dialogView.addChild(new TextView(new Properties<>().id("title"))
+    this.contentConsumer = contentConsumer;
+
+    this.addChild(new TextView(new Properties<>().id("title"))
         .setText(TITLE)
         .setCentered(true));
 
     var guildView = new ParentView(new Properties<>().id("guild"));
-    dialogView.addChild(guildView);
+    this.addChild(guildView);
 
     guildView.addChild(
         this.informationView = new ParentView(new Properties<>().id("information")));
 
     guildView.addChild(
         this.membersView = new ParentView(new Properties<>().id("members")));
-
-    this.addChild(dialogView);
   }
 
-  private void updateGuild(GameClientApi api, GuildPayload guild) {
+  private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
-      // this.minecraft.setScreen(new MainMenuScreen());
       return;
     }
 
     if (!guild.equals(this.guild)) {
       this.membersView.clearChildren();
-      api.getGuildMembers(guild.getId())
+      gateway.getGuildMembers(guild.getId())
           .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .doOnNext(member -> this.updateMember(api, member))
+          .doOnNext(member -> this.updateMember(gateway, member))
           .doOnTerminate(this::layout)
           .subscribeOn(Schedulers.boundedElastic())
           .subscribe();
+    } else {
+      this.memberViews.values().forEach(view -> view.updateGuild(guild));
     }
 
     this.informationView.clearChildren();
@@ -100,7 +100,7 @@ public class YourGuildView extends ParentView {
     this.informationView.addChild(new TextView(new Properties<>())
         .setText(new TextComponent("")
             .append(new TextComponent("Name: ")
-                .withStyle(ChatFormatting.GOLD))
+                .withStyle(ChatFormatting.GRAY))
             .append(guild.getName()))
         .setShadow(false));
     this.informationView.addChild(new TextView(new Properties<>())
@@ -116,17 +116,71 @@ public class YourGuildView extends ParentView {
             .append(guild.getOwner().getMinecraftProfile().getName()))
         .setShadow(false));
 
+    var controlsView = new ParentView(new Properties<>().id("controls"));
+    this.informationView.addChild(controlsView);
+
+    if (guild.getOwner().getMinecraftProfile().getId().equals(
+        this.minecraft.getUser().getGameProfile().getId())) {
+      controlsView.addChild(Theme.createRedButton(new TextComponent("Transfer"),
+          () -> this.contentConsumer.accept(new UsernameDialogView(
+              new TranslatableComponent("view.guild.your_guild.transfer.message"),
+              result -> {
+                gateway.getUserId(result)
+                    .flatMap(gateway::transferGuildOwnership)
+                    .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
+                        "Transferring guild: " + guild.getName()))
+                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild transferred"))
+                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                    .subscribe();
+                this.contentConsumer.accept(this);
+              },
+              () -> this.contentConsumer.accept(this)))));
+      controlsView.addChild(Theme.createRedButton(new TextComponent("Delete"),
+          () -> this.contentConsumer.accept(new ConfirmDialogView(
+              new TranslatableComponent("view.guild.your_guild.delete.message",
+                  this.guild.getName()),
+              () -> {
+                gateway.deleteGuild()
+                    .doOnSubscribe(
+                        __ -> RocketToast.info(this.minecraft,
+                            "Deleting guild: " + guild.getName()))
+                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild deleted"))
+                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                    .subscribe();
+                this.contentConsumer.accept(this);
+              },
+              () -> this.contentConsumer.accept(this)))));
+    } else {
+      controlsView.addChild(Theme.createRedButton(new TextComponent("Leave"),
+          () -> this.contentConsumer.accept(new ConfirmDialogView(
+              new TranslatableComponent("view.guild.your_guild.leave.message",
+                  this.guild.getName()),
+              () -> {
+                gateway.leaveGuild()
+                    .doOnSubscribe(
+                        __ -> RocketToast.info(this.minecraft,
+                            "Leaving guild: " + guild.getName()))
+                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Left guild"))
+                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                    .subscribe();
+                this.contentConsumer.accept(this);
+              },
+              () -> this.contentConsumer.accept(this)))));
+    }
+
     this.informationView.layout();
 
     this.guild = guild;
   }
 
-  private void updateMember(GameClientApi api, GuildMemberPayload member) {
-    MemberView view =
-        this.memberViews.computeIfAbsent(member.getUser().getId(), __ -> new MemberView(member));
-    if (view.isAdded()) {
+  private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
+    var view = this.memberViews.computeIfAbsent(member.getUser().getId(),
+        __ -> new MemberView(this.guild, member));
+    if (view.hasParent()) {
       view.updateMember(member);
     } else {
+      view.addListener(RemovedEvent.class,
+          __ -> this.memberViews.remove(member.getUser().getId(), view));
       this.membersView.addChild(view);
     }
   }
@@ -134,7 +188,7 @@ public class YourGuildView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = RocketConnector.getInstance().getGameClientApi()
+    this.listener = Rocket.getGameClientGatewayStream()
         .flatMap(api -> Mono.when(
             api.getSocialProfile()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
@@ -153,95 +207,6 @@ public class YourGuildView extends ParentView {
   protected void removed() {
     super.removed();
     this.listener.dispose();
-  }
-
-  private class MemberView extends ParentView {
-
-    private GuildMemberPayload member;
-
-    private Disposable removeListener;
-    private Disposable presenceListener;
-
-    private final AvatarView avatarView;
-    private final TextView nameView;
-
-    public MemberView(GuildMemberPayload member) {
-      super(new Properties<>().unscaleBorder(false));
-
-      this.updateMember(member);
-
-      this.avatarView = new AvatarView(new Properties<>(),
-          new GameProfile(member.getUser().getMinecraftProfile().getId(), null));
-      this.avatarView.defineBorderColorState(Theme.OFFLINE);
-      this.addChild(this.avatarView);
-
-      this.nameView = new TextView(new Properties<>().id("name"))
-          .setWrap(false)
-          .setText(member.getUser().getMinecraftProfile().getName());
-      this.nameView.defineBorderColorState(Theme.OFFLINE);
-
-      this.nameView.getColorProperty().defineState(Theme.OFFLINE);
-      this.addChild(this.nameView);
-    }
-
-    @Override
-    protected boolean isFocusable() {
-      return true;
-    }
-
-    private void updateMember(GuildMemberPayload member) {
-      this.member = member;
-
-      GuildRank rank = member.getRank();
-
-      Color color = Color.GRAY;
-
-      if (member.getUser().equals(YourGuildView.this.guild.getOwner())) {
-        color = Color.GOLD;
-      } else if (rank == GuildRank.DIGNITARY) {
-        color = Color.DARK_PURPLE;
-      } else if (rank == GuildRank.ENVOY) {
-        color = Color.AQUA;
-      }
-
-      this.getLeftBorderColorProperty().defineState(color);
-    }
-
-    private void updatePresence(UserPresencePayload presence) {
-      var color = presence.isOnline() ? Theme.ONLINE : Theme.OFFLINE;
-      this.avatarView.defineBorderColorState(color);
-      this.nameView.getColorProperty().defineState(color);
-    }
-
-    @Override
-    protected void added() {
-      super.added();
-      this.removeListener = RocketConnector.getInstance().getGameClientApi()
-          .flatMap(GameClientApi::getGuildEvents)
-          .ofType(GuildMemberLeaveEvent.class)
-          .filter(event -> event.getUser().equals(this.member.getUser()))
-          .next()
-          .subscribeOn(Schedulers.boundedElastic())
-          .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .subscribe(__ -> {
-            YourGuildView.this.memberViews.remove(this.member.getUser().getId(), this);
-            if (this.isAdded()) {
-              this.getParent().removeChild(this);
-            }
-          });
-
-      this.presenceListener = RocketConnector.getInstance().getGameClientApi()
-          .flatMap(api -> api.getUserPresence(this.member.getUser().getId()))
-          .subscribeOn(Schedulers.boundedElastic())
-          .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .subscribe(this::updatePresence);
-    }
-
-    @Override
-    protected void removed() {
-      super.removed();
-      this.removeListener.dispose();
-      this.presenceListener.dispose();
-    }
+    this.guild = null;
   }
 }

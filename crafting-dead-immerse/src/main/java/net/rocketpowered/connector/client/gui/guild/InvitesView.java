@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
+import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -35,23 +36,21 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.connector.RocketConnector;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildInvitePayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.UserPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.UserPresencePayload;
-import net.rocketpowered.connector.internal.shaded.org.bson.types.ObjectId;
-import net.rocketpowered.connector.internal.shaded.reactor.core.Disposable;
-import net.rocketpowered.connector.internal.shaded.reactor.core.publisher.Flux;
-import net.rocketpowered.connector.internal.shaded.reactor.core.publisher.Mono;
-import net.rocketpowered.connector.internal.shaded.reactor.core.scheduler.Schedulers;
+import net.rocketpowered.api.Rocket;
+import net.rocketpowered.common.payload.GuildInvitePayload;
+import net.rocketpowered.common.payload.GuildMemberPayload;
+import net.rocketpowered.common.payload.GuildPayload;
+import net.rocketpowered.common.payload.UserPayload;
+import net.rocketpowered.common.payload.UserPresencePayload;
+import net.rocketpowered.connector.client.gui.RocketToast;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class InvitesView extends ParentView {
 
   public static final Component TITLE = new TranslatableComponent("view.guild.invites");
-
-  private final ParentView dialogView;
 
   private final ParentView invitesListView;
 
@@ -73,39 +72,44 @@ public class InvitesView extends ParentView {
   private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
 
   public InvitesView() {
-    super(new Properties<>());
+    super(new Properties<>().styleClasses("page").backgroundBlur(50));
 
-    this.dialogView =
-        new ParentView(new Properties<>().styleClasses("dialog").backgroundBlur(50));
-    this.dialogView.addChild(new TextView(new Properties<>().id("title"))
+    this.addChild(new TextView(new Properties<>().id("title"))
         .setText(TITLE)
         .setCentered(true));
 
     this.invitesListView = new ParentView(new Properties<>().id("list"));
 
-    this.dialogView.addChild(this.invitesListView);
+    this.addChild(this.invitesListView);
 
     this.controlsView = new ParentView(new Properties<>().id("controls"));
     this.controlsView.addChild(
         this.acceptButton = Theme.createBlueButton(
             new TextComponent("Accept"),
-            () -> RocketConnector.getInstance().getGameClientApi()
-                .next()
-                .flatMap(api -> api.acceptGuildInvite(
-                    this.selectedInviteView.invite.getGuild().getId()))
-                .subscribe()));
+            () -> Rocket.getGameClientGateway()
+                .ifPresentOrElse(connection -> {
+                  var inviteGuild = this.selectedInviteView.invite.getGuild();
+                  connection
+                      .acceptGuildInvite(inviteGuild.getId())
+                      .publishOn(Schedulers.fromExecutor(this.minecraft))
+                      .doOnSuccess(__ -> RocketToast.info(this.minecraft,
+                          "Welcome to " + inviteGuild.getName()))
+                      .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                      .subscribe();
+                }, () -> RocketToast.info(this.minecraft, "Not connected to Rocket"))));
     this.controlsView.addChild(
         this.declineButton = Theme.createRedButton(
             new TextComponent("Decline"),
-            () -> RocketConnector.getInstance().getGameClientApi()
-                .next()
-                .flatMap(api -> api.declineGuildInvite(
-                    this.selectedInviteView.invite.getGuild().getId()))
-                .subscribe()));
+            () -> Rocket.getGameClientGateway()
+                .ifPresentOrElse(connection -> connection
+                    .declineGuildInvite(this.selectedInviteView.invite.getGuild().getId())
+                    .publishOn(Schedulers.fromExecutor(this.minecraft))
+                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                    .subscribe(),
+                    () -> RocketToast.info(this.minecraft, "Not connected to Rocket"))));
 
-    this.dialogView.addChild(this.controlsView);
+    this.addChild(this.controlsView);
 
-    this.addChild(this.dialogView);
 
     this.updateSelected();
   }
@@ -125,26 +129,24 @@ public class InvitesView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = RocketConnector.getInstance().getGameClientApi()
+    this.listener = Rocket.getGameClientGatewayStream()
         .flatMap(api -> api.getSocialProfile()
             .publishOn(Schedulers.fromExecutor(this.minecraft))
             .doOnNext(profile -> {
               Sets.difference(this.lastInvites, profile.getGuildInvites())
                   .forEach(invite -> {
-                    var view = this.inviteViews.remove(invite.getGuild().getId());
-                    if (view != null && view.isAdded()) {
+                    InviteView view = this.inviteViews.remove(invite.getGuild().getId());
+                    if (view != null && view.hasParent()) {
                       this.invitesListView.removeChild(view);
-                      this.updateSelected();
                     }
                   });
 
               profile.getGuildInvites().forEach(invite -> {
-                var view =
+                InviteView view =
                     this.inviteViews.computeIfAbsent(invite.getGuild().getId(),
                         __ -> new InviteView(invite));
-                if (!view.isAdded()) {
+                if (!view.hasParent()) {
                   this.invitesListView.addChild(view);
-                  this.updateSelected();
                 }
               });
 
@@ -179,7 +181,7 @@ public class InvitesView extends ParentView {
     private Disposable memberListener;
 
     public InviteView(GuildInvitePayload invite) {
-      super(new Properties<>().styleClasses("item").unscaleBorder(false));
+      super(new Properties<>().styleClasses("item").unscaleBorder(false).focusable(true));
 
       this.invite = invite;
 
@@ -209,15 +211,10 @@ public class InvitesView extends ParentView {
     }
 
     @Override
-    protected boolean isFocusable() {
-      return true;
-    }
-
-    @Override
     protected void added() {
       super.added();
       AtomicInteger counter = new AtomicInteger();
-      this.memberListener = RocketConnector.getInstance().getGameClientApi()
+      this.memberListener = Rocket.getGameClientGatewayStream()
           .flatMap(api -> Mono
               .fromRunnable(() -> this.minecraft.executeBlocking(() -> {
                 this.onlineMemebrsView.setText("0 Online");

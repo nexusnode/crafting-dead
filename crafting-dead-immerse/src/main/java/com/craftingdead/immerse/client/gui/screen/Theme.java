@@ -52,7 +52,7 @@ public class Theme {
 
   public static View createRedButton(Component text, Runnable actionListener, @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().styleClasses(RED_BUTTON_CLASS));
+        new ParentView.Properties<>().id(id).styleClasses(RED_BUTTON_CLASS));
   }
 
   public static View createGreenButton(Component text, Runnable actionListener) {
@@ -62,7 +62,7 @@ public class Theme {
   public static View createGreenButton(Component text, Runnable actionListener,
       @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().styleClasses(GREEN_BUTTON_CLASS));
+        new ParentView.Properties<>().id(id).styleClasses(GREEN_BUTTON_CLASS));
   }
 
   public static View createBlueButton(Component text, Runnable actionListener) {
@@ -72,17 +72,12 @@ public class Theme {
   public static View createBlueButton(Component text, Runnable actionListener,
       @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().styleClasses(BLUE_BUTTON_CLASS));
+        new ParentView.Properties<>().id(id).styleClasses(BLUE_BUTTON_CLASS));
   }
 
   public static View createButton(Component text, Runnable actionListener,
       ParentView.Properties<?> properties) {
-    var view = new ParentView(properties.styleClasses("button")) {
-      @Override
-      protected boolean isFocusable() {
-        return true;
-      }
-    };
+    var view = new ParentView(properties.styleClasses("button").focusable(true));
 
     view.addChild(new TextView(new TextView.Properties<>().id("label"))
         .setText(text)
@@ -97,12 +92,7 @@ public class Theme {
 
   public static ImageView createImageButton(ResourceLocation image, Runnable actionListener,
       ParentView.Properties<?> properties) {
-    var view = new ImageView(properties.styleClasses("image-button")) {
-      @Override
-      protected boolean isFocusable() {
-        return true;
-      }
-    };
+    var view = new ImageView(properties.styleClasses("image-button").focusable(true));
     view.setImage(image);
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());

@@ -41,6 +41,7 @@ import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.Tooltip;
+import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -69,7 +70,7 @@ public class MainMenuView extends ParentView {
 
     var homeButton = Theme.createImageButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"),
-        () -> this.contentContainer.replace(homeView),
+        () -> this.transitionTo(homeView),
         new Properties<>()
             .id("home")
             .tooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
@@ -79,7 +80,7 @@ public class MainMenuView extends ParentView {
 
     var playButton = Theme.createImageButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"),
-        () -> this.contentContainer.replace(playView),
+        () -> this.transitionTo(playView),
         new Properties<>()
             .id("play")
             .styleClasses("grow-button")
@@ -127,7 +128,27 @@ public class MainMenuView extends ParentView {
 
     this.addChild(sideBar);
 
-    this.contentContainer.replace(homeView);
+    this.contentContainer.addChild(homeView);
+  }
+
+  private void transitionTo(View view) {
+    var views = this.contentContainer.getChildViews();
+    if (views.contains(view)) {
+      return;
+    }
+    if (views.size() == 1) {
+      var currentView = views.get(0);
+      if (currentView instanceof AnimatableView animatable) {
+        animatable.animateRemoval(() -> {
+          this.contentContainer.removeChild(currentView);
+          this.contentContainer.layout();
+        });
+      } else {
+        this.contentContainer.removeChild(currentView);
+      }
+    }
+    this.contentContainer.addChild(view);
+    this.contentContainer.layout();
   }
 
   public static Screen createScreen() {

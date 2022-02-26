@@ -226,8 +226,8 @@ public class RenderUtil {
     GuiComponent.fill(poseStack, x, y, x + width, y + height, colour);
   }
 
-  public static void drawGradientRectangle(float x, float y, float x2, float y2, int startColor,
-      int endColor) {
+  public static void fillGradient(PoseStack poseStack, float x, float y, float x2, float y2,
+      int startColor, int endColor) {
     RenderSystem.disableTexture();
     RenderSystem.enableBlend();
     RenderSystem.defaultBlendFunc();
@@ -243,13 +243,27 @@ public class RenderUtil {
     var endGreen = (endColor >> 8 & 255) / 255.0F;
     var endBlue = (endColor & 255) / 255.0F;
 
+    var pose = poseStack.last().pose();
+
     var tessellator = Tesselator.getInstance();
     var builder = tessellator.getBuilder();
     builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-    builder.vertex(x, y2, 0.0F).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-    builder.vertex(x2, y2, 0.0F).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    builder.vertex(x2, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-    builder.vertex(x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+    builder
+        .vertex(pose, x, y2, 0.0F)
+        .color(startRed, startGreen, startBlue, startAlpha)
+        .endVertex();
+    builder
+        .vertex(pose, x2, y2, 0.0F)
+        .color(endRed, endGreen, endBlue, endAlpha)
+        .endVertex();
+    builder
+        .vertex(pose, x2, y, 0.0F)
+        .color(endRed, endGreen, endBlue, endAlpha)
+        .endVertex();
+    builder
+        .vertex(pose, x, y, 0.0F)
+        .color(startRed, startGreen, startBlue, startAlpha)
+        .endVertex();
     tessellator.end();
 
     RenderSystem.disableBlend();

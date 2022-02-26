@@ -22,37 +22,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.AvatarView;
-import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
-import com.google.common.base.Strings;
-import com.mojang.authlib.GameProfile;
+import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.connector.RocketConnector;
-import net.rocketpowered.connector.api.GameClientApi;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.GuildPermission;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.GuildRank;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberLeaveEvent;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildMemberUpdateEvent;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.GuildPayload;
-import net.rocketpowered.connector.internal.shaded.net.rocketpowered.api.payload.UserPresencePayload;
-import net.rocketpowered.connector.internal.shaded.org.bson.types.ObjectId;
-import net.rocketpowered.connector.internal.shaded.reactor.core.Disposable;
-import net.rocketpowered.connector.internal.shaded.reactor.core.publisher.Mono;
-import net.rocketpowered.connector.internal.shaded.reactor.core.scheduler.Schedulers;
+import net.rocketpowered.api.Rocket;
+import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.GuildPermission;
+import net.rocketpowered.common.payload.GuildMemberPayload;
+import net.rocketpowered.common.payload.GuildMemberUpdateEvent;
+import net.rocketpowered.common.payload.GuildPayload;
+import net.rocketpowered.connector.client.gui.RocketToast;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class ManageMembersView extends ParentView {
 
   public static final Component TITLE =
       new TranslatableComponent("view.guild.manage_members");
-
-  private final ParentView dialogView;
 
   private final ParentView membersListView;
 
@@ -76,15 +69,13 @@ public class ManageMembersView extends ParentView {
   private Disposable listener;
 
   public ManageMembersView(Consumer<View> viewConsumer) {
-    super(new Properties<>());
+    super(new Properties<>().styleClasses("page").backgroundBlur(50));
 
-    this.dialogView = new ParentView(new Properties<>().styleClasses("dialog").backgroundBlur(50));
-
-    this.dialogView.addChild(new TextView(new Properties<>().id("title"))
+    this.addChild(new TextView(new Properties<>().id("title"))
         .setText(TITLE)
         .setCentered(true));
 
-    this.dialogView.addChild(
+    this.addChild(
         this.membersListView = new ParentView(new Properties<>().id("list")));
 
     this.controlsView = new ParentView(new Properties<>().id("controls"));
@@ -92,42 +83,46 @@ public class ManageMembersView extends ParentView {
     this.controlsView.addChild(
         this.promoteButton = Theme.createBlueButton(
             new TextComponent("Promote"),
-            () -> RocketConnector.getInstance().getGameClientApi()
-                .next()
-                .flatMap(api -> api.setGuildMemberRank(
-                    this.selectedMemberView.member.getUser().getId(),
-                    this.selectedMemberView.member.getRank().promote()))
-                .subscribe(),
+            () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+                .setGuildMemberRank(
+                    this.selectedMemberView.getMember().getUser().getId(),
+                    this.selectedMemberView.getMember().getRank().promote())
+                .subscribe()),
             "promote-button"));
     this.controlsView.addChild(
         this.demoteButton = Theme.createRedButton(
             new TextComponent("Demote"),
-            () -> RocketConnector.getInstance().getGameClientApi()
-                .next()
-                .flatMap(api -> api.setGuildMemberRank(
-                    this.selectedMemberView.member.getUser().getId(),
-                    this.selectedMemberView.member.getRank().demote()))
-                .subscribe()));
+            () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+                .setGuildMemberRank(
+                    this.selectedMemberView.getMember().getUser().getId(),
+                    this.selectedMemberView.getMember().getRank().demote())
+                .subscribe())));
     this.controlsView.addChild(this.kickButton = Theme.createRedButton(
         new TextComponent("Kick"),
-        () -> RocketConnector.getInstance().getGameClientApi()
-            .next()
-            .flatMap(api -> api.kickGuildMember(
-                this.selectedMemberView.member.getUser().getId()))
-            .subscribe()));
+        () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+            .kickGuildMember(this.selectedMemberView.getMember().getUser().getId())
+            .subscribe())));
     this.controlsView.addChild(Theme.createBlueButton(new TextComponent("Invite"),
-        () -> viewConsumer.accept(new SendInviteView(result -> {
-          if (!Strings.isNullOrEmpty(result)) {
-            RocketConnector.getInstance().getGameClientApi()
-                .flatMap(api -> api.getUserId(result).flatMap(api::sendGuildInvite))
-                .subscribe();
-          }
-          viewConsumer.accept(this);
-        }))));
+        () -> viewConsumer.accept(new UsernameDialogView(
+            new TranslatableComponent("view.guild.manage_members.send_invite.message"),
+            result -> {
+              if (result.equalsIgnoreCase(this.minecraft.getUser().getName())) {
+                RocketToast.error(this.minecraft, "Cannot invite yourself");
+                viewConsumer.accept(this);
+                return;
+              }
+              Rocket.getGameClientGateway()
+                  .ifPresent(gateway -> gateway.getUserId(result)
+                      .flatMap(gateway::sendGuildInvite)
+                      .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
+                          "Sending invite to: " + result))
+                      .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Invite sent"))
+                      .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                      .subscribe());
+              viewConsumer.accept(this);
+            }, () -> viewConsumer.accept(this)))));
 
-    this.dialogView.addChild(this.controlsView);
-
-    this.addChild(this.dialogView);
+    this.addChild(this.controlsView);
 
     this.updateSelected();
   }
@@ -147,7 +142,7 @@ public class ManageMembersView extends ParentView {
       return;
     }
 
-    var selectedMember = this.selectedMemberView.member;
+    var selectedMember = this.selectedMemberView.getMember();
     var selectedMemberRank = selectedMember.getRank();
     var selectedMemberOwner = selectedMember.isOwner(this.guild);
 
@@ -169,33 +164,37 @@ public class ManageMembersView extends ParentView {
         && !selectedMemberOwner);
   }
 
-  private void updateGuild(GameClientApi api, GuildPayload guild) {
+  private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
       return;
     }
 
     if (!guild.equals(this.guild)) {
       this.membersListView.clearChildren();
-      api.getGuildMembers(guild.getId())
+      gateway.getGuildMembers(guild.getId())
           .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .doOnNext(member -> this.updateMember(api, member))
+          .doOnNext(member -> this.updateMember(gateway, member))
           .doOnTerminate(this::layout)
           .subscribeOn(Schedulers.boundedElastic())
           .subscribe();
+    } else {
+      this.memberViews.values().forEach(view -> view.updateGuild(guild));
     }
 
     this.guild = guild;
   }
 
-  private void updateMember(GameClientApi api, GuildMemberPayload member) {
-    if (member.getUser().equals(api.getUser())) {
+  private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
+    if (member.getUser().equals(gateway.getUser())) {
       this.updateSelfMember(member);
     }
-    MemberView view =
-        this.memberViews.computeIfAbsent(member.getUser().getId(), __ -> new MemberView(member));
-    if (view.isAdded()) {
+    var view = this.memberViews.computeIfAbsent(member.getUser().getId(),
+        __ -> new MemberView(this.guild, member));
+    if (view.hasParent()) {
       view.updateMember(member);
     } else {
+      view.addListener(RemovedEvent.class,
+          __ -> this.memberViews.remove(member.getUser().getId(), view));
       this.membersListView.addChild(view);
     }
   }
@@ -207,12 +206,12 @@ public class ManageMembersView extends ParentView {
     if (GuildPermission.KICK.hasPermission(permissions)
         || GuildPermission.MANAGE_RANKS.hasPermission(permissions)
         || GuildPermission.INVITE.hasPermission(permissions)) {
-      if (this.controlsView.getParent() != this.dialogView) {
-        this.dialogView.addChild(this.controlsView);
+      if (this.controlsView.getParent() != this) {
+        this.addChild(this.controlsView);
         this.layout();
       }
-    } else if (this.controlsView.getParent() == this.dialogView) {
-      this.dialogView.removeChild(this.controlsView);
+    } else if (this.controlsView.getParent() == this) {
+      this.removeChild(this.controlsView);
       this.layout();
     }
   }
@@ -220,18 +219,18 @@ public class ManageMembersView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = RocketConnector.getInstance().getGameClientApi()
-        .flatMap(api -> Mono.when(
-            api.getSocialProfile()
+    this.listener = Rocket.getGameClientGatewayStream()
+        .flatMap(gateway -> Mono.when(
+            gateway.getSocialProfile()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
-                .doOnNext(profile -> this.updateGuild(api, profile.getGuild().orElse(null))),
-            api.getGuildEvents()
+                .doOnNext(profile -> this.updateGuild(gateway, profile.getGuild().orElse(null))),
+            gateway.getGuildEvents()
                 .ofType(GuildMemberUpdateEvent.class)
                 .filter(event -> this.guild != null
                     && event.getGuildId().equals(this.guild.getId()))
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
                 .doOnNext(event -> {
-                  this.updateMember(api, event.getGuildMember());
+                  this.updateMember(gateway, event.getGuildMember());
                   this.membersListView.layout();
                 })))
         .subscribeOn(Schedulers.boundedElastic())
@@ -242,6 +241,9 @@ public class ManageMembersView extends ParentView {
   protected void removed() {
     super.removed();
     this.listener.dispose();
+    this.guild = null;
+    this.member = null;
+    this.selectedMemberView = null;
   }
 
   @Override
@@ -249,95 +251,5 @@ public class ManageMembersView extends ParentView {
     boolean result = super.mouseClicked(mouseX, mouseY, button);
     this.updateSelected();
     return result;
-  }
-
-  private class MemberView extends ParentView {
-
-    private GuildMemberPayload member;
-
-    private Disposable removeListener;
-    private Disposable presenceListener;
-
-    private final AvatarView avatarView;
-    private final TextView nameView;
-
-    public MemberView(GuildMemberPayload member) {
-      super(new Properties<>().styleClasses("item").unscaleBorder(false));
-
-      this.updateMember(member);
-
-      this.avatarView = new AvatarView(new Properties<>(),
-          new GameProfile(member.getUser().getMinecraftProfile().getId(), null));
-      this.avatarView.defineBorderColorState(Theme.OFFLINE);
-      this.addChild(this.avatarView);
-
-      this.nameView = new TextView(new Properties<>().id("name"))
-          .setWrap(false)
-          .setText(member.getUser().getMinecraftProfile().getName());
-      this.nameView.getColorProperty().defineState(Theme.OFFLINE);
-      this.addChild(this.nameView);
-    }
-
-    @Override
-    protected boolean isFocusable() {
-      return true;
-    }
-
-    private void updateMember(GuildMemberPayload member) {
-      this.member = member;
-
-      var rank = member.getRank();
-
-      var color = Color.GRAY;
-
-      if (member.getUser().equals(ManageMembersView.this.guild.getOwner())) {
-        color = Color.GOLD;
-      } else if (rank == GuildRank.DIGNITARY) {
-        color = Color.DARK_PURPLE;
-      } else if (rank == GuildRank.ENVOY) {
-        color = Color.AQUA;
-      } else if (member.equals(ManageMembersView.this.member)) {
-        color = Theme.ONLINE;
-      }
-
-      this.getLeftBorderColorProperty().defineState(color);
-    }
-
-    private void updatePresence(UserPresencePayload presence) {
-      var color = presence.isOnline() ? Theme.ONLINE : Theme.OFFLINE;
-      this.avatarView.defineBorderColorState(color);
-      this.nameView.getColorProperty().defineState(color);
-    }
-
-    @Override
-    protected void added() {
-      super.added();
-      this.removeListener = RocketConnector.getInstance().getGameClientApi()
-          .flatMap(GameClientApi::getGuildEvents)
-          .ofType(GuildMemberLeaveEvent.class)
-          .filter(event -> event.getUser().equals(this.member.getUser()))
-          .next()
-          .subscribeOn(Schedulers.boundedElastic())
-          .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .subscribe(__ -> {
-            ManageMembersView.this.memberViews.remove(this.member.getUser().getId(), this);
-            if (this.isAdded()) {
-              this.getParent().removeChild(this);
-            }
-          });
-
-      this.presenceListener = RocketConnector.getInstance().getGameClientApi()
-          .flatMap(api -> api.getUserPresence(this.member.getUser().getId()))
-          .subscribeOn(Schedulers.boundedElastic())
-          .publishOn(Schedulers.fromExecutor(this.minecraft))
-          .subscribe(this::updatePresence);
-    }
-
-    @Override
-    protected void removed() {
-      super.removed();
-      this.removeListener.dispose();
-      this.presenceListener.dispose();
-    }
   }
 }

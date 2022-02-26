@@ -88,7 +88,7 @@ public class ConnectView extends ParentView {
             .setText(this.nextAnimation())
             .setCentered(true));
 
-    var cancelButton = new TextView(new Properties<>().id("cancel-button"))
+    var cancelButton = new TextView(new Properties<>().id("cancel-button").focusable(true))
         .setText(CommonComponents.GUI_CANCEL)
         .setCentered(true);
     cancelButton.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
