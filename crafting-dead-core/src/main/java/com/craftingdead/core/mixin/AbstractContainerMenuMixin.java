@@ -14,6 +14,7 @@
 
 package com.craftingdead.core.mixin;
 
+import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -32,9 +33,9 @@ import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 
-//TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/7630 gets merged
+//TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/8224 gets merged
 @Mixin(AbstractContainerMenu.class)
-public class ContainerMixin {
+public class AbstractContainerMenuMixin {
 
   private static final Logger logger = LogManager.getLogger();
 
@@ -52,7 +53,11 @@ public class ContainerMixin {
       return ItemStack.matches(currentStack, lastStack);
     }
 
-    if (this.synchronizer.getClass().isAnonymousClass()) {
+    var clazz = this.synchronizer.getClass();
+
+    if (clazz.isAnonymousClass()
+        && clazz.getEnclosingClass() == ServerPlayer.class
+        && Modifier.isStatic(clazz.getModifiers())) {
       Object parent;
       try {
         final var parentField = this.synchronizer.getClass().getDeclaredField("this$0");

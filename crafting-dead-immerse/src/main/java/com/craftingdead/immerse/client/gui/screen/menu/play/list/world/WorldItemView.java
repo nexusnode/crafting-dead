@@ -71,7 +71,7 @@ class WorldItemView extends ParentView {
   private final WorldListView parentWorldList;
 
   WorldItemView(LevelSummary worldSummary, WorldListView parentWorldList) {
-    super(new Properties<>().styleClasses("item").doubleClick(true));
+    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
     this.worldSummary = worldSummary;
     this.parentWorldList = parentWorldList;
     var displayName = worldSummary.getLevelName();
@@ -107,11 +107,6 @@ class WorldItemView extends ParentView {
             .withStyle(ChatFormatting.GRAY))
         .setShadow(false));
     this.addChild(texts);
-  }
-
-  @Override
-  protected boolean isFocusable() {
-    return true;
   }
 
   @Nullable

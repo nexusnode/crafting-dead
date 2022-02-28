@@ -22,7 +22,7 @@ import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.ViewUtil;
 
-public class HomeView extends ParentView {
+public class HomeView extends ParentView implements AnimatableView {
 
   private final ParentView newsComponent;
 
@@ -51,7 +51,7 @@ public class HomeView extends ParentView {
   }
 
   @Override
-  protected void queueRemoval(Runnable remove) {
+  public void animateRemoval(Runnable remove) {
     new Animator.Builder()
         .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
             .to(0.3F)

@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
 
 @Mixin(ItemInHandRenderer.class)
-public interface FirstPersonRendererAccessor {
+public interface ItemInHandRendererAccessor {
 
   @Invoker
   public void invokeRenderArmWithItem(AbstractClientPlayer playerEntity,

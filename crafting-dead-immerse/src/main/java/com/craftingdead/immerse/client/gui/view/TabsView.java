@@ -79,7 +79,7 @@ public class TabsView extends ParentView {
     private boolean selected;
 
     public TabView() {
-      super(new Properties<>());
+      super(new Properties<>().focusable(true));
       this.underscoreColor = DEFAULT_UNDERSCORE_COLOR;
       this.underscoreHeight = DEFAULT_UNDERSCORE_HEIGHT;
       this.underscoreYOffset = DEFAULT_UNDERSCORE_OFFSET;

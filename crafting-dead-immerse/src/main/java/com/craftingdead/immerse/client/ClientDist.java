@@ -77,6 +77,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
+import net.rocketpowered.api.Rocket;
+import net.rocketpowered.connector.client.gui.RocketToast;
+import reactor.core.scheduler.Schedulers;
 
 public class ClientDist implements ModDist {
 
@@ -107,6 +110,8 @@ public class ClientDist implements ModDist {
   private final BlueprintOutlineRenderer blueprintOutlineRenderer;
 
   private final IngameGui ingameGui;
+
+  private boolean firstLoad = true;
 
   @Nullable
   private static RectShader rectShader;
@@ -302,6 +307,17 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleGuiOpen(ScreenOpenEvent event) {
+    if (event.getScreen() instanceof TitleScreen && this.firstLoad) {
+      // Do this here to make sure font is loaded for toasts
+      Rocket.getGameClientGatewayStream()
+          .doOnNext(__ -> RocketToast.info(this.minecraft, "Connected to Rocket"))
+          .flatMap(connection -> connection.onClose()
+              .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Disconnected from Rocket")))
+          .publishOn(Schedulers.fromExecutor(this.minecraft))
+          .subscribe();
+      this.firstLoad = false;
+    }
+
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
       if (this.minecraft.screen instanceof ViewScreen screen
@@ -360,8 +376,8 @@ public class ClientDist implements ModDist {
   @SubscribeEvent
   public void handleDrawHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
     var cameraPlayer = CraftingDead.getInstance().getClientDist().getCameraPlayer();
-    var heldStack = cameraPlayer.getMainHandItem();
-    if (heldStack.getItem() instanceof BlueprintItem blueprint) {
+    if (cameraPlayer != null
+        && cameraPlayer.getMainHandItem().getItem() instanceof BlueprintItem blueprint) {
       event.setCanceled(true);
       this.blueprintOutlineRenderer.render(cameraPlayer, blueprint, event.getTarget(),
           event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());

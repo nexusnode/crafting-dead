@@ -12,8 +12,9 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.event;
+package com.craftingdead.immerse.client.gui.screen.menu;
 
-import net.minecraftforge.eventbus.api.Event;
+public interface AnimatableView {
 
-public class RemovedEvent extends Event {}
+  void animateRemoval(Runnable remove);
+}

@@ -100,10 +100,9 @@ public class MutableServerListView extends ServerListView {
   }
 
   private void removeServer(ServerItemView serverItem) {
-    this.listView.queueChildForRemoval(serverItem, () -> {
-      this.updateSelected();
-      this.saveServerList();
-    });
+    this.listView.removeChild(serverItem);
+    this.updateSelected();
+    this.saveServerList();
   }
 
   private void saveServerList() {
