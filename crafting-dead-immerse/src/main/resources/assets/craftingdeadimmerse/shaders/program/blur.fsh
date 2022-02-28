@@ -1,14 +1,16 @@
-#version 110
+#version 150
 
 uniform sampler2D DiffuseSampler;
 
-varying vec2 texCoord;
-varying vec2 oneTexel;
+in vec2 texCoord;
+in vec2 oneTexel;
 
 uniform vec2 InSize;
 
 uniform vec2 BlurDir;
 uniform float Radius;
+
+out vec4 fragColor;
 
 void main() {
     vec4 blurred = vec4(0.0);
@@ -21,5 +23,5 @@ void main() {
         blurred = blurred + sample0;
     }
 
-    gl_FragColor = vec4(blurred.rgb / (Radius * 2.0 + 1.0), tAlpha);
+    fragColor = vec4(blurred.rgb / (Radius * 2.0 + 1.0), tAlpha);
 }

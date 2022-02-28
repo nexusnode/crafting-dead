@@ -22,4 +22,9 @@ public class ArmorPenetrationEnchantment extends Enchantment {
   protected ArmorPenetrationEnchantment(Rarity rarity, EquipmentSlot... slotType) {
     super(rarity, ModEnchantmentTypes.GUN, slotType);
   }
+
+  @Override
+  public int getMaxLevel() {
+    return 255;
+  }
 }

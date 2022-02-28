@@ -124,15 +124,14 @@ public class GuildView extends ParentView {
   }
 
   private void handleProfile(SocialProfilePayload profile, GameClientGateway gateway) {
-    this.invitesButtonView.setText(this.makeInvitesText(profile.getGuildInvites()));
+    this.invitesButtonView.setText(this.makeInvitesText(profile.guildInvites()));
 
-    var guild = profile.getGuild().orElse(null);
     var lastGuild = this.guild;
-    this.guild = guild;
+    this.guild = profile.guild();
 
-    if (guild != null
+    if (this.guild != null
         && lastGuild != null
-        && !this.guild.getOwner().equals(lastGuild.getOwner())
+        && !this.guild.owner().equals(lastGuild.owner())
         && this.selfMember != null) {
       // Refresh ownership status
       this.handleGuildMember(this.selfMember);
@@ -152,7 +151,7 @@ public class GuildView extends ParentView {
       this.sideBarView.removeChild(this.yourGuildButtonView);
       this.sideBarView.addChild(this.createGuildButtonView);
     } else {
-      this.guildMemberListener = gateway.getGuildMember()
+      this.guildMemberListener = gateway.getGuildMemberFeed()
           .publishOn(Schedulers.fromExecutor(this.minecraft))
           .doOnNext(this::handleGuildMember)
           .subscribe();
@@ -165,7 +164,7 @@ public class GuildView extends ParentView {
 
   private void handleGuildMember(GuildMemberPayload member) {
     this.selfMember = member;
-    var permissions = member.getPermissions(this.guild);
+    var permissions = this.guild.getPermissions(member);
     if (GuildPermission.KICK.hasPermission(permissions)
         || GuildPermission.MANAGE_RANKS.hasPermission(permissions)
         || GuildPermission.INVITE.hasPermission(permissions)) {
@@ -183,8 +182,8 @@ public class GuildView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.profileListener = Rocket.getGameClientGatewayStream()
-        .flatMap(api -> api.getSocialProfile()
+    this.profileListener = Rocket.getGameClientGatewayFeed()
+        .flatMap(api -> api.getSocialProfileFeed()
             .publishOn(Schedulers.fromExecutor(this.minecraft))
             .doOnNext(profile -> this.handleProfile(profile, api)))
         .subscribeOn(Schedulers.boundedElastic())
