@@ -86,6 +86,20 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   @ThreadSafe
+  public final void forceAddChild(View view) {
+    if (!this.minecraft.isSameThread()) {
+      this.minecraft.submit(() -> this.forceAddChild(view)).join();
+      return;
+    }
+
+    if (view.hasParent()) {
+      view.getParent().removeChild(view);
+    }
+
+    this.addChild(view);
+  }
+
+  @ThreadSafe
   public final void addChild(View view) {
     if (view.hasParent()) {
       return;

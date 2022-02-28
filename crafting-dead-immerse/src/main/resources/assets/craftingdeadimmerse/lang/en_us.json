@@ -132,7 +132,11 @@
     "view.guild.your_guild": "Your Guild",
     "view.guild.create_guild": "Create Guild",
 
+    "view.guild.text_dialog.username": "Username",
+    "view.guild.text_dialog.name": "Name",
+
     "view.guild.your_guild.delete.message": "Are you sure you want to delete %s?",
     "view.guild.your_guild.transfer.message": "Transfer Ownership",
+    "view.guild.your_guild.rename.message": "Rename Guild",
     "view.guild.your_guild.leave.message": "Are you sure you want to leave %s?"
 }

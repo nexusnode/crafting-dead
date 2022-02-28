@@ -50,6 +50,7 @@ public class ManageMembersView extends ParentView {
   private final View promoteButton;
   private final View demoteButton;
   private final View kickButton;
+  private final View inviteButton;
 
   private final Map<ObjectId, MemberView> memberViews = new HashMap<>();
 
@@ -81,8 +82,8 @@ public class ManageMembersView extends ParentView {
             new TextComponent("Promote"),
             () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
                 .setGuildMemberRank(
-                    this.selectedMemberView.getMember().getUser().getId(),
-                    this.selectedMemberView.getMember().getRank().promote())
+                    this.selectedMemberView.getMember().user().id(),
+                    this.selectedMemberView.getMember().rank().promote())
                 .subscribe()),
             "promote-button"));
     this.controlsView.addChild(
@@ -90,33 +91,35 @@ public class ManageMembersView extends ParentView {
             new TextComponent("Demote"),
             () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
                 .setGuildMemberRank(
-                    this.selectedMemberView.getMember().getUser().getId(),
-                    this.selectedMemberView.getMember().getRank().demote())
+                    this.selectedMemberView.getMember().user().id(),
+                    this.selectedMemberView.getMember().rank().demote())
                 .subscribe())));
     this.controlsView.addChild(this.kickButton = Theme.createRedButton(
         new TextComponent("Kick"),
         () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
-            .kickGuildMember(this.selectedMemberView.getMember().getUser().getId())
+            .kickGuildMember(this.selectedMemberView.getMember().user().id())
             .subscribe())));
-    this.controlsView.addChild(Theme.createBlueButton(new TextComponent("Invite"),
-        () -> viewConsumer.accept(new UsernameDialogView(
-            new TranslatableComponent("view.guild.manage_members.send_invite.message"),
-            result -> {
-              if (result.equalsIgnoreCase(this.minecraft.getUser().getName())) {
-                RocketToast.error(this.minecraft, "Cannot invite yourself");
-                viewConsumer.accept(this);
-                return;
-              }
-              Rocket.getGameClientGateway()
-                  .ifPresent(gateway -> gateway.getUserId(result)
-                      .flatMap(gateway::sendGuildInvite)
-                      .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
-                          "Sending invite to: " + result))
-                      .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Invite sent"))
-                      .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
-                      .subscribe());
-              viewConsumer.accept(this);
-            }, () -> viewConsumer.accept(this)))));
+    this.controlsView
+        .addChild(this.inviteButton = Theme.createBlueButton(new TextComponent("Invite"),
+            () -> viewConsumer.accept(new TextDialogView(
+                new TranslatableComponent("view.guild.manage_members.send_invite.message"),
+                new TranslatableComponent("view.guild.text_dialog.username"),
+                result -> {
+                  if (result.equalsIgnoreCase(this.minecraft.getUser().getName())) {
+                    RocketToast.error(this.minecraft, "Cannot invite yourself");
+                    viewConsumer.accept(this);
+                    return;
+                  }
+                  Rocket.getGameClientGateway()
+                      .ifPresent(gateway -> gateway.getUserId(result)
+                          .flatMap(gateway::sendGuildInvite)
+                          .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
+                              "Sending invite to: " + result))
+                          .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Invite sent"))
+                          .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
+                          .subscribe());
+                  viewConsumer.accept(this);
+                }, () -> viewConsumer.accept(this)))));
 
     this.addChild(this.controlsView);
 
@@ -139,25 +142,22 @@ public class ManageMembersView extends ParentView {
     }
 
     var selectedMember = this.selectedMemberView.getMember();
-    var selectedMemberRank = selectedMember.getRank();
-    var selectedMemberOwner = selectedMember.isOwner(this.guild);
-
-    var selfRank = this.member.getRank();
-    var selfPermissions = this.member.getPermissions(this.guild);
-    var selfOwner = this.member.isOwner(this.guild);
-    var manageRanks = GuildPermission.MANAGE_RANKS.hasPermission(selfPermissions);
+    var selectedMemberRank = selectedMember.rank();
+    var selectedMemberLower = this.guild.isOwner(this.member)
+        || selectedMemberRank.ordinal() < this.member.rank().ordinal();
+    
+    var permissions = this.guild.getPermissions(this.member);
+    var manageRanks = GuildPermission.MANAGE_RANKS.hasPermission(permissions);
 
     this.promoteButton.setEnabled(!selectedMemberRank.isHighest()
-        && (selfOwner || selectedMemberRank.ordinal() < selfRank.ordinal())
-        && !selectedMemberOwner
+        && selectedMemberLower
         && manageRanks);
     this.demoteButton.setEnabled(!selectedMemberRank.isLowest()
-        && (selfOwner || selectedMemberRank.ordinal() < selfRank.ordinal())
-        && !selectedMemberOwner
+        && selectedMemberLower
         && manageRanks);
     this.kickButton.setEnabled(!selectedMember.equals(this.member)
-        && GuildPermission.KICK.hasPermission(selfPermissions)
-        && !selectedMemberOwner);
+        && GuildPermission.KICK.hasPermission(permissions)
+        && selectedMemberLower);
   }
 
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
@@ -167,7 +167,7 @@ public class ManageMembersView extends ParentView {
 
     if (!guild.equals(this.guild)) {
       this.membersListView.clearChildren();
-      gateway.getGuildMembers(guild.getId())
+      gateway.getGuildMembers(guild.id())
           .publishOn(Schedulers.fromExecutor(this.minecraft))
           .doOnNext(member -> this.updateMember(gateway, member))
           .doOnTerminate(this::layout)
@@ -181,24 +181,26 @@ public class ManageMembersView extends ParentView {
   }
 
   private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
-    if (member.getUser().equals(gateway.getUser())) {
+    if (member.user().equals(gateway.getUser())) {
       this.updateSelfMember(member);
     }
-    var view = this.memberViews.computeIfAbsent(member.getUser().getId(),
+    var view = this.memberViews.computeIfAbsent(member.user().id(),
         __ -> new MemberView(this.guild, member));
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
       view.addListener(RemovedEvent.class,
-          __ -> this.memberViews.remove(member.getUser().getId(), view));
+          __ -> this.memberViews.remove(member.user().id(), view));
       this.membersListView.addChild(view);
     }
   }
 
   private void updateSelfMember(GuildMemberPayload member) {
     this.member = member;
-    long permissions =
-        this.guild.getPermissions(member.getUser().getId(), member.getRank());
+    var permissions = this.guild.getPermissions(member);
+
+    this.inviteButton.setEnabled(GuildPermission.INVITE.hasPermission(permissions));
+
     if (GuildPermission.KICK.hasPermission(permissions)
         || GuildPermission.MANAGE_RANKS.hasPermission(permissions)
         || GuildPermission.INVITE.hasPermission(permissions)) {
@@ -215,18 +217,18 @@ public class ManageMembersView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayStream()
+    this.listener = Rocket.getGameClientGatewayFeed()
         .flatMap(gateway -> Mono.when(
-            gateway.getSocialProfile()
+            gateway.getSocialProfileFeed()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
-                .doOnNext(profile -> this.updateGuild(gateway, profile.getGuild().orElse(null))),
-            gateway.getGuildEvents()
+                .doOnNext(profile -> this.updateGuild(gateway, profile.guild())),
+            gateway.getGuildEventFeed()
                 .ofType(GuildMemberUpdateEvent.class)
                 .filter(event -> this.guild != null
-                    && event.getGuildId().equals(this.guild.getId()))
+                    && event.getGuildId().equals(this.guild.id()))
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
                 .doOnNext(event -> {
-                  this.updateMember(gateway, event.getGuildMember());
+                  this.updateMember(gateway, event.guildMember());
                   this.membersListView.layout();
                 })))
         .subscribeOn(Schedulers.boundedElastic())

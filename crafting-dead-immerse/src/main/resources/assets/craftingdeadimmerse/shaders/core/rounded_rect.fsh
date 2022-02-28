@@ -1,4 +1,4 @@
-#version 430 compatibility
+#version 150
 
 uniform vec4 ColorModulator;
 

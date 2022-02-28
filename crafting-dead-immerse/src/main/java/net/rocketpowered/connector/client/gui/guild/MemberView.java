@@ -51,7 +51,7 @@ public class MemberView extends ParentView {
     this.guild = guild;
 
     this.avatarView = new AvatarView(new Properties<>(),
-        new GameProfile(member.getUser().getMinecraftProfile().getId(), null));
+        new GameProfile(member.user().minecraftProfile().id(), null));
     this.avatarView.defineBorderColorState(Theme.OFFLINE);
     this.addChild(this.avatarView);
 
@@ -60,7 +60,7 @@ public class MemberView extends ParentView {
 
     this.nameView = new TextView(new Properties<>())
         .setWrap(false)
-        .setText(member.getUser().getMinecraftProfile().getName());
+        .setText(member.user().minecraftProfile().name());
     this.nameView.getColorProperty().defineState(Theme.OFFLINE);
     textView.addChild(this.nameView);
 
@@ -82,9 +82,9 @@ public class MemberView extends ParentView {
   public void updateMember(GuildMemberPayload member) {
     this.member = member;
 
-    var rank = member.getRank();
+    var rank = member.rank();
     var color = Color.WHITE;
-    var owner = member.getUser().equals(this.guild.getOwner());
+    var owner = member.user().equals(this.guild.owner());
     if (owner) {
       color = Color.GOLD;
     } else if (rank == GuildRank.DIGNITARY) {
@@ -101,7 +101,7 @@ public class MemberView extends ParentView {
   }
 
   private void updatePresence(UserPresencePayload presence) {
-    var color = presence.isOnline() ? Theme.ONLINE : Theme.OFFLINE;
+    var color = presence.online() ? Theme.ONLINE : Theme.OFFLINE;
     this.avatarView.defineBorderColorState(color);
     this.nameView.getColorProperty().defineState(color);
   }
@@ -109,10 +109,10 @@ public class MemberView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.removeListener = Rocket.getGameClientGatewayStream()
-        .flatMap(GameClientGateway::getGuildEvents)
+    this.removeListener = Rocket.getGameClientGatewayFeed()
+        .flatMap(GameClientGateway::getGuildEventFeed)
         .ofType(GuildMemberLeaveEvent.class)
-        .filter(event -> event.getUser().equals(this.member.getUser()))
+        .filter(event -> event.user().equals(this.member.user()))
         .next()
         .subscribeOn(Schedulers.boundedElastic())
         .publishOn(Schedulers.fromExecutor(this.minecraft))
@@ -124,8 +124,8 @@ public class MemberView extends ParentView {
           }
         });
 
-    this.presenceListener = Rocket.getGameClientGatewayStream()
-        .flatMap(api -> api.getUserPresence(this.member.getUser().getId()))
+    this.presenceListener = Rocket.getGameClientGatewayFeed()
+        .flatMap(api -> api.getUserPresenceFeed(this.member.user().id()))
         .subscribeOn(Schedulers.boundedElastic())
         .publishOn(Schedulers.fromExecutor(this.minecraft))
         .subscribe(this::updatePresence);

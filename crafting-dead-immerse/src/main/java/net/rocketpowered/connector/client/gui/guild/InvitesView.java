@@ -84,12 +84,12 @@ public class InvitesView extends ParentView {
             new TextComponent("Accept"),
             () -> Rocket.getGameClientGateway()
                 .ifPresentOrElse(connection -> {
-                  var inviteGuild = this.selectedInviteView.invite.getGuild();
+                  var inviteGuild = this.selectedInviteView.invite.guild();
                   connection
-                      .acceptGuildInvite(inviteGuild.getId())
+                      .acceptGuildInvite(inviteGuild.id())
                       .publishOn(Schedulers.fromExecutor(this.minecraft))
                       .doOnSuccess(__ -> RocketToast.info(this.minecraft,
-                          "Welcome to " + inviteGuild.getName()))
+                          "Welcome to " + inviteGuild.name()))
                       .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
                       .subscribe();
                 }, () -> RocketToast.info(this.minecraft, "Not connected to Rocket"))));
@@ -98,7 +98,7 @@ public class InvitesView extends ParentView {
             new TextComponent("Decline"),
             () -> Rocket.getGameClientGateway()
                 .ifPresentOrElse(connection -> connection
-                    .declineGuildInvite(this.selectedInviteView.invite.getGuild().getId())
+                    .declineGuildInvite(this.selectedInviteView.invite.guild().id())
                     .publishOn(Schedulers.fromExecutor(this.minecraft))
                     .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
                     .subscribe(),
@@ -125,21 +125,21 @@ public class InvitesView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayStream()
-        .flatMap(api -> api.getSocialProfile()
+    this.listener = Rocket.getGameClientGatewayFeed()
+        .flatMap(api -> api.getSocialProfileFeed()
             .publishOn(Schedulers.fromExecutor(this.minecraft))
             .doOnNext(profile -> {
-              Sets.difference(this.lastInvites, profile.getGuildInvites())
+              Sets.difference(this.lastInvites, profile.guildInvites())
                   .forEach(invite -> {
-                    InviteView view = this.inviteViews.remove(invite.getGuild().getId());
+                    InviteView view = this.inviteViews.remove(invite.guild().id());
                     if (view != null && view.hasParent()) {
                       this.invitesListView.removeChild(view);
                     }
                   });
 
-              profile.getGuildInvites().forEach(invite -> {
+              profile.guildInvites().forEach(invite -> {
                 InviteView view =
-                    this.inviteViews.computeIfAbsent(invite.getGuild().getId(),
+                    this.inviteViews.computeIfAbsent(invite.guild().id(),
                         __ -> new InviteView(invite));
                 if (!view.hasParent()) {
                   this.invitesListView.addChild(view);
@@ -147,7 +147,7 @@ public class InvitesView extends ParentView {
               });
 
               this.invitesListView.layout();
-              this.lastInvites = profile.getGuildInvites();
+              this.lastInvites = profile.guildInvites();
             }))
         .subscribeOn(Schedulers.boundedElastic())
         .subscribe();
@@ -188,7 +188,7 @@ public class InvitesView extends ParentView {
       this.offlineMemebrsView.getColorProperty().defineState(Color.GRAY);
 
       this.addChild(new TextView(new Properties<>())
-          .setText(new TextComponent(this.invite.getGuild().getName())
+          .setText(new TextComponent(this.invite.guild().name())
               .withStyle(ChatFormatting.BOLD)));
 
       var playerCountsView = new ParentView(new Properties<>().id("player-counts"));
@@ -201,22 +201,25 @@ public class InvitesView extends ParentView {
       playerCountsView.addChild(new TextView(new Properties<>())
           .setText(new TextComponent(" | ")));
       playerCountsView.addChild(this.offlineMemebrsView);
-      this.invite.getSender().ifPresent(sender -> this.addChild(new TextView(new Properties<>())
-          .setText(new TextComponent("Invited by " + sender.getMinecraftProfile().getName())
-              .withStyle(ChatFormatting.ITALIC))));
+      if (this.invite.sender() != null) {
+        this.addChild(new TextView(new Properties<>())
+            .setText(
+                new TextComponent("Invited by " + this.invite.sender().minecraftProfile().name())
+                    .withStyle(ChatFormatting.ITALIC)));
+      }
     }
 
     @Override
     protected void added() {
       super.added();
       AtomicInteger counter = new AtomicInteger();
-      this.memberListener = Rocket.getGameClientGatewayStream()
+      this.memberListener = Rocket.getGameClientGatewayFeed()
           .flatMap(api -> Mono
               .fromRunnable(() -> this.minecraft.executeBlocking(() -> {
                 this.onlineMemebrsView.setText("0 Online");
                 this.offlineMemebrsView.setText("0 Offline");
               }))
-              .thenMany(api.getGuildMembers(this.invite.getGuild().getId()))
+              .thenMany(api.getGuildMembers(this.invite.guild().id()))
               .doOnNext(__ -> counter.incrementAndGet())
               .doOnComplete(() -> {
                 int count = counter.getAndSet(0);
@@ -226,10 +229,10 @@ public class InvitesView extends ParentView {
                   this.totalMembersView.setText(count + " Members");
                 }
               })
-              .map(GuildMemberPayload::getUser)
-              .map(UserPayload::getId)
-              .flatMap(userId -> api.getUserPresence(userId).next())
-              .groupBy(UserPresencePayload::isOnline)
+              .map(GuildMemberPayload::user)
+              .map(UserPayload::id)
+              .flatMap(userId -> api.getUserPresenceFeed(userId).next())
+              .groupBy(UserPresencePayload::online)
               .publishOn(Schedulers.fromExecutor(this.minecraft))
               .delayUntil(group -> group.count()
                   .doOnNext(count -> {

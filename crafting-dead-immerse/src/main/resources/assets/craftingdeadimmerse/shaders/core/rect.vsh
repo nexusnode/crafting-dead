@@ -1,4 +1,4 @@
-#version 430 compatibility
+#version 150
 
 in vec3 Position;
 in vec4 Color;

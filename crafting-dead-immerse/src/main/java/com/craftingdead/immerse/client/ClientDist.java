@@ -309,7 +309,7 @@ public class ClientDist implements ModDist {
   public void handleGuiOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen && this.firstLoad) {
       // Do this here to make sure font is loaded for toasts
-      Rocket.getGameClientGatewayStream()
+      Rocket.getGameClientGatewayFeed()
           .doOnNext(__ -> RocketToast.info(this.minecraft, "Connected to Rocket"))
           .flatMap(connection -> connection.onClose()
               .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Disconnected from Rocket")))

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -30,6 +32,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.api.Rocket;
 import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.GuildPermission;
+import net.rocketpowered.common.RocketException;
 import net.rocketpowered.common.payload.GuildMemberPayload;
 import net.rocketpowered.common.payload.GuildMemberUpdateEvent;
 import net.rocketpowered.common.payload.GuildPayload;
@@ -42,6 +46,8 @@ public class YourGuildView extends ParentView {
 
   public static final Component TITLE = new TranslatableComponent("view.guild.your_guild");
 
+  private static final Logger logger = LogManager.getLogger();
+
   private final ParentView informationView;
 
   private final ParentView membersView;
@@ -50,10 +56,18 @@ public class YourGuildView extends ParentView {
 
   private final Consumer<View> contentConsumer;
 
+  private final View transferButton;
+  private final View deleteButton;
+  private final View renameButton;
+  private final View leaveButton;
+
   @Nullable
   private GuildPayload guild;
 
   private Disposable listener;
+
+  @Nullable
+  private GuildMemberPayload selfMember;
 
   public YourGuildView(Consumer<View> contentConsumer) {
     super(new Properties<>().styleClasses("page").backgroundBlur(50));
@@ -72,6 +86,73 @@ public class YourGuildView extends ParentView {
 
     guildView.addChild(
         this.membersView = new ParentView(new Properties<>().id("members")));
+
+    this.transferButton = Theme.createRedButton(new TextComponent("Transfer"),
+        () -> this.contentConsumer.accept(new TextDialogView(
+            new TranslatableComponent("view.guild.your_guild.transfer.message"),
+            new TranslatableComponent("view.guild.text_dialog.username"),
+            result -> {
+              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.getUserId(result)
+                  .flatMap(gateway::transferGuildOwnership)
+                  .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
+                      "Transferring guild: " + this.guild.name()))
+                  .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild transferred"))
+                  .doOnError(RocketException.class,
+                      error -> RocketToast.error(this.minecraft, error.getMessage()))
+                  .subscribe());
+              this.contentConsumer.accept(this);
+            },
+            () -> this.contentConsumer.accept(this))));
+
+    this.deleteButton = Theme.createRedButton(new TextComponent("Delete"),
+        () -> this.contentConsumer.accept(new ConfirmDialogView(
+            new TranslatableComponent("view.guild.your_guild.delete.message",
+                this.guild.name()),
+            () -> {
+              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.deleteGuild()
+                  .doOnSubscribe(
+                      __ -> RocketToast.info(this.minecraft,
+                          "Deleting guild: " + guild.name()))
+                  .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild deleted"))
+                  .doOnError(RocketException.class,
+                      error -> RocketToast.error(this.minecraft, error.getMessage()))
+                  .subscribe());
+              this.contentConsumer.accept(this);
+            },
+            () -> this.contentConsumer.accept(this))));
+
+    this.renameButton = Theme.createBlueButton(new TextComponent("Rename"),
+        () -> this.contentConsumer.accept(new TextDialogView(
+            new TranslatableComponent("view.guild.your_guild.rename.message"),
+            new TranslatableComponent("view.guild.text_dialog.name"),
+            result -> {
+              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.renameGuild(result)
+                  .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
+                      "Renaming guild: " + this.guild.name()))
+                  .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild renamed"))
+                  .doOnError(RocketException.class,
+                      error -> RocketToast.error(this.minecraft, error.getMessage()))
+                  .subscribe());
+              this.contentConsumer.accept(this);
+            },
+            () -> this.contentConsumer.accept(this))));
+
+    this.leaveButton = Theme.createRedButton(new TextComponent("Leave"),
+        () -> this.contentConsumer.accept(new ConfirmDialogView(
+            new TranslatableComponent("view.guild.your_guild.leave.message",
+                this.guild.name()),
+            () -> {
+              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.leaveGuild()
+                  .doOnSubscribe(
+                      __ -> RocketToast.info(this.minecraft,
+                          "Leaving guild: " + this.guild.name()))
+                  .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Left guild"))
+                  .doOnError(RocketException.class,
+                      error -> RocketToast.error(this.minecraft, error.getMessage()))
+                  .subscribe());
+              this.contentConsumer.accept(this);
+            },
+            () -> this.contentConsumer.accept(this))));
   }
 
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
@@ -81,7 +162,7 @@ public class YourGuildView extends ParentView {
 
     if (!guild.equals(this.guild)) {
       this.membersView.clearChildren();
-      gateway.getGuildMembers(guild.getId())
+      gateway.getGuildMembers(guild.id())
           .publishOn(Schedulers.fromExecutor(this.minecraft))
           .doOnNext(member -> this.updateMember(gateway, member))
           .doOnTerminate(this::layout)
@@ -91,92 +172,66 @@ public class YourGuildView extends ParentView {
       this.memberViews.values().forEach(view -> view.updateGuild(guild));
     }
 
+    this.guild = guild;
+
+    if (this.selfMember != null) {
+      this.updateInformation(gateway);
+    }
+  }
+
+  private void updateInformation(GameClientGateway gateway) {
     this.informationView.clearChildren();
 
     this.informationView.addChild(new TextView(new Properties<>())
         .setText(new TextComponent("")
             .append(new TextComponent("Name: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(guild.getName()))
+            .append(this.guild.name()))
         .setShadow(false));
     this.informationView.addChild(new TextView(new Properties<>())
         .setText(new TextComponent("")
             .append(new TextComponent("Tag: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(guild.getTag()))
+            .append(this.guild.tag()))
         .setShadow(false));
     this.informationView.addChild(new TextView(new Properties<>())
         .setText(new TextComponent("")
             .append(new TextComponent("Owner: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(guild.getOwner().getMinecraftProfile().getName()))
+            .append(this.guild.owner().minecraftProfile().name()))
         .setShadow(false));
 
     var controlsView = new ParentView(new Properties<>().id("controls"));
     this.informationView.addChild(controlsView);
 
-    if (guild.getOwner().getMinecraftProfile().getId().equals(
-        this.minecraft.getUser().getGameProfile().getId())) {
-      controlsView.addChild(Theme.createRedButton(new TextComponent("Transfer"),
-          () -> this.contentConsumer.accept(new UsernameDialogView(
-              new TranslatableComponent("view.guild.your_guild.transfer.message"),
-              result -> {
-                gateway.getUserId(result)
-                    .flatMap(gateway::transferGuildOwnership)
-                    .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
-                        "Transferring guild: " + guild.getName()))
-                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild transferred"))
-                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
-                    .subscribe();
-                this.contentConsumer.accept(this);
-              },
-              () -> this.contentConsumer.accept(this)))));
-      controlsView.addChild(Theme.createRedButton(new TextComponent("Delete"),
-          () -> this.contentConsumer.accept(new ConfirmDialogView(
-              new TranslatableComponent("view.guild.your_guild.delete.message",
-                  this.guild.getName()),
-              () -> {
-                gateway.deleteGuild()
-                    .doOnSubscribe(
-                        __ -> RocketToast.info(this.minecraft,
-                            "Deleting guild: " + guild.getName()))
-                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild deleted"))
-                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
-                    .subscribe();
-                this.contentConsumer.accept(this);
-              },
-              () -> this.contentConsumer.accept(this)))));
+    var permissions = this.guild.getPermissions(this.selfMember);
+
+    if (GuildPermission.RENAME.hasPermission(permissions)) {
+      controlsView.forceAddChild(this.renameButton);
+    }
+
+    if (this.guild.isOwner(gateway.getUser())) {
+      controlsView.forceAddChild(this.transferButton);
+      controlsView.forceAddChild(this.deleteButton);
     } else {
-      controlsView.addChild(Theme.createRedButton(new TextComponent("Leave"),
-          () -> this.contentConsumer.accept(new ConfirmDialogView(
-              new TranslatableComponent("view.guild.your_guild.leave.message",
-                  this.guild.getName()),
-              () -> {
-                gateway.leaveGuild()
-                    .doOnSubscribe(
-                        __ -> RocketToast.info(this.minecraft,
-                            "Leaving guild: " + guild.getName()))
-                    .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Left guild"))
-                    .doOnError(error -> RocketToast.error(this.minecraft, error.getMessage()))
-                    .subscribe();
-                this.contentConsumer.accept(this);
-              },
-              () -> this.contentConsumer.accept(this)))));
+      controlsView.forceAddChild(this.leaveButton);
     }
 
     this.informationView.layout();
-
-    this.guild = guild;
   }
 
   private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
-    var view = this.memberViews.computeIfAbsent(member.getUser().getId(),
+    if (member.user().equals(gateway.getUser())) {
+      this.selfMember = member;
+      this.updateInformation(gateway);
+    }
+
+    var view = this.memberViews.computeIfAbsent(member.user().id(),
         __ -> new MemberView(this.guild, member));
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
-      view.addListener(RemovedEvent.class,
-          __ -> this.memberViews.remove(member.getUser().getId(), view));
+      view.addListener(RemovedEvent.class, __ -> this.memberViews.remove(member.user().id(), view));
       this.membersView.addChild(view);
     }
   }
@@ -184,17 +239,18 @@ public class YourGuildView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayStream()
+    this.listener = Rocket.getGameClientGatewayFeed()
         .flatMap(api -> Mono.when(
-            api.getSocialProfile()
+            api.getSocialProfileFeed()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
-                .doOnNext(profile -> this.updateGuild(api, profile.getGuild().orElse(null))),
-            api.getGuildEvents()
+                .doOnNext(profile -> this.updateGuild(api, profile.guild())),
+            api.getGuildEventFeed()
                 .ofType(GuildMemberUpdateEvent.class)
                 .filter(event -> this.guild != null
-                    && event.getGuildId().equals(this.guild.getId()))
+                    && event.guildId().equals(this.guild.id()))
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
-                .doOnNext(event -> this.updateMember(api, event.getGuildMember()))))
+                .doOnNext(event -> this.updateMember(api, event.guildMember()))))
+        .doOnError(logger::error)
         .subscribeOn(Schedulers.boundedElastic())
         .subscribe();
   }
@@ -203,6 +259,5 @@ public class YourGuildView extends ParentView {
   protected void removed() {
     super.removed();
     this.listener.dispose();
-    this.guild = null;
   }
 }
