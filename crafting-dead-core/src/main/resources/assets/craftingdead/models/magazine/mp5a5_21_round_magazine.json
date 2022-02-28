@@ -1,0 +1,81 @@
+{
+    "credit": "Made with Blockbench",
+    "texture_size": [64, 64],
+    "textures": {
+        "0": "craftingdead:magazine/mp5a5_21_round_magazine",
+        "particle": "craftingdead:magazine/mp5a5_21_round_magazine"
+    },
+    "elements": [
+        {
+            "from": [7.5, 6, 7.5],
+            "to": [9.5, 9, 10.5],
+            "rotation": {"angle": 0, "axis": "y", "origin": [8.5, 5.65119, 8.48307]},
+            "faces": {
+                "north": {"uv": [11.75, 0.75, 12.25, 1.5], "texture": "#0"},
+                "east": {"uv": [11, 0.75, 11.75, 1.5], "texture": "#0"},
+                "south": {"uv": [13, 0.75, 13.5, 1.5], "texture": "#0"},
+                "west": {"uv": [12.25, 0.75, 13, 1.5], "texture": "#0"},
+                "up": {"uv": [12.25, 0.75, 11.75, 0], "texture": "#0"},
+                "down": {"uv": [12.75, 0, 12.25, 0.75], "texture": "#0"}
+            }
+        },
+        {
+            "from": [7.5, 0.7453, 7.21299],
+            "to": [9.5, 6.7453, 10.21299],
+            "rotation": {"angle": 22.5, "axis": "x", "origin": [8.5, 5.65119, 8.48307]},
+            "faces": {
+                "north": {"uv": [14.25, 0.75, 14.75, 2.25], "texture": "#0"},
+                "east": {"uv": [13.5, 0.75, 14.25, 2.25], "texture": "#0"},
+                "south": {"uv": [15.5, 0.75, 16, 2.25], "texture": "#0"},
+                "west": {"uv": [14.75, 0.75, 15.5, 2.25], "texture": "#0"},
+                "up": {"uv": [14.75, 0.75, 14.25, 0], "texture": "#0"},
+                "down": {"uv": [15.25, 0, 14.75, 0.75], "texture": "#0"}
+            }
+        }
+    ],
+    "display": {
+        "thirdperson_righthand": {
+            "translation": [-0.5, 2, -0.25],
+            "scale": [0.6, 0.6, 0.6]
+        },
+        "thirdperson_lefthand": {
+            "translation": [0, 1.75, -0.5],
+            "scale": [0.6, 0.6, 0.6]
+        },
+        "firstperson_righthand": {
+            "translation": [6.75, 4.25, -5.25]
+        },
+        "firstperson_lefthand": {
+            "translation": [8.75, 4.25, -5.75]
+        },
+        "ground": {
+            "rotation": [0, 0, -92],
+            "translation": [2, -1.75, 0]
+        },
+        "gui": {
+            "rotation": [2, 90.5, 0],
+            "translation": [0, 3.25, 0],
+            "scale": [1.06836, 1.06836, 1.06836]
+        },
+        "fixed": {
+            "rotation": [0, -89.75, 0],
+            "translation": [0.5, 6.25, -4.25],
+            "scale": [2, 2, 2]
+        }
+    },
+    "groups": [
+        {
+            "name": "Anchor",
+            "origin": [8, 8, 8],
+            "color": 0,
+            "children": [
+                {
+                    "name": "Magazine",
+                    "origin": [8, 8, 8],
+                    "color": 0,
+                    "children": [0, 1]
+                }
+            ]
+        }
+    ]
+}

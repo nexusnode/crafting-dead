@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/p250",
     "muzzle_flash_transform": {
         "translation": [
-            2,
-            0,
-            -20
+            7,
+            1,
+            -15
         ],
         "scale": [
             0.75,
@@ -15,12 +15,12 @@
     },
     "aiming_transform": {
         "translation": [
-            -9,
-            6.65,
-            1.25
+            -9.05,
+            7,
+            2
         ],
         "rotation": [
-            -1,
+            0,
             0,
             0
         ]
@@ -29,52 +29,74 @@
         "held_right_handed": {
             "right_hand": {
                 "translation": [
-                    -3,
-                    2,
-                    -1
+                    -2,
+                    5.75,
+                    2.5
+                ],
+                "rotation": [
+                    0,
+                    -10,
+                    0
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
                 ]
             },
             "left_hand": {
                 "translation": [
-                    -2,
-                    2,
-                    3
+                    -3,
+                    4.75,
+                    6.25
                 ],
                 "rotation": [
-                    0,
+                    -5,
                     10,
                     0
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
                 ]
             }
         },
         "aiming_right_handed": {
             "right_hand": {
                 "translation": [
-                    -14,
-                    8,
-                    10
+                    -17.5,
+                    11,
+                    7.25
                 ],
                 "rotation": [
                     0,
-                    10,
+                    15,
                     0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
                 ]
             },
             "left_hand": {
                 "translation": [
-                    -14,
-                    6.75,
-                    13
+                    -17.75,
+                    11,
+                    10.25
                 ],
                 "rotation": [
                     0,
-                    20,
+                    32.5,
                     0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
                 ]
             }
         }
-    },
-    "iron_sights": {
-        "craftingdead:attachment/p250_iron_sight": {}
     }
 }

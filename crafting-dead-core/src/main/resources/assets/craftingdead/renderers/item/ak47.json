@@ -3,9 +3,9 @@
     "model": "craftingdead:gun/ak47",
     "muzzle_flash_transform": {
         "translation": [
-            1.6,
-            -1,
-            -28.8
+            5,
+            -3,
+            -40
         ],
         "scale": [
             1.2,
@@ -16,27 +16,34 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            4,
+            4.25,
             1.5
         ]
     },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    2,
+                    -0.5,
+                    -0.75
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    3,
-                    -10,
-                    -10
+                    4.25,
+                    -5,
+                    -13
                 ],
                 "rotation": [
                     0,
-                    11,
-                    -7.5
+                    20,
+                    0
                 ],
                 "scale": [
                     1.75,
-                    1.75,
-                    1.75
+                    1.5,
+                    1.5
                 ]
             }
         },
@@ -60,6 +67,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:ak47_30_round_magazine": {
+            "translation": [
+                0,
+                -0.5,
+                0
+            ]
         }
     }
 }

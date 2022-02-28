@@ -1,0 +1,102 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/m9",
+    "muzzle_flash_transform": {
+        "translation": [
+            6,
+            2.5,
+            -15
+        ],
+        "scale": [
+            0.75,
+            0.75,
+            0.75
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9,
+            6,
+            2
+        ],
+        "rotation": [
+            0,
+            0,
+            0
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -2.15,
+                    6,
+                    1.25
+                ],
+                "rotation": [
+                    0,
+                    -3,
+                    0
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    -3.25,
+                    5,
+                    6.5
+                ],
+                "rotation": [
+                    -5,
+                    10,
+                    0
+                ],
+                "scale": [
+                    0.75,
+                    0.75,
+                    0.75
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -17.6,
+                    11,
+                    7.25
+                ],
+                "rotation": [
+                    0,
+                    15,
+                    0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    -17.75,
+                    11,
+                    10.25
+                ],
+                "rotation": [
+                    0,
+                    32.5,
+                    0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            }
+        }
+    }
+}

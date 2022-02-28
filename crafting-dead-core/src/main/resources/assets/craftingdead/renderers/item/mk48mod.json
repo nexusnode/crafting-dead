@@ -1,0 +1,86 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/mk48mod",
+    "muzzle_flash_transform": {
+        "translation": [
+            2,
+            1.5,
+            -40
+        ],
+        "scale": [
+            1.2,
+            1.2,
+            1.2
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9.5,
+            3.5,
+            3
+        ],
+        "rotation": [
+            2,
+            0.2,
+            0
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -2.5,
+                    1.1,
+                    2.5
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    3,
+                    -2.5,
+                    -14
+                ],
+                "rotation": [
+                    5,
+                    15,
+                    0
+                ],
+                "scale": [
+                    2,
+                    1.5,
+                    1.5
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:mk48mod_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    }
+}

@@ -1,6 +1,5 @@
 {
 	"credit": "Made with Blockbench",
-	"ambientocclusion": false,
 	"texture_size": [128, 128],
 	"textures": {
 		"gun": "craftingdead:gun/hk417",
@@ -47,8 +46,8 @@
 			}
 		},
 		{
-			"from": [6.5, 8, -5.5],
-			"to": [10.5, 10, 4.5],
+			"from": [6.5, 7.5, -5.5],
+			"to": [10.5, 9.5, 4.5],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 7.74759, 10.79498]},
 			"faces": {
 				"north": {"uv": [4.75, 4.125, 5.25, 4.375], "texture": "#gun"},
@@ -252,8 +251,8 @@
 			"scale": [0.6, 0.6, 0.6]
 		},
 		"firstperson_righthand": {
-			"rotation": [7, 5.5, 0],
-			"translation": [3.25, 0, -9]
+			"rotation": [6.03, 3.94, 0.5],
+			"translation": [0.25, 1, -7.5]
 		},
 		"firstperson_lefthand": {
 			"translation": [-8.5, 2.5, -2.75]

@@ -4,7 +4,7 @@
     "muzzle_flash_transform": {
         "translation": [
             3,
-            -1,
+            0,
             -40
         ],
         "scale": [
@@ -16,27 +16,34 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            3,
-            -1.75
+            2.25,
+            0
         ]
     },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    0.5,
+                    2,
+                    0.5
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    3,
-                    -10,
-                    -10
+                    4,
+                    -2.5,
+                    -18
                 ],
                 "rotation": [
                     0,
-                    11,
-                    -7.5
+                    30,
+                    0
                 ],
                 "scale": [
-                    1.75,
-                    1.75,
-                    1.75
+                    2,
+                    1.5,
+                    1.5
                 ]
             }
         },
@@ -60,6 +67,15 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:fnfal_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
         }
     }
 }

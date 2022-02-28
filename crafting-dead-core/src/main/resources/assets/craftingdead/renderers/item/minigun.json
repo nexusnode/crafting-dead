@@ -1,0 +1,103 @@
+{
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/minigun",
+    "muzzle_flash_transform": {
+        "translation": [
+            -3,
+            0,
+            -30
+        ],
+        "scale": [
+            1.5,
+            1.5,
+            1.5
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -9.5,
+            3.25,
+            3
+        ]
+    },
+    "sprinting_transform": {
+        "translation": [
+            -0.3,
+            0,
+            2
+        ],
+        "rotation": [
+            -20,
+            40,
+            0
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -12,
+                    12,
+                    2.5
+                ],
+                "rotation": [
+                    -3,
+                    20,
+                    0
+                ],
+                "scale": [
+                    0.6,
+                    0.6,
+                    0.8
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    -10.5,
+                    10,
+                    15
+                ],
+                "rotation": [
+                    -10,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.6,
+                    0.6,
+                    0.6
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:minigun_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    }
+}
