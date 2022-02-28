@@ -145,9 +145,10 @@ public class ManageMembersView extends ParentView {
     var selectedMemberRank = selectedMember.rank();
     var selectedMemberLower = this.guild.isOwner(this.member)
         || selectedMemberRank.ordinal() < this.member.rank().ordinal();
-    
+
     var permissions = this.guild.getPermissions(this.member);
-    var manageRanks = GuildPermission.MANAGE_RANKS.hasPermission(permissions);
+    var manageRanks = !this.guild.isOwner(selectedMember)
+        && GuildPermission.MANAGE_RANKS.hasPermission(permissions);
 
     this.promoteButton.setEnabled(!selectedMemberRank.isHighest()
         && selectedMemberLower
@@ -156,8 +157,8 @@ public class ManageMembersView extends ParentView {
         && selectedMemberLower
         && manageRanks);
     this.kickButton.setEnabled(!selectedMember.equals(this.member)
-        && GuildPermission.KICK.hasPermission(permissions)
-        && selectedMemberLower);
+        && selectedMemberLower
+        && GuildPermission.KICK.hasPermission(permissions));
   }
 
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
