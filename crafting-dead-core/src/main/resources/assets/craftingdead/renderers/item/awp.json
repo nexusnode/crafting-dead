@@ -3,61 +3,52 @@
     "model": "craftingdead:gun/awp",
     "muzzle_flash_transform": {
         "translation": [
-            3,
+            1.6,
             0,
-            -40
+            -52
         ],
         "scale": [
-            1.2,
-            1.2,
-            1.2
+            1.5,
+            1.5,
+            1.5
         ]
     },
     "aiming_transform": {
         "translation": [
-            -8.5,
-            6.5,
-            -5
+            -8.45,
+            5.6,
+            -3
         ],
         "rotation": [
-            -1.5,
+            1,
             0,
             0
         ]
     },
-    "attachement_transforms": {
-        "craftingdead:lp_scope": {
-            "translation": [
-                -0.5,
-                9,
-                3.2
-            ]
-        },
-        "craftingdead:hp_scope": {
-            "translation": [
-                -0.5,
-                9,
-                3.2
-            ]
-        }
-    },
     "hand_transforms": {
         "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -3,
+                    2.75,
+                    5
+                ]
+            },
             "left_hand": {
                 "translation": [
-                    4,
-                    -7,
-                    -15
+                    -1.5,
+                    -2,
+                    -12.5
                 ],
                 "rotation": [
-                    0,
+                    5,
                     25,
                     0
                 ],
                 "scale": [
-                    1.75,
-                    1.75,
-                    1.75
+                    1.5,
+                    1.5,
+                    1.5
                 ]
             }
         },
@@ -81,6 +72,31 @@
                     0.25
                 ]
             }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:awp_magazine": {
+            "translation": [
+                0,
+                -2,
+                0
+            ]
+        }
+    },
+    "attachement_transforms": {
+        "craftingdead:lp_scope": {
+            "translation": [
+                -0.5,
+                9,
+                3.2
+            ]
+        },
+        "craftingdead:hp_scope": {
+            "translation": [
+                -0.5,
+                9,
+                3.2
+            ]
         }
     }
 }
