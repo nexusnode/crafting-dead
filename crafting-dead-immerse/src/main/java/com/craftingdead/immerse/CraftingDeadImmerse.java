@@ -19,7 +19,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
@@ -71,33 +70,30 @@ import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 @Mod(CraftingDeadImmerse.ID)
 public class CraftingDeadImmerse {
 
-  private static final boolean ENABLE_SENTRY = false;
-
   public static final String ID = "craftingdeadimmerse";
 
-  public static final String VERSION;
+  public static final String VERSION = JarVersionLookupHandler
+      .getImplementationVersion(CraftingDeadImmerse.class)
+      .orElse("[version]");
 
-  public static final String DISPLAY_NAME;
+  public static final String DISPLAY_NAME = JarVersionLookupHandler
+      .getImplementationTitle(CraftingDeadImmerse.class)
+      .orElse("[display_name]");
 
   public static final ServerConfig serverConfig;
   public static final ForgeConfigSpec serverConfigSpec;
+  public static final CommonConfig commonConfig;
+  public static final ForgeConfigSpec commonConfigSpec;
 
   static {
-    VERSION = JarVersionLookupHandler
-        .getImplementationVersion(CraftingDeadImmerse.class)
-        .orElse("[version]");
-    DISPLAY_NAME = JarVersionLookupHandler
-        .getImplementationTitle(CraftingDeadImmerse.class)
-        .orElse("[display_name]");
-
-    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
-        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    var serverConfigPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
     serverConfigSpec = serverConfigPair.getRight();
     serverConfig = serverConfigPair.getLeft();
-  }
 
-  private static final String SENTRY_DSN =
-      "https://31d8ac34b0c24ddf98223098d42fd526@o1128514.ingest.sentry.io/6174174";
+    var commonConfigPair = new ForgeConfigSpec.Builder().configure(CommonConfig::new);
+    commonConfigSpec = commonConfigPair.getRight();
+    commonConfig = commonConfigPair.getLeft();
+  }
 
   /**
    * Singleton.
@@ -127,6 +123,7 @@ public class CraftingDeadImmerse {
     }
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonConfigSpec);
 
     this.modDist = DistExecutor.unsafeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
@@ -143,17 +140,6 @@ public class CraftingDeadImmerse {
     LandOwnerTypes.landOwnerTypes.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
-
-    if (ENABLE_SENTRY) {
-      Sentry.init(options -> {
-        options.setDsn(SENTRY_DSN);
-        // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-        // We recommend adjusting this value in production.
-        options.setTracesSampleRate(1.0);
-        // When first trying Sentry it's good to see what the SDK is doing:
-        options.setDebug(true);
-      });
-    }
   }
 
   @Nullable
@@ -193,6 +179,15 @@ public class CraftingDeadImmerse {
   // ================================================================================
 
   private void handleCommonSetup(FMLCommonSetupEvent event) {
+    if (commonConfig.sentryEnabled.get()) {
+      Sentry.init(options -> {
+        options.setDsn(commonConfig.sentryDsn.get());
+        // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+        // We recommend adjusting this value in production.
+        options.setTracesSampleRate(0.5);
+      });
+    }
+
     NetworkChannel.loadChannels();
     GameNetworkChannel.load();
   }
