@@ -1,72 +1,72 @@
 {
-   "type": "craftingdead:gun",
-   "model": "craftingdead:gun/trench_gun",
-   "muzzle_flash_transform": {
-      "translation": [
-         6,
-         -1,
-         -40
-      ],
-      "scale": [
-         1.2,
-         1.2,
-         1.2
-      ]
-   },
-   "aiming_transform": {
-      "translation": [
-         -9.5,
-         1.5,
-         3
-      ]
-   },
-   "hand_transforms": {
-      "held_right_handed": {
-         "right_hand": {
-            "translation": [
-               -0.6,
-               1.75,
-               3.5
-            ]
-         },
-         "left_hand": {
-            "translation": [
-               2.5,
-               -4,
-               -9.5
-            ],
-            "rotation": [
-               0,
-               20,
-               0
-            ],
-            "scale": [
-               1.5,
-               1.5,
-               1.5
-            ]
-         }
-      },
-      "aiming_right_handed": {
-         "left_hand": {
-            "translation": [
-               -15,
-               2,
-               0.25
-            ],
-            "rotation": [
-               0,
-               20,
-               0
-            ]
-         },
-         "right_hand": {
-            "translation": [
-               -15,
-               2,
-               0.25
-            ]
-         }
-      }
-   }
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/trench_gun",
+    "muzzle_flash_transform": {
+        "translation": [
+            6,
+            1,
+            -40
+        ],
+        "scale": [
+            1.2,
+            1.2,
+            1.2
+        ]
+    },
+    "aiming_transform": {
+        "translation": [
+            -8.5,
+            3.75,
+            3
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -0.6,
+                    1.75,
+                    3.5
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    3.5,
+                    -4,
+                    -15
+                ],
+                "rotation": [
+                    0,
+                    25,
+                    0
+                ],
+                "scale": [
+                    1.75,
+                    1.5,
+                    1.5
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    }
 }
