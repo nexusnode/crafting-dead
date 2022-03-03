@@ -241,7 +241,8 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
         this.lastHeldStack.getCapability(Gun.CAPABILITY)
             .ifPresent(gun -> gun.reset(this));
       }
-      if (heldStack.getCapability(Gun.CAPABILITY).isPresent()) {
+      if ((this.lastHeldStack == null || !heldStack.is(this.lastHeldStack.getItem()))
+          && heldStack.getCapability(Gun.CAPABILITY).isPresent()) {
         this.entity.playSound(ModSoundEvents.GUN_EQUIP.get(), 0.25F, 1.0F);
       }
       this.lastHeldStack = heldStack;

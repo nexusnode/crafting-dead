@@ -120,8 +120,8 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
     ItemStack gunStack = this.menu.getGunStack();
     gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
 
-      final int gunSlotX = this.leftPos + 122;
-      final int gunSlotY = this.topPos + 26;
+      final int gunSlotX = this.leftPos + 124;
+      final int gunSlotY = this.topPos + 32;
 
       this.blit(matrixStack, gunSlotX, gunSlotY, 176, 0, 22, 22);
 
@@ -129,7 +129,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
           || Paint.isValid(this.menu.getGunStack(), this.menu.getCarried());
 
       if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
-          || carriedItemAccepted) {
+          || (!this.menu.getCarried().isEmpty() && carriedItemAccepted)) {
         // Green outline
         this.blit(matrixStack, gunSlotX, gunSlotY, 176, 22, 22, 22);
       } else if (!this.menu.getCarried().isEmpty() && !carriedItemAccepted) {

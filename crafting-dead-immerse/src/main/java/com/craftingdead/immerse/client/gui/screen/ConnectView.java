@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
@@ -31,6 +30,7 @@ import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.Util;
@@ -54,7 +54,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ConnectView extends ParentView {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
   private static final ExecutorService executorService = Executors.newSingleThreadExecutor(
       new ThreadFactoryBuilder()
           .setNameFormat("server-connector-%s")

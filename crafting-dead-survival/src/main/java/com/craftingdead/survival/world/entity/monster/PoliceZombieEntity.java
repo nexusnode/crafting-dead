@@ -38,7 +38,7 @@ public class PoliceZombieEntity extends AdvancedZombie {
   }
 
   @Override
-  protected ItemStack getHeldStack() {
+  protected ItemStack createHeldItem() {
     var gunStack = ModItems.G18.get().getDefaultInstance();
     gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.setAmmoProvider(
         new RefillableAmmoProvider(ModItems.G18_MAGAZINE.get().getDefaultInstance(), 0, true)));
@@ -46,7 +46,7 @@ public class PoliceZombieEntity extends AdvancedZombie {
   }
 
   @Override
-  protected ItemStack getClothingStack() {
+  protected ItemStack createClothingItem() {
     return ModItems.POLICE_CLOTHING.get().getDefaultInstance();
   }
 

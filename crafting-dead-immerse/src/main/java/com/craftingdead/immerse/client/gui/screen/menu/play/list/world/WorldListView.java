@@ -60,7 +60,7 @@ public class WorldListView extends ParentView {
     var createButton = Theme.createBlueButton(
         new TranslatableComponent("view.world_list.button.create"),
         () -> this.getScreen()
-            .keepOpenAndSetScreen(CreateWorldScreen.create(this.getScreen())));
+            .keepOpenAndSetScreen(CreateWorldScreen.createFresh(this.getScreen())));
 
     this.editButton = Theme.createBlueButton(
         new TranslatableComponent("view.world_list.button.edit"),
@@ -117,11 +117,12 @@ public class WorldListView extends ParentView {
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
+    var result = super.mouseClicked(mouseX, mouseY, button);
+    // Might have joined a world/server so we are removed
+    if (this.isAdded()) {
+      this.updateSelected();
     }
-    this.updateSelected();
-    return false;
+    return result;
   }
 
   protected void updateSelected() {

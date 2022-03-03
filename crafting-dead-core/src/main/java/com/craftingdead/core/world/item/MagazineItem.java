@@ -59,7 +59,7 @@ public class MagazineItem extends Item {
 
   @Override
   public boolean isValidRepairItem(ItemStack itemStack, ItemStack materialStack) {
-    return Tags.Items.GUNPOWDER.contains(materialStack.getItem())
+    return materialStack.is(Tags.Items.GUNPOWDER)
         || super.isValidRepairItem(itemStack, materialStack);
   }
 

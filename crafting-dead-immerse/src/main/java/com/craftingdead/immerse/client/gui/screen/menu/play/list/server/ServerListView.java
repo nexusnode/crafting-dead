@@ -110,7 +110,10 @@ public class ServerListView extends ParentView {
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     var result = super.mouseClicked(mouseX, mouseY, button);
-    this.updateSelected();
+    // Might have joined a world/server so we are removed
+    if (this.isAdded()) {
+      this.updateSelected();
+    }
     return result;
   }
 

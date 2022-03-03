@@ -40,7 +40,7 @@ public class GiantZombie extends AdvancedZombie {
   }
 
   @Override
-  protected ItemStack getHeldStack() {
+  protected ItemStack createHeldItem() {
     ItemStack gunStack = ModItems.M4A1.get().getDefaultInstance();
     gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.setAmmoProvider(
         new RefillableAmmoProvider(ModItems.RPK_MAGAZINE.get().getDefaultInstance(), 0, true)));
@@ -48,7 +48,7 @@ public class GiantZombie extends AdvancedZombie {
   }
 
   @Override
-  protected ItemStack getClothingStack() {
+  protected ItemStack createClothingItem() {
     return ModItems.ARMY_CLOTHING.get().getDefaultInstance();
   }
 

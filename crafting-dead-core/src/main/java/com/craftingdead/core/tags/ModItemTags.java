@@ -15,20 +15,20 @@
 package com.craftingdead.core.tags;
 
 import com.craftingdead.core.CraftingDead;
-import net.minecraft.world.item.Item;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
 public class ModItemTags {
 
-  public static final IOptionalNamedTag<Item> SYRINGES = tag("syringes");
-  public static final IOptionalNamedTag<Item> CLOTHING = tag("clothing");
-  public static final IOptionalNamedTag<Item> MELEES = tag("melees");
-  public static final IOptionalNamedTag<Item> HATS = tag("hats");
-  public static final IOptionalNamedTag<Item> MAGAZINES = tag("magazines");
+  public static final TagKey<Item> SYRINGES = bind("syringes");
+  public static final TagKey<Item> CLOTHING = bind("clothing");
+  public static final TagKey<Item> MELEES = bind("melees");
+  public static final TagKey<Item> HATS = bind("hats");
+  public static final TagKey<Item> MAGAZINES = bind("magazines");
 
-  private static IOptionalNamedTag<Item> tag(String name) {
-    return ItemTags.createOptional(new ResourceLocation(CraftingDead.ID, name));
+  private static TagKey<Item> bind(String name) {
+    return ItemTags.create(new ResourceLocation(CraftingDead.ID, name));
   }
 }

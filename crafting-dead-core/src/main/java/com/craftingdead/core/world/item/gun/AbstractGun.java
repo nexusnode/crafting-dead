@@ -14,6 +14,20 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -38,25 +52,12 @@ import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
-import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -105,8 +106,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.PacketDistributor.PacketTarget;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
@@ -184,7 +183,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   private boolean initialized;
 
   @Nullable
-  private Skin skin;
+  private Holder<Skin> skin;
   private boolean skinDirty;
 
   @SuppressWarnings("unchecked")
@@ -193,7 +192,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       ItemStack itemStack, Set<FireMode> fireModes) {
     this.itemStack = itemStack;
     this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(fireModes,
-        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get())).iterator();
+        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get()))
+        .iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
     this.client = FMLEnvironment.dist.isClient()
         ? Lazy.concurrentOf(() -> clientFactory.apply((SELF) this))
@@ -482,8 +482,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     if (CraftingDead.serverConfig.damageDropOffEnable.get()) {
       var distance = hitEntity.distanceTo(living.getEntity());
       // Ensure minimum damage
-      var minDamage = Math.min(damage, CraftingDead.serverConfig.damageDropOffMinimumDamage.get().floatValue());
-      damage = Math.max(minDamage, damage - (float)(((CraftingDead.serverConfig.damageDropOffLoss.get() / 100) * this.getRange()) * distance));
+      var minDamage =
+          Math.min(damage, CraftingDead.serverConfig.damageDropOffMinimumDamage.get().floatValue());
+      damage = Math.max(minDamage, damage
+          - (float) (((CraftingDead.serverConfig.damageDropOffLoss.get() / 100) * this.getRange())
+              * distance));
     }
 
     var armorPenetration = Math.min((1.0F
@@ -504,10 +507,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
       headshot = CraftingDead.serverConfig.headshotEnabled.get() &&
           (hitEntity instanceof Player || hitEntity instanceof Zombie
-          || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
-          || hitEntity instanceof EnderMan || hitEntity instanceof Witch
-          || hitEntity instanceof Villager || hitEntity instanceof Vindicator
-          || hitEntity instanceof WanderingTrader) && hitPos.y >= chinHeight;
+              || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
+              || hitEntity instanceof EnderMan || hitEntity instanceof Witch
+              || hitEntity instanceof Villager || hitEntity instanceof Vindicator
+              || hitEntity instanceof WanderingTrader)
+          && hitPos.y >= chinHeight;
       if (headshot) {
         var damagePercentage = 1.0F - hitLiving.getItemHandler()
             .getStackInSlot(ModEquipmentSlot.HAT.getIndex())
@@ -627,17 +631,16 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     this.dataManager.set(PAINT_STACK, paintStack);
     this.setSkin(paintStack.getCapability(Paint.CAPABILITY)
         .map(Paint::getSkin)
-        .map(Skins.REGISTRY::get)
         .orElse(null));
   }
 
   @Override
   public Skin getSkin() {
-    return this.skin;
+    return this.skin == null ? null : this.skin.value();
   }
 
   @Override
-  public void setSkin(Skin skin) {
+  public void setSkin(Holder<Skin> skin) {
     this.skin = skin;
     this.skinDirty = true;
   }
@@ -747,7 +750,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     nbt.put("attachments", attachmentsNbt);
     nbt.put("paintStack", this.getPaintStack().serializeNBT());
     if (this.skin != null) {
-      nbt.put("skin", Skin.CODEC.encodeStart(NbtOps.INSTANCE, () -> this.skin)
+      nbt.put("skin", Skin.CODEC.encodeStart(NbtOps.INSTANCE, this.skin)
           .getOrThrow(false, logger::error));
     }
     return nbt;
@@ -768,9 +771,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         .map(Attachments.REGISTRY.get()::getValue)
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
-    this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, nbt.get("skin")).result()
-        .map(Supplier::get)
-        .orElse(null);
+    this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, nbt.get("skin")).result().orElse(null);
   }
 
   @Override
@@ -802,7 +803,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         out.writeBoolean(true);
       } else {
         out.writeBoolean(false);
-        out.writeWithCodec(Skin.CODEC, () -> this.skin);
+        out.writeWithCodec(Skin.CODEC, this.skin);
       }
     } else {
       out.writeBoolean(false);
@@ -831,7 +832,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       if (in.readBoolean()) {
         this.skin = null;
       } else {
-        this.skin = in.readWithCodec(Skin.CODEC).get();
+        this.skin = in.readWithCodec(Skin.CODEC);
       }
     }
   }

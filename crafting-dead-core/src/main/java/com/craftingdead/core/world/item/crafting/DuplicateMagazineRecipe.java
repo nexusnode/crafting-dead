@@ -38,7 +38,7 @@ public class DuplicateMagazineRecipe extends CustomRecipe {
         case 2:
         case 6:
         case 8:
-          if (!Tags.Items.INGOTS_IRON.contains(inventory.getItem(i).getItem())) {
+          if (!inventory.getItem(i).is(Tags.Items.INGOTS_IRON)) {
             return false;
           }
           break;
@@ -48,7 +48,7 @@ public class DuplicateMagazineRecipe extends CustomRecipe {
           }
           break;
         default:
-          if (!Tags.Items.INGOTS_IRON.contains(inventory.getItem(i).getItem())) {
+          if (!inventory.getItem(i).is(Tags.Items.INGOTS_IRON)) {
             return false;
           }
           break;

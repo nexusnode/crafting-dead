@@ -15,6 +15,7 @@
 package com.craftingdead.core.world.item.gun.skin;
 
 import java.util.OptionalInt;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -26,14 +27,14 @@ public interface Paint {
 
   Capability<Paint> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
-  ResourceKey<Skin> getSkin();
+  Holder<Skin> getSkin();
 
   default OptionalInt getColor() {
     return OptionalInt.empty();
   }
 
   static Paint of(ResourceKey<Skin> skin) {
-    return () -> skin;
+    return () -> Skins.REGISTRY.getOrCreateHolder(skin);
   }
 
   static Paint of(ResourceKey<Skin> skin, int color) {
@@ -49,8 +50,8 @@ public interface Paint {
       }
 
       @Override
-      public ResourceKey<Skin> getSkin() {
-        return skin;
+      public Holder<Skin> getSkin() {
+        return Skins.REGISTRY.getOrCreateHolder(skin);
       }
     };
   }
@@ -62,7 +63,7 @@ public interface Paint {
   static boolean isValid(ResourceLocation gunName, ItemStack itemStack) {
     return itemStack.getCapability(Paint.CAPABILITY)
         .map(Paint::getSkin)
-        .map(Skins.REGISTRY::get)
+        .map(Holder::value)
         .filter(skin -> skin.getAcceptedGuns().contains(gunName))
         .isPresent();
   }

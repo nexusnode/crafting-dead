@@ -31,7 +31,7 @@ public class Skins {
   public static final ResourceKey<Registry<Skin>> SKINS = createRegistryKey("skins");
 
   public static final WritableRegistry<Skin> REGISTRY =
-      new MappedRegistry<>(SKINS, Lifecycle.stable());
+      new MappedRegistry<>(SKINS, Lifecycle.stable(), null);
 
   public static final ResourceKey<Skin> VULCAN =
       ResourceKey.create(SKINS, new ResourceLocation(CraftingDead.ID, "vulcan"));

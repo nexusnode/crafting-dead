@@ -27,6 +27,7 @@ import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachment.MultiplierType;
 import com.craftingdead.core.world.item.gun.skin.Skin;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -146,7 +147,7 @@ public interface Gun extends CombatSlotProvider, Synched {
   @Nullable
   Skin getSkin();
 
-  void setSkin(Skin skin);
+  void setSkin(@Nullable Holder<Skin> skin);
 
   /**
    * Get an optional skin to be used for this gun.

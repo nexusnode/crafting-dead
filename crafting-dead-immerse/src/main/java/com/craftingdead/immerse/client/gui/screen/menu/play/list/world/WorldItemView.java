@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +35,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.AlertScreen;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
@@ -47,14 +45,10 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.DataPackConfig;
-import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -265,32 +259,24 @@ class WorldItemView extends ParentView {
 
     this.minecraft.forceSetScreen(
         new GenericDirtMessageScreen(new TranslatableComponent("selectWorld.data_read")));
-    RegistryAccess.RegistryHolder dynamicRegistries = RegistryAccess.builtin();
 
     try (
-        LevelStorageSource.LevelStorageAccess levelSave =
+        var levelSave =
             this.minecraft.getLevelSource().createAccess(this.worldSummary.getLevelName());
-        Minecraft.ServerStem serverStem = this.minecraft.makeServerStem(dynamicRegistries,
-            Minecraft::loadDataPacks, Minecraft::loadWorldData, false, levelSave);) {
-      LevelSettings levelSettings = serverStem.worldData().getLevelSettings();
-      DataPackConfig dataPackCodec = levelSettings.getDataPackConfig();
-      WorldGenSettings worldGenSettings = serverStem
-          .worldData().worldGenSettings();
-      Path path =
-          CreateWorldScreen.createTempDataPackDirFromExistingWorld(
-              levelSave.getLevelPath(LevelResource.DATAPACK_DIR),
-              this.minecraft);
+        var worldStem = this.minecraft.makeWorldStem(levelSave, false);) {
+      var worldGenSettings = worldStem.worldData().worldGenSettings();
+      var path = CreateWorldScreen.createTempDataPackDirFromExistingWorld(
+          levelSave.getLevelPath(LevelResource.DATAPACK_DIR),
+          this.minecraft);
       if (worldGenSettings.isOldCustomizedWorld()) {
         this.minecraft.setScreen(new ConfirmScreen(confirm -> this.minecraft.setScreen(confirm
-            ? new CreateWorldScreen(screen, levelSettings,
-                worldGenSettings, path, dataPackCodec, dynamicRegistries)
+            ? CreateWorldScreen.createFromExisting(screen, worldStem, path)
             : screen),
             new TranslatableComponent("selectWorld.recreate.customized.title"),
             new TranslatableComponent("selectWorld.recreate.customized.text"),
             CommonComponents.GUI_PROCEED, CommonComponents.GUI_CANCEL));
       } else {
-        this.minecraft.setScreen(new CreateWorldScreen(screen, levelSettings,
-            worldGenSettings, path, dataPackCodec, dynamicRegistries));
+        this.minecraft.setScreen(CreateWorldScreen.createFromExisting(screen, worldStem, path));
       }
     } catch (Exception e) {
       logger.error("Unable to recreate world", e);

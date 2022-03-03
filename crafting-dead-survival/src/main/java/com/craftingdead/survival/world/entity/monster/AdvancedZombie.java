@@ -186,22 +186,22 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   @Override
   protected void populateDefaultEquipmentSlots(DifficultyInstance difficulty) {
     this.entityData.set(TEXTURE_NUMBER, this.random.nextInt(23));
-    this.setItemSlot(EquipmentSlot.MAINHAND, this.getHeldStack());
+    this.setItemSlot(EquipmentSlot.MAINHAND, this.createHeldItem());
     this.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
       living.getItemHandler().setStackInSlot(ModEquipmentSlot.CLOTHING.getIndex(),
-          this.getClothingStack());
+          this.createClothingItem());
       living.getItemHandler().setStackInSlot(ModEquipmentSlot.HAT.getIndex(),
           this.getHatStack());
     });
   }
 
-  protected ItemStack getHeldStack() {
+  protected ItemStack createHeldItem() {
     return this.getRandomItem(item -> item instanceof MeleeWeaponItem, MELEE_CHANCE)
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
-  protected ItemStack getClothingStack() {
+  protected ItemStack createClothingItem() {
     return this.getRandomItem(item -> item instanceof ClothingItem, CLOTHING_CHANCE)
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);

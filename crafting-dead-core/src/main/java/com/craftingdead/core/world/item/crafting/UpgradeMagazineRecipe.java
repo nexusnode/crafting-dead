@@ -52,7 +52,7 @@ public class UpgradeMagazineRecipe extends CustomRecipe {
           }
           break;
         default: // All other slots
-          if (!Tags.Items.NUGGETS_IRON.contains(inventory.getItem(i).getItem())) {
+          if (!inventory.getItem(i).is(Tags.Items.NUGGETS_IRON)) {
             return false;
           }
           break;

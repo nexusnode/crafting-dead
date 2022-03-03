@@ -22,10 +22,10 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.Util;
@@ -53,7 +53,7 @@ public class ServerPinger {
 
   public static final ServerPinger INSTANCE = new ServerPinger();
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static final Executor executor = Executors.newFixedThreadPool(5,
       new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true)

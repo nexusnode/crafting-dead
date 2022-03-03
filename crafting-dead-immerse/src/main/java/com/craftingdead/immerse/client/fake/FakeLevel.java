@@ -20,10 +20,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagContainer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -41,10 +41,11 @@ public class FakeLevel extends ClientLevel {
 
   private static FakeLevel instance;
 
-  private FakeLevel(Minecraft mc) {
-    super(mc.getConnection(), new ClientLevel.ClientLevelData(Difficulty.NORMAL, false, false),
-        OVERWORLD, DimensionType.DEFAULT_OVERWORLD, 0, 0, mc::getProfiler, mc.levelRenderer,
-        false, 0L);
+  private FakeLevel(Minecraft minecraft) {
+    super(minecraft.getConnection(),
+        new ClientLevel.ClientLevelData(Difficulty.NORMAL, false, false),
+        OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD), 0, 0, minecraft::getProfiler,
+        minecraft.levelRenderer, false, 0L);
   }
 
   @Override
@@ -90,11 +91,6 @@ public class FakeLevel extends ClientLevel {
   }
 
   @Override
-  public TagContainer getTagManager() {
-    return null;
-  }
-
-  @Override
   public LevelTickAccess<Block> getBlockTicks() {
     return null;
   }
@@ -114,13 +110,13 @@ public class FakeLevel extends ClientLevel {
   }
 
   @Override
-  public Biome getUncachedNoiseBiome(int x, int y, int z) {
+  public Holder<Biome> getUncachedNoiseBiome(int x, int y, int z) {
     return null;
   }
 
   @Override
   public RegistryAccess registryAccess() {
-    return RegistryAccess.builtin();
+    return RegistryAccess.BUILTIN.get();
   }
 
   @Override

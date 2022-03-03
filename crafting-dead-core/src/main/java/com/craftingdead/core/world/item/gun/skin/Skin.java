@@ -16,11 +16,11 @@ package com.craftingdead.core.world.item.gun.skin;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.RegistryFileCodec;
+import net.minecraft.resources.ResourceLocation;
 
 public class Skin {
 
@@ -35,7 +35,7 @@ public class Skin {
               .forGetter(Skin::getAcceptedGuns))
           .apply(instance, Skin::new));
 
-  public static final Codec<Supplier<Skin>> CODEC =
+  public static final Codec<Holder<Skin>> CODEC =
       RegistryFileCodec.create(Skins.SKINS, DIRECT_CODEC);
 
   private final ResourceLocation name;
