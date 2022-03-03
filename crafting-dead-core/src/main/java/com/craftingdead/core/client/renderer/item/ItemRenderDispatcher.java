@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -58,7 +58,7 @@ public class ItemRenderDispatcher implements ResourceManagerReloadListener {
 
   private static final Gson gson = new Gson();
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private final Minecraft minecraft = Minecraft.getInstance();
 

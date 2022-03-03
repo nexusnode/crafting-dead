@@ -14,8 +14,8 @@
 
 package com.craftingdead.core.client.sounds;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
@@ -25,7 +25,7 @@ import net.minecraft.client.sounds.SoundEngine;
 
 public class EffectsManager {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private boolean initialisied = false;
 

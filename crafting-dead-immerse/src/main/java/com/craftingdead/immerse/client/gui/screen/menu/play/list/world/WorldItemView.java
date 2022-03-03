@@ -23,8 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.ImageView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
@@ -55,7 +55,7 @@ import net.minecraft.world.level.storage.LevelSummary;
 
 class WorldItemView extends ParentView {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
   private static final DateFormat dateFormat = new SimpleDateFormat();
 
   private static final ResourceLocation UNKOWN_SERVER_ICON =

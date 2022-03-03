@@ -21,8 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
@@ -49,7 +49,7 @@ import net.minecraftforge.network.NetworkDirection;
 
 public class LogicalServer extends SavedData {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static final Gson gson = new Gson();
 

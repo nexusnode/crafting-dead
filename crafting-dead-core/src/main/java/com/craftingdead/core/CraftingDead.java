@@ -15,8 +15,7 @@
 package com.craftingdead.core;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.data.ModItemTagsProvider;
@@ -49,6 +48,7 @@ import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.hat.Hat;
 import com.craftingdead.core.world.item.scope.Scope;
+import com.mojang.logging.LogUtils;
 import io.netty.buffer.Unpooled;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.FriendlyByteBuf;
@@ -102,7 +102,7 @@ public class CraftingDead {
   /**
    * Logger.
    */
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   public static final ServerConfig serverConfig;
   public static final ForgeConfigSpec serverConfigSpec;

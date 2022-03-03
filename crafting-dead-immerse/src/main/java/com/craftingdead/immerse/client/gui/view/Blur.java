@@ -15,8 +15,8 @@
 package com.craftingdead.immerse.client.gui.view;
 
 import java.io.IOException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.gson.JsonSyntaxException;
@@ -28,7 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class Blur implements AutoCloseable {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static final ResourceLocation BLUR_SHADER =
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/blur.json");

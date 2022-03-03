@@ -17,8 +17,7 @@ package com.craftingdead.core.mixin;
 import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,6 +26,7 @@ import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.core.network.message.play.SyncGunContainerSlotMessage;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerSynchronizer;
@@ -37,7 +37,7 @@ import net.minecraftforge.network.PacketDistributor;
 @Mixin(AbstractContainerMenu.class)
 public class AbstractContainerMenuMixin {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   @Shadow
   @Nullable
@@ -64,7 +64,7 @@ public class AbstractContainerMenuMixin {
         parentField.setAccessible(true);
         parent = parentField.get(this.synchronizer);
       } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
-        logger.fatal("Failed to reflect", e);
+        logger.error("Failed to reflect", e);
         return ItemStack.matches(currentStack, lastStack);
       }
 

@@ -23,8 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.CRC32;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.Platform;
 import net.minecraft.CrashReport;
@@ -37,7 +37,7 @@ import net.minecraft.ReportedException;
  */
 public class LwjglNativeUtil {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static Path nativesDir;
 

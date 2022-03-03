@@ -22,18 +22,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleProperty;
 import com.craftingdead.immerse.util.NumberedLineIterator;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
 public class StylesheetParser {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static final String IMPORT = "@import";
 
@@ -89,7 +89,7 @@ public class StylesheetParser {
             list.addRule(selector, rules);
           }
         } else {
-          logger.fatal("Expected { at line " + iterator.getLineNumber());
+          logger.error("Expected { at line " + iterator.getLineNumber());
         }
       }
 
@@ -110,7 +110,7 @@ public class StylesheetParser {
     var elements = new ArrayList<StyleProperty>();
     while (!StringUtils.contains(currentLine, "}")) {
       if (StringUtils.contains(currentLine, "{")) {
-        logger.fatal(
+        logger.error(
             "Found opening bracket at line " + content.getLineNumber() + " while inside a block");
         return Collections.emptyList();
       }

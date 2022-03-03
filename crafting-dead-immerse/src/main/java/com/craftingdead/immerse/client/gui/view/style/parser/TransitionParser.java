@@ -17,8 +17,8 @@ package com.craftingdead.immerse.client.gui.view.style.parser;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Interpolator;
 import com.craftingdead.immerse.client.gui.view.style.StyleTransition;
 import com.craftingdead.immerse.client.gui.view.style.adapter.InterpolatorTranslator;
@@ -28,7 +28,7 @@ import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
 
 public class TransitionParser {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private final StyleValidator<Interpolator> interpolatorValidator;
   private final StyleDecoder<Interpolator> interpolatorDecoder;

@@ -19,8 +19,8 @@ import java.nio.file.Path;
 import java.util.SortedSet;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
@@ -33,7 +33,7 @@ import net.minecraft.world.level.chunk.storage.IOWorker;
 
 public class PersistedLandManager extends BaseLandManager {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private final IOWorker worker;
   private final SortedSet<ChunkPos> dirtyChunks = new ObjectLinkedOpenHashSet<>();

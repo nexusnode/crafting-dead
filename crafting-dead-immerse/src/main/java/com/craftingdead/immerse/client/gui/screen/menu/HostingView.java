@@ -25,8 +25,8 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 //import java.nio.file.StandardOpenOption;
 //import java.util.Collection;
 //import java.util.stream.Collectors;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
+//import com.mojang.logging.LogUtils;
+//import org.slf4j.Logger;
 //import com.craftingdead.immerse.CraftingDeadImmerse;
 //import com.craftingdead.immerse.client.gui.view.Color;
 //import com.craftingdead.immerse.client.gui.view.ImageView;
@@ -61,7 +61,7 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 //
 //public class HostingView extends ParentView {
 //
-//  private static final Logger logger = LogManager.getLogger();
+//  private static final Logger logger = LogUtils.getLogger();
 //
 //  private static final Gson gson = new GsonBuilder()
 //      .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())

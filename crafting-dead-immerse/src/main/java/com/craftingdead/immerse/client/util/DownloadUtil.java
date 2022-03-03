@@ -18,8 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -31,7 +31,7 @@ import net.minecraft.Util;
 
 public class DownloadUtil {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static final String USER_AGENT =
       "Minecraft Java/" + SharedConstants.getCurrentVersion().getName();

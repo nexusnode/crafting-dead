@@ -17,8 +17,8 @@ package com.craftingdead.immerse.game.network;
 import java.io.IOException;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameWrapper;
 import com.craftingdead.immerse.game.module.ModuleType;
@@ -45,7 +45,7 @@ public class GameNetworkChannel {
           () -> CraftingDeadImmerse.VERSION, CraftingDeadImmerse.VERSION::equals,
           CraftingDeadImmerse.VERSION::equals);
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static boolean loaded = false;
 

@@ -14,8 +14,8 @@
 
 package com.craftingdead.immerse.client.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -24,23 +24,22 @@ public class LoggingErrorHandler implements ErrorHandler {
 
   public static final LoggingErrorHandler INSTANCE = new LoggingErrorHandler();
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private LoggingErrorHandler() {}
 
   @Override
   public void warning(SAXParseException exception) throws SAXException {
-    logger.warn(exception);
+    logger.warn("[SAX Parser Warning] ", exception);
   }
 
   @Override
   public void error(SAXParseException exception) throws SAXException {
-    logger.error(exception);
-
+    logger.error("[SAX Parser Error] ", exception);
   }
 
   @Override
   public void fatalError(SAXParseException exception) throws SAXException {
-    logger.fatal(exception);
+    logger.error("[SAX Parser Fatal Error] ", exception);
   }
 }

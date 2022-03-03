@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -109,7 +109,7 @@ import net.minecraftforge.network.PacketDistributor.PacketTarget;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   /**
    * The constant difference between server and client entity positions.

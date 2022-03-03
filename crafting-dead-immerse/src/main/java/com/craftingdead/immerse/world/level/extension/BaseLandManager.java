@@ -27,8 +27,8 @@ import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.RegisterLandOwnerMessage;
 import com.craftingdead.immerse.network.play.RemoveLandOwnerMessage;
@@ -58,7 +58,7 @@ public class BaseLandManager implements LandManager {
 
   private static final int SYNC_AREA_THRESHOLD = 1000;
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   protected final Level level;
 

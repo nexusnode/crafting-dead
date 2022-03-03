@@ -24,8 +24,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.style.parser.StylesheetParser;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
@@ -33,6 +32,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -42,7 +42,7 @@ public class StylesheetManager implements ResourceManagerReloadListener {
   private static final ResourceLocation USER_AGENT =
       new ResourceLocation(CraftingDeadImmerse.ID, "css/user-agent.css");
 
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger logger = LogUtils.getLogger();
 
   private static StylesheetManager instance;
 
@@ -110,7 +110,7 @@ public class StylesheetManager implements ResourceManagerReloadListener {
       try {
         list.merge(this.getStyleList(styleSheet));
       } catch (ExecutionException e) {
-        logger.fatal("Error loading stylesheet {} {}", styleSheet, e);
+        logger.error("Error loading stylesheet {} {}", styleSheet, e);
       }
     }
     return list;
