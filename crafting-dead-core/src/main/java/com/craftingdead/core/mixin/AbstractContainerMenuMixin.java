@@ -30,6 +30,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.PacketDistributor;
 
 //TODO - temp until https://github.com/MinecraftForge/MinecraftForge/pull/8224 gets merged
@@ -42,6 +44,7 @@ public class AbstractContainerMenuMixin {
   @Nullable
   private ContainerSynchronizer synchronizer;
 
+  @SuppressWarnings("unchecked")
   @Redirect(at = @At(value = "INVOKE",
       target = "Lnet/minecraft/world/item/ItemStack;matches(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"),
       method = "synchronizeSlotToRemote")
@@ -56,10 +59,11 @@ public class AbstractContainerMenuMixin {
     if (clazz.isAnonymousClass() && clazz.getEnclosingClass() == ServerPlayer.class) {
       Object parent;
       try {
-        final var parentField = this.synchronizer.getClass().getDeclaredField("this$0");
-        parentField.setAccessible(true);
-        parent = parentField.get(this.synchronizer);
-      } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+        // this$0
+        parent = ObfuscationReflectionHelper.getPrivateValue(
+            (Class<ContainerSynchronizer>) this.synchronizer.getClass(), this.synchronizer,
+            "f_143433_");
+      } catch (ObfuscationReflectionHelper.UnableToAccessFieldException e) {
         logger.error("Failed to reflect", e);
         return ItemStack.matches(lastStack, currentStack);
       }
