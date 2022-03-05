@@ -90,9 +90,9 @@ public abstract class ItemAction implements Action {
   }
 
   protected boolean shouldConsumeItem(LivingExtension<?, ?> performer) {
-    return this.getType().shouldConsumeItemInCreative()
-        && !(performer.getEntity() instanceof Player player && player.isCreative())
-        && this.getType().shouldConsumeItem();
+    return this.getType().shouldConsumeItem() &&
+        !(performer.getEntity() instanceof Player player && player.isCreative())
+        || this.getType().shouldConsumeItemInCreative();
   }
 
   protected Optional<Item> getResultItem(LivingExtension<?, ?> performer) {
