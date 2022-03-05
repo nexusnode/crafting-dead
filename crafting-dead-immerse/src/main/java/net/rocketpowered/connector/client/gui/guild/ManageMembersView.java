@@ -182,7 +182,7 @@ public class ManageMembersView extends ParentView {
   }
 
   private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
-    if (member.user().equals(gateway.getUser())) {
+    if (member.user().equals(gateway.user())) {
       this.updateSelfMember(member);
     }
     var view = this.memberViews.computeIfAbsent(member.user().id(),

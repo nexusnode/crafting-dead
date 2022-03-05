@@ -206,7 +206,7 @@ public class YourGuildView extends ParentView {
       controlsView.forceAddChild(this.renameButton);
     }
 
-    if (this.guild.isOwner(gateway.getUser())) {
+    if (this.guild.isOwner(gateway.user())) {
       controlsView.forceAddChild(this.transferButton);
       controlsView.forceAddChild(this.deleteButton);
     } else {
@@ -217,7 +217,7 @@ public class YourGuildView extends ParentView {
   }
 
   private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
-    if (member.user().equals(gateway.getUser())) {
+    if (member.user().equals(gateway.user())) {
       this.selfMember = member;
       this.updateInformation(gateway);
     }
