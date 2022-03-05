@@ -14,7 +14,6 @@
 
 package com.craftingdead.core.mixin;
 
-import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
@@ -50,14 +49,11 @@ public class AbstractContainerMenuMixin {
       ItemStack __, Supplier<ItemStack> coppiedStack) {
 
     if (this.synchronizer == null) {
-      return ItemStack.matches(currentStack, lastStack);
+      return ItemStack.matches(lastStack, currentStack);
     }
 
     var clazz = this.synchronizer.getClass();
-
-    if (clazz.isAnonymousClass()
-        && clazz.getEnclosingClass() == ServerPlayer.class
-        && Modifier.isStatic(clazz.getModifiers())) {
+    if (clazz.isAnonymousClass() && clazz.getEnclosingClass() == ServerPlayer.class) {
       Object parent;
       try {
         final var parentField = this.synchronizer.getClass().getDeclaredField("this$0");
@@ -65,21 +61,21 @@ public class AbstractContainerMenuMixin {
         parent = parentField.get(this.synchronizer);
       } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
         logger.error("Failed to reflect", e);
-        return ItemStack.matches(currentStack, lastStack);
+        return ItemStack.matches(lastStack, currentStack);
       }
 
-      if (parent instanceof ServerPlayer playerEntity) {
-        var container = (AbstractContainerMenu) (Object) this;
-
+      if (parent instanceof ServerPlayer player) {
         if (!currentStack.equals(lastStack, true)) {
           return false;
         }
 
+        var container = (AbstractContainerMenu) (Object) this;
+
         currentStack.getCapability(Gun.CAPABILITY)
             .filter(Synched::requiresSync)
             .ifPresent(gun -> {
-              if (container == playerEntity.inventoryMenu) {
-                for (ItemStack equipmentStack : playerEntity.getAllSlots()) {
+              if (container == player.inventoryMenu) {
+                for (ItemStack equipmentStack : player.getAllSlots()) {
                   // If the item is equipment we don't need to sync it as Minecraft does
                   // that in a separate method (and if we sync it twice the capability wont think
                   // it's dirty anymore on the second call).
@@ -89,12 +85,13 @@ public class AbstractContainerMenuMixin {
                 }
               }
               NetworkChannel.PLAY.getSimpleChannel().send(
-                  PacketDistributor.PLAYER.with(() -> playerEntity),
+                  PacketDistributor.PLAYER.with(() -> player),
                   new SyncGunContainerSlotMessage(
-                      playerEntity.getId(), slotIndex, gun, false));
+                      player.getId(), slotIndex, gun, false));
             });
+        return true;
       }
     }
-    return true;
+    return ItemStack.matches(lastStack, currentStack);
   }
 }

@@ -66,7 +66,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
           this.magazineLocation.itemHandler.extractItem(this.magazineLocation.slot, 1, false);
     }
 
-    return true;
+    return super.start(simulate);
   }
 
   @Override
