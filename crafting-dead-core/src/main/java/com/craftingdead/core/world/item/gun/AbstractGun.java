@@ -17,6 +17,8 @@ package com.craftingdead.core.world.item.gun;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -26,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
@@ -56,6 +57,7 @@ import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -88,6 +90,7 @@ import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.CampfireBlock;
@@ -105,16 +108,10 @@ import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
   private static final Logger logger = LogUtils.getLogger();
-
-  /**
-   * The constant difference between server and client entity positions.
-   */
-  private static final int BASE_SNAPSHOT_TICK_OFFSET = 3;
 
   public static final byte HIT_VALIDATION_DELAY_TICKS = 3;
 
@@ -295,7 +292,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   @Override
   public void validatePendingHit(PlayerExtension<ServerPlayer> player,
       LivingExtension<?, ?> hitLiving, PendingHit pendingHit) {
-    final byte tickOffset = pendingHit.getTickOffset();
+    final byte tickOffset = pendingHit.tickOffset();
+
     if (tickOffset > HIT_VALIDATION_DELAY_TICKS) {
       logger.warn("Bad living hit packet received, tick offset is too big!");
       return;
@@ -311,30 +309,25 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     EntitySnapshot playerSnapshot;
     try {
       playerSnapshot = player.getSnapshot(tick - latencyTicks)
-          .combineUntrustedSnapshot(pendingHit.getPlayerSnapshot());
+          .combineUntrustedSnapshot(pendingHit.playerSnapshot());
     } catch (IndexOutOfBoundsException e) {
       return;
     }
 
     EntitySnapshot hitSnapshot;
     try {
-      hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks - BASE_SNAPSHOT_TICK_OFFSET)
-          .combineUntrustedSnapshot(pendingHit.getHitSnapshot());
+      hitSnapshot = hitLiving.getSnapshot(tick - latencyTicks)
+          .combineUntrustedSnapshot(pendingHit.hitSnapshot());
     } catch (IndexOutOfBoundsException e) {
       return;
     }
 
-    if (!hitLiving.getEntity().isDeadOrDying()) {
+    if (hitLiving.getEntity().isAlive()) {
       var random = player.getRandom();
-      random.setSeed(pendingHit.getRandomSeed());
-      hitSnapshot
-          .rayTrace(player.getLevel(),
-              playerSnapshot,
-              this.getRange(),
-              this.getAccuracy(player, random),
-              this.getShotCount(),
-              random)
-          .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
+      random.setSeed(pendingHit.randomSeed());
+      rayTrace(player.getLevel(), playerSnapshot, hitSnapshot, this.getRange(),
+          this.getAccuracy(player, random), pendingHit.shotCount(), random)
+              .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
     }
   }
 
@@ -426,44 +419,40 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
-      HitResult rayTraceResult = RayTraceUtil
-          .rayTrace(entity,
-              this.getRange(),
-              this.getAccuracy(living, random),
-              this.getShotCount(),
-              random)
-          .orElse(null);
+      var partialTick = level.isClientSide() ? this.getClient().getPartialTick() : 1.0F;
+      var hitResult = rayTrace(entity, this.getRange(), partialTick,
+          this.getAccuracy(living, random), this.getShotCount(), random).orElse(null);
 
-      if (rayTraceResult != null) {
-        switch (rayTraceResult.getType()) {
+      if (hitResult != null) {
+        switch (hitResult.getType()) {
           case BLOCK:
-            final BlockHitResult blockRayTraceResult = (BlockHitResult) rayTraceResult;
-            BlockState blockState = level.getBlockState(blockRayTraceResult.getBlockPos());
-            this.hitBlock(living, (BlockHitResult) rayTraceResult, blockState,
+            var blockHitResult = (BlockHitResult) hitResult;
+            var blockState = level.getBlockState(blockHitResult.getBlockPos());
+            this.hitBlock(living, blockHitResult, blockState,
                 level.isClientSide() && (i == 0 || !blocksHit.contains(blockState)));
             blocksHit.add(blockState);
             break;
           case ENTITY:
-            EntityHitResult entityRayTraceResult = (EntityHitResult) rayTraceResult;
-            if (!entityRayTraceResult.getEntity().isAlive()) {
+            var entityHitResult = (EntityHitResult) hitResult;
+            if (!entityHitResult.getEntity().isAlive()) {
               break;
             }
 
             // Handled by validatePendingHit
-            if (entityRayTraceResult.getEntity() instanceof ServerPlayer
+            if (entityHitResult.getEntity() instanceof LivingEntity
                 && entity instanceof ServerPlayer) {
               break;
             }
 
             if (level.isClientSide()) {
               this.getClient().handleHitEntityPre(living,
-                  entityRayTraceResult.getEntity(),
-                  entityRayTraceResult.getLocation(),
+                  entityHitResult.getEntity(),
+                  entityHitResult.getLocation(),
                   randomSeed);
             }
 
-            this.hitEntity(living, entityRayTraceResult.getEntity(),
-                entityRayTraceResult.getLocation(), !hitEntity && level.isClientSide());
+            this.hitEntity(living, entityHitResult.getEntity(),
+                entityHitResult.getLocation(), !hitEntity && level.isClientSide());
             hitEntity = true;
             break;
           default:
@@ -657,14 +646,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     this.fireMode = fireMode;
 
     living.getEntity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
-    if (living.getEntity() instanceof Player) {
-      ((Player) living.getEntity())
-          .displayClientMessage(new TranslatableComponent("message.switch_fire_mode",
-              new TranslatableComponent(this.fireMode.getTranslationKey())), true);
+    if (living.getEntity() instanceof Player player) {
+      player.displayClientMessage(new TranslatableComponent("message.switch_fire_mode",
+          new TranslatableComponent(this.fireMode.getTranslationKey())), true);
     }
 
     if (sendUpdate) {
-      PacketTarget target = living.getLevel().isClientSide()
+      var target = living.getLevel().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
       NetworkChannel.PLAY
@@ -851,9 +839,50 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, magazineStack)
             / (float) Enchantments.POWER_ARROWS.getMaxLevel();
     if (explosionSize > 0) {
-      entity.level.explode(
+      entity.getLevel().explode(
           entity, position.x(), position.y(), position.z(), explosionSize,
           Explosion.BlockInteraction.NONE);
     }
+  }
+
+  public static Optional<? extends HitResult> rayTrace(Entity fromEntity,
+      double distance, float partialTick, float accuracy, int shotCount, Random random) {
+    return RayTraceUtil.rayTrace(fromEntity, distance, partialTick,
+        getAccuracyOffset(accuracy, shotCount, random),
+        getAccuracyOffset(accuracy, shotCount, random));
+  }
+
+  public static Optional<Vec3> rayTrace(Level level, EntitySnapshot fromSnapshot,
+      EntitySnapshot targetSnapshot, double distance, float accuracy,
+      int shotCount, Random random) {
+    if (!fromSnapshot.complete() || !targetSnapshot.complete()) {
+      return Optional.empty();
+    }
+
+    var startPos = fromSnapshot.position().add(0.0D, fromSnapshot.eyeHeight(), 0.0D);
+    var look = RayTraceUtil.calculateViewVector(
+        fromSnapshot.rotation().x + getAccuracyOffset(accuracy, shotCount, random),
+        fromSnapshot.rotation().y + getAccuracyOffset(accuracy, shotCount, random));
+
+    var blockRayTraceResult = RayTraceUtil.rayTraceBlocks(startPos, distance, look, level);
+
+    var scaledLook = look.scale(distance);
+
+    var endPos = blockRayTraceResult
+        .map(HitResult::getLocation)
+        .orElse(startPos.add(scaledLook));
+
+    var potentialHit = targetSnapshot.boundingBox().clip(startPos, endPos);
+    if (targetSnapshot.boundingBox().contains(startPos)) {
+      return Optional.of(potentialHit.orElse(startPos));
+    } else {
+      return potentialHit;
+    }
+  }
+
+  public static float getAccuracyOffset(float accuracy, int shotCount, Random random) {
+    return (1.0F - (accuracy * accuracy)) * (Math.min(20, shotCount + 1) / 2.0F)
+        * ((1.0F - accuracy) * (random.nextInt(9) + 1))
+        * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F);
   }
 }

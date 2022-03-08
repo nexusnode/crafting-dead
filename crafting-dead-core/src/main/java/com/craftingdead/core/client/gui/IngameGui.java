@@ -94,7 +94,7 @@ public class IngameGui {
     this.killFeedMessages.add(killFeedMessage);
   }
 
-  public void displayHitMarker(HitMarker hitMarker) {
+  public void setHitMarker(@Nullable HitMarker hitMarker) {
     this.hitMarker = hitMarker;
   }
 

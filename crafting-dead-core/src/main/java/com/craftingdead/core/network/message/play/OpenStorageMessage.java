@@ -22,10 +22,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 public record OpenStorageMessage(ModEquipmentSlot slot) {
 
-  public OpenStorageMessage(ModEquipmentSlot slot) {
-    this.slot = slot;
-  }
-
   public void encode(FriendlyByteBuf out) {
     out.writeEnum(this.slot);
   }

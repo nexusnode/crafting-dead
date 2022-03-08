@@ -266,7 +266,7 @@ public class ClientDist implements ModDist {
 
   public void handleHit(Vec3 hitPos, boolean dead) {
     clientConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
-        .ifPresent(this.ingameGui::displayHitMarker);
+        .ifPresent(this.ingameGui::setHitMarker);
     if (dead && ClientDist.clientConfig.killSoundEnabled.get()) {
       // Plays a sound that follows the player
       SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(

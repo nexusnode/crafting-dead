@@ -66,13 +66,11 @@ public abstract class ItemAction implements Action {
 
     final var heldStack = this.getItemStack();
 
-    final var consumeItem = this.shouldConsumeItem(this.getPerformer());
     final var resultStack = this.getResultItem(this.getPerformer())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
 
-    if (consumeItem
-        && !(this.getPerformer().getEntity() instanceof Player player && player.isCreative())) {
+    if (this.shouldConsumeItem(this.getPerformer())) {
       heldStack.shrink(1);
     }
 

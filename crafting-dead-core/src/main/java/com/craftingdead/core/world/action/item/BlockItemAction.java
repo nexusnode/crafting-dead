@@ -14,7 +14,6 @@
 
 package com.craftingdead.core.world.action.item;
 
-import com.craftingdead.core.util.RayTraceUtil;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.action.ProgressBar;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -23,6 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class BlockItemAction extends ItemAction {
 
@@ -71,10 +71,8 @@ public class BlockItemAction extends ItemAction {
 
   @Override
   public boolean tick() {
-    var result = RayTraceUtil.pick(this.performer.getEntity()).orElse(null);
-    if (result == null
-        || !result.getBlockPos().equals(this.context.getClickedPos())
-        || !this.blockState.equals(this.performer.getLevel().getBlockState(result.getBlockPos()))) {
+    if (!this.performer.getLevel().isClientSide() && this.performer.getEntity()
+        .distanceToSqr(Vec3.atCenterOf(this.context.getClickedPos())) > 64.0D) {
       this.performer.cancelAction(true);
       return false;
     }

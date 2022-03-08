@@ -22,11 +22,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 public record HitMessage(Vec3 hitPos, boolean dead) {
 
-  public HitMessage(Vec3 hitPos, boolean dead) {
-    this.hitPos = hitPos;
-    this.dead = dead;
-  }
-
   public void encode(FriendlyByteBuf out) {
     out.writeDouble(this.hitPos.x());
     out.writeDouble(this.hitPos.y());

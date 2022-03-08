@@ -80,6 +80,10 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
     this.gun = gun;
   }
 
+  public float getPartialTick() {
+    return this.minecraft.getFrameTime();
+  }
+
   protected abstract Optional<SoundEvent> getSecondaryActionSound();
 
   protected abstract long getSecondaryActionSoundRepeatDelayMs();
@@ -185,8 +189,9 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
         && hitEntity instanceof LivingEntity) {
       this.livingHitValidationBuffer.put(hitEntity.getId(),
           new PendingHit((byte) (AbstractGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
-              new EntitySnapshot(living.getEntity()),
-              new EntitySnapshot(hitEntity), randomSeed));
+              new EntitySnapshot(living.getEntity(), this.minecraft.getFrameTime()),
+              new EntitySnapshot(hitEntity, this.minecraft.getFrameTime()), randomSeed,
+              this.gun.getShotCount()));
     }
   }
 

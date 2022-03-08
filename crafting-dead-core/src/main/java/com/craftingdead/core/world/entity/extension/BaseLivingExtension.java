@@ -263,10 +263,10 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     this.updateClothing();
     this.updateHat();
 
-    if (!this.entity.getCommandSenderWorld().isClientSide()) {
+    if (!this.entity.getLevel().isClientSide()) {
       // This is called at the start of the entity tick so it's equivalent of last tick's position.
       this.snapshots[this.entity.getServer().getTickCount() % 20] =
-          new EntitySnapshot(this.entity);
+          new EntitySnapshot(this.entity, 1.0F);
     }
 
     this.moving = !this.entity.position().equals(this.lastPos);
@@ -429,10 +429,12 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   @Override
   public EntitySnapshot getSnapshot(int tick) {
     final int currentTick = this.entity.getServer().getTickCount();
-    if (tick >= currentTick) {
-      return new EntitySnapshot(this.entity);
+    if (tick == currentTick) {
+      return new EntitySnapshot(this.entity, 1.0F);
     } else if (tick < currentTick - 20) {
       return this.snapshots[0];
+    } else if (tick > currentTick) {
+      throw new IllegalStateException("Tick bigger than current tick");
     }
 
     final int snapshotIndex = tick % 20;

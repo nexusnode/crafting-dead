@@ -82,6 +82,7 @@ public class SurvivalActionTypes {
               .forItem(itemStack -> itemStack.is(SurvivalItems.DIRTY_RAG.get())
                   || itemStack.is(SurvivalItems.BLOODY_RAG.get()))
               .returnItem(SurvivalItems.CLEAN_RAG)
+              .consumeItemInCreative(true)
               .finishSound(SoundEvents.BUCKET_FILL)
               .forBlock(blockState -> blockState.getFluidState().is(Fluids.WATER))
               .build());

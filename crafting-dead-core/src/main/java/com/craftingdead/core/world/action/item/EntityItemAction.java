@@ -116,7 +116,7 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
   public Optional<LivingExtension<?, ?>> getTarget() {
     return this.selectedTarget == this.performer
         ? Optional.empty()
-        : Optional.of(this.selectedTarget);
+        : Optional.ofNullable(this.selectedTarget);
   }
 
   @Override

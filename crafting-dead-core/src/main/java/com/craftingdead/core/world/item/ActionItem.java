@@ -26,7 +26,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 
 public class ActionItem extends Item {
 
@@ -70,9 +72,18 @@ public class ActionItem extends Item {
   }
 
   @Override
-  public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
     if (!player.getLevel().isClientSide()) {
       var performer = PlayerExtension.getOrThrow(player);
+      var hitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
+      if (hitResult.getType() == HitResult.Type.BLOCK
+          && this.getActionType()
+              .createBlockAction(performer, new UseOnContext(player, hand, hitResult))
+              .map(action -> performer.performAction(action, true))
+              .orElse(false)) {
+        return InteractionResultHolder.consume(player.getItemInHand(hand));
+      }
+
       if (this.getActionType().createAction(performer, hand)
           .map(action -> performer.performAction(action, true))
           .orElse(false)) {

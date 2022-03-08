@@ -34,11 +34,12 @@ public record ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hit
     for (var hit : this.hits.entrySet()) {
       out.writeVarInt(hit.getKey());
       out.writeVarInt(hit.getValue().size());
-      for (PendingHit value : hit.getValue()) {
-        out.writeByte(value.getTickOffset());
-        value.getPlayerSnapshot().write(out);
-        value.getHitSnapshot().write(out);
-        out.writeVarLong(value.getRandomSeed());
+      for (var value : hit.getValue()) {
+        out.writeByte(value.tickOffset());
+        value.playerSnapshot().encode(out);
+        value.hitSnapshot().encode(out);
+        out.writeVarLong(value.randomSeed());
+        out.writeVarInt(value.shotCount());
       }
     }
   }
@@ -51,8 +52,8 @@ public record ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hit
       int valueSize = in.readVarInt();
       var value = new ObjectArrayList<PendingHit>();
       for (int j = 0; j < valueSize; j++) {
-        value.add(new PendingHit(in.readByte(), EntitySnapshot.read(in), EntitySnapshot.read(in),
-            in.readVarLong()));
+        value.add(new PendingHit(in.readByte(), EntitySnapshot.decode(in), EntitySnapshot.decode(in),
+            in.readVarLong(), in.readVarInt()));
       }
       hits.put(key, value);
     }
