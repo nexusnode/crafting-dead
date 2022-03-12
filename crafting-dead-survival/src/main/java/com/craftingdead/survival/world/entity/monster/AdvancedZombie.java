@@ -18,26 +18,25 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.item.ClothingItem;
-import com.craftingdead.core.world.item.HatItem;
-import com.craftingdead.core.world.item.MeleeWeaponItem;
-import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -60,7 +59,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraftforge.registries.RegistryObject;
 
 public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
@@ -196,34 +194,30 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   }
 
   protected ItemStack createHeldItem() {
-    return this.getRandomItem(item -> item instanceof MeleeWeaponItem, MELEE_CHANCE)
+    return this.getRandomItem(ModItemTags.MELEES, MELEE_CHANCE)
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack createClothingItem() {
-    return this.getRandomItem(item -> item instanceof ClothingItem, CLOTHING_CHANCE)
+    return this.getRandomItem(ModItemTags.CLOTHING, CLOTHING_CHANCE)
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack getHatStack() {
-    return this.getRandomItem(item -> item instanceof HatItem, HAT_CHANCE)
+    return this.getRandomItem(ModItemTags.HATS, HAT_CHANCE)
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
-  protected Optional<Item> getRandomItem(Predicate<Item> predicate, float probability) {
-    if (this.random.nextFloat() < probability) {
-      var items = ModItems.ITEMS
-          .getEntries()
-          .stream()
-          .map(RegistryObject::get)
-          .filter(predicate)
-          .toList();
-      return Optional.of(items.get(this.random.nextInt(items.size())));
-    }
-    return Optional.empty();
+  @SuppressWarnings("deprecation")
+  protected Optional<Item> getRandomItem(TagKey<Item> tagKey, float probability) {
+    return this.random.nextFloat() < probability
+        ? Registry.ITEM.getTag(tagKey)
+            .flatMap(tag -> tag.getRandomElement(this.random))
+            .map(Holder::value)
+        : Optional.empty();
   }
 
   public int getTextureNumber() {

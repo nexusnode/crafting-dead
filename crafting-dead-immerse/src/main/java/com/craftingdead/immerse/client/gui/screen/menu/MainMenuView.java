@@ -30,9 +30,9 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.item.HatItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayerEntity;
 import com.craftingdead.immerse.client.gui.screen.Theme;
@@ -45,10 +45,13 @@ import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class MainMenuView extends ParentView {
 
@@ -110,15 +113,15 @@ public class MainMenuView extends ParentView {
 
     var fakePlayerEntity = new FakePlayerEntity(this.minecraft.getUser().getGameProfile());
 
-    var hatItems = ForgeRegistries.ITEMS.getValues()
-        .stream()
-        .filter(item -> item instanceof HatItem)
-        .toList();
-    var randomHatItem = hatItems.get(ThreadLocalRandom.current().nextInt(hatItems.size()));
+    @SuppressWarnings("deprecation")
+    var hatItem = Registry.ITEM.getTag(ModItemTags.HATS)
+        .flatMap(tag -> tag.getRandomElement(ThreadLocalRandom.current()))
+        .map(Holder::value)
+        .map(Item::getDefaultInstance)
+        .orElse(ItemStack.EMPTY);
 
     var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
-    livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(),
-        randomHatItem.getDefaultInstance(), false);
+    livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(), hatItem, false);
 
     var entityContainer = new ParentView(new Properties<>().id("entity-container"));
     entityContainer.addChild(new EntityView(new Properties<>(), fakePlayerEntity));
